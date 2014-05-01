@@ -245,7 +245,6 @@
     uint8_t _Dm2En:1 -> Dm2En;
     uint8_t _emph_bd:3 -> emph_bd;
     uint8_t _emph_bc:3 -> emph_bc;
-//    uint8_t _slvdSBit:1 -> slvdSBit;
     uint32_t _z:24;
   }
   uint32_t _reg7 {
