@@ -35,13 +35,6 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *  @defgroup PSXtcInput PSXtcInput package
- *  
- *  @brief Package with the implementation if psana input module for XTC files.
- *  
- */
-
 namespace PSXtcInput {
 
 /**
