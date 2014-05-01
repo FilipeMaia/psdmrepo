@@ -216,7 +216,7 @@
     uint8_t _dummyG:1 -> dummyG;
     uint8_t _dummyGA:1 -> dummyGA;
     uint16_t _dummyUpper12bits:12 -> dummyUpper12bits;
-    uint32_t _z:30;
+    uint32_t _z:28;
   }
   uint32_t _reg3 {
     uint16_t _pulser:10 -> pulser;
