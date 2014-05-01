@@ -31,7 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 import GlobalUtils          as     gu
 from GUILogger              import *
-from GUIRunRange            import *
+from GUIRange               import *
 #from FileNameManager        import fnm
 
 #---------------------
@@ -65,10 +65,10 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.labRuns = QtGui.QLabel('Show runs')
         self.labDets = QtGui.QLabel('  for detectors:')
 
-        self.guirunrange  = GUIRunRange(None,\
-                                        str(self.dark_list_run_min.value()),\
-                                        str(self.dark_list_run_max.value()),\
-                                        txt_from='', txt_to=':')
+        self.guirange  = GUIRange(None,\
+                                  str(self.dark_list_run_min.value()),\
+                                  str(self.dark_list_run_max.value()),\
+                                  txt_from='', txt_to=':')
  
         self.butRuns = QtGui.QPushButton( self.dark_list_show_runs.value() + self.char_expand )
         self.butRuns.setFixedWidth(90)
@@ -83,7 +83,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.labRuns)
         self.hbox.addWidget(self.butRuns)
-        self.hbox.addWidget(self.guirunrange)
+        self.hbox.addWidget(self.guirange)
         self.hbox.addWidget(self.labDets)
         self.hbox.addWidget(self.butDets)
         self.hbox.addWidget(self.butUpdate)
@@ -98,7 +98,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.connect( self.butUpdate,   QtCore.SIGNAL('clicked()'),          self.onButUpdate )
         self.connect( self.cbx_deploy_hotpix, QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
 
-        self.connect( self.guirunrange, QtCore.SIGNAL('update(QString)'), self.updateRunRange )
+        self.connect( self.guirange, QtCore.SIGNAL('update(QString)'), self.updateRunRange )
 
         self.showToolTips()
         self.setStyle()
@@ -144,8 +144,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 
     def setButtonsVisible(self):
         show_run_range = self.dark_list_show_runs.value() == 'in range' # self.list_of_show_runs[0]
-        #self.guirunrange.setFieldsEnable(show_run_range)
-        self.guirunrange.setVisible(show_run_range)
+        #self.guirange.setFieldsEnable(show_run_range)
+        self.guirange.setVisible(show_run_range)
 
         # DO NOT SHOW CHECKBOX!
         self.cbx_deploy_hotpix.  setVisible(False)

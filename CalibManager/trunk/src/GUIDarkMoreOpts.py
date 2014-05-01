@@ -360,7 +360,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             #print arr.shape,'\n', arr.shape
             tit = 'Plot for %s' % os.path.basename(fname)
             
-            cp.plotimgspe = PlotImgSpe(None, ifname=fname, ofname=fnm.path_peds_ave_plot(), title=tit, load_is_visible=True)
+            cp.plotimgspe = PlotImgSpe(None, ifname=fname, ofname=fnm.path_peds_ave_plot(), title=tit, is_expanded=False)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_ave_plot(), title=tit)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_ave_plot())
             #cp.plotimgspe.setParent(self)

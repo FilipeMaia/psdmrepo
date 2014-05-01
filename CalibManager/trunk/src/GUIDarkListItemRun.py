@@ -35,7 +35,7 @@ from BatchJobPedestals      import *
 #from FileDeployer           import *
 import FileDeployer         as     fdmets
 from BatchLogScanParser     import blsp # Just in order to instatiate it
-from GUIRunRange            import *
+from GUIRange               import *
 
 #---------------------
 #  Class definition --
@@ -71,7 +71,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         self.lab_run  = QtGui.QLabel('Run')
 
-        self.guirunrange  = GUIRunRange(None, str_run_number, 'end')
+        self.guirange  = GUIRange(None, str_run_number, 'end')
 
         #self.lab_rnum = QtGui.QPushButton( self.str_run_number )
         self.lab_rnum = QtGui.QLabel( self.str_run_number )
@@ -85,7 +85,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.hbox.addWidget(self.lab_run)
         self.hbox.addWidget(self.lab_rnum)
         #self.hbox.addStretch(1)     
-        self.hbox.addWidget(self.guirunrange)
+        self.hbox.addWidget(self.guirange)
         #self.hbox.addWidget(self.lab_from)
         #self.hbox.addWidget(self.edi_from)
         #self.hbox.addWidget(self.lab_to)
@@ -148,7 +148,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.but_go   .setEnabled(is_enabled)
         self.but_depl .setEnabled(is_enabled)
 
-        self.guirunrange.setFieldsEnable(is_enabled)
+        self.guirange.setFieldsEnable(is_enabled)
 
         #if self.str_run_number == 'None' : ...
 
@@ -281,7 +281,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def strRunRange(self):
-        return self.guirunrange.getRunRange()
+        return self.guirange.getRange()
 
 
 #---------

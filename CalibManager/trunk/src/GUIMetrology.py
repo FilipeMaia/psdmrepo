@@ -44,7 +44,7 @@ from ConfigParametersForApp import cp
 from Logger               import logger
 from FileNameManager      import fnm
 from GUIFileBrowser       import *
-from GUIRunRange          import *
+from GUIRange             import *
 import GlobalUtils        as     gu
 from xlsx_parser          import convert_xlsx_to_text
 from OpticAlignmentCspadV1 import *
@@ -103,7 +103,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butSrc       = QtGui.QPushButton(self.source_name + cp.char_expand )
         self.labSrc       = QtGui.QLabel('for detector')
         self.labScript    = QtGui.QLabel('using script')
-        self.guirunrange  = GUIRunRange()
+        self.guirange     = GUIRange()
 
         self.butViewOffice .setIcon(cp.icon_monitor)
         self.butViewText   .setIcon(cp.icon_monitor)
@@ -130,7 +130,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.grid.addWidget(self.butDeploy,     self.grid_row+4, 0)
         self.grid.addWidget(self.labSrc,        self.grid_row+4, 1)
         self.grid.addWidget(self.butSrc,        self.grid_row+4, 2)
-        self.grid.addWidget(self.guirunrange,   self.grid_row+4, 3, 1, 5)
+        self.grid.addWidget(self.guirange,      self.grid_row+4, 3, 1, 5)
         #self.setLayout(self.grid)
           
         self.vbox = QtGui.QVBoxLayout() 
@@ -583,7 +583,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         dst_calib_dir  = fnm.path_to_calib_dir()
         dst_calib_type = cp.dict_of_det_calib_types[det]
         dst_source     = self.source_name
-        dst_fname      = '%s.data' % cp.guirunrange.getRunRange()
+        dst_fname      = '%s.data' % cp.guirange.getRange()
 
         #print 'dst_calib_dir  ', dst_calib_dir
         #print 'dst_calib_type ', dst_calib_type

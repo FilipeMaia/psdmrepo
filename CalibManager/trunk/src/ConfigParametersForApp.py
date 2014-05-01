@@ -279,6 +279,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dark_list_run_min    = self.declareParameter( name='DARK_LIST_RUN_MIN',   val_def=1,      type='int' )
         self.dark_list_run_max    = self.declareParameter( name='DARK_LIST_RUN_MAX',   val_def=10,     type='int' )
 
+        #PlotImgSpeWidget.py
+        self.plot_intens_min = self.declareParameter( name='PLOT_INTENSITY_MIN',    val_def='', type='str' )
+        self.plot_intens_max = self.declareParameter( name='PLOT_INTENSITY_MAX',    val_def='', type='str' )
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )

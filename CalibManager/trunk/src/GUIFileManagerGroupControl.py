@@ -50,7 +50,7 @@ import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 from FileDeployer           import fd
-from GUIRunRange            import *
+from GUIRange               import *
 
 #---------------------
 #  Class definition --
@@ -82,7 +82,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
         self.setParams()
  
-        self.guirunrange  = GUIRunRange(None, self.str_run_from, self.str_run_to, txt_from='')
+        self.guirange  = GUIRange(None, self.str_run_from, self.str_run_to, txt_from='')
 
         self.but_move   = QtGui.QPushButton('-> Move ->')
         self.but_copy   = QtGui.QPushButton('-> Copy -> ')
@@ -103,7 +103,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.vboxW.addWidget( self.but_move )
         self.vboxW.addWidget( self.but_copy )
         self.vboxW.addWidget( self.lab_from )
-        self.vboxW.addWidget( self.guirunrange )
+        self.vboxW.addWidget( self.guirange )
         self.vboxW.addStretch(1)
         
         self.setLayout(self.vboxW)
@@ -185,7 +185,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.but_move  .setEnabled(is_enable_copy)
         #self.but_copy  .setEnabled(is_enable_copy)
 
-        self.guirunrange.setFieldsEnable(True)
+        self.guirange.setFieldsEnable(True)
         
  
     def setParams(self) :
@@ -198,7 +198,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
     def resetFields(self) :
         self.setParams()
         self.setStyleButtons()
-        self.guirunrange.resetFields()
+        self.guirange.resetFields()
 
 
     def resetFieldsOnDelete(self) :
@@ -298,7 +298,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
     def getRunRange(self) :
         """Interface method returning run range string, for example '123-end' """
-        return self.guirunrange.getRunRange()
+        return self.guirange.getRange()
 
 
     def list_of_group_delete_cmds(self):
@@ -406,7 +406,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
             ifname = fname
             ofname = os.path.join(fnm.path_dir_work(),'image.png')
             tit = 'Plot for %s' % os.path.basename(ifname)            
-            cp.plotimgspe = PlotImgSpe(None, ifname=ifname, ofname=ofname, title=tit, load_is_visible=True)
+            cp.plotimgspe = PlotImgSpe(None, ifname=ifname, ofname=ofname, title=tit, is_expanded=False)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
 

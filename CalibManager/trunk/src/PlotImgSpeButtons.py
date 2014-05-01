@@ -36,6 +36,8 @@ from GUIHelp                import *
 #from GUIELogPostingDialog   import *
 import GlobalUtils          as     gu
 
+from GUIRangeIntensity      import *
+
 from FileNameManager        import fnm
 from ConfigParametersForApp import cp
 
@@ -51,7 +53,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None, load_is_visible=False):
+    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None, is_expanded=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -60,7 +62,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ifname    = ifname
         self.ofname    = ofname
-        self.load_is_visible = load_is_visible
+        self.is_expanded = is_expanded
+        self.guirange  = None
 
         self.widgimage = widgimage
         if widgimage is None :
@@ -77,6 +80,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         if help_msg==None : self.help_msg = self.help_message()
         else              : self.help_msg = help_msg
 
+        self.but_more  = QtGui.QPushButton('&More')
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
         self.but_load  = QtGui.QPushButton('Load')
@@ -104,12 +108,14 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.edi_nbins.setValidator(QtGui.QIntValidator(1,1000,self))
  
         self.but_help .setStyleSheet (cp.styleButtonGood) 
+        self.but_more .setStyleSheet (cp.styleButton) 
         self.but_reset.setStyleSheet (cp.styleButton) 
         self.but_load .setStyleSheet (cp.styleButton) 
         self.but_diff .setStyleSheet (cp.styleButton) 
         self.but_save .setStyleSheet (cp.styleButton) 
         self.but_quit .setStyleSheet (cp.styleButtonBad) 
 
+        self.connect(self.but_more,  QtCore.SIGNAL('clicked()'),          self.on_but_more)
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
         self.connect(self.but_load,  QtCore.SIGNAL('clicked()'),          self.on_but_load)
@@ -123,9 +129,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
 
         #self.setGridLayout()        
-        self.setHBoxLayout()        
+        self.setPanelLayout()        
         self.showToolTips()
-        self.setFixedHeight(50)
+        #self.setFixedHeight(50)
 
 
     def setIcons(self) :
@@ -139,7 +145,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset.setIcon(cp.icon_reset)
 
 
-    def setHBoxLayout(self):
+    def setPanelLayoutV1(self):
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.but_help)
         self.hbox.addWidget(self.tit_nbins)
@@ -155,13 +161,74 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.hbox.addWidget(self.but_save)
         self.hbox.addWidget(self.but_elog)
         self.hbox.addWidget(self.but_quit)
+        self.hbox.addWidget(self.but_more)
         self.setLayout(self.hbox)
+
+        self.setPannel()
+
+
+    def setPanelLayout(self):
+        self.hbox1 = QtGui.QHBoxLayout()
+        self.hbox1.addWidget(self.but_help)
+        self.hbox1.addWidget(self.tit_nbins)
+        self.hbox1.addWidget(self.edi_nbins)
+        self.hbox1.addWidget(self.cbox_grid)
+        self.hbox1.addWidget(self.tit_log)
+        self.hbox1.addWidget(self.cbox_logx)
+        self.hbox1.addWidget(self.cbox_logy)
+        self.hbox1.addWidget(self.but_reset)
+        self.hbox1.addStretch(1)
+        self.hbox1.addWidget(self.but_elog)
+        self.hbox1.addWidget(self.but_quit)
+        self.hbox1.addWidget(self.but_more)
+
+        self.guirange = GUIRangeIntensity(self, None, None, txt_from='Spec range', txt_to=':')
+
+        self.hbox2 = QtGui.QHBoxLayout()
+        self.hbox2.addWidget(self.but_load)
+        self.hbox2.addWidget(self.but_diff)
+        self.hbox2.addWidget(self.guirange)
+        self.hbox2.addStretch(1)
+        self.hbox2.addWidget(self.but_save)
+
+        self.vbox = QtGui.QVBoxLayout()
+        self.vbox.addLayout(self.hbox2)
+        self.vbox.addLayout(self.hbox1)
+        self.vbox.addStretch(1)
+
+        self.setLayout(self.vbox)
+        self.setContentsMargins (QtCore.QMargins(0,-5,0,-5))
+        self.setPannel()
+
+
+    def setZMin(self, zmin=None) :
+        if self.guirange is None : return
+        self.guirange.setParamFrom(zmin)
+
+
+    def setZMax(self, zmin=None) :
+        if self.guirange is None : return
+        self.guirange.setParamTo(zmax)
+
+
+    def setZRange(self, str_from=None, str_to=None) :
+        if self.guirange is None : return
+        self.guirange.setParams(str_from, str_to)
+
+
+    def setPannel(self):
 
         self.but_quit.setVisible(False)
         self.but_elog.setVisible(False)
         #self.but_help.setVisible(False)
-        self.but_load.setVisible(self.load_is_visible)
-        self.but_diff.setVisible(self.load_is_visible)
+        self.but_load.setVisible(self.is_expanded)
+        self.but_diff.setVisible(self.is_expanded)
+        self.but_save.setVisible(self.is_expanded)
+        self.guirange.setVisible(self.is_expanded)
+        
+        height = 78 if self.is_expanded else 40
+        #self.setMinimumHeight(height)
+        self.setFixedHeight(height)
 
 
     def setGridLayout(self):
@@ -178,6 +245,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.but_diff,  0, 9)
         self.grid.addWidget(self.but_save,  0, 10)
         self.grid.addWidget(self.but_quit,  0, 11)
+        self.grid.addWidget(self.but_more,  0, 12)
         self.setLayout(self.grid)
 
 
@@ -207,6 +275,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
+        #print 'PlotImgSpeButtons resizeEvent: %s' % str(self.size())
 
 
     def closeEvent(self, event): # is called for self.close() or when click on "x"
@@ -243,7 +312,18 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.fig.myNBins = int(self.edi_nbins.displayText())
         logger.info('Set for spectrum the number of bins ='+str(self.fig.myNBins), __name__ )
         self.widgimage.processDraw()
+
  
+    def on_but_more(self):
+        logger.debug('on_but_more', __name__ )
+        if self.is_expanded :
+            self.but_more.setText('&More')
+            self.is_expanded = False
+        else :
+            self.but_more.setText('&Less')
+            self.is_expanded = True
+        self.setPannel()
+
 
     def on_but_reset(self):
         logger.debug('on_but_reset', __name__ )
@@ -409,7 +489,7 @@ def main():
 
     app = QtGui.QApplication(sys.argv)
 
-    w = PlotImgSpeButtons(None)
+    w = PlotImgSpeButtons(None, is_expanded=True)
     w.move(QtCore.QPoint(50,50))
     w.show()
 

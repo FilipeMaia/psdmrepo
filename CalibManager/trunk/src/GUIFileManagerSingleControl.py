@@ -50,7 +50,7 @@ import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 from FileDeployer           import fd
-from GUIRunRange            import *
+from GUIRange               import *
 
 #---------------------
 #  Class definition --
@@ -83,7 +83,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.path_fm_selected = ''
         self.setParams()
 
-        self.guirunrange  = GUIRunRange(None, self.str_run_from, self.str_run_to)
+        self.guirange  = GUIRange(None, self.str_run_from, self.str_run_to)
  
         self.lab_src        = QtGui.QLabel('for detector')
         self.lab_type       = QtGui.QLabel('calib type')
@@ -125,7 +125,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.hboxC.addWidget( self.but_src  )
         self.hboxC.addWidget( self.lab_type )
         self.hboxC.addWidget( self.but_type )
-        self.hboxC.addWidget( self.guirunrange )
+        self.hboxC.addWidget( self.guirange )
         self.hboxC.addStretch(1)     
 
 
@@ -246,7 +246,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         if self.calib_type  == 'Select' : self.but_type.setStyleSheet(cp.stylePink)
         else                            : self.but_type.setStyleSheet(cp.styleButton)
 
-        self.guirunrange.setFieldsEnable(True)
+        self.guirange.setFieldsEnable(True)
 
         #self.setButtonDelete()
         #self.setButtonCopy()
@@ -274,7 +274,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.but_src   .setText(self.source_name + self.char_expand )
         self.but_type  .setText(self.calib_type + self.char_expand )
         self.setStyleButtons()
-        self.guirunrange.resetFields()
+        self.guirange.resetFields()
 
 
     def resetFieldsOnDelete(self) :
@@ -374,7 +374,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
     def getRunRange(self) :
         """Interface method returning run range string, for example '123-end' """
-        return self.guirunrange.getRunRange()
+        return self.guirange.getRange()
 
 
     def get_out_path(self):
@@ -490,7 +490,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
             ifname = self.str_path()
             ofname = os.path.join(fnm.path_dir_work(),'image.png')
             tit = 'Plot for %s' % os.path.basename(ifname)            
-            cp.plotimgspe = PlotImgSpe(None, ifname=ifname, ofname=ofname, title=tit, load_is_visible=True)
+            cp.plotimgspe = PlotImgSpe(None, ifname=ifname, ofname=ofname, title=tit, is_expanded=False)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
 

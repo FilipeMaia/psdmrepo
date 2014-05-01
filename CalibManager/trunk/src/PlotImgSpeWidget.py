@@ -51,6 +51,8 @@ from   matplotlib.ticker import MaxNLocator, NullFormatter
 
 from PyQt4 import QtGui, QtCore
 
+from ConfigParametersForApp import cp
+
 #---------------------
 
 def arr_rot_n90(arr, rot_ang_n90=0) :
@@ -134,7 +136,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
     """Plots image and spectrum for 2d numpy array."""
 
     def __init__(self, parent=None, arr=None, rot_ang_n90=0, y_is_flip=False):
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QWidget.__init__(self, None)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
         self.y_is_flip = y_is_flip
         self.rot_ang_n90 = int(rot_ang_n90)
@@ -287,6 +289,14 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
         zmin = self.floatOrNone(zmin)
         zmax = self.floatOrNone(zmax)
+
+        #--------------------------- New option to set persistent zmin, zmax from GUIRangeIntensity
+        par_min = cp.plot_intens_min
+        par_max = cp.plot_intens_max
+
+        zmin = zmin if par_min.value() == par_min.value_def() else float(par_min.value())
+        zmax = zmax if par_max.value() == par_max.value_def() else float(par_max.value())
+        #---------------------------
 
         if zmin==None and zmax==None : self.range_his = None
         else                         : self.range_his = (zmin,zmax)
