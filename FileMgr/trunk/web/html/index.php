@@ -166,9 +166,9 @@ Custom JavaScript
 -->
 <script type="text/javascript" src="js/Menubar.js"></script>
 <script type="text/javascript" src="js/Dialogs.js"></script>
-<script type="text/javascript" src="js/Loader.js"></script>
 <script type="text/javascript" src="js/JSON.js"></script>
-<script type="text/javascript" src="js/Utilities.js"></script>
+<script type="text/javascript" src="../webfwk/js/Loader.js"></script>
+<script type="text/javascript" src="../webfwk/js/Utilities.js"></script>
 
 
 <!--
