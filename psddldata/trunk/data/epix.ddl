@@ -392,7 +392,6 @@
   uint32_t _lastRowExclusions -> lastRowExclusions;
   uint32_t _numberOfAsicsPerRow -> numberOfAsicsPerRow;
   uint32_t _numberOfAsicsPerColumn -> numberOfAsicsPerColumn;
-  // wish I could find the comments from the old ddl, that were apparently thrown away!
   uint32_t _numberOfRowsPerAsic -> numberOfRowsPerAsic;
   uint32_t _numberOfPixelsPerAsicRow -> numberOfPixelsPerAsicRow;
   uint32_t _baseClockFrequency -> baseClockFrequency;
