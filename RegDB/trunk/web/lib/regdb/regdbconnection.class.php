@@ -492,7 +492,7 @@ class RegDBConnection extends DbConnection {
         
             /* Connect to LDAP server
              */
-            $this->ldap_ds = ldap_connect( $this->ldap_host );
+            $this->ldap_ds = ldap_connect( /* $this->ldap_host */ );
             if( !$this->ldap_ds )
                 throw new RegDBException (
                     __METHOD__,
@@ -536,7 +536,7 @@ class RegDBConnection extends DbConnection {
 
         /* Connect to LDAP server
          */
-        $ldap_ds = ldap_connect( $this->ldap_host );
+        $ldap_ds = ldap_connect( /*$this->ldap_host*/ );
         if( !$ldap_ds )
             throw new RegDBException (
                 __METHOD__,
