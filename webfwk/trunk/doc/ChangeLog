@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2014-04-30 Igor Gaponenko
+- moved in javascript libraries from other refactored packages
+
 Tag: V00-00-08
 2014-04-22 Igor Gaponenko
 - added new classes: PropList, CheckTable
