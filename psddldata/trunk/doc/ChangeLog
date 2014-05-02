@@ -11,6 +11,18 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-08
+2014-05-01 Jack
+- epix10k, comments, adjust padding bit lengths
+	
+Tag: V01-00-07
+2014-04-30 Matt
+- epix10k, on behalf of Jack
+	
+Tag: V01-00-06 
+2014-03-10 Tomy
+- Fix typo in pimax
+
 Tag: V01-00-05
 2014-03-06 Matt
 - Adding EBeamV5
