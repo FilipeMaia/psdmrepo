@@ -128,6 +128,156 @@ private:
 };
 
 
+class Asic10kConfigV1 : public Psana::Epix::Asic10kConfigV1 {
+public:
+  typedef Pds::Epix::Asic10kConfigV1 XtcType;
+  typedef Psana::Epix::Asic10kConfigV1 PsanaType;
+  Asic10kConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~Asic10kConfigV1();
+  virtual uint8_t CompTH_DAC() const;
+  virtual uint8_t CompEn_0() const;
+  virtual uint8_t PulserSync() const;
+  virtual uint8_t dummyTest() const;
+  virtual uint8_t dummyMask() const;
+  virtual uint8_t dummyG() const;
+  virtual uint8_t dummyGA() const;
+  virtual uint16_t dummyUpper12bits() const;
+  virtual uint16_t pulser() const;
+  virtual uint8_t pbit() const;
+  virtual uint8_t atest() const;
+  virtual uint8_t test() const;
+  virtual uint8_t sabTest() const;
+  virtual uint8_t hrTest() const;
+  virtual uint8_t pulserR() const;
+  virtual uint8_t digMon1() const;
+  virtual uint8_t digMon2() const;
+  virtual uint8_t pulserDac() const;
+  virtual uint8_t monostPulser() const;
+  virtual uint8_t CompEn_1() const;
+  virtual uint8_t CompEn_2() const;
+  virtual uint8_t Dm1En() const;
+  virtual uint8_t Dm2En() const;
+  virtual uint8_t emph_bd() const;
+  virtual uint8_t emph_bc() const;
+  virtual uint8_t VRefDac() const;
+  virtual uint8_t vrefLow() const;
+  virtual uint8_t TpsTComp() const;
+  virtual uint8_t TpsMux() const;
+  virtual uint8_t RoMonost() const;
+  virtual uint8_t TpsGr() const;
+  virtual uint8_t S2dGr() const;
+  virtual uint8_t PpOcbS2d() const;
+  virtual uint8_t Ocb() const;
+  virtual uint8_t Monost() const;
+  virtual uint8_t FastppEnable() const;
+  virtual uint8_t Preamp() const;
+  virtual uint8_t PixelCb() const;
+  virtual uint8_t Vld1_b() const;
+  virtual uint8_t S2dTComp() const;
+  virtual uint8_t FilterDac() const;
+  virtual uint8_t testVDTransmitter() const;
+  virtual uint8_t TC() const;
+  virtual uint8_t S2d() const;
+  virtual uint8_t S2dDacBias() const;
+  virtual uint8_t TpsTcDac() const;
+  virtual uint8_t TpsDac() const;
+  virtual uint8_t S2dTcDac() const;
+  virtual uint8_t S2dDac() const;
+  virtual uint8_t TestBe() const;
+  virtual uint8_t IsEn() const;
+  virtual uint8_t DelExec() const;
+  virtual uint8_t DelCckReg() const;
+  virtual uint8_t RO_rst_en() const;
+  virtual uint8_t slvdSBit() const;
+  virtual uint8_t FELmode() const;
+  virtual uint8_t CompEnOn() const;
+  virtual uint16_t RowStartAddr() const;
+  virtual uint16_t RowStopAddr() const;
+  virtual uint8_t ColStartAddr() const;
+  virtual uint8_t ColStopAddr() const;
+  virtual uint16_t chipID() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+class Config10KV1 : public Psana::Epix::Config10KV1 {
+public:
+  typedef Pds::Epix::Config10KV1 XtcType;
+  typedef Psana::Epix::Config10KV1 PsanaType;
+  Config10KV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~Config10KV1();
+  virtual uint32_t version() const;
+  virtual uint32_t runTrigDelay() const;
+  virtual uint32_t daqTrigDelay() const;
+  virtual uint32_t dacSetting() const;
+  virtual uint8_t asicGR() const;
+  virtual uint8_t asicAcq() const;
+  virtual uint8_t asicR0() const;
+  virtual uint8_t asicPpmat() const;
+  virtual uint8_t asicPpbe() const;
+  virtual uint8_t asicRoClk() const;
+  virtual uint8_t asicGRControl() const;
+  virtual uint8_t asicAcqControl() const;
+  virtual uint8_t asicR0Control() const;
+  virtual uint8_t asicPpmatControl() const;
+  virtual uint8_t asicPpbeControl() const;
+  virtual uint8_t asicR0ClkControl() const;
+  virtual uint8_t prepulseR0En() const;
+  virtual uint32_t adcStreamMode() const;
+  virtual uint8_t testPatternEnable() const;
+  virtual uint8_t SyncMode() const;
+  virtual uint8_t R0Mode() const;
+  virtual uint32_t DoutPipelineDelay() const;
+  virtual uint32_t acqToAsicR0Delay() const;
+  virtual uint32_t asicR0ToAsicAcq() const;
+  virtual uint32_t asicAcqWidth() const;
+  virtual uint32_t asicAcqLToPPmatL() const;
+  virtual uint32_t asicRoClkHalfT() const;
+  virtual uint32_t adcReadsPerPixel() const;
+  virtual uint32_t adcClkHalfT() const;
+  virtual uint32_t asicR0Width() const;
+  virtual uint32_t adcPipelineDelay() const;
+  virtual uint16_t SyncWidth() const;
+  virtual uint16_t SyncDelay() const;
+  virtual uint32_t prepulseR0Width() const;
+  virtual uint32_t prepulseR0Delay() const;
+  virtual uint32_t digitalCardId0() const;
+  virtual uint32_t digitalCardId1() const;
+  virtual uint32_t analogCardId0() const;
+  virtual uint32_t analogCardId1() const;
+  virtual uint32_t lastRowExclusions() const;
+  virtual uint32_t numberOfAsicsPerRow() const;
+  virtual uint32_t numberOfAsicsPerColumn() const;
+  virtual uint32_t numberOfRowsPerAsic() const;
+  virtual uint32_t numberOfPixelsPerAsicRow() const;
+  virtual uint32_t baseClockFrequency() const;
+  virtual uint32_t asicMask() const;
+  virtual uint8_t scopeEnable() const;
+  virtual uint8_t scopeTrigEdge() const;
+  virtual uint8_t scopeTrigChan() const;
+  virtual uint8_t scopeArmMode() const;
+  virtual uint16_t scopeADCThreshold() const;
+  virtual uint16_t scopeTrigHoldoff() const;
+  virtual uint16_t scopeTrigOffset() const;
+  virtual uint16_t scopeTraceLength() const;
+  virtual uint16_t scopeADCsameplesToSkip() const;
+  virtual uint8_t scopeChanAwaveformSelect() const;
+  virtual uint8_t scopeChanBwaveformSelect() const;
+  virtual const Psana::Epix::Asic10kConfigV1& asics(uint32_t i0) const;
+  virtual ndarray<const uint16_t, 3> asicPixelConfigArray() const;
+  virtual uint32_t numberOfRows() const;
+  virtual uint32_t numberOfColumns() const;
+  virtual uint32_t numberOfAsics() const;
+  virtual std::vector<int> asics_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  std::vector< psddl_pds2psana::Epix::Asic10kConfigV1 > _asics;
+};
+
+
 template <typename Config>
 class ElementV1 : public Psana::Epix::ElementV1 {
 public:
