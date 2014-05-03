@@ -13,6 +13,12 @@ AsicConfigV1::~AsicConfigV1() {}
 ConfigV1::~ConfigV1() {}
 
 
+Asic10kConfigV1::~Asic10kConfigV1() {}
+
+
+Config10KV1::~Config10KV1() {}
+
+
 ElementV1::~ElementV1() {}
 
 } // namespace Epix
