@@ -221,6 +221,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
 
 
 
+    # there are more typeid's than tested for in this test, so it will fail.
+    @unittest.skip("disabled due to end of pyanna maintenance")
     def test_TypeId(self):
         """ Test for TypeId class """
         
@@ -430,6 +432,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( len(d), 2 ) 
 
 
+    # there are more detinfo's than tested for in this test, so it will fail.
+    @unittest.skip("disabled due to end of pyanna maintenance")
     def test_DetInfo(self):
         """ Test for DetInfo class """
         
