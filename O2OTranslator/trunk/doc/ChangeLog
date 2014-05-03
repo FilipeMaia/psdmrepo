@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-30-05
+2014-05-02 David Schneider
+- end maintenance of o2o-translate.
+- o2o-translate will not understand epix 10k.
+
 Tag: V00-30-04
 2014-04-14 David Schneider
 - fix bug with Epix::ElementV1 convert.
