@@ -117,6 +117,10 @@ TypeAliases::TypeAliases() {
   Epix.insert( & typeid(Psana::Epix::ElementV1));
   m_alias2TypesMap["Epix"] = Epix;
 
+  TypeInfoSet Epix10k;
+  Epix10k.insert( & typeid(Psana::Epix::Config10KV1));
+  m_alias2TypesMap["Epix10k"] = Epix10k;
+
   TypeInfoSet EpixSampler;
   EpixSampler.insert( & typeid(Psana::EpixSampler::ConfigV1));
   EpixSampler.insert( & typeid(Psana::EpixSampler::ElementV1));

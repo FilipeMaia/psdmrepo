@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2014-05-02 David
+- update for psddldata V01-00-08, epix 10k
+- trac ticket #295
+
 Tag: V00-01-02
 2014-04-21 David
 - Write both fixed sized ndarrays and vlen ndarrays.
