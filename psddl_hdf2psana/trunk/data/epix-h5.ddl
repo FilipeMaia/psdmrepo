@@ -10,6 +10,13 @@
 {
 }
 
+//------------------ Asic10kConfigV1 ------------------
+@h5schema Asic10kConfigV1
+  [[version(0)]]
+  [[embedded]]
+  [[default]]
+{
+}
 
 //------------------ ElementV1 ------------------
 @h5schema ElementV1

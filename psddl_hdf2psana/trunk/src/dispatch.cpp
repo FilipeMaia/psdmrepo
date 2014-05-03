@@ -383,6 +383,10 @@ try {
     // EpixSampler::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::EpixSampler::make_ConfigV1(schema_version, group, idx), src);
     break;
+  case 2244450246:
+    // Epix::Config10KV1
+    cfgStore.putProxy(psddl_hdf2psana::Epix::make_Config10KV1(schema_version, group, idx), src);
+    break;
   case 2263071815:
     // Bld::BldDataAcqADCV1
     if (boost::shared_ptr<Psana::Acqiris::ConfigV1> cfgPtr = cfgStore.get(src)) {
@@ -438,6 +442,8 @@ try {
   case 2914045208:
     // Epix::ElementV1
     if (boost::shared_ptr<Psana::Epix::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::Epix::Config10KV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
