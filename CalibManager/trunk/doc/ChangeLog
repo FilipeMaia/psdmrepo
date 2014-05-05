@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-43
+2014-05-05 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
 Tag: V00-00-42
 2014-04-30 Mikhail S. Dubrovin	
 - PlotImgSpe* - now use persistent (saved in config pars) range of intensity
