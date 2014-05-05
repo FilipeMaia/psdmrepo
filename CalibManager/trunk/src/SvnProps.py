@@ -4,6 +4,8 @@
 Class SvnProps stores updated by svn properties.
 
 NOTE: To update revision number in this file when revision changes, use command:
+psvn mktxtprop src/SvnProps.py
+or
 svn propset svn:keywords "Revision" src/SvnProps.py
 Also see: ~/.subversion/config
 
@@ -32,8 +34,8 @@ class SvnProps :
         self.revision = "$Revision$"
         self.author   = "$Author$"
         self.id       = "$Id$"
-        self.headurl  = "$HeadURL$"
-        self.header   = "$Header$"
+        self.headurl  = "$HeadURL:$"
+        self.header   = "$Header:$"
         self.datelc   = "$LastChangedDate$"
         self.date     = "$Date$"
 
