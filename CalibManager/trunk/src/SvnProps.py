@@ -12,7 +12,7 @@ Also see: ~/.subversion/config
 This software was developed for the SIT project.
 If you use all or part of it, please give an appropriate acknowledgment.
 
-@version $Id$
+@version $Id: SvnProps.py 8146 2014-05-05 16:33:57Z dubrovin@SLAC.STANFORD.EDU $
 
 @author Mikhai S. Dubrovin
 """
@@ -20,8 +20,8 @@ If you use all or part of it, please give an appropriate acknowledgment.
 #------------------------------
 # Properties substituted by SVN 
 #------------------------------
-# __revision__ = "$Revision$"
-# __author__   = "$Author$"
+# __revision__ = "$Revision: 8146 $"
+# __author__   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
 #------------------------------
 
 import sys
@@ -31,13 +31,13 @@ import sys
 class SvnProps :
     def __init__(self) : 
         self.updated  = "2014-05-05"
-        self.revision = "$Revision$"
-        self.author   = "$Author$"
-        self.id       = "$Id$"
-        self.headurl  = "$HeadURL:$"
+        self.revision = "$Revision: 8146 $"
+        self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
+        self.id       = "$Id: SvnProps.py 8146 2014-05-05 16:33:57Z dubrovin@SLAC.STANFORD.EDU $"
+        self.headurl  = "$HeadURL$"
         self.header   = "$Header:$"
-        self.datelc   = "$LastChangedDate$"
-        self.date     = "$Date$"
+        self.datelc   = "$LastChangedDate: 2014-05-05 09:33:57 -0700 (Mon, 05 May 2014) $"
+        self.date     = "$Date: 2014-05-05 09:33:57 -0700 (Mon, 05 May 2014) $"
 
 #------------------------------
 
