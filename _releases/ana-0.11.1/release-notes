@@ -1,0 +1,5 @@
+- added support for epix10k
+- end of support for new data types in pyana and the old HDF5 translator
+- a minor feature in the CalibManager: persistent intensity range in image viewer
+- minor bug fixes in the Doxygen generated documentation
+
