@@ -11,9 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-23
+2014-05-06 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
 Tag: V00-03-22
 2014-04-18 Mikhail Dubrovin
-- ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files
+- ALL modules: psvn mktxtprop CSPadPixCoords/src/*.py - add properties to files
 - add src/SvnProps.py
 
 Tag: V00-03-21
