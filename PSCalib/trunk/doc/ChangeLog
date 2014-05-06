@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-25
+2014-05-06 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
 Tag: V00-01-24
 2014-04-29 Mikhail Dubrovin
 - ALL modules: edit comments and correct doxy documentation
