@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-13
+2014-05-06 Mikhail S. Dubrovin
+- in GlobalMethods.h - get rid of uint for RHEL6
+
 Tag: V00-05-12
 2014-05-06 Mikhail S. Dubrovin
 - in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__

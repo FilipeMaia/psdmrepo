@@ -137,7 +137,6 @@ private:
     else if (s == typeid(int)     .name()) return INT; 
     else if (s == typeid(int16_t) .name()) return INT16; 
     else if (s == typeid(int32_t) .name()) return INT32; 
-    else if (s == typeid(uint)    .name()) return UINT; 
     else if (s == typeid(uint8_t) .name()) return UINT8; 
     else if (s == typeid(uint16_t).name()) return UINT16; 
     else if (s == typeid(uint32_t).name()) return UINT32; 
@@ -157,7 +156,7 @@ private:
     else if (enum_type == INT     ) return std::string("int");    
     else if (enum_type == INT16   ) return std::string("int16_t");
     else if (enum_type == INT32   ) return std::string("int32_t");
-    else if (enum_type == UINT    ) return std::string("uint");   
+    else if (enum_type == UINT    ) return std::string("unsigned");   
     else if (enum_type == UINT8   ) return std::string("uint8_t");
     else if (enum_type == UINT16  ) return std::string("uint16_t");
     else if (enum_type == UINT32  ) return std::string("uint32_t");
