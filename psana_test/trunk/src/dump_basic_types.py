@@ -10,6 +10,10 @@ psana_test_adler32.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
 
 def doIndent(indent,lvl):
     return ((' '*indent)*lvl)
+
+def char_to_str(v,indent=0, lvl=0):
+    return doIndent(indent,lvl) + str(v)
+
 # decimal for signed inteters
 def int8_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl)+str(v)
