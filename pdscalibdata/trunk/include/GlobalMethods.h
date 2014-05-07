@@ -61,7 +61,7 @@ namespace pdscalibdata {
 
 using namespace std;
  
-enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32, NONIMPL};
 
 const static int UnknownCM = -10000; 
 
@@ -103,7 +103,13 @@ private:
                        const  uint16_t *pixStatus, 
                        unsigned ssize,
                        int stride = 1); // const;
-  
+
+//--------------------
+
+  std::string strTimeStamp(const std::string& format=std::string("%Y-%m-%d %H:%M:%S"));
+
+  std::string strEnvVar(const std::string& str=std::string("LOGNAME"));  
+
 //--------------------
 // For type=T returns the string with symbolic data type and its size, i.e. "d of size 8"
   template <typename T>
@@ -111,6 +117,51 @@ private:
   {
     std::stringstream ss; ss << typeid(T).name() << " of size " << sizeof(T);
     return ss.str();
+  }
+
+//--------------------
+
+// Returns enumerated type for string type name
+  DATA_TYPE enumDataTypeForString(std::string str_type);
+
+//--------------------
+// For type=T returns enumerated data type
+  template <typename T>
+  DATA_TYPE enumDataType()
+  {
+    const char* s = typeid(T).name();
+    if      (s == typeid(float)   .name()) return FLOAT;
+    else if (s == typeid(double)  .name()) return DOUBLE; 
+    else if (s == typeid(short)   .name()) return SHORT; 
+    else if (s == typeid(unsigned).name()) return UNSIGNED; 
+    else if (s == typeid(int)     .name()) return INT; 
+    else if (s == typeid(int16_t) .name()) return INT16; 
+    else if (s == typeid(int32_t) .name()) return INT32; 
+    else if (s == typeid(uint)    .name()) return UINT; 
+    else if (s == typeid(uint8_t) .name()) return UINT8; 
+    else if (s == typeid(uint16_t).name()) return UINT16; 
+    else if (s == typeid(uint32_t).name()) return UINT32; 
+    else return NONIMPL;
+  }
+
+//--------------------
+// For type=T returns string name for data type
+  template <typename T>
+  std::string strDataType()
+  {
+    DATA_TYPE enum_type = enumDataType<T>();
+    if      (enum_type == FLOAT   ) return std::string("float");  
+    else if (enum_type == DOUBLE  ) return std::string("double"); 
+    else if (enum_type == SHORT   ) return std::string("short");  
+    else if (enum_type == UNSIGNED) return std::string("unsigned");
+    else if (enum_type == INT     ) return std::string("int");    
+    else if (enum_type == INT16   ) return std::string("int16_t");
+    else if (enum_type == INT32   ) return std::string("int32_t");
+    else if (enum_type == UINT    ) return std::string("uint");   
+    else if (enum_type == UINT8   ) return std::string("uint8_t");
+    else if (enum_type == UINT16  ) return std::string("uint16_t");
+    else if (enum_type == UINT32  ) return std::string("uint32_t");
+    else return std::string("non-implemented");
   }
 
 //--------------------

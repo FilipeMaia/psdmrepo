@@ -19,6 +19,8 @@
 // C/C++ Headers --
 //-----------------
 #include <cmath> // for sqrt, atan2, etc.
+#include <time.h>
+#include <stdlib.h>     // getenv
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -76,6 +78,26 @@ printSizeOfTypes()
             << "\nsizeof(float   ) = " << sizeof(float   ) << " with typeid(float   ).name(): " << typeid(float   ).name()  
             << "\nsizeof(double  ) = " << sizeof(double  ) << " with typeid(double  ).name(): " << typeid(double  ).name()  
             << "\n\n";
+}
+
+
+//--------------------
+
+DATA_TYPE 
+enumDataTypeForString(std::string str_type)
+{
+    if      (str_type == "float"   ) return FLOAT;   
+    else if (str_type == "double"  ) return DOUBLE;  
+    else if (str_type == "short"   ) return SHORT;   
+    else if (str_type == "unsigned") return UNSIGNED;
+    else if (str_type == "int"     ) return INT;     
+    else if (str_type == "int16_t" ) return INT16;   
+    else if (str_type == "int32_t" ) return INT32;   
+    else if (str_type == "uint"    ) return UINT;    
+    else if (str_type == "uint8_t" ) return UINT8;   
+    else if (str_type == "uint16_t") return UINT16;  
+    else if (str_type == "uint32_t") return UINT32;  
+    else return NONIMPL;
 }
 
 //--------------------
@@ -187,6 +209,26 @@ findCommonMode(const double* pars,
   if (mean > pars[0] or sigma > pars[1]) return float(UnknownCM);
   
   return mean;
+}
+
+//--------------------
+
+std::string strTimeStamp(const std::string& format)
+{
+  time_t  time_sec;
+  time ( &time_sec );
+  struct tm* timeinfo; timeinfo = localtime ( &time_sec );
+  char c_time_buf[32]; strftime(c_time_buf, 32, format.c_str(), timeinfo);
+  return std::string (c_time_buf);
+}
+
+//--------------------
+
+std::string strEnvVar(const std::string& str)
+{
+  char* var; var = getenv (str.c_str());
+  if (var!=NULL) return std::string (var);
+  else           return str + " IS NOT DEFINED!";
 }
 
 //--------------------
