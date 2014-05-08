@@ -50,6 +50,10 @@ using namespace std;
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
+namespace {
+  const char* logger = "PSXtcInput::Index";
+}
+
 namespace PSXtcInput {
 
 // class to take a list of xtc filenames and generate a map
@@ -88,8 +92,8 @@ public:
         if (strfiles.empty()) throw EmptyFileList(ERR_LOC);
         for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
           XtcInput::XtcFileName file(*it);
-          // hack: eliminate ioc-recorder (I think) runs
-          if (file.stream()==80) continue;
+          // hack: eliminate ioc-recorder runs.  right answer is offline event-builder.
+          if (file.stream()>=80) continue;
           files.push_back(file);
         }
       }
@@ -120,7 +124,7 @@ public:
       if (_fd[ifile]==-1) {
         stringstream ss;
         ss << "File " << xtclist[ifile].path().c_str() << " not found";
-        MsgLog("IndexXtcReader", error, ss.str());
+        MsgLog(logger, error, ss.str());
         throw XTCNotFound(ERR_LOC);
       }
     }
@@ -135,7 +139,7 @@ public:
     if (found != offset) {
       stringstream ss;
       ss << "Jump to offset " << offset << " failed";
-      MsgLog("IndexXtcReader", error, ss.str());
+      MsgLog(logger, error, ss.str());
       throw IndexSeekFailed(ERR_LOC);
     }
     Pds::Dgram* dg = (Pds::Dgram*)new char[MaxDgramSize];
@@ -153,7 +157,7 @@ private:
   vector<int> _fd;
 };
 
-// class which is used by IndexData. for each event in the index table,
+// class which is used by IndexBase. for each event in the index table,
 // keeps track of which xtc-file-number contains the associated epics
 // data, as well as the offset to that data (used by "jump").
 
@@ -170,44 +174,72 @@ public:
 // but is also reused for the table of BeginCalibs (hence the template)
 
 template<typename T>
-class IndexData {
+class IndexBase {
 public:
   T entry;
   int file;
-  int64_t calibOffset;
-  enum {MaxEpicsSources=4};
-  // the code would be neater if this was a vector, but I think it would
-  // be less performant as well, hence the hardwired number. - cpo
-  EpicsInfo einfo[MaxEpicsSources];
   void _init() {
     file=-1;
-    calibOffset=-1;
   }
-  IndexData() {}
-  IndexData(uint32_t seconds, uint32_t nanoseconds) {
+  virtual ~IndexBase() {}
+  IndexBase() {}
+  IndexBase(uint32_t seconds, uint32_t nanoseconds) {
     entry.uSeconds=seconds;
     entry.uNanoseconds=nanoseconds;
     _init();
   }
-  bool operator<(const IndexData& other) const {
+  bool operator<(const IndexBase& other) const {
     return entry.time()<other.entry.time();
   }
-  bool operator==(const IndexData& other) const {
+  bool operator==(const IndexBase& other) const {
     return entry.time()==other.entry.time();
   }
-  bool operator!=(const IndexData& other) const {
+  bool operator!=(const IndexBase& other) const {
     return !(*this==other);
   }
 };
 
-template <typename T>
-ostream& operator<<(ostream& os, const IndexData<T>& idx) {
-  os << "time " << std::hex << idx.entry.uSeconds << "/" << idx.entry.uNanoseconds << ", filenum " << idx.file;
+typedef IndexBase<Pds::Index::CalibNode> IndexCalib;
+
+class IndexEvent : public IndexBase<Pds::Index::L1AcceptNode> {
+public:
+  enum {MaxEpicsSources=4};
+  enum {SecondsLimit=5};
+  // the code would be neater if this was a vector, but I think it would
+  // be less performant as well, hence the hardwired number. - cpo
+  EpicsInfo einfo[MaxEpicsSources];
+  virtual ~IndexEvent() {}
+  IndexEvent() {}
+  IndexEvent(uint32_t seconds, uint32_t nanoseconds, uint32_t fiducial) : IndexBase<Pds::Index::L1AcceptNode>(seconds,nanoseconds) {
+    entry.uFiducial=fiducial;
+  }
+  bool operator<(const IndexEvent& other) const {
+    //    return entry.time()<other.entry.time();
+    int64_t t1sec = entry.uSeconds;
+    int64_t t2sec = other.entry.uSeconds;
+    // if the timestamp has changed by "a lot" use that to decide event ordering
+    if (abs(t1sec-t2sec)>SecondsLimit) return t1sec<t2sec;
+    // if the timestamp has changed by "a little" use the fiducial to decide event ordering
+    // shift the 17-bit fiducial value over so we can use signed-arithmetic
+    int32_t f1 = entry.uFiducial<<15;
+    int32_t f2 = other.entry.uFiducial<<15;
+    // do a sanity check: include a factor of 2 "headroom"
+    const int32_t maxdiff = (SecondsLimit*360*2)<<15;
+    if (abs(f2-f1)>maxdiff) MsgLog(logger, error, "fiducial1 " << entry.uFiducial << " fiducial2" << other.entry.uFiducial);
+    return f1<f2;
+  }
+  bool operator==(const IndexEvent& other) const {
+    return entry.time()==other.entry.time() && entry.uFiducial==other.entry.uFiducial;
+  }
+  bool operator!=(const IndexEvent& other) const {
+    return !(*this==other);
+  }
+};
+
+ostream& operator<<(ostream& os, const IndexEvent& idx) {
+  os << "time " << std::hex << idx.entry.uSeconds << "/" << idx.entry.uNanoseconds << " fiducial " << idx.entry.uFiducial << ", filenum " << idx.file;
     return os;
 }
-
-typedef IndexData<Pds::Index::L1AcceptNode> IndexEvent;
-typedef IndexData<Pds::Index::CalibNode>    IndexCalib;
 
 // this is the implementation of the per-run indexing.  shouldn't be too
 // hard to make it work for for per-calibcycle indexing as well.
@@ -255,10 +287,10 @@ private:
     return mask;
   }
 
-  // add a single DAQ index-file to the large IndexData table (either IndexEvent
+  // add a single DAQ index-file to the large IndexBase table (either IndexEvent
   // or IndexCalib)
-  template <typename T>
-  void _store(vector< IndexData<T> >& idx, const vector<T>& add, vector<string>::size_type ifile) {
+  template <typename T1, typename T2>
+  void _store(T1 &idx, const T2 &add, vector<string>::size_type ifile) {
     int numadd = add.size();
     int numtot = idx.size();
     idx.resize(numadd+numtot);
@@ -271,10 +303,10 @@ private:
 
   // create a vector of unique times that the user can use to jump to events
   void _fillTimes() {
-    IndexEvent last(0,0);
+    IndexEvent last(0,0,0);
     for (vector<IndexEvent>::iterator itev = _idx.begin(); itev != _idx.end(); ++ itev) {
       if (*itev!=last) {
-        _times.push_back(itev->entry.time());
+        _times.push_back(psana::EventTime(itev->entry.time(),itev->entry.uFiducial));
         last = *itev;
       }
     }
@@ -304,18 +336,29 @@ private:
     if (dg) _post(dg);
   }
 
-  // send configure from the first file.  this is wrong if we don't
-  // get chunk0 first in the list of files.  we have previously
+  // look for configure in first 2 datagrams from the first file.  this will fail
+  // if we don't get a chunk0 first in the list of files.  we have previously
   // sorted the files in RunMap to ensure this is the case.
   void _configure() {
-    Pds::Dgram* dg = _xtc.jump(0, 0);
-    _beginrunOffset = dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
-    _postOneDg(dg);
+    int64_t offset = 0;
+    for (int i=0; i<2; i++) {
+      Pds::Dgram* dg = _xtc.jump(0, offset);
+      if (dg->seq.service()==Pds::TransitionId::Configure) {
+        _postOneDg(dg);
+        _beginrunOffset = dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
+        return;
+      }
+      offset+=dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
+    }
+    MsgLog(logger, error, "Configure transition not found in first 2 datagrams");
   }
 
   // send beginrun from the first file
   void _beginrun() {
-    _postOneDg(_xtc.jump(0, _beginrunOffset));
+    Pds::Dgram* dg = _xtc.jump(0, _beginrunOffset);
+    if (dg->seq.service()!=Pds::TransitionId::BeginRun)
+      MsgLog(logger, error, "BeginRun transition not found after configure transition");
+    _postOneDg(dg);
   }
 
   // check to see if we need to send a begincalib by looking
@@ -464,14 +507,14 @@ public:
   ~IndexRun() {}
 
   // return vector of times that can be used for the "jump" method.
-  const vector<uint64_t>& times() const {return _times;}
+  const vector<psana::EventTime>& times() const {return _times;}
 
   // jump to an event
   // can't be a const method because it changes the "pieces" object
-  int jump(uint64_t timestamp) {
+  int jump(uint64_t timestamp, uint32_t fiducial) {
     uint32_t seconds= (uint32_t)((timestamp&0xffffffff00000000)>>32);
     uint32_t nanoseconds= (uint32_t)(timestamp&0xffffffff);
-    IndexEvent request(seconds,nanoseconds);
+    IndexEvent request(seconds,nanoseconds,fiducial);
     vector<IndexEvent>::iterator it;
     it = lower_bound(_idx.begin(),_idx.end(),request);
     Pds::Dgram* dg=0;
@@ -493,16 +536,16 @@ public:
   }
 
 private:
-  IndexXtcReader     _xtc;
-  vector<IndexEvent> _idx;
-  vector<Pds::Src>   _epicsSource;
-  vector<IndexCalib> _idxcalib;
-  int64_t            _beginrunOffset;
-  IndexCalib         _lastcalib;
-  vector<EpicsInfo>  _lastEpics;
-  DgramPieces        _pieces;
-  vector<uint64_t>   _times;
-  queue<DgramPieces>& _queue;
+  IndexXtcReader           _xtc;
+  vector<IndexEvent>       _idx;
+  vector<Pds::Src>         _epicsSource;
+  vector<IndexCalib>       _idxcalib;
+  int64_t                  _beginrunOffset;
+  IndexCalib               _lastcalib;
+  vector<EpicsInfo>        _lastEpics;
+  DgramPieces              _pieces;
+  vector<psana::EventTime> _times;
+  queue<DgramPieces>&      _queue;
 };
 
 // above is the "private" implementation (class IndexRun), below this is the
@@ -520,11 +563,11 @@ Index::~Index() {
   delete _rmap;
 }
 
-int Index::jump(uint64_t time) {
-  return _idxrun->jump(time);
+int Index::jump(psana::EventTime time) {
+  return _idxrun->jump(time.time(),time.fiducial());
 }
 
-const vector<uint64_t>& Index::runtimes() {
+const vector<psana::EventTime>& Index::runtimes() {
   return _idxrun->times();
 }
 
@@ -532,7 +575,7 @@ void Index::setrun(int run) {
   if (not _rmap->runFiles.count(run)) {
     stringstream ss;
     ss << "Run " << run << " not found";
-    MsgLog("IndexXtcReader", error, ss.str());
+    MsgLog(logger, error, ss.str());
     throw RunNotInDataset(ERR_LOC);
   }
   delete _idxrun;

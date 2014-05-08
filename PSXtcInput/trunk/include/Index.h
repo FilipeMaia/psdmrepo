@@ -30,9 +30,9 @@ class Index : public psana::Index, public psana::Configurable {
 public:
   Index(const std::string& name, std::queue<DgramPieces>& queue);
   ~Index();
-  int jump(uint64_t time);
+  int jump(psana::EventTime t);
   void setrun(int run);
-  const std::vector<uint64_t>& runtimes();
+  const std::vector<psana::EventTime>& runtimes();
   const std::vector<unsigned>& runs();
 private:
   std::vector<std::string> _fileNames;
