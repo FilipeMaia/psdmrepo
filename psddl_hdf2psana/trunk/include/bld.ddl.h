@@ -687,6 +687,61 @@ void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, con
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+
+namespace ns_BldDataGMDV2_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataGMDV2& psanaobj);
+  ~dataset_data();
+
+  double fMilliJoulesPerPulse;
+  double fMilliJoulesAverage;
+  double fSumAllPeaksFiltBkgd;
+  double fRawAvgBkgd;
+  double fRelativeEnergyPerPulse;
+  double fSumAllPeaksRawBkgd;
+
+
+};
+}
+
+
+class BldDataGMDV2_v0 : public Psana::Bld::BldDataGMDV2 {
+public:
+  typedef Psana::Bld::BldDataGMDV2 PsanaType;
+  BldDataGMDV2_v0() {}
+  BldDataGMDV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  BldDataGMDV2_v0(const boost::shared_ptr<Bld::ns_BldDataGMDV2_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~BldDataGMDV2_v0() {}
+  virtual double milliJoulesPerPulse() const;
+  virtual double milliJoulesAverage() const;
+  virtual double sumAllPeaksFiltBkgd() const;
+  virtual double rawAvgBkgd() const;
+  virtual double relativeEnergyPerPulse() const;
+  virtual double sumAllPeaksRawBkgd() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Bld::ns_BldDataGMDV2_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV2> > make_BldDataGMDV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataGMDV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataGMDV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Bld::BldDataGMDV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAcqADCV1> > make_BldDataAcqADCV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg);
 
 /// Store object as a single instance (scalar dataset) inside specified group.

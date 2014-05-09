@@ -11,8 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-07
+2014-05-08 David Schneider
+- regenerate for psddldata V01-00-09.
+- track ticket 300.
+
 Tag: V00-09-06
-2014-05-10 David Schneider
+2014-05-03 David Schneider
 - regenerate for psddldata V01-00-08.
 - track ticket 295.
 

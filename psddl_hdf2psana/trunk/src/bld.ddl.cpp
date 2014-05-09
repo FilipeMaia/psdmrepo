@@ -1874,6 +1874,159 @@ void store_at(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long ind
   store_BldDataGMDV1(obj, group, index, version, true);
 }
 
+
+hdf5pp::Type ns_BldDataGMDV2_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataGMDV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("fMilliJoulesPerPulse", offsetof(DsType, fMilliJoulesPerPulse), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fMilliJoulesAverage", offsetof(DsType, fMilliJoulesAverage), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fSumAllPeaksFiltBkgd", offsetof(DsType, fSumAllPeaksFiltBkgd), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fRawAvgBkgd", offsetof(DsType, fRawAvgBkgd), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fRelativeEnergyPerPulse", offsetof(DsType, fRelativeEnergyPerPulse), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fSumAllPeaksRawBkgd", offsetof(DsType, fSumAllPeaksRawBkgd), hdf5pp::TypeTraits<double>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataGMDV2_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataGMDV2_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataGMDV2_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataGMDV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("fMilliJoulesPerPulse", offsetof(DsType, fMilliJoulesPerPulse), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fMilliJoulesAverage", offsetof(DsType, fMilliJoulesAverage), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fSumAllPeaksFiltBkgd", offsetof(DsType, fSumAllPeaksFiltBkgd), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fRawAvgBkgd", offsetof(DsType, fRawAvgBkgd), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fRelativeEnergyPerPulse", offsetof(DsType, fRelativeEnergyPerPulse), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fSumAllPeaksRawBkgd", offsetof(DsType, fSumAllPeaksRawBkgd), hdf5pp::TypeTraits<double>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataGMDV2_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataGMDV2_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataGMDV2_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataGMDV2_v0::dataset_data::dataset_data(const Psana::Bld::BldDataGMDV2& psanaobj)
+  : fMilliJoulesPerPulse(psanaobj.milliJoulesPerPulse())
+  , fMilliJoulesAverage(psanaobj.milliJoulesAverage())
+  , fSumAllPeaksFiltBkgd(psanaobj.sumAllPeaksFiltBkgd())
+  , fRawAvgBkgd(psanaobj.rawAvgBkgd())
+  , fRelativeEnergyPerPulse(psanaobj.relativeEnergyPerPulse())
+  , fSumAllPeaksRawBkgd(psanaobj.sumAllPeaksRawBkgd())
+{
+}
+
+ns_BldDataGMDV2_v0::dataset_data::~dataset_data()
+{
+}
+double BldDataGMDV2_v0::milliJoulesPerPulse() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fMilliJoulesPerPulse);
+}
+double BldDataGMDV2_v0::milliJoulesAverage() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fMilliJoulesAverage);
+}
+double BldDataGMDV2_v0::sumAllPeaksFiltBkgd() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fSumAllPeaksFiltBkgd);
+}
+double BldDataGMDV2_v0::rawAvgBkgd() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fRawAvgBkgd);
+}
+double BldDataGMDV2_v0::relativeEnergyPerPulse() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fRelativeEnergyPerPulse);
+}
+double BldDataGMDV2_v0::sumAllPeaksRawBkgd() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->fSumAllPeaksRawBkgd);
+}
+void BldDataGMDV2_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV2_v0::dataset_data>(m_group, "data", m_idx);
+}
+
+void make_datasets_BldDataGMDV2_v0(const Psana::Bld::BldDataGMDV2& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataGMDV2_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_BldDataGMDV2_v0(const Psana::Bld::BldDataGMDV2* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Bld::ns_BldDataGMDV2_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV2> > make_BldDataGMDV2(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV2> >(boost::make_shared<BldDataGMDV2_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV2> >(boost::shared_ptr<Psana::Bld::BldDataGMDV2>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataGMDV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_BldDataGMDV2_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV2", version);
+  }
+}
+
+void store_BldDataGMDV2(const Psana::Bld::BldDataGMDV2* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_BldDataGMDV2_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV2", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataGMDV2& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataGMDV2(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Bld::BldDataGMDV2* obj, hdf5pp::Group group, long index, int version)
+{
+  store_BldDataGMDV2(obj, group, index, version, true);
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAcqADCV1> > make_BldDataAcqADCV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg) {
   switch (version) {
   case 0:

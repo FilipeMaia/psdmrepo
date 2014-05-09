@@ -509,6 +509,10 @@ try {
     // Bld::BldDataGMDV0
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataGMDV0(schema_version, group, idx), src);
     break;
+  case 3122588895:
+    // Bld::BldDataGMDV2
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataGMDV2(schema_version, group, idx), src);
+    break;
   case 3124602907:
     // Bld::BldDataEBeam
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV1(schema_version, group, idx), src);

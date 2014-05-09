@@ -212,6 +212,20 @@
   }
 }
 
+//------------------ BldDataGMDV2 ------------------
+@h5schema BldDataGMDV2
+  [[version(0)]]
+{
+  @dataset data {
+    @attribute fMilliJoulesPerPulse [[method(milliJoulesPerPulse)]];
+    @attribute fMilliJoulesAverage [[method(milliJoulesAverage)]];
+    @attribute fSumAllPeaksFiltBkgd [[method(sumAllPeaksFiltBkgd)]];
+    @attribute fRawAvgBkgd [[method(rawAvgBkgd)]];
+    @attribute fRelativeEnergyPerPulse [[method(relativeEnergyPerPulse)]];
+    @attribute fSumAllPeaksRawBkgd [[method(sumAllPeaksRawBkgd)]];
+  }
+}
+
 
 //------------------ BldDataAcqADCV1 ------------------
 @h5schema BldDataAcqADCV1
