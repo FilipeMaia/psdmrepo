@@ -163,6 +163,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Bld::BldDataFEEGasDetEnergy) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataFEEGasDetEnergy> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataGMDV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV0> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataGMDV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV1> >();
+  m_mainMap[ & typeid(Psana::Bld::BldDataGMDV2) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV2> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataIpimbV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataIpimbV0> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataIpimbV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataIpimbV1> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataPhaseCavity) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataPhaseCavity> >();

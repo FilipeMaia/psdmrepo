@@ -174,6 +174,7 @@ TypeAliases::TypeAliases() {
   TypeInfoSet GMD;
   GMD.insert( & typeid(Psana::Bld::BldDataGMDV0));
   GMD.insert( & typeid(Psana::Bld::BldDataGMDV1));
+  GMD.insert( & typeid(Psana::Bld::BldDataGMDV2));
   m_alias2TypesMap["GMD"] = GMD;
 
   TypeInfoSet Gsc16ai;
