@@ -129,6 +129,24 @@ private:
 };
 
 
+class BldDataGMDV2 : public Psana::Bld::BldDataGMDV2 {
+public:
+  typedef Pds::Bld::BldDataGMDV2 XtcType;
+  typedef Psana::Bld::BldDataGMDV2 PsanaType;
+  BldDataGMDV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataGMDV2();
+  virtual double milliJoulesPerPulse() const;
+  virtual double milliJoulesAverage() const;
+  virtual double sumAllPeaksFiltBkgd() const;
+  virtual double rawAvgBkgd() const;
+  virtual double relativeEnergyPerPulse() const;
+  virtual double sumAllPeaksRawBkgd() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
 template <typename Config>
 class BldDataAcqADCV1 : public Psana::Bld::BldDataAcqADCV1 {
 public:

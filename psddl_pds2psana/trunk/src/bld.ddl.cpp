@@ -242,6 +242,45 @@ double BldDataGMDV1::relativeEnergyPerPulse() const {
   return m_xtcObj->relativeEnergyPerPulse();
 }
 
+BldDataGMDV2::BldDataGMDV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataGMDV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataGMDV2::~BldDataGMDV2()
+{
+}
+
+
+double BldDataGMDV2::milliJoulesPerPulse() const {
+  return m_xtcObj->milliJoulesPerPulse();
+}
+
+
+double BldDataGMDV2::milliJoulesAverage() const {
+  return m_xtcObj->milliJoulesAverage();
+}
+
+
+double BldDataGMDV2::sumAllPeaksFiltBkgd() const {
+  return m_xtcObj->sumAllPeaksFiltBkgd();
+}
+
+
+double BldDataGMDV2::rawAvgBkgd() const {
+  return m_xtcObj->rawAvgBkgd();
+}
+
+
+double BldDataGMDV2::relativeEnergyPerPulse() const {
+  return m_xtcObj->relativeEnergyPerPulse();
+}
+
+
+double BldDataGMDV2::sumAllPeaksRawBkgd() const {
+  return m_xtcObj->sumAllPeaksRawBkgd();
+}
+
 template <typename Config>
 BldDataAcqADCV1<Config>::BldDataAcqADCV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Bld::BldDataAcqADCV1()

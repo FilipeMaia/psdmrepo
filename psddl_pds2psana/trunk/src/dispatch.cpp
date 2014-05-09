@@ -4,6 +4,7 @@
 #include "PSEvt/Exceptions.h"
 #include "psddl_pds2psana/EvtProxy.h"
 #include "psddl_pds2psana/EvtProxyCfg.h"
+
 #include "psddl_pds2psana/dispatch.h"
 #include "psddl_pds2psana/rayonix.ddl.h"
 #include "psddl_pds2psana/fli.ddl.h"
@@ -1103,6 +1104,13 @@ try {
           if (evt) evt->putProxy<Psana::Bld::BldDataGMDV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
+      case 2:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataGMDV2, psddl_pds2psana::Bld::BldDataGMDV2, Pds::Bld::BldDataGMDV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
       case 32768:
         {
           // store proxy
@@ -1115,6 +1123,13 @@ try {
           // store proxy
           typedef EvtProxy<Psana::Bld::BldDataGMDV1, psddl_pds2psana::Bld::BldDataGMDV1, Pds::Bld::BldDataGMDV1> ProxyType;
           if (evt) evt->putProxy<Psana::Bld::BldDataGMDV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32770:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataGMDV2, psddl_pds2psana::Bld::BldDataGMDV2, Pds::Bld::BldDataGMDV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -2513,11 +2528,17 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV2) );
+      break;
     case 32768:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV0) );
       break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV2) );
       break;
     } // end version switch
     break;
@@ -2898,6 +2919,7 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
   }  // typeId.id() switch statement
   return typeIdPtrs;
 }
+
 
 
 } // namespace psddl_pds2psana
