@@ -248,7 +248,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", "PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, \n                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2", no_init)
+  class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", "PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2,\n                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1,"UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds.")
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2,"UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds.")
     .def("charge1", &Psana::Bld::BldDataPhaseCavity::charge1,"UND:R02:IOC:16:BAT:Charge1 value in pico-columbs.")
@@ -261,7 +261,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataIpimbV0, boost::shared_ptr<Psana::Bld::BldDataIpimbV0>, boost::noncopyable >("BldDataIpimbV0", "Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and \n            Lusi.IpmFexV1 objects.", no_init)
+  class_<Psana::Bld::BldDataIpimbV0, boost::shared_ptr<Psana::Bld::BldDataIpimbV0>, boost::noncopyable >("BldDataIpimbV0", "Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and\n            Lusi.IpmFexV1 objects.", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV0::ipimbData, return_internal_reference<1>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV0::ipimbConfig, return_internal_reference<1>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV0::ipmFexData, return_value_policy<copy_const_reference>())
@@ -273,7 +273,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataIpimbV1, boost::shared_ptr<Psana::Bld::BldDataIpimbV1>, boost::noncopyable >("BldDataIpimbV1", "Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and \n            Lusi.IpmFexV1 objects.", no_init)
+  class_<Psana::Bld::BldDataIpimbV1, boost::shared_ptr<Psana::Bld::BldDataIpimbV1>, boost::noncopyable >("BldDataIpimbV1", "Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and\n            Lusi.IpmFexV1 objects.", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV1::ipimbData, return_internal_reference<1>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV1::ipimbConfig, return_internal_reference<1>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV1::ipmFexData, return_value_policy<copy_const_reference>())
@@ -285,7 +285,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataPimV1, boost::shared_ptr<Psana::Bld::BldDataPimV1>, boost::noncopyable >("BldDataPimV1", "Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and \n            Camera.FrameV1 objects.", no_init)
+  class_<Psana::Bld::BldDataPimV1, boost::shared_ptr<Psana::Bld::BldDataPimV1>, boost::noncopyable >("BldDataPimV1", "Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and\n            Camera.FrameV1 objects.", no_init)
     .def("camConfig", &Psana::Bld::BldDataPimV1::camConfig, return_internal_reference<1>())
     .def("pimConfig", &Psana::Bld::BldDataPimV1::pimConfig, return_value_policy<copy_const_reference>())
     .def("frame", &Psana::Bld::BldDataPimV1::frame, return_internal_reference<1>())
@@ -335,7 +335,22 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataAcqADCV1, boost::shared_ptr<Psana::Bld::BldDataAcqADCV1>, boost::noncopyable >("BldDataAcqADCV1", "Combined structure which includes Acqiris.ConfigV1 and \n            Acqiris.DataDescV1 objects.", no_init)
+  class_<Psana::Bld::BldDataGMDV2, boost::shared_ptr<Psana::Bld::BldDataGMDV2>, boost::noncopyable >("BldDataGMDV2", "Gas Monitor Detector data.", no_init)
+    .def("milliJoulesPerPulse", &Psana::Bld::BldDataGMDV2::milliJoulesPerPulse,"Shot to shot pulse energy (mJ)")
+    .def("milliJoulesAverage", &Psana::Bld::BldDataGMDV2::milliJoulesAverage,"Average pulse energy from ION cup current (mJ)")
+    .def("sumAllPeaksFiltBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksFiltBkgd,"Sum of all peaks, normalized w/ filt bkgd level")
+    .def("rawAvgBkgd", &Psana::Bld::BldDataGMDV2::rawAvgBkgd,"Avg background value per waveform in raw A/D counts")
+    .def("relativeEnergyPerPulse", &Psana::Bld::BldDataGMDV2::relativeEnergyPerPulse,"Shot by shot pulse energy in arbitrary units")
+    .def("sumAllPeaksRawBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksRawBkgd,"Sum of all peaks, normalized w/ raw avg bkgd level")
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_GMD);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV2> >(Pds::TypeId::Id_GMD));
+
+  {
+  scope outer = 
+  class_<Psana::Bld::BldDataAcqADCV1, boost::shared_ptr<Psana::Bld::BldDataAcqADCV1>, boost::noncopyable >("BldDataAcqADCV1", "Combined structure which includes Acqiris.ConfigV1 and\n            Acqiris.DataDescV1 objects.", no_init)
     .def("config", &Psana::Bld::BldDataAcqADCV1::config, return_internal_reference<1>())
     .def("data", &Psana::Bld::BldDataAcqADCV1::data, return_internal_reference<1>())
   ;
@@ -362,9 +377,10 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(2);
+    PyObject* unvlist = PyList_New(3);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataGMDV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataGMDV1"));
+    PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataGMDV2"));
     PyObject_SetAttrString(submodule, "BldDataGMD", unvlist);
     Py_CLEAR(unvlist);
   }
