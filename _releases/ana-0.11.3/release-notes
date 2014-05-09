@@ -1,0 +1,4 @@
+- added support for GMD BLD V2
+- bug fix in psana Python wrappers for methods:
+  ControlData.ConfigV1.duration()
+  ControlData.ConfigV2.duration()
