@@ -256,6 +256,9 @@ BldDataGMDV0::~BldDataGMDV0() {}
 BldDataGMDV1::~BldDataGMDV1() {}
 
 
+BldDataGMDV2::~BldDataGMDV2() {}
+
+
 BldDataAcqADCV1::~BldDataAcqADCV1() {}
 
 

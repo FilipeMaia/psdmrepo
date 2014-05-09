@@ -460,7 +460,7 @@ std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV5::DamageMask enva
 
 /** @class BldDataPhaseCavity
 
-  PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
+  PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2,
                 UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
 */
 
@@ -492,7 +492,7 @@ private:
 
 /** @class BldDataIpimbV0
 
-  Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and 
+  Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and
             Lusi.IpmFexV1 objects.
 */
 
@@ -509,7 +509,7 @@ public:
 
 /** @class BldDataIpimbV1
 
-  Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and 
+  Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and
             Lusi.IpmFexV1 objects.
 */
 
@@ -526,7 +526,7 @@ public:
 
 /** @class BldDataPimV1
 
-  Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and 
+  Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and
             Camera.FrameV1 objects.
 */
 
@@ -607,9 +607,34 @@ public:
   virtual double relativeEnergyPerPulse() const = 0;
 };
 
+/** @class BldDataGMDV2
+
+  Gas Monitor Detector data.
+*/
+
+
+class BldDataGMDV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~BldDataGMDV2();
+  /** Shot to shot pulse energy (mJ) */
+  virtual double milliJoulesPerPulse() const = 0;
+  /** Average pulse energy from ION cup current (mJ) */
+  virtual double milliJoulesAverage() const = 0;
+  /** Sum of all peaks, normalized w/ filt bkgd level */
+  virtual double sumAllPeaksFiltBkgd() const = 0;
+  /** Avg background value per waveform in raw A/D counts */
+  virtual double rawAvgBkgd() const = 0;
+  /** Shot by shot pulse energy in arbitrary units */
+  virtual double relativeEnergyPerPulse() const = 0;
+  /** Sum of all peaks, normalized w/ raw avg bkgd level */
+  virtual double sumAllPeaksRawBkgd() const = 0;
+};
+
 /** @class BldDataAcqADCV1
 
-  Combined structure which includes Acqiris.ConfigV1 and 
+  Combined structure which includes Acqiris.ConfigV1 and
             Acqiris.DataDescV1 objects.
 */
 
