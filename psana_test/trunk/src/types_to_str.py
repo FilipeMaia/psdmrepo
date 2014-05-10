@@ -1,7 +1,6 @@
 import ctypes
 import numpy as np
 import sys
-from IPython import embed
 
 dll = ctypes.cdll.LoadLibrary('libpsana_test.so')
 psana_test_adler32 = dll.psana_test_adler32
@@ -11,7 +10,7 @@ psana_test_adler32.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
 def doIndent(indent,lvl):
     return ((' '*indent)*lvl)
 
-def char_to_str(v,indent=0, lvl=0):
+def str_to_str(v,indent=0, lvl=0):
     return doIndent(indent,lvl) + str(v)
 
 # decimal for signed inteters
@@ -23,6 +22,9 @@ def int16_to_str(v, indent=0, lvl=0):
 
 def int32_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl)+str(v)
+
+def enum_to_str(v, indent=0, lvl=0, methodsep=''):
+    return int32_to_str(v,indent,lvl)
 
 def int64_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl)+str(v)
@@ -39,9 +41,6 @@ def uint32_to_str(v, indent=0, lvl=0):
 
 def uint64_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl) + ('0x%16.16x' % v)
-
-def str_to_str(v, indent=0, lvl=0):
-    return doIndent(indent,lvl) + str(v)
 
 def float_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl) + ("%.4e" % v)
@@ -82,29 +81,29 @@ def getTypeFn(dt):
 def ndarray_to_str(a, dim, indent=0, lvl=0):
     assert len(a.shape)==dim
     dimstr = ' x '.join(map(str,a.shape))
-    n = 1
+    numElem = 1
     for dim in a.shape:
-        n *= dim
-    n *= a.dtype.itemsize
+        numElem *= dim
+    outstr = doIndent(indent,lvl)
+    outstr +=  "dim=[ %s ]" % dimstr
+    if numElem == 0:
+        return outstr
+
+    numBytesForCheckSum = numElem * a.dtype.itemsize
     a_flat = a.flatten()
     assert a_flat.flags['C_CONTIGUOUS']
-    if n > 0:
-        adler = psana_test_adler32(a_flat.ctypes.get_as_parameter(),
-                                   ctypes.c_uint64(n))
-    else:
-        adler = 0
-    sys.stdout.flush()
+    assert a_flat.shape[0] == numElem
+    adler = psana_test_adler32(a_flat.ctypes.get_as_parameter(),
+                               ctypes.c_uint64(numBytesForCheckSum))
+    outstr += (" adler32=%s" % uint64_to_str(adler))
     a_flat.sort()
     qinds = getQuantileIndicies(a_flat.shape[0])
-    outstr = doIndent(indent,lvl)
-    outstr += "dim=[ %s ] adler32=0x%16.16x" % (dimstr, adler)
     type2str = getTypeFn(a_flat.dtype)
-    if n > 0:
-        outstr += " min=" + type2str(a_flat[qinds[0] ])
-        outstr += " 25th=" + type2str(a_flat[qinds[1] ])
-        outstr += " median=" + type2str(a_flat[qinds[2] ])
-        outstr += " 75th=" + type2str(a_flat[qinds[3] ])
-        outstr += " max=" + type2str(a_flat[qinds[4] ])
+    outstr += " min=" + type2str(a_flat[qinds[0] ])
+    outstr += " 25th=" + type2str(a_flat[qinds[1] ])
+    outstr += " median=" + type2str(a_flat[qinds[2] ])
+    outstr += " 75th=" + type2str(a_flat[qinds[3] ])
+    outstr += " max=" + type2str(a_flat[qinds[4] ])
     return outstr
 
 def ndarray_float32_1_to_str(a, indent=0, lvl=0):

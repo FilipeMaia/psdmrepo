@@ -4,6456 +4,6453 @@
 
 import psana
 from psana import *
-from  psana_test.dump_basic_types import *
+from  psana_test.types_to_str import *
+import numpy as np
 
-def line_indent(indent, indentLvl):
-    return ' ' * indent * indentLvl    
+def _Src_to_str(obj, indent, lvl, methodSep):
+    return doIndent(indent,lvl) + str(obj)
 
+def Partition_Src_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def Pds_Src_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
+    return Pds_ClockTime_toStr(obj, indent, lvl, methodSep)
+  
 # functions to dump psana objects to a string                    
-def Acqiris_VertV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fullScale: %s' % double_to_str(obj.fullScale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'offset: %s' % double_to_str(obj.offset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coupling: %s' % uint32_to_str(obj.coupling()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'bandwidth: %s' % uint32_to_str(obj.bandwidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'slope: %s' % double_to_str(obj.slope()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_VertV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fullScale: %s' % double_to_str( obj.fullScale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offset: %s' % double_to_str( obj.offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coupling: %s' % uint32_to_str( obj.coupling() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bandwidth: %s' % uint32_to_str( obj.bandwidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'slope: %s' % double_to_str( obj.slope() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_HorizV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sampInterval: %s' % double_to_str(obj.sampInterval()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delayTime: %s' % double_to_str(obj.delayTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrSamples: %s' % uint32_to_str(obj.nbrSamples()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrSegments: %s' % uint32_to_str(obj.nbrSegments()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_HorizV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sampInterval: %s' % double_to_str( obj.sampInterval() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delayTime: %s' % double_to_str( obj.delayTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrSamples: %s' % uint32_to_str( obj.nbrSamples() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrSegments: %s' % uint32_to_str( obj.nbrSegments() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_TrigV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coupling: %s' % uint32_to_str(obj.coupling()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'input: %s' % uint32_to_str(obj.input()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'slope: %s' % uint32_to_str(obj.slope()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'level: %s' % double_to_str(obj.level()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_TrigV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coupling: %s' % uint32_to_str( obj.coupling() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'input: %s' % uint32_to_str( obj.input() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'slope: %s' % uint32_to_str( obj.slope() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'level: %s' % double_to_str( obj.level() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_ConfigV1_to_str(obj, indent, indentLvl):
+def Acqiris_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Acqiris.ConfigV1.TypeId
     assert obj.Version == psana.Acqiris.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrConvertersPerChannel: %s' % uint32_to_str(obj.nbrConvertersPerChannel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channelMask: %s' % uint32_to_str(obj.channelMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrBanks: %s' % uint32_to_str(obj.nbrBanks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrChannels: %s' % uint32_to_str(obj.nbrChannels()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trig:\n%s' % Acqiris_TrigV1_to_str(obj.trig(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'horiz:\n%s' % Acqiris_HorizV1_to_str(obj.horiz(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.vert()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "vert[%d]\n" % idx
-        elemStr += Acqiris_VertV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrConvertersPerChannel: %s' % uint32_to_str( obj.nbrConvertersPerChannel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channelMask: %s' % uint32_to_str( obj.channelMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrBanks: %s' % uint32_to_str( obj.nbrBanks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrChannels: %s' % uint32_to_str( obj.nbrChannels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trig:\n'
+    methodStr += Acqiris_TrigV1_to_str(obj.trig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'horiz:\n'
+    methodStr += Acqiris_HorizV1_to_str(obj.horiz(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.vert() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'vert[%d]:\n' % idx
+        subMethodStr += Acqiris_VertV1_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TimestampV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pos: %s' % double_to_str(obj.pos()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampLo: %s' % uint32_to_str(obj.timeStampLo()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampHi: %s' % uint32_to_str(obj.timeStampHi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % uint64_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_TimestampV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pos: %s' % double_to_str( obj.pos() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampLo: %s' % uint32_to_str( obj.timeStampLo() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampHi: %s' % uint32_to_str( obj.timeStampHi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % uint64_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_DataDescV1Elem_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'waveforms: %s' % ndarray_int16_2_to_str(obj.waveforms()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrSamplesInSeg: %s' % uint32_to_str(obj.nbrSamplesInSeg()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'indexFirstPoint: %s' % uint32_to_str(obj.indexFirstPoint()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nbrSegments: %s' % uint32_to_str(obj.nbrSegments()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.timestamp()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "timestamp[%d]\n" % idx
-        elemStr += Acqiris_TimestampV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def Acqiris_DataDescV1Elem_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrSamplesInSeg: %s' % uint32_to_str( obj.nbrSamplesInSeg() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'indexFirstPoint: %s' % uint32_to_str( obj.indexFirstPoint() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nbrSegments: %s' % uint32_to_str( obj.nbrSegments() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'waveforms: %s' % ndarray_int16_2_to_str( obj.waveforms() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.timestamp() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'timestamp[%d]:\n' % idx
+        subMethodStr += Acqiris_TimestampV1_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_DataDescV1_to_str(obj, indent, indentLvl):
+def Acqiris_DataDescV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Acqiris.DataDescV1.TypeId
     assert obj.Version == psana.Acqiris.DataDescV1.Version
-    lines = ''
-         # list methods
+    methodStrings = []
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.data()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "data[%d]\n" % idx
-        elemStr += Acqiris_DataDescV1Elem_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    numObjs = obj.data_shape()[0]
+    for idx in range( numObjs ):
+        subObj = obj.data(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'data[%d]:\n' % idx
+        methodStr += Acqiris_DataDescV1Elem_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcChannel_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'level: %s' % double_to_str(obj.level()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel: %s' % int32_to_str(obj.channel()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'slope: %s' % int32_to_str(obj.slope()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'mode: %s' % int32_to_str(obj.mode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def Acqiris_TdcChannel_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'level: %s' % double_to_str( obj.level() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel:\n'
+    methodStr += enum_to_str(obj.channel(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'slope:\n'
+    methodStr += enum_to_str(obj.slope(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'mode:\n'
+    methodStr += enum_to_str(obj.mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcAuxIO_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel: %s' % int32_to_str(obj.channel()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'mode: %s' % int32_to_str(obj.mode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'term: %s' % int32_to_str(obj.term()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def Acqiris_TdcAuxIO_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel:\n'
+    methodStr += enum_to_str(obj.channel(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'mode:\n'
+    methodStr += enum_to_str(obj.mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'term:\n'
+    methodStr += enum_to_str(obj.term(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcVetoIO_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel: %s' % int32_to_str(obj.channel()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'mode: %s' % int32_to_str(obj.mode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'term: %s' % int32_to_str(obj.term()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def Acqiris_TdcVetoIO_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel:\n'
+    methodStr += enum_to_str(obj.channel(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'mode:\n'
+    methodStr += enum_to_str(obj.mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'term:\n'
+    methodStr += enum_to_str(obj.term(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcConfigV1_to_str(obj, indent, indentLvl):
+def Acqiris_TdcConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Acqiris.TdcConfigV1.TypeId
     assert obj.Version == psana.Acqiris.TdcConfigV1.Version
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'veto:\n%s' % Acqiris_TdcVetoIO_to_str(obj.veto(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.channels()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "channels[%d]\n" % idx
-        elemStr += Acqiris_TdcChannel_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.auxio()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "auxio[%d]\n" % idx
-        elemStr += Acqiris_TdcAuxIO_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'veto:\n'
+    methodStr += Acqiris_TdcVetoIO_to_str(obj.veto(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.channels() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'channels[%d]:\n' % idx
+        subMethodStr += Acqiris_TdcChannel_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.auxio() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'auxio[%d]:\n' % idx
+        subMethodStr += Acqiris_TdcAuxIO_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcDataV1_Item_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % uint32_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'bf_val_: %s' % uint32_to_str(obj.bf_val_()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'bf_ofv_: %s' % uint8_to_str(obj.bf_ofv_()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'source: %s' % int32_to_str(obj.source()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def Acqiris_TdcDataV1_Item_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % uint32_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bf_val_: %s' % uint32_to_str( obj.bf_val_() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bf_ofv_: %s' % uint8_to_str( obj.bf_ofv_() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'source:\n'
+    methodStr += enum_to_str(obj.source(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcDataV1Common_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nhits: %s' % uint32_to_str(obj.nhits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'overflow: %s' % uint8_to_str(obj.overflow()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_TdcDataV1Common_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nhits: %s' % uint32_to_str( obj.nhits() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'overflow: %s' % uint8_to_str( obj.overflow() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcDataV1Channel_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'overflow: %s' % uint8_to_str(obj.overflow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'time: %s' % double_to_str(obj.time()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Acqiris_TdcDataV1Channel_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'overflow: %s' % uint8_to_str( obj.overflow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'time: %s' % double_to_str( obj.time() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcDataV1Marker_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'type: %s' % int32_to_str(obj.type()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def Acqiris_TdcDataV1Marker_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'type:\n'
+    methodStr += enum_to_str(obj.type(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Acqiris_TdcDataV1_to_str(obj, indent, indentLvl):
+def Acqiris_TdcDataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Acqiris.TdcDataV1.TypeId
     assert obj.Version == psana.Acqiris.TdcDataV1.Version
-    lines = ''
-         # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.data()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "data[%d]\n" % idx
-        elemStr += Acqiris_TdcDataV1_Item_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.data() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'data[%d]:\n' % idx
+        subMethodStr += Acqiris_TdcDataV1_Item_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Pds_ClockTime_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nanoseconds: %s' % uint32_to_str(obj.nanoseconds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seconds: %s' % uint32_to_str(obj.seconds()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Pds_ClockTime_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nanoseconds: %s' % uint32_to_str( obj.nanoseconds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seconds: %s' % uint32_to_str( obj.seconds() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Pds_DetInfo_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'log: %s' % uint32_to_str(obj.log()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'phy: %s' % uint32_to_str(obj.phy()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Alias_SrcAlias_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'aliasName: %s' % str_to_str( obj.aliasName() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'src:\n'
+    methodStr += Pds_Src_to_str(obj.src(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Pds_Src_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'log: %s' % uint32_to_str(obj.log()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'phy: %s' % uint32_to_str(obj.phy()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
-
-def Alias_SrcAlias_to_str(obj, indent, indentLvl):
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'src:\n%s' % Pds_Src_to_str(obj.src(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.aliasName()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "aliasName[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
-
-def Alias_ConfigV1_to_str(obj, indent, indentLvl):
+def Alias_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Alias.ConfigV1.TypeId
     assert obj.Version == psana.Alias.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSrcAlias: %s' % uint32_to_str(obj.numSrcAlias()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.srcAlias()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "srcAlias[%d]\n" % idx
-        elemStr += Alias_SrcAlias_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSrcAlias: %s' % uint32_to_str( obj.numSrcAlias() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.srcAlias() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'srcAlias[%d]:\n' % idx
+        subMethodStr += Alias_SrcAlias_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Andor_ConfigV1_to_str(obj, indent, indentLvl):
+def Andor_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Andor.ConfigV1.TypeId
     assert obj.Version == psana.Andor.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'baselineClamp: %s' % uint8_to_str(obj.baselineClamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'highCapacity: %s' % uint8_to_str(obj.highCapacity()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint8_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str(obj.numDelayShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fanMode: %s' % int32_to_str(obj.fanMode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baselineClamp: %s' % uint8_to_str( obj.baselineClamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'highCapacity: %s' % uint8_to_str( obj.highCapacity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fanMode:\n'
+    methodStr += enum_to_str(obj.fanMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Andor_FrameV1_to_str(obj, indent, indentLvl):
+def Andor_FrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Andor.FrameV1.TypeId
     assert obj.Version == psana.Andor.FrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str(obj.shotIdStart()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutTime: %s' % float_to_str(obj.readoutTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % float_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Arraychar_DataV1_to_str(obj, indent, indentLvl):
+def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Arraychar.DataV1.TypeId
     assert obj.Version == psana.Arraychar.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint8_1_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numChars: %s' % uint64_to_str(obj.numChars()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numChars: %s' % uint64_to_str( obj.numChars() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint8_1_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Camera_FrameCoord_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'column: %s' % uint16_to_str(obj.column()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'row: %s' % uint16_to_str(obj.row()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Camera_FrameCoord_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'column: %s' % uint16_to_str( obj.column() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'row: %s' % uint16_to_str( obj.row() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Camera_FrameFccdConfigV1_to_str(obj, indent, indentLvl):
+def Camera_FrameFccdConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Camera.FrameFccdConfigV1.TypeId
     assert obj.Version == psana.Camera.FrameFccdConfigV1.Version
-    lines = ''
-           
-    return lines
+    methodStrings = []
+    return methodSep.join(methodStrings)
 
-def Camera_FrameFexConfigV1_to_str(obj, indent, indentLvl):
+def Camera_FrameFexConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Camera.FrameFexConfigV1.TypeId
     assert obj.Version == psana.Camera.FrameFexConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'forward_prescale: %s' % uint32_to_str(obj.forward_prescale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'threshold: %s' % uint32_to_str(obj.threshold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'number_of_masked_pixels: %s' % uint32_to_str(obj.number_of_masked_pixels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'forwarding: %s' % int32_to_str(obj.forwarding()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'processing: %s' % int32_to_str(obj.processing()) 
-    lines += ('%s' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiBegin:\n%s' % Camera_FrameCoord_to_str(obj.roiBegin(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiEnd:\n%s' % Camera_FrameCoord_to_str(obj.roiEnd(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.masked_pixel_coordinates()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "masked_pixel_coordinates[%d]\n" % idx
-        elemStr += Camera_FrameCoord_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'forward_prescale: %s' % uint32_to_str( obj.forward_prescale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'threshold: %s' % uint32_to_str( obj.threshold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_masked_pixels: %s' % uint32_to_str( obj.number_of_masked_pixels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'forwarding:\n'
+    methodStr += enum_to_str(obj.forwarding(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'processing:\n'
+    methodStr += enum_to_str(obj.processing(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiBegin:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.roiBegin(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiEnd:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.roiEnd(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.masked_pixel_coordinates() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'masked_pixel_coordinates[%d]:\n' % idx
+        subMethodStr += Camera_FrameCoord_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Camera_FrameV1_to_str(obj, indent, indentLvl):
+def Camera_FrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Camera.FrameV1.TypeId
     assert obj.Version == psana.Camera.FrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data8: %s' % ndarray_uint8_2_to_str(obj.data8()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data16: %s' % ndarray_uint16_2_to_str(obj.data16()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth: %s' % uint32_to_str(obj.depth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'offset: %s' % uint32_to_str(obj.offset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth_bytes: %s' % uint32_to_str(obj.depth_bytes()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offset: %s' % uint32_to_str( obj.offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data8: %s' % ndarray_uint8_2_to_str( obj.data8() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data16: %s' % ndarray_uint16_2_to_str( obj.data16() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth_bytes: %s' % uint32_to_str( obj.depth_bytes() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Camera_TwoDGaussianV1_to_str(obj, indent, indentLvl):
+def Camera_TwoDGaussianV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Camera.TwoDGaussianV1.TypeId
     assert obj.Version == psana.Camera.TwoDGaussianV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'integral: %s' % uint64_to_str(obj.integral()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'xmean: %s' % double_to_str(obj.xmean()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ymean: %s' % double_to_str(obj.ymean()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'major_axis_width: %s' % double_to_str(obj.major_axis_width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'minor_axis_width: %s' % double_to_str(obj.minor_axis_width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'major_axis_tilt: %s' % double_to_str(obj.major_axis_tilt()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'integral: %s' % uint64_to_str( obj.integral() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'xmean: %s' % double_to_str( obj.xmean() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ymean: %s' % double_to_str( obj.ymean() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'major_axis_width: %s' % double_to_str( obj.major_axis_width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'minor_axis_width: %s' % double_to_str( obj.minor_axis_width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'major_axis_tilt: %s' % double_to_str( obj.major_axis_tilt() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Ipimb_ConfigV1_to_str(obj, indent, indentLvl):
+def Ipimb_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Ipimb.ConfigV1.TypeId
     assert obj.Version == psana.Ipimb.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerCounter: %s' % uint64_to_str(obj.triggerCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'serialID: %s' % uint64_to_str(obj.serialID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chargeAmpRange: %s' % uint16_to_str(obj.chargeAmpRange()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calibrationRange: %s' % uint16_to_str(obj.calibrationRange()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'resetLength: %s' % uint32_to_str(obj.resetLength()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'resetDelay: %s' % uint32_to_str(obj.resetDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chargeAmpRefVoltage: %s' % float_to_str(obj.chargeAmpRefVoltage()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calibrationVoltage: %s' % float_to_str(obj.calibrationVoltage()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'diodeBias: %s' % float_to_str(obj.diodeBias()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'status: %s' % uint16_to_str(obj.status()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'errors: %s' % uint16_to_str(obj.errors()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calStrobeLength: %s' % uint16_to_str(obj.calStrobeLength()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigDelay: %s' % uint32_to_str(obj.trigDelay()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.capacitorValues()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "capacitorValues[%d]\n" % idx
-        elemStr += int32_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerCounter: %s' % uint64_to_str( obj.triggerCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'serialID: %s' % uint64_to_str( obj.serialID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chargeAmpRange: %s' % uint16_to_str( obj.chargeAmpRange() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calibrationRange: %s' % uint16_to_str( obj.calibrationRange() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'resetLength: %s' % uint32_to_str( obj.resetLength() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'resetDelay: %s' % uint32_to_str( obj.resetDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chargeAmpRefVoltage: %s' % float_to_str( obj.chargeAmpRefVoltage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calibrationVoltage: %s' % float_to_str( obj.calibrationVoltage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'diodeBias: %s' % float_to_str( obj.diodeBias() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'status: %s' % uint16_to_str( obj.status() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'errors: %s' % uint16_to_str( obj.errors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calStrobeLength: %s' % uint16_to_str( obj.calStrobeLength() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigDelay: %s' % uint32_to_str( obj.trigDelay() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'capacitorValues'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.capacitorValues(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.capacitorValues() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    return methodSep.join(methodStrings)
 
-def Ipimb_ConfigV2_to_str(obj, indent, indentLvl):
+def Ipimb_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Ipimb.ConfigV2.TypeId
     assert obj.Version == psana.Ipimb.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerCounter: %s' % uint64_to_str(obj.triggerCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'serialID: %s' % uint64_to_str(obj.serialID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chargeAmpRange: %s' % uint16_to_str(obj.chargeAmpRange()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calibrationRange: %s' % uint16_to_str(obj.calibrationRange()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'resetLength: %s' % uint32_to_str(obj.resetLength()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'resetDelay: %s' % uint32_to_str(obj.resetDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chargeAmpRefVoltage: %s' % float_to_str(obj.chargeAmpRefVoltage()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calibrationVoltage: %s' % float_to_str(obj.calibrationVoltage()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'diodeBias: %s' % float_to_str(obj.diodeBias()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'status: %s' % uint16_to_str(obj.status()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'errors: %s' % uint16_to_str(obj.errors()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calStrobeLength: %s' % uint16_to_str(obj.calStrobeLength()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigDelay: %s' % uint32_to_str(obj.trigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigPsDelay: %s' % uint32_to_str(obj.trigPsDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcDelay: %s' % uint32_to_str(obj.adcDelay()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.capacitorValues()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "capacitorValues[%d]\n" % idx
-        elemStr += int32_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerCounter: %s' % uint64_to_str( obj.triggerCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'serialID: %s' % uint64_to_str( obj.serialID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chargeAmpRange: %s' % uint16_to_str( obj.chargeAmpRange() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calibrationRange: %s' % uint16_to_str( obj.calibrationRange() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'resetLength: %s' % uint32_to_str( obj.resetLength() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'resetDelay: %s' % uint32_to_str( obj.resetDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chargeAmpRefVoltage: %s' % float_to_str( obj.chargeAmpRefVoltage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calibrationVoltage: %s' % float_to_str( obj.calibrationVoltage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'diodeBias: %s' % float_to_str( obj.diodeBias() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'status: %s' % uint16_to_str( obj.status() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'errors: %s' % uint16_to_str( obj.errors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calStrobeLength: %s' % uint16_to_str( obj.calStrobeLength() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigDelay: %s' % uint32_to_str( obj.trigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigPsDelay: %s' % uint32_to_str( obj.trigPsDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcDelay: %s' % uint32_to_str( obj.adcDelay() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'capacitorValues'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.capacitorValues(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.capacitorValues() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    return methodSep.join(methodStrings)
 
-def Ipimb_DataV1_to_str(obj, indent, indentLvl):
+def Ipimb_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Ipimb.DataV1.TypeId
     assert obj.Version == psana.Ipimb.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerCounter: %s' % uint64_to_str(obj.triggerCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config0: %s' % uint16_to_str(obj.config0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config1: %s' % uint16_to_str(obj.config1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config2: %s' % uint16_to_str(obj.config2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0: %s' % uint16_to_str(obj.channel0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1: %s' % uint16_to_str(obj.channel1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2: %s' % uint16_to_str(obj.channel2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3: %s' % uint16_to_str(obj.channel3()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'checksum: %s' % uint16_to_str(obj.checksum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0Volts: %s' % float_to_str(obj.channel0Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1Volts: %s' % float_to_str(obj.channel1Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2Volts: %s' % float_to_str(obj.channel2Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3Volts: %s' % float_to_str(obj.channel3Volts()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerCounter: %s' % uint64_to_str( obj.triggerCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config0: %s' % uint16_to_str( obj.config0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config1: %s' % uint16_to_str( obj.config1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config2: %s' % uint16_to_str( obj.config2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0: %s' % uint16_to_str( obj.channel0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1: %s' % uint16_to_str( obj.channel1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2: %s' % uint16_to_str( obj.channel2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3: %s' % uint16_to_str( obj.channel3() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'checksum: %s' % uint16_to_str( obj.checksum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0Volts: %s' % float_to_str( obj.channel0Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1Volts: %s' % float_to_str( obj.channel1Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2Volts: %s' % float_to_str( obj.channel2Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3Volts: %s' % float_to_str( obj.channel3Volts() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Ipimb_DataV2_to_str(obj, indent, indentLvl):
+def Ipimb_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Ipimb.DataV2.TypeId
     assert obj.Version == psana.Ipimb.DataV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config0: %s' % uint16_to_str(obj.config0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config1: %s' % uint16_to_str(obj.config1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config2: %s' % uint16_to_str(obj.config2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0: %s' % uint16_to_str(obj.channel0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1: %s' % uint16_to_str(obj.channel1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2: %s' % uint16_to_str(obj.channel2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3: %s' % uint16_to_str(obj.channel3()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0ps: %s' % uint16_to_str(obj.channel0ps()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1ps: %s' % uint16_to_str(obj.channel1ps()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2ps: %s' % uint16_to_str(obj.channel2ps()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3ps: %s' % uint16_to_str(obj.channel3ps()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'checksum: %s' % uint16_to_str(obj.checksum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0Volts: %s' % float_to_str(obj.channel0Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1Volts: %s' % float_to_str(obj.channel1Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2Volts: %s' % float_to_str(obj.channel2Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3Volts: %s' % float_to_str(obj.channel3Volts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel0psVolts: %s' % float_to_str(obj.channel0psVolts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel1psVolts: %s' % float_to_str(obj.channel1psVolts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel2psVolts: %s' % float_to_str(obj.channel2psVolts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel3psVolts: %s' % float_to_str(obj.channel3psVolts()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerCounter: %s' % uint64_to_str(obj.triggerCounter()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config0: %s' % uint16_to_str( obj.config0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config1: %s' % uint16_to_str( obj.config1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config2: %s' % uint16_to_str( obj.config2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0: %s' % uint16_to_str( obj.channel0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1: %s' % uint16_to_str( obj.channel1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2: %s' % uint16_to_str( obj.channel2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3: %s' % uint16_to_str( obj.channel3() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0ps: %s' % uint16_to_str( obj.channel0ps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1ps: %s' % uint16_to_str( obj.channel1ps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2ps: %s' % uint16_to_str( obj.channel2ps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3ps: %s' % uint16_to_str( obj.channel3ps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'checksum: %s' % uint16_to_str( obj.checksum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0Volts: %s' % float_to_str( obj.channel0Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1Volts: %s' % float_to_str( obj.channel1Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2Volts: %s' % float_to_str( obj.channel2Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3Volts: %s' % float_to_str( obj.channel3Volts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel0psVolts: %s' % float_to_str( obj.channel0psVolts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel1psVolts: %s' % float_to_str( obj.channel1psVolts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel2psVolts: %s' % float_to_str( obj.channel2psVolts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel3psVolts: %s' % float_to_str( obj.channel3psVolts() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerCounter: %s' % uint64_to_str( obj.triggerCounter() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Lusi_DiodeFexConfigV1_to_str(obj, indent, indentLvl):
+def Lusi_DiodeFexConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.DiodeFexConfigV1.TypeId
     assert obj.Version == psana.Lusi.DiodeFexConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'base: %s' % ndarray_float32_1_to_str(obj.base()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scale: %s' % ndarray_float32_1_to_str(obj.scale()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base: %s' % ndarray_float32_1_to_str( obj.base() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scale: %s' % ndarray_float32_1_to_str( obj.scale() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Lusi_DiodeFexConfigV2_to_str(obj, indent, indentLvl):
+def Lusi_DiodeFexConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.DiodeFexConfigV2.TypeId
     assert obj.Version == psana.Lusi.DiodeFexConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'base: %s' % ndarray_float32_1_to_str(obj.base()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scale: %s' % ndarray_float32_1_to_str(obj.scale()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base: %s' % ndarray_float32_1_to_str( obj.base() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scale: %s' % ndarray_float32_1_to_str( obj.scale() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Lusi_DiodeFexV1_to_str(obj, indent, indentLvl):
+def Lusi_DiodeFexV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.DiodeFexV1.TypeId
     assert obj.Version == psana.Lusi.DiodeFexV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % float_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % float_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Lusi_IpmFexConfigV1_to_str(obj, indent, indentLvl):
+def Lusi_IpmFexConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.IpmFexConfigV1.TypeId
     assert obj.Version == psana.Lusi.IpmFexConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'xscale: %s' % float_to_str(obj.xscale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'yscale: %s' % float_to_str(obj.yscale()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.diode()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "diode[%d]\n" % idx
-        elemStr += Lusi_DiodeFexConfigV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'xscale: %s' % float_to_str( obj.xscale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'yscale: %s' % float_to_str( obj.yscale() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.diode() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'diode[%d]:\n' % idx
+        subMethodStr += Lusi_DiodeFexConfigV1_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Lusi_IpmFexConfigV2_to_str(obj, indent, indentLvl):
+def Lusi_IpmFexConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.IpmFexConfigV2.TypeId
     assert obj.Version == psana.Lusi.IpmFexConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'xscale: %s' % float_to_str(obj.xscale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'yscale: %s' % float_to_str(obj.yscale()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.diode()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "diode[%d]\n" % idx
-        elemStr += Lusi_DiodeFexConfigV2_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'xscale: %s' % float_to_str( obj.xscale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'yscale: %s' % float_to_str( obj.yscale() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.diode() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'diode[%d]:\n' % idx
+        subMethodStr += Lusi_DiodeFexConfigV2_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Lusi_IpmFexV1_to_str(obj, indent, indentLvl):
+def Lusi_IpmFexV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.IpmFexV1.TypeId
     assert obj.Version == psana.Lusi.IpmFexV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channel: %s' % ndarray_float32_1_to_str(obj.channel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sum: %s' % float_to_str(obj.sum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'xpos: %s' % float_to_str(obj.xpos()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ypos: %s' % float_to_str(obj.ypos()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channel: %s' % ndarray_float32_1_to_str( obj.channel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sum: %s' % float_to_str( obj.sum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'xpos: %s' % float_to_str( obj.xpos() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ypos: %s' % float_to_str( obj.ypos() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Lusi_PimImageConfigV1_to_str(obj, indent, indentLvl):
+def Lusi_PimImageConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Lusi.PimImageConfigV1.TypeId
     assert obj.Version == psana.Lusi.PimImageConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'xscale: %s' % float_to_str(obj.xscale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'yscale: %s' % float_to_str(obj.yscale()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'xscale: %s' % float_to_str( obj.xscale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'yscale: %s' % float_to_str( obj.yscale() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Pulnix_TM6740ConfigV1_to_str(obj, indent, indentLvl):
+def Pulnix_TM6740ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pulnix.TM6740ConfigV1.TypeId
     assert obj.Version == psana.Pulnix.TM6740ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_a: %s' % uint16_to_str(obj.gain_a()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_b: %s' % uint16_to_str(obj.gain_b()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vref: %s' % uint16_to_str(obj.vref()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shutter_width: %s' % uint16_to_str(obj.shutter_width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_balance: %s' % uint8_to_str(obj.gain_balance()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution_bits: %s' % uint8_to_str(obj.output_resolution_bits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution: %s' % int32_to_str(obj.output_resolution()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'horizontal_binning: %s' % int32_to_str(obj.horizontal_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vertical_binning: %s' % int32_to_str(obj.vertical_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lookuptable_mode: %s' % int32_to_str(obj.lookuptable_mode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_a: %s' % uint16_to_str( obj.gain_a() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_b: %s' % uint16_to_str( obj.gain_b() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vref: %s' % uint16_to_str( obj.vref() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shutter_width: %s' % uint16_to_str( obj.shutter_width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_balance: %s' % uint8_to_str( obj.gain_balance() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution_bits: %s' % uint8_to_str( obj.output_resolution_bits() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution:\n'
+    methodStr += enum_to_str(obj.output_resolution(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'horizontal_binning:\n'
+    methodStr += enum_to_str(obj.horizontal_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_binning:\n'
+    methodStr += enum_to_str(obj.vertical_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lookuptable_mode:\n'
+    methodStr += enum_to_str(obj.lookuptable_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Pulnix_TM6740ConfigV2_to_str(obj, indent, indentLvl):
+def Pulnix_TM6740ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pulnix.TM6740ConfigV2.TypeId
     assert obj.Version == psana.Pulnix.TM6740ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_a: %s' % uint16_to_str(obj.gain_a()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_b: %s' % uint16_to_str(obj.gain_b()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vref_a: %s' % uint16_to_str(obj.vref_a()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vref_b: %s' % uint16_to_str(obj.vref_b()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_balance: %s' % uint8_to_str(obj.gain_balance()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution_bits: %s' % uint8_to_str(obj.output_resolution_bits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution: %s' % int32_to_str(obj.output_resolution()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'horizontal_binning: %s' % int32_to_str(obj.horizontal_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vertical_binning: %s' % int32_to_str(obj.vertical_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lookuptable_mode: %s' % int32_to_str(obj.lookuptable_mode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_a: %s' % uint16_to_str( obj.gain_a() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_b: %s' % uint16_to_str( obj.gain_b() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vref_a: %s' % uint16_to_str( obj.vref_a() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vref_b: %s' % uint16_to_str( obj.vref_b() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_balance: %s' % uint8_to_str( obj.gain_balance() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution_bits: %s' % uint8_to_str( obj.output_resolution_bits() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution:\n'
+    methodStr += enum_to_str(obj.output_resolution(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'horizontal_binning:\n'
+    methodStr += enum_to_str(obj.horizontal_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_binning:\n'
+    methodStr += enum_to_str(obj.vertical_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lookuptable_mode:\n'
+    methodStr += enum_to_str(obj.lookuptable_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, indentLvl):
+def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataFEEGasDetEnergy.TypeId
     assert obj.Version == psana.Bld.BldDataFEEGasDetEnergy.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'f_11_ENRC: %s' % double_to_str(obj.f_11_ENRC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'f_12_ENRC: %s' % double_to_str(obj.f_12_ENRC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'f_21_ENRC: %s' % double_to_str(obj.f_21_ENRC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'f_22_ENRC: %s' % double_to_str(obj.f_22_ENRC()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_11_ENRC: %s' % double_to_str( obj.f_11_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_12_ENRC: %s' % double_to_str( obj.f_12_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_21_ENRC: %s' % double_to_str( obj.f_21_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_22_ENRC: %s' % double_to_str( obj.f_22_ENRC() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV0_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV0.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV0.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV1_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV1.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str(obj.ebeamPkCurrBC2()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV2_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV2.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str(obj.ebeamPkCurrBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC2: %s' % double_to_str(obj.ebeamEnergyBC2()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV3_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV3.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str(obj.ebeamPkCurrBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC2: %s' % double_to_str(obj.ebeamEnergyBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str(obj.ebeamPkCurrBC1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC1: %s' % double_to_str(obj.ebeamEnergyBC1()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str( obj.ebeamPkCurrBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV4_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV4_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV4.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV4.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str(obj.ebeamPkCurrBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC2: %s' % double_to_str(obj.ebeamEnergyBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str(obj.ebeamPkCurrBC1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC1: %s' % double_to_str(obj.ebeamEnergyBC1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndPosX: %s' % double_to_str(obj.ebeamUndPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndPosY: %s' % double_to_str(obj.ebeamUndPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndAngX: %s' % double_to_str(obj.ebeamUndAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndAngY: %s' % double_to_str(obj.ebeamUndAngY()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str( obj.ebeamPkCurrBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosX: %s' % double_to_str( obj.ebeamUndPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosY: %s' % double_to_str( obj.ebeamUndPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngX: %s' % double_to_str( obj.ebeamUndAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngY: %s' % double_to_str( obj.ebeamUndAngY() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataEBeamV5_to_str(obj, indent, indentLvl):
+def Bld_BldDataEBeamV5_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV5.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV5.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'damageMask: %s' % uint32_to_str(obj.damageMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamCharge: %s' % double_to_str(obj.ebeamCharge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamL3Energy: %s' % double_to_str(obj.ebeamL3Energy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosX: %s' % double_to_str(obj.ebeamLTUPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUPosY: %s' % double_to_str(obj.ebeamLTUPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngX: %s' % double_to_str(obj.ebeamLTUAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamLTUAngY: %s' % double_to_str(obj.ebeamLTUAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str(obj.ebeamPkCurrBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC2: %s' % double_to_str(obj.ebeamEnergyBC2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str(obj.ebeamPkCurrBC1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamEnergyBC1: %s' % double_to_str(obj.ebeamEnergyBC1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndPosX: %s' % double_to_str(obj.ebeamUndPosX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndPosY: %s' % double_to_str(obj.ebeamUndPosY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndAngX: %s' % double_to_str(obj.ebeamUndAngX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamUndAngY: %s' % double_to_str(obj.ebeamUndAngY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamXTCAVAmpl: %s' % double_to_str(obj.ebeamXTCAVAmpl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamXTCAVPhase: %s' % double_to_str(obj.ebeamXTCAVPhase()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ebeamDumpCharge: %s' % double_to_str(obj.ebeamDumpCharge()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str( obj.ebeamPkCurrBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosX: %s' % double_to_str( obj.ebeamUndPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosY: %s' % double_to_str( obj.ebeamUndPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngX: %s' % double_to_str( obj.ebeamUndAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngY: %s' % double_to_str( obj.ebeamUndAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVAmpl: %s' % double_to_str( obj.ebeamXTCAVAmpl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVPhase: %s' % double_to_str( obj.ebeamXTCAVPhase() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamDumpCharge: %s' % double_to_str( obj.ebeamDumpCharge() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataPhaseCavity_to_str(obj, indent, indentLvl):
+def Bld_BldDataPhaseCavity_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataPhaseCavity.TypeId
     assert obj.Version == psana.Bld.BldDataPhaseCavity.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fitTime1: %s' % double_to_str(obj.fitTime1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fitTime2: %s' % double_to_str(obj.fitTime2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'charge1: %s' % double_to_str(obj.charge1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'charge2: %s' % double_to_str(obj.charge2()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fitTime1: %s' % double_to_str( obj.fitTime1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fitTime2: %s' % double_to_str( obj.fitTime2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'charge1: %s' % double_to_str( obj.charge1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'charge2: %s' % double_to_str( obj.charge2() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataIpimbV0_to_str(obj, indent, indentLvl):
+def Bld_BldDataIpimbV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataIpimbV0.TypeId
     assert obj.Version == psana.Bld.BldDataIpimbV0.Version
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipimbData:\n%s' % Ipimb_DataV1_to_str(obj.ipimbData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipimbConfig:\n%s' % Ipimb_ConfigV1_to_str(obj.ipimbConfig(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipmFexData:\n%s' % Lusi_IpmFexV1_to_str(obj.ipmFexData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipimbData:\n'
+    methodStr += Ipimb_DataV1_to_str(obj.ipimbData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipimbConfig:\n'
+    methodStr += Ipimb_ConfigV1_to_str(obj.ipimbConfig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipmFexData:\n'
+    methodStr += Lusi_IpmFexV1_to_str(obj.ipmFexData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataIpimbV1_to_str(obj, indent, indentLvl):
+def Bld_BldDataIpimbV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataIpimbV1.TypeId
     assert obj.Version == psana.Bld.BldDataIpimbV1.Version
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipimbData:\n%s' % Ipimb_DataV2_to_str(obj.ipimbData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipimbConfig:\n%s' % Ipimb_ConfigV2_to_str(obj.ipimbConfig(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ipmFexData:\n%s' % Lusi_IpmFexV1_to_str(obj.ipmFexData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipimbData:\n'
+    methodStr += Ipimb_DataV2_to_str(obj.ipimbData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipimbConfig:\n'
+    methodStr += Ipimb_ConfigV2_to_str(obj.ipimbConfig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ipmFexData:\n'
+    methodStr += Lusi_IpmFexV1_to_str(obj.ipmFexData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataPimV1_to_str(obj, indent, indentLvl):
+def Bld_BldDataPimV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataPimV1.TypeId
     assert obj.Version == psana.Bld.BldDataPimV1.Version
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'camConfig:\n%s' % Pulnix_TM6740ConfigV2_to_str(obj.camConfig(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pimConfig:\n%s' % Lusi_PimImageConfigV1_to_str(obj.pimConfig(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame:\n%s' % Camera_FrameV1_to_str(obj.frame(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'camConfig:\n'
+    methodStr += Pulnix_TM6740ConfigV2_to_str(obj.camConfig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pimConfig:\n'
+    methodStr += Lusi_PimImageConfigV1_to_str(obj.pimConfig(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame:\n'
+    methodStr += Camera_FrameV1_to_str(obj.frame(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataGMDV0_to_str(obj, indent, indentLvl):
+def Bld_BldDataGMDV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataGMDV0.TypeId
     assert obj.Version == psana.Bld.BldDataGMDV0.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pressure: %s' % double_to_str(obj.pressure()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % double_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'current: %s' % double_to_str(obj.current()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hvMeshElectron: %s' % double_to_str(obj.hvMeshElectron()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hvMeshIon: %s' % double_to_str(obj.hvMeshIon()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hvMultIon: %s' % double_to_str(obj.hvMultIon()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chargeQ: %s' % double_to_str(obj.chargeQ()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'photonEnergy: %s' % double_to_str(obj.photonEnergy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'multPulseIntensity: %s' % double_to_str(obj.multPulseIntensity()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'keithleyPulseIntensity: %s' % double_to_str(obj.keithleyPulseIntensity()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulseEnergy: %s' % double_to_str(obj.pulseEnergy()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulseEnergyFEE: %s' % double_to_str(obj.pulseEnergyFEE()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'transmission: %s' % double_to_str(obj.transmission()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'transmissionFEE: %s' % double_to_str(obj.transmissionFEE()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.gasType()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "gasType[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gasType: %s' % str_to_str( obj.gasType() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pressure: %s' % double_to_str( obj.pressure() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % double_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'current: %s' % double_to_str( obj.current() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hvMeshElectron: %s' % double_to_str( obj.hvMeshElectron() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hvMeshIon: %s' % double_to_str( obj.hvMeshIon() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hvMultIon: %s' % double_to_str( obj.hvMultIon() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chargeQ: %s' % double_to_str( obj.chargeQ() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'photonEnergy: %s' % double_to_str( obj.photonEnergy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'multPulseIntensity: %s' % double_to_str( obj.multPulseIntensity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'keithleyPulseIntensity: %s' % double_to_str( obj.keithleyPulseIntensity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulseEnergy: %s' % double_to_str( obj.pulseEnergy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulseEnergyFEE: %s' % double_to_str( obj.pulseEnergyFEE() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'transmission: %s' % double_to_str( obj.transmission() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'transmissionFEE: %s' % double_to_str( obj.transmissionFEE() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataGMDV1_to_str(obj, indent, indentLvl):
+def Bld_BldDataGMDV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataGMDV1.TypeId
     assert obj.Version == psana.Bld.BldDataGMDV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'milliJoulesPerPulse: %s' % double_to_str(obj.milliJoulesPerPulse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'milliJoulesAverage: %s' % double_to_str(obj.milliJoulesAverage()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'correctedSumPerPulse: %s' % double_to_str(obj.correctedSumPerPulse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'bgValuePerSample: %s' % double_to_str(obj.bgValuePerSample()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'relativeEnergyPerPulse: %s' % double_to_str(obj.relativeEnergyPerPulse()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'milliJoulesPerPulse: %s' % double_to_str( obj.milliJoulesPerPulse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'milliJoulesAverage: %s' % double_to_str( obj.milliJoulesAverage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'correctedSumPerPulse: %s' % double_to_str( obj.correctedSumPerPulse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bgValuePerSample: %s' % double_to_str( obj.bgValuePerSample() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'relativeEnergyPerPulse: %s' % double_to_str( obj.relativeEnergyPerPulse() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataAcqADCV1_to_str(obj, indent, indentLvl):
+def Bld_BldDataAcqADCV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataAcqADCV1.TypeId
     assert obj.Version == psana.Bld.BldDataAcqADCV1.Version
-    lines = ''
-      # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'config:\n%s' % Acqiris_ConfigV1_to_str(obj.config(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data:\n%s' % Acqiris_DataDescV1_to_str(obj.data(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config:\n'
+    methodStr += Acqiris_ConfigV1_to_str(obj.config(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data:\n'
+    methodStr += Acqiris_DataDescV1_to_str(obj.data(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Bld_BldDataSpectrometerV0_to_str(obj, indent, indentLvl):
+def Bld_BldDataSpectrometerV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataSpectrometerV0.TypeId
     assert obj.Version == psana.Bld.BldDataSpectrometerV0.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hproj: %s' % ndarray_uint32_1_to_str(obj.hproj()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vproj: %s' % ndarray_uint32_1_to_str(obj.vproj()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hproj: %s' % ndarray_uint32_1_to_str( obj.hproj() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vproj: %s' % ndarray_uint32_1_to_str( obj.vproj() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def ControlData_PVControl_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'index: %s' % uint32_to_str(obj.index()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % double_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'array: %s' % uint8_to_str(obj.array()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def ControlData_PVControl_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'name: %s' % str_to_str( obj.name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'index: %s' % uint32_to_str( obj.index() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % double_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'array: %s' % uint8_to_str( obj.array() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def ControlData_PVMonitor_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'index: %s' % uint32_to_str(obj.index()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'loValue: %s' % double_to_str(obj.loValue()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hiValue: %s' % double_to_str(obj.hiValue()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'array: %s' % uint8_to_str(obj.array()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def ControlData_PVMonitor_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'name: %s' % str_to_str( obj.name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'index: %s' % uint32_to_str( obj.index() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'loValue: %s' % double_to_str( obj.loValue() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hiValue: %s' % double_to_str( obj.hiValue() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'array: %s' % uint8_to_str( obj.array() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def ControlData_PVLabel_to_str(obj, indent, indentLvl):
-    lines = ''
-         # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.value()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "value[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def ControlData_PVLabel_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'name: %s' % str_to_str( obj.name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % str_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def ControlData_ConfigV1_to_str(obj, indent, indentLvl):
+def ControlData_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.ControlData.ConfigV1.TypeId
     assert obj.Version == psana.ControlData.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvControls: %s' % uint32_to_str(obj.npvControls()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvMonitors: %s' % uint32_to_str(obj.npvMonitors()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'events: %s' % uint32_to_str(obj.events()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_duration: %s' % uint8_to_str(obj.uses_duration()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_events: %s' % uint8_to_str(obj.uses_events()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'duration:\n%s' % Pds_ClockTime_to_str(obj.duration(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvControls()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvControls[%d]\n" % idx
-        elemStr += ControlData_PVControl_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvMonitors()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvMonitors[%d]\n" % idx
-        elemStr += ControlData_PVMonitor_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvControls: %s' % uint32_to_str( obj.npvControls() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvMonitors: %s' % uint32_to_str( obj.npvMonitors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'events: %s' % uint32_to_str( obj.events() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_duration: %s' % uint8_to_str( obj.uses_duration() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_events: %s' % uint8_to_str( obj.uses_events() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'duration:\n'
+    methodStr += Pds_ClockTime_to_str(obj.duration(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvControls() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvControls[%d]:\n' % idx
+        subMethodStr += ControlData_PVControl_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvMonitors() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvMonitors[%d]:\n' % idx
+        subMethodStr += ControlData_PVMonitor_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def ControlData_ConfigV2_to_str(obj, indent, indentLvl):
+def ControlData_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.ControlData.ConfigV2.TypeId
     assert obj.Version == psana.ControlData.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvControls: %s' % uint32_to_str(obj.npvControls()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvMonitors: %s' % uint32_to_str(obj.npvMonitors()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvLabels: %s' % uint32_to_str(obj.npvLabels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'events: %s' % uint32_to_str(obj.events()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_duration: %s' % uint8_to_str(obj.uses_duration()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_events: %s' % uint8_to_str(obj.uses_events()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'duration:\n%s' % Pds_ClockTime_to_str(obj.duration(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvControls()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvControls[%d]\n" % idx
-        elemStr += ControlData_PVControl_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvMonitors()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvMonitors[%d]\n" % idx
-        elemStr += ControlData_PVMonitor_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvLabels()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvLabels[%d]\n" % idx
-        elemStr += ControlData_PVLabel_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvControls: %s' % uint32_to_str( obj.npvControls() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvMonitors: %s' % uint32_to_str( obj.npvMonitors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvLabels: %s' % uint32_to_str( obj.npvLabels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'events: %s' % uint32_to_str( obj.events() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_duration: %s' % uint8_to_str( obj.uses_duration() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_events: %s' % uint8_to_str( obj.uses_events() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'duration:\n'
+    methodStr += Pds_ClockTime_to_str(obj.duration(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvControls() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvControls[%d]:\n' % idx
+        subMethodStr += ControlData_PVControl_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvMonitors() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvMonitors[%d]:\n' % idx
+        subMethodStr += ControlData_PVMonitor_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvLabels() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvLabels[%d]:\n' % idx
+        subMethodStr += ControlData_PVLabel_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def ControlData_ConfigV3_to_str(obj, indent, indentLvl):
+def ControlData_ConfigV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.ControlData.ConfigV3.TypeId
     assert obj.Version == psana.ControlData.ConfigV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvControls: %s' % uint32_to_str(obj.npvControls()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvMonitors: %s' % uint32_to_str(obj.npvMonitors()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npvLabels: %s' % uint32_to_str(obj.npvLabels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'events: %s' % uint32_to_str(obj.events()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_l3t_events: %s' % uint8_to_str(obj.uses_l3t_events()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_duration: %s' % uint8_to_str(obj.uses_duration()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'uses_events: %s' % uint8_to_str(obj.uses_events()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'duration:\n%s' % Pds_ClockTime_to_str(obj.duration(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvControls()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvControls[%d]\n" % idx
-        elemStr += ControlData_PVControl_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvMonitors()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvMonitors[%d]\n" % idx
-        elemStr += ControlData_PVMonitor_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pvLabels()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pvLabels[%d]\n" % idx
-        elemStr += ControlData_PVLabel_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvControls: %s' % uint32_to_str( obj.npvControls() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvMonitors: %s' % uint32_to_str( obj.npvMonitors() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npvLabels: %s' % uint32_to_str( obj.npvLabels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'events: %s' % uint32_to_str( obj.events() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_l3t_events: %s' % uint8_to_str( obj.uses_l3t_events() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_duration: %s' % uint8_to_str( obj.uses_duration() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'uses_events: %s' % uint8_to_str( obj.uses_events() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'duration:\n'
+    methodStr += Pds_ClockTime_to_str(obj.duration(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvControls() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvControls[%d]:\n' % idx
+        subMethodStr += ControlData_PVControl_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvMonitors() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvMonitors[%d]:\n' % idx
+        subMethodStr += ControlData_PVMonitor_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pvLabels() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pvLabels[%d]:\n' % idx
+        subMethodStr += ControlData_PVLabel_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad_CsPadDigitalPotsCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pots: %s' % ndarray_uint8_1_to_str(obj.pots()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad_CsPadDigitalPotsCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pots: %s' % ndarray_uint8_1_to_str( obj.pots() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_CsPadReadOnlyCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftTest: %s' % uint32_to_str(obj.shiftTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'version: %s' % uint32_to_str(obj.version()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad_CsPadReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftTest: %s' % uint32_to_str( obj.shiftTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % uint32_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_ProtectionSystemThreshold_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcThreshold: %s' % uint32_to_str(obj.adcThreshold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelCountThreshold: %s' % uint32_to_str(obj.pixelCountThreshold()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcThreshold: %s' % uint32_to_str( obj.adcThreshold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelCountThreshold: %s' % uint32_to_str( obj.pixelCountThreshold() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_CsPadGainMapCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str(obj.gainMap()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad_CsPadGainMapCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str( obj.gainMap() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_ConfigV1QuadReg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str(obj.shiftSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str(obj.edgeSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkSet: %s' % uint32_to_str(obj.readClkSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkHold: %s' % uint32_to_str(obj.readClkHold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataMode: %s' % uint32_to_str(obj.dataMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prstSel: %s' % uint32_to_str(obj.prstSel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqDelay: %s' % uint32_to_str(obj.acqDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intTime: %s' % uint32_to_str(obj.intTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digDelay: %s' % uint32_to_str(obj.digDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampIdle: %s' % uint32_to_str(obj.ampIdle()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'injTotal: %s' % uint32_to_str(obj.injTotal()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rowColShiftPer: %s' % uint32_to_str(obj.rowColShiftPer()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ro:\n%s' % CsPad_CsPadReadOnlyCfg_to_str(obj.ro(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dp:\n%s' % CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gm:\n%s' % CsPad_CsPadGainMapCfg_to_str(obj.gm(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+def CsPad_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkHold: %s' % uint32_to_str( obj.readClkHold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataMode: %s' % uint32_to_str( obj.dataMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prstSel: %s' % uint32_to_str( obj.prstSel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqDelay: %s' % uint32_to_str( obj.acqDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intTime: %s' % uint32_to_str( obj.intTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digDelay: %s' % uint32_to_str( obj.digDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampIdle: %s' % uint32_to_str( obj.ampIdle() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'injTotal: %s' % uint32_to_str( obj.injTotal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rowColShiftPer: %s' % uint32_to_str( obj.rowColShiftPer() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ro:\n'
+    methodStr += CsPad_CsPadReadOnlyCfg_to_str(obj.ro(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dp:\n'
+    methodStr += CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gm:\n'
+    methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad_ConfigV2QuadReg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str(obj.shiftSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str(obj.edgeSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkSet: %s' % uint32_to_str(obj.readClkSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkHold: %s' % uint32_to_str(obj.readClkHold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataMode: %s' % uint32_to_str(obj.dataMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prstSel: %s' % uint32_to_str(obj.prstSel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqDelay: %s' % uint32_to_str(obj.acqDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intTime: %s' % uint32_to_str(obj.intTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digDelay: %s' % uint32_to_str(obj.digDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampIdle: %s' % uint32_to_str(obj.ampIdle()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'injTotal: %s' % uint32_to_str(obj.injTotal()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rowColShiftPer: %s' % uint32_to_str(obj.rowColShiftPer()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampReset: %s' % uint32_to_str(obj.ampReset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digCount: %s' % uint32_to_str(obj.digCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digPeriod: %s' % uint32_to_str(obj.digPeriod()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ro:\n%s' % CsPad_CsPadReadOnlyCfg_to_str(obj.ro(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dp:\n%s' % CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gm:\n%s' % CsPad_CsPadGainMapCfg_to_str(obj.gm(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+def CsPad_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkHold: %s' % uint32_to_str( obj.readClkHold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataMode: %s' % uint32_to_str( obj.dataMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prstSel: %s' % uint32_to_str( obj.prstSel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqDelay: %s' % uint32_to_str( obj.acqDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intTime: %s' % uint32_to_str( obj.intTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digDelay: %s' % uint32_to_str( obj.digDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampIdle: %s' % uint32_to_str( obj.ampIdle() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'injTotal: %s' % uint32_to_str( obj.injTotal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rowColShiftPer: %s' % uint32_to_str( obj.rowColShiftPer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampReset: %s' % uint32_to_str( obj.ampReset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digCount: %s' % uint32_to_str( obj.digCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digPeriod: %s' % uint32_to_str( obj.digPeriod() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ro:\n'
+    methodStr += CsPad_CsPadReadOnlyCfg_to_str(obj.ro(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dp:\n'
+    methodStr += CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gm:\n'
+    methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad_ConfigV3QuadReg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str(obj.shiftSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str(obj.edgeSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkSet: %s' % uint32_to_str(obj.readClkSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkHold: %s' % uint32_to_str(obj.readClkHold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataMode: %s' % uint32_to_str(obj.dataMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prstSel: %s' % uint32_to_str(obj.prstSel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqDelay: %s' % uint32_to_str(obj.acqDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intTime: %s' % uint32_to_str(obj.intTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digDelay: %s' % uint32_to_str(obj.digDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampIdle: %s' % uint32_to_str(obj.ampIdle()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'injTotal: %s' % uint32_to_str(obj.injTotal()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rowColShiftPer: %s' % uint32_to_str(obj.rowColShiftPer()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampReset: %s' % uint32_to_str(obj.ampReset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digCount: %s' % uint32_to_str(obj.digCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digPeriod: %s' % uint32_to_str(obj.digPeriod()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'biasTuning: %s' % uint32_to_str(obj.biasTuning()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pdpmndnmBalance: %s' % uint32_to_str(obj.pdpmndnmBalance()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ro:\n%s' % CsPad_CsPadReadOnlyCfg_to_str(obj.ro(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dp:\n%s' % CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gm:\n%s' % CsPad_CsPadGainMapCfg_to_str(obj.gm(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+def CsPad_ConfigV3QuadReg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkHold: %s' % uint32_to_str( obj.readClkHold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataMode: %s' % uint32_to_str( obj.dataMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prstSel: %s' % uint32_to_str( obj.prstSel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqDelay: %s' % uint32_to_str( obj.acqDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intTime: %s' % uint32_to_str( obj.intTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digDelay: %s' % uint32_to_str( obj.digDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampIdle: %s' % uint32_to_str( obj.ampIdle() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'injTotal: %s' % uint32_to_str( obj.injTotal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rowColShiftPer: %s' % uint32_to_str( obj.rowColShiftPer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampReset: %s' % uint32_to_str( obj.ampReset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digCount: %s' % uint32_to_str( obj.digCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digPeriod: %s' % uint32_to_str( obj.digPeriod() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'biasTuning: %s' % uint32_to_str( obj.biasTuning() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pdpmndnmBalance: %s' % uint32_to_str( obj.pdpmndnmBalance() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ro:\n'
+    methodStr += CsPad_CsPadReadOnlyCfg_to_str(obj.ro(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dp:\n'
+    methodStr += CsPad_CsPadDigitalPotsCfg_to_str(obj.dp(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gm:\n'
+    methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad_ConfigV1_to_str(obj, indent, indentLvl):
+def CsPad_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.ConfigV1.TypeId
     assert obj.Version == psana.CsPad.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runDelay: %s' % uint32_to_str(obj.runDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask0: %s' % uint32_to_str(obj.badAsicMask0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask1: %s' % uint32_to_str(obj.badAsicMask1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadMask: %s' % uint32_to_str(obj.quadMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numQuads: %s' % uint32_to_str(obj.numQuads()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSect: %s' % uint32_to_str(obj.numSect()) 
-    lines += ('%s\n' % methodStr)
-              # not_basic_idx_method
-    n = obj.numQuads()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ConfigV1QuadReg_to_str(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runDelay: %s' % uint32_to_str( obj.runDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask0: %s' % uint32_to_str( obj.badAsicMask0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask1: %s' % uint32_to_str( obj.badAsicMask1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadMask: %s' % uint32_to_str( obj.quadMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numQuads: %s' % uint32_to_str( obj.numQuads() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSect: %s' % uint32_to_str( obj.numSect() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_multi_line_methods
+    methodStr = ''
+    numObjs = 4
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ConfigV1QuadReg_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
-
-def CsPad_ConfigV2_to_str(obj, indent, indentLvl):
+def CsPad_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.ConfigV2.TypeId
     assert obj.Version == psana.CsPad.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runDelay: %s' % uint32_to_str(obj.runDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask0: %s' % uint32_to_str(obj.badAsicMask0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask1: %s' % uint32_to_str(obj.badAsicMask1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadMask: %s' % uint32_to_str(obj.quadMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMasks: %s' % uint32_to_str(obj.roiMasks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numQuads: %s' % uint32_to_str(obj.numQuads()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSect: %s' % uint32_to_str(obj.numSect()) 
-    lines += ('%s\n' % methodStr)
-          # basic_0_to_methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('roiMask[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.roiMask(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('numAsicsStored[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.numAsicsStored(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-        # not_basic_idx_method
-    n = obj.numQuads()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ConfigV1QuadReg_to_str(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runDelay: %s' % uint32_to_str( obj.runDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask0: %s' % uint32_to_str( obj.badAsicMask0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask1: %s' % uint32_to_str( obj.badAsicMask1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadMask: %s' % uint32_to_str( obj.quadMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMasks: %s' % uint32_to_str( obj.roiMasks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numQuads: %s' % uint32_to_str( obj.numQuads() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSect: %s' % uint32_to_str( obj.numSect() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.roiMask(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.roiMask() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.numAsicsStored(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.numAsicsStored() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    # idx_list_multi_line_methods
+    methodStr = ''
+    numObjs = 4
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ConfigV1QuadReg_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
-
-def CsPad_ConfigV3_to_str(obj, indent, indentLvl):
+def CsPad_ConfigV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.ConfigV3.TypeId
     assert obj.Version == psana.CsPad.ConfigV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runDelay: %s' % uint32_to_str(obj.runDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionEnable: %s' % uint32_to_str(obj.protectionEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask0: %s' % uint32_to_str(obj.badAsicMask0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask1: %s' % uint32_to_str(obj.badAsicMask1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadMask: %s' % uint32_to_str(obj.quadMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMasks: %s' % uint32_to_str(obj.roiMasks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numQuads: %s' % uint32_to_str(obj.numQuads()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSect: %s' % uint32_to_str(obj.numSect()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runDelay: %s' % uint32_to_str( obj.runDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionEnable: %s' % uint32_to_str( obj.protectionEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask0: %s' % uint32_to_str( obj.badAsicMask0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask1: %s' % uint32_to_str( obj.badAsicMask1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadMask: %s' % uint32_to_str( obj.quadMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMasks: %s' % uint32_to_str( obj.roiMasks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numQuads: %s' % uint32_to_str( obj.numQuads() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSect: %s' % uint32_to_str( obj.numSect() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.roiMask(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.roiMask() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.numAsicsStored(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.numAsicsStored() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.protectionThresholds()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "protectionThresholds[%d]\n" % idx
-        elemStr += CsPad_ProtectionSystemThreshold_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      # basic_0_to_methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('roiMask[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.roiMask(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('numAsicsStored[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.numAsicsStored(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-        # not_basic_idx_method
-    n = obj.numQuads()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ConfigV1QuadReg_to_str(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+    numObjs = 4
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ConfigV1QuadReg_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.protectionThresholds() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'protectionThresholds[%d]:\n' % idx
+        subMethodStr += CsPad_ProtectionSystemThreshold_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
-
-def CsPad_ConfigV4_to_str(obj, indent, indentLvl):
+def CsPad_ConfigV4_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.ConfigV4.TypeId
     assert obj.Version == psana.CsPad.ConfigV4.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runDelay: %s' % uint32_to_str(obj.runDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionEnable: %s' % uint32_to_str(obj.protectionEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask0: %s' % uint32_to_str(obj.badAsicMask0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask1: %s' % uint32_to_str(obj.badAsicMask1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadMask: %s' % uint32_to_str(obj.quadMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMasks: %s' % uint32_to_str(obj.roiMasks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numQuads: %s' % uint32_to_str(obj.numQuads()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSect: %s' % uint32_to_str(obj.numSect()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runDelay: %s' % uint32_to_str( obj.runDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionEnable: %s' % uint32_to_str( obj.protectionEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask0: %s' % uint32_to_str( obj.badAsicMask0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask1: %s' % uint32_to_str( obj.badAsicMask1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadMask: %s' % uint32_to_str( obj.quadMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMasks: %s' % uint32_to_str( obj.roiMasks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numQuads: %s' % uint32_to_str( obj.numQuads() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSect: %s' % uint32_to_str( obj.numSect() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.roiMask(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.roiMask() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.numAsicsStored(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.numAsicsStored() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.protectionThresholds()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "protectionThresholds[%d]\n" % idx
-        elemStr += CsPad_ProtectionSystemThreshold_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      # basic_0_to_methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('roiMask[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.roiMask(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('numAsicsStored[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.numAsicsStored(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-        # not_basic_idx_method
-    n = obj.numQuads()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ConfigV2QuadReg_to_str(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+    numObjs = 4
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ConfigV2QuadReg_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.protectionThresholds() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'protectionThresholds[%d]:\n' % idx
+        subMethodStr += CsPad_ProtectionSystemThreshold_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
-
-def CsPad_ConfigV5_to_str(obj, indent, indentLvl):
+def CsPad_ConfigV5_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.ConfigV5.TypeId
     assert obj.Version == psana.CsPad.ConfigV5.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runDelay: %s' % uint32_to_str(obj.runDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionEnable: %s' % uint32_to_str(obj.protectionEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'internalTriggerDelay: %s' % uint32_to_str(obj.internalTriggerDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask0: %s' % uint32_to_str(obj.badAsicMask0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask1: %s' % uint32_to_str(obj.badAsicMask1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadMask: %s' % uint32_to_str(obj.quadMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMasks: %s' % uint32_to_str(obj.roiMasks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numQuads: %s' % uint32_to_str(obj.numQuads()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSect: %s' % uint32_to_str(obj.numSect()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runDelay: %s' % uint32_to_str( obj.runDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionEnable: %s' % uint32_to_str( obj.protectionEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'internalTriggerDelay: %s' % uint32_to_str( obj.internalTriggerDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask0: %s' % uint32_to_str( obj.badAsicMask0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask1: %s' % uint32_to_str( obj.badAsicMask1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadMask: %s' % uint32_to_str( obj.quadMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMasks: %s' % uint32_to_str( obj.roiMasks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numQuads: %s' % uint32_to_str( obj.numQuads() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSect: %s' % uint32_to_str( obj.numSect() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.roiMask(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.roiMask() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored'
+    try:
+       for idx in range( obj.numQuads() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( obj.numAsicsStored(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.numAsicsStored() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % uint32_to_str( subObj )
+       methodStrings.append( methodStr )
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.protectionThresholds()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "protectionThresholds[%d]\n" % idx
-        elemStr += CsPad_ProtectionSystemThreshold_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      # basic_0_to_methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('roiMask[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.roiMask(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('numAsicsStored[0:' + str(obj.numQuads()) + ']:')
-    for idx in range(obj.numQuads()):
-        elem = obj.numAsicsStored(idx)
-        methodStr += (' ' + uint32_to_str(elem) )
-    lines += '%s\n' % methodStr
-        # not_basic_idx_method
-    n = obj.numQuads()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ConfigV3QuadReg_to_str(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+    numObjs = 4
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ConfigV3QuadReg_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.protectionThresholds() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'protectionThresholds[%d]:\n' % idx
+        subMethodStr += CsPad_ProtectionSystemThreshold_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
+def CsPad_ElementV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_count: %s' % uint32_to_str( obj.seq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint32_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tid: %s' % uint32_to_str( obj.tid() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acq_count: %s' % uint32_to_str( obj.acq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'op_code: %s' % uint32_to_str( obj.op_code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quad: %s' % uint32_to_str( obj.quad() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sectionMask: %s' % uint32_to_str( obj.sectionMask() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_ElementV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str(obj.sb_temp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_count: %s' % uint32_to_str(obj.seq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fiducials: %s' % uint32_to_str(obj.fiducials()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame_type: %s' % uint32_to_str(obj.frame_type()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'virtual_channel: %s' % uint32_to_str(obj.virtual_channel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint32_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tid: %s' % uint32_to_str(obj.tid()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acq_count: %s' % uint32_to_str(obj.acq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'op_code: %s' % uint32_to_str(obj.op_code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quad: %s' % uint32_to_str(obj.quad()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sectionMask: %s' % uint32_to_str(obj.sectionMask()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
-
-def CsPad_DataV1_to_str(obj, indent, indentLvl):
+def CsPad_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.DataV1.TypeId
     assert obj.Version == psana.CsPad.DataV1.Version
-    lines = ''
-               # not_basic_shape_method
-    assert len(obj.quads_shape())==1, "shape function quads_shape is not length 1"
-    n = obj.quads_shape()[0]
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ElementV1_to_str(elem,indent,indentLvl+1)
-    lines += ('%s' % methodStr)
+    methodStrings = []
+    # idx_list_multi_line_methods
+    methodStr = ''
+    numObjs = obj.quads_shape()[0]
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ElementV1_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
+def CsPad_ElementV2_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_count: %s' % uint32_to_str( obj.seq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint32_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tid: %s' % uint32_to_str( obj.tid() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acq_count: %s' % uint32_to_str( obj.acq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'op_code: %s' % uint32_to_str( obj.op_code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quad: %s' % uint32_to_str( obj.quad() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sectionMask: %s' % uint32_to_str( obj.sectionMask() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad_ElementV2_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str(obj.sb_temp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_count: %s' % uint32_to_str(obj.seq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fiducials: %s' % uint32_to_str(obj.fiducials()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame_type: %s' % uint32_to_str(obj.frame_type()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'virtual_channel: %s' % uint32_to_str(obj.virtual_channel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint32_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tid: %s' % uint32_to_str(obj.tid()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acq_count: %s' % uint32_to_str(obj.acq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'op_code: %s' % uint32_to_str(obj.op_code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quad: %s' % uint32_to_str(obj.quad()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sectionMask: %s' % uint32_to_str(obj.sectionMask()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
-
-def CsPad_DataV2_to_str(obj, indent, indentLvl):
+def CsPad_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad.DataV2.TypeId
     assert obj.Version == psana.CsPad.DataV2.Version
-    lines = ''
-               # not_basic_shape_method
-    assert len(obj.quads_shape())==1, "shape function quads_shape is not length 1"
-    n = obj.quads_shape()[0]
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.quads(idx)
-        methodStr += ("quads[%d]\n" % idx)
-        methodStr += CsPad_ElementV2_to_str(elem,indent,indentLvl+1)
-    lines += ('%s' % methodStr)
+    methodStrings = []
+    # idx_list_multi_line_methods
+    methodStr = ''
+    numObjs = obj.quads_shape()[0]
+    for idx in range( numObjs ):
+        subObj = obj.quads(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'quads[%d]:\n' % idx
+        methodStr += CsPad_ElementV2_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-    return lines
+def CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pots: %s' % ndarray_uint8_1_to_str( obj.pots() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pots: %s' % ndarray_uint8_1_to_str(obj.pots()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftTest: %s' % uint32_to_str( obj.shiftTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % uint32_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftTest: %s' % uint32_to_str(obj.shiftTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'version: %s' % uint32_to_str(obj.version()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad2x2_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcThreshold: %s' % uint32_to_str( obj.adcThreshold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelCountThreshold: %s' % uint32_to_str( obj.pixelCountThreshold() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_ProtectionSystemThreshold_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcThreshold: %s' % uint32_to_str(obj.adcThreshold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelCountThreshold: %s' % uint32_to_str(obj.pixelCountThreshold()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad2x2_CsPad2x2GainMapCfg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str( obj.gainMap() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_CsPad2x2GainMapCfg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str(obj.gainMap()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def CsPad2x2_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftSelect: %s' % uint32_to_str( obj.shiftSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'edgeSelect: %s' % uint32_to_str( obj.edgeSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkHold: %s' % uint32_to_str( obj.readClkHold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataMode: %s' % uint32_to_str( obj.dataMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prstSel: %s' % uint32_to_str( obj.prstSel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqDelay: %s' % uint32_to_str( obj.acqDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intTime: %s' % uint32_to_str( obj.intTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digDelay: %s' % uint32_to_str( obj.digDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampIdle: %s' % uint32_to_str( obj.ampIdle() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'injTotal: %s' % uint32_to_str( obj.injTotal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rowColShiftPer: %s' % uint32_to_str( obj.rowColShiftPer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampReset: %s' % uint32_to_str( obj.ampReset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digCount: %s' % uint32_to_str( obj.digCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digPeriod: %s' % uint32_to_str( obj.digPeriod() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PeltierEnable: %s' % uint32_to_str( obj.PeltierEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kpConstant: %s' % uint32_to_str( obj.kpConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kiConstant: %s' % uint32_to_str( obj.kiConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kdConstant: %s' % uint32_to_str( obj.kdConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'humidThold: %s' % uint32_to_str( obj.humidThold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'setPoint: %s' % uint32_to_str( obj.setPoint() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ro:\n'
+    methodStr += CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj.ro(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dp:\n'
+    methodStr += CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj.dp(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gm:\n'
+    methodStr += CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_ConfigV1QuadReg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftSelect: %s' % uint32_to_str(obj.shiftSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'edgeSelect: %s' % uint32_to_str(obj.edgeSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkSet: %s' % uint32_to_str(obj.readClkSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkHold: %s' % uint32_to_str(obj.readClkHold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataMode: %s' % uint32_to_str(obj.dataMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prstSel: %s' % uint32_to_str(obj.prstSel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqDelay: %s' % uint32_to_str(obj.acqDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intTime: %s' % uint32_to_str(obj.intTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digDelay: %s' % uint32_to_str(obj.digDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampIdle: %s' % uint32_to_str(obj.ampIdle()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'injTotal: %s' % uint32_to_str(obj.injTotal()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rowColShiftPer: %s' % uint32_to_str(obj.rowColShiftPer()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampReset: %s' % uint32_to_str(obj.ampReset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digCount: %s' % uint32_to_str(obj.digCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digPeriod: %s' % uint32_to_str(obj.digPeriod()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PeltierEnable: %s' % uint32_to_str(obj.PeltierEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kpConstant: %s' % uint32_to_str(obj.kpConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kiConstant: %s' % uint32_to_str(obj.kiConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kdConstant: %s' % uint32_to_str(obj.kdConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'humidThold: %s' % uint32_to_str(obj.humidThold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'setPoint: %s' % uint32_to_str(obj.setPoint()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ro:\n%s' % CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj.ro(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dp:\n%s' % CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj.dp(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gm:\n%s' % CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
-
-def CsPad2x2_ConfigV1_to_str(obj, indent, indentLvl):
+def CsPad2x2_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad2x2.ConfigV1.TypeId
     assert obj.Version == psana.CsPad2x2.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionEnable: %s' % uint32_to_str(obj.protectionEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask: %s' % uint32_to_str(obj.badAsicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMask: %s' % uint32_to_str(obj.roiMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsStored: %s' % uint32_to_str(obj.numAsicsStored()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionThreshold:\n%s' % CsPad2x2_ProtectionSystemThreshold_to_str(obj.protectionThreshold(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quad:\n%s' % CsPad2x2_ConfigV1QuadReg_to_str(obj.quad(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionEnable: %s' % uint32_to_str( obj.protectionEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask: %s' % uint32_to_str( obj.badAsicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask: %s' % uint32_to_str( obj.roiMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored: %s' % uint32_to_str( obj.numAsicsStored() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionThreshold:\n'
+    methodStr += CsPad2x2_ProtectionSystemThreshold_to_str(obj.protectionThreshold(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quad:\n'
+    methodStr += CsPad2x2_ConfigV1QuadReg_to_str(obj.quad(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_ConfigV2QuadReg_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shiftSelect: %s' % uint32_to_str(obj.shiftSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'edgeSelect: %s' % uint32_to_str(obj.edgeSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkSet: %s' % uint32_to_str(obj.readClkSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readClkHold: %s' % uint32_to_str(obj.readClkHold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataMode: %s' % uint32_to_str(obj.dataMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prstSel: %s' % uint32_to_str(obj.prstSel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqDelay: %s' % uint32_to_str(obj.acqDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intTime: %s' % uint32_to_str(obj.intTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digDelay: %s' % uint32_to_str(obj.digDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampIdle: %s' % uint32_to_str(obj.ampIdle()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'injTotal: %s' % uint32_to_str(obj.injTotal()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rowColShiftPer: %s' % uint32_to_str(obj.rowColShiftPer()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ampReset: %s' % uint32_to_str(obj.ampReset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digCount: %s' % uint32_to_str(obj.digCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digPeriod: %s' % uint32_to_str(obj.digPeriod()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PeltierEnable: %s' % uint32_to_str(obj.PeltierEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kpConstant: %s' % uint32_to_str(obj.kpConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kiConstant: %s' % uint32_to_str(obj.kiConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kdConstant: %s' % uint32_to_str(obj.kdConstant()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'humidThold: %s' % uint32_to_str(obj.humidThold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'setPoint: %s' % uint32_to_str(obj.setPoint()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'biasTuning: %s' % uint32_to_str(obj.biasTuning()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pdpmndnmBalance: %s' % uint32_to_str(obj.pdpmndnmBalance()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ro:\n%s' % CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj.ro(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dp:\n%s' % CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj.dp(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gm:\n%s' % CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+def CsPad2x2_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shiftSelect: %s' % uint32_to_str( obj.shiftSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'edgeSelect: %s' % uint32_to_str( obj.edgeSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readClkHold: %s' % uint32_to_str( obj.readClkHold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataMode: %s' % uint32_to_str( obj.dataMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prstSel: %s' % uint32_to_str( obj.prstSel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqDelay: %s' % uint32_to_str( obj.acqDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intTime: %s' % uint32_to_str( obj.intTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digDelay: %s' % uint32_to_str( obj.digDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampIdle: %s' % uint32_to_str( obj.ampIdle() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'injTotal: %s' % uint32_to_str( obj.injTotal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rowColShiftPer: %s' % uint32_to_str( obj.rowColShiftPer() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ampReset: %s' % uint32_to_str( obj.ampReset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digCount: %s' % uint32_to_str( obj.digCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digPeriod: %s' % uint32_to_str( obj.digPeriod() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PeltierEnable: %s' % uint32_to_str( obj.PeltierEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kpConstant: %s' % uint32_to_str( obj.kpConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kiConstant: %s' % uint32_to_str( obj.kiConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kdConstant: %s' % uint32_to_str( obj.kdConstant() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'humidThold: %s' % uint32_to_str( obj.humidThold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'setPoint: %s' % uint32_to_str( obj.setPoint() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'biasTuning: %s' % uint32_to_str( obj.biasTuning() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pdpmndnmBalance: %s' % uint32_to_str( obj.pdpmndnmBalance() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ro:\n'
+    methodStr += CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj.ro(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dp:\n'
+    methodStr += CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj.dp(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gm:\n'
+    methodStr += CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_ConfigV2_to_str(obj, indent, indentLvl):
+def CsPad2x2_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad2x2.ConfigV2.TypeId
     assert obj.Version == psana.CsPad2x2.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'concentratorVersion: %s' % uint32_to_str(obj.concentratorVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionEnable: %s' % uint32_to_str(obj.protectionEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inactiveRunMode: %s' % uint32_to_str(obj.inactiveRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'activeRunMode: %s' % uint32_to_str(obj.activeRunMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runTriggerDelay: %s' % uint32_to_str(obj.runTriggerDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tdi: %s' % uint32_to_str(obj.tdi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSize: %s' % uint32_to_str(obj.payloadSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'badAsicMask: %s' % uint32_to_str(obj.badAsicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'roiMask: %s' % uint32_to_str(obj.roiMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsRead: %s' % uint32_to_str(obj.numAsicsRead()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numAsicsStored: %s' % uint32_to_str(obj.numAsicsStored()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'protectionThreshold:\n%s' % CsPad2x2_ProtectionSystemThreshold_to_str(obj.protectionThreshold(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quad:\n%s' % CsPad2x2_ConfigV2QuadReg_to_str(obj.quad(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'concentratorVersion: %s' % uint32_to_str( obj.concentratorVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionEnable: %s' % uint32_to_str( obj.protectionEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inactiveRunMode: %s' % uint32_to_str( obj.inactiveRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'activeRunMode: %s' % uint32_to_str( obj.activeRunMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runTriggerDelay: %s' % uint32_to_str( obj.runTriggerDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tdi: %s' % uint32_to_str( obj.tdi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSize: %s' % uint32_to_str( obj.payloadSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'badAsicMask: %s' % uint32_to_str( obj.badAsicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roiMask: %s' % uint32_to_str( obj.roiMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsRead: %s' % uint32_to_str( obj.numAsicsRead() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numAsicsStored: %s' % uint32_to_str( obj.numAsicsStored() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'protectionThreshold:\n'
+    methodStr += CsPad2x2_ProtectionSystemThreshold_to_str(obj.protectionThreshold(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quad:\n'
+    methodStr += CsPad2x2_ConfigV2QuadReg_to_str(obj.quad(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def CsPad2x2_ElementV1_to_str(obj, indent, indentLvl):
+def CsPad2x2_ElementV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.CsPad2x2.ElementV1.TypeId
     assert obj.Version == psana.CsPad2x2.ElementV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str(obj.sb_temp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_count: %s' % uint32_to_str(obj.seq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fiducials: %s' % uint32_to_str(obj.fiducials()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame_type: %s' % uint32_to_str(obj.frame_type()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'virtual_channel: %s' % uint32_to_str(obj.virtual_channel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint32_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tid: %s' % uint32_to_str(obj.tid()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acq_count: %s' % uint32_to_str(obj.acq_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'op_code: %s' % uint32_to_str(obj.op_code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quad: %s' % uint32_to_str(obj.quad()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_count: %s' % uint32_to_str( obj.seq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint32_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tid: %s' % uint32_to_str( obj.tid() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acq_count: %s' % uint32_to_str( obj.acq_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'op_code: %s' % uint32_to_str( obj.op_code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quad: %s' % uint32_to_str( obj.quad() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Encoder_ConfigV1_to_str(obj, indent, indentLvl):
+def Encoder_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Encoder.ConfigV1.TypeId
     assert obj.Version == psana.Encoder.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chan_num: %s' % uint32_to_str(obj.chan_num()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'input_num: %s' % uint32_to_str(obj.input_num()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'input_rising: %s' % uint32_to_str(obj.input_rising()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks_per_sec: %s' % uint32_to_str(obj.ticks_per_sec()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'count_mode: %s' % int32_to_str(obj.count_mode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadrature_mode: %s' % int32_to_str(obj.quadrature_mode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chan_num: %s' % uint32_to_str( obj.chan_num() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'input_num: %s' % uint32_to_str( obj.input_num() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'input_rising: %s' % uint32_to_str( obj.input_rising() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks_per_sec: %s' % uint32_to_str( obj.ticks_per_sec() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'count_mode:\n'
+    methodStr += enum_to_str(obj.count_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadrature_mode:\n'
+    methodStr += enum_to_str(obj.quadrature_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Encoder_ConfigV2_to_str(obj, indent, indentLvl):
+def Encoder_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Encoder.ConfigV2.TypeId
     assert obj.Version == psana.Encoder.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chan_mask: %s' % uint32_to_str(obj.chan_mask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'input_num: %s' % uint32_to_str(obj.input_num()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'input_rising: %s' % uint32_to_str(obj.input_rising()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks_per_sec: %s' % uint32_to_str(obj.ticks_per_sec()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'count_mode: %s' % int32_to_str(obj.count_mode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'quadrature_mode: %s' % int32_to_str(obj.quadrature_mode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chan_mask: %s' % uint32_to_str( obj.chan_mask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'input_num: %s' % uint32_to_str( obj.input_num() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'input_rising: %s' % uint32_to_str( obj.input_rising() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks_per_sec: %s' % uint32_to_str( obj.ticks_per_sec() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'count_mode:\n'
+    methodStr += enum_to_str(obj.count_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadrature_mode:\n'
+    methodStr += enum_to_str(obj.quadrature_mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Encoder_DataV1_to_str(obj, indent, indentLvl):
+def Encoder_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Encoder.DataV1.TypeId
     assert obj.Version == psana.Encoder.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % uint32_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'encoder_count: %s' % uint32_to_str(obj.encoder_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % int32_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_count: %s' % uint32_to_str( obj.encoder_count() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % int32_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Encoder_DataV2_to_str(obj, indent, indentLvl):
+def Encoder_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Encoder.DataV2.TypeId
     assert obj.Version == psana.Encoder.DataV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'encoder_count: %s' % ndarray_uint32_1_to_str(obj.encoder_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % uint32_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-            # basic_0_to_const_methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value[0:3]:'
-    for idx in range(3):
-        elem = obj.value(idx)
-        methodStr += (' ' + int32_to_str(elem) )
-    lines += '%s\n' % methodStr
-  
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_count: %s' % ndarray_uint32_1_to_str( obj.encoder_count() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value'
+    try:
+       for idx in range( 3 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % int32_to_str( obj.value(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.value() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % int32_to_str( subObj )
+       methodStrings.append( methodStr )
+    return methodSep.join(methodStrings)
 
-def Epix_AsicConfigV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'monostPulser: %s' % uint8_to_str(obj.monostPulser()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyTest: %s' % uint8_to_str(obj.dummyTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyMask: %s' % uint8_to_str(obj.dummyMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulser: %s' % uint16_to_str(obj.pulser()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pbit: %s' % uint8_to_str(obj.pbit()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'atest: %s' % uint8_to_str(obj.atest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'test: %s' % uint8_to_str(obj.test()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sabTest: %s' % uint8_to_str(obj.sabTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hrTest: %s' % uint8_to_str(obj.hrTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digMon1: %s' % uint8_to_str(obj.digMon1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digMon2: %s' % uint8_to_str(obj.digMon2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulserDac: %s' % uint8_to_str(obj.pulserDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Dm1En: %s' % uint8_to_str(obj.Dm1En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Dm2En: %s' % uint8_to_str(obj.Dm2En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'slvdSBit: %s' % uint8_to_str(obj.slvdSBit()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'VRefDac: %s' % uint8_to_str(obj.VRefDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsTComp: %s' % uint8_to_str(obj.TpsTComp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsMux: %s' % uint8_to_str(obj.TpsMux()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RoMonost: %s' % uint8_to_str(obj.RoMonost()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsGr: %s' % uint8_to_str(obj.TpsGr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dGr: %s' % uint8_to_str(obj.S2dGr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PpOcbS2d: %s' % uint8_to_str(obj.PpOcbS2d()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Ocb: %s' % uint8_to_str(obj.Ocb()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Monost: %s' % uint8_to_str(obj.Monost()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'FastppEnable: %s' % uint8_to_str(obj.FastppEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Preamp: %s' % uint8_to_str(obj.Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PixelCb: %s' % uint8_to_str(obj.PixelCb()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dTComp: %s' % uint8_to_str(obj.S2dTComp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'FilterDac: %s' % uint8_to_str(obj.FilterDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TC: %s' % uint8_to_str(obj.TC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2d: %s' % uint8_to_str(obj.S2d()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dDacBias: %s' % uint8_to_str(obj.S2dDacBias()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsTcDac: %s' % uint8_to_str(obj.TpsTcDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsDac: %s' % uint8_to_str(obj.TpsDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dTcDac: %s' % uint8_to_str(obj.S2dTcDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dDac: %s' % uint8_to_str(obj.S2dDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TestBe: %s' % uint8_to_str(obj.TestBe()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'IsEn: %s' % uint8_to_str(obj.IsEn()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'DelExec: %s' % uint8_to_str(obj.DelExec()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'DelCckReg: %s' % uint8_to_str(obj.DelCckReg()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RowStartAddr: %s' % uint16_to_str(obj.RowStartAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RowStopAddr: %s' % uint16_to_str(obj.RowStopAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ColStartAddr: %s' % uint8_to_str(obj.ColStartAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ColStopAddr: %s' % uint8_to_str(obj.ColStopAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chipID: %s' % uint16_to_str(obj.chipID()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Epix_AsicConfigV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'monostPulser: %s' % uint8_to_str( obj.monostPulser() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyTest: %s' % uint8_to_str( obj.dummyTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyMask: %s' % uint8_to_str( obj.dummyMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulser: %s' % uint16_to_str( obj.pulser() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pbit: %s' % uint8_to_str( obj.pbit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'atest: %s' % uint8_to_str( obj.atest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'test: %s' % uint8_to_str( obj.test() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sabTest: %s' % uint8_to_str( obj.sabTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hrTest: %s' % uint8_to_str( obj.hrTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digMon1: %s' % uint8_to_str( obj.digMon1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digMon2: %s' % uint8_to_str( obj.digMon2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulserDac: %s' % uint8_to_str( obj.pulserDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Dm1En: %s' % uint8_to_str( obj.Dm1En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Dm2En: %s' % uint8_to_str( obj.Dm2En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'slvdSBit: %s' % uint8_to_str( obj.slvdSBit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'VRefDac: %s' % uint8_to_str( obj.VRefDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsTComp: %s' % uint8_to_str( obj.TpsTComp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsMux: %s' % uint8_to_str( obj.TpsMux() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RoMonost: %s' % uint8_to_str( obj.RoMonost() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsGr: %s' % uint8_to_str( obj.TpsGr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dGr: %s' % uint8_to_str( obj.S2dGr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PpOcbS2d: %s' % uint8_to_str( obj.PpOcbS2d() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Ocb: %s' % uint8_to_str( obj.Ocb() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Monost: %s' % uint8_to_str( obj.Monost() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FastppEnable: %s' % uint8_to_str( obj.FastppEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Preamp: %s' % uint8_to_str( obj.Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PixelCb: %s' % uint8_to_str( obj.PixelCb() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dTComp: %s' % uint8_to_str( obj.S2dTComp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FilterDac: %s' % uint8_to_str( obj.FilterDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TC: %s' % uint8_to_str( obj.TC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2d: %s' % uint8_to_str( obj.S2d() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dDacBias: %s' % uint8_to_str( obj.S2dDacBias() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsTcDac: %s' % uint8_to_str( obj.TpsTcDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsDac: %s' % uint8_to_str( obj.TpsDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dTcDac: %s' % uint8_to_str( obj.S2dTcDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dDac: %s' % uint8_to_str( obj.S2dDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TestBe: %s' % uint8_to_str( obj.TestBe() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'IsEn: %s' % uint8_to_str( obj.IsEn() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'DelExec: %s' % uint8_to_str( obj.DelExec() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'DelCckReg: %s' % uint8_to_str( obj.DelCckReg() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RowStartAddr: %s' % uint16_to_str( obj.RowStartAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RowStopAddr: %s' % uint16_to_str( obj.RowStopAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ColStartAddr: %s' % uint8_to_str( obj.ColStartAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ColStopAddr: %s' % uint8_to_str( obj.ColStopAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chipID: %s' % uint16_to_str( obj.chipID() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Epix_ConfigV1_to_str(obj, indent, indentLvl):
+def Epix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Epix.ConfigV1.TypeId
     assert obj.Version == psana.Epix.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPixelTestArray: %s' % ndarray_uint32_3_to_str(obj.asicPixelTestArray()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPixelMaskArray: %s' % ndarray_uint32_3_to_str(obj.asicPixelMaskArray()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'version: %s' % uint32_to_str(obj.version()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runTrigDelay: %s' % uint32_to_str(obj.runTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'daqTrigDelay: %s' % uint32_to_str(obj.daqTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dacSetting: %s' % uint32_to_str(obj.dacSetting()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqToAsicR0Delay: %s' % uint32_to_str(obj.acqToAsicR0Delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0ToAsicAcq: %s' % uint32_to_str(obj.asicR0ToAsicAcq()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqWidth: %s' % uint32_to_str(obj.asicAcqWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqLToPPmatL: %s' % uint32_to_str(obj.asicAcqLToPPmatL()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicRoClkHalfT: %s' % uint32_to_str(obj.asicRoClkHalfT()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcReadsPerPixel: %s' % uint32_to_str(obj.adcReadsPerPixel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcClkHalfT: %s' % uint32_to_str(obj.adcClkHalfT()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0Width: %s' % uint32_to_str(obj.asicR0Width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcPipelineDelay: %s' % uint32_to_str(obj.adcPipelineDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0Width: %s' % uint32_to_str(obj.prepulseR0Width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0Delay: %s' % uint32_to_str(obj.prepulseR0Delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId0: %s' % uint32_to_str(obj.digitalCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId1: %s' % uint32_to_str(obj.digitalCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId0: %s' % uint32_to_str(obj.analogCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId1: %s' % uint32_to_str(obj.analogCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lastRowExclusions: %s' % uint32_to_str(obj.lastRowExclusions()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsicsPerRow: %s' % uint32_to_str(obj.numberOfAsicsPerRow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsicsPerColumn: %s' % uint32_to_str(obj.numberOfAsicsPerColumn()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfRowsPerAsic: %s' % uint32_to_str(obj.numberOfRowsPerAsic()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfPixelsPerAsicRow: %s' % uint32_to_str(obj.numberOfPixelsPerAsicRow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'baseClockFrequency: %s' % uint32_to_str(obj.baseClockFrequency()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicGR: %s' % uint8_to_str(obj.asicGR()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcq: %s' % uint8_to_str(obj.asicAcq()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0: %s' % uint8_to_str(obj.asicR0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpmat: %s' % uint8_to_str(obj.asicPpmat()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpbe: %s' % uint8_to_str(obj.asicPpbe()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicRoClk: %s' % uint8_to_str(obj.asicRoClk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicGRControl: %s' % uint8_to_str(obj.asicGRControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqControl: %s' % uint8_to_str(obj.asicAcqControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0Control: %s' % uint8_to_str(obj.asicR0Control()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpmatControl: %s' % uint8_to_str(obj.asicPpmatControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpbeControl: %s' % uint8_to_str(obj.asicPpbeControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0ClkControl: %s' % uint8_to_str(obj.asicR0ClkControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0En: %s' % uint8_to_str(obj.prepulseR0En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcStreamMode: %s' % uint32_to_str(obj.adcStreamMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'testPatternEnable: %s' % uint8_to_str(obj.testPatternEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfRows: %s' % uint32_to_str(obj.numberOfRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfColumns: %s' % uint32_to_str(obj.numberOfColumns()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsics: %s' % uint32_to_str(obj.numberOfAsics()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % uint32_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runTrigDelay: %s' % uint32_to_str( obj.runTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'daqTrigDelay: %s' % uint32_to_str( obj.daqTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dacSetting: %s' % uint32_to_str( obj.dacSetting() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqToAsicR0Delay: %s' % uint32_to_str( obj.acqToAsicR0Delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0ToAsicAcq: %s' % uint32_to_str( obj.asicR0ToAsicAcq() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqWidth: %s' % uint32_to_str( obj.asicAcqWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqLToPPmatL: %s' % uint32_to_str( obj.asicAcqLToPPmatL() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicRoClkHalfT: %s' % uint32_to_str( obj.asicRoClkHalfT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcReadsPerPixel: %s' % uint32_to_str( obj.adcReadsPerPixel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcClkHalfT: %s' % uint32_to_str( obj.adcClkHalfT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0Width: %s' % uint32_to_str( obj.asicR0Width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay: %s' % uint32_to_str( obj.adcPipelineDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0Width: %s' % uint32_to_str( obj.prepulseR0Width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0Delay: %s' % uint32_to_str( obj.prepulseR0Delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId0: %s' % uint32_to_str( obj.digitalCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId1: %s' % uint32_to_str( obj.digitalCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId0: %s' % uint32_to_str( obj.analogCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId1: %s' % uint32_to_str( obj.analogCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastRowExclusions: %s' % uint32_to_str( obj.lastRowExclusions() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsicsPerRow: %s' % uint32_to_str( obj.numberOfAsicsPerRow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsicsPerColumn: %s' % uint32_to_str( obj.numberOfAsicsPerColumn() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfRowsPerAsic: %s' % uint32_to_str( obj.numberOfRowsPerAsic() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfPixelsPerAsicRow: %s' % uint32_to_str( obj.numberOfPixelsPerAsicRow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baseClockFrequency: %s' % uint32_to_str( obj.baseClockFrequency() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPixelTestArray: %s' % ndarray_uint32_3_to_str( obj.asicPixelTestArray() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPixelMaskArray: %s' % ndarray_uint32_3_to_str( obj.asicPixelMaskArray() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicGR: %s' % uint8_to_str( obj.asicGR() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcq: %s' % uint8_to_str( obj.asicAcq() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0: %s' % uint8_to_str( obj.asicR0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpmat: %s' % uint8_to_str( obj.asicPpmat() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpbe: %s' % uint8_to_str( obj.asicPpbe() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicRoClk: %s' % uint8_to_str( obj.asicRoClk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicGRControl: %s' % uint8_to_str( obj.asicGRControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqControl: %s' % uint8_to_str( obj.asicAcqControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0Control: %s' % uint8_to_str( obj.asicR0Control() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpmatControl: %s' % uint8_to_str( obj.asicPpmatControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpbeControl: %s' % uint8_to_str( obj.asicPpbeControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0ClkControl: %s' % uint8_to_str( obj.asicR0ClkControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0En: %s' % uint8_to_str( obj.prepulseR0En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcStreamMode: %s' % uint32_to_str( obj.adcStreamMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'testPatternEnable: %s' % uint8_to_str( obj.testPatternEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfRows: %s' % uint32_to_str( obj.numberOfRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfColumns: %s' % uint32_to_str( obj.numberOfColumns() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsics: %s' % uint32_to_str( obj.numberOfAsics() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.asics()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "asics[%d]\n" % idx
-        elemStr += Epix_AsicConfigV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    numObjs = obj.numberOfAsicsPerRow()*obj.numberOfAsicsPerColumn()
+    for idx in range( numObjs ):
+        subObj = obj.asics(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'asics[%d]:\n' % idx
+        methodStr += Epix_AsicConfigV1_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Epix_Asic10kConfigV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'CompTH_DAC: %s' % uint8_to_str(obj.CompTH_DAC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'CompEn_0: %s' % uint8_to_str(obj.CompEn_0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PulserSync: %s' % uint8_to_str(obj.PulserSync()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyTest: %s' % uint8_to_str(obj.dummyTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyMask: %s' % uint8_to_str(obj.dummyMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyG: %s' % uint8_to_str(obj.dummyG()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyGA: %s' % uint8_to_str(obj.dummyGA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dummyUpper12bits: %s' % uint16_to_str(obj.dummyUpper12bits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulser: %s' % uint16_to_str(obj.pulser()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pbit: %s' % uint8_to_str(obj.pbit()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'atest: %s' % uint8_to_str(obj.atest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'test: %s' % uint8_to_str(obj.test()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sabTest: %s' % uint8_to_str(obj.sabTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'hrTest: %s' % uint8_to_str(obj.hrTest()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulserR: %s' % uint8_to_str(obj.pulserR()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digMon1: %s' % uint8_to_str(obj.digMon1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digMon2: %s' % uint8_to_str(obj.digMon2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulserDac: %s' % uint8_to_str(obj.pulserDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'monostPulser: %s' % uint8_to_str(obj.monostPulser()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'CompEn_1: %s' % uint8_to_str(obj.CompEn_1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'CompEn_2: %s' % uint8_to_str(obj.CompEn_2()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Dm1En: %s' % uint8_to_str(obj.Dm1En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Dm2En: %s' % uint8_to_str(obj.Dm2En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'emph_bd: %s' % uint8_to_str(obj.emph_bd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'emph_bc: %s' % uint8_to_str(obj.emph_bc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'VRefDac: %s' % uint8_to_str(obj.VRefDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vrefLow: %s' % uint8_to_str(obj.vrefLow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsTComp: %s' % uint8_to_str(obj.TpsTComp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsMux: %s' % uint8_to_str(obj.TpsMux()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RoMonost: %s' % uint8_to_str(obj.RoMonost()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsGr: %s' % uint8_to_str(obj.TpsGr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dGr: %s' % uint8_to_str(obj.S2dGr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PpOcbS2d: %s' % uint8_to_str(obj.PpOcbS2d()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Ocb: %s' % uint8_to_str(obj.Ocb()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Monost: %s' % uint8_to_str(obj.Monost()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'FastppEnable: %s' % uint8_to_str(obj.FastppEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Preamp: %s' % uint8_to_str(obj.Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'PixelCb: %s' % uint8_to_str(obj.PixelCb()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'Vld1_b: %s' % uint8_to_str(obj.Vld1_b()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dTComp: %s' % uint8_to_str(obj.S2dTComp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'FilterDac: %s' % uint8_to_str(obj.FilterDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'testVDTransmitter: %s' % uint8_to_str(obj.testVDTransmitter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TC: %s' % uint8_to_str(obj.TC()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2d: %s' % uint8_to_str(obj.S2d()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dDacBias: %s' % uint8_to_str(obj.S2dDacBias()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsTcDac: %s' % uint8_to_str(obj.TpsTcDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TpsDac: %s' % uint8_to_str(obj.TpsDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dTcDac: %s' % uint8_to_str(obj.S2dTcDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'S2dDac: %s' % uint8_to_str(obj.S2dDac()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'TestBe: %s' % uint8_to_str(obj.TestBe()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'IsEn: %s' % uint8_to_str(obj.IsEn()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'DelExec: %s' % uint8_to_str(obj.DelExec()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'DelCckReg: %s' % uint8_to_str(obj.DelCckReg()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RO_rst_en: %s' % uint8_to_str(obj.RO_rst_en()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'slvdSBit: %s' % uint8_to_str(obj.slvdSBit()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'FELmode: %s' % uint8_to_str(obj.FELmode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'CompEnOn: %s' % uint8_to_str(obj.CompEnOn()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RowStartAddr: %s' % uint16_to_str(obj.RowStartAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'RowStopAddr: %s' % uint16_to_str(obj.RowStopAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ColStartAddr: %s' % uint8_to_str(obj.ColStartAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ColStopAddr: %s' % uint8_to_str(obj.ColStopAddr()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chipID: %s' % uint16_to_str(obj.chipID()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Epix_Asic10kConfigV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'CompTH_DAC: %s' % uint8_to_str( obj.CompTH_DAC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'CompEn_0: %s' % uint8_to_str( obj.CompEn_0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PulserSync: %s' % uint8_to_str( obj.PulserSync() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyTest: %s' % uint8_to_str( obj.dummyTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyMask: %s' % uint8_to_str( obj.dummyMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyG: %s' % uint8_to_str( obj.dummyG() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyGA: %s' % uint8_to_str( obj.dummyGA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dummyUpper12bits: %s' % uint16_to_str( obj.dummyUpper12bits() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulser: %s' % uint16_to_str( obj.pulser() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pbit: %s' % uint8_to_str( obj.pbit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'atest: %s' % uint8_to_str( obj.atest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'test: %s' % uint8_to_str( obj.test() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sabTest: %s' % uint8_to_str( obj.sabTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hrTest: %s' % uint8_to_str( obj.hrTest() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulserR: %s' % uint8_to_str( obj.pulserR() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digMon1: %s' % uint8_to_str( obj.digMon1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digMon2: %s' % uint8_to_str( obj.digMon2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulserDac: %s' % uint8_to_str( obj.pulserDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'monostPulser: %s' % uint8_to_str( obj.monostPulser() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'CompEn_1: %s' % uint8_to_str( obj.CompEn_1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'CompEn_2: %s' % uint8_to_str( obj.CompEn_2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Dm1En: %s' % uint8_to_str( obj.Dm1En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Dm2En: %s' % uint8_to_str( obj.Dm2En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'emph_bd: %s' % uint8_to_str( obj.emph_bd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'emph_bc: %s' % uint8_to_str( obj.emph_bc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'VRefDac: %s' % uint8_to_str( obj.VRefDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vrefLow: %s' % uint8_to_str( obj.vrefLow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsTComp: %s' % uint8_to_str( obj.TpsTComp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsMux: %s' % uint8_to_str( obj.TpsMux() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RoMonost: %s' % uint8_to_str( obj.RoMonost() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsGr: %s' % uint8_to_str( obj.TpsGr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dGr: %s' % uint8_to_str( obj.S2dGr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PpOcbS2d: %s' % uint8_to_str( obj.PpOcbS2d() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Ocb: %s' % uint8_to_str( obj.Ocb() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Monost: %s' % uint8_to_str( obj.Monost() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FastppEnable: %s' % uint8_to_str( obj.FastppEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Preamp: %s' % uint8_to_str( obj.Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'PixelCb: %s' % uint8_to_str( obj.PixelCb() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'Vld1_b: %s' % uint8_to_str( obj.Vld1_b() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dTComp: %s' % uint8_to_str( obj.S2dTComp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FilterDac: %s' % uint8_to_str( obj.FilterDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'testVDTransmitter: %s' % uint8_to_str( obj.testVDTransmitter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TC: %s' % uint8_to_str( obj.TC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2d: %s' % uint8_to_str( obj.S2d() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dDacBias: %s' % uint8_to_str( obj.S2dDacBias() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsTcDac: %s' % uint8_to_str( obj.TpsTcDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TpsDac: %s' % uint8_to_str( obj.TpsDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dTcDac: %s' % uint8_to_str( obj.S2dTcDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'S2dDac: %s' % uint8_to_str( obj.S2dDac() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'TestBe: %s' % uint8_to_str( obj.TestBe() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'IsEn: %s' % uint8_to_str( obj.IsEn() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'DelExec: %s' % uint8_to_str( obj.DelExec() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'DelCckReg: %s' % uint8_to_str( obj.DelCckReg() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RO_rst_en: %s' % uint8_to_str( obj.RO_rst_en() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'slvdSBit: %s' % uint8_to_str( obj.slvdSBit() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FELmode: %s' % uint8_to_str( obj.FELmode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'CompEnOn: %s' % uint8_to_str( obj.CompEnOn() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RowStartAddr: %s' % uint16_to_str( obj.RowStartAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'RowStopAddr: %s' % uint16_to_str( obj.RowStopAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ColStartAddr: %s' % uint8_to_str( obj.ColStartAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ColStopAddr: %s' % uint8_to_str( obj.ColStopAddr() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chipID: %s' % uint16_to_str( obj.chipID() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Epix_Config10KV1_to_str(obj, indent, indentLvl):
+def Epix_Config10KV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Epix.Config10KV1.TypeId
     assert obj.Version == psana.Epix.Config10KV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPixelConfigArray: %s' % ndarray_uint16_3_to_str(obj.asicPixelConfigArray()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'version: %s' % uint32_to_str(obj.version()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runTrigDelay: %s' % uint32_to_str(obj.runTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'daqTrigDelay: %s' % uint32_to_str(obj.daqTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dacSetting: %s' % uint32_to_str(obj.dacSetting()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'DoutPipelineDelay: %s' % uint32_to_str(obj.DoutPipelineDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqToAsicR0Delay: %s' % uint32_to_str(obj.acqToAsicR0Delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0ToAsicAcq: %s' % uint32_to_str(obj.asicR0ToAsicAcq()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqWidth: %s' % uint32_to_str(obj.asicAcqWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqLToPPmatL: %s' % uint32_to_str(obj.asicAcqLToPPmatL()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicRoClkHalfT: %s' % uint32_to_str(obj.asicRoClkHalfT()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcReadsPerPixel: %s' % uint32_to_str(obj.adcReadsPerPixel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcClkHalfT: %s' % uint32_to_str(obj.adcClkHalfT()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0Width: %s' % uint32_to_str(obj.asicR0Width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcPipelineDelay: %s' % uint32_to_str(obj.adcPipelineDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0Width: %s' % uint32_to_str(obj.prepulseR0Width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0Delay: %s' % uint32_to_str(obj.prepulseR0Delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId0: %s' % uint32_to_str(obj.digitalCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId1: %s' % uint32_to_str(obj.digitalCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId0: %s' % uint32_to_str(obj.analogCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId1: %s' % uint32_to_str(obj.analogCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lastRowExclusions: %s' % uint32_to_str(obj.lastRowExclusions()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsicsPerRow: %s' % uint32_to_str(obj.numberOfAsicsPerRow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsicsPerColumn: %s' % uint32_to_str(obj.numberOfAsicsPerColumn()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfRowsPerAsic: %s' % uint32_to_str(obj.numberOfRowsPerAsic()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfPixelsPerAsicRow: %s' % uint32_to_str(obj.numberOfPixelsPerAsicRow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'baseClockFrequency: %s' % uint32_to_str(obj.baseClockFrequency()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicMask: %s' % uint32_to_str(obj.asicMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicGR: %s' % uint8_to_str(obj.asicGR()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcq: %s' % uint8_to_str(obj.asicAcq()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0: %s' % uint8_to_str(obj.asicR0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpmat: %s' % uint8_to_str(obj.asicPpmat()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpbe: %s' % uint8_to_str(obj.asicPpbe()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicRoClk: %s' % uint8_to_str(obj.asicRoClk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicGRControl: %s' % uint8_to_str(obj.asicGRControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicAcqControl: %s' % uint8_to_str(obj.asicAcqControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0Control: %s' % uint8_to_str(obj.asicR0Control()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpmatControl: %s' % uint8_to_str(obj.asicPpmatControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicPpbeControl: %s' % uint8_to_str(obj.asicPpbeControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'asicR0ClkControl: %s' % uint8_to_str(obj.asicR0ClkControl()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prepulseR0En: %s' % uint8_to_str(obj.prepulseR0En()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcStreamMode: %s' % uint32_to_str(obj.adcStreamMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'testPatternEnable: %s' % uint8_to_str(obj.testPatternEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'SyncMode: %s' % uint8_to_str(obj.SyncMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'R0Mode: %s' % uint8_to_str(obj.R0Mode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'SyncWidth: %s' % uint16_to_str(obj.SyncWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'SyncDelay: %s' % uint16_to_str(obj.SyncDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeEnable: %s' % uint8_to_str(obj.scopeEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeTrigEdge: %s' % uint8_to_str(obj.scopeTrigEdge()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeTrigChan: %s' % uint8_to_str(obj.scopeTrigChan()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeArmMode: %s' % uint8_to_str(obj.scopeArmMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeADCThreshold: %s' % uint16_to_str(obj.scopeADCThreshold()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeTrigHoldoff: %s' % uint16_to_str(obj.scopeTrigHoldoff()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeTrigOffset: %s' % uint16_to_str(obj.scopeTrigOffset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeTraceLength: %s' % uint16_to_str(obj.scopeTraceLength()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeADCsameplesToSkip: %s' % uint16_to_str(obj.scopeADCsameplesToSkip()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeChanAwaveformSelect: %s' % uint8_to_str(obj.scopeChanAwaveformSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'scopeChanBwaveformSelect: %s' % uint8_to_str(obj.scopeChanBwaveformSelect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfRows: %s' % uint32_to_str(obj.numberOfRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfColumns: %s' % uint32_to_str(obj.numberOfColumns()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfAsics: %s' % uint32_to_str(obj.numberOfAsics()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % uint32_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runTrigDelay: %s' % uint32_to_str( obj.runTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'daqTrigDelay: %s' % uint32_to_str( obj.daqTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dacSetting: %s' % uint32_to_str( obj.dacSetting() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'DoutPipelineDelay: %s' % uint32_to_str( obj.DoutPipelineDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqToAsicR0Delay: %s' % uint32_to_str( obj.acqToAsicR0Delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0ToAsicAcq: %s' % uint32_to_str( obj.asicR0ToAsicAcq() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqWidth: %s' % uint32_to_str( obj.asicAcqWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqLToPPmatL: %s' % uint32_to_str( obj.asicAcqLToPPmatL() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicRoClkHalfT: %s' % uint32_to_str( obj.asicRoClkHalfT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcReadsPerPixel: %s' % uint32_to_str( obj.adcReadsPerPixel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcClkHalfT: %s' % uint32_to_str( obj.adcClkHalfT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0Width: %s' % uint32_to_str( obj.asicR0Width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay: %s' % uint32_to_str( obj.adcPipelineDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0Width: %s' % uint32_to_str( obj.prepulseR0Width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0Delay: %s' % uint32_to_str( obj.prepulseR0Delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId0: %s' % uint32_to_str( obj.digitalCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId1: %s' % uint32_to_str( obj.digitalCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId0: %s' % uint32_to_str( obj.analogCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId1: %s' % uint32_to_str( obj.analogCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastRowExclusions: %s' % uint32_to_str( obj.lastRowExclusions() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsicsPerRow: %s' % uint32_to_str( obj.numberOfAsicsPerRow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsicsPerColumn: %s' % uint32_to_str( obj.numberOfAsicsPerColumn() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfRowsPerAsic: %s' % uint32_to_str( obj.numberOfRowsPerAsic() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfPixelsPerAsicRow: %s' % uint32_to_str( obj.numberOfPixelsPerAsicRow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baseClockFrequency: %s' % uint32_to_str( obj.baseClockFrequency() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPixelConfigArray: %s' % ndarray_uint16_3_to_str( obj.asicPixelConfigArray() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicGR: %s' % uint8_to_str( obj.asicGR() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcq: %s' % uint8_to_str( obj.asicAcq() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0: %s' % uint8_to_str( obj.asicR0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpmat: %s' % uint8_to_str( obj.asicPpmat() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpbe: %s' % uint8_to_str( obj.asicPpbe() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicRoClk: %s' % uint8_to_str( obj.asicRoClk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicGRControl: %s' % uint8_to_str( obj.asicGRControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicAcqControl: %s' % uint8_to_str( obj.asicAcqControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0Control: %s' % uint8_to_str( obj.asicR0Control() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpmatControl: %s' % uint8_to_str( obj.asicPpmatControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicPpbeControl: %s' % uint8_to_str( obj.asicPpbeControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'asicR0ClkControl: %s' % uint8_to_str( obj.asicR0ClkControl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prepulseR0En: %s' % uint8_to_str( obj.prepulseR0En() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcStreamMode: %s' % uint32_to_str( obj.adcStreamMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'testPatternEnable: %s' % uint8_to_str( obj.testPatternEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'SyncMode: %s' % uint8_to_str( obj.SyncMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'R0Mode: %s' % uint8_to_str( obj.R0Mode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'SyncWidth: %s' % uint16_to_str( obj.SyncWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'SyncDelay: %s' % uint16_to_str( obj.SyncDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeEnable: %s' % uint8_to_str( obj.scopeEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeTrigEdge: %s' % uint8_to_str( obj.scopeTrigEdge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeTrigChan: %s' % uint8_to_str( obj.scopeTrigChan() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeArmMode: %s' % uint8_to_str( obj.scopeArmMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeADCThreshold: %s' % uint16_to_str( obj.scopeADCThreshold() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeTrigHoldoff: %s' % uint16_to_str( obj.scopeTrigHoldoff() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeTrigOffset: %s' % uint16_to_str( obj.scopeTrigOffset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeTraceLength: %s' % uint16_to_str( obj.scopeTraceLength() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeADCsameplesToSkip: %s' % uint16_to_str( obj.scopeADCsameplesToSkip() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeChanAwaveformSelect: %s' % uint8_to_str( obj.scopeChanAwaveformSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'scopeChanBwaveformSelect: %s' % uint8_to_str( obj.scopeChanBwaveformSelect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfRows: %s' % uint32_to_str( obj.numberOfRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfColumns: %s' % uint32_to_str( obj.numberOfColumns() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsics: %s' % uint32_to_str( obj.numberOfAsics() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.asics()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "asics[%d]\n" % idx
-        elemStr += Epix_Asic10kConfigV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    numObjs = obj.numberOfAsicsPerRow()*obj.numberOfAsicsPerColumn()
+    for idx in range( numObjs ):
+        subObj = obj.asics(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'asics[%d]:\n' % idx
+        methodStr += Epix_Asic10kConfigV1_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Epix_ElementV1_to_str(obj, indent, indentLvl):
+def Epix_ElementV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Epix.ElementV1.TypeId
     assert obj.Version == psana.Epix.ElementV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame: %s' % ndarray_uint16_2_to_str(obj.frame()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'excludedRows: %s' % ndarray_uint16_2_to_str(obj.excludedRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str(obj.temperatures()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameNumber: %s' % uint32_to_str(obj.frameNumber()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fiducials: %s' % uint32_to_str(obj.fiducials()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lastWord: %s' % uint32_to_str(obj.lastWord()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vc: %s' % uint8_to_str(obj.vc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint8_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqCount: %s' % uint16_to_str(obj.acqCount()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame: %s' % ndarray_uint16_2_to_str( obj.frame() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'excludedRows: %s' % ndarray_uint16_2_to_str( obj.excludedRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str( obj.temperatures() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastWord: %s' % uint32_to_str( obj.lastWord() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vc: %s' % uint8_to_str( obj.vc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint8_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqCount: %s' % uint16_to_str( obj.acqCount() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EpixSampler_ConfigV1_to_str(obj, indent, indentLvl):
+def EpixSampler_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EpixSampler.ConfigV1.TypeId
     assert obj.Version == psana.EpixSampler.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'version: %s' % uint32_to_str(obj.version()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'runTrigDelay: %s' % uint32_to_str(obj.runTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'daqTrigDelay: %s' % uint32_to_str(obj.daqTrigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'daqSetting: %s' % uint32_to_str(obj.daqSetting()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcClkHalfT: %s' % uint32_to_str(obj.adcClkHalfT()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcPipelineDelay: %s' % uint32_to_str(obj.adcPipelineDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId0: %s' % uint32_to_str(obj.digitalCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digitalCardId1: %s' % uint32_to_str(obj.digitalCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId0: %s' % uint32_to_str(obj.analogCardId0()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analogCardId1: %s' % uint32_to_str(obj.analogCardId1()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfChannels: %s' % uint32_to_str(obj.numberOfChannels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'samplesPerChannel: %s' % uint32_to_str(obj.samplesPerChannel()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'baseClockFrequency: %s' % uint32_to_str(obj.baseClockFrequency()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'testPatternEnable: %s' % uint8_to_str(obj.testPatternEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sampleInterval_sec: %s' % double_to_str(obj.sampleInterval_sec()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'version: %s' % uint32_to_str( obj.version() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'runTrigDelay: %s' % uint32_to_str( obj.runTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'daqTrigDelay: %s' % uint32_to_str( obj.daqTrigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'daqSetting: %s' % uint32_to_str( obj.daqSetting() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcClkHalfT: %s' % uint32_to_str( obj.adcClkHalfT() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcPipelineDelay: %s' % uint32_to_str( obj.adcPipelineDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId0: %s' % uint32_to_str( obj.digitalCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digitalCardId1: %s' % uint32_to_str( obj.digitalCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId0: %s' % uint32_to_str( obj.analogCardId0() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analogCardId1: %s' % uint32_to_str( obj.analogCardId1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfChannels: %s' % uint32_to_str( obj.numberOfChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'samplesPerChannel: %s' % uint32_to_str( obj.samplesPerChannel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baseClockFrequency: %s' % uint32_to_str( obj.baseClockFrequency() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'testPatternEnable: %s' % uint8_to_str( obj.testPatternEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sampleInterval_sec: %s' % double_to_str( obj.sampleInterval_sec() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EpixSampler_ElementV1_to_str(obj, indent, indentLvl):
+def EpixSampler_ElementV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EpixSampler.ElementV1.TypeId
     assert obj.Version == psana.EpixSampler.ElementV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frame: %s' % ndarray_uint16_2_to_str(obj.frame()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str(obj.temperatures()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameNumber: %s' % uint32_to_str(obj.frameNumber()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ticks: %s' % uint32_to_str(obj.ticks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fiducials: %s' % uint32_to_str(obj.fiducials()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lastWord: %s' % uint32_to_str(obj.lastWord()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vc: %s' % uint8_to_str(obj.vc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint8_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'acqCount: %s' % uint16_to_str(obj.acqCount()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ticks: %s' % uint32_to_str( obj.ticks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame: %s' % ndarray_uint16_2_to_str( obj.frame() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str( obj.temperatures() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastWord: %s' % uint32_to_str( obj.lastWord() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vc: %s' % uint8_to_str( obj.vc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint8_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'acqCount: %s' % uint16_to_str( obj.acqCount() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_PulseConfig_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulse: %s' % uint32_to_str(obj.pulse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prescale: %s' % uint32_to_str(obj.prescale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delay: %s' % uint32_to_str(obj.delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'polarity: %s' % uint8_to_str(obj.polarity()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'map_set_enable: %s' % uint8_to_str(obj.map_set_enable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'map_reset_enable: %s' % uint8_to_str(obj.map_reset_enable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'map_trigger_enable: %s' % uint8_to_str(obj.map_trigger_enable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigger: %s' % int16_to_str(obj.trigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'set: %s' % int16_to_str(obj.set()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'clear: %s' % int16_to_str(obj.clear()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_PulseConfig_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulse: %s' % uint32_to_str( obj.pulse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prescale: %s' % uint32_to_str( obj.prescale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delay: %s' % uint32_to_str( obj.delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'polarity: %s' % uint8_to_str( obj.polarity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'map_set_enable: %s' % uint8_to_str( obj.map_set_enable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'map_reset_enable: %s' % uint8_to_str( obj.map_reset_enable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'map_trigger_enable: %s' % uint8_to_str( obj.map_trigger_enable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigger: %s' % int16_to_str( obj.trigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'set: %s' % int16_to_str( obj.set() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'clear: %s' % int16_to_str( obj.clear() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_PulseConfigV3_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pulseId: %s' % uint16_to_str(obj.pulseId()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'polarity: %s' % uint16_to_str(obj.polarity()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'prescale: %s' % uint32_to_str(obj.prescale()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delay: %s' % uint32_to_str(obj.delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_PulseConfigV3_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pulseId: %s' % uint16_to_str( obj.pulseId() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'polarity: %s' % uint16_to_str( obj.polarity() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'prescale: %s' % uint32_to_str( obj.prescale() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delay: %s' % uint32_to_str( obj.delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_EventCodeV3_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'code: %s' % uint16_to_str(obj.code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTrigger: %s' % uint32_to_str(obj.maskTrigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskSet: %s' % uint32_to_str(obj.maskSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskClear: %s' % uint32_to_str(obj.maskClear()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isReadout: %s' % uint8_to_str(obj.isReadout()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isTerminator: %s' % uint8_to_str(obj.isTerminator()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_EventCodeV3_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'code: %s' % uint16_to_str( obj.code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTrigger: %s' % uint32_to_str( obj.maskTrigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskSet: %s' % uint32_to_str( obj.maskSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskClear: %s' % uint32_to_str( obj.maskClear() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isReadout: %s' % uint8_to_str( obj.isReadout() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isTerminator: %s' % uint8_to_str( obj.isTerminator() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_EventCodeV4_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'code: %s' % uint16_to_str(obj.code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportDelay: %s' % uint32_to_str(obj.reportDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportWidth: %s' % uint32_to_str(obj.reportWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTrigger: %s' % uint32_to_str(obj.maskTrigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskSet: %s' % uint32_to_str(obj.maskSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskClear: %s' % uint32_to_str(obj.maskClear()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isReadout: %s' % uint8_to_str(obj.isReadout()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isTerminator: %s' % uint8_to_str(obj.isTerminator()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_EventCodeV4_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'code: %s' % uint16_to_str( obj.code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportDelay: %s' % uint32_to_str( obj.reportDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportWidth: %s' % uint32_to_str( obj.reportWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTrigger: %s' % uint32_to_str( obj.maskTrigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskSet: %s' % uint32_to_str( obj.maskSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskClear: %s' % uint32_to_str( obj.maskClear() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isReadout: %s' % uint8_to_str( obj.isReadout() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isTerminator: %s' % uint8_to_str( obj.isTerminator() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_EventCodeV5_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'code: %s' % uint16_to_str(obj.code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportDelay: %s' % uint32_to_str(obj.reportDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportWidth: %s' % uint32_to_str(obj.reportWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTrigger: %s' % uint32_to_str(obj.maskTrigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskSet: %s' % uint32_to_str(obj.maskSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskClear: %s' % uint32_to_str(obj.maskClear()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isReadout: %s' % uint8_to_str(obj.isReadout()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isCommand: %s' % uint8_to_str(obj.isCommand()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isLatch: %s' % uint8_to_str(obj.isLatch()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'releaseCode: %s' % uint32_to_str(obj.releaseCode()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.desc()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "desc[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def EvrData_EventCodeV5_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'code: %s' % uint16_to_str( obj.code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportDelay: %s' % uint32_to_str( obj.reportDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportWidth: %s' % uint32_to_str( obj.reportWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTrigger: %s' % uint32_to_str( obj.maskTrigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskSet: %s' % uint32_to_str( obj.maskSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskClear: %s' % uint32_to_str( obj.maskClear() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'desc: %s' % str_to_str( obj.desc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isReadout: %s' % uint8_to_str( obj.isReadout() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isCommand: %s' % uint8_to_str( obj.isCommand() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isLatch: %s' % uint8_to_str( obj.isLatch() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'releaseCode: %s' % uint32_to_str( obj.releaseCode() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_EventCodeV6_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'code: %s' % uint16_to_str(obj.code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportDelay: %s' % uint32_to_str(obj.reportDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reportWidth: %s' % uint32_to_str(obj.reportWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTrigger: %s' % uint32_to_str(obj.maskTrigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskSet: %s' % uint32_to_str(obj.maskSet()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskClear: %s' % uint32_to_str(obj.maskClear()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutGroup: %s' % uint16_to_str(obj.readoutGroup()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isReadout: %s' % uint8_to_str(obj.isReadout()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isCommand: %s' % uint8_to_str(obj.isCommand()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'isLatch: %s' % uint8_to_str(obj.isLatch()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'releaseCode: %s' % uint32_to_str(obj.releaseCode()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.desc()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "desc[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def EvrData_EventCodeV6_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'code: %s' % uint16_to_str( obj.code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportDelay: %s' % uint32_to_str( obj.reportDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reportWidth: %s' % uint32_to_str( obj.reportWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTrigger: %s' % uint32_to_str( obj.maskTrigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskSet: %s' % uint32_to_str( obj.maskSet() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskClear: %s' % uint32_to_str( obj.maskClear() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'desc: %s' % str_to_str( obj.desc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutGroup: %s' % uint16_to_str( obj.readoutGroup() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isReadout: %s' % uint8_to_str( obj.isReadout() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isCommand: %s' % uint8_to_str( obj.isCommand() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'isLatch: %s' % uint8_to_str( obj.isLatch() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'releaseCode: %s' % uint32_to_str( obj.releaseCode() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_SrcEventCode_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'code: %s' % uint16_to_str(obj.code()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'period: %s' % uint32_to_str(obj.period()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTriggerP: %s' % uint32_to_str(obj.maskTriggerP()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskTriggerR: %s' % uint32_to_str(obj.maskTriggerR()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutGroup: %s' % uint16_to_str(obj.readoutGroup()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.desc()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "desc[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def EvrData_SrcEventCode_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'code: %s' % uint16_to_str( obj.code() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'period: %s' % uint32_to_str( obj.period() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTriggerP: %s' % uint32_to_str( obj.maskTriggerP() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskTriggerR: %s' % uint32_to_str( obj.maskTriggerR() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'desc: %s' % str_to_str( obj.desc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutGroup: %s' % uint16_to_str( obj.readoutGroup() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_OutputMap_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % uint32_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'source_id: %s' % uint8_to_str(obj.source_id()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'conn_id: %s' % uint8_to_str(obj.conn_id()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'map: %s' % uint32_to_str(obj.map()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'source: %s' % int32_to_str(obj.source()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'conn: %s' % int32_to_str(obj.conn()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def EvrData_OutputMap_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % uint32_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'source_id: %s' % uint8_to_str( obj.source_id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'conn_id: %s' % uint8_to_str( obj.conn_id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'map: %s' % uint32_to_str( obj.map() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'source:\n'
+    methodStr += enum_to_str(obj.source(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'conn:\n'
+    methodStr += enum_to_str(obj.conn(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_OutputMapV2_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'value: %s' % uint32_to_str(obj.value()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'source_id: %s' % uint8_to_str(obj.source_id()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'conn_id: %s' % uint8_to_str(obj.conn_id()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'module: %s' % uint8_to_str(obj.module()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'map: %s' % uint32_to_str(obj.map()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'source: %s' % int32_to_str(obj.source()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'conn: %s' % int32_to_str(obj.conn()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+def EvrData_OutputMapV2_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % uint32_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'source_id: %s' % uint8_to_str( obj.source_id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'conn_id: %s' % uint8_to_str( obj.conn_id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'module: %s' % uint8_to_str( obj.module() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'map: %s' % uint32_to_str( obj.map() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'source:\n'
+    methodStr += enum_to_str(obj.source(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'conn:\n'
+    methodStr += enum_to_str(obj.conn(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV1_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV1.TypeId
     assert obj.Version == psana.EvrData.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfig_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMap_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfig_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMap_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV2_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV2.TypeId
     assert obj.Version == psana.EvrData.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'opcode: %s' % uint32_to_str(obj.opcode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'beam: %s' % int32_to_str(obj.beam()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rate: %s' % int32_to_str(obj.rate()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfig_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMap_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'opcode: %s' % uint32_to_str( obj.opcode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'beam:\n'
+    methodStr += enum_to_str(obj.beam(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rate:\n'
+    methodStr += enum_to_str(obj.rate(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfig_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMap_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV3_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV3.TypeId
     assert obj.Version == psana.EvrData.ConfigV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_EventCodeV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMap_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_EventCodeV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMap_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV4_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV4_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV4.TypeId
     assert obj.Version == psana.EvrData.ConfigV4.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_EventCodeV4_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMap_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_EventCodeV4_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMap_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_SequencerEntry_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delay: %s' % uint32_to_str(obj.delay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventcode: %s' % uint32_to_str(obj.eventcode()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_SequencerEntry_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delay: %s' % uint32_to_str( obj.delay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventcode: %s' % uint32_to_str( obj.eventcode() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_SequencerConfigV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'length: %s' % uint32_to_str(obj.length()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'cycles: %s' % uint32_to_str(obj.cycles()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'sync_source: %s' % int32_to_str(obj.sync_source()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'beam_source: %s' % int32_to_str(obj.beam_source()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.entries()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "entries[%d]\n" % idx
-        elemStr += EvrData_SequencerEntry_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def EvrData_SequencerConfigV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'length: %s' % uint32_to_str( obj.length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'cycles: %s' % uint32_to_str( obj.cycles() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sync_source:\n'
+    methodStr += enum_to_str(obj.sync_source(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'beam_source:\n'
+    methodStr += enum_to_str(obj.beam_source(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.entries() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'entries[%d]:\n' % idx
+        subMethodStr += EvrData_SequencerEntry_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV5_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV5_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV5.TypeId
     assert obj.Version == psana.EvrData.ConfigV5.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_config:\n%s' % EvrData_SequencerConfigV1_to_str(obj.seq_config(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_EventCodeV5_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMap_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_config:\n'
+    methodStr += EvrData_SequencerConfigV1_to_str(obj.seq_config(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_EventCodeV5_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMap_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV6_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV6_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV6.TypeId
     assert obj.Version == psana.EvrData.ConfigV6.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_config:\n%s' % EvrData_SequencerConfigV1_to_str(obj.seq_config(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_EventCodeV5_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMapV2_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_config:\n'
+    methodStr += EvrData_SequencerConfigV1_to_str(obj.seq_config(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_EventCodeV5_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMapV2_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_ConfigV7_to_str(obj, indent, indentLvl):
+def EvrData_ConfigV7_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.ConfigV7.TypeId
     assert obj.Version == psana.EvrData.ConfigV7.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'seq_config:\n%s' % EvrData_SequencerConfigV1_to_str(obj.seq_config(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_EventCodeV6_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMapV2_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'seq_config:\n'
+    methodStr += EvrData_SequencerConfigV1_to_str(obj.seq_config(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_EventCodeV6_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMapV2_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_SrcConfigV1_to_str(obj, indent, indentLvl):
+def EvrData_SrcConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.SrcConfigV1.TypeId
     assert obj.Version == psana.EvrData.SrcConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'neventcodes: %s' % uint32_to_str(obj.neventcodes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'npulses: %s' % uint32_to_str(obj.npulses()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'noutputs: %s' % uint32_to_str(obj.noutputs()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.eventcodes()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "eventcodes[%d]\n" % idx
-        elemStr += EvrData_SrcEventCode_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.pulses()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "pulses[%d]\n" % idx
-        elemStr += EvrData_PulseConfigV3_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.output_maps()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "output_maps[%d]\n" % idx
-        elemStr += EvrData_OutputMapV2_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'neventcodes: %s' % uint32_to_str( obj.neventcodes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'npulses: %s' % uint32_to_str( obj.npulses() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'noutputs: %s' % uint32_to_str( obj.noutputs() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.eventcodes() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'eventcodes[%d]:\n' % idx
+        subMethodStr += EvrData_SrcEventCode_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.pulses() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'pulses[%d]:\n' % idx
+        subMethodStr += EvrData_PulseConfigV3_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.output_maps() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'output_maps[%d]:\n' % idx
+        subMethodStr += EvrData_OutputMapV2_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_FIFOEvent_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestampHigh: %s' % uint32_to_str(obj.timestampHigh()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestampLow: %s' % uint32_to_str(obj.timestampLow()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'eventCode: %s' % uint32_to_str(obj.eventCode()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def EvrData_FIFOEvent_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestampHigh: %s' % uint32_to_str( obj.timestampHigh() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestampLow: %s' % uint32_to_str( obj.timestampLow() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def EvrData_DataV3_to_str(obj, indent, indentLvl):
+def EvrData_DataV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.DataV3.TypeId
     assert obj.Version == psana.EvrData.DataV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numFifoEvents: %s' % uint32_to_str(obj.numFifoEvents()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.fifoEvents()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "fifoEvents[%d]\n" % idx
-        elemStr += EvrData_FIFOEvent_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numFifoEvents: %s' % uint32_to_str( obj.numFifoEvents() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.fifoEvents() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'fifoEvents[%d]:\n' % idx
+        subMethodStr += EvrData_FIFOEvent_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_IOChannel_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ninfo: %s' % uint32_to_str(obj.ninfo()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.infos()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "infos[%d]\n" % idx
-        elemStr += Pds_DetInfo_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+def EvrData_IOChannel_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'name: %s' % str_to_str( obj.name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ninfo: %s' % uint32_to_str( obj.ninfo() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.infos() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'infos[%d]:\n' % idx
+        subMethodStr += Pds_DetInfo_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def EvrData_IOConfigV1_to_str(obj, indent, indentLvl):
+def EvrData_IOConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.EvrData.IOConfigV1.TypeId
     assert obj.Version == psana.EvrData.IOConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nchannels: %s' % uint16_to_str(obj.nchannels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'conn: %s' % int32_to_str(obj.conn()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.channels()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "channels[%d]\n" % idx
-        elemStr += EvrData_IOChannel_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nchannels: %s' % uint16_to_str( obj.nchannels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'conn:\n'
+    methodStr += enum_to_str(obj.conn(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.channels() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'channels[%d]:\n' % idx
+        subMethodStr += EvrData_IOChannel_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def FCCD_FccdConfigV1_to_str(obj, indent, indentLvl):
+def FCCD_FccdConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.FCCD.FccdConfigV1.TypeId
     assert obj.Version == psana.FCCD.FccdConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'outputMode: %s' % uint16_to_str(obj.outputMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trimmedWidth: %s' % uint32_to_str(obj.trimmedWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trimmedHeight: %s' % uint32_to_str(obj.trimmedHeight()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'outputMode: %s' % uint16_to_str( obj.outputMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trimmedWidth: %s' % uint32_to_str( obj.trimmedWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trimmedHeight: %s' % uint32_to_str( obj.trimmedHeight() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def FCCD_FccdConfigV2_to_str(obj, indent, indentLvl):
+def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.FCCD.FccdConfigV2.TypeId
     assert obj.Version == psana.FCCD.FccdConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dacVoltages: %s' % ndarray_float32_1_to_str(obj.dacVoltages()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'waveforms: %s' % ndarray_uint16_1_to_str(obj.waveforms()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'outputMode: %s' % uint16_to_str(obj.outputMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'ccdEnable: %s' % uint8_to_str(obj.ccdEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'focusMode: %s' % uint8_to_str(obj.focusMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % uint32_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trimmedWidth: %s' % uint32_to_str(obj.trimmedWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trimmedHeight: %s' % uint32_to_str(obj.trimmedHeight()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'outputMode: %s' % uint16_to_str( obj.outputMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ccdEnable: %s' % uint8_to_str( obj.ccdEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'focusMode: %s' % uint8_to_str( obj.focusMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % uint32_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dacVoltages: %s' % ndarray_float32_1_to_str( obj.dacVoltages() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'waveforms: %s' % ndarray_uint16_1_to_str( obj.waveforms() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trimmedWidth: %s' % uint32_to_str( obj.trimmedWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trimmedHeight: %s' % uint32_to_str( obj.trimmedHeight() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Fli_ConfigV1_to_str(obj, indent, indentLvl):
+def Fli_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Fli.ConfigV1.TypeId
     assert obj.Version == psana.Fli.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint8_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str(obj.numDelayShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Fli_FrameV1_to_str(obj, indent, indentLvl):
+def Fli_FrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Fli.FrameV1.TypeId
     assert obj.Version == psana.Fli.FrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str(obj.shotIdStart()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutTime: %s' % float_to_str(obj.readoutTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % float_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Gsc16ai_ConfigV1_to_str(obj, indent, indentLvl):
+def Gsc16ai_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Gsc16ai.ConfigV1.TypeId
     assert obj.Version == psana.Gsc16ai.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'firstChan: %s' % uint16_to_str(obj.firstChan()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lastChan: %s' % uint16_to_str(obj.lastChan()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'fps: %s' % uint16_to_str(obj.fps()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'autocalibEnable: %s' % uint8_to_str(obj.autocalibEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeTagEnable: %s' % uint8_to_str(obj.timeTagEnable()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numChannels: %s' % uint16_to_str(obj.numChannels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'voltageRange: %s' % int32_to_str(obj.voltageRange()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'inputMode: %s' % int32_to_str(obj.inputMode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerMode: %s' % int32_to_str(obj.triggerMode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dataFormat: %s' % int32_to_str(obj.dataFormat()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'firstChan: %s' % uint16_to_str( obj.firstChan() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastChan: %s' % uint16_to_str( obj.lastChan() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fps: %s' % uint16_to_str( obj.fps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'autocalibEnable: %s' % uint8_to_str( obj.autocalibEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeTagEnable: %s' % uint8_to_str( obj.timeTagEnable() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numChannels: %s' % uint16_to_str( obj.numChannels() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'voltageRange:\n'
+    methodStr += enum_to_str(obj.voltageRange(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'inputMode:\n'
+    methodStr += enum_to_str(obj.inputMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerMode:\n'
+    methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dataFormat:\n'
+    methodStr += enum_to_str(obj.dataFormat(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Gsc16ai_DataV1_to_str(obj, indent, indentLvl):
+def Gsc16ai_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Gsc16ai.DataV1.TypeId
     assert obj.Version == psana.Gsc16ai.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % ndarray_uint16_1_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channelValue: %s' % ndarray_uint16_1_to_str(obj.channelValue()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % ndarray_uint16_1_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channelValue: %s' % ndarray_uint16_1_to_str( obj.channelValue() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Imp_ConfigV1_to_str(obj, indent, indentLvl):
+def Imp_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Imp.ConfigV1.TypeId
     assert obj.Version == psana.Imp.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'range: %s' % uint32_to_str(obj.range()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calRange: %s' % uint32_to_str(obj.calRange()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'reset: %s' % uint32_to_str(obj.reset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'biasData: %s' % uint32_to_str(obj.biasData()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calData: %s' % uint32_to_str(obj.calData()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'biasDacData: %s' % uint32_to_str(obj.biasDacData()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'calStrobe: %s' % uint32_to_str(obj.calStrobe()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numberOfSamples: %s' % uint32_to_str(obj.numberOfSamples()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigDelay: %s' % uint32_to_str(obj.trigDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'adcDelay: %s' % uint32_to_str(obj.adcDelay()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'range: %s' % uint32_to_str( obj.range() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calRange: %s' % uint32_to_str( obj.calRange() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reset: %s' % uint32_to_str( obj.reset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'biasData: %s' % uint32_to_str( obj.biasData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calData: %s' % uint32_to_str( obj.calData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'biasDacData: %s' % uint32_to_str( obj.biasDacData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calStrobe: %s' % uint32_to_str( obj.calStrobe() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfSamples: %s' % uint32_to_str( obj.numberOfSamples() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigDelay: %s' % uint32_to_str( obj.trigDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'adcDelay: %s' % uint32_to_str( obj.adcDelay() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Imp_Sample_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'channels: %s' % ndarray_uint16_1_to_str(obj.channels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Imp_Sample_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channels: %s' % ndarray_uint16_1_to_str( obj.channels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Imp_LaneStatus_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'linkErrCount: %s' % uint8_to_str(obj.linkErrCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'linkDownCount: %s' % uint8_to_str(obj.linkDownCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'cellErrCount: %s' % uint8_to_str(obj.cellErrCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rxCount: %s' % uint8_to_str(obj.rxCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'locLinked: %s' % uint8_to_str(obj.locLinked()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'remLinked: %s' % uint8_to_str(obj.remLinked()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'zeros: %s' % uint16_to_str(obj.zeros()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'powersOkay: %s' % uint8_to_str(obj.powersOkay()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def Imp_LaneStatus_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'linkErrCount: %s' % uint8_to_str( obj.linkErrCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'linkDownCount: %s' % uint8_to_str( obj.linkDownCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'cellErrCount: %s' % uint8_to_str( obj.cellErrCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rxCount: %s' % uint8_to_str( obj.rxCount() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'locLinked: %s' % uint8_to_str( obj.locLinked() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'remLinked: %s' % uint8_to_str( obj.remLinked() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'zeros: %s' % uint16_to_str( obj.zeros() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'powersOkay: %s' % uint8_to_str( obj.powersOkay() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Imp_ElementV1_to_str(obj, indent, indentLvl):
+def Imp_ElementV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Imp.ElementV1.TypeId
     assert obj.Version == psana.Imp.ElementV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameNumber: %s' % uint32_to_str(obj.frameNumber()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'range: %s' % uint32_to_str(obj.range()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vc: %s' % uint8_to_str(obj.vc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lane: %s' % uint8_to_str(obj.lane()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'laneStatus:\n%s' % Imp_LaneStatus_to_str(obj.laneStatus(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-       # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.samples()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "samples[%d]\n" % idx
-        elemStr += Imp_Sample_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'range: %s' % uint32_to_str( obj.range() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vc: %s' % uint8_to_str( obj.vc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lane: %s' % uint8_to_str( obj.lane() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'laneStatus:\n'
+    methodStr += Imp_LaneStatus_to_str(obj.laneStatus(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.samples() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'samples[%d]:\n' % idx
+        subMethodStr += Imp_Sample_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def L3T_ConfigV1_to_str(obj, indent, indentLvl):
+def L3T_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.L3T.ConfigV1.TypeId
     assert obj.Version == psana.L3T.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'module_id_len: %s' % uint32_to_str(obj.module_id_len()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'desc_len: %s' % uint32_to_str(obj.desc_len()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.module_id()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "module_id[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.desc()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "desc[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'module_id_len: %s' % uint32_to_str( obj.module_id_len() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'desc_len: %s' % uint32_to_str( obj.desc_len() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'module_id: %s' % str_to_str( obj.module_id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'desc: %s' % str_to_str( obj.desc() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def L3T_DataV1_to_str(obj, indent, indentLvl):
+def L3T_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.L3T.DataV1.TypeId
     assert obj.Version == psana.L3T.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'accept: %s' % uint32_to_str(obj.accept()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'accept: %s' % uint32_to_str( obj.accept() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def OceanOptics_ConfigV1_to_str(obj, indent, indentLvl):
+def OceanOptics_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.ConfigV1.TypeId
     assert obj.Version == psana.OceanOptics.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str(obj.waveLenCalib()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str(obj.nonlinCorrect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'strayLightConstant: %s' % double_to_str(obj.strayLightConstant()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str( obj.waveLenCalib() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str( obj.nonlinCorrect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'strayLightConstant: %s' % double_to_str( obj.strayLightConstant() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def OceanOptics_ConfigV2_to_str(obj, indent, indentLvl):
+def OceanOptics_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.ConfigV2.TypeId
     assert obj.Version == psana.OceanOptics.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str(obj.waveLenCalib()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str(obj.nonlinCorrect()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'deviceType: %s' % int32_to_str(obj.deviceType()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'strayLightConstant: %s' % double_to_str(obj.strayLightConstant()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'deviceType: %s' % int32_to_str( obj.deviceType() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str( obj.waveLenCalib() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str( obj.nonlinCorrect() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'strayLightConstant: %s' % double_to_str( obj.strayLightConstant() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def OceanOptics_timespec64_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tv_sec: %s' % uint64_to_str(obj.tv_sec()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'tv_nsec: %s' % uint64_to_str(obj.tv_nsec()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def OceanOptics_timespec64_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tv_sec: %s' % uint64_to_str( obj.tv_sec() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'tv_nsec: %s' % uint64_to_str( obj.tv_nsec() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def OceanOptics_DataV1_to_str(obj, indent, indentLvl):
+def OceanOptics_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.DataV1.TypeId
     assert obj.Version == psana.OceanOptics.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_1_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameCounter: %s' % uint64_to_str(obj.frameCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayedFrames: %s' % uint64_to_str(obj.numDelayedFrames()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDiscardFrames: %s' % uint64_to_str(obj.numDiscardFrames()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraInData: %s' % int8_to_str(obj.numSpectraInData()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraInQueue: %s' % int8_to_str(obj.numSpectraInQueue()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraUnused: %s' % int8_to_str(obj.numSpectraUnused()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'durationOfFrame: %s' % double_to_str(obj.durationOfFrame()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameStart:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameStart(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameFirstData:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameFirstData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameEnd:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameEnd(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_1_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameCounter: %s' % uint64_to_str( obj.frameCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayedFrames: %s' % uint64_to_str( obj.numDelayedFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDiscardFrames: %s' % uint64_to_str( obj.numDiscardFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInData: %s' % int8_to_str( obj.numSpectraInData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInQueue: %s' % int8_to_str( obj.numSpectraInQueue() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraUnused: %s' % int8_to_str( obj.numSpectraUnused() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'durationOfFrame: %s' % double_to_str( obj.durationOfFrame() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameStart:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameStart(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameFirstData:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameFirstData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameEnd:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameEnd(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def OceanOptics_DataV2_to_str(obj, indent, indentLvl):
+def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.DataV2.TypeId
     assert obj.Version == psana.OceanOptics.DataV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_1_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameCounter: %s' % uint64_to_str(obj.frameCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayedFrames: %s' % uint64_to_str(obj.numDelayedFrames()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDiscardFrames: %s' % uint64_to_str(obj.numDiscardFrames()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraInData: %s' % int8_to_str(obj.numSpectraInData()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraInQueue: %s' % int8_to_str(obj.numSpectraInQueue()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSpectraUnused: %s' % int8_to_str(obj.numSpectraUnused()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'durationOfFrame: %s' % double_to_str(obj.durationOfFrame()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameStart:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameStart(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameFirstData:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameFirstData(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeFrameEnd:\n%s' % OceanOptics_timespec64_to_str(obj.timeFrameEnd(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_1_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameCounter: %s' % uint64_to_str( obj.frameCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayedFrames: %s' % uint64_to_str( obj.numDelayedFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDiscardFrames: %s' % uint64_to_str( obj.numDiscardFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInData: %s' % int8_to_str( obj.numSpectraInData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInQueue: %s' % int8_to_str( obj.numSpectraInQueue() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraUnused: %s' % int8_to_str( obj.numSpectraUnused() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'durationOfFrame: %s' % double_to_str( obj.durationOfFrame() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameStart:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameStart(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameFirstData:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameFirstData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameEnd:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameEnd(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Opal1k_ConfigV1_to_str(obj, indent, indentLvl):
+def Opal1k_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Opal1k.ConfigV1.TypeId
     assert obj.Version == psana.Opal1k.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str(obj.output_lookup_table()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'number_of_defect_pixels: %s' % uint32_to_str(obj.number_of_defect_pixels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'black_level: %s' % uint16_to_str(obj.black_level()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_percent: %s' % uint16_to_str(obj.gain_percent()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vertical_remapping: %s' % uint8_to_str(obj.vertical_remapping()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_lookup_table_enabled: %s' % uint8_to_str(obj.output_lookup_table_enabled()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str(obj.defect_pixel_correction_enabled()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_offset: %s' % uint16_to_str(obj.output_offset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution_bits: %s' % uint32_to_str(obj.output_resolution_bits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution: %s' % int32_to_str(obj.output_resolution()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vertical_binning: %s' % int32_to_str(obj.vertical_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_mirroring: %s' % int32_to_str(obj.output_mirroring()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.defect_pixel_coordinates()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "defect_pixel_coordinates[%d]\n" % idx
-        elemStr += Camera_FrameCoord_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_defect_pixels: %s' % uint32_to_str( obj.number_of_defect_pixels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str( obj.output_lookup_table() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'black_level: %s' % uint16_to_str( obj.black_level() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_percent: %s' % uint16_to_str( obj.gain_percent() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_remapping: %s' % uint8_to_str( obj.vertical_remapping() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table_enabled: %s' % uint8_to_str( obj.output_lookup_table_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str( obj.defect_pixel_correction_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_offset: %s' % uint16_to_str( obj.output_offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution_bits: %s' % uint32_to_str( obj.output_resolution_bits() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution:\n'
+    methodStr += enum_to_str(obj.output_resolution(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_binning:\n'
+    methodStr += enum_to_str(obj.vertical_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_mirroring:\n'
+    methodStr += enum_to_str(obj.output_mirroring(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.defect_pixel_coordinates() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'defect_pixel_coordinates[%d]:\n' % idx
+        subMethodStr += Camera_FrameCoord_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Orca_ConfigV1_to_str(obj, indent, indentLvl):
+def Orca_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Orca.ConfigV1.TypeId
     assert obj.Version == psana.Orca.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rows: %s' % uint32_to_str(obj.rows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str(obj.defect_pixel_correction_enabled()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'mode: %s' % int32_to_str(obj.mode()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'cooling: %s' % int32_to_str(obj.cooling()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rows: %s' % uint32_to_str( obj.rows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str( obj.defect_pixel_correction_enabled() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'mode:\n'
+    methodStr += enum_to_str(obj.mode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'cooling:\n'
+    methodStr += enum_to_str(obj.cooling(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Partition_Source_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'group: %s' % uint32_to_str(obj.group()) 
-    lines += ('%s\n' % methodStr)
-     # not basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'src:\n%s' % Pds_Src_to_str(obj.src(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-         
-    return lines
+def Partition_Source_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'group: %s' % uint32_to_str( obj.group() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'src:\n'
+    methodStr += Pds_Src_to_str(obj.src(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Partition_ConfigV1_to_str(obj, indent, indentLvl):
+def Partition_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Partition.ConfigV1.TypeId
     assert obj.Version == psana.Partition.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'bldMask: %s' % uint64_to_str(obj.bldMask()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSources: %s' % uint32_to_str(obj.numSources()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.sources()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "sources[%d]\n" % idx
-        elemStr += Partition_Source_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bldMask: %s' % uint64_to_str( obj.bldMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSources: %s' % uint32_to_str( obj.numSources() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.sources() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'sources[%d]:\n' % idx
+        subMethodStr += Partition_Source_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Pimax_ConfigV1_to_str(obj, indent, indentLvl):
+def Pimax_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pimax.ConfigV1.TypeId
     assert obj.Version == psana.Pimax.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeed: %s' % float_to_str(obj.readoutSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint16_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'intensifierGain: %s' % uint16_to_str(obj.intensifierGain()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gateDelay: %s' % double_to_str(obj.gateDelay()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gateWidth: %s' % double_to_str(obj.gateWidth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskedHeight: %s' % uint32_to_str(obj.maskedHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kineticHeight: %s' % uint32_to_str(obj.kineticHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vsSpeed: %s' % float_to_str(obj.vsSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'infoReportInterval: %s' % int16_to_str(obj.infoReportInterval()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numIntegrationShots: %s' % uint32_to_str(obj.numIntegrationShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeed: %s' % float_to_str( obj.readoutSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint16_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'intensifierGain: %s' % uint16_to_str( obj.intensifierGain() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gateDelay: %s' % double_to_str( obj.gateDelay() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gateWidth: %s' % double_to_str( obj.gateWidth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskedHeight: %s' % uint32_to_str( obj.maskedHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kineticHeight: %s' % uint32_to_str( obj.kineticHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vsSpeed: %s' % float_to_str( obj.vsSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'infoReportInterval: %s' % int16_to_str( obj.infoReportInterval() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numIntegrationShots: %s' % uint32_to_str( obj.numIntegrationShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Pimax_FrameV1_to_str(obj, indent, indentLvl):
+def Pimax_FrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Pimax.FrameV1.TypeId
     assert obj.Version == psana.Pimax.FrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str(obj.shotIdStart()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutTime: %s' % float_to_str(obj.readoutTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % float_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def PNCCD_ConfigV1_to_str(obj, indent, indentLvl):
+def PNCCD_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.PNCCD.ConfigV1.TypeId
     assert obj.Version == psana.PNCCD.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numLinks: %s' % uint32_to_str(obj.numLinks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSizePerLink: %s' % uint32_to_str(obj.payloadSizePerLink()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numLinks: %s' % uint32_to_str( obj.numLinks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSizePerLink: %s' % uint32_to_str( obj.payloadSizePerLink() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def PNCCD_ConfigV2_to_str(obj, indent, indentLvl):
+def PNCCD_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.PNCCD.ConfigV2.TypeId
     assert obj.Version == psana.PNCCD.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numLinks: %s' % uint32_to_str(obj.numLinks()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'payloadSizePerLink: %s' % uint32_to_str(obj.payloadSizePerLink()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numChannels: %s' % uint32_to_str(obj.numChannels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numRows: %s' % uint32_to_str(obj.numRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSubmoduleChannels: %s' % uint32_to_str(obj.numSubmoduleChannels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSubmoduleRows: %s' % uint32_to_str(obj.numSubmoduleRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numSubmodules: %s' % uint32_to_str(obj.numSubmodules()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'camexMagic: %s' % uint32_to_str(obj.camexMagic()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.info()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "info[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.timingFName()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "timingFName[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numLinks: %s' % uint32_to_str( obj.numLinks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payloadSizePerLink: %s' % uint32_to_str( obj.payloadSizePerLink() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numChannels: %s' % uint32_to_str( obj.numChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numRows: %s' % uint32_to_str( obj.numRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSubmoduleChannels: %s' % uint32_to_str( obj.numSubmoduleChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSubmoduleRows: %s' % uint32_to_str( obj.numSubmoduleRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSubmodules: %s' % uint32_to_str( obj.numSubmodules() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'camexMagic: %s' % uint32_to_str( obj.camexMagic() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'info: %s' % str_to_str( obj.info() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timingFName: %s' % str_to_str( obj.timingFName() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def PNCCD_FrameV1_to_str(obj, indent, indentLvl):
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'specialWord: %s' % uint32_to_str(obj.specialWord()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameNumber: %s' % uint32_to_str(obj.frameNumber()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampHi: %s' % uint32_to_str(obj.timeStampHi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampLo: %s' % uint32_to_str(obj.timeStampLo()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+def PNCCD_FrameV1_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'specialWord: %s' % uint32_to_str( obj.specialWord() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampHi: %s' % uint32_to_str( obj.timeStampHi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampLo: %s' % uint32_to_str( obj.timeStampLo() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def PNCCD_FullFrameV1_to_str(obj, indent, indentLvl):
+def PNCCD_FullFrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.PNCCD.FullFrameV1.TypeId
     assert obj.Version == psana.PNCCD.FullFrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'specialWord: %s' % uint32_to_str(obj.specialWord()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameNumber: %s' % uint32_to_str(obj.frameNumber()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampHi: %s' % uint32_to_str(obj.timeStampHi()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timeStampLo: %s' % uint32_to_str(obj.timeStampLo()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'specialWord: %s' % uint32_to_str( obj.specialWord() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameNumber: %s' % uint32_to_str( obj.frameNumber() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampHi: %s' % uint32_to_str( obj.timeStampHi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeStampLo: %s' % uint32_to_str( obj.timeStampLo() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def PNCCD_FramesV1_to_str(obj, indent, indentLvl):
+def PNCCD_FramesV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.PNCCD.FramesV1.TypeId
     assert obj.Version == psana.PNCCD.FramesV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numLinks: %s' % uint32_to_str(obj.numLinks()) 
-    lines += ('%s\n' % methodStr)
-        # list methods
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numLinks: %s' % uint32_to_str( obj.numLinks() )
+    methodStrings.append(methodStr)                                 
+    # idx_list_multi_line_methods
     methodStr = ''
-    for idx, subObj in enumerate(obj.frame()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "frame[%d]\n" % idx
-        elemStr += PNCCD_FrameV1_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    numObjs = obj.frame_shape()[0]
+    for idx in range( numObjs ):
+        subObj = obj.frame(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += 'frame[%d]:\n' % idx
+        methodStr += PNCCD_FrameV1_to_str(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Princeton_ConfigV1_to_str(obj, indent, indentLvl):
+def Princeton_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.ConfigV1.TypeId
     assert obj.Version == psana.Princeton.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint32_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutEventCode: %s' % uint16_to_str(obj.readoutEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delayMode: %s' % uint16_to_str(obj.delayMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint32_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutEventCode: %s' % uint16_to_str( obj.readoutEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delayMode: %s' % uint16_to_str( obj.delayMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_ConfigV2_to_str(obj, indent, indentLvl):
+def Princeton_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.ConfigV2.TypeId
     assert obj.Version == psana.Princeton.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint16_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutEventCode: %s' % uint16_to_str(obj.readoutEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'delayMode: %s' % uint16_to_str(obj.delayMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint16_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutEventCode: %s' % uint16_to_str( obj.readoutEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'delayMode: %s' % uint16_to_str( obj.delayMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_ConfigV3_to_str(obj, indent, indentLvl):
+def Princeton_ConfigV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.ConfigV3.TypeId
     assert obj.Version == psana.Princeton.ConfigV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint8_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str(obj.numDelayShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_ConfigV4_to_str(obj, indent, indentLvl):
+def Princeton_ConfigV4_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.ConfigV4.TypeId
     assert obj.Version == psana.Princeton.ConfigV4.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskedHeight: %s' % uint32_to_str(obj.maskedHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kineticHeight: %s' % uint32_to_str(obj.kineticHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vsSpeed: %s' % float_to_str(obj.vsSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint8_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str(obj.numDelayShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskedHeight: %s' % uint32_to_str( obj.maskedHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kineticHeight: %s' % uint32_to_str( obj.kineticHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vsSpeed: %s' % float_to_str( obj.vsSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint8_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint8_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_ConfigV5_to_str(obj, indent, indentLvl):
+def Princeton_ConfigV5_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.ConfigV5.TypeId
     assert obj.Version == psana.Princeton.ConfigV5.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgX: %s' % uint32_to_str(obj.orgX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'orgY: %s' % uint32_to_str(obj.orgY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binX: %s' % uint32_to_str(obj.binX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binY: %s' % uint32_to_str(obj.binY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureTime: %s' % float_to_str(obj.exposureTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'coolingTemp: %s' % float_to_str(obj.coolingTemp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gainIndex: %s' % uint16_to_str(obj.gainIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str(obj.readoutSpeedIndex()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'maskedHeight: %s' % uint32_to_str(obj.maskedHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'kineticHeight: %s' % uint32_to_str(obj.kineticHeight()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vsSpeed: %s' % float_to_str(obj.vsSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'infoReportInterval: %s' % int16_to_str(obj.infoReportInterval()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposureEventCode: %s' % uint16_to_str(obj.exposureEventCode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numDelayShots: %s' % uint32_to_str(obj.numDelayShots()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameSize: %s' % uint32_to_str(obj.frameSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsX: %s' % uint32_to_str(obj.numPixelsX()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixelsY: %s' % uint32_to_str(obj.numPixelsY()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'numPixels: %s' % uint32_to_str(obj.numPixels()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgX: %s' % uint32_to_str( obj.orgX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'orgY: %s' % uint32_to_str( obj.orgY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binX: %s' % uint32_to_str( obj.binX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binY: %s' % uint32_to_str( obj.binY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'coolingTemp: %s' % float_to_str( obj.coolingTemp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gainIndex: %s' % uint16_to_str( obj.gainIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeedIndex: %s' % uint16_to_str( obj.readoutSpeedIndex() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'maskedHeight: %s' % uint32_to_str( obj.maskedHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'kineticHeight: %s' % uint32_to_str( obj.kineticHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vsSpeed: %s' % float_to_str( obj.vsSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'infoReportInterval: %s' % int16_to_str( obj.infoReportInterval() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposureEventCode: %s' % uint16_to_str( obj.exposureEventCode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayShots: %s' % uint32_to_str( obj.numDelayShots() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameSize: %s' % uint32_to_str( obj.frameSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsX: %s' % uint32_to_str( obj.numPixelsX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixelsY: %s' % uint32_to_str( obj.numPixelsY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_FrameV1_to_str(obj, indent, indentLvl):
+def Princeton_FrameV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.FrameV1.TypeId
     assert obj.Version == psana.Princeton.FrameV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str(obj.shotIdStart()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutTime: %s' % float_to_str(obj.readoutTime()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_FrameV2_to_str(obj, indent, indentLvl):
+def Princeton_FrameV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.FrameV2.TypeId
     assert obj.Version == psana.Princeton.FrameV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shotIdStart: %s' % uint32_to_str(obj.shotIdStart()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutTime: %s' % float_to_str(obj.readoutTime()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % float_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shotIdStart: %s' % uint32_to_str( obj.shotIdStart() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Princeton_InfoV1_to_str(obj, indent, indentLvl):
+def Princeton_InfoV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Princeton.InfoV1.TypeId
     assert obj.Version == psana.Princeton.InfoV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'temperature: %s' % float_to_str(obj.temperature()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Quartz_ConfigV1_to_str(obj, indent, indentLvl):
+def Quartz_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Quartz.ConfigV1.TypeId
     assert obj.Version == psana.Quartz.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str(obj.output_lookup_table()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'number_of_defect_pixels: %s' % uint32_to_str(obj.number_of_defect_pixels()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'black_level: %s' % uint16_to_str(obj.black_level()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'gain_percent: %s' % uint16_to_str(obj.gain_percent()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_lookup_table_enabled: %s' % uint8_to_str(obj.output_lookup_table_enabled()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str(obj.defect_pixel_correction_enabled()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_offset: %s' % uint16_to_str(obj.output_offset()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution_bits: %s' % uint32_to_str(obj.output_resolution_bits()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_resolution: %s' % int32_to_str(obj.output_resolution()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'horizontal_binning: %s' % int32_to_str(obj.horizontal_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'vertical_binning: %s' % int32_to_str(obj.vertical_binning()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'output_mirroring: %s' % int32_to_str(obj.output_mirroring()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.defect_pixel_coordinates()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "defect_pixel_coordinates[%d]\n" % idx
-        elemStr += Camera_FrameCoord_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_defect_pixels: %s' % uint32_to_str( obj.number_of_defect_pixels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str( obj.output_lookup_table() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'black_level: %s' % uint16_to_str( obj.black_level() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_percent: %s' % uint16_to_str( obj.gain_percent() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table_enabled: %s' % uint8_to_str( obj.output_lookup_table_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str( obj.defect_pixel_correction_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_offset: %s' % uint16_to_str( obj.output_offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution_bits: %s' % uint32_to_str( obj.output_resolution_bits() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution:\n'
+    methodStr += enum_to_str(obj.output_resolution(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'horizontal_binning:\n'
+    methodStr += enum_to_str(obj.horizontal_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_binning:\n'
+    methodStr += enum_to_str(obj.vertical_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_mirroring:\n'
+    methodStr += enum_to_str(obj.output_mirroring(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.defect_pixel_coordinates() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'defect_pixel_coordinates[%d]:\n' % idx
+        subMethodStr += Camera_FrameCoord_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Rayonix_ConfigV1_to_str(obj, indent, indentLvl):
+def Rayonix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Rayonix.ConfigV1.TypeId
     assert obj.Version == psana.Rayonix.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binning_f: %s' % uint8_to_str(obj.binning_f()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binning_s: %s' % uint8_to_str(obj.binning_s()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposure: %s' % uint32_to_str(obj.exposure()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigger: %s' % uint32_to_str(obj.trigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rawMode: %s' % uint16_to_str(obj.rawMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'darkFlag: %s' % uint16_to_str(obj.darkFlag()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutMode: %s' % int32_to_str(obj.readoutMode()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.deviceID()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "deviceID[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binning_f: %s' % uint8_to_str( obj.binning_f() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binning_s: %s' % uint8_to_str( obj.binning_s() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposure: %s' % uint32_to_str( obj.exposure() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigger: %s' % uint32_to_str( obj.trigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rawMode: %s' % uint16_to_str( obj.rawMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'darkFlag: %s' % uint16_to_str( obj.darkFlag() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'deviceID: %s' % str_to_str( obj.deviceID() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutMode:\n'
+    methodStr += enum_to_str(obj.readoutMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Rayonix_ConfigV2_to_str(obj, indent, indentLvl):
+def Rayonix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Rayonix.ConfigV2.TypeId
     assert obj.Version == psana.Rayonix.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binning_f: %s' % uint8_to_str(obj.binning_f()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'binning_s: %s' % uint8_to_str(obj.binning_s()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'testPattern: %s' % int16_to_str(obj.testPattern()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'exposure: %s' % uint32_to_str(obj.exposure()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'trigger: %s' % uint32_to_str(obj.trigger()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'rawMode: %s' % uint16_to_str(obj.rawMode()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'darkFlag: %s' % uint16_to_str(obj.darkFlag()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutMode: %s' % int32_to_str(obj.readoutMode()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.deviceID()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "deviceID[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binning_f: %s' % uint8_to_str( obj.binning_f() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'binning_s: %s' % uint8_to_str( obj.binning_s() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'testPattern: %s' % int16_to_str( obj.testPattern() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'exposure: %s' % uint32_to_str( obj.exposure() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'trigger: %s' % uint32_to_str( obj.trigger() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rawMode: %s' % uint16_to_str( obj.rawMode() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'darkFlag: %s' % uint16_to_str( obj.darkFlag() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'deviceID: %s' % str_to_str( obj.deviceID() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutMode:\n'
+    methodStr += enum_to_str(obj.readoutMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Timepix_ConfigV1_to_str(obj, indent, indentLvl):
+def Timepix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Timepix.ConfigV1.TypeId
     assert obj.Version == psana.Timepix.ConfigV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'shutterTimeout: %s' % int32_to_str(obj.shutterTimeout()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ikrum: %s' % int32_to_str(obj.dac0Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Disc: %s' % int32_to_str(obj.dac0Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Preamp: %s' % int32_to_str(obj.dac0Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogA: %s' % int32_to_str(obj.dac0BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogB: %s' % int32_to_str(obj.dac0BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Hist: %s' % int32_to_str(obj.dac0Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlFine: %s' % int32_to_str(obj.dac0ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlCourse: %s' % int32_to_str(obj.dac0ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Vcas: %s' % int32_to_str(obj.dac0Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Fbk: %s' % int32_to_str(obj.dac0Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Gnd: %s' % int32_to_str(obj.dac0Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ths: %s' % int32_to_str(obj.dac0Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BiasLvds: %s' % int32_to_str(obj.dac0BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0RefLvds: %s' % int32_to_str(obj.dac0RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ikrum: %s' % int32_to_str(obj.dac1Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Disc: %s' % int32_to_str(obj.dac1Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Preamp: %s' % int32_to_str(obj.dac1Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogA: %s' % int32_to_str(obj.dac1BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogB: %s' % int32_to_str(obj.dac1BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Hist: %s' % int32_to_str(obj.dac1Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlFine: %s' % int32_to_str(obj.dac1ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlCourse: %s' % int32_to_str(obj.dac1ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Vcas: %s' % int32_to_str(obj.dac1Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Fbk: %s' % int32_to_str(obj.dac1Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Gnd: %s' % int32_to_str(obj.dac1Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ths: %s' % int32_to_str(obj.dac1Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BiasLvds: %s' % int32_to_str(obj.dac1BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1RefLvds: %s' % int32_to_str(obj.dac1RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ikrum: %s' % int32_to_str(obj.dac2Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Disc: %s' % int32_to_str(obj.dac2Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Preamp: %s' % int32_to_str(obj.dac2Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogA: %s' % int32_to_str(obj.dac2BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogB: %s' % int32_to_str(obj.dac2BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Hist: %s' % int32_to_str(obj.dac2Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlFine: %s' % int32_to_str(obj.dac2ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlCourse: %s' % int32_to_str(obj.dac2ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Vcas: %s' % int32_to_str(obj.dac2Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Fbk: %s' % int32_to_str(obj.dac2Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Gnd: %s' % int32_to_str(obj.dac2Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ths: %s' % int32_to_str(obj.dac2Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BiasLvds: %s' % int32_to_str(obj.dac2BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2RefLvds: %s' % int32_to_str(obj.dac2RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ikrum: %s' % int32_to_str(obj.dac3Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Disc: %s' % int32_to_str(obj.dac3Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Preamp: %s' % int32_to_str(obj.dac3Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogA: %s' % int32_to_str(obj.dac3BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogB: %s' % int32_to_str(obj.dac3BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Hist: %s' % int32_to_str(obj.dac3Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlFine: %s' % int32_to_str(obj.dac3ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlCourse: %s' % int32_to_str(obj.dac3ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Vcas: %s' % int32_to_str(obj.dac3Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Fbk: %s' % int32_to_str(obj.dac3Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Gnd: %s' % int32_to_str(obj.dac3Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ths: %s' % int32_to_str(obj.dac3Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BiasLvds: %s' % int32_to_str(obj.dac3BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3RefLvds: %s' % int32_to_str(obj.dac3RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeed: %s' % int32_to_str(obj.readoutSpeed()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerMode: %s' % int32_to_str(obj.triggerMode()) 
-    lines += ('%s' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'shutterTimeout: %s' % int32_to_str( obj.shutterTimeout() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ikrum: %s' % int32_to_str( obj.dac0Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Disc: %s' % int32_to_str( obj.dac0Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Preamp: %s' % int32_to_str( obj.dac0Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogA: %s' % int32_to_str( obj.dac0BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogB: %s' % int32_to_str( obj.dac0BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Hist: %s' % int32_to_str( obj.dac0Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlFine: %s' % int32_to_str( obj.dac0ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlCourse: %s' % int32_to_str( obj.dac0ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Vcas: %s' % int32_to_str( obj.dac0Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Fbk: %s' % int32_to_str( obj.dac0Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Gnd: %s' % int32_to_str( obj.dac0Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ths: %s' % int32_to_str( obj.dac0Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BiasLvds: %s' % int32_to_str( obj.dac0BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0RefLvds: %s' % int32_to_str( obj.dac0RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ikrum: %s' % int32_to_str( obj.dac1Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Disc: %s' % int32_to_str( obj.dac1Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Preamp: %s' % int32_to_str( obj.dac1Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogA: %s' % int32_to_str( obj.dac1BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogB: %s' % int32_to_str( obj.dac1BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Hist: %s' % int32_to_str( obj.dac1Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlFine: %s' % int32_to_str( obj.dac1ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlCourse: %s' % int32_to_str( obj.dac1ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Vcas: %s' % int32_to_str( obj.dac1Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Fbk: %s' % int32_to_str( obj.dac1Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Gnd: %s' % int32_to_str( obj.dac1Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ths: %s' % int32_to_str( obj.dac1Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BiasLvds: %s' % int32_to_str( obj.dac1BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1RefLvds: %s' % int32_to_str( obj.dac1RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ikrum: %s' % int32_to_str( obj.dac2Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Disc: %s' % int32_to_str( obj.dac2Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Preamp: %s' % int32_to_str( obj.dac2Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogA: %s' % int32_to_str( obj.dac2BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogB: %s' % int32_to_str( obj.dac2BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Hist: %s' % int32_to_str( obj.dac2Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlFine: %s' % int32_to_str( obj.dac2ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlCourse: %s' % int32_to_str( obj.dac2ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Vcas: %s' % int32_to_str( obj.dac2Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Fbk: %s' % int32_to_str( obj.dac2Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Gnd: %s' % int32_to_str( obj.dac2Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ths: %s' % int32_to_str( obj.dac2Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BiasLvds: %s' % int32_to_str( obj.dac2BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2RefLvds: %s' % int32_to_str( obj.dac2RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ikrum: %s' % int32_to_str( obj.dac3Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Disc: %s' % int32_to_str( obj.dac3Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Preamp: %s' % int32_to_str( obj.dac3Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogA: %s' % int32_to_str( obj.dac3BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogB: %s' % int32_to_str( obj.dac3BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Hist: %s' % int32_to_str( obj.dac3Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlFine: %s' % int32_to_str( obj.dac3ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlCourse: %s' % int32_to_str( obj.dac3ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Vcas: %s' % int32_to_str( obj.dac3Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Fbk: %s' % int32_to_str( obj.dac3Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Gnd: %s' % int32_to_str( obj.dac3Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ths: %s' % int32_to_str( obj.dac3Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BiasLvds: %s' % int32_to_str( obj.dac3BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3RefLvds: %s' % int32_to_str( obj.dac3RefLvds() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeed:\n'
+    methodStr += enum_to_str(obj.readoutSpeed(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerMode:\n'
+    methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Timepix_ConfigV2_to_str(obj, indent, indentLvl):
+def Timepix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Timepix.ConfigV2.TypeId
     assert obj.Version == psana.Timepix.ConfigV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str(obj.pixelThresh()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timepixSpeed: %s' % int32_to_str(obj.timepixSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ikrum: %s' % int32_to_str(obj.dac0Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Disc: %s' % int32_to_str(obj.dac0Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Preamp: %s' % int32_to_str(obj.dac0Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogA: %s' % int32_to_str(obj.dac0BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogB: %s' % int32_to_str(obj.dac0BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Hist: %s' % int32_to_str(obj.dac0Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlFine: %s' % int32_to_str(obj.dac0ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlCourse: %s' % int32_to_str(obj.dac0ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Vcas: %s' % int32_to_str(obj.dac0Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Fbk: %s' % int32_to_str(obj.dac0Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Gnd: %s' % int32_to_str(obj.dac0Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ths: %s' % int32_to_str(obj.dac0Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BiasLvds: %s' % int32_to_str(obj.dac0BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0RefLvds: %s' % int32_to_str(obj.dac0RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ikrum: %s' % int32_to_str(obj.dac1Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Disc: %s' % int32_to_str(obj.dac1Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Preamp: %s' % int32_to_str(obj.dac1Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogA: %s' % int32_to_str(obj.dac1BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogB: %s' % int32_to_str(obj.dac1BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Hist: %s' % int32_to_str(obj.dac1Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlFine: %s' % int32_to_str(obj.dac1ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlCourse: %s' % int32_to_str(obj.dac1ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Vcas: %s' % int32_to_str(obj.dac1Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Fbk: %s' % int32_to_str(obj.dac1Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Gnd: %s' % int32_to_str(obj.dac1Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ths: %s' % int32_to_str(obj.dac1Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BiasLvds: %s' % int32_to_str(obj.dac1BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1RefLvds: %s' % int32_to_str(obj.dac1RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ikrum: %s' % int32_to_str(obj.dac2Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Disc: %s' % int32_to_str(obj.dac2Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Preamp: %s' % int32_to_str(obj.dac2Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogA: %s' % int32_to_str(obj.dac2BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogB: %s' % int32_to_str(obj.dac2BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Hist: %s' % int32_to_str(obj.dac2Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlFine: %s' % int32_to_str(obj.dac2ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlCourse: %s' % int32_to_str(obj.dac2ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Vcas: %s' % int32_to_str(obj.dac2Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Fbk: %s' % int32_to_str(obj.dac2Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Gnd: %s' % int32_to_str(obj.dac2Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ths: %s' % int32_to_str(obj.dac2Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BiasLvds: %s' % int32_to_str(obj.dac2BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2RefLvds: %s' % int32_to_str(obj.dac2RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ikrum: %s' % int32_to_str(obj.dac3Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Disc: %s' % int32_to_str(obj.dac3Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Preamp: %s' % int32_to_str(obj.dac3Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogA: %s' % int32_to_str(obj.dac3BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogB: %s' % int32_to_str(obj.dac3BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Hist: %s' % int32_to_str(obj.dac3Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlFine: %s' % int32_to_str(obj.dac3ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlCourse: %s' % int32_to_str(obj.dac3ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Vcas: %s' % int32_to_str(obj.dac3Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Fbk: %s' % int32_to_str(obj.dac3Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Gnd: %s' % int32_to_str(obj.dac3Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ths: %s' % int32_to_str(obj.dac3Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BiasLvds: %s' % int32_to_str(obj.dac3BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3RefLvds: %s' % int32_to_str(obj.dac3RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'driverVersion: %s' % int32_to_str(obj.driverVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'firmwareVersion: %s' % uint32_to_str(obj.firmwareVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelThreshSize: %s' % uint32_to_str(obj.pixelThreshSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip0ID: %s' % int32_to_str(obj.chip0ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip1ID: %s' % int32_to_str(obj.chip1ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip2ID: %s' % int32_to_str(obj.chip2ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip3ID: %s' % int32_to_str(obj.chip3ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chipCount: %s' % int32_to_str(obj.chipCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeed: %s' % int32_to_str(obj.readoutSpeed()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'triggerMode: %s' % int32_to_str(obj.triggerMode()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip0Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip0Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip1Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip1Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip2Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip2Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip3Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip3Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timepixSpeed: %s' % int32_to_str( obj.timepixSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ikrum: %s' % int32_to_str( obj.dac0Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Disc: %s' % int32_to_str( obj.dac0Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Preamp: %s' % int32_to_str( obj.dac0Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogA: %s' % int32_to_str( obj.dac0BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogB: %s' % int32_to_str( obj.dac0BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Hist: %s' % int32_to_str( obj.dac0Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlFine: %s' % int32_to_str( obj.dac0ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlCourse: %s' % int32_to_str( obj.dac0ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Vcas: %s' % int32_to_str( obj.dac0Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Fbk: %s' % int32_to_str( obj.dac0Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Gnd: %s' % int32_to_str( obj.dac0Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ths: %s' % int32_to_str( obj.dac0Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BiasLvds: %s' % int32_to_str( obj.dac0BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0RefLvds: %s' % int32_to_str( obj.dac0RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ikrum: %s' % int32_to_str( obj.dac1Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Disc: %s' % int32_to_str( obj.dac1Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Preamp: %s' % int32_to_str( obj.dac1Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogA: %s' % int32_to_str( obj.dac1BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogB: %s' % int32_to_str( obj.dac1BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Hist: %s' % int32_to_str( obj.dac1Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlFine: %s' % int32_to_str( obj.dac1ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlCourse: %s' % int32_to_str( obj.dac1ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Vcas: %s' % int32_to_str( obj.dac1Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Fbk: %s' % int32_to_str( obj.dac1Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Gnd: %s' % int32_to_str( obj.dac1Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ths: %s' % int32_to_str( obj.dac1Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BiasLvds: %s' % int32_to_str( obj.dac1BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1RefLvds: %s' % int32_to_str( obj.dac1RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ikrum: %s' % int32_to_str( obj.dac2Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Disc: %s' % int32_to_str( obj.dac2Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Preamp: %s' % int32_to_str( obj.dac2Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogA: %s' % int32_to_str( obj.dac2BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogB: %s' % int32_to_str( obj.dac2BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Hist: %s' % int32_to_str( obj.dac2Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlFine: %s' % int32_to_str( obj.dac2ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlCourse: %s' % int32_to_str( obj.dac2ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Vcas: %s' % int32_to_str( obj.dac2Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Fbk: %s' % int32_to_str( obj.dac2Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Gnd: %s' % int32_to_str( obj.dac2Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ths: %s' % int32_to_str( obj.dac2Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BiasLvds: %s' % int32_to_str( obj.dac2BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2RefLvds: %s' % int32_to_str( obj.dac2RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ikrum: %s' % int32_to_str( obj.dac3Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Disc: %s' % int32_to_str( obj.dac3Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Preamp: %s' % int32_to_str( obj.dac3Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogA: %s' % int32_to_str( obj.dac3BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogB: %s' % int32_to_str( obj.dac3BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Hist: %s' % int32_to_str( obj.dac3Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlFine: %s' % int32_to_str( obj.dac3ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlCourse: %s' % int32_to_str( obj.dac3ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Vcas: %s' % int32_to_str( obj.dac3Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Fbk: %s' % int32_to_str( obj.dac3Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Gnd: %s' % int32_to_str( obj.dac3Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ths: %s' % int32_to_str( obj.dac3Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BiasLvds: %s' % int32_to_str( obj.dac3BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3RefLvds: %s' % int32_to_str( obj.dac3RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'driverVersion: %s' % int32_to_str( obj.driverVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'firmwareVersion: %s' % uint32_to_str( obj.firmwareVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelThreshSize: %s' % uint32_to_str( obj.pixelThreshSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str( obj.pixelThresh() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip0Name: %s' % str_to_str( obj.chip0Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip1Name: %s' % str_to_str( obj.chip1Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip2Name: %s' % str_to_str( obj.chip2Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip3Name: %s' % str_to_str( obj.chip3Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip0ID: %s' % int32_to_str( obj.chip0ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip1ID: %s' % int32_to_str( obj.chip1ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip2ID: %s' % int32_to_str( obj.chip2ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip3ID: %s' % int32_to_str( obj.chip3ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chipCount: %s' % int32_to_str( obj.chipCount() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeed:\n'
+    methodStr += enum_to_str(obj.readoutSpeed(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'triggerMode:\n'
+    methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Timepix_ConfigV3_to_str(obj, indent, indentLvl):
+def Timepix_ConfigV3_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Timepix.ConfigV3.TypeId
     assert obj.Version == psana.Timepix.ConfigV3.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str(obj.pixelThresh()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timepixSpeed: %s' % int32_to_str(obj.timepixSpeed()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ikrum: %s' % int32_to_str(obj.dac0Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Disc: %s' % int32_to_str(obj.dac0Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Preamp: %s' % int32_to_str(obj.dac0Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogA: %s' % int32_to_str(obj.dac0BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BufAnalogB: %s' % int32_to_str(obj.dac0BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Hist: %s' % int32_to_str(obj.dac0Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlFine: %s' % int32_to_str(obj.dac0ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0ThlCourse: %s' % int32_to_str(obj.dac0ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Vcas: %s' % int32_to_str(obj.dac0Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Fbk: %s' % int32_to_str(obj.dac0Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Gnd: %s' % int32_to_str(obj.dac0Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0Ths: %s' % int32_to_str(obj.dac0Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0BiasLvds: %s' % int32_to_str(obj.dac0BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac0RefLvds: %s' % int32_to_str(obj.dac0RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ikrum: %s' % int32_to_str(obj.dac1Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Disc: %s' % int32_to_str(obj.dac1Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Preamp: %s' % int32_to_str(obj.dac1Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogA: %s' % int32_to_str(obj.dac1BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BufAnalogB: %s' % int32_to_str(obj.dac1BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Hist: %s' % int32_to_str(obj.dac1Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlFine: %s' % int32_to_str(obj.dac1ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1ThlCourse: %s' % int32_to_str(obj.dac1ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Vcas: %s' % int32_to_str(obj.dac1Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Fbk: %s' % int32_to_str(obj.dac1Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Gnd: %s' % int32_to_str(obj.dac1Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1Ths: %s' % int32_to_str(obj.dac1Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1BiasLvds: %s' % int32_to_str(obj.dac1BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac1RefLvds: %s' % int32_to_str(obj.dac1RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ikrum: %s' % int32_to_str(obj.dac2Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Disc: %s' % int32_to_str(obj.dac2Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Preamp: %s' % int32_to_str(obj.dac2Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogA: %s' % int32_to_str(obj.dac2BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BufAnalogB: %s' % int32_to_str(obj.dac2BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Hist: %s' % int32_to_str(obj.dac2Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlFine: %s' % int32_to_str(obj.dac2ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2ThlCourse: %s' % int32_to_str(obj.dac2ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Vcas: %s' % int32_to_str(obj.dac2Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Fbk: %s' % int32_to_str(obj.dac2Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Gnd: %s' % int32_to_str(obj.dac2Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2Ths: %s' % int32_to_str(obj.dac2Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2BiasLvds: %s' % int32_to_str(obj.dac2BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac2RefLvds: %s' % int32_to_str(obj.dac2RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ikrum: %s' % int32_to_str(obj.dac3Ikrum()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Disc: %s' % int32_to_str(obj.dac3Disc()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Preamp: %s' % int32_to_str(obj.dac3Preamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogA: %s' % int32_to_str(obj.dac3BufAnalogA()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BufAnalogB: %s' % int32_to_str(obj.dac3BufAnalogB()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Hist: %s' % int32_to_str(obj.dac3Hist()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlFine: %s' % int32_to_str(obj.dac3ThlFine()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3ThlCourse: %s' % int32_to_str(obj.dac3ThlCourse()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Vcas: %s' % int32_to_str(obj.dac3Vcas()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Fbk: %s' % int32_to_str(obj.dac3Fbk()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Gnd: %s' % int32_to_str(obj.dac3Gnd()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3Ths: %s' % int32_to_str(obj.dac3Ths()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3BiasLvds: %s' % int32_to_str(obj.dac3BiasLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dac3RefLvds: %s' % int32_to_str(obj.dac3RefLvds()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'dacBias: %s' % int8_to_str(obj.dacBias()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'flags: %s' % int8_to_str(obj.flags()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'driverVersion: %s' % int32_to_str(obj.driverVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'firmwareVersion: %s' % uint32_to_str(obj.firmwareVersion()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'pixelThreshSize: %s' % uint32_to_str(obj.pixelThreshSize()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip0ID: %s' % int32_to_str(obj.chip0ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip1ID: %s' % int32_to_str(obj.chip1ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip2ID: %s' % int32_to_str(obj.chip2ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chip3ID: %s' % int32_to_str(obj.chip3ID()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'chipCount: %s' % int32_to_str(obj.chipCount()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'readoutSpeed: %s' % int32_to_str(obj.readoutSpeed()) 
-    lines += ('%s' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timepixMode: %s' % int32_to_str(obj.timepixMode()) 
-    lines += ('%s' % methodStr)
-        # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip0Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip0Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip1Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip1Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip2Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip2Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.chip3Name()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "chip3Name[%d]\n" % idx
-        elemStr += char_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timepixSpeed: %s' % int32_to_str( obj.timepixSpeed() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ikrum: %s' % int32_to_str( obj.dac0Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Disc: %s' % int32_to_str( obj.dac0Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Preamp: %s' % int32_to_str( obj.dac0Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogA: %s' % int32_to_str( obj.dac0BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BufAnalogB: %s' % int32_to_str( obj.dac0BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Hist: %s' % int32_to_str( obj.dac0Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlFine: %s' % int32_to_str( obj.dac0ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0ThlCourse: %s' % int32_to_str( obj.dac0ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Vcas: %s' % int32_to_str( obj.dac0Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Fbk: %s' % int32_to_str( obj.dac0Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Gnd: %s' % int32_to_str( obj.dac0Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0Ths: %s' % int32_to_str( obj.dac0Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0BiasLvds: %s' % int32_to_str( obj.dac0BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac0RefLvds: %s' % int32_to_str( obj.dac0RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ikrum: %s' % int32_to_str( obj.dac1Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Disc: %s' % int32_to_str( obj.dac1Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Preamp: %s' % int32_to_str( obj.dac1Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogA: %s' % int32_to_str( obj.dac1BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BufAnalogB: %s' % int32_to_str( obj.dac1BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Hist: %s' % int32_to_str( obj.dac1Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlFine: %s' % int32_to_str( obj.dac1ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1ThlCourse: %s' % int32_to_str( obj.dac1ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Vcas: %s' % int32_to_str( obj.dac1Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Fbk: %s' % int32_to_str( obj.dac1Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Gnd: %s' % int32_to_str( obj.dac1Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1Ths: %s' % int32_to_str( obj.dac1Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1BiasLvds: %s' % int32_to_str( obj.dac1BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac1RefLvds: %s' % int32_to_str( obj.dac1RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ikrum: %s' % int32_to_str( obj.dac2Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Disc: %s' % int32_to_str( obj.dac2Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Preamp: %s' % int32_to_str( obj.dac2Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogA: %s' % int32_to_str( obj.dac2BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BufAnalogB: %s' % int32_to_str( obj.dac2BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Hist: %s' % int32_to_str( obj.dac2Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlFine: %s' % int32_to_str( obj.dac2ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2ThlCourse: %s' % int32_to_str( obj.dac2ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Vcas: %s' % int32_to_str( obj.dac2Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Fbk: %s' % int32_to_str( obj.dac2Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Gnd: %s' % int32_to_str( obj.dac2Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2Ths: %s' % int32_to_str( obj.dac2Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2BiasLvds: %s' % int32_to_str( obj.dac2BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac2RefLvds: %s' % int32_to_str( obj.dac2RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ikrum: %s' % int32_to_str( obj.dac3Ikrum() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Disc: %s' % int32_to_str( obj.dac3Disc() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Preamp: %s' % int32_to_str( obj.dac3Preamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogA: %s' % int32_to_str( obj.dac3BufAnalogA() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BufAnalogB: %s' % int32_to_str( obj.dac3BufAnalogB() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Hist: %s' % int32_to_str( obj.dac3Hist() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlFine: %s' % int32_to_str( obj.dac3ThlFine() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3ThlCourse: %s' % int32_to_str( obj.dac3ThlCourse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Vcas: %s' % int32_to_str( obj.dac3Vcas() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Fbk: %s' % int32_to_str( obj.dac3Fbk() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Gnd: %s' % int32_to_str( obj.dac3Gnd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3Ths: %s' % int32_to_str( obj.dac3Ths() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3BiasLvds: %s' % int32_to_str( obj.dac3BiasLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dac3RefLvds: %s' % int32_to_str( obj.dac3RefLvds() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'dacBias: %s' % int8_to_str( obj.dacBias() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'flags: %s' % int8_to_str( obj.flags() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'driverVersion: %s' % int32_to_str( obj.driverVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'firmwareVersion: %s' % uint32_to_str( obj.firmwareVersion() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelThreshSize: %s' % uint32_to_str( obj.pixelThreshSize() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str( obj.pixelThresh() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip0Name: %s' % str_to_str( obj.chip0Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip1Name: %s' % str_to_str( obj.chip1Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip2Name: %s' % str_to_str( obj.chip2Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip3Name: %s' % str_to_str( obj.chip3Name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip0ID: %s' % int32_to_str( obj.chip0ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip1ID: %s' % int32_to_str( obj.chip1ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip2ID: %s' % int32_to_str( obj.chip2ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chip3ID: %s' % int32_to_str( obj.chip3ID() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'chipCount: %s' % int32_to_str( obj.chipCount() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'readoutSpeed:\n'
+    methodStr += enum_to_str(obj.readoutSpeed(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timepixMode:\n'
+    methodStr += enum_to_str(obj.timepixMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    return methodSep.join(methodStrings)
 
-def Timepix_DataV1_to_str(obj, indent, indentLvl):
+def Timepix_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Timepix.DataV1.TypeId
     assert obj.Version == psana.Timepix.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % uint32_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameCounter: %s' % uint16_to_str(obj.frameCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lostRows: %s' % uint16_to_str(obj.lostRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint32_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint32_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth: %s' % uint32_to_str(obj.depth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth_bytes: %s' % uint32_to_str(obj.depth_bytes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data_size: %s' % uint32_to_str(obj.data_size()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameCounter: %s' % uint16_to_str( obj.frameCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lostRows: %s' % uint16_to_str( obj.lostRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint32_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth_bytes: %s' % uint32_to_str( obj.depth_bytes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def Timepix_DataV2_to_str(obj, indent, indentLvl):
+def Timepix_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Timepix.DataV2.TypeId
     assert obj.Version == psana.Timepix.DataV2.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str(obj.data()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'width: %s' % uint16_to_str(obj.width()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'height: %s' % uint16_to_str(obj.height()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % uint32_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'frameCounter: %s' % uint16_to_str(obj.frameCounter()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'lostRows: %s' % uint16_to_str(obj.lostRows()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth: %s' % uint32_to_str(obj.depth()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'depth_bytes: %s' % uint32_to_str(obj.depth_bytes()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'data_size: %s' % uint32_to_str(obj.data_size()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint16_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'height: %s' % uint16_to_str( obj.height() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameCounter: %s' % uint16_to_str( obj.frameCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lostRows: %s' % uint16_to_str( obj.lostRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'depth_bytes: %s' % uint32_to_str( obj.depth_bytes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
-def UsdUsb_ConfigV1_to_str(obj, indent, indentLvl):
+def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.UsdUsb.ConfigV1.TypeId
     assert obj.Version == psana.UsdUsb.ConfigV1.Version
-    lines = ''
-         # list methods
-    methodStr = ''
-    for idx, subObj in enumerate(obj.counting_mode()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "counting_mode[%d]\n" % idx
-        elemStr += int32_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-    methodStr = ''
-    for idx, subObj in enumerate(obj.quadrature_mode()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "quadrature_mode[%d]\n" % idx
-        elemStr += int32_to_str(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-      
-    return lines
+    methodStrings = []
+    # idx_list_one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'counting_mode'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.counting_mode(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.counting_mode() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'quadrature_mode'
+    try:
+       for idx in range( 4 ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( obj.quadrature_mode(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.quadrature_mode() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % enum_to_str( subObj )
+       methodStrings.append( methodStr )
+    return methodSep.join(methodStrings)
 
-def UsdUsb_DataV1_to_str(obj, indent, indentLvl):
+def UsdUsb_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.UsdUsb.DataV1.TypeId
     assert obj.Version == psana.UsdUsb.DataV1.Version
-    lines = ''
-     # basic methods
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'status: %s' % ndarray_uint8_1_to_str(obj.status()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'analog_in: %s' % ndarray_uint16_1_to_str(obj.analog_in()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'encoder_count: %s' % ndarray_int32_1_to_str(obj.encoder_count()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'digital_in: %s' % uint8_to_str(obj.digital_in()) 
-    lines += ('%s\n' % methodStr)
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += 'timestamp: %s' % uint32_to_str(obj.timestamp()) 
-    lines += ('%s\n' % methodStr)
-          
-    return lines
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'digital_in: %s' % uint8_to_str( obj.digital_in() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'status: %s' % ndarray_uint8_1_to_str( obj.status() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'analog_in: %s' % ndarray_uint16_1_to_str( obj.analog_in() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'encoder_count: %s' % ndarray_int32_1_to_str( obj.encoder_count() )
+    methodStrings.append(methodStr)                                 
+    return methodSep.join(methodStrings)
 
- 
+
 # dispatch table
 objFunctionTable = {
     (psana.Acqiris.ConfigV1.TypeId,1) : Acqiris_ConfigV1_to_str,
@@ -6545,7 +6542,6 @@ objFunctionTable = {
     (psana.PNCCD.ConfigV1.TypeId,1) : PNCCD_ConfigV1_to_str,
     (psana.PNCCD.ConfigV2.TypeId,2) : PNCCD_ConfigV2_to_str,
     (psana.PNCCD.FramesV1.TypeId,1) : PNCCD_FramesV1_to_str,
-    (psana.PNCCD.FullFrameV1.TypeId,1) : PNCCD_FullFrameV1_to_str,
     (psana.Partition.ConfigV1.TypeId,1) : Partition_ConfigV1_to_str,
     (psana.Pimax.ConfigV1.TypeId,1) : Pimax_ConfigV1_to_str,
     (psana.Pimax.FrameV1.TypeId,1) : Pimax_FrameV1_to_str,
@@ -6574,15 +6570,23 @@ objFunctionTable = {
 
 #########################################
 # The primary high level function that users can call to dump a psana object to a string
-def obj2str(obj, indent=0, indentLvl=0):
-    assert hasattr(obj,'TypeId'), "obj2str is only for xtc types with a TypeId"
-    assert obj.TypeId is not None, "obj2str is only for xtc types with a TypeId that is not None"
-    assert hasattr(obj,'Version'), "obj2str is only for xtc types with a Version"
-    assert obj.Version is not None, "obj2str is only for xtc types with a Version that is not None"
-    if obj.TypeId == 54:
-       return ((" " * indent) * indentLvl) + "no dump function for epics config"
-
-    fnKey = (obj.TypeId, obj.Version)
-    dump_function = objFunctionTable.get(fnKey,None)
-    assert dump_function is not None, "obj2str - no dump function found for obj=%r typeid/version=%s" % (obj,fnKey,)
-    return dump_function(obj, indent, indentLvl)
+def obj2str(obj, indent=0, lvl=0, methodsep='\n'):
+    if hasattr(obj,'TypeId'):
+        if obj.TypeId is not None:
+            if obj.TypeId == 54:
+                return doIndent(indent,lvl) + 'epicsConfig not dumped'
+            if obj.TypeId == 11 and type(obj) == psana.PNCCD.FullFrameV1:
+                return doIndent(indent,lvl) + 'PNCCD.FullFramesV1 not dumped'
+        if hasattr(obj,'Version'):
+            if obj.Version is not None:
+              fnKey = (obj.TypeId, obj.Version)
+              dump_function = objFunctionTable.get(fnKey,None)
+              assert dump_function is not None, "obj2str - no dump function found for obj=%r typeid/version=%s" % (obj,fnKey,)
+              return dump_function(obj, indent, lvl, methodsep)
+    # check for an ndarray that we know how to convert
+    if isinstance(obj,np.ndarray):
+        fnCvt = getTypeFn(obj.dtype)
+        if fnCvt is not None:
+            return ndarray_to_str(obj, len(obj.shape), indent, lvl)
+    # default to Python str
+    return str(obj)

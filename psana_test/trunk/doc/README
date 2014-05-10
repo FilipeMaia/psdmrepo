@@ -11,16 +11,28 @@ Package author: David A. Schneider
 Brief description:
 ==================
 
-Tools for testing - presently a C++ psana Dump module generated from the ddl.
-Plan to do a Python module. May not be suitable for release.
+Tools for testing - presently a Python psana Dump module generated from the ddl.
 
 Detailed description:
 =====================
 
-Package provides a module Dump, psana -m PsanaTools.Dump
-Module will go through eventKeys and print all Psana objects to stdout.
+Package provides a module dump, psana -m psana_test.dump datasource
 
-Output will not be user friendly, use output to test refactoring
-of Psana, or comparing how Psana processes input that should be
-treated the same (such as xtc and hdf5, C++ vs. Python wrappers).
+During the the beginJob, the module will dump everything from the config store.
+During the event, the module will dump all the event keys.
+Epics is skipped.
+
+Orovides a useful function to write a psana object to a string.
+
+import psana_test
+
+...
+print psana_test.obj2str(myobject)
+
+for ndarrays, a checksum is printed, as well as quantile statistics 
+(min, 25th, 50th, 75th and max values).
+
+Output is intended to test refactoring of Psana, or comparing how Psana 
+processes two different input sources that should produce the same
+output (such as hdf5 vs. xtc).
 

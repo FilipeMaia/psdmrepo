@@ -1,2 +1,3 @@
 import psddl_dump
-import dump_basic_types
+import types_to_str
+from psddl_dump import obj2str

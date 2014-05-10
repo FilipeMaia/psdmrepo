@@ -29,138 +29,110 @@
 
 import psana
 from psana import *
-from  psana_test.dump_basic_types import *
+from  psana_test.types_to_str import *
+import numpy as np
 
-def line_indent(indent, indentLvl):
-    return ' ' * indent * indentLvl    
+def _Src_to_str(obj, indent, lvl, methodSep):
+    return doIndent(indent,lvl) + str(obj)
 
+def Partition_Src_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def Pds_Src_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
+    return _Src_to_str(obj, indent, lvl, methodSep)
+
+def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
+    return Pds_ClockTime_toStr(obj, indent, lvl, methodSep)
+  
 # functions to dump psana objects to a string                    
 {% for psana_type in psana_types %}
 {% set namespace = psana_type.namespace %}
 {% set classname = psana_type.classname %}
 {% set xtctype = psana_type.xtctype %}
-{% set basic_methods = psana_type.basic_methods %}
-{% set not_basic_methods = psana_type.not_basic_methods %}
-{% set list_methods = psana_type.list_methods %}
-{% set string_methods = psana_type.string_methods %}
-{% set basic_0_to_methods = psana_type.basic_0_to_methods %}
-{% set basic_0_to_const_methods = psana_type.basic_0_to_const_methods %}
-{% set not_basic_idx_methods = psana_type.not_basic_idx_methods %}
-{% set not_basic_shape_methods = psana_type.not_basic_shape_methods %}
-def {{namespace}}_{{classname}}_to_str(obj, indent, indentLvl):
+{% set one_line_methods = psana_type.one_line_methods %}
+{% set multi_line_methods = psana_type.multi_line_methods %}
+{% set idx_list_one_line_methods = psana_type.idx_list_one_line_methods %}
+{% set idx_list_multi_line_methods = psana_type.idx_list_multi_line_methods %}
+{% set list_multi_line_methods = psana_type.list_multi_line_methods %}
+def {{namespace}}_{{classname}}_to_str(obj, indent, lvl, methodSep):
 {% if xtctype %}
     assert obj.TypeId == psana.{{namespace}}.{{classname}}.TypeId
     assert obj.Version == psana.{{namespace}}.{{classname}}.Version
 {% endif %}
-    lines = ''
-{% if basic_attr -%}
-    # basic attributes
+    methodStrings = []
+{% if one_line_methods %}
+    # one_line_methods
 {% endif %}
-{% for attrFn in basic_attr %}
-{% set attr,dump_function = attrFn %}
-    attrStr = line_indent(indent, indentLvl)
-    attrStr += '{{attr}}: %s' % {{dump_function}}(obj.{{attr}}) 
-    lines += ('%s\n' % attrStr)
-{% endfor %} {# basic attr #}
-{% if basic_methods %}
-    # basic methods
+{% for xx in one_line_methods %}
+{% set name, expr, fn = xx %}
+    methodStr = doIndent(indent, lvl)
+    methodStr += '{{name}}: %s' % {{fn}}( {{expr}} )
+    methodStrings.append(methodStr)                                 
+{% endfor %}
+{% if multi_line_methods %}
+    # multi_line_methods
 {% endif %}
-{% for basic_method in basic_methods %}
-{% set method,dump_function,method_sep = basic_method %}
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += '{{method}}: %s' % {{dump_function}}(obj.{{method}}()) 
-    lines += ('%s{{method_sep}}' % methodStr)
-{% endfor %} {# basic_methods #}
-{% if not_basic_methods %}
-    # not basic methods
+{% for xx  in multi_line_methods %}
+{% set name, expr, fn = xx %}
+    methodStr = doIndent(indent, lvl)
+    methodStr += '{{name}}:\n'
+    methodStr += {{fn}}({{expr}}, indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+{% endfor %}
+{% if idx_list_one_line_methods %}
+    # idx_list_one_line_methods
 {% endif %}
-{% for not_basic_method in not_basic_methods %}
-{% set method,dump_function = not_basic_method %}
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += '{{method}}:\n%s' % {{dump_function}}(obj.{{method}}(),indent,indentLvl+1)
-    lines += ('%s' % methodStr)
-{% endfor %} {# not_basic_methods #}
-{% if string_methods %}
-    # string methods
+{% for xx in idx_list_one_line_methods %}
+{% set name, fn, maxexpr = xx %}
+    methodStr = doIndent(indent, lvl)
+    methodStr += '{{name}}'
+    try:
+       for idx in range( {{maxexpr}} ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % {{fn}}( obj.{{name}}(idx) )
+       methodStrings.append( methodStr )
+    except:
+       for idx, subObj in enumerate( obj.{{name}}() ):
+            methodStr += ' [%d]' % idx
+            methodStr += '=%s' % {{fn}}( subObj )
+       methodStrings.append( methodStr )
+{% endfor %}
+{% if idx_list_multi_line_methods %}
+    # idx_list_multi_line_methods
 {% endif %}
-{% for string_method in string_methods %}
-{% set method,maxlen = string_method %}
-    methodStr = line_indent(indent, indentLvl)
-{% if maxlen %}
-    methodStr += str(obj.{{method}}()[0:{{maxlen}}])
-{% else %}
-    methodStr += str(obj.{{method}}())
-{% endif %}
-    lines += '%s\n' % methodStr
-{% endfor %}  {# string_methods #}
-{% if list_methods %}
-    # list methods
-{% endif %}
-{% for list_method in list_methods %}
-{% set method,elem_dump_function = list_method %}
+{% for nameFnMaxExpr in idx_list_multi_line_methods %}
+{% set name, fn, maxexpr = nameFnMaxExpr %}
     methodStr = ''
-    for idx, subObj in enumerate(obj.{{method}}()):
-        elemStr = line_indent(indent, indentLvl)
-        elemStr += "{{method}}[%d]\n" % idx
-        elemStr += {{elem_dump_function}}(subObj,indent,indentLvl+1)
-        methodStr += '%s\n' % elemStr
-    lines += '%s\n' % methodStr
-{% endfor %}  {# list_methods #}
-{% if basic_0_to_methods %}
-    # basic_0_to_methods
-{% endif %}
-{% for basic_0_to_method in basic_0_to_methods %}
-{% set method, elem_dump_function, maxiter = basic_0_to_method %}
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += ('{{method}}[0:' + str(obj.{{maxiter}}()) + ']:')
-    for idx in range(obj.{{maxiter}}()):
-        elem = obj.{{method}}(idx)
-        methodStr += (' ' + {{elem_dump_function}}(elem) )
-    lines += '%s\n' % methodStr
-{% endfor %}  {# basic_0_to_methods #}
-{% if basic_0_to_const_methods %}
-    # basic_0_to_const_methods
-{% endif %}
-{% for basic_0_to_const_method in basic_0_to_const_methods %}
-{% set method, elem_dump_function, maxiter = basic_0_to_const_method %}
-    methodStr = line_indent(indent, indentLvl)
-    methodStr += '{{method}}[0:{{maxiter}}]:'
-    for idx in range({{maxiter}}):
-        elem = obj.{{method}}(idx)
-        methodStr += (' ' + {{elem_dump_function}}(elem) )
-    lines += '%s\n' % methodStr
-{% endfor %}  {# basic_0_to_const_methods #}
-{% if not_basic_shape_methods %}
-    # not_basic_shape_method
-{% endif %}
-{% for not_basic_shape_method in not_basic_shape_methods %}
-{% set method,shape_fn,elem_dump_fn = not_basic_shape_method %}
-    assert len(obj.{{shape_fn}}())==1, "shape function {{shape_fn}} is not length 1"
-    n = obj.{{shape_fn}}()[0]
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.{{method}}(idx)
-        methodStr += ("{{method}}[%d]\n" % idx)
-        methodStr += {{elem_dump_fn}}(elem,indent,indentLvl+1)
-    lines += ('%s' % methodStr)
+    numObjs = {{ maxexpr }}
+    for idx in range( numObjs ):
+        subObj = obj.{{name}}(idx)
+        methodStr += doIndent(indent, lvl)
+        methodStr += '{{name}}[%d]:\n' % idx
+        methodStr += {{fn}}(subObj, indent, lvl+1, methodSep)
+        if idx+1 < numObjs:
+            methodStr += '\n'
+    methodStrings.append(methodStr)
 {% endfor %}
-{% if not_basic_idx_methods %}
-    # not_basic_idx_method
+{% if list_multi_line_methods %}
+    # list_multi_line_methods
 {% endif %}
-{% for not_basic_idx_method in not_basic_idx_methods %}
-{% set method,shape_fn,elem_dump_fn = not_basic_idx_method %}
-    n = obj.{{shape_fn}}()
-    methodStr = line_indent(indent, indentLvl)
-    for idx in range(n):
-        elem = obj.{{method}}(idx)
-        methodStr += ("{{method}}[%d]\n" % idx)
-        methodStr += {{elem_dump_fn}}(elem,indent,indentLvl+1)
-    lines += ("%s" % methodStr)
+{% for nameFn in list_multi_line_methods %}
+{% set name, fn = nameFn %}
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.{{name}}() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += '{{name}}[%d]:\n' % idx
+        subMethodStr += {{fn}}(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
 {% endfor %}
+    return methodSep.join(methodStrings)
 
-    return lines
-
-{% endfor %} {# psana_types #}
+{% endfor %}{# psana_types #}
 
 # dispatch table
 objFunctionTable = {
@@ -173,44 +145,24 @@ objFunctionTable = {
 
 #########################################
 # The primary high level function that users can call to dump a psana object to a string
-def obj2str(obj, indent=0, indentLvl=0):
-    assert hasattr(obj,'TypeId'), "obj2str is only for xtc types with a TypeId"
-    assert obj.TypeId is not None, "obj2str is only for xtc types with a TypeId that is not None"
-    assert hasattr(obj,'Version'), "obj2str is only for xtc types with a Version"
-    assert obj.Version is not None, "obj2str is only for xtc types with a Version that is not None"
-    if obj.TypeId == 54:
-       return ((" " * indent) * indentLvl) + "no dump function for epics config"
-
-    fnKey = (obj.TypeId, obj.Version)
-    dump_function = objFunctionTable.get(fnKey,None)
-    assert dump_function is not None, "obj2str - no dump function found for obj=%r typeid/version=%s" % (obj,fnKey,)
-    return dump_function(obj, indent, indentLvl)
-
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-::::template:::: include_headers
-::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-:
-:  Template for first part of psana_test/src/psddl_Dump.cpp
-:
-:  Parameters for this template:
-:
-:  base_headers  - list of the basename of the header files in the psddl_psana package 
-:
-
-/* Do not modify this file, it is generated code. 
-   Modify the template file and Ddl backend and run the psddl compiler. */
-
-{% for header in base_headers %}
-#include "psddl_psana/{{header}}"
-{% endfor %}
-
-#include "MsgLogger/MsgLogger.h"
-#include "PSEvt/Event.h"
-#include "PSEnv/Env.h"
-#include "psana_test/psddl_Dump.h"
-#include <cstdio>
-#include <vector>
-
-using namespace std;
-using namespace Psana;
+def obj2str(obj, indent=0, lvl=0, methodsep='\n'):
+    if hasattr(obj,'TypeId'):
+        if obj.TypeId is not None:
+            if obj.TypeId == 54:
+                return doIndent(indent,lvl) + 'epicsConfig not dumped'
+            if obj.TypeId == 11 and type(obj) == psana.PNCCD.FullFrameV1:
+                return doIndent(indent,lvl) + 'PNCCD.FullFramesV1 not dumped'
+        if hasattr(obj,'Version'):
+            if obj.Version is not None:
+              fnKey = (obj.TypeId, obj.Version)
+              dump_function = objFunctionTable.get(fnKey,None)
+              assert dump_function is not None, "obj2str - no dump function found for obj=%r typeid/version=%s" % (obj,fnKey,)
+              return dump_function(obj, indent, lvl, methodsep)
+    # check for an ndarray that we know how to convert
+    if isinstance(obj,np.ndarray):
+        fnCvt = getTypeFn(obj.dtype)
+        if fnCvt is not None:
+            return ndarray_to_str(obj, len(obj.shape), indent, lvl)
+    # default to Python str
+    return str(obj)
 

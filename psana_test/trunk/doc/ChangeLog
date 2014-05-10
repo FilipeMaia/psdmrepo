@@ -11,7 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: No tag yet, just in development - first tag will be V00-00-01
+Tag: no tag yet
+2014-05-09 David Schneider
+- psana python module that dumps all non-epics data
+- got rid of much of the C++ Dump module.
+	
+Tag: No tag yet, just in development 
 2014-02-04 David A. Schneider
 - checking in C++ Dump module that prints basic attributes of non-epics, 
   and some basic arrays.
