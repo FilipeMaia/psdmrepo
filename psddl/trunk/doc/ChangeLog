@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-10
+2014-05-09 David
+- Add backend for psana_test package.
+
 Tag: V00-13-09
 2014-03-25 David
 - Documenting error with check in of Tag V00-13-13 from Jan 2013. That

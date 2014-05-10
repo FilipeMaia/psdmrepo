@@ -52,6 +52,7 @@ from psddl.DdlHdf5Translator import DdlHdf5Translator
 from psddl.DdlDumpHddl import DdlDumpHddl
 from psddl.XmlReader import XmlReader
 from psddl.HddlReader import HddlReader
+from psddl.DdlPsanaTest import DdlPsanaTest
 
 #---------------------
 # Local definitions --
@@ -117,6 +118,7 @@ class psddlc ( AppBase ) :
             "hdf5": DdlHdf5Data,
             "hdf5-dispatch": DdlHdf5DataDispatch,
             "hdf5Translator": DdlHdf5Translator,
+            "psana_test":DdlPsanaTest,
             "dump-hddl": DdlDumpHddl,
         }
         
