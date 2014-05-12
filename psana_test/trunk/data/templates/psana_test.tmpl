@@ -45,7 +45,7 @@ def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
     return _Src_to_str(obj, indent, lvl, methodSep)
 
 def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
-    return Pds_ClockTime_toStr(obj, indent, lvl, methodSep)
+    return Pds_ClockTime_to_str(obj, indent, lvl, methodSep)
   
 # functions to dump psana objects to a string                    
 {% for psana_type in psana_types %}
@@ -130,6 +130,7 @@ def {{namespace}}_{{classname}}_to_str(obj, indent, lvl, methodSep):
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
 {% endfor %}
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 {% endfor %}{# psana_types #}

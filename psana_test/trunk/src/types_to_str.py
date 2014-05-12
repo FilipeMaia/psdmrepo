@@ -31,16 +31,16 @@ def int64_to_str(v, indent=0, lvl=0):
 
 # hex for unsigned integers
 def uint8_to_str(v, indent=0, lvl=0):
-    return doIndent(indent,lvl) + ('0x%2.2x' % v)
+    return doIndent(indent,lvl) + ('0x%X' % v)
 
 def uint16_to_str(v, indent=0, lvl=0):
-    return doIndent(indent,lvl) + ('0x%4.4x' % v)
+    return doIndent(indent,lvl) + ('0x%X' % v)
 
 def uint32_to_str(v, indent=0, lvl=0):
-    return doIndent(indent,lvl) + ('0x%8.8x' % v)
+    return doIndent(indent,lvl) + ('0x%X' % v)
 
 def uint64_to_str(v, indent=0, lvl=0):
-    return doIndent(indent,lvl) + ('0x%16.16x' % v)
+    return doIndent(indent,lvl) + ('0x%X' % v)
 
 def float_to_str(v, indent=0, lvl=0):
     return doIndent(indent,lvl) + ("%.4e" % v)
@@ -78,14 +78,14 @@ def getTypeFn(dt):
         return double_to_str
     return None
 
-def ndarray_to_str(a, dim, indent=0, lvl=0):
-    assert len(a.shape)==dim
+def ndarray_to_str(a, indent=0, lvl=0):
     dimstr = ' x '.join(map(str,a.shape))
+    dim = len(a.shape)
     numElem = 1
     for dim in a.shape:
         numElem *= dim
     outstr = doIndent(indent,lvl)
-    outstr +=  "dim=[ %s ]" % dimstr
+    outstr +=  "ndarray_%s_%d: dim=[ %s ]" % (a.dtype.name, dim, dimstr)
     if numElem == 0:
         return outstr
 
@@ -105,166 +105,4 @@ def ndarray_to_str(a, dim, indent=0, lvl=0):
     outstr += " 75th=" + type2str(a_flat[qinds[3] ])
     outstr += " max=" + type2str(a_flat[qinds[4] ])
     return outstr
-
-def ndarray_float32_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_float32_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_float32_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_float32_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_float32_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_float32_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_float32_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_float64_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_float64_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_float64_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_float64_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_float64_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_float64_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_float64_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_int16_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_int16_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_int16_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_int16_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_int16_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_int16_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_int16_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_int32_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_int32_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_int32_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_int32_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_int32_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_int32_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_int32_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_int64_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_int64_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_int64_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_int64_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_int64_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_int64_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_int64_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_uint8_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_uint8_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_uint8_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_uint8_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_uint8_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_uint8_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint8_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_uint16_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_uint16_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_uint16_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_uint16_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_uint16_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_uint16_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint16_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_uint32_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_uint32_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_uint32_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_uint32_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_uint32_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_uint32_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint32_6: %s" % ndarray_to_str(a,6,indent,lvl)
-
-def ndarray_uint64_1_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_1: %s" % ndarray_to_str(a,1,indent,lvl)
-
-def ndarray_uint64_2_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_2: %s" % ndarray_to_str(a,2,indent,lvl)
-
-def ndarray_uint64_3_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_3: %s" % ndarray_to_str(a,3,indent,lvl)
-
-def ndarray_uint64_4_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_4: %s" % ndarray_to_str(a,4,indent,lvl)
-
-def ndarray_uint64_5_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_5: %s" % ndarray_to_str(a,5,indent,lvl)
-
-def ndarray_uint64_6_to_str(a, indent=0, lvl=0):
-    return "ndarray_uint64_6: %s" % ndarray_to_str(a,6,indent,lvl)
 

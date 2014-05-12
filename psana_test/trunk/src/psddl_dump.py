@@ -20,7 +20,7 @@ def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
     return _Src_to_str(obj, indent, lvl, methodSep)
 
 def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
-    return Pds_ClockTime_toStr(obj, indent, lvl, methodSep)
+    return Pds_ClockTime_to_str(obj, indent, lvl, methodSep)
   
 # functions to dump psana objects to a string                    
 def Acqiris_VertV1_to_str(obj, indent, lvl, methodSep):
@@ -41,6 +41,7 @@ def Acqiris_VertV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'slope: %s' % double_to_str( obj.slope() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_HorizV1_to_str(obj, indent, lvl, methodSep):
@@ -58,6 +59,7 @@ def Acqiris_HorizV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'nbrSegments: %s' % uint32_to_str( obj.nbrSegments() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TrigV1_to_str(obj, indent, lvl, methodSep):
@@ -75,6 +77,7 @@ def Acqiris_TrigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'level: %s' % double_to_str( obj.level() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -112,6 +115,7 @@ def Acqiris_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TimestampV1_to_str(obj, indent, lvl, methodSep):
@@ -129,6 +133,7 @@ def Acqiris_TimestampV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'value: %s' % uint64_to_str( obj.value() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_DataDescV1Elem_to_str(obj, indent, lvl, methodSep):
@@ -144,7 +149,7 @@ def Acqiris_DataDescV1Elem_to_str(obj, indent, lvl, methodSep):
     methodStr += 'nbrSegments: %s' % uint32_to_str( obj.nbrSegments() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'waveforms: %s' % ndarray_int16_2_to_str( obj.waveforms() )
+    methodStr += 'waveforms: %s' % ndarray_to_str( obj.waveforms() )
     methodStrings.append(methodStr)                                 
     # list_multi_line_methods
     subMethodStrs = []
@@ -155,6 +160,7 @@ def Acqiris_DataDescV1Elem_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_DataDescV1_to_str(obj, indent, lvl, methodSep):
@@ -172,6 +178,7 @@ def Acqiris_DataDescV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcChannel_to_str(obj, indent, lvl, methodSep):
@@ -193,6 +200,7 @@ def Acqiris_TdcChannel_to_str(obj, indent, lvl, methodSep):
     methodStr += 'mode:\n'
     methodStr += enum_to_str(obj.mode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcAuxIO_to_str(obj, indent, lvl, methodSep):
@@ -210,6 +218,7 @@ def Acqiris_TdcAuxIO_to_str(obj, indent, lvl, methodSep):
     methodStr += 'term:\n'
     methodStr += enum_to_str(obj.term(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcVetoIO_to_str(obj, indent, lvl, methodSep):
@@ -227,6 +236,7 @@ def Acqiris_TdcVetoIO_to_str(obj, indent, lvl, methodSep):
     methodStr += 'term:\n'
     methodStr += enum_to_str(obj.term(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -255,6 +265,7 @@ def Acqiris_TdcConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcDataV1_Item_to_str(obj, indent, lvl, methodSep):
@@ -274,6 +285,7 @@ def Acqiris_TdcDataV1_Item_to_str(obj, indent, lvl, methodSep):
     methodStr += 'source:\n'
     methodStr += enum_to_str(obj.source(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcDataV1Common_to_str(obj, indent, lvl, methodSep):
@@ -285,6 +297,7 @@ def Acqiris_TdcDataV1Common_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'overflow: %s' % uint8_to_str( obj.overflow() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcDataV1Channel_to_str(obj, indent, lvl, methodSep):
@@ -299,6 +312,7 @@ def Acqiris_TdcDataV1Channel_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'time: %s' % double_to_str( obj.time() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcDataV1Marker_to_str(obj, indent, lvl, methodSep):
@@ -308,6 +322,7 @@ def Acqiris_TdcDataV1Marker_to_str(obj, indent, lvl, methodSep):
     methodStr += 'type:\n'
     methodStr += enum_to_str(obj.type(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Acqiris_TdcDataV1_to_str(obj, indent, lvl, methodSep):
@@ -323,6 +338,7 @@ def Acqiris_TdcDataV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Pds_ClockTime_to_str(obj, indent, lvl, methodSep):
@@ -334,6 +350,7 @@ def Pds_ClockTime_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'seconds: %s' % uint32_to_str( obj.seconds() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Alias_SrcAlias_to_str(obj, indent, lvl, methodSep):
@@ -347,6 +364,7 @@ def Alias_SrcAlias_to_str(obj, indent, lvl, methodSep):
     methodStr += 'src:\n'
     methodStr += Pds_Src_to_str(obj.src(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Alias_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -366,6 +384,7 @@ def Alias_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Andor_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -432,6 +451,7 @@ def Andor_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fanMode:\n'
     methodStr += enum_to_str(obj.fanMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Andor_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -449,8 +469,9 @@ def Andor_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -462,8 +483,9 @@ def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'numChars: %s' % uint64_to_str( obj.numChars() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint8_1_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Camera_FrameCoord_to_str(obj, indent, lvl, methodSep):
@@ -475,12 +497,14 @@ def Camera_FrameCoord_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'row: %s' % uint16_to_str( obj.row() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Camera_FrameFccdConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Camera.FrameFccdConfigV1.TypeId
     assert obj.Version == psana.Camera.FrameFccdConfigV1.Version
     methodStrings = []
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Camera_FrameFexConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -523,6 +547,7 @@ def Camera_FrameFexConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Camera_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -543,14 +568,15 @@ def Camera_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'offset: %s' % uint32_to_str( obj.offset() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data8: %s' % ndarray_uint8_2_to_str( obj.data8() )
+    methodStr += 'data8: %s' % ndarray_to_str( obj.data8() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data16: %s' % ndarray_uint16_2_to_str( obj.data16() )
+    methodStr += 'data16: %s' % ndarray_to_str( obj.data16() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'depth_bytes: %s' % uint32_to_str( obj.depth_bytes() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Camera_TwoDGaussianV1_to_str(obj, indent, lvl, methodSep):
@@ -576,6 +602,7 @@ def Camera_TwoDGaussianV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'major_axis_tilt: %s' % double_to_str( obj.major_axis_tilt() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Ipimb_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -635,6 +662,7 @@ def Ipimb_ConfigV1_to_str(obj, indent, lvl, methodSep):
             methodStr += ' [%d]' % idx
             methodStr += '=%s' % enum_to_str( subObj )
        methodStrings.append( methodStr )
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Ipimb_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -700,6 +728,7 @@ def Ipimb_ConfigV2_to_str(obj, indent, lvl, methodSep):
             methodStr += ' [%d]' % idx
             methodStr += '=%s' % enum_to_str( subObj )
        methodStrings.append( methodStr )
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Ipimb_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -746,6 +775,7 @@ def Ipimb_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'channel3Volts: %s' % float_to_str( obj.channel3Volts() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Ipimb_DataV2_to_str(obj, indent, lvl, methodSep):
@@ -816,6 +846,7 @@ def Ipimb_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'triggerCounter: %s' % uint64_to_str( obj.triggerCounter() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_DiodeFexConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -824,11 +855,12 @@ def Lusi_DiodeFexConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'base: %s' % ndarray_float32_1_to_str( obj.base() )
+    methodStr += 'base: %s' % ndarray_to_str( obj.base() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'scale: %s' % ndarray_float32_1_to_str( obj.scale() )
+    methodStr += 'scale: %s' % ndarray_to_str( obj.scale() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_DiodeFexConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -837,11 +869,12 @@ def Lusi_DiodeFexConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'base: %s' % ndarray_float32_1_to_str( obj.base() )
+    methodStr += 'base: %s' % ndarray_to_str( obj.base() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'scale: %s' % ndarray_float32_1_to_str( obj.scale() )
+    methodStr += 'scale: %s' % ndarray_to_str( obj.scale() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_DiodeFexV1_to_str(obj, indent, lvl, methodSep):
@@ -852,6 +885,7 @@ def Lusi_DiodeFexV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'value: %s' % float_to_str( obj.value() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_IpmFexConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -874,6 +908,7 @@ def Lusi_IpmFexConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_IpmFexConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -896,6 +931,7 @@ def Lusi_IpmFexConfigV2_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_IpmFexV1_to_str(obj, indent, lvl, methodSep):
@@ -904,7 +940,7 @@ def Lusi_IpmFexV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'channel: %s' % ndarray_float32_1_to_str( obj.channel() )
+    methodStr += 'channel: %s' % ndarray_to_str( obj.channel() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'sum: %s' % float_to_str( obj.sum() )
@@ -915,6 +951,7 @@ def Lusi_IpmFexV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ypos: %s' % float_to_str( obj.ypos() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Lusi_PimImageConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -928,6 +965,7 @@ def Lusi_PimImageConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'yscale: %s' % float_to_str( obj.yscale() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Pulnix_TM6740ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -970,6 +1008,7 @@ def Pulnix_TM6740ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'lookuptable_mode:\n'
     methodStr += enum_to_str(obj.lookuptable_mode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Pulnix_TM6740ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -1012,6 +1051,7 @@ def Pulnix_TM6740ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'lookuptable_mode:\n'
     methodStr += enum_to_str(obj.lookuptable_mode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, lvl, methodSep):
@@ -1031,6 +1071,7 @@ def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'f_22_ENRC: %s' % double_to_str( obj.f_22_ENRC() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV0_to_str(obj, indent, lvl, methodSep):
@@ -1059,6 +1100,7 @@ def Bld_BldDataEBeamV0_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV1_to_str(obj, indent, lvl, methodSep):
@@ -1090,6 +1132,7 @@ def Bld_BldDataEBeamV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV2_to_str(obj, indent, lvl, methodSep):
@@ -1124,6 +1167,7 @@ def Bld_BldDataEBeamV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV3_to_str(obj, indent, lvl, methodSep):
@@ -1164,6 +1208,7 @@ def Bld_BldDataEBeamV3_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV4_to_str(obj, indent, lvl, methodSep):
@@ -1216,6 +1261,7 @@ def Bld_BldDataEBeamV4_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamUndAngY: %s' % double_to_str( obj.ebeamUndAngY() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataEBeamV5_to_str(obj, indent, lvl, methodSep):
@@ -1277,6 +1323,7 @@ def Bld_BldDataEBeamV5_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'ebeamDumpCharge: %s' % double_to_str( obj.ebeamDumpCharge() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataPhaseCavity_to_str(obj, indent, lvl, methodSep):
@@ -1296,6 +1343,7 @@ def Bld_BldDataPhaseCavity_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'charge2: %s' % double_to_str( obj.charge2() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataIpimbV0_to_str(obj, indent, lvl, methodSep):
@@ -1315,6 +1363,7 @@ def Bld_BldDataIpimbV0_to_str(obj, indent, lvl, methodSep):
     methodStr += 'ipmFexData:\n'
     methodStr += Lusi_IpmFexV1_to_str(obj.ipmFexData(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataIpimbV1_to_str(obj, indent, lvl, methodSep):
@@ -1334,6 +1383,7 @@ def Bld_BldDataIpimbV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'ipmFexData:\n'
     methodStr += Lusi_IpmFexV1_to_str(obj.ipmFexData(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataPimV1_to_str(obj, indent, lvl, methodSep):
@@ -1353,6 +1403,7 @@ def Bld_BldDataPimV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'frame:\n'
     methodStr += Camera_FrameV1_to_str(obj.frame(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataGMDV0_to_str(obj, indent, lvl, methodSep):
@@ -1405,6 +1456,7 @@ def Bld_BldDataGMDV0_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'transmissionFEE: %s' % double_to_str( obj.transmissionFEE() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataGMDV1_to_str(obj, indent, lvl, methodSep):
@@ -1427,6 +1479,7 @@ def Bld_BldDataGMDV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'relativeEnergyPerPulse: %s' % double_to_str( obj.relativeEnergyPerPulse() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataAcqADCV1_to_str(obj, indent, lvl, methodSep):
@@ -1442,6 +1495,7 @@ def Bld_BldDataAcqADCV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'data:\n'
     methodStr += Acqiris_DataDescV1_to_str(obj.data(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Bld_BldDataSpectrometerV0_to_str(obj, indent, lvl, methodSep):
@@ -1450,11 +1504,12 @@ def Bld_BldDataSpectrometerV0_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'hproj: %s' % ndarray_uint32_1_to_str( obj.hproj() )
+    methodStr += 'hproj: %s' % ndarray_to_str( obj.hproj() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'vproj: %s' % ndarray_uint32_1_to_str( obj.vproj() )
+    methodStr += 'vproj: %s' % ndarray_to_str( obj.vproj() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_PVControl_to_str(obj, indent, lvl, methodSep):
@@ -1472,6 +1527,7 @@ def ControlData_PVControl_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'array: %s' % uint8_to_str( obj.array() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_PVMonitor_to_str(obj, indent, lvl, methodSep):
@@ -1492,6 +1548,7 @@ def ControlData_PVMonitor_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'array: %s' % uint8_to_str( obj.array() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_PVLabel_to_str(obj, indent, lvl, methodSep):
@@ -1503,6 +1560,7 @@ def ControlData_PVLabel_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'value: %s' % str_to_str( obj.value() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -1547,6 +1605,7 @@ def ControlData_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -1602,6 +1661,7 @@ def ControlData_ConfigV2_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def ControlData_ConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -1660,14 +1720,16 @@ def ControlData_ConfigV3_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_CsPadDigitalPotsCfg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'pots: %s' % ndarray_uint8_1_to_str( obj.pots() )
+    methodStr += 'pots: %s' % ndarray_to_str( obj.pots() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_CsPadReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
@@ -1679,6 +1741,7 @@ def CsPad_CsPadReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'version: %s' % uint32_to_str( obj.version() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
@@ -1690,24 +1753,26 @@ def CsPad_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'pixelCountThreshold: %s' % uint32_to_str( obj.pixelCountThreshold() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_CsPadGainMapCfg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str( obj.gainMap() )
+    methodStr += 'gainMap: %s' % ndarray_to_str( obj.gainMap() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStr += 'shiftSelect: %s' % ndarray_to_str( obj.shiftSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStr += 'edgeSelect: %s' % ndarray_to_str( obj.edgeSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
@@ -1752,16 +1817,17 @@ def CsPad_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStr += 'gm:\n'
     methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStr += 'shiftSelect: %s' % ndarray_to_str( obj.shiftSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStr += 'edgeSelect: %s' % ndarray_to_str( obj.edgeSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
@@ -1815,16 +1881,17 @@ def CsPad_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStr += 'gm:\n'
     methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV3QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'shiftSelect: %s' % ndarray_uint32_1_to_str( obj.shiftSelect() )
+    methodStr += 'shiftSelect: %s' % ndarray_to_str( obj.shiftSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'edgeSelect: %s' % ndarray_uint32_1_to_str( obj.edgeSelect() )
+    methodStr += 'edgeSelect: %s' % ndarray_to_str( obj.edgeSelect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'readClkSet: %s' % uint32_to_str( obj.readClkSet() )
@@ -1884,6 +1951,7 @@ def CsPad_ConfigV3QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStr += 'gm:\n'
     methodStr += CsPad_CsPadGainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -1944,6 +2012,7 @@ def CsPad_ConfigV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -2032,6 +2101,7 @@ def CsPad_ConfigV2_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -2132,6 +2202,7 @@ def CsPad_ConfigV3_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV4_to_str(obj, indent, lvl, methodSep):
@@ -2232,6 +2303,7 @@ def CsPad_ConfigV4_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ConfigV5_to_str(obj, indent, lvl, methodSep):
@@ -2335,6 +2407,7 @@ def CsPad_ConfigV5_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ElementV1_to_str(obj, indent, lvl, methodSep):
@@ -2350,13 +2423,13 @@ def CsPad_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStr += 'sb_temp: %s' % ndarray_to_str( obj.sb_temp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
@@ -2379,6 +2452,7 @@ def CsPad_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'sectionMask: %s' % uint32_to_str( obj.sectionMask() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -2396,6 +2470,7 @@ def CsPad_DataV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_ElementV2_to_str(obj, indent, lvl, methodSep):
@@ -2411,13 +2486,13 @@ def CsPad_ElementV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStr += 'sb_temp: %s' % ndarray_to_str( obj.sb_temp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
@@ -2440,6 +2515,7 @@ def CsPad_ElementV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'sectionMask: %s' % uint32_to_str( obj.sectionMask() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad_DataV2_to_str(obj, indent, lvl, methodSep):
@@ -2457,14 +2533,16 @@ def CsPad_DataV2_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_CsPad2x2DigitalPotsCfg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'pots: %s' % ndarray_uint8_1_to_str( obj.pots() )
+    methodStr += 'pots: %s' % ndarray_to_str( obj.pots() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
@@ -2476,6 +2554,7 @@ def CsPad2x2_CsPad2x2ReadOnlyCfg_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'version: %s' % uint32_to_str( obj.version() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
@@ -2487,14 +2566,16 @@ def CsPad2x2_ProtectionSystemThreshold_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'pixelCountThreshold: %s' % uint32_to_str( obj.pixelCountThreshold() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_CsPad2x2GainMapCfg_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'gainMap: %s' % ndarray_uint16_2_to_str( obj.gainMap() )
+    methodStr += 'gainMap: %s' % ndarray_to_str( obj.gainMap() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
@@ -2576,6 +2657,7 @@ def CsPad2x2_ConfigV1QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStr += 'gm:\n'
     methodStr += CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -2625,6 +2707,7 @@ def CsPad2x2_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'quad:\n'
     methodStr += CsPad2x2_ConfigV1QuadReg_to_str(obj.quad(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
@@ -2712,6 +2795,7 @@ def CsPad2x2_ConfigV2QuadReg_to_str(obj, indent, lvl, methodSep):
     methodStr += 'gm:\n'
     methodStr += CsPad2x2_CsPad2x2GainMapCfg_to_str(obj.gm(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -2764,6 +2848,7 @@ def CsPad2x2_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'quad:\n'
     methodStr += CsPad2x2_ConfigV2QuadReg_to_str(obj.quad(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def CsPad2x2_ElementV1_to_str(obj, indent, lvl, methodSep):
@@ -2781,13 +2866,13 @@ def CsPad2x2_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'sb_temp: %s' % ndarray_uint16_1_to_str( obj.sb_temp() )
+    methodStr += 'sb_temp: %s' % ndarray_to_str( obj.sb_temp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frame_type: %s' % uint32_to_str( obj.frame_type() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_int16_3_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'virtual_channel: %s' % uint32_to_str( obj.virtual_channel() )
@@ -2807,6 +2892,7 @@ def CsPad2x2_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'quad: %s' % uint32_to_str( obj.quad() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Encoder_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -2835,6 +2921,7 @@ def Encoder_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'quadrature_mode:\n'
     methodStr += enum_to_str(obj.quadrature_mode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Encoder_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -2863,6 +2950,7 @@ def Encoder_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'quadrature_mode:\n'
     methodStr += enum_to_str(obj.quadrature_mode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Encoder_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -2879,6 +2967,7 @@ def Encoder_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'value: %s' % int32_to_str( obj.value() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Encoder_DataV2_to_str(obj, indent, lvl, methodSep):
@@ -2890,7 +2979,7 @@ def Encoder_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'encoder_count: %s' % ndarray_uint32_1_to_str( obj.encoder_count() )
+    methodStr += 'encoder_count: %s' % ndarray_to_str( obj.encoder_count() )
     methodStrings.append(methodStr)                                 
     # idx_list_one_line_methods
     methodStr = doIndent(indent, lvl)
@@ -2905,6 +2994,7 @@ def Encoder_DataV2_to_str(obj, indent, lvl, methodSep):
             methodStr += ' [%d]' % idx
             methodStr += '=%s' % int32_to_str( subObj )
        methodStrings.append( methodStr )
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Epix_AsicConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -3045,6 +3135,7 @@ def Epix_AsicConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'chipID: %s' % uint16_to_str( obj.chipID() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Epix_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -3131,10 +3222,10 @@ def Epix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'asicPixelTestArray: %s' % ndarray_uint32_3_to_str( obj.asicPixelTestArray() )
+    methodStr += 'asicPixelTestArray: %s' % ndarray_to_str( obj.asicPixelTestArray() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'asicPixelMaskArray: %s' % ndarray_uint32_3_to_str( obj.asicPixelMaskArray() )
+    methodStr += 'asicPixelMaskArray: %s' % ndarray_to_str( obj.asicPixelMaskArray() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'asicGR: %s' % uint8_to_str( obj.asicGR() )
@@ -3201,6 +3292,7 @@ def Epix_ConfigV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Epix_Asic10kConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -3392,6 +3484,7 @@ def Epix_Asic10kConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'chipID: %s' % uint16_to_str( obj.chipID() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Epix_Config10KV1_to_str(obj, indent, lvl, methodSep):
@@ -3481,7 +3574,7 @@ def Epix_Config10KV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'asicMask: %s' % uint32_to_str( obj.asicMask() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'asicPixelConfigArray: %s' % ndarray_uint16_3_to_str( obj.asicPixelConfigArray() )
+    methodStr += 'asicPixelConfigArray: %s' % ndarray_to_str( obj.asicPixelConfigArray() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'asicGR: %s' % uint8_to_str( obj.asicGR() )
@@ -3593,6 +3686,7 @@ def Epix_Config10KV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Epix_ElementV1_to_str(obj, indent, lvl, methodSep):
@@ -3610,13 +3704,13 @@ def Epix_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'frame: %s' % ndarray_uint16_2_to_str( obj.frame() )
+    methodStr += 'frame: %s' % ndarray_to_str( obj.frame() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'excludedRows: %s' % ndarray_uint16_2_to_str( obj.excludedRows() )
+    methodStr += 'excludedRows: %s' % ndarray_to_str( obj.excludedRows() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str( obj.temperatures() )
+    methodStr += 'temperatures: %s' % ndarray_to_str( obj.temperatures() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'lastWord: %s' % uint32_to_str( obj.lastWord() )
@@ -3630,6 +3724,7 @@ def Epix_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'acqCount: %s' % uint16_to_str( obj.acqCount() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EpixSampler_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -3682,6 +3777,7 @@ def EpixSampler_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'sampleInterval_sec: %s' % double_to_str( obj.sampleInterval_sec() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EpixSampler_ElementV1_to_str(obj, indent, lvl, methodSep):
@@ -3699,10 +3795,10 @@ def EpixSampler_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'fiducials: %s' % uint32_to_str( obj.fiducials() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'frame: %s' % ndarray_uint16_2_to_str( obj.frame() )
+    methodStr += 'frame: %s' % ndarray_to_str( obj.frame() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'temperatures: %s' % ndarray_uint16_1_to_str( obj.temperatures() )
+    methodStr += 'temperatures: %s' % ndarray_to_str( obj.temperatures() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'lastWord: %s' % uint32_to_str( obj.lastWord() )
@@ -3716,6 +3812,7 @@ def EpixSampler_ElementV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'acqCount: %s' % uint16_to_str( obj.acqCount() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_PulseConfig_to_str(obj, indent, lvl, methodSep):
@@ -3754,6 +3851,7 @@ def EvrData_PulseConfig_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'clear: %s' % int16_to_str( obj.clear() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_PulseConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -3774,6 +3872,7 @@ def EvrData_PulseConfigV3_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'width: %s' % uint32_to_str( obj.width() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_EventCodeV3_to_str(obj, indent, lvl, methodSep):
@@ -3797,6 +3896,7 @@ def EvrData_EventCodeV3_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'isTerminator: %s' % uint8_to_str( obj.isTerminator() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_EventCodeV4_to_str(obj, indent, lvl, methodSep):
@@ -3826,6 +3926,7 @@ def EvrData_EventCodeV4_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'isTerminator: %s' % uint8_to_str( obj.isTerminator() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_EventCodeV5_to_str(obj, indent, lvl, methodSep):
@@ -3864,6 +3965,7 @@ def EvrData_EventCodeV5_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'releaseCode: %s' % uint32_to_str( obj.releaseCode() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_EventCodeV6_to_str(obj, indent, lvl, methodSep):
@@ -3905,6 +4007,7 @@ def EvrData_EventCodeV6_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'releaseCode: %s' % uint32_to_str( obj.releaseCode() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_SrcEventCode_to_str(obj, indent, lvl, methodSep):
@@ -3928,6 +4031,7 @@ def EvrData_SrcEventCode_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'readoutGroup: %s' % uint16_to_str( obj.readoutGroup() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_OutputMap_to_str(obj, indent, lvl, methodSep):
@@ -3954,6 +4058,7 @@ def EvrData_OutputMap_to_str(obj, indent, lvl, methodSep):
     methodStr += 'conn:\n'
     methodStr += enum_to_str(obj.conn(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_OutputMapV2_to_str(obj, indent, lvl, methodSep):
@@ -3983,6 +4088,7 @@ def EvrData_OutputMapV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'conn:\n'
     methodStr += enum_to_str(obj.conn(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4013,6 +4119,7 @@ def EvrData_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -4055,6 +4162,7 @@ def EvrData_ConfigV2_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -4096,6 +4204,7 @@ def EvrData_ConfigV3_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV4_to_str(obj, indent, lvl, methodSep):
@@ -4137,6 +4246,7 @@ def EvrData_ConfigV4_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_SequencerEntry_to_str(obj, indent, lvl, methodSep):
@@ -4148,6 +4258,7 @@ def EvrData_SequencerEntry_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'eventcode: %s' % uint32_to_str( obj.eventcode() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_SequencerConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4177,6 +4288,7 @@ def EvrData_SequencerConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV5_to_str(obj, indent, lvl, methodSep):
@@ -4223,6 +4335,7 @@ def EvrData_ConfigV5_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV6_to_str(obj, indent, lvl, methodSep):
@@ -4269,6 +4382,7 @@ def EvrData_ConfigV6_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_ConfigV7_to_str(obj, indent, lvl, methodSep):
@@ -4315,6 +4429,7 @@ def EvrData_ConfigV7_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_SrcConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4356,6 +4471,7 @@ def EvrData_SrcConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_FIFOEvent_to_str(obj, indent, lvl, methodSep):
@@ -4370,6 +4486,7 @@ def EvrData_FIFOEvent_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'eventCode: %s' % uint32_to_str( obj.eventCode() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_DataV3_to_str(obj, indent, lvl, methodSep):
@@ -4389,6 +4506,7 @@ def EvrData_DataV3_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_IOChannel_to_str(obj, indent, lvl, methodSep):
@@ -4409,6 +4527,7 @@ def EvrData_IOChannel_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def EvrData_IOConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4433,6 +4552,7 @@ def EvrData_IOConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def FCCD_FccdConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4455,6 +4575,7 @@ def FCCD_FccdConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'trimmedHeight: %s' % uint32_to_str( obj.trimmedHeight() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -4475,10 +4596,10 @@ def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'exposureTime: %s' % uint32_to_str( obj.exposureTime() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'dacVoltages: %s' % ndarray_float32_1_to_str( obj.dacVoltages() )
+    methodStr += 'dacVoltages: %s' % ndarray_to_str( obj.dacVoltages() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'waveforms: %s' % ndarray_uint16_1_to_str( obj.waveforms() )
+    methodStr += 'waveforms: %s' % ndarray_to_str( obj.waveforms() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'width: %s' % uint32_to_str( obj.width() )
@@ -4492,6 +4613,7 @@ def FCCD_FccdConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'trimmedHeight: %s' % uint32_to_str( obj.trimmedHeight() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Fli_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4547,6 +4669,7 @@ def Fli_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Fli_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -4564,8 +4687,9 @@ def Fli_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Gsc16ai_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4608,6 +4732,7 @@ def Gsc16ai_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'dataFormat:\n'
     methodStr += enum_to_str(obj.dataFormat(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Gsc16ai_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -4616,11 +4741,12 @@ def Gsc16ai_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'timestamp: %s' % ndarray_uint16_1_to_str( obj.timestamp() )
+    methodStr += 'timestamp: %s' % ndarray_to_str( obj.timestamp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'channelValue: %s' % ndarray_uint16_1_to_str( obj.channelValue() )
+    methodStr += 'channelValue: %s' % ndarray_to_str( obj.channelValue() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Imp_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4658,14 +4784,16 @@ def Imp_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'adcDelay: %s' % uint32_to_str( obj.adcDelay() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Imp_Sample_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'channels: %s' % ndarray_uint16_1_to_str( obj.channels() )
+    methodStr += 'channels: %s' % ndarray_to_str( obj.channels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Imp_LaneStatus_to_str(obj, indent, lvl, methodSep):
@@ -4695,6 +4823,7 @@ def Imp_LaneStatus_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'powersOkay: %s' % uint8_to_str( obj.powersOkay() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Imp_ElementV1_to_str(obj, indent, lvl, methodSep):
@@ -4728,6 +4857,7 @@ def Imp_ElementV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def L3T_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4747,6 +4877,7 @@ def L3T_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'desc: %s' % str_to_str( obj.desc() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def L3T_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -4757,6 +4888,7 @@ def L3T_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'accept: %s' % uint32_to_str( obj.accept() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def OceanOptics_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4768,14 +4900,15 @@ def OceanOptics_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'exposureTime: %s' % float_to_str( obj.exposureTime() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str( obj.waveLenCalib() )
+    methodStr += 'waveLenCalib: %s' % ndarray_to_str( obj.waveLenCalib() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str( obj.nonlinCorrect() )
+    methodStr += 'nonlinCorrect: %s' % ndarray_to_str( obj.nonlinCorrect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'strayLightConstant: %s' % double_to_str( obj.strayLightConstant() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def OceanOptics_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -4790,14 +4923,15 @@ def OceanOptics_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'deviceType: %s' % int32_to_str( obj.deviceType() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'waveLenCalib: %s' % ndarray_float64_1_to_str( obj.waveLenCalib() )
+    methodStr += 'waveLenCalib: %s' % ndarray_to_str( obj.waveLenCalib() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'nonlinCorrect: %s' % ndarray_float64_1_to_str( obj.nonlinCorrect() )
+    methodStr += 'nonlinCorrect: %s' % ndarray_to_str( obj.nonlinCorrect() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'strayLightConstant: %s' % double_to_str( obj.strayLightConstant() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def OceanOptics_timespec64_to_str(obj, indent, lvl, methodSep):
@@ -4809,6 +4943,7 @@ def OceanOptics_timespec64_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'tv_nsec: %s' % uint64_to_str( obj.tv_nsec() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def OceanOptics_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -4817,7 +4952,7 @@ def OceanOptics_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_1_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frameCounter: %s' % uint64_to_str( obj.frameCounter() )
@@ -4853,6 +4988,7 @@ def OceanOptics_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timeFrameEnd:\n'
     methodStr += OceanOptics_timespec64_to_str(obj.timeFrameEnd(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
@@ -4861,7 +4997,7 @@ def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_1_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'frameCounter: %s' % uint64_to_str( obj.frameCounter() )
@@ -4897,6 +5033,7 @@ def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timeFrameEnd:\n'
     methodStr += OceanOptics_timespec64_to_str(obj.timeFrameEnd(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Opal1k_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4908,7 +5045,7 @@ def Opal1k_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'number_of_defect_pixels: %s' % uint32_to_str( obj.number_of_defect_pixels() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str( obj.output_lookup_table() )
+    methodStr += 'output_lookup_table: %s' % ndarray_to_str( obj.output_lookup_table() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'black_level: %s' % uint16_to_str( obj.black_level() )
@@ -4953,6 +5090,7 @@ def Opal1k_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Orca_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -4975,6 +5113,7 @@ def Orca_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'cooling:\n'
     methodStr += enum_to_str(obj.cooling(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Partition_Source_to_str(obj, indent, lvl, methodSep):
@@ -4988,6 +5127,7 @@ def Partition_Source_to_str(obj, indent, lvl, methodSep):
     methodStr += 'src:\n'
     methodStr += Pds_Src_to_str(obj.src(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Partition_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5010,6 +5150,7 @@ def Partition_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Pimax_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5086,6 +5227,7 @@ def Pimax_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Pimax_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -5103,8 +5245,9 @@ def Pimax_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def PNCCD_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5118,6 +5261,7 @@ def PNCCD_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'payloadSizePerLink: %s' % uint32_to_str( obj.payloadSizePerLink() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def PNCCD_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -5155,6 +5299,7 @@ def PNCCD_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'timingFName: %s' % str_to_str( obj.timingFName() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def PNCCD_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -5173,8 +5318,9 @@ def PNCCD_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timeStampLo: %s' % uint32_to_str( obj.timeStampLo() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def PNCCD_FullFrameV1_to_str(obj, indent, lvl, methodSep):
@@ -5195,8 +5341,9 @@ def PNCCD_FullFrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timeStampLo: %s' % uint32_to_str( obj.timeStampLo() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def PNCCD_FramesV1_to_str(obj, indent, lvl, methodSep):
@@ -5218,6 +5365,7 @@ def PNCCD_FramesV1_to_str(obj, indent, lvl, methodSep):
         if idx+1 < numObjs:
             methodStr += '\n'
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5270,6 +5418,7 @@ def Princeton_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -5325,6 +5474,7 @@ def Princeton_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_ConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -5380,6 +5530,7 @@ def Princeton_ConfigV3_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_ConfigV4_to_str(obj, indent, lvl, methodSep):
@@ -5444,6 +5595,7 @@ def Princeton_ConfigV4_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_ConfigV5_to_str(obj, indent, lvl, methodSep):
@@ -5511,6 +5663,7 @@ def Princeton_ConfigV5_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'numPixels: %s' % uint32_to_str( obj.numPixels() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_FrameV1_to_str(obj, indent, lvl, methodSep):
@@ -5525,8 +5678,9 @@ def Princeton_FrameV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'readoutTime: %s' % float_to_str( obj.readoutTime() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_FrameV2_to_str(obj, indent, lvl, methodSep):
@@ -5544,8 +5698,9 @@ def Princeton_FrameV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Princeton_InfoV1_to_str(obj, indent, lvl, methodSep):
@@ -5556,6 +5711,7 @@ def Princeton_InfoV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'temperature: %s' % float_to_str( obj.temperature() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Quartz_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5567,7 +5723,7 @@ def Quartz_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'number_of_defect_pixels: %s' % uint32_to_str( obj.number_of_defect_pixels() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'output_lookup_table: %s' % ndarray_uint16_1_to_str( obj.output_lookup_table() )
+    methodStr += 'output_lookup_table: %s' % ndarray_to_str( obj.output_lookup_table() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'black_level: %s' % uint16_to_str( obj.black_level() )
@@ -5613,6 +5769,7 @@ def Quartz_ConfigV1_to_str(obj, indent, lvl, methodSep):
         subMethodStrs.append(subMethodStr)
     methodStr = '\n'.join(subMethodStrs)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Rayonix_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5646,6 +5803,7 @@ def Rayonix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'readoutMode:\n'
     methodStr += enum_to_str(obj.readoutMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Rayonix_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -5682,6 +5840,7 @@ def Rayonix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'readoutMode:\n'
     methodStr += enum_to_str(obj.readoutMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Timepix_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -5869,6 +6028,7 @@ def Timepix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'triggerMode:\n'
     methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Timepix_ConfigV2_to_str(obj, indent, lvl, methodSep):
@@ -6057,7 +6217,7 @@ def Timepix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'pixelThreshSize: %s' % uint32_to_str( obj.pixelThreshSize() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str( obj.pixelThresh() )
+    methodStr += 'pixelThresh: %s' % ndarray_to_str( obj.pixelThresh() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'chip0Name: %s' % str_to_str( obj.chip0Name() )
@@ -6095,6 +6255,7 @@ def Timepix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'triggerMode:\n'
     methodStr += enum_to_str(obj.triggerMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Timepix_ConfigV3_to_str(obj, indent, lvl, methodSep):
@@ -6289,7 +6450,7 @@ def Timepix_ConfigV3_to_str(obj, indent, lvl, methodSep):
     methodStr += 'pixelThreshSize: %s' % uint32_to_str( obj.pixelThreshSize() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'pixelThresh: %s' % ndarray_uint8_1_to_str( obj.pixelThresh() )
+    methodStr += 'pixelThresh: %s' % ndarray_to_str( obj.pixelThresh() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'chip0Name: %s' % str_to_str( obj.chip0Name() )
@@ -6327,6 +6488,7 @@ def Timepix_ConfigV3_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timepixMode:\n'
     methodStr += enum_to_str(obj.timepixMode(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Timepix_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -6344,7 +6506,7 @@ def Timepix_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'lostRows: %s' % uint16_to_str( obj.lostRows() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'width: %s' % uint32_to_str( obj.width() )
@@ -6361,6 +6523,7 @@ def Timepix_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def Timepix_DataV2_to_str(obj, indent, lvl, methodSep):
@@ -6384,7 +6547,7 @@ def Timepix_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'lostRows: %s' % uint16_to_str( obj.lostRows() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'data: %s' % ndarray_uint16_2_to_str( obj.data() )
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'depth: %s' % uint32_to_str( obj.depth() )
@@ -6395,6 +6558,7 @@ def Timepix_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'data_size: %s' % uint32_to_str( obj.data_size() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
@@ -6426,6 +6590,7 @@ def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
             methodStr += ' [%d]' % idx
             methodStr += '=%s' % enum_to_str( subObj )
        methodStrings.append( methodStr )
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 def UsdUsb_DataV1_to_str(obj, indent, lvl, methodSep):
@@ -6440,14 +6605,15 @@ def UsdUsb_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStr += 'timestamp: %s' % uint32_to_str( obj.timestamp() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'status: %s' % ndarray_uint8_1_to_str( obj.status() )
+    methodStr += 'status: %s' % ndarray_to_str( obj.status() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'analog_in: %s' % ndarray_uint16_1_to_str( obj.analog_in() )
+    methodStr += 'analog_in: %s' % ndarray_to_str( obj.analog_in() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
-    methodStr += 'encoder_count: %s' % ndarray_int32_1_to_str( obj.encoder_count() )
+    methodStr += 'encoder_count: %s' % ndarray_to_str( obj.encoder_count() )
     methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
 
