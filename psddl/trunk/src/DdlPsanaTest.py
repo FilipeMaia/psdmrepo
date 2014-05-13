@@ -171,16 +171,9 @@ def getBasicNotArrayRule(namespace, classname, methodname):
         return rule
   return None
 
-def getNdarrayDumpFunction(ptype, rank):
+def getNdarrayDumpFunction(ptype):
   if isBasicType(ptype):
-    typename = ptype.name
-    if typename.endswith('_t'):
-      typename = typename[0:-2]
-    if typename == 'float':
-      typename = 'float32'
-    elif typename == 'double':
-      typename = 'float64'
-    return 'ndarray_%s_%d_to_str' % (typename,rank)
+    return 'ndarray_to_str'
   return None
   
 def getDumpFunction(ptype, namespace=None):
@@ -480,7 +473,7 @@ def categorize(ptype):
                                       psana_type, methodReturnTypeNamespace)
 
     elif basic and args == False and array == True:           #  101
-      fnCvt = getNdarrayDumpFunction(method.type, method.rank)
+      fnCvt = getNdarrayDumpFunction(method.type)
       assert fnCvt, "did not get valid convert function for %r"  %method
       psana_type.one_line_methods.append((method.name, 
                                           'obj.%s()' % method.name,
