@@ -10,6 +10,28 @@ psana_test_adler32.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
 def doIndent(indent,lvl):
     return ((' '*indent)*lvl)
 
+def epicsPvToStr(pv):
+    def toStr(x):
+        return str(x)
+    res = ''
+    if pv.isTime():
+        stamp = pv.stamp()
+        res += 'stamp.sec=%s stamp.nsec=%s ' % (stamp.sec(), stamp.nsec())
+    # for string pv's (dbrType = 14 or 28), elements are not value_type, 
+    # and data() will take an index argument
+    if pv.dbrType() in [14,28]:
+        dataStr = [str(pv.data(idx)) for idx in range(pv.numElements())]
+    else:
+        data = pv.data()
+        fn = getTypeFn(data.dtype)
+        assert fn is not None
+        dataStr = ' '.join(map(fn,data.flatten()))
+    res += 'data=%s' % dataStr
+    res += ' status=%s' % pv.status()
+    res += ' severity=%s' % pv.severity()
+    # not printing pvid
+    return res
+
 def str_to_str(v,indent=0, lvl=0):
     return doIndent(indent,lvl) + str(v)
 

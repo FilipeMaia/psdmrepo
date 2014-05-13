@@ -1,5 +1,5 @@
 import psana
-from psana_test import obj2str
+from psana_test import obj2str, epicsPvToStr
 from psana_test import types_to_str
 import numpy as np
 
@@ -165,24 +165,3 @@ def getEventObjectStr(evt, env, key, inEvent, indent=2):
             return ''
     return obj2str(obj, indent=indent, lvl=1, methodsep='\n')
 
-def epicsPvToStr(pv):
-    def toStr(x):
-        return str(x)
-    res = ''
-    if pv.isTime():
-        stamp = pv.stamp()
-        res += 'stamp.sec=%s stamp.nsec=%s ' % (stamp.sec(), stamp.nsec())
-    # for string pv's (dbrType = 14 or 28), elements are not value_type, 
-    # and data() will take an index argument
-    if pv.dbrType() in [14,28]:
-        dataStr = [str(pv.data(idx)) for idx in range(pv.numElements())]
-    else:
-        data = pv.data()
-        fn = types_to_str.getTypeFn(data.dtype)
-        assert fn is not None
-        dataStr = ' '.join(map(fn,data.flatten()))
-    res += 'data=%s' % dataStr
-    res += ' status=%s' % pv.status()
-    res += ' severity=%s' % pv.severity()
-    # not printing pvid
-    return res
