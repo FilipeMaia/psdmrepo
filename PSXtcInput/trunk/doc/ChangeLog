@@ -12,8 +12,15 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-14-02
-2014-05-01 Mikhail Dubrovin
-- XtcIndexInputModule.h - fix doxygen issue; remove @defgroup, which is defined in XtcInputModule.h
+2014-05-13 Christopher O'Grady
+- Change to use new EventTime object for index event selection.
+  (allows use of fiducial in timestamp comparison).
+  Eliminate some indexing-related exceptions and use fatal MsgLog instead.
+  Search for configure/beginrun transitions better (previously
+  assumed they were the first and second transition in a chunk0).
+  Fix case with multiple EpicsArch generators where an older non-event
+  datagram could incorrectly overwrite the values from a newer
+  non-event datagram.
 
 Tag: V00-14-01
 2014-04-25 Christopher O'Grady
