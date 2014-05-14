@@ -78,7 +78,7 @@ public:
     for (FileList::const_iterator it = m_fileNames.begin(); it != m_fileNames.end(); ++ it) {
     
       IData::Dataset ds(*it);
-      if (ds.exists("live")) throw NoLiveIndex(ERR_LOC);
+      if (ds.exists("live")) MsgLog(logger, fatal, "Live mode not supported with xtc indexing");
     
       if (ds.isFile()) {
 
@@ -89,7 +89,7 @@ public:
 
         // Find files on disk and add to the list
         const IData::Dataset::NameList& strfiles = ds.files();
-        if (strfiles.empty()) throw EmptyFileList(ERR_LOC);
+        if (strfiles.empty()) MsgLog(logger, fatal, "Empty file list");
         for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
           XtcInput::XtcFileName file(*it);
           // hack: eliminate ioc-recorder runs.  right answer is offline event-builder.
@@ -121,12 +121,8 @@ public:
 
     for (vector<string>::size_type ifile=0; ifile!=_nfiles; ifile++) {
       _fd[ifile] = ::open(xtclist[ifile].path().c_str(), O_RDONLY | O_LARGEFILE);
-      if (_fd[ifile]==-1) {
-        stringstream ss;
-        ss << "File " << xtclist[ifile].path().c_str() << " not found";
-        MsgLog(logger, error, ss.str());
-        throw XTCNotFound(ERR_LOC);
-      }
+      if (_fd[ifile]==-1) MsgLog(logger, fatal,
+                                 "File " << xtclist[ifile].path().c_str() << " not found");
     }
   }
 
@@ -225,7 +221,7 @@ public:
     int32_t f2 = other.entry.uFiducial<<15;
     // do a sanity check: include a factor of 2 "headroom"
     const int32_t maxdiff = (SecondsLimit*360*2)<<15;
-    if (abs(f2-f1)>maxdiff) MsgLog(logger, error, "fiducial1 " << entry.uFiducial << " fiducial2" << other.entry.uFiducial);
+    if (abs(f2-f1)>maxdiff) MsgLog(logger, fatal, "Fiducial sanity check failed.  fiducial1 " << entry.uFiducial << " fiducial2" << other.entry.uFiducial);
     return f1<f2;
   }
   bool operator==(const IndexEvent& other) const {
@@ -254,9 +250,7 @@ private:
     idxname.insert(pos,"index/");
     idxname.append(".idx");
     int fd = open(idxname.c_str(), O_RDONLY | O_LARGEFILE);
-    if (fd < 0) {
-      printf("Unable to open xtc file %s\n", idxname.c_str());
-    }
+    if (fd < 0) MsgLog(logger, fatal, "Unable to open xtc index file " << idxname);
     idxlist.readFromFile(fd);
     ::close(fd);
     return;
@@ -350,14 +344,14 @@ private:
       }
       offset+=dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
     }
-    MsgLog(logger, error, "Configure transition not found in first 2 datagrams");
+    MsgLog(logger, fatal, "Configure transition not found in first 2 datagrams");
   }
 
   // send beginrun from the first file
   void _beginrun() {
     Pds::Dgram* dg = _xtc.jump(0, _beginrunOffset);
     if (dg->seq.service()!=Pds::TransitionId::BeginRun)
-      MsgLog(logger, error, "BeginRun transition not found after configure transition");
+      MsgLog(logger, fatal, "BeginRun transition not found after configure transition");
     _postOneDg(dg);
   }
 
@@ -369,7 +363,7 @@ private:
     vector<IndexCalib>::iterator it;
     it = lower_bound(_idxcalib.begin(),_idxcalib.end(),request);
     if (it==_idxcalib.begin()) {
-      throw CalibCycleNotFound(ERR_LOC);
+      MsgLog(logger, fatal, "Calib cycle for time " << seconds << "/" << nanoseconds << " not found");
     } else {
       vector<IndexCalib>::iterator calib;
       calib=it-1;
@@ -384,12 +378,7 @@ private:
 
   // loop over the _lastEpics list (one per epics source).
   // look in the big IndexEvent table and see if this L1 timestamp needs
-  // a new "nonEvent" datagram of epics info.  I think there may be
-  // a problem here: what if the 2 epics sources "conflict"?  i.e. if
-  // one nonEvent datagram also happens to include the epics data of the other,
-  // which needs a more recent nonEvent datagram.  probably need to put
-  // them in the right order, so the "higher rate" one goes in the list
-  // second.  shit.
+  // a new "nonEvent" datagram of epics info.
   void _maybeAddEpics(const IndexEvent& evt, const vector<Pds::Src>& src, Pds::Dgram* dg) {
     int i=0;
     for (vector<EpicsInfo>::iterator last =_lastEpics.begin(); last!=_lastEpics.end(); last++) {
@@ -402,13 +391,17 @@ private:
           if (epicsdg) {
             _pieces.nonEventDg.push_back(XtcInput::Dgram(XtcInput::Dgram::make_ptr(epicsdg),XtcFileName("")));
           } else {
-            throw EpicsDataNotFound(ERR_LOC);
+            MsgLog(logger, fatal, "Epics data not found at offset" << request.offset);
           }
           *last=request;
         }
       }
       i++;
     }
+    // if there are multiple EPICS sources, sort them so that
+    // the oldest is first in the list, so the newest data "wins"
+    // when andy processes the non-event datagrams.
+    sort(_pieces.nonEventDg.begin(),_pieces.nonEventDg.end());
   }
 
   typedef std::map<int,Pds::Src> epicsmap;
@@ -553,9 +546,7 @@ private:
 
 Index::Index(const std::string& name, std::queue<DgramPieces>& queue) : Configurable(name), _queue(queue),_idxrun(0) {
   _fileNames = configList("files");
-  if ( _fileNames.empty() ) {
-    throw EmptyFileList(ERR_LOC);
-  }
+  if ( _fileNames.empty() ) MsgLog(logger, fatal, "Empty file list");
   _rmap = new RunMap(_fileNames);
 }
 
@@ -572,12 +563,7 @@ const vector<psana::EventTime>& Index::runtimes() {
 }
 
 void Index::setrun(int run) {
-  if (not _rmap->runFiles.count(run)) {
-    stringstream ss;
-    ss << "Run " << run << " not found";
-    MsgLog(logger, error, ss.str());
-    throw RunNotInDataset(ERR_LOC);
-  }
+  if (not _rmap->runFiles.count(run)) MsgLog(logger, fatal, "Run " << run << " not found");
   delete _idxrun;
   _idxrun = new IndexRun(_queue,_rmap->runFiles[run]);
 }
