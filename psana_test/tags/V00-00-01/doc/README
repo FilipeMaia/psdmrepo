@@ -1,0 +1,38 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psana-tools
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Brief description:
+==================
+
+Tools for testing - presently a Python psana Dump module generated from the ddl.
+
+Detailed description:
+=====================
+
+Package provides a module dump, psana -m psana_test.dump datasource
+
+During the the beginJob, the module will dump everything from the config store.
+During the event, the module will dump all the event keys.
+Epics is skipped.
+
+Orovides a useful function to write a psana object to a string.
+
+import psana_test
+
+...
+print psana_test.obj2str(myobject)
+
+for ndarrays, a checksum is printed, as well as quantile statistics 
+(min, 25th, 50th, 75th and max values).
+
+Output is intended to test refactoring of Psana, or comparing how Psana 
+processes two different input sources that should produce the same
+output (such as hdf5 vs. xtc).
+

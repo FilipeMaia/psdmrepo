@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -d psddldata/data/ ]; then
+    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
+    exit 1
+fi
+
+if [ ! -d psana_test/ ]; then
+    echo "The psana_test directory was not found. Try doing 'addpkg psana_test' first."
+    exit 1
+fi
+
+psddlc -I data -B package_dir:psana_test -b psana_test data/psddldata/*.ddl
+
