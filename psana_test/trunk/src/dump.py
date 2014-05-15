@@ -84,7 +84,7 @@ class dump(object):
             objStr = getEventObjectStr(evt, env, key, inEvent=False, indent=self.indent)
             if objStr == '':
                 continue
-            eventKeyStr = getEventKeyStr(key)
+            eventKeyStr = getEventKeyStr(key, env.aliasMap())
             if self.filterKey(eventKeyStr):
                 continue
             if objStr != self.previousConfig.get(eventKeyStr, ''):
@@ -98,7 +98,7 @@ class dump(object):
             objStr = getEventObjectStr(evt, env, key, inEvent=True, indent=self.indent)
             if objStr == '':
                 continue
-            eventKeyStr = getEventKeyStr(key)
+            eventKeyStr = getEventKeyStr(key, env.aliasMap())
             if self.filterKey(eventKeyStr):
                 continue
             print eventKeyStr
@@ -132,16 +132,20 @@ class dump(object):
                 if not printedEpicsHeader:
                     printedEpicsHeader = True
                     print "Epics PV"
-                print "%s%s: %s" % (indent, pvName, pvStr)
+                print "%spvName=%s %s" % (indent, pvName, pvStr)
             self.previousEpics[pvName]=pvStr
 
 ######## helper functions ############
-def getEventKeyStr(key):
+def getEventKeyStr(key, amap=None):
     '''Takes a key from evt.keys()
     '''
     typeStr = str(key).split('type=')[1].split('src=')[0].strip()
     srcStr = str(key.src())
     keyStr = "type=%s src=%s" % (typeStr, srcStr)
+    if amap:
+        srcAlias = amap.alias(key.src())
+        if len(srcAlias)>0:
+            keyStr += " alias=%s" % srcAlias
     if key.key():
         keyStr += " key=%s" % key.key()
     return keyStr

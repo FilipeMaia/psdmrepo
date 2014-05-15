@@ -13,23 +13,62 @@ def doIndent(indent,lvl):
 def epicsPvToStr(pv):
     def toStr(x):
         return str(x)
-    res = ''
+
+    def numericToStr(x):
+        if isinstance(x,float):
+            return '%.4e' % x
+        else:
+            return str(x)
+    # all epics pv have these attributes:
+    res = ' pvid=%s' % pv.pvId()
+    dbrType = pv.dbrType()
+    res += ' dbrtype=%s' % dbrType 
     if pv.isTime():
+        res += " isTime=1"
+    elif pv.isCtrl():
+        res += " isCtrl=1" 
+    res += " numElements=%s" % pv.numElements()
+    res += ' status=%s' % pv.status()
+    res += ' severity=%s' % pv.severity()
+    if pv.isCtrl():
+        dbr = pv.dbr()
+        if dbrType not in [28, 31]:
+            # not a CtrlString and not a CtrlEnum so it has a dbr with:
+            res += ' units=%s' % dbr.units()
+            res += ' upper_disp_limit=%s' % numericToStr(dbr.upper_disp_limit())
+            res += ' lower_disp_limit=%s' % numericToStr(dbr.lower_disp_limit())
+            res += ' upper_alarm_limit=%s' % numericToStr(dbr.upper_alarm_limit())
+            res += ' upper_warning_limit=%s' % numericToStr(dbr.upper_warning_limit())
+            res += ' lower_warning_limit=%s' % numericToStr(dbr.lower_warning_limit())
+            res += ' lower_alarm_limit=%s' % numericToStr(dbr.lower_alarm_limit())
+            res += ' upper_ctrl_limit=%s' % numericToStr(dbr.upper_ctrl_limit())
+            res += ' lower_ctrl_limit=%s' % numericToStr(dbr.lower_ctrl_limit())
+        elif dbrType == 28:
+            # CtrlString
+            pass
+        elif dbrType == 31:
+            # CtrlEnum
+            res += ' no_str=%d' % dbr.no_str()
+            for ii in range(dbr.no_str()):
+                res += ' enum[%d]=%s' % (ii, dbr.strings(ii))
+    elif pv.isTime():
         stamp = pv.stamp()
-        res += 'stamp.sec=%s stamp.nsec=%s ' % (stamp.sec(), stamp.nsec())
+        res += ' stamp.sec=%s stamp.nsec=%s' % (stamp.sec(), stamp.nsec())
     # for string pv's (dbrType = 14 or 28), elements are not value_type, 
     # and data() will take an index argument
     if pv.dbrType() in [14,28]:
         dataStr = [str(pv.data(idx)) for idx in range(pv.numElements())]
     else:
         data = pv.data()
+        assert len(data.shape)==1, "unexpected: pv has shape that is not len 1: shape=%r" % data.shape
         fn = getTypeFn(data.dtype)
         assert fn is not None
-        dataStr = ' '.join(map(fn,data.flatten()))
-    res += 'data=%s' % dataStr
-    res += ' status=%s' % pv.status()
-    res += ' severity=%s' % pv.severity()
-    # not printing pvid
+        if data.shape[0] < 20:
+            dataStr = ' '.join(map(fn,data.flatten()))
+        else:
+            dataStr = ndarray_to_str(data, indent=0, lvl=0)
+
+    res += ' data=%s' % dataStr
     return res
 
 def str_to_str(v,indent=0, lvl=0):
@@ -102,12 +141,12 @@ def getTypeFn(dt):
 
 def ndarray_to_str(a, indent=0, lvl=0):
     dimstr = ' x '.join(map(str,a.shape))
-    dim = len(a.shape)
+    rank = len(a.shape)
     numElem = 1
     for dim in a.shape:
         numElem *= dim
     outstr = doIndent(indent,lvl)
-    outstr +=  "ndarray_%s_%d: dim=[ %s ]" % (a.dtype.name, dim, dimstr)
+    outstr +=  "ndarray_%s_%d: dim=[ %s ]" % (a.dtype.name, rank, dimstr)
     if numElem == 0:
         return outstr
 

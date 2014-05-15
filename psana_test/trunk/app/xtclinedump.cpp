@@ -8,10 +8,12 @@
 #include <string>
 #include <map>
 
+#include "pdsdata/xtc/Dgram.hh"
+#include "pdsdata/xtc/TypeId.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 #include "psana_test/xtciter.h"
 #include "psana_test/printxtc.h"
 
-#include "pdsdata/xtc/Dgram.hh"
 
 
 const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
@@ -29,7 +31,7 @@ void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams);           // dg
 void dgramAndItsXtcIterator(int fd, long maxDgrams);                      // xtc1
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint); // xtc
 
-const int DEFAULT_MAX_PAYLOAD_PRINT = 20;
+const int DEFAULT_MAX_PAYLOAD_PRINT = 1;
 
 int main(int argc, char *argv[]) {
   char * dumpArg = NULL;
@@ -126,6 +128,16 @@ void dgramAndItsXtcIterator(int fd, long maxDgrams) {
   }
 }
 
+bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id) {
+  if (damage.value() == 0) return true;
+  if (id == Pds::TypeId::Id_EBeam) {
+    bool userDamageBitSet = (damage.bits() & (1 << Pds::Damage::UserDefined));
+    uint32_t otherDamageBits = (damage.bits() & (~(1 << Pds::Damage::UserDefined)));
+    if (userDamageBitSet and not otherDamageBits) return true;
+  }
+  return false;
+}
+
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint) {
   psana_test::DgramWithXtcPayloadIterator dgIter(fd);
   std::pair<Pds::Dgram *,size_t> dgramOffset = dgIter.nextAndOffsetFromStart();
@@ -147,11 +159,19 @@ void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, s
       psana_test::printXtcHeader(xtcDepthOffset.xtc);
       Pds::Xtc *xtc = xtcDepthOffset.xtc;
       if (xtc->contains.id() != Pds::TypeId::Id_Xtc) {
-        fprintf(stdout," plen=%d payload=",xtc->sizeofPayload());
-        if (xtc->damage.value()!=0) {
-          fprintf(stdout,"**damaged**");
-        } else {
+        fprintf(stdout," plen=%d",xtc->sizeofPayload());
+        const Pds::TypeId &typeId = xtc->contains;
+        const Pds::Damage damage = xtc->damage;
+        if (validPayload(damage,typeId.id())) {
+          if (typeId.id() == Pds::TypeId::Id_Epics) {
+            Pds::Epics::EpicsPvHeader *pv = static_cast<Pds::Epics::EpicsPvHeader *>(static_cast<void *>(xtc->payload()));
+            fprintf(stdout," dbrType=%d", pv->dbrType());
+            fprintf(stdout," numElements=%d", pv->numElements());
+          }
+          fprintf(stdout," payload=");
           psana_test::printBytes(xtc->payload(), xtc->sizeofPayload(), maxPayloadPrint);
+        } else {
+          fprintf(stdout," payload=**damaged**");
         }
       }
       fprintf(stdout,"\n");
