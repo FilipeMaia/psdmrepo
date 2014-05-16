@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>   // for stringstream
 #include <stdlib.h> // for atoi
+#include <cstring>  // for memcpy
 
 //-------------------------------
 // Collaborating Class Headers --

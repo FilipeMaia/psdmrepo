@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-15
+2014-05-16 Mikhail S. Dubrovin
+- NDArrIOV1 - add "#include <cstring>" for RHEL6
+
 Tag: V00-05-14
 2014-05-15 Mikhail S. Dubrovin
 - NDArrIOV1 - is updated for backward compatability with old format of calib files

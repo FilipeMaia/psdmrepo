@@ -34,10 +34,10 @@ class SvnProps :
         self.revision = "$Revision$"
         self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
         self.id       = "$Id: SvnProps.py 8169 2014-05-07 00:27:22Z dubrovin@SLAC.STANFORD.EDU $"
-        self.headurl  = "$HeadURL$"
+        self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pdscalibdata/trunk/src/SvnProps.py $"
         self.header   = "$Header:$"
-        self.datelc   = "$LastChangedDate: 2014-05-06 17:27:22 -0700 (Tue, 06 May 2014) $"
-        self.date     = "$Date: 2014-05-06 17:27:22 -0700 (Tue, 06 May 2014) $"
+        self.datelc   = "$LastChangedDate$"
+        self.date     = "$Date$"
 
 #------------------------------
 
