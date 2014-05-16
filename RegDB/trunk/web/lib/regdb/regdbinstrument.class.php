@@ -53,6 +53,10 @@ class RegDBInstrument {
     	return !is_null( $is_mobile_param ) && ( $is_mobile_param->value() != '0' );
     }
 
+    public function experiments () {
+        return $this->parent()->experiments_for_instrument($this->name());
+    }
+
     /* =============
      *   MODIFIERS
      * =============

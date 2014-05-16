@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2014-05-16 Igor Gaponenko
+- added method RegDBInstrument::experiments() to select experiments in a scope of an instrument
+- added method is_facility() and operator_uid() to class RegDBExperiment
+- allowed non-standard group 'xpptst14' for the group management
+
 Tag: V00-02-00
 2014-04-30 Igor Gaponenko
 - moved javascript libraries to package webfwk/

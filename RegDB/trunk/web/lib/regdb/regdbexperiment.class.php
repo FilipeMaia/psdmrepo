@@ -89,9 +89,9 @@ class RegDBExperiment {
             $this->attr['begin_time'],
             $this->attr['end_time'] ); }
 
-   	public function is_facility () {
+    public function is_facility () {
         return $this->instrument()->is_location();
-   	}
+    }
 
     /* =============
      *   MODIFIERS
@@ -479,6 +479,29 @@ class RegDBExperiment {
                     mysql_fetch_array( $result, MYSQL_ASSOC )));
 
         return $list;
+    }
+
+    /**
+     * Return the operator's account for the experiment
+     *
+     * The ruls for determining the account:
+     *
+     * 1. for regular instruments is '<low_case_instr_TLA>opr'
+     * 2. for the facility e-Logs of regular instruments is the same as above
+     *    (however it's pulled from the database of teh experiment's parameters)
+     * 3. it's undefined for others
+     *
+     * @return String
+     */
+    public function operator_uid () {
+        $uid = null ;
+        if ($this->instrument()->is_standard()) {
+            $uid = strtolower($this->instrument()->name()).'opr' ;
+        } else if ($this->instrument()->is_location()) {
+            $operator_uid_param = $this->find_param_by_name('operator_uid') ;
+            if ($operator_uid_param) $uid = strtolower($operator_uid_param->value()) ;
+        }
+        return $uid ;
     }
 }
 ?>

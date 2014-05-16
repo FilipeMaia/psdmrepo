@@ -670,6 +670,7 @@ HERE;
             $groups['xppopr'] = True;
             $groups['xppcom12'] = True;
             $groups['xppcom13'] = True;
+            $groups['xpptst14'] = True;
         }
         /* CXI commissionning, in-house, etc. experiments for the year of 2010.
          */
@@ -695,7 +696,7 @@ HERE;
             $groups['xcscom12'] = True;
         }
 
-        /* MObile rack experiments
+        /* Mobile rack experiments
          */
         if( is_null( $instr ) || ( $instr == 'MOB' )) {
             $groups['ps-mob'] = True;
