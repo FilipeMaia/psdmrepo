@@ -60,7 +60,8 @@ function RadioBox (buttons, onchange, options) {
     this._onchange = onchange ;
 
     this._options = {
-        activate: this._buttons[0].name  // -- the button to be activa by default
+        activate: this._buttons[0].name ,   // the button to be activa by default
+        pointer:  false                     // the optional pointer to the active button
     } ;
     if (options) {
         _ASSERT(_.isObject(options)) ;
@@ -71,6 +72,7 @@ function RadioBox (buttons, onchange, options) {
             _ASSERT(button2activate) ;
             this._options.activate = button2activate.name ;
         }
+        this._options.pointer = _.has(options, 'pointer') && options.pointer ;
     }
 
     // Rendering is done only once
@@ -93,12 +95,16 @@ function RadioBox (buttons, onchange, options) {
         for (var i in this._buttons) {
             var button = this._buttons[i] ;
             html +=
-  '<button name="'+button.name+'"' +
-         ' class="radio-box-button '+button.class+'"' +
-         ' style="'+button.style+'"' +
-         ' title="'+button.title+'" >'+button.text+'</button>' ;
+  '<div style="float:left;" >' +
+    '<button name="'+button.name+'"' +
+           ' class="radio-box-button '+button.class+'"' +
+           ' style="'+button.style+'"' +
+           ' title="'+button.title+'" >'+button.text+'</button>' +
+    '<div class="radio-box-hint" >&nbsp;</div>' +
+  '</div>' ;
         }
         html +=
+  '<div style="clear:both;" >' +
 '</div>' ;
         this.container.html(html) ;
 
@@ -106,20 +112,30 @@ function RadioBox (buttons, onchange, options) {
             button().
             button('enable') ;
 
+        this._button_elements.
+            next().
+            removeClass('radio-box-hint-active') ;
+
         this.container.find('.radio-box-button[name="'+this._options.activate+'"]').
             button().
             button('disable').
-            addClass('radio-box-active') ;
+            addClass('radio-box-active').
+            next().
+            addClass('radio-box-hint-active') ;
 
         this._button_elements.click(function () {
 
             _that._button_elements.
                 button('enable').
-                removeClass('radio-box-active') ;
+                removeClass('radio-box-active').
+                next().
+                removeClass('radio-box-hint-active') ; 
 
             $(this).
                 button('disable').
-                addClass('radio-box-active') ;
+                addClass('radio-box-active').
+                next().
+                addClass('radio-box-hint-active') ;
         
             _that._onchange(this.name) ;
         }) ;
@@ -148,10 +164,15 @@ function RadioBox (buttons, onchange, options) {
         _ASSERT(button2activate) ;
         this._button_elements.
             button('enable').
-            removeClass('radio-box-active') ;
+            removeClass('radio-box-active').
+            next().
+            removeClass('radio-box-hint-active') ;
+
         this.container.find('.radio-box-button[name="'+name+'"]').
             button('disable').
-            addClass('radio-box-active') ;
+            addClass('radio-box-active').
+            next().
+            addClass('radio-box-hint-active') ;
     } ;
 }
 define_class(RadioBox, Widget, {}, {}) ;

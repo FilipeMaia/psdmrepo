@@ -49,24 +49,36 @@
  *   * The column definition must be an array of at least 1 column (the selector
  *     column goes first). Each element of the array would have a dictionary of:
  *    
- *     { name:  <an identifier for accessing values> ,   // mandatory, no default allowed
- *       text:  <Column name to be displayed ,           // default: same as the name
- *       class: <CSS classes for column cells> ,         // default: ''
- *       style: <CSS styles for columnn cells> ,         // default: ''
- *       justify: <left|center|right>                    // default: left
- *       hidden:  <true|false>                           // default: false
+ *     { name:   <an identifier for accessing values> ,   // mandatory, no default allowed
+ *       text:   <Column name to be displayed ,           // default: same as the name
+ *       class:  <CSS classes for column cells> ,         // default: ''
+ *       style:  <CSS styles for columnn cells> ,         // default: ''
+ *       align:  <left|center|right> ,                  // default: left
+ *       hidden: <true|false>                           // default: false
  *     }
+ *
+ *   * The column names starting with symbol '_' should not be used in the
+ *     table definitions because the names are reserved by the class.
+ *     Reserved names:
+ *     
+ *       _row_id : an internal identifier of a row
+ *       _locked : a flag indicating of the table row should be locked
  *
  *   * Each row is represented with an object (dictionary) representing values for
  *     the table cells:
  *    
- *     { <column name> : <a value of the corresponding cell> }
+ *       { <column name> : <a value of the corresponding cell> }
  *    
  *     Cells of columns not mentioned in the object will set to the default state.
  *     Notes for the values of the (first) selector column:
  *
- *     - the default value is 'false' (not selected)
- *     - any value (if present) will be evaluated as boolean
+ *       - the default value is 'false' (not selected)
+ *       - any value (if present) will be evaluated as boolean
+ *
+ *     The following reserved column names can be used as follow:
+ *     
+ *       _locked : if set to 'true' it will lock the row from being checked/unchecked
+ *                 via the UI or programatically.
  *
  * @param array coldef
  * @param array rows
@@ -115,7 +127,7 @@ function CheckTable (coldef, rows, options) {
     this._coldef   = {} ;   // the definitions of the columns (column names are the keys)
     this._rows     = [] ;
  
-    this._is_rendered = false ; // eendering is done only once
+    this._is_rendered = false ; // rendering is done only once
 
     this._tbody = null ;
 
@@ -146,11 +158,11 @@ function CheckTable (coldef, rows, options) {
         _that._colnames.push(name) ;
         _that._coldef[name]  = {
             is_selector: _that._colnames.length === 1 ,
-            text:    _PROP_STRING(col, 'text',    name) ,   // use the name if no text is provided
-            class:   _PROP_STRING(col, 'class',   '') ,
-            style:   _PROP_STRING(col, 'style',   '') ,
-            justify: _PROP_STRING(col, 'justify', 'left') ,
-            hidden:  _PROP_BOOL  (col, 'hidden',  false)
+            text:   _PROP_STRING(col, 'text',   name) ,   // use the name if no text is provided
+            class:  _PROP_STRING(col, 'class',  '') ,
+            style:  _PROP_STRING(col, 'style',  '') ,
+            align:  _PROP_STRING(col, 'align',  'left') ,
+            hidden: _PROP_BOOL  (col, 'hidden', false)
         } ;
     }) ;
 
@@ -171,12 +183,13 @@ function CheckTable (coldef, rows, options) {
 
         _ASSERT (_.isObject(row)) ;
         var row2add = _.reduce(this._colnames, function (row2add, name) {
-            if (_that._coldef[name].is_selector) row2add[name] = _PROP       (row, name, false, _.isBoolean) ;
+            if (_that._coldef[name].is_selector) row2add[name] = _PROP_BOOL  (row, name, false) ;
             else                                 row2add[name] = _PROP_STRING(row, name, '') ;
             return row2add ;
-        } , {}) ;
-
-        row2add._row_id = this._get_row_id() ;
+        } , {
+            _row_id : this._get_row_id() ,
+            _locked : _PROP_BOOL  (row, '_locked', false)
+        }) ;
 
         if (_.isUndefined(position)) {
             this._rows.push(row2add) ;
@@ -252,16 +265,16 @@ function CheckTable (coldef, rows, options) {
 
     this.check = function (on, predicate) {
 
-        var togglers = this._tbody.children('tr').children('td.check-table-selector').children('div') ;
-        if (on) togglers.addClass   ('check-table-toggler-on') ;
-        else    togglers.removeClass('check-table-toggler-on') ;
-
         var selector_name = _.find(this._colnames , function (name) {
             return _that._coldef[name].is_selector ;
         }) ;
         _.each(this._rows, function (row) {
-            if (predicate(row))
+            if (predicate(row)) {
+                var toggler = _that._tbody.children('tr[row_id="'+row._row_id+'"]').children('td.check-table-selector').children('div.check-table-toggler') ;
+                if (on) toggler.addClass   ('check-table-toggler-on') ;
+                else    toggler.removeClass('check-table-toggler-on') ;
                 row[selector_name] = on ? true : false ;
+            }
         }) ; 
     } ;
     this.check_all = function () {
@@ -271,6 +284,38 @@ function CheckTable (coldef, rows, options) {
     } ;
     this.uncheck_all = function () {
         this.check(false, function () {
+            return true ;
+        }) ;
+    } ;
+
+
+    this.find_by_lock_status = function (expect_locked) {
+        return _.filter(this._rows, function (row) {
+            var locked  = row._locked ;
+            return expect_locked ? locked : !locked ;
+        }) ;
+    } ;
+    this.find_locked     = function () { return this.find_by_lock_status(true) ; } ;
+    this.find_not_locked = function () { return this.find_by_lock_status(false) ; } ;
+
+    this.lock = function (on, predicate) {
+
+        _.each(this._rows, function (row) {
+            if (predicate(row)) {
+                var tr = _that._tbody.children('tr[row_id="'+row._row_id+'"]') ;
+                if (on) tr.addClass   ('check-table-locked') ;
+                else    tr.removeClass('check-table-locked') ;
+                row._locked = on ? true : false ;
+            }
+        }) ; 
+    } ;
+    this.lock_all = function () {
+        this.lock(true, function () {
+            return true ;
+        }) ;
+    } ;
+    this.unlock_all = function () {
+        this.lock(false, function () {
             return true ;
         }) ;
     } ;
@@ -322,16 +367,20 @@ function CheckTable (coldef, rows, options) {
     
     this._display_row = function (row, position) {
         var html =
-'<tr row_id="'+row._row_id+'" >' +
+'<tr row_id="'+row._row_id+'" '+(row._locked ? 'class="check-table-locked"' : '')+' data="this row is locked" >' +
             _.reduce (
                 this._colnames ,
                 function (html, name) {
                     var col = _that._coldef[name] ;
                     if (col.is_selector) html +=
-'  <td class="check-table-selector" name="'+name+'" ><div class="check-table-toggler '+(row[name] ? ' check-table-toggler-on ' : '')+'" /></td>' ;
+  '<td class="check-table-selector" name="'+name+'" align="'+col.align+'" >' +
+     '<div style="float:left;"  class="check-table-toggler '+(row[name]   ? ' check-table-toggler-on ' : '')+'" ></div>' +
+     '<div style="float:right;" class="check-table-locker" ><span class="ui-icon ui-icon-locked" ></span></div>' +
+     '<div style="clear:both;" ></div>' +
+  '</td>' ;
                     else if (col.hidden) ;
                     else                 html +=
-'  <td name="'+name+'">'+row[name]+'</td>' ;
+  '<td name="'+name+'" align="'+col.align+'" >'+row[name]+'</td>' ;
                     return html ;
                 }, '') +
 '</tr>' ;
@@ -346,25 +395,26 @@ function CheckTable (coldef, rows, options) {
                 $(html).insertBefore(trs[position]) ;
             }
         }
-        this._tbody.children('tr[row_id="'+row._row_id+'"]').click(function () {
+        //if (!row._locked)
+            this._tbody.children('tr[row_id="'+row._row_id+'"]').click(function () {
 
-                var tr      = $(this) ;
-                var td      = tr.children('td.check-table-selector') ;
-                var toggler = td.children('div') ;
+                    var tr      = $(this) ;
+                    var td      = tr.children('td.check-table-selector') ;
+                    var toggler = td.children('div.check-table-toggler') ;
 
-                var row_id  = parseInt(tr.attr('row_id')) ;
-                var name    =          td.attr('name') ;
+                    var row_id  = parseInt(tr.attr('row_id')) ;
+                    var name    =          td.attr('name') ;
 
-                for (var i in _that._rows) {
-                    var row = _that._rows[i] ;
-                    if (row._row_id === row_id) {
-                        if (row[name]) toggler.removeClass('check-table-toggler-on') ;
-                        else           toggler.addClass   ('check-table-toggler-on') ;
-                        row[name] = !row[name] ;
-                        break ;
+                    for (var i in _that._rows) {
+                        var row = _that._rows[i] ;
+                        if ((row._row_id === row_id) && !row._locked) {
+                            if (row[name]) toggler.removeClass('check-table-toggler-on') ;
+                            else           toggler.addClass   ('check-table-toggler-on') ;
+                            row[name] = !row[name] ;
+                            break ;
+                        }
                     }
-                }
-            }) ;
+                }) ;
     } ;
     this._undisplay_row = function (row) {
         this._tbody.find('tr[row_id="'+row._row_id+'"]').remove() ;

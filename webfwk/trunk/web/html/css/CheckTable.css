@@ -5,6 +5,9 @@
 .check-table > table {
   border-spacing: 0;
 }
+.check-table > table > tbody > tr.check-table-locked {
+  background-color: #fafafa;
+}
 
 .check-table > table > thead > tr > td {
   padding: 5px 8px;
@@ -23,7 +26,34 @@
 
 .check-table > table > tbody > tr:hover {
   cursor: pointer;
-  background-color: aliceblue;
+  background-color: #c5dbec;
+}
+
+.check-table > table > tbody > tr.check-table-locked:hover {
+  cursor: default;
+  background-color: #fafafa;
+}
+.check-table > table > tbody > tr.check-table-locked[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-weight: normal;
+  font-size: 11px;
+}
+
+.check-table > table > tbody > tr > td.check-table-selector > div.check-table-locker {
+  display: none;
+}
+.check-table > table > tbody > tr.check-table-locked > td.check-table-selector > div.check-table-locker {
+  display: block;
 }
 
 .check-table > table > tbody > tr > td {
@@ -49,3 +79,4 @@ div.check-table-toggler {
 div.check-table-toggler-on {
   background-color:red;
 }
+
