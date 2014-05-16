@@ -39,7 +39,7 @@ TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"test_044_Translator_t1_dropped_s
 TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
 TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.xtc")
 TESTDATA_PARTITION = os.path.join(DATADIR,"test_051_sxr_sxrdaq10_e19-r057-s01-c00.xtc")
-
+TESTDATA_EPICS = os.path.join(DATADIR, "test_020_sxr_sxr33211_e103-r0845-s00-c00.xtc")
 
 #------------------
 # Utility functions 
@@ -1222,6 +1222,74 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_epics(self):
+        '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.
+        '''
+        input_file = TESTDATA_EPICS
+        output_h5 = makeH5OutputNameFromXtc(input_file)
+        cfgfile = writeCfgFile(input_file, output_h5)
+        self.runPsanaOnCfg(cfgfile, output_h5, '-n 1', printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()        
+        h5=h5py.File(output_h5,'r')
+        # long  data=1000
+        cfgDbr33 = h5['/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/LAS:FS1:REG:kp_vcxo:rd/data']
+        self.assertEqual(cfgDbr33['value'][0], 10000, msg="%s != %s  name=%s" % (cfgDbr33['value'][0], 10000, cfgDbr33.name))
+
+        # string '08/23/2011 06:28:38'
+        cfgDbr28 = h5['/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SIOC:SYS0:ML00:TOD/data']
+        self.assertEqual(cfgDbr28['value'][0], '08/23/2011 06:28:38', msg="%s != %s name=%s" % (cfgDbr28['value'][0], '08/23/2011 06:28:38', cfgDbr28.name))
+
+        # double data=-4.0000e+01
+        cfgDbr34 = h5['/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:DFP:MMS:01.RBV/data']
+        self.assertEqual('%.4e' % cfgDbr34['value'][0], '-4.0000e+01', msg="%s !=%s name=%s" % ('%.4e' % cfgDbr34['value'][0], '-4.0000e+01', cfgDbr34.name))
+
+        # enum data=0x1, no_str=2 enum[0]=Unlocked enum[1]=Locked
+        cfgDbr31 = h5['/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:EXP:AOT:02:Lock/data']
+        self.assertEqual( cfgDbr31['value'][0], 1, msg="%s !=%s name=%s" % (cfgDbr31['value'][0], 1, cfgDbr31.name))
+        self.assertEqual( cfgDbr31['no_str'][0], 2, msg="no_str: %s !=%s name=%s" % (cfgDbr31['no_str'][0], 2, cfgDbr31.name))
+        self.assertEqual( cfgDbr31['strs'][0][0], 'Unlocked', msg="strs[0]: %s !=%s name=%s" % (cfgDbr31['strs'][0][0], 'Unlocked', cfgDbr31.name))
+        self.assertEqual( cfgDbr31['strs'][0][1], 'Locked', msg="strs[1]: %s !=%s name=%s" % (cfgDbr31['strs'][0][1], 'Locked', cfgDbr31.name))
+
+        # short data=0   upper_ctrl_limit=32767 lower_ctrl_limit=-32768
+        cfgDbr29 = h5['/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:SPS:MMS:01.HLS/data']
+        self.assertEqual( cfgDbr29['value'][0], 0, msg="%s !=%s name=%s" % (cfgDbr29['value'][0], 0, cfgDbr29.name))
+        self.assertEqual( cfgDbr29['upper_ctrl_limit'][0], 32767, msg="upper_ctrl_limit: %s !=%s name=%s" % (cfgDbr29['upper_ctrl_limit'][0], 32767, cfgDbr29.name))
+        self.assertEqual( cfgDbr29['lower_ctrl_limit'][0], -32768, msg="lower_ctrl_limit: %s !=%s name=%s" % (cfgDbr29['lower_ctrl_limit'][0], -32768, cfgDbr29.name))
+
+        # long  data=10000 stamp.sec=682908957 stamp.nsec=393338000
+        evtDbr19 = h5['/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/LAS:FS1:REG:kp_vcxo:rd/data']
+        self.assertEqual( evtDbr19['value'][0], 10000, msg="%s !=%s name=%s" % (evtDbr19['value'][0], 10000, evtDbr19.name))
+        self.assertEqual( evtDbr19['stamp']['secPastEpoch'][0], 682908957, msg="stamp.sec %s !=%s name=%s" % (evtDbr19['stamp']['secPastEpoch'][0], 682908957, evtDbr19.name))
+        self.assertEqual( evtDbr19['stamp']['nsec'][0], 393338000, msg="stamp.nsec %s !=%s name=%s" % (evtDbr19['stamp']['nsec'][0], 393338000, evtDbr19.name))
+
+        # string stamp.sec=682956951 stamp.nsec=227500000 data=['08/23/2011 07:15:51']
+        evtDbr14 = h5['/Configure:0000/Run:0000//CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SIOC:SYS0:ML00:TOD/data']
+        self.assertEqual( evtDbr14['value'][0], '08/23/2011 07:15:51', msg="%s !=%s name=%s" % (evtDbr14['value'][0], 10000, evtDbr14.name))
+        self.assertEqual( evtDbr14['stamp']['secPastEpoch'][0], 682956951, msg="stamp.sec %s !=%s name=%s" % (evtDbr14['stamp']['secPastEpoch'][0], 682956951, evtDbr14.name))
+        self.assertEqual( evtDbr14['stamp']['nsec'][0], 227500000, msg="stamp.nsec %s !=%s name=%s" % (evtDbr14['stamp']['nsec'][0], 227500000, evtDbr14.name))
+
+        # double  stamp.sec=682954114 stamp.nsec=64595000 data=-4.0000e+01
+        evtDbr20 = h5['/Configure:0000/Run:0000//CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:DFP:MMS:01.RBV/data']
+        self.assertEqual( '%.4e' % evtDbr20['value'][0], '-4.0000e+01', msg="%s !=%s name=%s" % (evtDbr20['value'][0], 10000, evtDbr20.name))
+        self.assertEqual( evtDbr20['stamp']['secPastEpoch'][0], 682954114, msg="stamp.sec %s !=%s name=%s" % (evtDbr20['stamp']['secPastEpoch'][0], 682954114, evtDbr20.name))
+        self.assertEqual( evtDbr20['stamp']['nsec'][0], 64595000, msg="stamp.nsec %s !=%s name=%s" % (evtDbr20['stamp']['nsec'][0], 64595000, evtDbr20.name))
+
+        # enum  stamp.sec=682853411 stamp.nsec=0 data=0x1
+        evtDbr17 = h5['/Configure:0000/Run:0000//CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:EXP:AOT:02:Lock/data']
+        self.assertEqual( evtDbr17['value'][0], 1, msg="%s !=%s name=%s" % (evtDbr17['value'][0], 10000, evtDbr17.name))
+        self.assertEqual( evtDbr17['stamp']['secPastEpoch'][0], 682853411, msg="stamp.sec %s !=%s name=%s" % (evtDbr17['stamp']['secPastEpoch'][0], 682853411, evtDbr17.name))
+        self.assertEqual( evtDbr17['stamp']['nsec'][0], 0, msg="stamp.nsec %s !=%s name=%s" % (evtDbr17['stamp']['nsec'][0], 0, evtDbr17.name))
+
+        # short data=0   stamp.sec=682954118 stamp.nsec=384744000 data=0
+        evtDbr15 = h5['/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/SXR:SPS:MMS:01.HLS/data']
+        self.assertEqual( evtDbr15['value'][0], 0, msg="%s !=%s name=%s" % (evtDbr15['value'][0], 0, evtDbr15.name))
+        self.assertEqual( evtDbr15['stamp']['secPastEpoch'][0], 682954118, msg="stamp.sec %s !=%s name=%s" % (evtDbr15['stamp']['secPastEpoch'][0], 682954118, evtDbr15.name))
+        self.assertEqual( evtDbr15['stamp']['nsec'][0], 384744000, msg="stamp.nsec %s !=%s name=%s" % (evtDbr15['stamp']['nsec'][0], 384744000, evtDbr15.name))
+        
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+        
 #    In the future, I would like to translate ndarrays that are placed in the 
 #    calibStore. Presently, we only translate known types associated with 
 #    calibrated objects that were seen - that is we are not doing a general
