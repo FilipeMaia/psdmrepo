@@ -1,0 +1,37 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana-tools
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-02
+2014-05-16 David Schneider
+- Cleaned up code. 
+- Explicitly add libz (for adler32) to build through SConscript
+- Add dump of nonlinearCorrected for OceanOptics.Data
+- re-generated data/prev.txt
+	
+Tag: V00-00-01
+2014-05-15 David Schneider
+- First tag for a release.
+- Adjusted dump to print all epics info.
+- Added epics dbr type and numElements to xtclinedump xtc printout.
+- test data maintenance script is still work in progress.
+
+Tag: no tag yet
+2014-05-09 David Schneider
+- psana python module that dumps all non-epics data
+- got rid of much of the C++ Dump module.
+	
+Tag: No tag yet, just in development 
+2014-02-04 David A. Schneider
+- checking in C++ Dump module that prints basic attributes of non-epics, 
+  and some basic arrays.
+
