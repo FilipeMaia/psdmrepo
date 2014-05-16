@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-19
+2014-05-16 David Schneider
+- quiet compiler warning about unhandled types.
+
 Tag: V01-01-18
 2014-05-02 David Schneider
 - end maintenance for Pyana (via the pypdsdata data package). 

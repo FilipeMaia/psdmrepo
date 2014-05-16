@@ -611,6 +611,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum
     break;
+
+  default:
+    // to quiet compiler about unhandled types since maintenance stopped
+    break;
   }
 
   if ( not obj ) {
