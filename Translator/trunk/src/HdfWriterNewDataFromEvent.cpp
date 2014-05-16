@@ -79,7 +79,7 @@ void HdfWriterNewDataFromEvent::make_datasets(DataTypeLoc dataTypeLoc,
   Translator::DataSetCreationProperties dataSetCreationProperties(chunkPolicy,shuffle, deflate);
   m_writer.createUnlimitedSizeDataset(srcGroup.id(), 
                                       m_datasetName,
-                                      h5type,
+                                      h5type, h5type,
                                       dataSetCreationProperties);
 }
 
@@ -159,7 +159,7 @@ void HdfWriterNewDataFromEvent::store(DataTypeLoc dataTypeLoc,
 
   m_writer.createAndStoreDataset(srcGroup.id(), 
                                  m_datasetName,
-                                 h5type,
+                                 h5type, h5type,
                                  writeBuffer);
 }
 

@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2014-05-15 David
+- use file and memory h5 typeids
+- first step for trac ticket #301
+
 Tag: V00-01-04
 2014-05-08 David
 - update for psddldata V01-00-09, bld GMD v2

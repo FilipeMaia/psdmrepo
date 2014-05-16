@@ -172,9 +172,9 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
     
     Translator::DataSetCreationProperties dataSetCreationProperties(chunkPolicy, shuffle, deflate);
     if (vlen) {
-      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", vlenType, dataSetCreationProperties);
+      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", vlenType, vlenType, dataSetCreationProperties);
     } else {
-      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", arrayType, dataSetCreationProperties);
+      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", arrayType, arrayType, dataSetCreationProperties);
     }
   }
 
@@ -259,7 +259,7 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
     
     m_writer.createAndStoreDataset(srcGroup.id(),
                                    "data",
-                                   arrayType,
+                                   arrayType, arrayType,
                                    ndarrayPtr->data());
   }
 

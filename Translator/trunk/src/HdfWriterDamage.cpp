@@ -50,11 +50,11 @@ void HdfWriterDamage::make_datasets(hid_t groupId)
   try {
     m_damagePos = m_writer.createUnlimitedSizeDataset(groupId,
                                                       "_damage",
-                                                      m_h5DamageTypeId,
+                                                      m_h5DamageTypeId,m_h5DamageTypeId,
                                                       dataSetCreationProperties());
     m_maskPos = m_writer.createUnlimitedSizeDataset(groupId,
                                                     "_mask",
-                                                    H5T_NATIVE_UINT8,
+                                                    H5T_NATIVE_UINT8, H5T_NATIVE_UINT8,
                                                     dataSetCreationProperties());
   } catch (ErrSvc::Issue &issue) {
     std::ostringstream msg;
@@ -62,14 +62,18 @@ void HdfWriterDamage::make_datasets(hid_t groupId)
         << " Generic writer failure: " << issue.what();
     throw HdfWriterGeneric::DataSetException(ERR_LOC, msg.str());
   }
-  if ((m_damagePos != 0) or (m_maskPos != 1)) throw HdfWriterGeneric::DataSetException(ERR_LOC,
-                                 "HdfWritereDamage::make_datasets, damagePos != 0 or maskPos != 1");
+  if ((m_damagePos != 0) or (m_maskPos != 1)) {
+    throw HdfWriterGeneric::DataSetException(ERR_LOC,
+             "HdfWritereDamage::make_datasets, damagePos != 0 or maskPos != 1");
+  }
 }
 
 void HdfWriterDamage::store_at(long index, hid_t groupId, Pds::Damage damage, MaskVal mask) 
 {
-  if ((m_damagePos != 0) or (m_maskPos != 1)) throw HdfWriterGeneric::DataSetException(ERR_LOC,
-                                "HdfWritereDamage::store_at, damagePos != 0 or maskPos != 1");
+  if ((m_damagePos != 0) or (m_maskPos != 1)) {
+    throw HdfWriterGeneric::DataSetException(ERR_LOC,
+               "HdfWritereDamage::store_at, damagePos != 0 or maskPos != 1");
+  }
 
   DamageStruct damageBuffer(damage);
   uint8_t maskBuffer = mask;

@@ -48,7 +48,7 @@ void HdfWriterEventId::make_dataset(hid_t groupId)
   try {
     m_dsetPos = m_writer.createUnlimitedSizeDataset(groupId,
                                                     "time",
-                                                    m_h5typeId,
+                                                    m_h5typeId, m_h5typeId,
                                                     dataSetCreationProperties());
   } catch (ErrSvc::Issue &issue) {
     std::ostringstream msg;

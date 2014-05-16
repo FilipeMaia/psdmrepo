@@ -88,17 +88,17 @@ class HdfWriterGeneric {
 
   size_t createUnlimitedSizeDataset(hid_t groupId,
                                     const std::string & dsetName,
-                                    hid_t h5type,
+                                    hid_t h5FileType, hid_t h5MemType,
                                     const DataSetCreationProperties & dsetCreateProp);
 
   size_t createFixedSizeDataset(hid_t groupId,
                                 const std::string & dsetName,
-                                hid_t h5type,
+                                hid_t h5FileType, hid_t h5MemType,
                                 hsize_t fixedSize);
   
   void createAndStoreDataset(hid_t groupId,
                              const std::string & dsetName,
-                             hid_t h5type,
+                             hid_t h5FileType, hid_t h5MemType,
                              const void * data);
 
   void append(hid_t groupId, size_t idx, const void * data) { store_at(groupId,-1,idx,data); };

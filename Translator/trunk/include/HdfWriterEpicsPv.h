@@ -123,7 +123,7 @@ class HdfWriterEpicsPv {
                                               psanaVar->numElements() << " elements");
         typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
         dsetIdx = m_hdfWriterGeneric->createFixedSizeDataset(groupId, "data", 
-                                                             typeId,
+                                                             typeId, typeId,
                                                              psanaVar->numElements());
         copyToUnrolled(*psanaVar, 0, unrollBuffer);
         for (el = 0; el < psanaVar->numElements(); ++el) {
@@ -140,7 +140,7 @@ class HdfWriterEpicsPv {
       case CreateAppend:
         typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
         dsetIdx = m_hdfWriterGeneric->createUnlimitedSizeDataset(groupId, "data", 
-                                                                 typeId,
+                                                                 typeId, typeId,
                                                                  dataSetCreationProperties());
         copyToUnrolled(*psanaVar, 0, unrollBuffer);
         for (el = 0; el < psanaVar->numElements(); ++el) {

@@ -4,6 +4,7 @@
 
 #include "MsgLogger/MsgLogger.h"
 #include "Translator/hdf5util.h"
+#include "hdf5/hdf5_hl.h"
 #include "ErrSvc/Issue.h"
 
 using namespace std;
@@ -62,3 +63,18 @@ std::string Translator::hdf5util::objectName(hid_t obj)
   delete [] dbuf;
   return res;
 }
+
+// This function is based on hdf5pp::Type << operator
+// dumps type information in HDF5 DDL format.
+std::string Translator::hdf5util::type2str(hid_t id) {
+  std::string out;
+  size_t len = 0;
+  herr_t err = H5LTdtype_to_text(id, 0, H5LT_DDL, &len);
+  if (err >= 0) {
+    char* buf = new char[len];
+    err = H5LTdtype_to_text(id, buf, H5LT_DDL, &len);
+    if (err >= 0) out = buf;
+    delete [] buf;
+  }
+  return out;
+ }
