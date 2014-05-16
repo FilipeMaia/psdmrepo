@@ -108,9 +108,11 @@ function ELog_Search (experiment, access_list) {
 
 '    <ul>' +
 '      <li><a href="#simple">Simple</a></li>' +
-'      <li><a href="#advanced">Advanced</a></li>' +
+'      <li><a href="#advanced">Advanced</a></li>' ;
+        if (!this.experiment.is_facility) html +=
 '      <li><a href="#byrunrange">Range of Runs</a></li>' +
-'      <li><a href="#byrun">By Run #</a></li>' +
+'      <li><a href="#byrun">By Run #</a></li>' ;
+        html +=
 '      <li><a href="#bymessage">By Message ID</a></li>' +
 '    </ul>' +
 
@@ -149,10 +151,10 @@ function ELog_Search (experiment, access_list) {
 '        </div>' +
 '        <div class="group">' +
 '          <span class="label">Posted at:</span>' +
-'          <div><input class="update-trigger" type="checkbox" name="posted_at_instrument"                   /> instrument</div>' +
-'          <div><input class="update-trigger" type="checkbox" name="posted_at_experiment" checked="checked" /> experiment</div>' +
-'          <div><input class="update-trigger" type="checkbox" name="posted_at_shifts"     checked="checked" /> shifts</div>' +
-'          <div><input class="update-trigger" type="checkbox" name="posted_at_runs"       checked="checked" /> runs</div>' +
+'          <div><input class="update-trigger" type="checkbox" name="posted_at_instrument" '+(this.experiment.is_facility ? 'disabled' : '')+' /> instrument</div>' +
+'          <div><input class="update-trigger" type="checkbox" name="posted_at_experiment" '+(this.experiment.is_facility ? 'disabled' : '')+' checked="checked" /> experiment</div>' +
+'          <div><input class="update-trigger" type="checkbox" name="posted_at_shifts"     '+(this.experiment.is_facility ? 'disabled' : 'checked="checked"')+' /> shifts</div>' +
+'          <div><input class="update-trigger" type="checkbox" name="posted_at_runs"       '+(this.experiment.is_facility ? 'disabled' : 'checked="checked"')+' /> runs</div>' +
 '        </div>' +
 '        <div class="group">' +
 '          <div title="'+time_title+'">' +
@@ -174,7 +176,8 @@ function ELog_Search (experiment, access_list) {
 '        </div>' +
 '        <div style="clear:both;"></div>' +
 '      </div>' +
-'    </div>' +
+'    </div>' ;
+        if (!this.experiment.is_facility) html +=
 
 '    <div id="byrunrange">' +
 '      <div class="search-dialog">' +
@@ -213,7 +216,9 @@ function ELog_Search (experiment, access_list) {
 '        </div>' +
 '        <div style="clear:both;"></div>' +
 '      </div>' +
-'    </div>' +
+'    </div>' ;
+
+        html +=
 
 '    <div id="bymessage">' +
 '      <div class="search-dialog">' +
@@ -279,7 +284,12 @@ function ELog_Search (experiment, access_list) {
 
         this._viewer = new ELog_MessageViewer (
             this ,
-            this._wa.find('#viewer')
+            this._wa.find('#viewer') ,
+            {
+                allow_groups: true ,
+                allow_runs:   !this.experiment.is_facility ,
+                allow_shifts: !this.experiment.is_facility
+            }
         ) ;
 
         ELog_Utils.load_tags_and_authors (

@@ -281,7 +281,6 @@ function ELog_Runs (experiment, access_list) {
         //   - new runs appeared since the previous request
 
         if (!this._last_request) {
-            console.log('ELog_Runs::_display()  !this._last_request') ;
 
             this._last_request = runs ;
             this._max_seconds  = max_seconds ;
@@ -292,7 +291,6 @@ function ELog_Runs (experiment, access_list) {
             }
             
         } else if (this._max_seconds !== max_seconds) {
-            console.log('ELog_Runs::_display()  this._max_seconds('+this._max_seconds+') !== max_seconds('+max_seconds+')') ;
 
             table.reset() ;
 
@@ -314,7 +312,6 @@ function ELog_Runs (experiment, access_list) {
             var r_last_old = this._last_request[0] ;
             var r_last_new = runs[runs.length - this._last_request.length] ;    // in case if there are more new runs
             if (r_last_old.sec !== r_last_new.sec) {
-                console.log('ELog_Runs::_display()  r_last_old.secs('+r_last_old.sec+') !== r_last_new.sec('+r_last_new.sec+')') ;
                 table.update_row(r_last_old.row_id, this._run2row(r_last_new, max_seconds)) ;
                 this._last_request[0] = r_last_new ;
                 this._last_request[0].row_id = r_last_old.row_id ;

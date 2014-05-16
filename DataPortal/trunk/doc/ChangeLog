@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2014-05-16 Igor Gaponenko
+- added regdbauth() database connector to the PHP JASON Web Service
+- a bug fix in teh statistics report tool (missing CSS)
+- a bug fix in the ELog message viewer class
+- added e-Log authorization management for the operator accounts in the Portal
+and Experiment Switch
+- cleaned facility e-Logs version of the Portal from mentioning runs or shifts
+- rename the application from 'Web Portal of Experiment' into 'Data Manager of Experiment'
+
 Tag: V00-07-00
 2014-04-30 Igor Gaponenko
 - code cleanup (removed the old version of the Portal)

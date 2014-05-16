@@ -26,6 +26,18 @@ try {
     if ($select_instr_name && !RegDB::instance()->find_instrument_by_name($select_instr_name))
         report_error('unknown instrument name provided to the script') ;
 
+    $no_page_access_html = <<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We\'re sorry! Our records indicate that your SLAC UNIX account has no proper permissions to access this page.
+</div>
+HERE;
+
     $instruments = array() ;
     foreach (RegDB::instance()->instruments() as $instr) {
 
@@ -49,9 +61,11 @@ try {
         array_push($instruments, array (
             'name'         => $instr->name() ,
             'num_stations' => intval($num_stations->value()) ,
+            'operator_uid' => strtolower($instr->name()).'opr' ,
             'access_list'  => array (
-                'can_manage' => $can_manage ? 1 : 0 ,
-                'can_read'   => $can_manage ? 1 : 0))) ;
+                'can_manage'          => $can_manage ? 1 : 0 ,
+                'can_read'            => $can_manage ? 1 : 0) ,
+                'no_page_access_html' => $no_page_access_html)) ;
 
         if ($select_instr_name) {
             $select_instr_name = $instr->name() ;
@@ -81,6 +95,7 @@ try {
 
 <link type="text/css" href="../portal/css/ExpSwitch_Station.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ExpSwitch_History.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/ExpSwitch_ELogAccess.css" rel="Stylesheet" />
 
 
 <style>
@@ -125,6 +140,7 @@ button {
 
 <script type="text/javascript" src="../portal/js/ExpSwitch_Station.js"></script>
 <script type="text/javascript" src="../portal/js/ExpSwitch_History.js"></script>
+<script type="text/javascript" src="../portal/js/ExpSwitch_ELogAccess.js"></script>
 
 <script type="text/javascript">
 
@@ -150,7 +166,11 @@ $(function() {
 
             instr_tab.menu.push ({
                 name: 'History' ,
-                application: new ExpSwitch_History(instr.name,  instr.access_list)}) ;
+                application: new ExpSwitch_History(instr.name, instr.access_list)
+            } , {
+                name: 'e-Log Access - '+instr.operator_uid ,
+                application: new ExpSwitch_ELogAccess(instr.name, instr.operator_uid, instr.access_list)
+            }) ;
 
         menus.push(instr_tab) ;
     }

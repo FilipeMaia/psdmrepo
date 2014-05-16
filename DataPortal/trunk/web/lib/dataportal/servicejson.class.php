@@ -32,6 +32,7 @@ class ServiceJSON {
     private $options     = null ;
     private $authdb      = null ;
     private $regdb       = null ;
+    private $regdbauth   = null ;
     private $logbook     = null ;
     private $logbookauth = null ;
     private $configdb    = null ;
@@ -335,6 +336,13 @@ class ServiceJSON {
         }
         return $this->regdb ;
     }
+    public function regdbauth () {
+        if (is_null($this->regdbauth)) {
+            require_once 'regdb/regdb.inc.php' ;
+            $this->regdbauth = \RegDB\RegDBAuth::instance() ;
+        }
+        return $this->regdbauth ;
+    }
     public function logbook () {
         if (is_null($this->logbook)) {
             require_once 'logbook/logbook.inc.php' ;
@@ -431,6 +439,7 @@ class ServiceJSON {
         if (!$parameters) $parameters = array() ;
         if (!is_null($this->authdb     )) $this->authdb    ->commit() ;
         if (!is_null($this->regdb      )) $this->regdb     ->commit() ;
+        if (!is_null($this->regdbauth)) ;
         if (!is_null($this->logbook    )) $this->logbook   ->commit() ;
         if (!is_null($this->logbookauth)) ;
         if (!is_null($this->configdb   )) $this->configdb  ->commit() ;

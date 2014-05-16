@@ -123,7 +123,7 @@ try {
     $experiment = $logbook_experiment->regdb_experiment() ;
     $instrument = $experiment->instrument() ;
 
-    $title        = $experiment->is_facility() ? 'E-Log of Facility:' : 'Web Portal of Experiment' ;
+    $title        = $experiment->is_facility() ? 'E-Log of Facility:' : 'Data Manager of Experiment' ;
     $subtitle     = $experiment->instrument()->name().'/'.$experiment->name() ;
     $subtitle_url = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>' ;
 
@@ -137,6 +137,9 @@ try {
             break ;
         }
     }
+
+    $operator_uid = $experiment->operator_uid() ;
+
     $elog_can_read_messages   = LogBookAuth::instance()->canRead           ($logbook_experiment->id()) ;
     $elog_can_post_messages   = LogBookAuth::instance()->canPostNewMessages($logbook_experiment->id()) ;
     $elog_can_edit_messages   = LogBookAuth::instance()->canEditMessages   ($logbook_experiment->id()) ;
@@ -189,6 +192,8 @@ try {
 
 <link type="text/css" href="../portal/css/Experiment_Info.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Experiment_Group.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Experiment_ELogAccess.css" rel="Stylesheet" />
+
 
 <link type="text/css" href="../portal/css/ELog_MessageViewer.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Live.css" rel="Stylesheet" />
@@ -263,6 +268,7 @@ button {
 
 <script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
 <script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
+<script type="text/javascript" src="../portal/js/Experiment_ELogAccess.js"></script>
 
 <script type="text/javascript" src="../portal/js/ELog_Utils.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_MessageViewer.js"></script>
@@ -293,16 +299,17 @@ button {
 <script type="text/javascript">
 
 var experiment = {
-    id          :  <?= $experiment->id() ?> ,
-    name        : '<?= $experiment->name() ?>' ,
-    contact_uid : '<?= $experiment->leader_Account() ?>' ,
-    posix_group : '<?= $experiment->POSIX_gid() ?>' ,
-    is_facility :  <?= $experiment->is_facility() ? 1 : 0 ?> ,
-    instrument : {
-        id   :  <?= $instrument->id()   ?> ,
-        name : '<?= $instrument->name() ?>'
-    }
-}
+    id           :  <?= $experiment->id() ?> ,
+    name         : '<?= $experiment->name() ?>' ,
+    contact_uid  : '<?= $experiment->leader_Account() ?>' ,
+    posix_group  : '<?= $experiment->POSIX_gid() ?>' ,
+    is_facility  :  <?= $experiment->is_facility() ? 1 : 0 ?> ,
+    instrument   : {
+        id       :  <?= $instrument->id()   ?> ,
+        name     : '<?= $instrument->name() ?>'
+    } ,
+    operator_uid : '<?= $operator_uid ? $operator_uid : '' ?>'
+} ;
 
 var access_list = {
     user : {
@@ -388,7 +395,10 @@ $(function() {
             application: new Experiment_Info(experiment, access_list) } , {
  
             name: 'Group Manager' ,
-            application: new Experiment_Group(experiment, access_list) }]}
+            application: new Experiment_Group(experiment, access_list) } , {
+
+            name: 'e-Log Access' ,
+            application: new Experiment_ELogAccess(experiment, access_list) }]}
     ) ;
 
     if (experiment.is_facility) {

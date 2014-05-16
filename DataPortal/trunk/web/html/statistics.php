@@ -11,7 +11,6 @@ require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
 
-use DataPortal\DataPortal;
 
 use LogBook\LogBook;
 use LogBook\LogBookException;
@@ -386,7 +385,7 @@ try {
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 </head>
 <body>
 

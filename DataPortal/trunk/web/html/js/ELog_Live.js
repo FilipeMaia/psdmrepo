@@ -157,6 +157,12 @@ function ELog_Live (experiment, access_list) {
     this._latest_timestamp = 0 ;
     this._oldest_timestamp = 0 ;
 
+    function event_timestamp (m) {
+        if (typeof m === 'string') {
+            m = eval('('+m+')') ;
+        }
+        return m.event_timestamp ;
+    }
     this._load_viewer = function () {
 
         this._updated.html('Loading messages...') ;
@@ -183,8 +189,8 @@ function ELog_Live (experiment, access_list) {
 
                 var num_threads = data.ResultSet.Result.length ;
                 if (num_threads) {
-                    _that._latest_timestamp = data.ResultSet.Result[num_threads-1].event_timestamp ;
-                    _that._oldest_timestamp = data.ResultSet.Result[0]            .event_timestamp ;
+                    _that._latest_timestamp = event_timestamp(data.ResultSet.Result[num_threads-1]) ;
+                    _that._oldest_timestamp = event_timestamp(data.ResultSet.Result[0]) ;
                     _that._viewer.load(data.ResultSet.Result) ;
                 }
                 var num_runs = _that._viewer.num_runs() ;
@@ -224,8 +230,8 @@ function ELog_Live (experiment, access_list) {
 
                 var num_threads = data.ResultSet.Result.length ;
                 if (num_threads) {
-                    _that._latest_timestamp = data.ResultSet.Result[num_threads-1].event_timestamp ;
-                    _that._oldest_timestamp = data.ResultSet.Result[0]            .event_timestamp ;
+                    _that._latest_timestamp = event_timestamp(data.ResultSet.Result[num_threads-1]) ;
+                    _that._oldest_timestamp = event_timestamp(data.ResultSet.Result[0]) ;
                     _that._viewer.update(data.ResultSet.Result) ;
                 }
                 var num_runs = _that._viewer.num_runs() ;
@@ -243,14 +249,14 @@ function ELog_Live (experiment, access_list) {
 
     this._backtrack = function () {
 
+        if (!this._oldest_timestamp) return ;
+
         // - display the loader at the botton in the middle of the page
 
         this._loading.css({
             'display' : 'block' ,
             'right'   : this._wa.width() / 2 - this._loading.width() / 2
         }) ;
-
-        if (!this._oldest_timestamp) return ;
 
         var params = {
             id:                      this.experiment.id ,
@@ -277,7 +283,7 @@ function ELog_Live (experiment, access_list) {
                 
                 var num_threads = data.ResultSet.Result.length ;
                 if (num_threads) {
-                    _that._oldest_timestamp = data.ResultSet.Result[0].event_timestamp ;
+                    _that._oldest_timestamp = event_timestamp(data.ResultSet.Result[0]) ;
                     _that._viewer.append(data.ResultSet.Result) ;
                 }
                 var num_runs = _that._viewer.num_runs() ;

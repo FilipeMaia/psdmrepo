@@ -81,7 +81,7 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
 
         // Make proper adjustments to the OPR account access privileges
         //
-        // 1. remove authorizations fo rthe prior experiment
+        // 1. remove authorizations for the prior experiment
         // 2. add the 'Writer' role for the new one
         //
 

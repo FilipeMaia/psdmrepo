@@ -88,7 +88,7 @@ function ELog_Attachments (experiment, access_list) {
 '            </select></td>' +
 '        <td><div style="width:20px;"></div></td>' +
 '        <td><b>Mix-in runs:</b></td>' +
-'        <td><input name="runs" type="checkbox" /></td>' +
+'        <td><input name="runs" type="checkbox" '+(this.experiment.is_facility ? 'disabled' : '')+' /></td>' +
 '        <td><div style="width:20px;"></div></td>' +
 '        <td><button class="control-button" id="reverse">Show in Reverse Order</button></td>' +
 '      </tr>' +

@@ -993,13 +993,16 @@ function ELog_MessageViewerBase (parent, options) {
     this.instant_expand = false ;
     this.deleted        = false ;
     this.allow_groups   = false ;
+    this.allow_runs     = true ;    // -- do not display anyting related to runs if false
+    this.allow_shifts   = true ;    // -- do not display anyting related to shifts if false
     this.no_ymd         = false ;   // -- do not display the data in timestamps if true
-    if (options) {
-        for (var opt in options) {
-            var val = options[opt] ;
-            this[opt] = val ? true : false ;
-        }   
-    }
+
+    this.options = options || {} ;
+
+    for (var opt in this.options) {
+        var val = this.options[opt] ;
+        this[opt] = val ? true : false ;
+    }   
 
     // -- methods to be implemented by the base classes
 
@@ -1093,35 +1096,43 @@ function ELog_MessageViewerBase (parent, options) {
         var row = {
             title: {
                 posted: posted ,
-                run: m.run_num ? '<div class="m-run">'+m.run_num+'</div>' : '&nbsp;' ,
                 author: m.author ,
                 subj:  '&nbsp;' ,
                 id: '&nbsp;' ,
                 attach: '&nbsp;' ,
                 child: '&nbsp;' ,
-                tag: '&nbsp;' ,
-                duration: '&nbsp;'
+                tag: '&nbsp;'
             } ,
             body: ''
         } ;
+        if (this.allow_runs) {
+            row.title.run      = m.run_num ? '<div class="m-run">'+m.run_num+'</div>' : '&nbsp;' ;
+            row.title.duration = '&nbsp;' ;
+        }
         if (m.is_run) {
-            row.title.run = '<div class="m-run">'+m.run_num+'</div>' ;
+            if (!this.allow_runs) {
+                throw new WidgetError('ELog_MessageViewerBase::_message2row() the runs are not supported by the current configuration of the viewer') ;
+            }
+            row.title.run  = '<div class="m-run">'+m.run_num+'</div>' ;
             row.title.subj = this._run2subj(m) ;
             if (m.type !== 'begin_run') { row.title.duration = m.duration1 ; }
-            row.body = new ELog_RunBody(this, m) ;
-            row.color_theme = 'stack-theme-green' ;
+            row.body                = new ELog_RunBody(this, m) ;
+            row.color_theme         = 'stack-theme-green' ;
             row.block_common_expand = true ;
         } else {
             row.title.subj = m.deleted ? '<span class="m-subj-deleted">'+m.subject+'</span>'+' <span class="m-subj-notes">deleted by <b>'+m.deleted_by+'</b> [ '+m.deleted_time+' ]</span>': m.subject ;
-            row.title.id = '<div class="m-id">'+m.id+'</div>' ;
+            row.title.id   = '<div class="m-id">'+m.id+'</div>' ;
             if (m.attachments_num) row.title.attach = '<img src="../portal/img/attachment.png" height="18">' ;
-            if (m.children_num) row.title.child = '<sup><b>&crarr;</b></sup>' ;
-            if (m.tags_num) row.title.tag = '<sup><b>T</b></sup>' ;
+            if (m.children_num)    row.title.child = '<sup><b>&crarr;</b></sup>' ;
+            if (m.tags_num)        row.title.tag = '<sup><b>T</b></sup>' ;
             row.body = new ELog_MessageBody(this, m) ;
         }
         return row ;
     } ;
     this._run2subj = function (m) {
+        if (!this.allow_runs) {
+            throw new WidgetError('ELog_MessageViewerBase::_run2subj() the runs are not supported by the current configuration of the viewer') ;
+        }
         switch (m.type) {
             case 'run'       : return '<b>stop</b>';
             case 'end_run'   : return '<b>stop</b>' ;
@@ -1152,9 +1163,13 @@ function ELog_MessageViewerNoGroupping (parent, options) {
     this._messages = [] ;
     var hdr = [(this.no_ymd ? 
         {id: 'posted',   title: 'Time',      width:  80} :
-        {id: 'posted',   title: 'Posted',    width: 150}),
+        {id: 'posted',   title: 'Posted',    width: 150})
+    ] ;
+    if (this.allow_runs) hdr.push (
         {id: 'run',      title: 'Run',       width:  34, align: 'right'} ,
-        {id: 'duration', title: 'Length',    width:  55, align: 'right', style: 'color:maroon;'} ,
+        {id: 'duration', title: 'Length',    width:  55, align: 'right', style: 'color:maroon;'}
+    ) ;
+    hdr.push (
         {id: 'attach',   title: '&nbsp',     width:  16} ,
         {id: 'tag',      title: '&nbsp;',    width:  16} ,
         {id: 'child',    title: '&nbsp;',    width:  20} ,
@@ -1162,7 +1177,7 @@ function ELog_MessageViewerNoGroupping (parent, options) {
         {id: '>'} ,
         {id: 'id',       title: 'MessageId', width:  70} ,
         {id: 'author',   title: 'Author',    width:  90}
-    ] ;
+    ) ;
     this._table = new StackOfRows (
         hdr ,
         [] ,
@@ -2746,15 +2761,16 @@ function ELog_MessageViewer (parent, cont, options) {
 '<div id="body">' +
 '  <div id="stream"></div>' +
 '  <div id="day"></div>' ;
+            if (this.allow_shifts) html +=
+'  <div id="shift"></div>' ;
             html +=
-'  <div id="shift"></div>' +
 '  <div id="tag"></div>' +
 '  <div id="author"></div>' +
 '</div>' ;
             this.cont.html(html) ;
 
-            this._rb = new RadioBox(
-                [{  name:  "stream" ,
+            var cfg = [
+                {  name:  "stream" ,
                     text:  "SIMPLE STREAM" ,
                     class: "control-button" ,
                     title: "The groupping is off. Messages are show in the same order they were posted."
@@ -2763,12 +2779,18 @@ function ELog_MessageViewer (parent, cont, options) {
                     text:  "GROUP BY DAY" ,
                     class: "control-button" ,
                     title: "Group messages by a day they were posted."
-                } , {
+                }
+            ] ;
+            if (this.allow_shifts) cfg.push (
+                {
                     name:  "shift" ,
                     text:  "GROUP BY SHIFT" ,
                     class: "control-button" ,
                     title: "Group messages by a shift in which they were posted."
-                } , {
+                }
+            ) ;
+            cfg.push (
+                {
                     name:  "tag" ,
                     text:  "GROUP BY TAG" ,
                     class: "control-button" ,
@@ -2778,8 +2800,10 @@ function ELog_MessageViewer (parent, cont, options) {
                     text:  "GROUP BY AUTHOR" ,
                     class: "control-button" ,
                     title: "Group messages by message authors."
-                }] ,
-
+                }
+            ) ;
+            this._rb = new RadioBox (
+                cfg ,
                 function (name) {
 
                     // Borrow messages from the old viewer. Make sure they're sorted
@@ -2834,7 +2858,8 @@ function ELog_MessageViewer (parent, cont, options) {
                 } ,
 
                 {
-                    activate: "stream"}
+                    activate: "stream"
+                }
             ) ;
             this._rb.display(this.cont.children('div#ctrl')) ;
 
