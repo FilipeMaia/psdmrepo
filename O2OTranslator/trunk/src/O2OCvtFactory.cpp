@@ -976,7 +976,11 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
 
   case Pds::TypeId::NumberOf:
     break;
+
+  default:
+    break;  // to quiet warning about unhandled cases since maintenance stopped
   }
+
 
   return cvts;
 }
