@@ -21,7 +21,16 @@ def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
 
 def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
     return Pds_ClockTime_to_str(obj, indent, lvl, methodSep)
-  
+
+def OceanOptics_nonLinearCorrected(obj, indent, lvl):
+    data = obj.data()
+    nonlinearCorrected = np.zeros(data.shape, np.float64)
+    for idx in range(data.shape[0]):
+        nonlinearCorrected[idx] = obj.nonlinerCorrected(idx)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nonlinearCorrected: %s' % ndarray_to_str( nonlinearCorrected )
+    return methodStr
+
 # functions to dump psana objects to a string                    
 def Acqiris_VertV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
@@ -1478,6 +1487,32 @@ def Bld_BldDataGMDV1_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'relativeEnergyPerPulse: %s' % double_to_str( obj.relativeEnergyPerPulse() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Bld_BldDataGMDV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataGMDV2.TypeId
+    assert obj.Version == psana.Bld.BldDataGMDV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'milliJoulesPerPulse: %s' % double_to_str( obj.milliJoulesPerPulse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'milliJoulesAverage: %s' % double_to_str( obj.milliJoulesAverage() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sumAllPeaksFiltBkgd: %s' % double_to_str( obj.sumAllPeaksFiltBkgd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rawAvgBkgd: %s' % double_to_str( obj.rawAvgBkgd() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'relativeEnergyPerPulse: %s' % double_to_str( obj.relativeEnergyPerPulse() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sumAllPeaksRawBkgd: %s' % double_to_str( obj.sumAllPeaksRawBkgd() )
     methodStrings.append(methodStr)                                 
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
@@ -4950,6 +4985,7 @@ def OceanOptics_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.DataV1.TypeId
     assert obj.Version == psana.OceanOptics.DataV1.Version
     methodStrings = []
+    methodStrings.append(OceanOptics_nonLinearCorrected(obj, indent, lvl))
     # one_line_methods
     methodStr = doIndent(indent, lvl)
     methodStr += 'data: %s' % ndarray_to_str( obj.data() )
@@ -4995,6 +5031,7 @@ def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.DataV2.TypeId
     assert obj.Version == psana.OceanOptics.DataV2.Version
     methodStrings = []
+    methodStrings.append(OceanOptics_nonLinearCorrected(obj, indent, lvl))
     # one_line_methods
     methodStr = doIndent(indent, lvl)
     methodStr += 'data: %s' % ndarray_to_str( obj.data() )
@@ -6637,6 +6674,7 @@ objFunctionTable = {
     (psana.Bld.BldDataFEEGasDetEnergy.TypeId,0) : Bld_BldDataFEEGasDetEnergy_to_str,
     (psana.Bld.BldDataGMDV0.TypeId,0) : Bld_BldDataGMDV0_to_str,
     (psana.Bld.BldDataGMDV1.TypeId,1) : Bld_BldDataGMDV1_to_str,
+    (psana.Bld.BldDataGMDV2.TypeId,2) : Bld_BldDataGMDV2_to_str,
     (psana.Bld.BldDataIpimbV0.TypeId,0) : Bld_BldDataIpimbV0_to_str,
     (psana.Bld.BldDataIpimbV1.TypeId,1) : Bld_BldDataIpimbV1_to_str,
     (psana.Bld.BldDataPhaseCavity.TypeId,0) : Bld_BldDataPhaseCavity_to_str,

@@ -101,8 +101,8 @@ uint32_t printXtcHeader(Pds::Xtc *xtc) {
 
 namespace {
 
-  char *  sequenceType2string(enum Pds::Sequence::Type tp) {
-    static char *type2string[] = { "Event",
+  const char *  sequenceType2string(enum Pds::Sequence::Type tp) {
+    static const char *type2string[] = { "Event",
                                    "Occur",
                                    "Markr"};
     if ((tp>=0) and (size_t(tp) < sizeof(type2string)/sizeof(char *))) return type2string[int(tp)];

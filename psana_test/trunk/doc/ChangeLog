@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2014-05-16 David Schneider
+- Cleaned up code. 
+- Explicitly add libz (for adler32) to build through SConscript
+- Add dump of nonlinearCorrected for OceanOptics.Data
+- re-generated data/prev.txt
+	
 Tag: V00-00-01
 2014-05-15 David Schneider
 - First tag for a release.

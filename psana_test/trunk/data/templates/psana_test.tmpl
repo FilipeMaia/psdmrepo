@@ -46,7 +46,16 @@ def Pds_DetInfo_to_str(obj, indent, lvl, methodSep):
 
 def ControlData_ClockTime_to_str(obj, indent, lvl, methodSep):
     return Pds_ClockTime_to_str(obj, indent, lvl, methodSep)
-  
+
+def OceanOptics_nonLinearCorrected(obj, indent, lvl):
+    data = obj.data()
+    nonlinearCorrected = np.zeros(data.shape, np.float64)
+    for idx in range(data.shape[0]):
+        nonlinearCorrected[idx] = obj.nonlinerCorrected(idx)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nonlinearCorrected: %s' % ndarray_to_str( nonlinearCorrected )
+    return methodStr
+
 # functions to dump psana objects to a string                    
 {% for psana_type in psana_types %}
 {% set namespace = psana_type.namespace %}
@@ -63,6 +72,9 @@ def {{namespace}}_{{classname}}_to_str(obj, indent, lvl, methodSep):
     assert obj.Version == psana.{{namespace}}.{{classname}}.Version
 {% endif %}
     methodStrings = []
+{% if namespace == 'OceanOptics' and classname.startswith('DataV') %}
+    methodStrings.append(OceanOptics_nonLinearCorrected(obj, indent, lvl))
+{% endif %}
 {% if one_line_methods %}
     # one_line_methods
 {% endif %}
