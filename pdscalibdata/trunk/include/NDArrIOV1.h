@@ -84,17 +84,22 @@ namespace pdscalibdata {
  *  @li Includes and typedefs
  *  @code
  *  #include "pdscalibdata/NDArrIOV1.h"
- *  typedef pdscalibdata::NDArrIOV1 ARRIO;
+ *  typedef pdscalibdata::NDArrIOV1<float,3> NDAIO;
  *  @endcode
  *
  *  @li Instatiation
  *  \n Use short name for type and instatiate the object:
  *  @code
- *  ARRIO* arrio = ARRIO();
- *  // or
- *  std::string fname("path/pedestals/0-end.data");
- *  ARRIO* arrio = ARRIO(fname);
+ *  std::string fname("path/pedestals/0-end.data"); // mandatory parameter
+ *  unsigned shape[] = {2,3,4};                     // mandatory parameter
+ *  TYPE val_def(1);                                // optional parameter
+ *  unsigned print_bits(0377);                      // optional parameter 
+ *
+ *  ARRIO* arrio = ARRIO(fname, shape, val_def, print_bits);
  *  @endcode
+ *  where shape is used for 
+ *  \n 1) cross-check of metadata shape from file,
+ *  \n 2) creation of ndarray<TYPE,NDIM> with default parameters if file is missing.
  *
  *  @li Access methods
  *  @code
@@ -166,9 +171,14 @@ public:
    *  File name can be passed later in the get_ndarray(fname) method, but print_file() and print_ndarray() 
    *  methods will complain about missing file name until it is specified.
    *  @param[in] fname std::string file name
+   *  @param[in] shape_def default shape of the ndarray (is used for shape crosscheck at readout and in case of missing file or metadata)
+   *  @param[in] val_def default value of the ndarray elements (in case of missing file or metadata)
    *  @param[in] print_bits unsigned bit-word to control verbosity
    */ 
-  NDArrIOV1 (const std::string& fname = std::string(), unsigned print_bits=0377);
+  NDArrIOV1 ( const std::string& fname
+	    , const shape_t* shape_def
+	    , const TDATA& val_def=TDATA(0) 
+	    , const unsigned print_bits=0377 );
 
   /// Destructor
   ~NDArrIOV1 (){}
@@ -195,7 +205,7 @@ public:
   /**
    *  @param[in] nda ndarray to save in file
    *  @param[in] fname std::string file name to save ndarray
-   *  @param[in] vcoms std::vector<std::string> vector of strings with comments
+   *  @param[in] vcoms std::vector<std::string> vector of strings with comments; one-string comment per vector entry
    */ 
   static void save_ndarray(const ndarray<const TDATA, NDIM>& nda, 
                            const std::string& fname,
@@ -207,7 +217,10 @@ private:
 
   /// Data members  
 
+  ndarray<TDATA, NDIM>* p_nda;
+
   std::string m_fname;
+  TDATA       m_val_def;
   unsigned    m_print_bits;
   unsigned    m_count_str_data;
   unsigned    m_count_str_comt;
@@ -219,18 +232,37 @@ private:
   std::string m_str_type;
   DATA_TYPE   m_enum_type;
 
-  ndarray<TDATA, NDIM>* p_nda;
+
   TDATA* p_data;
 
+  /// static method returns class name for MsgLog
   static std::string __name__(){ return std::string("NDArrIOV1"); }
-  bool file_is_available();
-  void parse_str_of_comment(std::string str);
-  void parse_str_of_data(std::string str);
-  void create_ndarray();
-  void check_input_consistency();
+
   /// loads metadata and ndarray<TYPE,NDIM> from file
   void load_ndarray();
-  
+
+  /// true if the file name non empty anf file is readable
+  bool file_is_available();
+
+  /// parser for comment lines and metadata from file with ndarray
+  /**
+   *  @param[in] str one string of comments from file
+   */ 
+  void parse_str_of_comment(const std::string& str);
+
+  /// creates ndarray, begins to fill data from the 1st string and reads data by the end
+  /**
+   *  @param[in] in input file stream
+   *  @param[in] str 1st string of the data
+   */ 
+  void load_data(std::ifstream& in, const std::string& str);
+
+  /// creates ndarray<TYPE,NDIM> with shape from constructor parameter or metadata.
+  /**
+   *  @param[in] fill_def if true - fills ndarray with default values
+   */ 
+  void create_ndarray(const bool& fill_def=false);
+
   /// Copy constructor and assignment are disabled by default
   NDArrIOV1 ( const NDArrIOV1& ) ;
   NDArrIOV1& operator = ( const NDArrIOV1& ) ;

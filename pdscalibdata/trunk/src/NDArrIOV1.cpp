@@ -30,11 +30,16 @@ namespace pdscalibdata {
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
-NDArrIOV1<TDATA, NDIM>::NDArrIOV1 (const std::string& fname, unsigned print_bits) 
+NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
+				  , const shape_t* shape_def
+				  , const TDATA& val_def 
+                                  , const unsigned print_bits ) 
+  : p_nda(0)
+  , m_fname(fname)
+  , m_val_def(val_def)
+  , m_print_bits(print_bits)
 {
-  p_nda = 0;
-  m_fname = fname; 
-  m_print_bits = print_bits;
+  if (shape_def != 0) std::memcpy (m_shape, shape_def, c_ndim*sizeof(shape_t));  
   MsgLog(__name__(), debug, "ctor, fname=" << fname);
 }
 
@@ -43,7 +48,11 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 (const std::string& fname, unsigned print_bits
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 {
-    if (! file_is_available() ) return;
+    // if file is not available - create default ndarray
+    if (! file_is_available()) { 
+        create_ndarray(true); 
+        return; 
+    }
 
     if( m_print_bits & 1 ) MsgLog(__name__(), info, "Load file " << m_fname);
 
@@ -59,24 +68,19 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
     std::string str; 
     while(getline(in,str)) { 
 
-        //cout << str << '\n'; 
-
         // 1. parse lines with comments marked by # in the 1st position
         if(str[0] == '#') parse_str_of_comment(str.substr(1));
 
         // 2. skip empty lines 
         else if (str.find_first_not_of(" ")==string::npos) continue; 
 
-        // 3. parse lins with data
-        else parse_str_of_data(str);
+        // 3. parse 1st line and load other data
+        else load_data(in,str);
     }
 
     //close file
     in.close();
-
-    check_input_consistency();
 }
-
 
 //-----------------------------
 
@@ -100,7 +104,7 @@ bool NDArrIOV1<TDATA, NDIM>::file_is_available()
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
-void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(std::string str)
+void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 {
     m_count_str_comt ++;
     // cout << "comment, str.size()=" << str.size() << '\n';
@@ -137,8 +141,21 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(std::string str)
     else if (field.substr(0,4)=="DIM:") { 
         //cout << "field.substr(0,4)" << field.substr(0,4) << "field[4]" << field[4] << endl;
         int dim = atoi(&field[4]); 
-        ss >> m_shape[dim];	
-        MsgLog(__name__(), debug, "Dimension: " << dim << " set to stride: " << m_shape[dim] );
+	shape_t val;    
+        ss >> val;
+	if (m_shape[dim] !=val) {
+	   std::stringstream smsg; 
+	   smsg << "NDArray metadata shape field " << field
+                << " = " << val 
+	        << " is different from expected " << m_shape[dim] 
+                << " in file " << m_fname
+	        << "\nCheck that calibration file has expected shape and data...";
+           MsgLogRoot(error, smsg.str());
+           throw std::runtime_error(smsg.str());
+	   // override or not ?
+	   //m_shape[dim] = val;
+	   //MsgLog(__name__(), debug, "Dimension: " << dim << " set to stride: " << m_shape[dim] );
+	}
     }
 
     else 
@@ -149,47 +166,55 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(std::string str)
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
-void NDArrIOV1<TDATA, NDIM>::create_ndarray()
+void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
 {
-  p_nda = new ndarray<TDATA, NDIM>(m_shape);
-  p_data = p_nda->data();
-  m_size = p_nda->size();
-  //MsgLog(__name__(), info, "Begin to load data p_nda->size(): " << m_size);
+    p_nda = new ndarray<TDATA, NDIM>(m_shape);
+    p_data = p_nda->data();
+    m_size = p_nda->size();
+
+    if (fill_def) std::fill_n (p_data, m_size, m_val_def);
+
+    //MsgLog(__name__(), info, "Begin to load data p_nda->size(): " << m_size);
 }
 
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
-void NDArrIOV1<TDATA, NDIM>::parse_str_of_data(std::string str)
+void NDArrIOV1<TDATA, NDIM>::load_data(std::ifstream& in, const std::string& str)
 {
     if (! m_count_str_data++) create_ndarray();
 
+    // parse the 1st string
     TDATA val;
+    TDATA* it=p_data; 
+
     std::stringstream ss(str);
-    while (ss >> val) { 
-	   if (++m_count_data > m_size) break;
-           *p_data++ = val; 
-	   //cout << val << "  "; 
-    }
-}
-
-//-----------------------------
-
-template <typename TDATA, unsigned NDIM>
-void NDArrIOV1<TDATA, NDIM>::check_input_consistency()
-{
-    if (m_count_data > m_size) {
-      std::stringstream smsg; 
-      smsg << "Length of input data array " << m_count_data << " exceeds expected size " << m_size;
-      MsgLog(__name__(), error, smsg.str());
-      throw std::runtime_error(smsg.str());
+    while (ss >> val and m_count_data != m_size) { 
+      *it++ = val;
+      ++m_count_data;
+      //cout << "count:data = " << m_count_data << " : " << val << '\n';
     }
 
-    if (m_count_data < m_size) {
-      std::stringstream smsg; 
-      smsg << "Length of input data array " << m_count_data << " is less than expected size " << m_size;
-      MsgLog(__name__(), error, smsg.str());
-      throw std::runtime_error(smsg.str());
+    // load all data by the end
+    while(in and m_count_data != m_size) {
+      in >> *it++;
+      ++m_count_data;
+    }
+
+    // check that we read whole array
+    if (m_count_data != m_size) {
+      const std::string msg = "NDArray file does not have enough data: "+m_fname;
+      MsgLogRoot(error, msg);
+      throw std::runtime_error(msg);
+    }
+
+    // and no data left after we finished reading
+    if ( in >> val ) {
+      ++ m_count_data;
+      const std::string msg = "NDArray file has extra data: "+m_fname;
+      MsgLogRoot(error, msg);
+      MsgLogRoot(error, "read " << m_count_data << " numbers, expecting " << m_size );
+      throw std::runtime_error(msg);
     }
 }
 
@@ -345,6 +370,10 @@ template class pdscalibdata::NDArrIOV1<double,3>;
 template class pdscalibdata::NDArrIOV1<int,4>; 
 template class pdscalibdata::NDArrIOV1<float,4>; 
 template class pdscalibdata::NDArrIOV1<double,4>; 
+
+template class pdscalibdata::NDArrIOV1<int,5>; 
+template class pdscalibdata::NDArrIOV1<float,5>; 
+template class pdscalibdata::NDArrIOV1<double,5>; 
 
 //-----------------------------
 //-----------------------------
