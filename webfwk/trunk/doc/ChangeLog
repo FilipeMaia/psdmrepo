@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2014-05-17 Igor Gaponenko
+- loader for CSS files
+
 Tag: V00-00-10
 2014-05-16 Igor Gaponenko
 - extended API and other improvements in classes RadioBox and CheckTable
