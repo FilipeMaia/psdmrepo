@@ -1,65 +1,72 @@
-/**
- * The application for viewing and managing subscriptions for events posted in the experimental e-Log
- *
- * @returns {ELog_Subscribe}
- */
-function ELog_Subscribe (experiment, access_list) {
+define ([
+    'webfwk/CSSLoader'] ,
 
-    var that = this ;
+function (cssloader) {
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+    cssloader.load('../portal/css/ELog_Subscribe.css') ;
 
-    FwkApplication.call(this) ;
+    /**
+     * The application for viewing and managing subscriptions for events posted in the experimental e-Log
+     *
+     * @returns {ELog_Subscribe}
+     */
+    function ELog_Subscribe (experiment, access_list) {
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
+        var that = this ;
 
-    this.on_activate = function() {
-        this.on_update() ;
-    } ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    this.on_deactivate = function() {
-        this.init() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this.on_update = function () {
-        if (this.active) {
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
+
+        this.on_activate = function() {
+            this.on_update() ;
+        } ;
+
+        this.on_deactivate = function() {
             this.init() ;
-        }
-    } ;
+        } ;
 
-    // -----------------------------
-    // Parameters of the application
-    // -----------------------------
+        this.on_update = function () {
+            if (this.active) {
+                this.init() ;
+            }
+        } ;
 
-    this.experiment  = experiment ;
-    this.access_list = access_list ;
+        // -----------------------------
+        // Parameters of the application
+        // -----------------------------
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        this.experiment  = experiment ;
+        this.access_list = access_list ;
 
-    this.is_initialized = false ;
+        // --------------------
+        // Own data and methods
+        // --------------------
 
-    this.wa = null ;
+        this.is_initialized = false ;
 
-    this.init = function () {
+        this.wa = null ;
 
-        if (this.is_initialized) return ;
-        this.is_initialized = true ;
+        this.init = function () {
 
-        this.container.html('<div id="elog-subscribe"></div>') ;
-        this.wa = this.container.find('div#elog-subscribe') ;
+            if (this.is_initialized) return ;
+            this.is_initialized = true ;
 
-        if (!this.access_list.elog.read_messages) {
-            this.wa.html(this.access_list.no_page_access_html) ;
-            return ;
-        }
+            this.container.html('<div id="elog-subscribe"></div>') ;
+            this.wa = this.container.find('div#elog-subscribe') ;
 
-        var html =
+            if (!this.access_list.elog.read_messages) {
+                this.wa.html(this.access_list.no_page_access_html) ;
+                return ;
+            }
+
+            var html =
 '<div class="elog-subscribe-user" id="subscribed" style="display:none;">' +
 '  <h3>Your subscription:</h3>' +
 '  <div style="padding-left:10px;">' +
@@ -103,55 +110,57 @@ function ELog_Subscribe (experiment, access_list) {
 '  </div>' +
 '</div>' +
 '<div class="elog-subscribe-all"></div>' ;
-        this.wa.html(html) ;
+            this.wa.html(html) ;
 
-        this.wa.find('button#subscribe'  ).button().click(function () { that.subscription('SUBSCRIBE',   null) ; }) ;
-        this.wa.find('button#unsubscribe').button().click(function () { that.subscription('UNSUBSCRIBE', null) ; }) ;
+            this.wa.find('button#subscribe'  ).button().click(function () { that.subscription('SUBSCRIBE',   null) ; }) ;
+            this.wa.find('button#unsubscribe').button().click(function () { that.subscription('UNSUBSCRIBE', null) ; }) ;
 
-        this.subscription('CHECK', null) ;
-    } ;
+            this.subscription('CHECK', null) ;
+        } ;
 
-    this.subscription = function(operation, id) {
-        var params = {exper_id: this.experiment.id, operation: operation} ;
-        if (id) params.id = id ;
-        Fwk.web_service_GET (
-            '../logbook/ws/subscribe_check.php' ,
-            params ,
-            function (data) {
-                that.wa.find('#subscribed'  ).css('display', data.Subscribed ? 'block' : 'none' ) ;
-                that.wa.find('#unsubscribed').css('display', data.Subscribed ? 'none'  : 'block') ;
-                var html = '' ;
-                var all_subscriptions = data.AllSubscriptions ;
-                for (var i=0; i < all_subscriptions.length; i++) {
-                    var s = all_subscriptions[i] ;
-                    var extra_class = (i == all_subscriptions.length-1 ? 'table_cell_bottom' : '') ;
-                    html +=
+        this.subscription = function(operation, id) {
+            var params = {exper_id: this.experiment.id, operation: operation} ;
+            if (id) params.id = id ;
+            Fwk.web_service_GET (
+                '../logbook/ws/subscribe_check.php' ,
+                params ,
+                function (data) {
+                    that.wa.find('#subscribed'  ).css('display', data.Subscribed ? 'block' : 'none' ) ;
+                    that.wa.find('#unsubscribed').css('display', data.Subscribed ? 'none'  : 'block') ;
+                    var html = '' ;
+                    var all_subscriptions = data.AllSubscriptions ;
+                    for (var i=0; i < all_subscriptions.length; i++) {
+                        var s = all_subscriptions[i] ;
+                        var extra_class = (i == all_subscriptions.length-1 ? 'table_cell_bottom' : '') ;
+                        html +=
 '  <tr><td class="table_cell '+extra_class+' table_cell_left" >'+s.address        +'</td>' +
 '      <td class="table_cell '+extra_class+' "                >'+s.subscriber     +'</td>' +
 '      <td class="table_cell '+extra_class+' "                >'+s.subscribed_host+'</td>' +
 '      <td class="table_cell '+extra_class+' "                >'+s.subscribed_time+'</td>' +
 '      <td class="table_cell '+extra_class+' table_cell_right"><button class="control-button" title="Stop receiving automated notifications" value='+s.id+'>Unsubscribe</button></td></tr>' ;
-            }
-            if (html !== '') {
-                html =
+                }
+                if (html !== '') {
+                    html =
 '<h3>All subscriptions for this e-Log:</h3>' +
 '<table style="padding-left:10px;"><tbody>' +
 '  <tr><td class="table_hdr">Recipient</td>' +
 '      <td class="table_hdr">Subscribed by</td>' +
 '      <td class="table_hdr">From host</td>' +
 '      <td class="table_hdr">Date</td>' +
-'      <td class="table_hdr">Actions</td></tr>' +
-html +
+'      <td class="table_hdr">Actions</td></tr>' + html +
 '</tbody></table>' ;
-            }
-            that.wa.find('.elog-subscribe-all').html(html) ;
-            that.wa.find('.elog-subscribe-all').find('button').button().click(function () {
-                that.subscription('UNSUBSCRIBE', $(this).val()) ;
+                }
+                that.wa.find('.elog-subscribe-all').html(html) ;
+                that.wa.find('.elog-subscribe-all').find('button').button().click(function () {
+                    that.subscription('UNSUBSCRIBE', $(this).val()) ;
+                }) ;
+            } ,
+            function (msg) {
+                Fwk.report_error('Failed to contact the Web service to obtain e-Log notificaton subscriptions: <span style="color:red;">'+msg+'</span>.') ;
             }) ;
-        } ,
-        function (msg) {
-            Fwk.report_error('Failed to contact the Web service to obtain e-Log notificaton subscriptions: <span style="color:red;">'+msg+'</span>.') ;
-        }) ;
-    };
-}
-define_class (ELog_Subscribe, FwkApplication, {}, {});
+        };
+    }
+    define_class (ELog_Subscribe, FwkApplication, {}, {});
+
+    return ELog_Subscribe ;
+}) ;

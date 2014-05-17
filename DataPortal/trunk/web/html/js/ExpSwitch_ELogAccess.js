@@ -1,3 +1,7 @@
+require(['webfwk/CSSLoader'], function (cssloader) {
+    cssloader.load('../portal/css/ExpSwitch_ELogAccess.css') ;
+}) ;
+
 /**
  * The application for managing access to the Electronic LogBook
  * of teh instrument's experiments by the corresponing operator.

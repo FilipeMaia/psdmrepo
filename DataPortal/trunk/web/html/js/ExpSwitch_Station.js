@@ -1,3 +1,7 @@
+require(['webfwk/CSSLoader'], function (cssloader) {
+    cssloader.load('../portal/css/ExpSwitch_Station.css') ;
+}) ;
+
 /**
  * @brief The application for activating/deactivating experiments
  *

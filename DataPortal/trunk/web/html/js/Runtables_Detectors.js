@@ -1,74 +1,82 @@
-/**
- * The application for displaying the run table with DAQ detectors
- *
- * @returns {Runtables_Detectors}
- */
-function Runtables_Detectors (experiment, access_list) {
+define ([
+    'webfwk/CSSLoader'
+] ,
 
-    var that = this ;
+function (cssloader) {
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+    cssloader.load('../portal/css/Runtables_Detectors.css') ;
 
-    FwkApplication.call(this) ;
+    /**
+     * The application for displaying the run table with DAQ detectors
+     *
+     * @returns {Runtables_Detectors}
+     */
+    function Runtables_Detectors (experiment, access_list) {
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
+        var that = this ;
 
-    this.on_activate = function() {
-        this.on_update() ;
-    } ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    this.on_deactivate = function() {
-        this.init() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this.on_update = function () {
-        if (this.active) {
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
+
+        this.on_activate = function() {
+            this.on_update() ;
+        } ;
+
+        this.on_deactivate = function() {
             this.init() ;
-        }
-    } ;
+        } ;
 
-    // -----------------------------
-    // Parameters of the application
-    // -----------------------------
+        this.on_update = function () {
+            if (this.active) {
+                this.init() ;
+            }
+        } ;
 
-    this.experiment  = experiment ;
-    this.access_list = access_list ;
+        // -----------------------------
+        // Parameters of the application
+        // -----------------------------
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        this.experiment  = experiment ;
+        this.access_list = access_list ;
 
-    this.is_initialized = false ;
+        // --------------------
+        // Own data and methods
+        // --------------------
 
-    this.wa = null ;
+        this.is_initialized = false ;
 
-    this.runs = null ;
+        this.wa = null ;
 
-    this.refresh_button = null ;
-    this.reset_button = null ;
-    this.from_run = null ;
-    this.through_run = null ;
+        this.runs = null ;
 
-    this.table = null ;
+        this.refresh_button = null ;
+        this.reset_button = null ;
+        this.from_run = null ;
+        this.through_run = null ;
 
-    this.init = function () {
+        this.table = null ;
 
-        if (this.is_initialized) return ;
-        this.is_initialized = true ;
+        this.init = function () {
 
-        this.container.html('<div id="runtables-detectors"></div>') ;
-        this.wa = this.container.find('div#runtables-detectors') ;
+            if (this.is_initialized) return ;
+            this.is_initialized = true ;
 
-        if (!this.access_list.runtables.read) {
-            this.wa.html(this.access_list.no_page_access_html) ;
-            return ;
-        }
+            this.container.html('<div id="runtables-detectors"></div>') ;
+            this.wa = this.container.find('div#runtables-detectors') ;
 
-        var html =
+            if (!this.access_list.runtables.read) {
+                this.wa.html(this.access_list.no_page_access_html) ;
+                return ;
+            }
+
+            var html =
 '<div class="runtables-detectors-ctrl">' +
 '  <table><tbody>' +
 '    <tr style="font-size:12px;">' +
@@ -107,152 +115,155 @@ function Runtables_Detectors (experiment, access_list) {
 '    <div id="table"></div>' +
 '  </div>' +
 '</div>' ;
-        this.wa.html(html) ;
+            this.wa.html(html) ;
 
-        this.refresh_button = this.wa.find('button[name="refresh"]').button() ;
-        this.reset_button   = this.wa.find('button[name="reset"]')  .button() ;
-        this.from_run       = this.wa.find('input[name="from"]') ;
-        this.through_run    = this.wa.find('input[name="through"]') ;
+            this.refresh_button = this.wa.find('button[name="refresh"]').button() ;
+            this.reset_button   = this.wa.find('button[name="reset"]')  .button() ;
+            this.from_run       = this.wa.find('input[name="from"]') ;
+            this.through_run    = this.wa.find('input[name="through"]') ;
 
-        this.refresh_button.click (function () { that.load() ;  }) ;
-        this.from_run      .change(function () { that.load() ;  }) ;
-        this.through_run   .change(function () { that.load() ;  }) ;
+            this.refresh_button.click (function () { that.load() ;  }) ;
+            this.from_run      .change(function () { that.load() ;  }) ;
+            this.through_run   .change(function () { that.load() ;  }) ;
 
-        this.reset_button.click (function () {
-            that.from_run.val('') ;
-            that.through_run.val('') ;
-            that.load() ;
-        }) ;
+            this.reset_button.click (function () {
+                that.from_run.val('') ;
+                that.through_run.val('') ;
+                that.load() ;
+            }) ;
 
-        this.show_all_button = this.wa.find('button[name="show_all"]').button().button('disable') ;
-        this.hide_all_button = this.wa.find('button[name="hide_all"]').button().button('disable') ;
-        this.advanced_button = this.wa.find('button[name="advanced"]').button().button('disable') ;
+            this.show_all_button = this.wa.find('button[name="show_all"]').button().button('disable') ;
+            this.hide_all_button = this.wa.find('button[name="hide_all"]').button().button('disable') ;
+            this.advanced_button = this.wa.find('button[name="advanced"]').button().button('disable') ;
 
-        this.show_all_button.click(function() { that.table.display('show_all') ; }) ;
-        this.hide_all_button.click(function() { that.table.display('hide_all') ; }) ;
-        this.advanced_button.click(function() { that.advanced() ; }) ;
+            this.show_all_button.click(function() { that.table.display('show_all') ; }) ;
+            this.hide_all_button.click(function() { that.table.display('hide_all') ; }) ;
+            this.advanced_button.click(function() { that.advanced() ; }) ;
 
-        this.load() ;
-    } ;
+            this.load() ;
+        } ;
 
-    this.advanced = function () {
+        this.advanced = function () {
 
-        var detectors_selector = $('#fwk-largedialogs') ;
+            var detectors_selector = $('#fwk-largedialogs') ;
 
-        var html =
+            var html =
 '<div style="overflow:auto;">' +
 '  <table><tbody>' ;
-        var detectors_per_row = 5 ;
-        var num_detectors = 0 ;
-        var header_info = this.table.header_info() ;
-        for (var i in header_info) {
-            var col = header_info[i] ;
-            if (col.hideable) {
-                if (!num_detectors) {
-                    html +=
+            var detectors_per_row = 5 ;
+            var num_detectors = 0 ;
+            var header_info = this.table.header_info() ;
+            for (var i in header_info) {
+                var col = header_info[i] ;
+                if (col.hideable) {
+                    if (!num_detectors) {
+                        html +=
 '    <tr>' ;
-                } else if (!(num_detectors % detectors_per_row)) {
-                    html +=
+                    } else if (!(num_detectors % detectors_per_row)) {
+                        html +=
 '    </tr>' +
 '    <tr>' ;
-                }
-                html +=
+                    }
+                    html +=
 '      <td class="table_cell table_cell_borderless">' +
 '        <div style="float:left;"><input type="checkbox" class="detector" name="'+col.number+'" '+(col.hidden?'':'checked="checked"')+' /></div>' +
 '        <div style="float:left; margin-left:5px; font-weight:bold;">'+col.name+'</div>' +
 '        <div style="clear:both;"></div>' +
 '      </td>' ;
-                num_detectors++ ;
+                    num_detectors++ ;
+                }
             }
-        }
-        if (num_detectors % detectors_per_row) {
-            html +=
+            if (num_detectors % detectors_per_row) {
+                html +=
 '    </tr>' ;
-        }
-        html +=
+            }
+            html +=
 '  </tbody></table>' ;
 '</div>';
-        detectors_selector.html (html) ;
-        detectors_selector.dialog ({
-            minHeight: 240 ,
-            width: 720 ,
-            resizable: true ,
-            modal: true ,
-            buttons: {
-                "Close": function() {
-                    $( this ).dialog('close') ;
-                }
-            } ,
-            title: 'Switch on/off detectors'
-        });
-        detectors_selector.find('input.detector').change(function() {
-            var col_number = this.name ;
-            that.table.display(this.checked ? 'show' : 'hide', parseInt(col_number)) ;
-        }) ;
-    } ;
-    this.display = function () {
-        var table_cont = this.wa.find('div#table') ;
-        var hdr = [
-            {name: 'RUN', type: Table.Types.Number_HTML}
-        ] ;
-        for (var name in that.detectors) {
-            var det_dev = name.split('|') ;
-            var det = det_dev[0] ;
-            var dev = det_dev[1] ;
-            hdr.push({
-                name: '<div><div>'+det+'</div><div>'+dev+'</div></div>' ,
-                hideable: true ,
-                align: 'center' ,
-                style: ' white-space: nowrap;'
+            detectors_selector.html (html) ;
+            detectors_selector.dialog ({
+                minHeight: 240 ,
+                width: 720 ,
+                resizable: true ,
+                modal: true ,
+                buttons: {
+                    "Close": function() {
+                        $( this ).dialog('close') ;
+                    }
+                } ,
+                title: 'Switch on/off detectors'
+            });
+            detectors_selector.find('input.detector').change(function() {
+                var col_number = this.name ;
+                that.table.display(this.checked ? 'show' : 'hide', parseInt(col_number)) ;
             }) ;
-        }
-        this.table = new Table (
-            table_cont ,
-            hdr ,
-            null ,
-            { default_sort_forward: false } ,
-            Fwk.config_handler('runtables', 'detectors')
-        ) ;
-        var title = 'show the run in the e-Log Search panel within the current Portal' ;
-        var rows = [] ;
-        for (var run in this.runs) {
-            var row = [] ;
-            row.push(
-                {   number: run ,
-                    html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+        } ;
+        this.display = function () {
+            var table_cont = this.wa.find('div#table') ;
+            var hdr = [
+                {name: 'RUN', type: Table.Types.Number_HTML}
+            ] ;
+            for (var name in that.detectors) {
+                var det_dev = name.split('|') ;
+                var det = det_dev[0] ;
+                var dev = det_dev[1] ;
+                hdr.push({
+                    name: '<div><div>'+det+'</div><div>'+dev+'</div></div>' ,
+                    hideable: true ,
+                    align: 'center' ,
+                    style: ' white-space: nowrap;'
+                }) ;
+            }
+            this.table = new Table (
+                table_cont ,
+                hdr ,
+                null ,
+                { default_sort_forward: false } ,
+                Fwk.config_handler('runtables', 'detectors')
+            ) ;
+            var title = 'show the run in the e-Log Search panel within the current Portal' ;
+            var rows = [] ;
+            for (var run in this.runs) {
+                var row = [] ;
+                row.push(
+                    {   number: run ,
+                        html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+                    }
+                ) ;
+                var run_detectors = this.runs[run] ;
+                for (var name in that.detectors) {
+                    row.push('<span style="font-size:150%;">'+(run_detectors[name] ? '&diams;' : '&nbsp;')+'</span>')  ;
+                }
+                rows.push(row) ;
+            }
+            this.table.load(rows) ;
+            this.table.display() ;
+        } ;
+
+        this.load = function () {
+            this.wa.find('.runtables-detectors-info#updated').html('Loading...') ;
+            that.show_all_button.button('disable') ;
+            that.hide_all_button.button('disable') ;
+            that.advanced_button.button('disable') ;
+            Fwk.web_service_GET (
+                '../portal/ws/runtable_detectors_get.php' ,
+                {   exper_id:    this.experiment.id ,
+                    from_run:    parseInt(this.from_run.val()) ,
+                    through_run: parseInt(this.through_run.val())
+                } ,
+                function (data) {
+                    that.detectors      = data.detectors ;
+                    that.runs = data.runs ;
+                    that.display() ;
+                    that.wa.find('.runtables-detectors-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    that.show_all_button.button('enable') ;
+                    that.hide_all_button.button('enable') ;
+                    that.advanced_button.button('enable') ;
                 }
             ) ;
-            var run_detectors = this.runs[run] ;
-            for (var name in that.detectors) {
-                row.push('<span style="font-size:150%;">'+(run_detectors[name] ? '&diams;' : '&nbsp;')+'</span>')  ;
-            }
-            rows.push(row) ;
-        }
-        this.table.load(rows) ;
-        this.table.display() ;
-    } ;
+        } ;
+    }
+    define_class (Runtables_Detectors, FwkApplication, {}, {});
 
-    this.load = function () {
-        this.wa.find('.runtables-detectors-info#updated').html('Loading...') ;
-        that.show_all_button.button('disable') ;
-        that.hide_all_button.button('disable') ;
-        that.advanced_button.button('disable') ;
-        Fwk.web_service_GET (
-            '../portal/ws/runtable_detectors_get.php' ,
-            {   exper_id:    this.experiment.id ,
-                from_run:    parseInt(this.from_run.val()) ,
-                through_run: parseInt(this.through_run.val())
-            } ,
-            function (data) {
-                that.detectors      = data.detectors ;
-                that.runs = data.runs ;
-                that.display() ;
-                that.wa.find('.runtables-detectors-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
-                that.show_all_button.button('enable') ;
-                that.hide_all_button.button('enable') ;
-                that.advanced_button.button('enable') ;
-            }
-        ) ;
-    } ;
-}
-define_class (Runtables_Detectors, FwkApplication, {}, {});
+    return Runtables_Detectors ;
+}) ;

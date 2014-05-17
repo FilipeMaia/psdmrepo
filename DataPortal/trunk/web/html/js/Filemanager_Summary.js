@@ -1,72 +1,80 @@
-/**
- * The application for displaying the integral info about the data files of the experiment
- *
- * @returns {Filemanager_Summary}
- */
-function Filemanager_Summary (experiment, access_list) {
+define ([
+    'webfwk/CSSLoader'
+] ,
 
-    var _that = this ;
+function (cssloader) {
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+    cssloader.load('../portal/css/Filemanager_Summary.css') ;
 
-    FwkApplication.call(this) ;
+    /**
+     * The application for displaying the integral info about the data files of the experiment
+     *
+     * @returns {Filemanager_Summary}
+     */
+    function Filemanager_Summary (experiment, access_list) {
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
+        var _that = this ;
 
-    this.on_activate = function() {
-        this.on_update() ;
-    } ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    this.on_deactivate = function() {
-        this._init() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this._prev_update_sec = null ;
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
 
-    this.on_update = function () {
-        if (this.active) {
+        this.on_activate = function() {
+            this.on_update() ;
+        } ;
+
+        this.on_deactivate = function() {
             this._init() ;
-            var now_sec = Fwk.now().sec ;
-            if (!this._prev_update_sec || (now_sec - this._prev_update_sec) > 20) {
-                this._prev_update_sec = now_sec ;
-                this._load() ;
+        } ;
+
+        this._prev_update_sec = null ;
+
+        this.on_update = function () {
+            if (this.active) {
+                this._init() ;
+                var now_sec = Fwk.now().sec ;
+                if (!this._prev_update_sec || (now_sec - this._prev_update_sec) > 20) {
+                    this._prev_update_sec = now_sec ;
+                    this._load() ;
+                }
             }
-        }
-    } ;
+        } ;
 
-    // -----------------------------
-    // Parameters of the application
-    // -----------------------------
+        // -----------------------------
+        // Parameters of the application
+        // -----------------------------
 
-    this.experiment  = experiment ;
-    this.access_list = access_list ;
+        this.experiment  = experiment ;
+        this.access_list = access_list ;
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        // --------------------
+        // Own data and methods
+        // --------------------
 
-    this._is_initialized = false ;
+        this._is_initialized = false ;
 
-    this._wa = null ;
-    this._updated = null ;
+        this._wa = null ;
+        this._updated = null ;
 
-    this._init = function () {
-        if (this._is_initialized) return ;
-        this._is_initialized = true ;
+        this._init = function () {
+            if (this._is_initialized) return ;
+            this._is_initialized = true ;
 
-        this.container.html('<div id="datafiles-summary"></div>') ;
-        this._wa = this.container.find('div#datafiles-summary') ;
+            this.container.html('<div id="datafiles-summary"></div>') ;
+            this._wa = this.container.find('div#datafiles-summary') ;
 
-        if (!this.access_list.datafiles.read) {
-            this.wa.html(this.access_list.no_page_access_html) ;
-            return ;
-        }
+            if (!this.access_list.datafiles.read) {
+                this.wa.html(this.access_list.no_page_access_html) ;
+                return ;
+            }
 
-        var html =
+            var html =
 '<div id="ctrl">' +
 '  <div style="float:right;"><button class="control-button" name="refresh" title="click to refresh the summary information">Refresh</button></div>' +
 '  <div style="clear:both;"></div>' +
@@ -109,39 +117,43 @@ function Filemanager_Summary (experiment, access_list) {
 '        </td></tr>' +
 '  </tbody></table>' +
 '</div>' ;
-        this._wa.html(html) ;
-        this._wa.find('button[name="refresh"]').button().click(function () { _that._load() ; }) ;
-        this._updated = this._wa.find('#updated') ;
-        this._load() ;
-    } ;
+            this._wa.html(html) ;
+            this._wa.find('button[name="refresh"]').button().click(function () { _that._load() ; }) ;
+            this._updated = this._wa.find('#updated') ;
+            this._load() ;
+        } ;
 
-    this._load = function () {
+        this._load = function () {
 
-        this._updated.html('Updating...') ;
+            this._updated.html('Updating...') ;
 
-        Fwk.web_service_GET (
-            '../portal/ws/SearchFiles.php' ,
-            {exper_id: this.experiment.id} ,
-            function (data) {
+            Fwk.web_service_GET (
+                '../portal/ws/SearchFiles.php' ,
+                {exper_id: this.experiment.id} ,
+                function (data) {
 
-                _that._updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    _that._updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
 
-                _that._wa.find('#runs'         ).html(data.summary.runs) ;
-                _that._wa.find('#firstrun'     ).html(data.summary.runs ? data.summary.min_run : 'n/a') ;
-                _that._wa.find('#lastrun'      ).html(data.summary.runs ? data.summary.max_run : 'n/a') ;
-                _that._wa.find('#xtc-size'     ).html(data.summary.xtc.size) ; 
-                _that._wa.find('#xtc-files'    ).html(data.summary.xtc.files) ;
-                _that._wa.find('#xtc-archived' ).html(data.summary.xtc.archived_html) ;
-                _that._wa.find('#xtc-disk'     ).html(data.summary.xtc.disk_html) ;
-                _that._wa.find('#hdf5-size'    ).html(data.summary.hdf5.size) ;
-                _that._wa.find('#hdf5-files'   ).html(data.summary.hdf5.files) ;
-                _that._wa.find('#hdf5-archived').html(data.summary.hdf5.archived_html) ;
-                _that._wa.find('#hdf5-disk'    ).html(data.summary.hdf5.disk_html) ;
-            } ,
-            function (msg) {
-                Fwk.report_error(msg) ; 
-            }
-        ) ;
-    } ;
-}
-define_class (Filemanager_Summary, FwkApplication, {}, {});
+                    _that._wa.find('#runs'         ).html(data.summary.runs) ;
+                    _that._wa.find('#firstrun'     ).html(data.summary.runs ? data.summary.min_run : 'n/a') ;
+                    _that._wa.find('#lastrun'      ).html(data.summary.runs ? data.summary.max_run : 'n/a') ;
+                    _that._wa.find('#xtc-size'     ).html(data.summary.xtc.size) ; 
+                    _that._wa.find('#xtc-files'    ).html(data.summary.xtc.files) ;
+                    _that._wa.find('#xtc-archived' ).html(data.summary.xtc.archived_html) ;
+                    _that._wa.find('#xtc-disk'     ).html(data.summary.xtc.disk_html) ;
+                    _that._wa.find('#hdf5-size'    ).html(data.summary.hdf5.size) ;
+                    _that._wa.find('#hdf5-files'   ).html(data.summary.hdf5.files) ;
+                    _that._wa.find('#hdf5-archived').html(data.summary.hdf5.archived_html) ;
+                    _that._wa.find('#hdf5-disk'    ).html(data.summary.hdf5.disk_html) ;
+                } ,
+                function (msg) {
+                    Fwk.report_error(msg) ; 
+                }
+            ) ;
+        } ;
+    }
+    define_class (Filemanager_Summary, FwkApplication, {}, {});
+
+    return Filemanager_Summary ;
+}) ;
+

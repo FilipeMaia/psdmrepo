@@ -1,3 +1,11 @@
+define ([
+    'webfwk/CSSLoader'
+] ,
+
+function (cssloader) {
+
+    cssloader.load('../portal/css/ELog_MessageViewer.css') ;
+
 /**
  * Display a run within a table row's body.
  *
@@ -2902,3 +2910,6 @@ function ELog_MessageViewer (parent, cont, options) {
     this.display(this.cont) ;
 }
 define_class (ELog_MessageViewer, ELog_MessageViewerBase, {}, {}) ;
+
+    return ELog_MessageViewer ;
+}) ;

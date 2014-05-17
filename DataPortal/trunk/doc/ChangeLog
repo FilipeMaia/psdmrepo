@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2014-05-17 Igor Gaponenko
+- partial migration to the component model using RequireJS
+
 Tag: V00-07-01
 2014-05-16 Igor Gaponenko
 - added regdbauth() database connector to the PHP JASON Web Service

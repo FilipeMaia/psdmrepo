@@ -1,90 +1,97 @@
-/**
- * The application for posting messages to the experimental e-Log
- *
- * @returns {ELog_Post}
- */
-function ELog_Post (experiment, access_list, post_onsuccess) {
+define ([
+    'webfwk/CSSLoader'] ,
 
-    var that = this ;
+function (cssloader) {
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+    cssloader.load('../portal/css/ELog_Post.css') ;
 
-    FwkApplication.call(this) ;
+    /**
+     * The application for posting messages to the experimental e-Log
+     *
+     * @returns {ELog_Post}
+     */
+    function ELog_Post (experiment, access_list, post_onsuccess) {
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
+        var that = this ;
 
-    this.on_activate = function() {
-        this.init() ;
-        if (!this.experiment.is_facility) {
-            this.load_shifts() ;
-        }
-        this.load_tags() ;
-    } ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    this.on_deactivate = function() {
-        this.init() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this.on_update = function () {
-        if (this.active) {
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
+
+        this.on_activate = function() {
             this.init() ;
-        }
-    } ;
+            if (!this.experiment.is_facility) {
+                this.load_shifts() ;
+            }
+            this.load_tags() ;
+        } ;
 
-    // -----------------------------
-    // Parameters of the application
-    // -----------------------------
+        this.on_deactivate = function() {
+            this.init() ;
+        } ;
 
-    this.experiment     = experiment ;
-    this.access_list    = access_list ;
-    this.post_onsuccess = post_onsuccess || null ;
+        this.on_update = function () {
+            if (this.active) {
+                this.init() ;
+            }
+        } ;
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        // -----------------------------
+        // Parameters of the application
+        // -----------------------------
 
-    this.is_initialized = false ;
+        this.experiment     = experiment ;
+        this.access_list    = access_list ;
+        this.post_onsuccess = post_onsuccess || null ;
 
-    this.wa = null ;
+        // --------------------
+        // Own data and methods
+        // --------------------
 
-    if (!this.experiment.is_facility) {
-        this.runnum = null ;
-        this.shift  = null ;
-    }
+        this.is_initialized = false ;
 
-    this.form              = null ;
-    this.form_scope        = null ;
-    this.form_run_num      = null ;
-    this.form_shift_id     = null ;
-    this.form_message_text = null ;
-    this.form_attachments  = null ;
-    this.form_tags         = null ;
+        this.wa = null ;
 
-    this.submit_button = null ;
-    this.reset_button  = null ;
-
-    this.max_file_size = 25000000 ;
-
-    this.init = function () {
-
-        if (this.is_initialized) return ;
-        this.is_initialized = true ;
-
-        this.container.html('<div id="elog-post"></div>') ;
-        this.wa = this.container.find('div#elog-post') ;
-
-        if (!this.access_list.elog.post_messages) {
-            this.wa.html(this.access_list.no_page_access_html) ;
-            return ;
+        if (!this.experiment.is_facility) {
+            this.runnum = null ;
+            this.shift  = null ;
         }
 
-        var html =
+        this.form              = null ;
+        this.form_scope        = null ;
+        this.form_run_num      = null ;
+        this.form_shift_id     = null ;
+        this.form_message_text = null ;
+        this.form_attachments  = null ;
+        this.form_tags         = null ;
+
+        this.submit_button = null ;
+        this.reset_button  = null ;
+
+        this.max_file_size = 25000000 ;
+
+        this.init = function () {
+
+            if (this.is_initialized) return ;
+            this.is_initialized = true ;
+
+            this.container.html('<div id="elog-post"></div>') ;
+            this.wa = this.container.find('div#elog-post') ;
+
+            if (!this.access_list.elog.post_messages) {
+                this.wa.html(this.access_list.no_page_access_html) ;
+                return ;
+            }
+
+            var html =
 '<div style="float:left;">' ;
-        if (!this.experiment.is_facility) html +=
+            if (!this.experiment.is_facility) html +=
 '  <div style="float:left; font-weight:bold; padding-top:5px;">Run number:</div>' +
 '  <div style="float:left; margin-left:5px;">' +
 '    <input type="text" id="runnum" value="" size=4 />' +
@@ -96,7 +103,7 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
 '  </div>' +
 '  <div class="info" style="float:left; margin-left:5px; padding-top:5px;">(optional)</div>' +
 '  <div style="clear:both;"></div>' ;
-        html +=
+            html +=
 '  <form id="form" enctype="multipart/form-data" action="../logbook/ws/message_new.php" method="post">' +
 '    <input type="hidden" name="id" value="'+this.experiment.id+'" />' +
 '    <input type="hidden" name="scope" value="" />' +
@@ -134,160 +141,163 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
 '  <button class="control-button" name="reset" style="margin-left:5px;">Reset form</button>' +
 '</div>' +
 '<div style="clear:both;"></div>' ;
-        this.wa.html(html) ;
+            this.wa.html(html) ;
 
-        if (!this.experiment.is_facility) {
-            this.runnum = this.wa.find('input#runnum') ;
-            this.shift  = this.wa.find('select#shift') ;
-        }
-        this.form   = this.wa.find('form#form') ;
-
-        this.form_scope          = this.form.find('input[name="scope"]') ;
-        this.form_run_num        = this.form.find('input[name="run_num"]') ;
-        this.form_shift_id       = this.form.find('input[name="shift_id"]') ;
-        this.form_message_text   = this.form.find('textarea[name="message_text"]') ;
-        this.form_author_account = this.form.find('input[name="uthor_account"]') ;
-        this.form_tags           = this.form.find('#tags') ;
-        this.form_attachments    = this.form.find('#attachments') ;
-
-        this.form_attachments.find('input:file[name="file2attach_0"]').change(function () {
-            that.post_add_attachment() ;
-        }) ;
-
-        this.submit_button = this.wa.find('button[name="submit"]').button() ;
-        this.submit_button.click(function () {
-    
-            var urlbase = window.location.href ;
-            var idx = urlbase.indexOf('?') ;
-            if( idx > 0 ) urlbase = urlbase.substring(0, idx) ;
-
-            if (that.form_message_text.val() === '') {
-                Fwk.report_error('Can not post the empty message. Please put some text into the message box.') ;
-                return ;
+            if (!this.experiment.is_facility) {
+                this.runnum = this.wa.find('input#runnum') ;
+                this.shift  = this.wa.find('select#shift') ;
             }
+            this.form   = this.wa.find('form#form') ;
 
-            that.form_scope.val('experiment') ;
+            this.form_scope          = this.form.find('input[name="scope"]') ;
+            this.form_run_num        = this.form.find('input[name="run_num"]') ;
+            this.form_shift_id       = this.form.find('input[name="shift_id"]') ;
+            this.form_message_text   = this.form.find('textarea[name="message_text"]') ;
+            this.form_author_account = this.form.find('input[name="uthor_account"]') ;
+            this.form_tags           = this.form.find('#tags') ;
+            this.form_attachments    = this.form.find('#attachments') ;
 
-            if (!that.experiment.is_facility) {
-                var runnum = 0 ;
-                var str = that.runnum.val() ;
-                if (str) {
-                    runnum = parseInt(str) ;
-                    if (!runnum) {
-                        Fwk.report_error('Failed to parse the run number. Please, correct or clean the field.') ;
-                        return ;
-                    }
-                    that.form_scope.val('run') ;
-                    that.form_run_num.val(runnum) ;
-                } else {
-                    that.form_run_num.val('') ;
-                }
+            this.form_attachments.find('input:file[name="file2attach_0"]').change(function () {
+                that.post_add_attachment() ;
+            }) ;
 
-                var shift_id = parseInt(that.shift.val()) ;
-                if (shift_id) {
-                    that.form_scope.val('shift') ;
-                    that.form_shift_id.val(shift_id) ;
-                } else {
-                    that.form_shift_id.val('') ;
-                }
+            this.submit_button = this.wa.find('button[name="submit"]').button() ;
+            this.submit_button.click(function () {
 
-                if (runnum && shift_id) {
-                    Fwk.report_error('Run number and shift are mutually exclusive options. Please, chose either one or another.') ;
+                var urlbase = window.location.href ;
+                var idx = urlbase.indexOf('?') ;
+                if( idx > 0 ) urlbase = urlbase.substring(0, idx) ;
+
+                if (that.form_message_text.val() === '') {
+                    Fwk.report_error('Can not post the empty message. Please put some text into the message box.') ;
                     return ;
                 }
-            }
-                
-            /* Submit the new message using the JQuery AJAX POST plug-in,
-             * which also allow uploading files w/o reloading the current page.
-             *
-             * NOTE: We aren't refreshing the list of messages because we're relying on
-             *       the live display.
-             */
-            that.form.ajaxSubmit ({
-                success: function(data) {
-                    if (data.Status !== 'success') {
-                        Fwk.report_error(data.Message) ;
+
+                that.form_scope.val('experiment') ;
+
+                if (!that.experiment.is_facility) {
+                    var runnum = 0 ;
+                    var str = that.runnum.val() ;
+                    if (str) {
+                        runnum = parseInt(str) ;
+                        if (!runnum) {
+                            Fwk.report_error('Failed to parse the run number. Please, correct or clean the field.') ;
+                            return ;
+                        }
+                        that.form_scope.val('run') ;
+                        that.form_run_num.val(runnum) ;
+                    } else {
+                        that.form_run_num.val('') ;
+                    }
+
+                    var shift_id = parseInt(that.shift.val()) ;
+                    if (shift_id) {
+                        that.form_scope.val('shift') ;
+                        that.form_shift_id.val(shift_id) ;
+                    } else {
+                        that.form_shift_id.val('') ;
+                    }
+
+                    if (runnum && shift_id) {
+                        Fwk.report_error('Run number and shift are mutually exclusive options. Please, chose either one or another.') ;
                         return ;
                     }
-                    that.post_reset() ;
+                }
 
-                    // If the parent provided a call back then tell the parent
-                    // that we have a new message.
-                    //
-                    if (that.post_onsuccess) that.post_onsuccess() ;
-                },
-                error: function () {
-                    Fwk.report_error('The request can not go through due a failure to contact the server.') ;
-                } ,
-                dataType: 'json'
+                /* Submit the new message using the JQuery AJAX POST plug-in,
+                 * which also allow uploading files w/o reloading the current page.
+                 *
+                 * NOTE: We aren't refreshing the list of messages because we're relying on
+                 *       the live display.
+                 */
+                that.form.ajaxSubmit ({
+                    success: function(data) {
+                        if (data.Status !== 'success') {
+                            Fwk.report_error(data.Message) ;
+                            return ;
+                        }
+                        that.post_reset() ;
+
+                        // If the parent provided a call back then tell the parent
+                        // that we have a new message.
+                        //
+                        if (that.post_onsuccess) that.post_onsuccess() ;
+                    },
+                    error: function () {
+                        Fwk.report_error('The request can not go through due a failure to contact the server.') ;
+                    } ,
+                    dataType: 'json'
+                }) ;
             }) ;
-        }) ;
 
-        this.reset_button = this.wa.find('button[name="reset"]').button() ;
-        this.reset_button.click(function () {
-            that.post_reset() ;
-        }) ;
+            this.reset_button = this.wa.find('button[name="reset"]').button() ;
+            this.reset_button.click(function () {
+                that.post_reset() ;
+            }) ;
 
-        if (!this.experiment.is_facility) {
-            this.load_shifts() ;
-        }
-        this.load_tags() ;
-        this.post_reset() ;
-    };
-    this.simple_post4experiment = function (text2post) {
-        this.post_reset() ;
-        this.form_message_text.val(text2post) ;
-    };
+            if (!this.experiment.is_facility) {
+                this.load_shifts() ;
+            }
+            this.load_tags() ;
+            this.post_reset() ;
+        };
+        this.simple_post4experiment = function (text2post) {
+            this.post_reset() ;
+            this.form_message_text.val(text2post) ;
+        };
 
-    this.post_reset = function () {
+        this.post_reset = function () {
 
-        if (!this.experiment.is_facility) {
-            this.load_shifts() ;
-        }
-        this.load_tags() ;
+            if (!this.experiment.is_facility) {
+                this.load_shifts() ;
+            }
+            this.load_tags() ;
 
-        if (!this.experiment.is_facility) {
-            this.runnum.val('') ;
-            this.shift.val(0) ;
-        }
-        this.form_scope.val('') ;
-        this.form_message_text.val('') ;
-        this.form_run_num.val('') ;
-        this.form_author_account.val(this.access_list.user.uid) ;
-        this.form_tags.find('.tag-name').val('') ;
-        this.form_attachments.html (
+            if (!this.experiment.is_facility) {
+                this.runnum.val('') ;
+                this.shift.val(0) ;
+            }
+            this.form_scope.val('') ;
+            this.form_message_text.val('') ;
+            this.form_run_num.val('') ;
+            this.form_author_account.val(this.access_list.user.uid) ;
+            this.form_tags.find('.tag-name').val('') ;
+            this.form_attachments.html (
 '<div>' +
 '  <input type="file"   name="file2attach_0" />' +
 '  <input type="hidden" name="file2attach_0" value="" />' +
 '</div>'
-        ) ;
-        this.form_attachments.find('input:file[name="file2attach_0"]').change(function () { that.post_add_attachment() ; }) ;
-    } ;
+            ) ;
+            this.form_attachments.find('input:file[name="file2attach_0"]').change(function () { that.post_add_attachment() ; }) ;
+        } ;
 
-    this.post_add_attachment = function () {
-        var num = this.form_attachments.find('div').size() ;
-        this.form_attachments.append (
+        this.post_add_attachment = function () {
+            var num = this.form_attachments.find('div').size() ;
+            this.form_attachments.append (
 '<div>' +
 ' <input type="file"   name="file2attach_'+num+'" />' +
 ' <input type="hidden" name="file2attach_'+num+'" value="" />' +
 '</div>'
-        ) ;
-        this.form_attachments.find('input:file[name="file2attach_'+num+'"]').change(function () { that.post_add_attachment() ; }) ;
-    } ;
+            ) ;
+            this.form_attachments.find('input:file[name="file2attach_'+num+'"]').change(function () { that.post_add_attachment() ; }) ;
+        } ;
 
-    if (!this.experiment.is_facility) {
-        this.load_shifts = function () {
-            ELog_Utils.load_shifts (
+        if (!this.experiment.is_facility) {
+            this.load_shifts = function () {
+                ELog_Utils.load_shifts (
+                    this.experiment.id ,
+                    this.shift
+                ) ;
+            } ;
+        }
+        this.load_tags = function () {
+            ELog_Utils.load_tags_and_authors (
                 this.experiment.id ,
-                this.shift
+                this.form_tags
             ) ;
         } ;
     }
-    this.load_tags = function () {
-        ELog_Utils.load_tags_and_authors (
-            this.experiment.id ,
-            this.form_tags
-        ) ;
-    } ;
-}
-define_class (ELog_Post, FwkApplication, {}, {});
+    define_class (ELog_Post, FwkApplication, {}, {});
+
+    return ELog_Post ;
+}) ;

@@ -1,6 +1,5 @@
 <?php
 
-
 /* Let a user to select an experiment first if no valid experiment
  * identifier is supplied to the script.
  */
@@ -185,38 +184,13 @@ try {
 <link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
 <link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
+
 <link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/SmartTable.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/RadioBox.css" rel="Stylesheet" />
 
-<link type="text/css" href="../portal/css/Experiment_Info.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Experiment_Group.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Experiment_ELogAccess.css" rel="Stylesheet" />
-
-
-<link type="text/css" href="../portal/css/ELog_MessageViewer.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Live.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Post.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Search.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Shifts.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Runs.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Attachments.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ELog_Subscribe.css" rel="Stylesheet" />
-
-<link type="text/css" href="../portal/css/Runtables_Calibrations.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Runtables_Detectors.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Runtables_EPICS.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Runtables_User.css" rel="Stylesheet" />
-
-<link type="text/css" href="../portal/css/Filemanager_Summary.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Filemanager_Files.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/Filemanager_Files_USR.css" rel="Stylesheet" />
-
-<link type="text/css" href="../portal/css/HDF5_Manage.css" rel="Stylesheet" />
-
 <link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
-
 
 <style>
 
@@ -241,7 +215,6 @@ label.control-label {
 }
 
 button {
-  //background: 0 !important;
   background: rgba(240, 248, 255, 0.39) !important;
   border-radius: 2px !important;
 }
@@ -261,35 +234,14 @@ button {
 <script type="text/javascript" src="../webfwk/js/Class.js" ></script>
 <script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
 <script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>
+
 <script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
+
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 <script type="text/javascript" src="../webfwk/js/SmartTable.js" ></script>
 <script type="text/javascript" src="../webfwk/js/RadioBox.js" ></script>
 
-<script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
-<script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
-<script type="text/javascript" src="../portal/js/Experiment_ELogAccess.js"></script>
-
 <script type="text/javascript" src="../portal/js/ELog_Utils.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_MessageViewer.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Live.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Post.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Search.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Shifts.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Runs.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Attachments.js"></script>
-<script type="text/javascript" src="../portal/js/ELog_Subscribe.js"></script>
-
-<script type="text/javascript" src="../portal/js/Runtables_Calibrations.js"></script>
-<script type="text/javascript" src="../portal/js/Runtables_Detectors.js"></script>
-<script type="text/javascript" src="../portal/js/Runtables_EPICS.js"></script>
-<script type="text/javascript" src="../portal/js/Runtables_User.js"></script>
-
-<script type="text/javascript" src="../portal/js/Filemanager_Summary.js"></script>
-<script type="text/javascript" src="../portal/js/Filemanager_Files.js"></script>
-<script type="text/javascript" src="../portal/js/Filemanager_Files_USR.js"></script>
-
-<script type="text/javascript" src="../portal/js/HDF5_Manage.js"></script>
 
 <script type="text/javascript" src="../shiftmgr/js/Definitions.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
@@ -298,6 +250,9 @@ button {
 
 <script type="text/javascript">
 
+var title        = '<?=$title?>' ;
+var subtitle_url = '<?=$subtitle_url?>' ;
+        
 var experiment = {
     id           :  <?= $experiment->id() ?> ,
     name         : '<?= $experiment->name() ?>' ,
@@ -384,141 +339,8 @@ var global_extra_params = {} ;
     }
 ?>
 
-$(function() {
-
-    var menus = [] ;
-    menus.push ({
-        
-        name: 'Experiment' ,
-        menu: [{
-            name: 'Info' ,
-            application: new Experiment_Info(experiment, access_list) } , {
- 
-            name: 'Group Manager' ,
-            application: new Experiment_Group(experiment, access_list) } , {
-
-            name: 'e-Log Access' ,
-            application: new Experiment_ELogAccess(experiment, access_list) }]}
-    ) ;
-
-    if (experiment.is_facility) {
-        
-        menus.push ({
-
-            name: 'e-Log',
-            menu: [{
-                name: 'Recent (Live)' ,
-                application: new ELog_Live(experiment, access_list) } , {
-
-                name: 'Post' ,
-                application: new ELog_Post(experiment, access_list) } , {
-
-                name: 'Search' ,
-                application: new ELog_Search(experiment, access_list) } , {
-
-                name: 'Attachments' ,
-                application: new ELog_Attachments(experiment, access_list) } , {
-
-                name: 'Subscribe' ,
-                application: new ELog_Subscribe(experiment, access_list) }]}
-        ) ;
-
-    } else {
-
-        menus.push ({
-        
-            name: 'e-Log',
-            menu: [{
-                name: 'Recent (Live)' ,
-                application: new ELog_Live(experiment, access_list) } , {
-
-                name: 'Post' ,
-                application: new ELog_Post(experiment, access_list) } , {
-
-                name: 'Search' ,
-                application: new ELog_Search(experiment, access_list) } , {
-
-                name: 'Shifts' ,
-                application: new ELog_Shifts(experiment, access_list) } , {
-
-                name: 'Runs' ,
-                application: new ELog_Runs(experiment, access_list) } , {
-
-                name: 'Attachments' ,
-                application: new ELog_Attachments(experiment, access_list) } , {
-
-                name: 'Subscribe' ,
-                application: new ELog_Subscribe(experiment, access_list) }]} , {
-
-            name: 'Run Tables',
-            menu: [{
-                name: 'Calibrations' ,
-                application: new Runtables_Calibrations(experiment, access_list) } , {
-
-                name: 'DAQ Detectors' ,
-                application: new Runtables_Detectors(experiment, access_list) } , {
-
-                name: 'EPICS' ,
-                application: new Runtables_EPICS(experiment, access_list) } , {
-
-                name: 'User' ,
-                application: new Runtables_User(experiment, access_list) } ] } , {
-
-            name: 'File Manager',
-            menu: [{
-                name: 'Summary' ,
-                application: new Filemanager_Summary(experiment, access_list) } , {
-
-                name: 'XTC HDF5' ,
-                application: new Filemanager_Files(experiment, access_list) } , {
-
-                name: 'USR' ,
-                application: new Filemanager_Files_USR(experiment, access_list) }]} , {
-
-            name: 'HDF5 Translation',
-            menu: [{
-                name: 'Manage' ,
-                application: new HDF5_Manage(experiment, access_list) }]}
-        ) ;
-
-        if (access_list.shiftmgr.can_edit) {
-            
-            menus.push ({
-        
-                name: 'Hutch Manager',
-                menu: [{
-                    name: 'Reports' ,
-                    application: new Reports(experiment.instrument.name, access_list.shiftmgr.can_edit) ,
-                    html_container: 'shift-reports-'+experiment.instrument.name} , {
-
-                    name: 'History' ,
-                    application: new History(experiment.instrument.name),
-                    html_container: 'shift-history-'+experiment.instrument.name} , {
-
-                    name: 'E-mail Notifications' ,
-                    application: new Notifications(experiment.instrument.namet) ,
-                    html_container: 'shift-notifications-'+experiment.instrument.name}]}
-            ) ;
-        }
-    }
-
-    Fwk.build (
-
-        '<?=$title?>' ,
-        '<?=$subtitle_url?>' ,
-
-        menus ,
-
-        function (text2search) {
-            global_elog_search_message_by_text (text2search) ; } ,
-
-        function () {
-            Fwk.activate(select_app, select_app_context1) ; }
-    ) ;
-});
-
-// Redirections which may be required by the legacy code generated
-// by Web services.
+// Redirections in the global scope which may be required by the legacy
+// code generatet by Web services.
 
 function show_email (user, addr) { Fwk.show_email(user, addr) ; }
 
@@ -543,6 +365,12 @@ function global_elog_search_run_by_num (num, show_in_vicinity) {
 function display_path(filepath) { Fwk.show_path(filepath) ; }
 
 </script>
+
+
+<!-- Finally, when all JavaScript structures have been initialized
+     loading RequireJS -->
+
+<script data-main="../portal/js/index_main.js" src="/require/require.js"></script>
 
 </head>
 

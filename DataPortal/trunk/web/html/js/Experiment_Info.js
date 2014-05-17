@@ -1,75 +1,83 @@
-/**
- * The application for displaying the general information about the experiment
- *
- * @returns {Experiment_Info}
- */
-function Experiment_Info (experiment, access_list) {
+define ([    
+    'webfwk/CSSLoader'
+] ,
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+function (cssloader) {
 
-    FwkApplication.call(this) ;
+    cssloader.load('../portal/css/Experiment_Info.css') ;
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
+    /**
+     * The application for displaying the general information about the experiment
+     *
+     * @returns {Experiment_Info}
+     */
+    function Experiment_Info (experiment, access_list) {
 
-    this.on_activate = function() {
-        this.on_update() ;
-    } ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    this.on_deactivate = function() {
-        this.init() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this.on_update = function () {
-        if (this.active) {
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
+
+        this.on_activate = function() {
+            this.on_update() ;
+        } ;
+
+        this.on_deactivate = function() {
             this.init() ;
-            this.update() ;
-        }
-    } ;
+        } ;
 
-    // -----------------------------
-    // Parameters of the application
-    // -----------------------------
+        this.on_update = function () {
+            if (this.active) {
+                this.init() ;
+                this.update() ;
+            }
+        } ;
 
-    this.experiment  = experiment ;
-    this.access_list = access_list ;
+        // -----------------------------
+        // Parameters of the application
+        // -----------------------------
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        this.experiment  = experiment ;
+        this.access_list = access_list ;
 
-    this.wa = null ;    // work area container
+        // --------------------
+        // Own data and methods
+        // --------------------
 
-    this.is_initialized = false ;
+        this.wa = null ;    // work area container
 
-    this.init = function () {
+        this.is_initialized = false ;
 
-        var that = this ;
+        this.init = function () {
 
-        if (this.is_initialized) return ;
-        this.is_initialized = true ;
+            var that = this ;
 
-        this.container.html('<div id="exp-info"></div>') ;
-        this.wa = this.container.find('div#exp-info') ;
+            if (this.is_initialized) return ;
+            this.is_initialized = true ;
 
-        if (!this.access_list.experiment.view_info) {
-            this.wa.html(this.access_list.no_page_access_html) ;
-            return ;
-        }
+            this.container.html('<div id="exp-info"></div>') ;
+            this.wa = this.container.find('div#exp-info') ;
 
-        var html =
+            if (!this.access_list.experiment.view_info) {
+                this.wa.html(this.access_list.no_page_access_html) ;
+                return ;
+            }
+
+            var html =
 '<table><tbody>' +
 '  <tr><td class="table_cell table_cell_left"  >Id</td>' +
 '      <td class="table_cell table_cell_right" >'+this.experiment.id+'</td></tr>' ;
-        if (this.experiment.is_facility) html +=
+            if (this.experiment.is_facility) html +=
 '  <tr><td class="table_cell table_cell_left"                   >Total # of e-Log entries</td>' +
 '      <td class="table_cell table_cell_right" id="num_entries" >Loading...</td></tr>' +
 '  <tr><td class="table_cell table_cell_left"                   >Last entry</td>' +
 '      <td class="table_cell table_cell_right" id="last_entry"  >Loading...</td></tr>' ;
-        else html +=
+            else html +=
 '  <tr><td class="table_cell table_cell_left"                   >Status</td>' +
 '      <td class="table_cell table_cell_right" id="status"      >Loading...</td></tr>' +
 '  <tr><td class="table_cell table_cell_left"                                 >Total # of runs taken</td>' +
@@ -78,7 +86,7 @@ function Experiment_Info (experiment, access_list) {
 '      <td class="table_cell table_cell_right" id="first_run"                 >Loading...</td></tr>' +
 '  <tr><td class="table_cell table_cell_left"                                 >Last run</td>' +
 '      <td class="table_cell table_cell_right" id="last_run"                  >Loading...</td></tr>' ;
-        html +=
+         html +=
 '  <tr><td class="table_cell table_cell_left"                                 >Description</td>' +
 '      <td class="table_cell table_cell_right" id="description"               ><div class="exp-info-descr">Loading...</div></td></tr>' +
 '  <tr><td class="table_cell table_cell_left"                                 >Contact person(s)</td>' +
@@ -96,67 +104,70 @@ function Experiment_Info (experiment, access_list) {
 '        </tbody></table>' +
 '      </td></tr>' +
 '</tbody></table>' ;
-        this.wa.html(html) ;
+            this.wa.html(html) ;
 
-        this.group_toggler = this.wa.find('#group-toggler') ;
-        this.group_members = this.wa.find('#group-members') ;
+            this.group_toggler = this.wa.find('#group-toggler') ;
+            this.group_members = this.wa.find('#group-members') ;
 
-        this.group_toggler.click(function () {
-            if (that.group_members.hasClass('group-hidden')) {
-                that.group_members.removeClass('group-hidden').addClass('group-visible') ;
-                that.group_toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
+            this.group_toggler.click(function () {
+                if (that.group_members.hasClass('group-hidden')) {
+                    that.group_members.removeClass('group-hidden').addClass('group-visible') ;
+                    that.group_toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
+                } else {
+                    that.group_members.removeClass('group-visible').addClass('group-hidden') ;
+                    that.group_toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
+                }
+            });
+        } ;
+
+        this.updated_once = false ;
+        this.update = function () {
+            if (!this.access_list.experiment.view_info) return ;
+            if (this.updated_once) return ;
+            this.updated_once = true ;
+            this.load() ;
+        } ;
+
+        this.load = function () {
+            var that = this ;
+            Fwk.web_service_GET (
+                '../portal/ws/experiment_info.php', {id:this.experiment.id} ,
+                function (data) {
+                    if (data.status === 'success') that.display(data) ;
+                }   
+            ) ;
+        } ;
+        this.display = function (data) {
+            if (this.experiment.is_facility) {
+                this.wa.find('#num_entries').html(data.num_elog_entries) ;
+                this.wa.find('#last_entry' ).html(data.last_elog_entry_posted) ;
             } else {
-                that.group_members.removeClass('group-visible').addClass('group-hidden') ;
-                that.group_toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
-            }
-        });
-    } ;
-
-    this.updated_once = false ;
-    this.update = function () {
-        if (!this.access_list.experiment.view_info) return ;
-        if (this.updated_once) return ;
-        this.updated_once = true ;
-        this.load() ;
-    } ;
-
-    this.load = function () {
-        var that = this ;
-        Fwk.web_service_GET (
-            '../portal/ws/experiment_info.php', {id:this.experiment.id} ,
-            function (data) {
-                if (data.status === 'success') that.display(data) ;
-            }   
-        ) ;
-    } ;
-    this.display = function (data) {
-        if (this.experiment.is_facility) {
-            this.wa.find('#num_entries').html(data.num_elog_entries) ;
-            this.wa.find('#last_entry' ).html(data.last_elog_entry_posted) ;
-        } else {
-            this.wa.find('#status').html(data.is_active ?
+                this.wa.find('#status').html(data.is_active ?
 '<span style="color:#ff0000; font-weight:bold;" >ACTIVE</span>' :
 '<span style="color:#b0b0b0; font-weight:bold;" >NOT ACTIVE</span>'
-            ) ;
-            this.wa.find('#num_runs'   ).html(data.num_runs) ;
-            this.wa.find('#first_run'  ).html(data.first_run.num ? data.first_run.begin_time+' (<b>run '+data.first_run.num+'</b>)' : 'n/a') ;
-            this.wa.find('#last_run'   ).html(data.last_run.num  ? data.last_run.begin_time +' (<b>run '+data.last_run.num +'</b>)' : 'n/a') ;
-        }
-        this.wa.find('#description').html(data.description) ;
-        this.wa.find('#contact'    ).html(data.contact_info_decorated) ;
-        var html =
+                ) ;
+                this.wa.find('#num_runs'   ).html(data.num_runs) ;
+                this.wa.find('#first_run'  ).html(data.first_run.num ? data.first_run.begin_time+' (<b>run '+data.first_run.num+'</b>)' : 'n/a') ;
+                this.wa.find('#last_run'   ).html(data.last_run.num  ? data.last_run.begin_time +' (<b>run '+data.last_run.num +'</b>)' : 'n/a') ;
+            }
+            this.wa.find('#description').html(data.description) ;
+            this.wa.find('#contact'    ).html(data.contact_info_decorated) ;
+            var html =
 '<table><tbody>' +
 '  <tr><td class="table_cell table_cell_left"  ></td>' +
 '      <td class="table_cell table_cell_right" ></td></tr>' ;
-        for (var i in data.group_members) {
-            var member = data.group_members[i] ;
-            html +=
+            for (var i in data.group_members) {
+                var member = data.group_members[i] ;
+                html +=
 '  <tr><td class="table_cell table_cell_left"  >'+member.uid+'</td>' +
 '      <td class="table_cell table_cell_right" >'+member.gecos+'</td></tr>' ;
-        }
-        html +=
+            }
+            html +=
 '</tbody></table>' ;
-        this.group_members.html(html) ;
-    } ;
-}
-define_class (Experiment_Info, FwkApplication, {}, {});
+            this.group_members.html(html) ;
+        } ;
+    }
+    define_class (Experiment_Info, FwkApplication, {}, {});
+
+    return Experiment_Info ;
+});

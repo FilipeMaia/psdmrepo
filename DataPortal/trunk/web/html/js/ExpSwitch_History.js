@@ -1,3 +1,7 @@
+require(['webfwk/CSSLoader'], function (cssloader) {
+    cssloader.load('../portal/css/ExpSwitch_History.css') ;
+}) ;
+
 /**
  * @brief The application for displaying a history experiment activations
  *
