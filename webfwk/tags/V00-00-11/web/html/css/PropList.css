@@ -1,0 +1,20 @@
+
+.prop-list {
+  font-size: 13px;
+}
+.prop-list > table {
+  border-spacing: 0;
+}
+.prop-list > table > tbody > tr > td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  font-family: Helvetica, sans-serif !important;
+}
+.prop-list > table > tbody > tr > td.prop-list-name {
+  border-right: 1px solid #e0e0e0;
+  font-weight: bold ;
+  white-space: nowrap;
+}
+.prop-list > table > tbody > tr:last-child > td {
+  border-bottom: 0;
+}
