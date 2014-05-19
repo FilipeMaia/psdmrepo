@@ -1,0 +1,7 @@
+- suppressed warning in the old Translator
+- suppressed warning in the pypdsdata (pyana)
+- bug fix in the Translator: translating calibrated cspad in the presence of damaged  cspad
+- added package psana_test for psana diagnostics
+- minor improvements in the calibration modules
+- finalized API for direct access to events in Python psana (ipsana)
+
