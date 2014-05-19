@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2014-05-18 David
+- fix bug when translating calibrated cspad in the presence of damaged 
+  cspad that caused the same h5 group for the cspad src to be created 
+  twice, causing a crash. fix bug, trac ticket #302.
+
 Tag: V00-01-06
 2014-05-16 David
 - add unit test for epics

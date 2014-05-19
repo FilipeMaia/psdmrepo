@@ -136,16 +136,23 @@ inline SrcKeyPair getSrcKeyPair(const PSEvt::EventKey &eventKey) {
 
 class LessSrcKeyPair {
  public:
+ LessSrcKeyPair(const std::string &calibKey) : m_calibKey(calibKey) {} 
   bool operator()(const SrcKeyPair &a, const SrcKeyPair &b) {
     const Pds::Src & aSrc = a.first;
     const Pds::Src & bSrc = b.first;
     if ((aSrc.level() ==  Pds::Level::Event) and (bSrc.level() ==  Pds::Level::Event)) return false;
     if (aSrc < bSrc) return true;
     if (bSrc < aSrc) return false;
-    const std::string & aStr = a.second;
-    const std::string & bStr = b.second;
-      return (aStr < bStr);
+    
+    const std::string *aStr = & a.second;
+    const std::string *bStr = & b.second;
+    if (a.second == m_calibKey) aStr = & EMPTY_STRING;
+    if (b.second == m_calibKey) bStr = & EMPTY_STRING;
+    return (*aStr < *bStr);
   }
+  private:
+      std::string m_calibKey;
+      static const std::string EMPTY_STRING;
 };
       
 typedef std::map< SrcKeyPair, SrcKeyGroup, LessSrcKeyPair > SrcKeyMap;
@@ -166,12 +173,15 @@ typedef std::map< SrcKeyPair, SrcKeyGroup, LessSrcKeyPair > SrcKeyMap;
  */
 class TypeGroup {
  public:
-  TypeGroup() {};
+ TypeGroup(const std::string & calibrationKey) : 
+  m_srcKeyMap(LessSrcKeyPair(calibrationKey)) {};
  TypeGroup(hdf5pp::Group &group, 
            boost::shared_ptr<Translator::HdfWriterEventId> hdfWriterEventId,
-           boost::shared_ptr<Translator::HdfWriterDamage> hdfWriterDamage) 
-   : m_group(group),
-     m_hdfWriterEventId(hdfWriterEventId),
+           boost::shared_ptr<Translator::HdfWriterDamage> hdfWriterDamage,
+           const std::string &calibrationKey) 
+   : m_group(group), 
+    m_srcKeyMap(LessSrcKeyPair(calibrationKey)),
+    m_hdfWriterEventId(hdfWriterEventId),
     m_hdfWriterDamage(hdfWriterDamage) {};
     
   SrcKeyMap & srcKeyMap() { return m_srcKeyMap; };

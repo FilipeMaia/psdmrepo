@@ -16,6 +16,7 @@ const char* logger = "TypeSrcKeyH5GroupDirectory";
 
 }; // end the local namespace
 
+const std::string LessSrcKeyPair::EMPTY_STRING;
 
 /////////////////////////////////////////////////////////
 void SrcKeyGroup::make_timeDamageDatasets()
@@ -232,9 +233,14 @@ TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const PSEvt::EventKey &even
   string groupName = m_h5GroupNames->nameForType(typeInfoPtr, key);
   hdf5pp::Group group = parentGroup.createGroup(groupName);
   m_h5GroupNames->addTypeAttributes(group, typeInfoPtr, key);
-  return (m_map[ groupName ] = TypeGroup(group,
-                                         m_hdfWriterEventId,
-                                         m_hdfWriterDamage));
+  TypeMapContainer::iterator pos = m_map.find(groupName);
+  if (pos != m_map.end()) MsgLog(logger, error, "addTypeGroup is overwriting existing entry for " << groupName);
+  TypeMapContainer::value_type newElem(groupName, TypeGroup(group,
+                                                            m_hdfWriterEventId,
+                                                            m_hdfWriterDamage,
+                                                            m_h5GroupNames->calibratedKey()));
+  m_map.insert(newElem);
+  return m_map.find(newElem.first)->second;
 }
 
 SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::findSrcKey(const PSEvt::EventKey &eventKey) {

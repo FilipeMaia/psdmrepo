@@ -40,6 +40,7 @@ TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
 TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.xtc")
 TESTDATA_PARTITION = os.path.join(DATADIR,"test_051_sxr_sxrdaq10_e19-r057-s01-c00.xtc")
 TESTDATA_EPICS = os.path.join(DATADIR, "test_020_sxr_sxr33211_e103-r0845-s00-c00.xtc")
+TESTDATA_CALIBDAMAGE = os.path.join(DATADIR, "test_080_cxi_cxi83714_e379-r0121-s00-c00_calibdamage.xtc")
 
 #------------------
 # Utility functions 
@@ -1112,6 +1113,21 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
             
+    def test_calibrationDamage(self):
+        '''Test that we can handle seeing calibrated cspad, and then damaged
+        cspad, address bug that was found with naming groups. Trac ticket 302
+        '''
+        input_file = TESTDATA_CALIBDAMAGE
+        output_h5 = os.path.join(OUTDIR,"unit-test_calibdamage.h5")
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile.write("deflate = -1\n")
+        self.runPsanaOnCfg(cfgfile,output_h5, 
+                           extraOpts='--calib-dir /reg/g/psdm/data_test/calib',
+                           printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        f = h5py.File(output_h5,'r')
+        
+        
     @unittest.skip("disabled no data access")
     def test_calibration(self):
         '''runs on xpptut data to see if calibration occurs. We are testing against 

@@ -126,6 +126,12 @@ class H5GroupNames {
    */
   std::string srcKeySep();
 
+  /**
+   * @brief returns the calibration key.
+   *
+   * This is the special key that is is ignored when forming the srcKey Group name.
+   */
+  const std::string &calibratedKey() { return m_calibratedKey; }
  private:
   const std::string m_calibratedKey;
   const TypeAliases::TypeInfoSet m_ndarrays;

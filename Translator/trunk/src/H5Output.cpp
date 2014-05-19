@@ -865,12 +865,12 @@ void H5Output::eventImpl()
     Pds::Damage damage = keyIter->damage;
     boost::shared_ptr<HdfWriterFromEvent> hdfWriter = keyIter->hdfWriter;
     const Pds::Src & src = eventKey.src();
-    MsgLog(logger(),debug,eventImpl << " eventKey=" << eventKey << "damage= " << damage.value() << 
+    MsgLog(logger(),debug,eventImpl << " eventKey=" << eventKey << "damage= " << damage.value() <<
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
     const std::string  & key = eventKey.key();
     if (key == m_calibration_key) {
       m_calibratedEventKeys.insert(eventKey);
-      MsgLog(logger(),debug,eventImpl << " eventKey is calibration key. Adding Pds::Src to calibratedSrcSrc.");
+      MsgLog(logger(),debug,eventImpl << " eventKey is calibration key. Adding Pds::Src to calibratedSrc Src.");
     }
     TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(eventKey);
     if (typePos == m_calibCycleEventGroupDir.endType()) {
@@ -881,9 +881,9 @@ void H5Output::eventImpl()
     }
     SrcKeyMap::iterator srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
     if (srcKeyPos == m_calibCycleEventGroupDir.endSrcKey(eventKey)) {
+      MsgLog(logger(eventImpl),trace, // DVD: 
+             "src " << src << " not in type group.  Adding src to type group");
       SrcKeyGroup & srcKeyGroup = m_calibCycleEventGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
-      MsgLog(logger(eventImpl),trace,
-             "src " << src << " not in type group.  Added src to type group");
       if (writeBlank) {
         MsgLog(logger(eventImpl),trace," initial event is blank.  Only creating time/damage datasets");
         srcKeyGroup.make_timeDamageDatasets();
@@ -1139,7 +1139,8 @@ void H5Output::lookForAndStoreCalibData() {
   getType2CalibTypesMap(type2calibTypeMap);
   bool calibGroupCreated = false;
   hdf5pp::Group calibGroup;
-  map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair> calibStoreTypesAlreadyWritten;
+  map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair> 
+    calibStoreTypesAlreadyWritten(LessSrcKeyPair(m_h5groupNames->calibratedKey()));
   map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair>::iterator alreadyWrittenIter;
   std::set<PSEvt::EventKey, LessEventKey>::iterator calibEventKeyIter;
   for (calibEventKeyIter = m_calibratedEventKeys.begin(); 
