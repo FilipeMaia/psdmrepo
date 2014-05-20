@@ -193,7 +193,8 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   m_hdfWriterDamage->setDatasetCreationProperties(m_damageCreateDsetProp);
   m_epicsGroupDir.initialize(m_storeEpics,
                              m_hdfWriterEventId,
-                             m_epicsPvCreateDsetProp);
+                             m_epicsPvCreateDsetProp,
+                             m_defaultCreateDsetProp);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibStoreGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);

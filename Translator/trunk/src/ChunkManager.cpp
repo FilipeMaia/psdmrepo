@@ -98,7 +98,8 @@ void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output) {
   // there will be a lot of epics datasets, and an epics entry tends to be only 30 bytes or so.
   // If we used 16 Mb chunks, and we had 200 epics pv, we'd have at least 3.2 Gb of chunks that we'd 
   // be writing, and each chunk would hold an hours worth of data.  
-  // We set the epics pv chunk size in bytes to 16 kilobytes.
+  // We set the epics pv chunk size in bytes to 16 kilobytes.  This is not the right thing to do for 
+  // epics pv's that contain projections or image data. Below is just for pv's with a few values.
   m_epicsPvChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetInBytes",_16KB); 
   m_epicsPvChunkSizeTargetObjects = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   m_epicsPvChunkSizeTargetObjectsOrig = m_epicsPvChunkSizeTargetObjects;

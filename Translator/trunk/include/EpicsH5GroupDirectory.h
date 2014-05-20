@@ -45,7 +45,8 @@ class EpicsH5GroupDirectory {
   EpicsH5GroupDirectory();
   void initialize(EpicsStoreMode epicsStoreMode,
                   boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
-                  const DataSetCreationProperties & epicsPvHCreateDsetProp);
+                  const DataSetCreationProperties & oneElemEpicsPvHCreateDsetProp,
+                  const DataSetCreationProperties & manyElemEpicsPvHCreateDsetProp);
   void processBeginJob(hid_t currentConfigGroup, 
                        PSEnv::EpicsStore &epicsStore,
                        boost::shared_ptr<PSEvt::EventId> eventId);

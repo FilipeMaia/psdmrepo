@@ -579,30 +579,31 @@ std::vector<const std::type_info *>  HdfWriterMap::types(bool vlenTable) {
 The code is generated from psddl/src/DdlHdf5Translator.py 
   and the template in      psddl/data/templates/hdf5Translator.tmpl?XXX
 
+The DDL defines the 14 epics classes via a C++ class hierarchy. 
+These 14 types are EpicsPvCtrl* and EpicsPvTime* where * is one of:
+String, Short, Float, Enum, Char, Long or Double.
+
+An example of the hierarchy is
+
+EpicsPvTimeDouble  derives from 
+EpicsPvTimeHeader  derives from
+EpicsPvHeader
+
+moreover, classes have attributes that are themselves classes - the
+dbr and stamp attributes.
+
 We use the DDL description of the Epics Pv to 'unroll' the 14 epicsPv
-types that we will write into simple 'flat' structures that make it easier
-to generate the hdf5 types.  Flat except for stamp, so as not to deviate from
-the previous schema, we do not unroll the stamp field into seconds past the epoch
-and nanoseconds. These 14 types are EpicsPvCtrl* and EpicsPvTime*
-where * is one of String, Short, Float, Enum, Char, Long or Double.
+types into  'flat' structures.  All fields within dbr are brought into
+the top level. stamp in not flattened, so as not to deviate from the previous hdf5 schema.
 
-The DDL defines these classes via a C++ class hierarchy, and there are some
-compound objects that make up some of the attributes.  For example 
 
-EpicsPvTimeDouble  -> EpicsPvTimeHeader -> EpicsPvHeader
+For each of the 14 classes, we define a flat structure (except for stamp) in the Unroll
+namespace. These structs hold one value.  See EpicsWriteBuffer for the templatized class
+that will hold all the values.
 
-moreover, classes can have compound types, for instance EpicsPvTimeHeader includes an
-instance of epicsTimeStamp as an attribute.
-
-For each of the 14 classes, we define a flat structure (except for stamp) that we can fill for Hdf5
-translation, a function to produce the hdf5 type, and a function to fill the structure from
-the appropriate Psana object that we will obtain from the epics store.
-
-A difference between entries stored in the hdf5 datasets and the epics pv's from xtc, is the following.
-EpicsPvTimeLong has an attribute NumElements() which says how many longs are stored (back to back, 
-in an array) in the data() field.  If there are 3 longs in a particular epics pv, lets say the
-pv name is "LASERTIMING", then for one psana epics pv of "LASERTIMING", we will store 3 entries 
-in the "LASERTIMING" dataset of the Hdf5 file.  Each entry has one long in it.
+Note for Unroll::EpicsPvCtrlEnum - space is allocated for the maximum number of 
+enum string constants and the first value is stored after this. The hdf5 type will
+only store the number of string constants used, with the values occuring after these.
 
  */
 
@@ -628,6 +629,7 @@ struct epicsTimeStamp {
 {% for epicsPv in epicsPvs %}
 struct {{epicsPv['name']}} {
   typedef Psana::Epics::{{epicsPv['name']}} PsanaSrc;
+  typedef {{epicsPv['value_basetype']}} valueBaseType{{epicsPv['value_array_print_info']}};
 {% for attr in epicsPv['attrs'] %}
   {{attr['basetype']}} {{attr['name']}}{{attr['array_print_info']}};
 {% endfor %} 
@@ -638,40 +640,8 @@ struct {{epicsPv['name']}} {
 } // namespace Unroll
 
 {% for epicsPv in epicsPvs %}
-void copyToUnrolled(const Psana::Epics::{{epicsPv['name']}} &source, const int16_t element, Unroll::{{epicsPv['name']}} &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::{{epicsPv['name']}} &source, Unroll::{{epicsPv['name']}} &dest);
 {% endfor %} 
-
-template <class U>
-void copyValueFldToUnrolled(const typename U::PsanaSrc &psanaVar, int16_t el, U & unrollBuffer) {
-  unrollBuffer.value = psanaVar.value(el);
-}
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvTimeString >
-       (const Unroll::EpicsPvTimeString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvTimeString & unrollBuffer);
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlString >
-       (const Unroll::EpicsPvCtrlString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlString & unrollBuffer);
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlEnum >
-       (const Unroll::EpicsPvCtrlEnum::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlEnum & unrollBuffer);
-
-hid_t createH5TypeId_epicsTimeStamp();
-
-{% for epicsPv in epicsPvs %}
-hid_t createH5TypeId_{{epicsPv['name']}}({{epicsPv['type_create_args']}});
-{% endfor %} 
-
-template <class U>
-int getNumberStringsForCtrlEnum(boost::shared_ptr<typename U::PsanaSrc> ptr) { return -1; }
- 
-template <>
-int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr);
 
 } // namespace Translator
 
@@ -701,8 +671,6 @@ int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unrol
 
 namespace {
 
-const char * logger = "epics.dll";
-
 void copyEpicsPvCtrlEnumStrings(const Psana::Epics::EpicsPvCtrlEnum & sourceObject, 
                                 Translator::Unroll::EpicsPvCtrlEnum & destObject)
 {
@@ -717,7 +685,7 @@ void copyEpicsPvCtrlEnumStrings(const Psana::Epics::EpicsPvCtrlEnum & sourceObje
 namespace Translator {
 
 {% for epicsPv in epicsPvs %}
-void copyToUnrolled(const Psana::Epics::{{epicsPv['name']}} &source, const int16_t element, 
+void copyToUnrolledExceptForValue(const Psana::Epics::{{epicsPv['name']}} &source,
                     Unroll::{{epicsPv['name']}} &dest) 
 {
 {% for attr in epicsPv['attrs'] %}
@@ -731,95 +699,10 @@ void copyToUnrolled(const Psana::Epics::{{epicsPv['name']}} &source, const int16
   strncpy(dest.{{attr['name']}}, source.{{attr['accessor']}}, Psana::Epics::{{attr['strncpy_max']}});
 {% endif %}
 {% endfor %}
-  copyValueFldToUnrolled<Unroll::{{epicsPv['name']}}>(source,element,dest);
 }
 
 {% endfor %} 
 
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvTimeString >
-       (const Unroll::EpicsPvTimeString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvTimeString & unrollBuffer) {
-  strncpy(unrollBuffer.value, psanaVar.value(el), Psana::Epics::MAX_STRING_SIZE);
-}
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlString >
-       (const Unroll::EpicsPvCtrlString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlString & unrollBuffer) {
-  strncpy(unrollBuffer.value, psanaVar.value(el), Psana::Epics::MAX_STRING_SIZE);
-}
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlEnum >
-       (const Unroll::EpicsPvCtrlEnum::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlEnum & unrollBuffer) {
-  int numberOfStrs = psanaVar.dbr().no_str();
-  int rangeCheckedNumberOfStrs = std::max(0,std::min(numberOfStrs, int(Psana::Epics::MAX_ENUM_STATES)));
-  if (numberOfStrs != rangeCheckedNumberOfStrs) {
-    MsgLog(logger,warning,"EpicsPvCtrlEnum no_strs = " << numberOfStrs 
-                          << " is not within [0," << Psana::Epics::MAX_ENUM_STATES
-                          << "].  copyValueFldToUnrolled is using "
-                          << rangeCheckedNumberOfStrs << " to writing value field");
-  }
-  void * valueAddress = &unrollBuffer.strs[rangeCheckedNumberOfStrs];
-  uint16_t * valuePtr = static_cast<uint16_t*>(valueAddress);
-  *valuePtr = psanaVar.value(el);  
-}
-
-hid_t createH5TypeId_epicsTimeStamp() {
-  hid_t typeId = H5Tcreate(H5T_COMPOUND, sizeof(Unroll::epicsTimeStamp));
-  if (typeId < 0) MsgLog(logger, fatal, "Failed to create h5 type id for epicsTimeStamp");
-  herr_t status = 0;
-  status = std::min(status, H5Tinsert(typeId, "secPastEpoch", offsetof(Unroll::epicsTimeStamp, secPastEpoch), H5T_NATIVE_INT32));
-  status = std::min(status, H5Tinsert(typeId, "nsec", offsetof(Unroll::epicsTimeStamp, nsec), H5T_NATIVE_INT32));
-  if (status < 0) MsgLog(logger, fatal, "error inserting field into h5 typeId for epicsTimeStamp"); 
-  return typeId;
-}
-
- 
-{% for epicsPv in epicsPvs if epicsPv['name'] != 'EpicsPvCtrlEnum' %}
-hid_t createH5TypeId_{{epicsPv['name']}}({{epicsPv['type_create_args']}}) {
-  hid_t typeId = H5Tcreate(H5T_COMPOUND, sizeof(Unroll::{{epicsPv['name']}}));
-  if (typeId < 0) MsgLog(logger, fatal, "Failed to create h5 type id for {{epicsPv['name']}}");
-  herr_t status = 0;
-{% for attr in epicsPv['attrs'] %}
-  status = std::min(status, H5Tinsert(typeId, "{{attr['h5name']}}", offsetof(Unroll::{{epicsPv['name']}}, {{attr['name']}}), {{attr['h5type']}}));
-{% endfor %} 
-  status = std::min(status, H5Tinsert(typeId, "value", offsetof(Unroll::{{epicsPv['name']}}, value), {{epicsPv['value_h5type']}}));
-
-  if (status < 0) MsgLog(logger, fatal, "error inserting field into h5 typeId for {{epicsPv['name']}}"); 
-
-  return typeId;
-}
-
-{% endfor %} 
-
-hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t strsArrayType, int numberOfStrings) {
-  hid_t typeId = H5Tcreate(H5T_COMPOUND, sizeof(Unroll::EpicsPvCtrlEnum));
-  if (typeId < 0) MsgLog(logger, fatal, "Failed to create h5 type id for EpicsPvCtrlEnum");
-  herr_t status = 0;
-  status = std::min(status, H5Tinsert(typeId, "pvId", offsetof(Unroll::EpicsPvCtrlEnum, iPvId), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "dbrType", offsetof(Unroll::EpicsPvCtrlEnum, iDbrType), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "numElements", offsetof(Unroll::EpicsPvCtrlEnum, iNumElements), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "pvname", offsetof(Unroll::EpicsPvCtrlEnum, sPvName), pvNameType));
-  status = std::min(status, H5Tinsert(typeId, "status", offsetof(Unroll::EpicsPvCtrlEnum, status), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "severity", offsetof(Unroll::EpicsPvCtrlEnum, severity), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "no_str", offsetof(Unroll::EpicsPvCtrlEnum, no_str), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "strs", offsetof(Unroll::EpicsPvCtrlEnum, strs), strsArrayType));
-  size_t offsetForValue = offsetof(Unroll::EpicsPvCtrlEnum, strs) +  numberOfStrings * Psana::Epics::MAX_ENUM_STRING_SIZE;
-  status = std::min(status, H5Tinsert(typeId, "value", offsetForValue, H5T_NATIVE_UINT16));
-
-  if (status < 0) MsgLog(logger, fatal, "error inserting field into h5 typeId for EpicsPvCtrlEnum"); 
-
-  return typeId;
-}
-  
-template <>
-int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr) 
-{ 
-  return ptr->dbr().no_str(); 
-}
  
 } // Translator
 
@@ -838,7 +721,8 @@ int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unrol
 :  
 :  psana_types - list of the psana types that we generate converters for
 :
-
+/* Do not edit this file. It is generated by a code generator.
+*/
 #include "MsgLogger/MsgLogger.h"
 #include "psddl_psana/epics.ddl.h"
 #include "Translator/epics.ddl.h"

@@ -7,30 +7,31 @@
 The code is generated from psddl/src/DdlHdf5Translator.py 
   and the template in      psddl/data/templates/hdf5Translator.tmpl?XXX
 
+The DDL defines the 14 epics classes via a C++ class hierarchy. 
+These 14 types are EpicsPvCtrl* and EpicsPvTime* where * is one of:
+String, Short, Float, Enum, Char, Long or Double.
+
+An example of the hierarchy is
+
+EpicsPvTimeDouble  derives from 
+EpicsPvTimeHeader  derives from
+EpicsPvHeader
+
+moreover, classes have attributes that are themselves classes - the
+dbr and stamp attributes.
+
 We use the DDL description of the Epics Pv to 'unroll' the 14 epicsPv
-types that we will write into simple 'flat' structures that make it easier
-to generate the hdf5 types.  Flat except for stamp, so as not to deviate from
-the previous schema, we do not unroll the stamp field into seconds past the epoch
-and nanoseconds. These 14 types are EpicsPvCtrl* and EpicsPvTime*
-where * is one of String, Short, Float, Enum, Char, Long or Double.
+types into  'flat' structures.  All fields within dbr are brought into
+the top level. stamp in not flattened, so as not to deviate from the previous hdf5 schema.
 
-The DDL defines these classes via a C++ class hierarchy, and there are some
-compound objects that make up some of the attributes.  For example 
 
-EpicsPvTimeDouble  -> EpicsPvTimeHeader -> EpicsPvHeader
+For each of the 14 classes, we define a flat structure (except for stamp) in the Unroll
+namespace. These structs hold one value.  See EpicsWriteBuffer for the templatized class
+that will hold all the values.
 
-moreover, classes can have compound types, for instance EpicsPvTimeHeader includes an
-instance of epicsTimeStamp as an attribute.
-
-For each of the 14 classes, we define a flat structure (except for stamp) that we can fill for Hdf5
-translation, a function to produce the hdf5 type, and a function to fill the structure from
-the appropriate Psana object that we will obtain from the epics store.
-
-A difference between entries stored in the hdf5 datasets and the epics pv's from xtc, is the following.
-EpicsPvTimeLong has an attribute NumElements() which says how many longs are stored (back to back, 
-in an array) in the data() field.  If there are 3 longs in a particular epics pv, lets say the
-pv name is "LASERTIMING", then for one psana epics pv of "LASERTIMING", we will store 3 entries 
-in the "LASERTIMING" dataset of the Hdf5 file.  Each entry has one long in it.
+Note for Unroll::EpicsPvCtrlEnum - space is allocated for the maximum number of 
+enum string constants and the first value is stored after this. The hdf5 type will
+only store the number of string constants used, with the values occuring after these.
 
  */
 
@@ -55,6 +56,7 @@ struct epicsTimeStamp {
 
 struct EpicsPvCtrlString {
   typedef Psana::Epics::EpicsPvCtrlString PsanaSrc;
+  typedef char valueBaseType[Psana::Epics:: MAX_STRING_SIZE];
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -67,6 +69,7 @@ struct EpicsPvCtrlString {
 
 struct EpicsPvCtrlShort {
   typedef Psana::Epics::EpicsPvCtrlShort PsanaSrc;
+  typedef int16_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -88,6 +91,7 @@ struct EpicsPvCtrlShort {
 
 struct EpicsPvCtrlFloat {
   typedef Psana::Epics::EpicsPvCtrlFloat PsanaSrc;
+  typedef float valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -110,6 +114,7 @@ struct EpicsPvCtrlFloat {
 
 struct EpicsPvCtrlEnum {
   typedef Psana::Epics::EpicsPvCtrlEnum PsanaSrc;
+  typedef uint16_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -124,6 +129,7 @@ struct EpicsPvCtrlEnum {
 
 struct EpicsPvCtrlChar {
   typedef Psana::Epics::EpicsPvCtrlChar PsanaSrc;
+  typedef uint8_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -145,6 +151,7 @@ struct EpicsPvCtrlChar {
 
 struct EpicsPvCtrlLong {
   typedef Psana::Epics::EpicsPvCtrlLong PsanaSrc;
+  typedef int32_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -166,6 +173,7 @@ struct EpicsPvCtrlLong {
 
 struct EpicsPvCtrlDouble {
   typedef Psana::Epics::EpicsPvCtrlDouble PsanaSrc;
+  typedef double valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -188,6 +196,7 @@ struct EpicsPvCtrlDouble {
 
 struct EpicsPvTimeString {
   typedef Psana::Epics::EpicsPvTimeString PsanaSrc;
+  typedef char valueBaseType[Psana::Epics:: MAX_STRING_SIZE];
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -200,6 +209,7 @@ struct EpicsPvTimeString {
 
 struct EpicsPvTimeShort {
   typedef Psana::Epics::EpicsPvTimeShort PsanaSrc;
+  typedef int16_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -212,6 +222,7 @@ struct EpicsPvTimeShort {
 
 struct EpicsPvTimeFloat {
   typedef Psana::Epics::EpicsPvTimeFloat PsanaSrc;
+  typedef float valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -224,6 +235,7 @@ struct EpicsPvTimeFloat {
 
 struct EpicsPvTimeEnum {
   typedef Psana::Epics::EpicsPvTimeEnum PsanaSrc;
+  typedef uint16_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -236,6 +248,7 @@ struct EpicsPvTimeEnum {
 
 struct EpicsPvTimeChar {
   typedef Psana::Epics::EpicsPvTimeChar PsanaSrc;
+  typedef uint8_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -248,6 +261,7 @@ struct EpicsPvTimeChar {
 
 struct EpicsPvTimeLong {
   typedef Psana::Epics::EpicsPvTimeLong PsanaSrc;
+  typedef int32_t valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -260,6 +274,7 @@ struct EpicsPvTimeLong {
 
 struct EpicsPvTimeDouble {
   typedef Psana::Epics::EpicsPvTimeDouble PsanaSrc;
+  typedef double valueBaseType;
   int16_t iPvId;
   int16_t iDbrType;
   int16_t iNumElements;
@@ -272,65 +287,21 @@ struct EpicsPvTimeDouble {
 
 } // namespace Unroll
 
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlString &source, const int16_t element, Unroll::EpicsPvCtrlString &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlShort &source, const int16_t element, Unroll::EpicsPvCtrlShort &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlFloat &source, const int16_t element, Unroll::EpicsPvCtrlFloat &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlEnum &source, const int16_t element, Unroll::EpicsPvCtrlEnum &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlChar &source, const int16_t element, Unroll::EpicsPvCtrlChar &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlLong &source, const int16_t element, Unroll::EpicsPvCtrlLong &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvCtrlDouble &source, const int16_t element, Unroll::EpicsPvCtrlDouble &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeString &source, const int16_t element, Unroll::EpicsPvTimeString &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeShort &source, const int16_t element, Unroll::EpicsPvTimeShort &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeFloat &source, const int16_t element, Unroll::EpicsPvTimeFloat &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeEnum &source, const int16_t element, Unroll::EpicsPvTimeEnum &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeChar &source, const int16_t element, Unroll::EpicsPvTimeChar &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeLong &source, const int16_t element, Unroll::EpicsPvTimeLong &dest);
-void copyToUnrolled(const Psana::Epics::EpicsPvTimeDouble &source, const int16_t element, Unroll::EpicsPvTimeDouble &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlString &source, Unroll::EpicsPvCtrlString &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlShort &source, Unroll::EpicsPvCtrlShort &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlFloat &source, Unroll::EpicsPvCtrlFloat &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlEnum &source, Unroll::EpicsPvCtrlEnum &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlChar &source, Unroll::EpicsPvCtrlChar &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlLong &source, Unroll::EpicsPvCtrlLong &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvCtrlDouble &source, Unroll::EpicsPvCtrlDouble &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeString &source, Unroll::EpicsPvTimeString &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeShort &source, Unroll::EpicsPvTimeShort &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeFloat &source, Unroll::EpicsPvTimeFloat &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeEnum &source, Unroll::EpicsPvTimeEnum &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeChar &source, Unroll::EpicsPvTimeChar &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeLong &source, Unroll::EpicsPvTimeLong &dest);
+void copyToUnrolledExceptForValue(const Psana::Epics::EpicsPvTimeDouble &source, Unroll::EpicsPvTimeDouble &dest);
  
-
-template <class U>
-void copyValueFldToUnrolled(const typename U::PsanaSrc &psanaVar, int16_t el, U & unrollBuffer) {
-  unrollBuffer.value = psanaVar.value(el);
-}
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvTimeString >
-       (const Unroll::EpicsPvTimeString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvTimeString & unrollBuffer);
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlString >
-       (const Unroll::EpicsPvCtrlString::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlString & unrollBuffer);
-
-template <>
-void copyValueFldToUnrolled < Unroll::EpicsPvCtrlEnum >
-       (const Unroll::EpicsPvCtrlEnum::PsanaSrc &psanaVar, int16_t el, 
-        Unroll::EpicsPvCtrlEnum & unrollBuffer);
-
-hid_t createH5TypeId_epicsTimeStamp();
-
-hid_t createH5TypeId_EpicsPvCtrlString(hid_t pvNameType, hid_t stringType);
-hid_t createH5TypeId_EpicsPvCtrlShort(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvCtrlFloat(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t strsArrayType, int numberOfStrings);
-hid_t createH5TypeId_EpicsPvCtrlChar(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvCtrlLong(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvCtrlDouble(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvTimeString(hid_t stringType, hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeShort(hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeFloat(hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeEnum(hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeChar(hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeLong(hid_t stampType);
-hid_t createH5TypeId_EpicsPvTimeDouble(hid_t stampType);
- 
-
-template <class U>
-int getNumberStringsForCtrlEnum(boost::shared_ptr<typename U::PsanaSrc> ptr) { return -1; }
- 
-template <>
-int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr);
 
 } // namespace Translator
 

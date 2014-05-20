@@ -16,6 +16,7 @@
 #include "Translator/DataSetCreationProperties.h"
 #include "Translator/HdfWriterGeneric.h"
 #include "Translator/HdfWriterEventId.h"
+#include "Translator/EpicsWriteBuffer.h"
 
 namespace Translator {
 
@@ -31,7 +32,9 @@ namespace Translator {
  */
 class HdfWriterEpicsPv {
  public:
-  HdfWriterEpicsPv(const DataSetCreationProperties &, boost::shared_ptr<HdfWriterEventId> );
+  HdfWriterEpicsPv(const DataSetCreationProperties & oneElemDataSetCreationProperties, 
+                   const DataSetCreationProperties & manyElemDataSetCreationProperties, 
+                   boost::shared_ptr<HdfWriterEventId> );
   ~HdfWriterEpicsPv();
 
   void oneTimeCreateAndWrite(hid_t groupId, int16_t dbrType, 
@@ -55,18 +58,21 @@ class HdfWriterEpicsPv {
 
   void closeDataset(hid_t groupId);
 
-  const DataSetCreationProperties & dataSetCreationProperties() 
-  { return m_dataSetCreationProperties; }
-  void setDatasetCreationProperties(const DataSetCreationProperties & dataSetCreationProperties) 
-  { m_dataSetCreationProperties = dataSetCreationProperties; }
+  const DataSetCreationProperties & oneElemDataSetCreationProperties() 
+  { return m_oneElemDataSetCreationProperties; }
+
+  const DataSetCreationProperties & manyElemDataSetCreationProperties() 
+  { return m_manyElemDataSetCreationProperties; }
+
+  void setOneElemDatasetCreationProperties(const DataSetCreationProperties & dataSetCreationProperties) 
+  { m_oneElemDataSetCreationProperties = dataSetCreationProperties; }
+
+  void setManyElemDatasetCreationProperties(const DataSetCreationProperties & dataSetCreationProperties) 
+  { m_manyElemDataSetCreationProperties = dataSetCreationProperties; }
 
   typedef enum {CreateWriteClose, CreateAppend, Append} DispatchAction;
 
  protected:
-  void makeSharedTypes();
-  void closeSharedTypes();
-  hid_t getTypeId(int16_t dbrType, int ctrlEnumNumberOfStrs);
-  hid_t getCtrlEnumTypeId(int numberOfStrs);
   void dispatch(hid_t groupId, int16_t dbrType, 
                 PSEnv::EpicsStore & epicsStore, 
                 const std::string & pvName, 
@@ -74,20 +80,12 @@ class HdfWriterEpicsPv {
                 DispatchAction dispatchAction);
   
  private:
-  DataSetCreationProperties m_dataSetCreationProperties;
+  const static int MANY_ELEM = 50;
+  DataSetCreationProperties m_oneElemDataSetCreationProperties;
+  DataSetCreationProperties m_manyElemDataSetCreationProperties;
 
   boost::shared_ptr<HdfWriterGeneric> m_hdfWriterGeneric;
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
-  std::vector<hid_t> m_enumStrsArrayTypes;
-  std::vector<hid_t> m_numberStringsToH5TypeForCtrlEnum;   
-  std::map<uint16_t, hid_t>  m_dbr2h5TypeId;   
-  
-  // base h5 types that are used in the Epics Pv types
-  hid_t m_pvNameType;  // char[Psana::Epics::iMaxPvNameLength
-  hid_t m_stringType;  // char[Psana::Epics:: MAX_STRING_SIZE]
-  hid_t m_unitsType;   // char[Psana::Epics::MAX_UNITS_SIZE]
-  hid_t m_enumStrType; // char[Psana::Epics::MAX_ENUM_STRING_SIZE]
-  hid_t m_stampType;
 
   template <class U>
   void doDispatchAction(int16_t dbrType,
@@ -110,26 +108,17 @@ class HdfWriterEpicsPv {
            << " psanaTypeStr=" << psanaTypeStr << " groupId=" << groupId
            << " epicsPvName=" << epicsPvName << " dispatchAction=" << dispatchAction);
     
-    U unrollBuffer;
+    EpicsWriteBuffer<U> epicsWriteBuffer(dbrType, *psanaVar);
 
     try {
-      int numberStringsForCtrlEnum = getNumberStringsForCtrlEnum<U>(psanaVar);
-      hid_t typeId = -1;
+      hid_t fileTypeId = epicsWriteBuffer.getFileH5Type();
+      hid_t memTypeId = epicsWriteBuffer.getMemH5Type();
       size_t dsetIdx = -1;
-      int16_t el = -1;
       switch (dispatchAction) {
       case CreateWriteClose:
-        if (psanaVar->numElements()>1) MsgLog("Translator.HdfWriterEpicsPv",trace,"pv with " << 
-                                              psanaVar->numElements() << " elements");
-        typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
         dsetIdx = m_hdfWriterGeneric->createFixedSizeDataset(groupId, "data", 
-                                                             typeId, typeId,
-                                                             psanaVar->numElements());
-        copyToUnrolled(*psanaVar, 0, unrollBuffer);
-        for (el = 0; el < psanaVar->numElements(); ++el) {
-          if (el>0) copyValueFldToUnrolled<U>(*psanaVar, el, unrollBuffer);
-          m_hdfWriterGeneric->append(groupId, dsetIdx, &unrollBuffer);
-        }
+                                                             fileTypeId, memTypeId,1);
+        m_hdfWriterGeneric->append(groupId, dsetIdx, epicsWriteBuffer.data());
         m_hdfWriterGeneric->closeDatasets(groupId);
         m_hdfWriterEventId->make_dataset(groupId);
         m_hdfWriterEventId->append(groupId, *eventId);
@@ -138,16 +127,16 @@ class HdfWriterEpicsPv {
         break;
 
       case CreateAppend:
-        typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
-        dsetIdx = m_hdfWriterGeneric->createUnlimitedSizeDataset(groupId, "data", 
-                                                                 typeId, typeId,
-                                                                 dataSetCreationProperties());
-        copyToUnrolled(*psanaVar, 0, unrollBuffer);
-        for (el = 0; el < psanaVar->numElements(); ++el) {
-          if (el>0) copyValueFldToUnrolled<U>(*psanaVar, el, unrollBuffer);
-          m_hdfWriterGeneric->append(groupId, dsetIdx, &unrollBuffer);
+        if (psanaVar->numElements() > MANY_ELEM) {
+          dsetIdx = m_hdfWriterGeneric->createUnlimitedSizeDataset(groupId, "data", 
+                                                                   fileTypeId, memTypeId,
+                                                                   manyElemDataSetCreationProperties());
+        } else {
+          dsetIdx = m_hdfWriterGeneric->createUnlimitedSizeDataset(groupId, "data", 
+                                                                   fileTypeId, memTypeId,
+                                                                   oneElemDataSetCreationProperties());
         }
-        
+        m_hdfWriterGeneric->append(groupId, dsetIdx, epicsWriteBuffer.data());
         m_hdfWriterEventId->make_dataset(groupId);
         m_hdfWriterEventId->append(groupId, *eventId);
         
@@ -155,12 +144,7 @@ class HdfWriterEpicsPv {
         
       case Append:
         dsetIdx = 0; // we only use one dataset for epics pv's
-        copyToUnrolled(*psanaVar, 0, unrollBuffer);
-        for (int16_t el = 0; el < psanaVar->numElements(); ++el) {
-          if (el>0) copyValueFldToUnrolled<U>(*psanaVar, el, unrollBuffer);
-          m_hdfWriterGeneric->append(groupId, dsetIdx, &unrollBuffer);
-        }
-        
+        m_hdfWriterGeneric->append(groupId, dsetIdx, epicsWriteBuffer.data());
         m_hdfWriterEventId->append(groupId, *eventId);
         
         break;

@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2014-05-19 David
+- correct how multi value epics pv's are translated.
+- track ticket #301.
+
 Tag: V00-01-07
 2014-05-18 David
 - fix bug when translating calibrated cspad in the presence of damaged 

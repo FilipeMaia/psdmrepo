@@ -223,11 +223,14 @@ EpicsH5GroupDirectory::EpicsH5GroupDirectory() :
 
 void EpicsH5GroupDirectory::initialize(EpicsStoreMode epicsStoreMode,
                                        boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
-                                       const DataSetCreationProperties & epicsPvCreateDsetProp) 
+                                       const DataSetCreationProperties & oneElemEpicsPvCreateDsetProp,
+                                       const DataSetCreationProperties & manyElemEpicsPvCreateDsetProp) 
 {
   m_epicsStoreMode = epicsStoreMode;
   if (m_epicsStoreMode == Unknown) MsgLog(logger(), fatal, "epics store mode is unknown");
-  m_hdfWriterEpicsPv = boost::make_shared<HdfWriterEpicsPv>(epicsPvCreateDsetProp, hdfWriterEventId);
+  m_hdfWriterEpicsPv = boost::make_shared<HdfWriterEpicsPv>(oneElemEpicsPvCreateDsetProp, 
+                                                            manyElemEpicsPvCreateDsetProp, 
+                                                            hdfWriterEventId);
 }
 
 bool EpicsH5GroupDirectory::checkIfStoringEpics() {
