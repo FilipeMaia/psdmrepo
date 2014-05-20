@@ -1,0 +1,1 @@
+- fixed a bug in how multi-valued epics pv's are being written
