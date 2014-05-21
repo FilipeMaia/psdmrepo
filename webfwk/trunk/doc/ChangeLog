@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2014-05-21 Igor Gaponenko
+- imajor refactoring to migrate to the component model based on RequireJS (AMD)
+
 Tag: V00-00-11
 2014-05-17 Igor Gaponenko
 - loader for CSS files

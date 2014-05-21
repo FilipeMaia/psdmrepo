@@ -1,3 +1,13 @@
+define ([
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/Widget'] ,
+
+function (
+    cssloader ,
+    Class, Widget) {
+
+    cssloader.load('../webfwk/css/StackOfRows.css') ;
+
 /*
  * Two wrapper classes and a factory for producing an appropriate
  * RowTitle object from the specified input.
@@ -20,7 +30,7 @@ function RowTitle_Factory (title, hdr) {
             case 'string' : return new RowTitle_FromString(title) ;
         }
     }
-    throw new WidgetError('RowTitle_Factory: missing or unsupported row title') ;
+    throw new Widget.WidgetError('RowTitle_Factory: missing or unsupported row title') ;
 }
 
 /**
@@ -38,7 +48,7 @@ function RowTitle_Factory (title, hdr) {
  */
 function StackRowBody () {
 
-    Widget.call(this) ;
+    Widget.Widget.call(this) ;
     
     /*
      * The parent stack object
@@ -54,7 +64,7 @@ function StackRowBody () {
      */
     this.row_id = null ;
 }
-define_class(StackRowBody, Widget, {}, {}) ;
+Class.define_class(StackRowBody, Widget.Widget, {}, {}) ;
 
 /**
  * The final class to package the body of a stack from 
@@ -79,7 +89,7 @@ function StackRowBody_FromString (parent_stack, row_id, text) {
         this.container.html(this.text) ;
     } ;
 }
-define_class(StackRowBody_FromString, StackRowBody, {}, {}) ;
+Class.define_class(StackRowBody_FromString, StackRowBody, {}, {}) ;
 
 /**
  * The factory method will return an object coformant to the StackRowBody interface
@@ -104,7 +114,7 @@ function StackRowBody_Factory (parent_stack, row_id, body) {
                 return body ;
             }
     }
-    throw new WidgetError('StackRowBody_Factory: missing or unsupported row body') ;
+    throw new Widget.WidgetError('StackRowBody_Factory: missing or unsupported row body') ;
 }
 
 /**
@@ -135,7 +145,7 @@ function SimpleStackRowData (title, body) {
     this.title = title ;
     this.body  = body ;
 }
-define_class(SimpleStackRowData, StackRowData, {}, {}) ;
+Class.define_class(SimpleStackRowData, StackRowData, {}, {}) ;
 
 /**
  * 
@@ -178,7 +188,7 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
             opt.allow_replicated_headers
         ) ;
     }
-    throw new WidgetError('StackRowData_Factory: unsupported type of the row') ;
+    throw new Widget.WidgetError('StackRowData_Factory: unsupported type of the row') ;
 }
 
 /**
@@ -204,7 +214,7 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
  */
 function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, block_common_expand, effect_on_insert, block_expand, allow_replicated_headers) {
 
-    Widget.call(this) ;
+    Widget.Widget.call(this) ;
 
     this.parent = parent ;
     this.id = id ;
@@ -217,7 +227,7 @@ function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, 
     this.block_expand = block_expand ? true : false ;
     this.allow_replicated_headers = allow_replicated_headers ? true : false ;
 }
-define_class (StackRow, Widget, {}, {
+Class.define_class (StackRow, Widget.Widget, {}, {
 
 /**
  * @function - overloading the function of the base class Widget
@@ -418,7 +428,7 @@ function StackOfRows (hdr, rows, options) {
             this.add_row(rows[i]) ;
 
 }
-define_class (StackOfRows, Widget, {
+Class.define_class (StackOfRows, Widget.Widget, {
     
 /******************
  * Static members *
@@ -596,7 +606,7 @@ stack_header: function () {
 
 assert_initialized: function () {
     if (!this.is_initialized)
-        throw new WidgetError('StackRows.assert_initialized: the widget has not been rendered yet') ;
+        throw new Widget.WidgetError('StackRows.assert_initialized: the widget has not been rendered yet') ;
 } ,
 
 get_row_location_by_id: function (id) {
@@ -604,7 +614,7 @@ get_row_location_by_id: function (id) {
         var row = this.rows[i] ;
         if (row.id === id) return i ;
     }
-    throw new WidgetError('StackRows.get_row_location_by_id: illegal row id: '+id) ;
+    throw new Widget.WidgetError('StackRows.get_row_location_by_id: illegal row id: '+id) ;
 } ,
 
 get_row_by_id: function (id) {
@@ -699,7 +709,7 @@ delete_row : function (id) {
  */
 update_row : function (id, row_data, effect_on_update_required) {
 
-    if (!row_data) throw new WidgetError('StackRows.update_row: illegal row data') ;
+    if (!row_data) throw new Widget.WidgetError('StackRows.update_row: illegal row data') ;
 
     this.assert_initialized() ;
 
@@ -734,7 +744,7 @@ update_row : function (id, row_data, effect_on_update_required) {
  */
 insert_front : function (row_data) {
 
-    if (!row_data) throw new WidgetError('StackRows.update_row: illegal row data') ;
+    if (!row_data) throw new Widget.WidgetError('StackRows.update_row: illegal row data') ;
 
     this.assert_initialized() ;
 
@@ -772,7 +782,7 @@ insert_front : function (row_data) {
  */
 append : function (row_data) {
 
-    if (!row_data) throw new WidgetError('StackRows.append: illegal row data') ;
+    if (!row_data) throw new Widget.WidgetError('StackRows.append: illegal row data') ;
 
     this.assert_initialized() ;
 
@@ -799,4 +809,11 @@ append : function (row_data) {
     return new_row_obj.id ;
 }
 
+}) ;
+
+    return {
+        StackRowBody : StackRowBody ,
+        StackRowData : StackRowData ,
+        StackOfRows : StackOfRows
+    } ;
 }) ;

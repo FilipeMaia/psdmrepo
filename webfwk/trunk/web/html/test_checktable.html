@@ -1,26 +1,15 @@
-<!--
-This is an example of the CheckTable widget.
--->
 <!DOCTYPE html>
 <html>
 <head>
 <title>An example of the CheckTable widget</title>
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 
 <script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
 
-<script type="text/javascript" src="/underscore/underscore-min.js"></script>
-
-<script type="text/javascript" src="js/Class.js" ></script>
-<script type="text/javascript" src="js/Widget.js" ></script>
-<script type="text/javascript" src="js/CheckTable.js" ></script>
-
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
-
-<link type="text/css" href="css/Table.css" rel="Stylesheet" />
-<link type="text/css" href="css/CheckTable.css" rel="Stylesheet" />
 
 <style>
 body {
@@ -31,112 +20,23 @@ body {
     padding: 10px 20px 20px 20px;
 }
 .test > #ctrl button {
-  width:100%;
-  border-radius: 2px;
-  font-size: 10px;
-  color: black;
+    width:100%;
+    border-radius: 2px;
+    font-size: 10px;
+    color: black;
 }
 .test > #checktable {
-  margin-top: 10px;
+    margin-top: 10px;
 }
 .test > #result {
-  margin-top: 20px;
-  margin-left: 40px;
-  color: maroon;
+    margin-top: 20px;
+    margin-left: 40px;
+    color: maroon;
 }
 
 </style>
 
-<script type="text/javascript" >
-
-var next_id = 0 ;
-
-function make_row(role) {
-    var id = next_id++ ;
-    var row = {
-        notify:  id % 3 ? true : false ,
-        user:    'user_'+id ,
-        role:    role ? role : (Math.floor(id / 4) ? 'Member of instrument support group ps-amo' : 'Data Administrator') ,
-        _locked: (Math.floor(id % 5) ? false : true)
-    } ;
-    return row ;
-}
-
-function report_result(msg) {
-  $('#result').html(msg) ;
-}
-var checktable = null ;
-
-$(function () {
-    var coldef = [
-        {name: 'notify', text: 'Notify'} ,
-        {name: 'user',   text: 'User'} ,
-        {name: 'role',   text: 'Role'}
-    ] ;
-    var rows = [] ;
-    rows.push(make_row('Experiment PI')) ;
-    for (var i = 0; i < 20; i++)
-        rows.push(make_row()) ;
-
-    checktable = new CheckTable(coldef, rows) ;
-    checktable.display($('#checktable')) ;
-    
-    $('button').button().click(function () {
-        var row = make_row() ;
-        switch (this.name) {
-
-            case 'insert_front'     : checktable.insert_front(row) ; break ;
-            case 'append'           : checktable.append      (row) ; break ;
-            case 'remove_by_role'   :
-                var rows = checktable.remove(function (row) {
-                    return row.role === 'Experiment PI' ;
-                }) ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'remove_unchecked' :
-                var rows = checktable.remove(function (row) {
-                    return row.notify ? false : true 
-                }) ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'remove_all' :
-                var rows = checktable.remove_all() ;
-                report_result(rows.length+' rows') ;
-                break ;
-
-            case 'find_checked' :
-                var rows = checktable.find_checked() ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'find_not_checked' :
-                var rows = checktable.find_not_checked() ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'check' :
-                checktable.check_all() ;
-                break ;
-            case 'uncheck' :
-                checktable.uncheck_all() ;
-                break ;
-
-            case 'find_locked' :
-                var rows = checktable.find_locked() ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'find_not_locked' :
-                var rows = checktable.find_not_locked() ;
-                report_result(rows.length+' rows') ;
-                break ;
-            case 'lock' :
-                checktable.lock_all() ;
-                break ;
-            case 'unlock' :
-                checktable.unlock_all() ;
-                break ;
-        }
-    }) ;
-}) ;
-</script>
+<script data-main="../webfwk/js/test_checktable_main.js" src="/require/require.js"></script>
 
 </head>
 <body>

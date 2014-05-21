@@ -1,16 +1,23 @@
+define ([
+    'underscore' ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class' ,
+    'webfwk/Widget'] ,
+
+function (
+    _ ,
+    cssloader ,
+    Class ,
+    Widget) {
+
+    cssloader.load('../webfwk/css/RadioBox.css') ;
+
 /**
  * The radio-box widget encapsulates buttons
  *
- * DEPENDENCIES:
- *      underscrore.js
- *      jquery
- *      jquery ui
- *      Widget.js
- *
- * STYLING:
- *      radiobox.css
- *
  * USAGE:
+ * 
+ *   TO BE DONE LATER...
  *
  * @param array buttons
  * @param function onchange
@@ -23,10 +30,10 @@ function RadioBox (buttons, onchange, options) {
 
     // Always call the c-tor of the base class
 
-    Widget.call(this) ;
+    Widget.Widget.call(this) ;
 
     function _ASSERT (expression) {
-        if (!expression) throw new WidgetError('RadioBox::'+arguments.callee.caller.name) ;
+        if (!expression) throw new Widget.WidgetError('RadioBox::'+arguments.callee.caller.name) ;
     }
 
     // Verify parameters of the object
@@ -175,4 +182,7 @@ function RadioBox (buttons, onchange, options) {
             addClass('radio-box-hint-active') ;
     } ;
 }
-define_class(RadioBox, Widget, {}, {}) ;
+Class.define_class(RadioBox, Widget.Widget, {}, {}) ;
+
+    return RadioBox ;
+}) ;
