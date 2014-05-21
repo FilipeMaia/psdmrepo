@@ -1,50 +1,67 @@
-/**
- * The application for managing e-mail notifications on changes in the database
- *
- * @returns {Notifications}
- */
-function Notifications (instr_name) {
+define ([
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-    // -----------------------------------------
-    // Allways call the base class's constructor
-    // -----------------------------------------
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
-    FwkApplication.call(this) ;
+    cssloader.load('../shiftmgr/css/shiftmgr.css') ;
 
-    // ------------------------
-    // Parameters of the object
-    // ------------------------
+    /**
+     * The application for managing e-mail notifications on changes in the database
+     *
+     * @returns {Notifications}
+     */
+    function Notifications (instr_name) {
 
-    this.instr_name = instr_name || '' ;
+        // -----------------------------------------
+        // Allways call the base class's constructor
+        // -----------------------------------------
 
-    // ------------------------------------------------
-    // Override event handler defined in the base class
-    // ------------------------------------------------
-    
-    this.on_activate = function() {
-        this.on_update() ;
-    } ;
+        FwkApplication.call(this) ;
 
-    this.on_deactivate = function() {
-        this.init() ;
-    } ;
+        // ------------------------
+        // Parameters of the object
+        // ------------------------
 
-    this.on_update = function (sec) {
-        this.init() ;
-        if (this.active) {
-            ;
-        }
-    } ;
+        this.instr_name = instr_name || '' ;
 
-    // --------------------
-    // Own data and methods
-    // --------------------
+        // ------------------------------------------------
+        // Override event handler defined in the base class
+        // ------------------------------------------------
 
-    this.is_initialized = false ;
+        this.on_activate = function() {
+            this.on_update() ;
+        } ;
 
-    this.init = function () {
-        if (this.is_initialized) return ;
-        this.is_initialized = true ;
-    } ;
-}
-define_class (Notifications, FwkApplication, {}, {});
+        this.on_deactivate = function() {
+            this.init() ;
+        } ;
+
+        this.on_update = function (sec) {
+            this.init() ;
+            if (this.active) {
+                ;
+            }
+        } ;
+
+        // --------------------
+        // Own data and methods
+        // --------------------
+
+        this.is_initialized = false ;
+
+        this.init = function () {
+            if (this.is_initialized) return ;
+            this.is_initialized = true ;
+            
+            this.container.html (
+'View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.)'
+            ) ;
+        } ;
+    }
+    Class.define_class (Notifications, FwkApplication, {}, {}) ;
+
+    return Notifications ;
+}) ;
