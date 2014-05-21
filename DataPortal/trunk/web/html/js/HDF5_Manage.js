@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/HDF5_Manage.css') ;
 
@@ -529,7 +531,7 @@ function (cssloader) {
             else    this._auto.attr('checked', 'checked') ;
         } ;
     }
-    define_class (HDF5_Manage, FwkApplication, {}, {}) ;
+    Class.define_class (HDF5_Manage, FwkApplication, {}, {}) ;
 
     return HDF5_Manage ;
 }) ;

@@ -1,8 +1,8 @@
 <?php
 
-/* Let a user to select an experiment first if no valid experiment
- * identifier is supplied to the script.
- */
+// Let a user to select an experiment first if no valid experiment
+// identifier is supplied to the script.
+
 function select_experiment () {
     header("Location: select_experiment.php") ;
     exit ;
@@ -11,8 +11,8 @@ function select_experiment () {
 $exper_id = isset($_GET['exper_id']) ? intval(trim($_GET['exper_id'])) : 0 ;
 if (!$exper_id) select_experiment() ;
 
-/* Redirections to support legacy URLs.
- */
+// Redirections to support legacy URLs.
+
 $known_apps = array (
 
     'experiment' => array (
@@ -86,10 +86,11 @@ if (is_null($select_app)) {
     $select_app = 'Experiment' ;
     $select_app_context1 = 'Info' ;
 }
-/* Parse optional parameters which may be used by applications. The parameters
- * will be passed directly into applications for further analysis (syntax, values,
- * etc.).
- */
+
+// Parse optional parameters which may be used by applications. The parameters
+// will be passed directly into applications for further analysis (syntax, values,
+// etc.).
+
 if (isset($_GET['params'])) {
     $params = explode(',', trim( $_GET['params'])) ;
 }
@@ -183,43 +184,7 @@ try {
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
-<link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
-
-<link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/SmartTable.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/RadioBox.css" rel="Stylesheet" />
-
-<link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
-
-<style>
-
-span.toggler {
-  background-color: #ffffff;
-  border: 1px solid #c0c0c0;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  cursor: pointer;
-}
-
-button.control-button,
-label.control-label {
-  font-size: 10px;
-  color: black;
-}
-
-.shift-reports,
-.shift-history-reports,
-.shift-notifications {
-  padding: 15px 20px 20px 20px;
-}
-
-button {
-  background: rgba(240, 248, 255, 0.39) !important;
-  border-radius: 2px !important;
-}
-
-</style>
 
 <script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
@@ -229,79 +194,67 @@ button {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
 
-<script type="text/javascript" src="/underscore/underscore-min.js"></script>
-
-<script type="text/javascript" src="../webfwk/js/Class.js" ></script>
-<script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
-<script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>
-
-<script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
-
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
-<script type="text/javascript" src="../webfwk/js/SmartTable.js" ></script>
-<script type="text/javascript" src="../webfwk/js/RadioBox.js" ></script>
-
-<script type="text/javascript" src="../portal/js/ELog_Utils.js"></script>
-
-<script type="text/javascript" src="../shiftmgr/js/Definitions.js"></script>
-<script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
-<script type="text/javascript" src="../shiftmgr/js/Notifications.js"></script>
-<script type="text/javascript" src="../shiftmgr/js/History.js"></script>
 
 <script type="text/javascript">
 
-var title        = '<?=$title?>' ;
-var subtitle_url = '<?=$subtitle_url?>' ;
-        
-var experiment = {
-    id           :  <?= $experiment->id() ?> ,
-    name         : '<?= $experiment->name() ?>' ,
-    contact_uid  : '<?= $experiment->leader_Account() ?>' ,
-    posix_group  : '<?= $experiment->POSIX_gid() ?>' ,
-    is_facility  :  <?= $experiment->is_facility() ? 1 : 0 ?> ,
-    instrument   : {
-        id       :  <?= $instrument->id()   ?> ,
-        name     : '<?= $instrument->name() ?>'
-    } ,
-    operator_uid : '<?= $operator_uid ? $operator_uid : '' ?>'
-} ;
+// Application configuration needs to be passed to the Fwk initialization
+// procedure run upon loading RequireJS.
 
-var access_list = {
-    user : {
-        uid   : '<?= $user["uid"]   ?>' ,
-        gecos : '<?= htmlspecialchars($user["gecos"], ENT_QUOTES) ?>' ,
-        email : '<?= htmlspecialchars($user["email"], ENT_QUOTES) ?>'
-    } ,
+var app_config = {
+
+    title :        '<?=$title?>' ,
+    subtitle_url : '<?=$subtitle_url?>' ,
+        
     experiment : {
-        view_info    : <?= $experiment_can_read_data    ? 1 : 0 ?> ,
-        manage_group : <?= $experiment_can_manage_group ? 1 : 0 ?>
+        id           :  <?= $experiment->id() ?> ,
+        name         : '<?= $experiment->name() ?>' ,
+        contact_uid  : '<?= $experiment->leader_Account() ?>' ,
+        posix_group  : '<?= $experiment->POSIX_gid() ?>' ,
+        is_facility  :  <?= $experiment->is_facility() ? 1 : 0 ?> ,
+        instrument   : {
+            id       :  <?= $instrument->id()   ?> ,
+            name     : '<?= $instrument->name() ?>'
+        } ,
+        operator_uid : '<?= $operator_uid ? $operator_uid : '' ?>'
     } ,
-    elog : {
-        read_messages   : <?= $elog_can_read_messages   ? 1 : 0 ?> ,
-        post_messages   : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
-        edit_messages   : <?= $elog_can_edit_messages   ? 1 : 0 ?> ,
-        delete_messages : <?= $elog_can_delete_messages ? 1 : 0 ?> ,
-        manage_shifts   : <?= $elog_can_manage_shifts   ? 1 : 0 ?>
-    } ,
-    runtables : {
-        read              : <?= $experiment_can_read_data ? 1 : 0 ?> ,
-        edit_calibrations : <?= $calibrations_can_edit    ? 1 : 0 ?> ,
-        edit              : <?= $elog_can_post_messages   ? 1 : 0 ?>
-    } ,
-    datafiles : {
-        read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
-        manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
-        is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
-    } ,
-    hdf5 : {
-        read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
-        manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
-        is_data_administrator : <?= $hdf5_can_retranslate     ? 1 : 0 ?>
-    } ,
-    shiftmgr : {
-        can_edit : <?= $shiftmgr_can_edit ? 1 : 0 ; ?>
-    } ,
-    no_page_access_html :
+
+    access_list : {
+        user : {
+            uid   : '<?= $user["uid"]   ?>' ,
+            gecos : '<?= htmlspecialchars($user["gecos"], ENT_QUOTES) ?>' ,
+            email : '<?= htmlspecialchars($user["email"], ENT_QUOTES) ?>'
+        } ,
+        experiment : {
+            view_info    : <?= $experiment_can_read_data    ? 1 : 0 ?> ,
+            manage_group : <?= $experiment_can_manage_group ? 1 : 0 ?>
+        } ,
+        elog : {
+            read_messages   : <?= $elog_can_read_messages   ? 1 : 0 ?> ,
+            post_messages   : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
+            edit_messages   : <?= $elog_can_edit_messages   ? 1 : 0 ?> ,
+            delete_messages : <?= $elog_can_delete_messages ? 1 : 0 ?> ,
+            manage_shifts   : <?= $elog_can_manage_shifts   ? 1 : 0 ?>
+        } ,
+        runtables : {
+            read              : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+            edit_calibrations : <?= $calibrations_can_edit    ? 1 : 0 ?> ,
+            edit              : <?= $elog_can_post_messages   ? 1 : 0 ?>
+        } ,
+        datafiles : {
+            read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+            manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
+            is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
+        } ,
+        hdf5 : {
+            read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+            manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
+            is_data_administrator : <?= $hdf5_can_retranslate     ? 1 : 0 ?>
+        } ,
+        shiftmgr : {
+            can_edit : <?= $shiftmgr_can_edit ? 1 : 0 ; ?>
+        } ,
+        no_page_access_html :
 '<br><br>' +
 '<center>' +
 '  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">' +
@@ -311,13 +264,12 @@ var access_list = {
 '<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;"> ' +
 '  We\'re sorry! Our records indicate that your SLAC UNIX account has no proper permissions to access this page.' +
 '  You\'re encoureged to directly contact the PI of the experiment to resolve this issue.' +
-'</div>'
-} ;
+'</div>'} ,
 
-var select_app = '<?=$select_app?>' ;
-var select_app_context1 = '<?=$select_app_context1?>' ;
+    select_app : '<?=$select_app?>' ,
+    select_app_context1 : '<?=$select_app_context1?>' ,
 
-var global_extra_params = {} ;
+    global_extra_params : {
 <?php
     if (isset($params)) {
         foreach ($params as $p) {
@@ -327,17 +279,19 @@ var global_extra_params = {} ;
                 break;
             case 1 :
                 $k = $kv[0] ;
-                echo "global_extra_params['{$k}'] = true ;\n" ;
+                echo "'{$k}' : true ,\n" ;
                 break ;
             default :
                 $k = $kv[0] ;
                 $v = $kv[1] ;
-                echo "global_extra_params['{$k}'] = '{$v}' ;\n" ;
+                echo "'{$k}' : '{$v}' ,\n" ;
                 break ;
             }
         }
     }
 ?>
+    }
+} ;
 
 // Redirections in the global scope which may be required by the legacy
 // code generatet by Web services.
@@ -366,259 +320,10 @@ function display_path(filepath) { Fwk.show_path(filepath) ; }
 
 </script>
 
-
-<!-- Finally, when all JavaScript structures have been initialized
-     loading RequireJS -->
-
 <script data-main="../portal/js/index_main.js" src="/require/require.js"></script>
 
 </head>
-
-  <body>
-
-      Loading...
-
-<?php { $instr_name = $instrument->name() ; ?>
-
-      <div id="shift-reports-<?php echo $instr_name ; ?>" style="display:none">
-
-        <div class="shift-reports">
-
-          <!-- Controls for selecting shifts for display and updating the list of
-            -- the selected shifts. -->
-
-          <div id="shifts-search-controls"  style="float:left;" >
-
-            <div class="shifts-search-filters" >
-
-              <div class="shifts-search-filter-group" >
-                <div class="header" >Time range</div>
-                <div class="cell-1" >
-                  <select class="filter" name="range" style="padding:1px;">
-                    <option value="week"  >Last 7 days</option>
-                    <option value="month" >Last month</option>
-                    <option value="range" >Specific range</option>
-                  </select>
-                </div>
-                <div class="cell-2" >
-                  <input class="filter" type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
-                  <input class="filter" type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" />
-                </div>
-                <div class="terminator" ></div>
-              </div>
-
-              <div class="shifts-search-filter-group" >
-                <div class="header" >Stopper out</div>
-                <div class="cell-2">
-                  <select class="filter" name="stopper" style="padding:1px;">
-                    <option value=""  ></option>
-                    <option value="0" >&gt; 0 %</option>
-                    <option value="1" >&gt; 1 %</option>
-                    <option value="2" >&gt; 2 %</option>
-                    <option value="3" >&gt; 3 %</option>
-                    <option value="4" >&gt; 4 %</option>
-                    <option value="5" >&gt; 5 %</option>
-                  </select>
-                </div>
-                <div class="header-1">Door open</div>
-                <div class="cell-2" >
-                  <select class="filter" name="door" style="padding:1px;">
-                    <option value="" ></option>
-                    <option value="100" >&lt; 100 %</option>
-                    <option value="99"  >&lt; 99 %</option>
-                    <option value="98"  >&lt; 98 %</option>
-                    <option value="97"  >&lt; 97 %</option>
-                    <option value="96"  >&lt; 96 %</option>
-                    <option value="95"  >&lt; 95 %</option>
-                  </select>
-                </div>
-                <div class="header-1" >LCLS beam</div>
-                <div class="cell-2">
-                  <select class="filter"t name="lcls" style="padding:1px;">
-                    <option value=""  ></option>
-                    <option value="0" >&gt; 0 %</option>
-                    <option value="1" >&gt; 1 %</option>
-                    <option value="2" >&gt; 2 %</option>
-                    <option value="3" >&gt; 3 %</option>
-                    <option value="4" >&gt; 4 %</option>
-                    <option value="5" >&gt; 5 %</option>
-                  </select>
-                </div>
-                <div class="header-1">Data taking</div>
-                <div class="cell-2" >
-                  <select class="filter" name="daq" style="padding:1px;">
-                    <option value=""  ></option>
-                    <option value="0" >&gt; 0 %</option>
-                    <option value="1" >&gt; 1 %</option>
-                    <option value="2" >&gt; 2 %</option>
-                    <option value="3" >&gt; 3 %</option>
-                    <option value="4" >&gt; 4 %</option>
-                    <option value="5" >&gt; 5 %</option>
-                  </select>
-                </div>
-                <div class="terminator" ></div>
-              </div>
-
-              <div class="shifts-search-filter-group" >
-                <div class="header" >Shift types</div>
-                <div class="cell-2">
-                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="USER"     title="if enabled it will include shifts of this type" /></div><div class="cell-4">USER</div>
-                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="MD"       title="if enabled it will include shifts of this type" /></div><div class="cell-4">MD</div>
-                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="IN-HOUSE" title="if enabled it will include shifts of this type" /></div><div class="cell-4">IN-HOUSE</div>
-                </div>
-                <div class="terminator" ></div>
-              </div>
-
-            </div>
-            <div class="shifts-search-buttons" >
-              <button name="reset"  title="reset the search form to the default state">RESET</button>
-            </div>
-            <div class="shifts-search-filter-terminator" ></div>
-          </div>
-
-<?php if ($shiftmgr_can_edit) { ?>
-
-          <div id="new-shift-controls" style="float:left; margin-left:10px;">
-            <button name="new-shift" title="open a dialog for creating a new shift" >CREATE NEW SHIFT</button>
-            <div id="new-shift-con" class="new-shift-hdn" style="background-color:#f0f0f0; margin-top:5px; padding:1px 10px 5px 10px; border-radius:5px;" >
-              <div style="max-width:460px;">
-                <p>Note that shifts are usually created automatically based on rules defined
-                in the Administrative section of this application. You may still want to create
-                your own shift if that shift happens to be an exception from the rules.
-                Possible cases would be: non-planned shift, very short shift, etc. In all
-                other cases please see if there is a possibility to reuse an empty shift slot
-                by checking "Display all shifts" checkbox on the left.</p>
-              </div>
-              <div style="float:left;">
-                <table style="font-size:90%;"><tbody>
-                  <tr>
-                    <td class="shift-grid-hdr " valign="center" >Type:</td>
-                    <td class="shift-grid-val " valign="center" >
-                      <select name="type" >
-                        <option value="USER"     >USER</option>
-                        <option value="MD"       >MD</option>
-                        <option value="IN-HOUSE" >IN-HOUSE</option>
-                      </select></td>
-                  </tr>
-                  <tr>
-                    <td class="shift-grid-hdr " valign="center" >Begin:</td>
-                    <td class="shift-grid-val " valign="center" >
-                      <input name="begin-day" type="text" size=8 title="specify the begin date of the shift" />
-                      <input name="begin-h"   type="text" size=1 title="hour: 0..23" />
-                      <input name="begin-m"   type="text" size=1 title="minute: 0..59" /></td>
-                  </tr>
-                  <tr>
-                    <td class="shift-grid-hdr " valign="center" >End:</td>
-                    <td class="shift-grid-val " valign="center" >
-                      <input name="end-day" type="text" size=8 title="specify the end date of the shift" />
-                      <input name="end-h"   type="text" size=1 title="hour: 0..23" />
-                      <input name="end-m"   type="text" size=1 title="minute: 0..59" /></td>
-                  </tr>
-                </tbody></table>
-              </div>
-              <div style="float:left; margin-left:20px; margin-top:40px; padding-top:5px;">
-                <button name="save"   title="submit modifications and open the editing dialog for the new shift">SAVE</button>
-                <button name="cancel" title="discard modifications and close this dialog">CANCEL</button>
-              </div>
-              <div style="clear:both;"></div>
-            </div>
-          </div>
-
-<?php } ?>
-
-          <div style="clear:both;"></div>
-          <div style="float:right;" id="shifts-search-info">Searching...</div>
-          <div style="clear:both;"></div>
-
-          <!-- The shifts display -->
-
-          <div id="shifts-search-display"> </div>
-
-        </div>
-      </div>
-
-      <div id="shift-history-<?php echo $instr_name ; ?>" style="display:none">
-
-        <div class="shift-history-reports">
-
-          <!-- Controls for selecting an interval for display and updating the list of
-            -- the selected shifts. -->
-
-          <div id="shifts-history-controls" style="float:left;" >
-            <div>
-              <table><tbody>
-                <tr>
-                  <td><b>Range:</b></td>
-                  <td><select name="range" style="padding:1px;">
-                        <option value="week"  >Last 7 days</option>
-                        <option value="month" >Last month</option>
-                        <option value="range" >Specific range</option>
-                      </select></td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td><input type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
-                      <b>&mdash;</b>
-                      <input type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" /></td>
-                  <td><div style="width:20px;">&nbsp;</div></td>
-                  <td><button name="reset"  title="reset the search form to the default state">Reset</button></td>
-                </tr>
-              </tbody></table>
-            </div>
-            <div style="margin-top:5px;" >
-              <table><tbody>
-                <tr>
-                  <td><b>Display:</b></td>
-                  <td class="annotated"
-                      data="if enabled the table below will display shift creation events">
-                    <input type="checkbox"
-                           name="display-create-shift"
-                           checked="checked" />CREATE SHIFT</td>
-                </tr>
-                <tr>
-                  <td>&nbsp;</td>
-                  <td class="annotated"
-                      data="if enabled the table below will display shift modifications">
-                    <input type="checkbox"
-                           name="display-modify-shift"
-                           checked="checked" />MODIFY SHIFT</td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td class="annotated"
-                      data="if enabled the table below will display area modifications">
-                    <input type="checkbox"
-                           name="display-modify-area"
-                           checked="checked" />MODIFY AREA</td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td class="annotated"
-                      data="if enabled the table below will display timer allocation modifications">
-                    <input type="checkbox"
-                           name="display-modify-time"
-                           checked="checked" />MODIFY TIME ALLOCATION</td>
-                </tr>
-              </tbody></table>
-            </div>
-          </div>
-          <div style="clear:both;"></div>
-          <div style="float:right;" id="shifts-history-info">Searching...</div>
-          <div style="clear:both;"></div>
-
-          <!-- The shifts display -->
-
-          <div id="shifts-history-display"></div>
-
-        </div>
-      </div>
-
-      <div id="shift-notifications-<?php echo $instr_name ; ?>" style="display:none">
-
-        <div class="shift-notifications">
-          View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.
-        </div>
-
-      </div>
-
-<?php } ?>
-
-  </body>
-
+<body></body>
 </html>
 
 <?php

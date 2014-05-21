@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/SmartTable', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, SmartTable, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Runtables_User.css') ;
 
@@ -134,12 +136,12 @@ function (cssloader) {
                     max_hdr_rows = 5 ;
 
                 this._table = new SmartTable (
-                    this._get_cont().find('div#table') ,
                     hdr ,
                     [] ,            // row data will be loaded later
                     num_hdr_rows ,
                     max_hdr_rows
                 ) ;
+                this._table.display(this._get_cont().find('div#table')) ;
             }
             return this._table ;
         } ;
@@ -423,7 +425,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (Runtable_DialogView, Runtable_Dialog, {}, {});
+    Class.define_class (Runtable_DialogView, Runtable_Dialog, {}, {}) ;
 
     /**
      * The table editing dialogs
@@ -1049,16 +1051,15 @@ function (cssloader) {
                 max_hdr_rows = 5 ;
 
             var table = new SmartTable (
-                table_cont ,
                 hdr ,
                 rows ,
                 num_hdr_rows ,
                 max_hdr_rows
             ) ;
-            table.display() ;
+            table.display(table_cont) ;
         } ;
     }
-    define_class (Runtable_DialogEdit, Runtable_Dialog, {}, {}) ;
+    Class.define_class (Runtable_DialogEdit, Runtable_Dialog, {}, {}) ;
 
     /**
      * The application for displaying user-defined run tables
@@ -1359,7 +1360,7 @@ function (cssloader) {
             delete this._table_dialog[id] ;
         } ;
     }
-    define_class (Runtables_User, FwkApplication, {}, {});
+    Class.define_class (Runtables_User, FwkApplication, {}, {}) ;
 
     return Runtables_User ;
 }) ;

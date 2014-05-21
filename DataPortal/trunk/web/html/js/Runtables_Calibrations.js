@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Runtables_Calibrations.css') ;
 
@@ -306,7 +308,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (Runtables_Calibrations, FwkApplication, {}, {});
+    Class.define_class (Runtables_Calibrations, FwkApplication, {}, {}) ;
 
     return Runtables_Calibrations ;
 }) ;

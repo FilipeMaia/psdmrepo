@@ -88,15 +88,7 @@ HERE;
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
-<link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/PropList.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/CheckTable.css" rel="Stylesheet" />
-
-<link type="text/css" href="../portal/css/ExpSwitch_Station.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ExpSwitch_History.css" rel="Stylesheet" />
-<link type="text/css" href="../portal/css/ExpSwitch_ELogAccess.css" rel="Stylesheet" />
-
 
 <style>
 
@@ -129,64 +121,23 @@ button {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
 
-<script type="text/javascript" src="/underscore/underscore-min.js"></script>
-
-<script type="text/javascript" src="../webfwk/js/Class.js" ></script>
-<script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
-<script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
-<script type="text/javascript" src="../webfwk/js/PropList.js"></script>
-<script type="text/javascript" src="../webfwk/js/CheckTable.js"></script>
-
-<script type="text/javascript" src="../portal/js/ExpSwitch_Station.js"></script>
-<script type="text/javascript" src="../portal/js/ExpSwitch_History.js"></script>
-<script type="text/javascript" src="../portal/js/ExpSwitch_ELogAccess.js"></script>
 
 <script type="text/javascript">
 
-var select_app = '<?=$select_instr_name?>' ;
-var select_app_context1 = 'Station <?=$select_station?>' ;
+// Application configuration needs to be passed to the Fwk initialization
+// procedure run upon loading RequireJS.
 
-var instruments = <?=json_encode($instruments)?> ;
+var app_config = {
 
-$(function() {
+    title : '<?=$title?>' ,
+    subtitle : 'Activate Experiments for DAQ' ,
 
-    var menus = [] ;
-    for (var i in instruments) {
+    select_app : '<?=$select_instr_name?>' ,
+    select_app_context1 : 'Station <?=$select_station?>' ,
 
-        var instr = instruments[i] ;
-        var instr_tab = {
-            name: instr.name ,
-            menu: []} ;
-
-        for (var station = 0; station < instr.num_stations; ++station)
-            instr_tab.menu.push ({
-                name: 'Station '+station ,
-                application: new ExpSwitch_Station(instr.name, station, instr.access_list)}) ;
-
-            instr_tab.menu.push ({
-                name: 'History' ,
-                application: new ExpSwitch_History(instr.name, instr.access_list)
-            } , {
-                name: 'e-Log Access - '+instr.operator_uid ,
-                application: new ExpSwitch_ELogAccess(instr.name, instr.operator_uid, instr.access_list)
-            }) ;
-
-        menus.push(instr_tab) ;
-    }
-    Fwk.build (
-
-        '<?=$title?>' ,
-        'Activate Experiments for DAQ' ,
-
-        menus ,
-
-        null ,  // no quick search for this application
-
-        function () {
-            Fwk.activate(select_app, select_app_context1) ; }
-    ) ;
-}) ;
+    instruments : <?=json_encode($instruments)?>
+} ;
 
 // Redirections which may be required by the legacy code generated
 // by Web services.
@@ -194,9 +145,16 @@ $(function() {
 function show_email (user, addr) { Fwk.show_email(user, addr) ; }
 
 </script>
+
+<!-- Finally, when all JavaScript structures have been initialized
+     loading RequireJS -->
+
+<script data-main="../portal/js/experiment_switch_main.js" src="/require/require.js"></script>
+
 </head>
-<body>
-</body>
+
+<body></body>
+
 </html>
 
 <?php

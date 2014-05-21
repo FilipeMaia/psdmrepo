@@ -1,7 +1,10 @@
 define ([
-    'webfwk/CSSLoader'] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/SmartTable', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, SmartTable, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Runtables_EPICS.css') ;
 
@@ -226,12 +229,12 @@ function (cssloader) {
             var num_hdr_rows = 2 ;
             var max_hdr_rows = 5 ;
             var table = new SmartTable (
-                tab_body.find('div#table') ,
                 hdr ,
                 rows ,
                 num_hdr_rows ,
                 max_hdr_rows
             ) ;
+            table.display(tab_body.find('div#table')) ;
             this._tables[s_name] = table ;
 
             return table ;
@@ -302,7 +305,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (Runtables_EPICS, FwkApplication, {}, {}) ;
+    Class.define_class (Runtables_EPICS, FwkApplication, {}, {}) ;
 
     return Runtables_EPICS ;
 }) ;

@@ -215,40 +215,66 @@ class Translator {
      */
     function apply_filter_range2runs( $range, $logbook_in ) {
 
-        /* Translate the range into a dictionary of runs. This is going to be
-         * our filter. Run numbers will be the keys. And each key will have True
-         * as the corresponding value.
-         */ 
-        $runs2allow = array();
-        foreach( explode( ',', $range ) as $subrange ) {
-
-            /* Check if this is just a number or a subrange: <begin>-<end>
-             */
-            $pair = explode( '-', $subrange );
-            switch( count( $pair )) {
-                case 1:
-                    $runs2allow[$pair[0]] = True;
-                    break;
-                case 2:
-                    if( $pair[0] >= $pair[1] )
-                        throw new DataPortalexception(
-                            __METHOD__, "illegal subrange: ".$pair[0]."-".$pair[1] );
-                    for( $run = $pair[0]; $run <= $pair[1]; $run++ )
-                        $runs2allow[$run] = True;
-                    break;
-                default:
-                    throw new DataPortalexception(
-                        __METHOD__, 'illegal syntax of the runs range' );
-            }
-        }
-
-        /* Apply the filter
-         */
         $out = array();
+
+        $min_runnum = null ;
+        $max_runnum = null ;
+        
         foreach( $logbook_in as $run ) {
             $runum = $run->num();
-            if( array_key_exists( $runum, $runs2allow ))
-                array_push( $out, $run );
+            $min_runnum = $min_runnum ? min(array($min_runnum, $runum)) : $runum;
+            $max_runnum = $max_runnum ? max(array($max_runnum, $runum)) : $runum;
+        }
+        
+        /* Proceed to teh filter only if the input list of runs isn't empty */
+
+        if( $min_runnum && $max_runnum ) {
+
+            /* Translate the range into a dictionary of runs. This is going to be
+             * our filter. Run numbers will be the keys. And each key will have True
+             * as the corresponding value. */ 
+
+            $runs2allow = array();
+            foreach( explode( ',', $range ) as $subrange ) {
+
+                /* Check if this is just a number or a subrange: <begin>-<end>
+                 */
+                $pair = explode( '-', $subrange );
+                switch( count( $pair )) {
+                    case 1:
+                        $runs2allow[$pair[0]] = True;
+                        break;
+                    case 2:
+                        $begin_run = $min_runnum;
+                        if ($pair[0]) {
+                            $begin_run = intval($pair[0]);
+                            if (!$begin_run) throw new DataPortalexception(__METHOD__, "illegal run '".$pair[0]."' subrange: '".$subrange."'" );
+                        }
+                        $end_run = $max_runnum;
+                        if ($pair[1]) {
+                            $end_run = intval($pair[1]);
+                            if (!$end_run) throw new DataPortalexception(__METHOD__, "illegal run '".$pair[1]."' subrange: '".$subrange."'" );
+                        }
+                        if ($begin_run >= $end_run) throw new DataPortalexception(__METHOD__, "illegal subrange: '".$subrange."'" );
+                        if ($begin_run < $min_runnum) throw new DataPortalexception(__METHOD__, "non-existing begin run in subrange: '".$subrange."'" );
+                        if ($end_run   > $max_runnum) throw new DataPortalexception(__METHOD__, "non-existing end run in subrange: '".$subrange."'" );
+
+                        for( $run = $begin_run; $run <= $end_run; $run++ )
+                            $runs2allow[$run] = True;
+                        break;
+                    default:
+                        throw new DataPortalexception(
+                            __METHOD__, 'illegal syntax of the runs range' );
+                }
+            }
+
+            /* Apply the filter */
+
+            foreach( $logbook_in as $run ) {
+                $runum = $run->num();
+                if( array_key_exists( $runum, $runs2allow ))
+                    array_push( $out, $run );
+            }
         }
         return $out;
     }

@@ -1,7 +1,10 @@
 define ([
-    'webfwk/CSSLoader'] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/ELog_Attachments.css') ;
 
@@ -472,7 +475,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (ELog_Attachments, FwkApplication, {}, {});
+    Class.define_class (ELog_Attachments, FwkApplication, {}, {});
 
     return ELog_Attachments ;
 }) ;

@@ -7,13 +7,32 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/ExpSwitch_Station.css</file>
         </group>
         <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/experiment_elog_access_get.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/Experiment_ELogAccess.css</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/experiment_elog_access_set.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/expswitch_station.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/lib/dataportal/switchutils.class.php</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/experiment_switch.php</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ExpSwitch_ELogAccess.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_Group.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Filemanager_Files_USR.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/HDF5_Manage.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_MessageViewer.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Filemanager_Files.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Runtables_Detectors.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Runtables_User.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ExpSwitch_Station.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_Info.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/index_main.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Attachments.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Shifts.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Runtables_Calibrations.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Post.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Search.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Runtables_EPICS.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Filemanager_Summary.js</file>
             <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/index.php</file>
             <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_ELogAccess.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Subscribe.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Runs.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Live.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ExpSwitch_History.js</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/experiment_switch_main.js</file>
         </group>
     </open-files>
 </project-private>

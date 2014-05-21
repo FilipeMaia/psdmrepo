@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Filemanager_Files_USR.css') ;
 
@@ -55,7 +57,7 @@ function (cssloader) {
             this.is_initialized = true ;
         } ;
     }
-    define_class (Filemanager_Files_USR, FwkApplication, {}, {}) ;
+    Class.define_class (Filemanager_Files_USR, FwkApplication, {}, {}) ;
     
     return Filemanager_Files_USR ;
 }) ;

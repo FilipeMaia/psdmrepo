@@ -1,9 +1,11 @@
 define ([
     'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/Widget' , 'webfwk/StackOfRows', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
     'portal/ELog_MessageViewer'] ,
 
 function (
     cssloader ,
+    Class, Widget, StackOfRows, FwkApplication, Fwk ,
     ELog_MessageViewer) {
 
     cssloader.load('../portal/css/ELog_Runs.css') ;
@@ -235,7 +237,7 @@ function (
                     {id: 'duration',     title: 'Length',      width:   55, align: 'right', style: 'color:maroon;'} ,
                     {id: 'duration_bar', title: '&nbsp',       width:  200}
                 ] ;
-                this._run_table_obj = new StackOfRows (
+                this._run_table_obj = new StackOfRows.StackOfRows (
                     hdr ,
                     [] ,
                     {
@@ -365,7 +367,7 @@ function (
             return row ;
         } ;
     }
-    define_class (ELog_Runs, FwkApplication, {}, {});
+    Class.define_class (ELog_Runs, FwkApplication, {}, {}) ;
 
 
     function ELog_Runs_RunBody (parent, run) {
@@ -376,7 +378,7 @@ function (
         // Allways call the base class's constructor
         // -----------------------------------------
 
-        Widget.call(this) ;
+        Widget.Widget.call(this) ;
 
         // -- parameters
 
@@ -458,7 +460,7 @@ function (
             ) ;
         } ;
     }
-    define_class (ELog_Runs_RunBody, Widget, {}, {}) ;
+    Class.define_class (ELog_Runs_RunBody, Widget.Widget, {}, {}) ;
 
     return ELog_Runs ;
 }) ;

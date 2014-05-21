@@ -1,7 +1,12 @@
 define ([
-    'webfwk/CSSLoader'] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'portal/ELog_Utils'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk ,
+    ELog_Utils) {
 
     cssloader.load('../portal/css/ELog_Post.css') ;
 
@@ -297,7 +302,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (ELog_Post, FwkApplication, {}, {});
+    Class.define_class (ELog_Post, FwkApplication, {}, {}) ;
 
     return ELog_Post ;
 }) ;

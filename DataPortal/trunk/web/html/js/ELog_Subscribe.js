@@ -1,7 +1,10 @@
 define ([
-    'webfwk/CSSLoader'] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/ELog_Subscribe.css') ;
 
@@ -160,7 +163,7 @@ function (cssloader) {
             }) ;
         };
     }
-    define_class (ELog_Subscribe, FwkApplication, {}, {});
+    Class.define_class (ELog_Subscribe, FwkApplication, {}, {}) ;
 
     return ELog_Subscribe ;
 }) ;

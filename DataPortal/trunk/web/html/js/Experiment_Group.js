@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Experiment_Group.css') ;
 
@@ -225,7 +227,7 @@ function (cssloader) {
             );
         } ;
     }
-    define_class (Experiment_Group, FwkApplication, {}, {});
+    Class.define_class (Experiment_Group, FwkApplication, {}, {}) ;
 
     return Experiment_Group ;
 });

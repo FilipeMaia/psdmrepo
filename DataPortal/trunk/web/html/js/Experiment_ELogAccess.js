@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Experiment_ELogAccess.css') ;
 
@@ -201,7 +203,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (Experiment_ELogAccess, FwkApplication, {}, {});
+    Class.define_class (Experiment_ELogAccess, FwkApplication, {}, {}) ;
 
     return Experiment_ELogAccess ;
 }) ;

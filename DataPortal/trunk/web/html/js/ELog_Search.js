@@ -1,10 +1,12 @@
 define ([
     'webfwk/CSSLoader' ,
-    'portal/ELog_MessageViewer'] ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'portal/ELog_MessageViewer', 'portal/ELog_Utils'] ,
 
 function (
     cssloader ,
-    ELog_MessageViewer) {
+    Class, FwkApplication, Fwk ,
+    ELog_MessageViewer, ELog_Utils) {
 
     cssloader.load('../portal/css/ELog_Search.css') ;
 
@@ -322,8 +324,8 @@ function (
 
             // Process global search options
 
-            if ('message' in global_extra_params) {
-                this.search_message_by_id(parseInt(global_extra_params['message']), true) ;
+            if ('message' in app_config.global_extra_params) {
+                this.search_message_by_id(parseInt(app_config.global_extra_params['message']), true) ;
             }
         } ;
 
@@ -501,7 +503,7 @@ function (
             ) ;
         } ;
     }
-    define_class (ELog_Search, FwkApplication, {}, {});
+    Class.define_class (ELog_Search, FwkApplication, {}, {}) ;
 
     return ELog_Search ;
 }) ;

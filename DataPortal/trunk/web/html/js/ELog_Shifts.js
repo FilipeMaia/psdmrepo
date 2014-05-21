@@ -1,7 +1,10 @@
 define ([
-    'webfwk/CSSLoader'] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/Widget', 'webfwk/StackOfRows', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, Widget, StackOfRows, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/ELog_Shifts.css') ;
 
@@ -203,7 +206,7 @@ function (cssloader) {
                     {id: '_',                                    width:   10} ,
                     {id: 'goals',         title: 'Goals',        width:  320, style: 'color:maroon;'}
                 ] ;
-                this._shift_table_obj = new StackOfRows (
+                this._shift_table_obj = new StackOfRows.StackOfRows (
                     hdr ,
                     [] ,
                     {
@@ -368,7 +371,7 @@ function (cssloader) {
             return row ;
         } ;
     }
-    define_class (ELog_Shifts, FwkApplication, {}, {});
+    Class.define_class (ELog_Shifts, FwkApplication, {}, {}) ;
 
 
     function ELog_Shifts_ShiftBody (parent, shift) {
@@ -379,7 +382,7 @@ function (cssloader) {
         // Allways call the base class's constructor
         // -----------------------------------------
 
-        Widget.call(this) ;
+        Widget.Widget.call(this) ;
 
         // -- parameters
 
@@ -618,7 +621,7 @@ function (cssloader) {
             this._viewer().html('<pre>'+this.shift.goals+'</pre>') ;
         } ;
     }
-    define_class (ELog_Shifts_ShiftBody, Widget, {}, {}) ;
+    Class.define_class (ELog_Shifts_ShiftBody, Widget.Widget, {}, {}) ;
 
     return ELog_Shifts ;
 }) ;

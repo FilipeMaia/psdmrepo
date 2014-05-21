@@ -1,8 +1,10 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/StackOfRows', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, StackOfRows, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Filemanager_Files.css') ;
 
@@ -22,7 +24,7 @@ function (cssloader) {
         // Allways call the base class's constructor
         // -----------------------------------------
 
-        StackRowBody.call(this) ;
+        StackOfRows.StackRowBody.call(this) ;
 
         // ------------------------
         // Parameters of the object
@@ -485,7 +487,7 @@ function (cssloader) {
             ) ;
         } ;
     }
-    define_class (Filemanager_Body, StackRowBody, {}, {}) ;
+    Class.define_class (Filemanager_Body, StackOfRows.StackRowBody, {}, {}) ;
 
     /**
      * The fake class representing the body of the summary row.
@@ -499,7 +501,7 @@ function (cssloader) {
         // Allways call the base class's constructor
         // -----------------------------------------
 
-        StackRowBody.call(this) ;
+        StackOfRows.StackRowBody.call(this) ;
 
         // ------------------------
         // Parameters of the object
@@ -527,7 +529,7 @@ function (cssloader) {
             this.container.html('') ;
         } ;
     }
-    define_class (Filemanager_SummaryBody, StackRowBody, {}, {}) ;
+    Class.define_class (Filemanager_SummaryBody, StackOfRows.StackRowBody, {}, {}) ;
 
     /**
      * The application for displaying the detailed info about the data files of the experiment
@@ -815,7 +817,7 @@ function (cssloader) {
 
             var options = this._get_display_options() ;
 
-            this._table = new StackOfRows (
+            this._table = new StackOfRows.StackOfRows (
                 this._table_hdr ,
                 [] ,
                 {   theme: 'stack-theme-mustard' ,
@@ -1049,7 +1051,7 @@ function (cssloader) {
             return options ;
         } ;
     }
-    define_class (Filemanager_Files, FwkApplication, {}, {}) ;
+    Class.define_class (Filemanager_Files, FwkApplication, {}, {}) ;
 
     return Filemanager_Files ;
 }) ;

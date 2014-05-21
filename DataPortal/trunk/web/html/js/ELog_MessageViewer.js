@@ -1,8 +1,12 @@
 define ([
-    'webfwk/CSSLoader'
-] ,
+    'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/Widget', 'webfwk/RadioBox', 'webfwk/StackOfRows', 'webfwk/Fwk' ,
+    'portal/ELog_Utils'] ,
 
-function (cssloader) {
+function (
+    cssloader ,
+    Class, Widget, RadioBox, StackOfRows, Fwk ,
+    ELog_Utils) {
 
     cssloader.load('../portal/css/ELog_MessageViewer.css') ;
 
@@ -21,7 +25,7 @@ function ELog_RunBody (parent, message) {
     // Allways call the base class's constructor
     // -----------------------------------------
 
-    StackRowBody.call(this) ;
+    StackOfRows.StackRowBody.call(this) ;
 
     // ------------------------
     // Parameters of the object
@@ -112,7 +116,7 @@ function ELog_RunBody (parent, message) {
             '../logbook/ws/RequestRunParams.php' ,
             {run_id: this.message.run_id} ,
             function (data) {
-                that.parameters_view = new StackOfRows() ;
+                that.parameters_view = new StackOfRows.StackOfRows() ;
                 for (var i in data.params) {
                     var section = data.params[i] ;
                     var section_body_html =
@@ -238,7 +242,7 @@ function ELog_RunBody (parent, message) {
         this.dialogs_cont.html('') ;
     } ;
 }
-define_class (ELog_RunBody, StackRowBody, {}, {}) ;
+Class.define_class (ELog_RunBody, StackOfRows.StackRowBody, {}, {}) ;
 
 /**
  * Display a message within a table row's body.
@@ -255,7 +259,7 @@ function ELog_MessageBody (parent, message) {
     // Allways call the base class's constructor
     // -----------------------------------------
 
-    StackRowBody.call(this) ;
+    StackOfRows.StackRowBody.call(this) ;
 
     // ------------------------
     // Parameters of the object
@@ -910,7 +914,7 @@ function ELog_MessageBody (parent, message) {
         this.form_attachments_cont.find('input:file[name="file2attach_'+num+'"]').change(function () { that.add_attachment() ; }) ;
     } ;
 }
-define_class (ELog_MessageBody, StackRowBody, {}, {}) ;
+Class.define_class (ELog_MessageBody, StackOfRows.StackRowBody, {}, {}) ;
 
 
 /**
@@ -928,7 +932,7 @@ function ELog_MessageGroupBody (parent, messages, options, id) {
     // Allways call the base class's constructor
     // -----------------------------------------
 
-    StackRowBody.call(this) ;
+    StackOfRows.StackRowBody.call(this) ;
 
     // ------------------------
     // Parameters of the object
@@ -971,7 +975,7 @@ function ELog_MessageGroupBody (parent, messages, options, id) {
             this._viewer.update([m]) ;
     } ;
 }
-define_class (ELog_MessageGroupBody, StackRowBody, {}, {}) ;
+Class.define_class (ELog_MessageGroupBody, StackOfRows.StackRowBody, {}, {}) ;
 
 
 /**
@@ -987,7 +991,7 @@ function ELog_MessageViewerBase (parent, options) {
 
     // Always call the c-tor of the base class
 
-    Widget.call(this) ;
+    Widget.Widget.call(this) ;
 
     // -- parameters
 
@@ -1015,19 +1019,19 @@ function ELog_MessageViewerBase (parent, options) {
     // -- methods to be implemented by the base classes
 
     this.messages = function () {
-        throw new WidgetError('ELog_MessageViewerBase::messages() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::messages() the implementation must be provided by a derived class') ;
     } ;
     this.num_rows = function () {
-        throw new WidgetError('ELog_MessageViewerBase::num_rows() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::num_rows() the implementation must be provided by a derived class') ;
     } ;
     this.num_runs = function () {
-        throw new WidgetError('ELog_MessageViewerBase::num_runs() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::num_runs() the implementation must be provided by a derived class') ;
     } ;
     this.min_run  = function () {
-        throw new WidgetError('ELog_MessageViewerBase::min_run() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::min_run() the implementation must be provided by a derived class') ;
     } ;
     this.max_run  = function () {
-        throw new WidgetError('ELog_MessageViewerBase::max_run() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::max_run() the implementation must be provided by a derived class') ;
     } ;
 
     /**
@@ -1039,7 +1043,7 @@ function ELog_MessageViewerBase (parent, options) {
      * @returns {undefined}
      */
     this.load = function (messages) {
-        throw new WidgetError('ELog_MessageViewerBase::load() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::load() the implementation must be provided by a derived class') ;
     } ;
 
     /**
@@ -1049,7 +1053,7 @@ function ELog_MessageViewerBase (parent, options) {
      * @returns {undefined}
      */
     this.update = function (new_messages) {
-        throw new WidgetError('ELog_MessageViewerBase::update() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::update() the implementation must be provided by a derived class') ;
     } ;
 
     /**
@@ -1059,7 +1063,7 @@ function ELog_MessageViewerBase (parent, options) {
      * @returns {undefined}
      */
     this.append = function (new_messages) {
-        throw new WidgetError('ELog_MessageViewerBase::append() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::append() the implementation must be provided by a derived class') ;
     } ;
 
     /**
@@ -1074,23 +1078,23 @@ function ELog_MessageViewerBase (parent, options) {
      * @returns {undefined}
      */
     this.update_row = function (old_row, new_message) {
-        throw new WidgetError('ELog_MessageViewerBase::update_row() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::update_row() the implementation must be provided by a derived class') ;
     } ;
 
     this.undelete_row = function (row) {
-        throw new WidgetError('ELog_MessageViewerBase::undelete_row() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::undelete_row() the implementation must be provided by a derived class') ;
     } ;
 
     this.delete_row = function (row, deleted_time, deleted_by) {
-        throw new WidgetError('ELog_MessageViewerBase::delete_row() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::delete_row() the implementation must be provided by a derived class') ;
     } ;
 
     this.focus_at_message = function (message_id) {
-        throw new WidgetError('ELog_MessageViewerBase::focus_at_message() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::focus_at_message() the implementation must be provided by a derived class') ;
     } ;
 
     this.focus_at_run = function (run_num) {
-        throw new WidgetError('ELog_MessageViewerBase::focus_at_run() the implementation must be provided by a derived class') ;
+        throw new Widget.WidgetError('ELog_MessageViewerBase::focus_at_run() the implementation must be provided by a derived class') ;
     } ;
 
     /**
@@ -1119,7 +1123,7 @@ function ELog_MessageViewerBase (parent, options) {
         }
         if (m.is_run) {
             if (!this.allow_runs) {
-                throw new WidgetError('ELog_MessageViewerBase::_message2row() the runs are not supported by the current configuration of the viewer') ;
+                throw new Widget.WidgetError('ELog_MessageViewerBase::_message2row() the runs are not supported by the current configuration of the viewer') ;
             }
             row.title.run  = '<div class="m-run">'+m.run_num+'</div>' ;
             row.title.subj = this._run2subj(m) ;
@@ -1139,7 +1143,7 @@ function ELog_MessageViewerBase (parent, options) {
     } ;
     this._run2subj = function (m) {
         if (!this.allow_runs) {
-            throw new WidgetError('ELog_MessageViewerBase::_run2subj() the runs are not supported by the current configuration of the viewer') ;
+            throw new Widget.WidgetError('ELog_MessageViewerBase::_run2subj() the runs are not supported by the current configuration of the viewer') ;
         }
         switch (m.type) {
             case 'run'       : return '<b>stop</b>';
@@ -1149,7 +1153,7 @@ function ELog_MessageViewerBase (parent, options) {
         return '' ;
     } ;
 }
-define_class (ELog_MessageViewerBase, Widget, {}, {}) ;
+Class.define_class (ELog_MessageViewerBase, Widget.Widget, {}, {}) ;
 
 
 
@@ -1186,7 +1190,7 @@ function ELog_MessageViewerNoGroupping (parent, options) {
         {id: 'id',       title: 'MessageId', width:  70} ,
         {id: 'author',   title: 'Author',    width:  90}
     ) ;
-    this._table = new StackOfRows (
+    this._table = new StackOfRows.StackOfRows (
         hdr ,
         [] ,
         {   hidden_header: this.hidden_header ,
@@ -1403,7 +1407,7 @@ function ELog_MessageViewerNoGroupping (parent, options) {
         console.log('ELog_MessageViewerNoGroupping.focus_at_run('+run_num+') the message was not found in StackOfRows') ;
     } ;
 }
-define_class (ELog_MessageViewerNoGroupping, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewerNoGroupping, ELog_MessageViewerBase, {}, {}) ;
 
 
 /**
@@ -1418,7 +1422,7 @@ function ELog_DayBody (parent, messages, options) {
     var options = jQuery.extend(true, {no_ymd: true}, options) ;
     ELog_MessageGroupBody.call(this, parent, messages, options, 'day-viewer') ;
 }
-define_class (ELog_DayBody, ELog_MessageGroupBody, {}, {}) ;
+Class.define_class (ELog_DayBody, ELog_MessageGroupBody, {}, {}) ;
 
 /**
  * Group messages by a day they were posted.
@@ -1445,7 +1449,7 @@ function ELog_MessageViewerByDay (parent, options) {
         {id: 'runs-begin' ,    title: '&nbsp;',   width: 60, align: 'left'} ,
         {id: 'messages',       title: 'Messages', width: 40, align: 'right'}
     ] ;
-    this._table = new StackOfRows (
+    this._table = new StackOfRows.StackOfRows (
         hdr ,
         [] ,
         {   hidden_header: this.hidden_header ,
@@ -1722,7 +1726,7 @@ function ELog_MessageViewerByDay (parent, options) {
         return title ; 
     } ;
 }
-define_class (ELog_MessageViewerByDay, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewerByDay, ELog_MessageViewerBase, {}, {}) ;
 
 
 /**
@@ -1736,7 +1740,7 @@ define_class (ELog_MessageViewerByDay, ELog_MessageViewerBase, {}, {}) ;
 function ELog_ShiftBody (parent, messages, options) {
     ELog_MessageGroupBody.call(this, parent, messages, options, 'shift-viewer') ;
 }
-define_class (ELog_ShiftBody, ELog_MessageGroupBody, {}, {}) ;
+Class.define_class (ELog_ShiftBody, ELog_MessageGroupBody, {}, {}) ;
 
 /**
  * Group messages by a shift they were posted.
@@ -1765,7 +1769,7 @@ function ELog_MessageViewerByShift (parent, options) {
         {id: '_',                                           width:  20} ,
         {id: 'goals' ,         title: '&nbsp;',             width: 460, align: 'left'}
     ] ;
-    this._table = new StackOfRows (
+    this._table = new StackOfRows.StackOfRows (
         hdr ,
         [] ,
         {   hidden_header: this.hidden_header ,
@@ -2053,7 +2057,7 @@ function ELog_MessageViewerByShift (parent, options) {
         return title ; 
     } ;
 }
-define_class (ELog_MessageViewerByShift, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewerByShift, ELog_MessageViewerBase, {}, {}) ;
 
 
 
@@ -2068,7 +2072,7 @@ define_class (ELog_MessageViewerByShift, ELog_MessageViewerBase, {}, {}) ;
 function ELog_TagBody (parent, messages, options) {
     ELog_MessageGroupBody.call(this, parent, messages, options, 'tag-viewer') ;
 }
-define_class (ELog_TagBody, ELog_MessageGroupBody, {}, {}) ;
+Class.define_class (ELog_TagBody, ELog_MessageGroupBody, {}, {}) ;
 
 /**
  * Group messages by a tag they were posted with.
@@ -2095,7 +2099,7 @@ function ELog_MessageViewerByTag (parent, options) {
         {id: 'runs-begin' ,    title: '&nbsp;',     width:  60, align: 'left'} ,
         {id: 'messages',       title: 'Messages',   width:  60, align: 'right'}
     ] ;
-    this._table = new StackOfRows (
+    this._table = new StackOfRows.StackOfRows (
         hdr ,
         [] ,
         {   hidden_header: this.hidden_header ,
@@ -2407,7 +2411,7 @@ function ELog_MessageViewerByTag (parent, options) {
         return title ; 
     } ;
 }
-define_class (ELog_MessageViewerByTag, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewerByTag, ELog_MessageViewerBase, {}, {}) ;
 
 
 
@@ -2422,7 +2426,7 @@ define_class (ELog_MessageViewerByTag, ELog_MessageViewerBase, {}, {}) ;
 function ELog_AuthorBody (parent, messages, options) {
     ELog_MessageGroupBody.call(this, parent, messages, options, 'author-viewer') ;
 }
-define_class (ELog_AuthorBody, ELog_MessageGroupBody, {}, {}) ;
+Class.define_class (ELog_AuthorBody, ELog_MessageGroupBody, {}, {}) ;
 
 
 /**
@@ -2450,7 +2454,7 @@ function ELog_MessageViewerByAuthor (parent, options) {
         {id: 'runs-begin' ,    title: '&nbsp;',     width:  60, align: 'left'} ,
         {id: 'messages',       title: 'Messages',   width:  60, align: 'right'}
     ] ;
-    this._table = new StackOfRows (
+    this._table = new StackOfRows.StackOfRows (
         hdr ,
         [] ,
         {   hidden_header: this.hidden_header ,
@@ -2726,7 +2730,7 @@ function ELog_MessageViewerByAuthor (parent, options) {
         return title ; 
     } ;
 }
-define_class (ELog_MessageViewerByAuthor, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewerByAuthor, ELog_MessageViewerBase, {}, {}) ;
 
 
 /**
@@ -2759,9 +2763,6 @@ function ELog_MessageViewer (parent, cont, options) {
      * @function - overloading the function of the base class Widget
      */
     this.render = function () {
-
-        // TODO: Construct the DOM including RadioBox for switching between
-        //       different views, and the container for a viewer instance.
 
         if (this.allow_groups) {
             var html =
@@ -2909,7 +2910,7 @@ function ELog_MessageViewer (parent, cont, options) {
 
     this.display(this.cont) ;
 }
-define_class (ELog_MessageViewer, ELog_MessageViewerBase, {}, {}) ;
+Class.define_class (ELog_MessageViewer, ELog_MessageViewerBase, {}, {}) ;
 
     return ELog_MessageViewer ;
 }) ;

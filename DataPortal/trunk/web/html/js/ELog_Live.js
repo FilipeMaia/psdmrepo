@@ -1,9 +1,11 @@
 define ([
     'webfwk/CSSLoader' ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
     'portal/ELog_MessageViewer'] ,
 
 function (
     cssloader ,
+    Class, FwkApplication, Fwk ,
     ELog_MessageViewer) {
 
     cssloader.load('../portal/css/ELog_Live.css') ;
@@ -323,7 +325,7 @@ function (
             else        $('#fwk-center').unbind('scroll', evaluate) ;
         } ;
     }
-    define_class (ELog_Live, FwkApplication, {}, {});
+    Class.define_class (ELog_Live, FwkApplication, {}, {}) ;
 
     return ELog_Live ;
 }) ;
