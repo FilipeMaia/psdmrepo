@@ -36,8 +36,8 @@ class SvnProps :
         self.id       = "$Id: SvnProps.py 8169 2014-05-07 00:27:22Z dubrovin@SLAC.STANFORD.EDU $"
         self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pdscalibdata/trunk/src/SvnProps.py $"
         self.header   = "$Header:$"
-        self.datelc   = "$LastChangedDate$"
-        self.date     = "$Date$"
+        self.datelc   = "$LastChangedDate: 2014-05-16 08:43:43 -0700 (Fri, 16 May 2014) $"
+        self.date     = "$Date: 2014-05-16 08:43:43 -0700 (Fri, 16 May 2014) $"
 
 #------------------------------
 

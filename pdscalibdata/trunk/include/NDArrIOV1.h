@@ -88,24 +88,33 @@ namespace pdscalibdata {
  *  @endcode
  *
  *  @li Instatiation
+ *  \n Constractor 1:
  *  \n Use short name for type and instatiate the object:
  *  @code
  *  std::string fname("path/pedestals/0-end.data"); // mandatory parameter
- *  unsigned shape[] = {2,3,4};                     // mandatory parameter
- *  TYPE val_def(1);                                // optional parameter
+ *  unsigned shape[]   = {2,3,4};                   // mandatory parameter
+ *  TYPE   val_def = 123;                           // optional parameter
  *  unsigned print_bits(0377);                      // optional parameter 
  *
- *  ARRIO* arrio = ARRIO(fname, shape, val_def, print_bits);
+ *  ARRIO* arrio = new ARRIO(fname, shape, data_def, print_bits);
  *  @endcode
  *  where shape is used for 
  *  \n 1) cross-check of metadata shape from file,
  *  \n 2) creation of ndarray<TYPE,NDIM> with default parameters if file is missing.
+ *
+ *  \n Constractor 2:
+ *  @code
+ *  CalibPars::common_mode_t data_def[] = {1, 50, 10, Size};
+ *  ndarray<CalibPars::common_mode_t,1> nda = make_ndarray(&data_def[0], 4);
+ *  ARRIO* arrio = new ARRIO(fname, nda, print_bits);
+ *  @endcode
  *
  *  @li Access methods
  *  @code
  *  const ndarray<const float,3>& nda = arrio -> get_ndarray(); // returns ndarray 
  *  // or
  *  const ndarray<const float,3>& nda = arrio -> get_ndarray(fname); // returns ndarray 
+ *  std::string& str_status = arrio -> status(); // returns status comment
  *  @endcode
  *
  *  @li Print methods
@@ -165,19 +174,23 @@ class NDArrIOV1 {
 
 
 public:
-  /// Constructor with/without file name
+  /// Constructors have different default initialization
   /**
    *  @brief creates an object which holds the file name and pointer (0 before load) to ndarray.
    *  File name can be passed later in the get_ndarray(fname) method, but print_file() and print_ndarray() 
    *  methods will complain about missing file name until it is specified.
    *  @param[in] fname std::string file name
    *  @param[in] shape_def default shape of the ndarray (is used for shape crosscheck at readout and in case of missing file or metadata)
-   *  @param[in] val_def default value of the ndarray elements (in case of missing file or metadata)
+   *  @param[in] val_def value to fill all data elements by default(in case of missing file or metadata)
    *  @param[in] print_bits unsigned bit-word to control verbosity
    */ 
   NDArrIOV1 ( const std::string& fname
 	    , const shape_t* shape_def
 	    , const TDATA& val_def=TDATA(0) 
+	    , const unsigned print_bits=0377 );
+
+  NDArrIOV1 ( const std::string& fname
+	    , const ndarray<const TDATA, NDIM>& nda_def
 	    , const unsigned print_bits=0377 );
 
   /// Destructor
@@ -201,6 +214,15 @@ public:
    */ 
   ndarray<const TDATA, NDIM> get_ndarray(const std::string& fname = std::string());
 
+  /// returns string with status of calibration constants
+  std::string& str_status() { return m_status; }
+
+  /// returns string with info about ndarray
+  std::string str_ndarray_info();
+
+  /// returns string of shape
+  std::string str_shape();
+
   /// Save ndarray in file with metadata internal and external comments
   /**
    *  @param[in] nda ndarray to save in file
@@ -221,22 +243,27 @@ private:
 
   std::string m_fname;
   TDATA       m_val_def;
+  const ndarray<const TDATA, NDIM>& m_nda_def;
   unsigned    m_print_bits;
   unsigned    m_count_str_data;
   unsigned    m_count_str_comt;
   unsigned    m_count_data;
 
+  unsigned    m_ctor;
   unsigned    m_ndim;
   size_t      m_size;
   shape_t     m_shape[NDIM];
   std::string m_str_type;
   DATA_TYPE   m_enum_type;
-
+  std::string m_status;
 
   TDATA* p_data;
 
   /// static method returns class name for MsgLog
   static std::string __name__(){ return std::string("NDArrIOV1"); }
+
+  /// member data common initialization in constructors
+  void init();
 
   /// loads metadata and ndarray<TYPE,NDIM> from file
   void load_ndarray();

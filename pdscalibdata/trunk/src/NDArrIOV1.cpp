@@ -38,10 +38,37 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   : p_nda(0)
   , m_fname(fname)
   , m_val_def(val_def)
+  , m_nda_def(ndarray<const TDATA, NDIM>())
   , m_print_bits(print_bits)
+  , m_ctor(1)
 {
+  init();
   if (shape_def != 0) std::memcpy (m_shape, shape_def, c_ndim*sizeof(shape_t));  
-  MsgLog(__name__(), debug, "ctor, fname=" << fname);
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
+	                          , const ndarray<const TDATA, NDIM>& nda_def
+                                  , const unsigned print_bits ) 
+  : p_nda(0)
+  , m_fname(fname)
+  , m_val_def(0)
+  , m_nda_def(nda_def)
+  , m_print_bits(print_bits)
+  , m_ctor(2)
+{
+  init();
+  std::memcpy (m_shape, nda_def.shape(), c_ndim*sizeof(shape_t));  
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+void NDArrIOV1<TDATA, NDIM>::init()
+{
+  if( m_print_bits & 2 ) MsgLog(__name__(), info, "ctor:" << m_ctor << ", fname=" << m_fname);
 }
 
 //-----------------------------
@@ -51,7 +78,8 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 {
     // if file is not available - create default ndarray
     if (! file_is_available()) { 
-        create_ndarray(true); 
+        create_ndarray(true);
+        m_status=std::string("loaded default");
         return; 
     }
 
@@ -63,7 +91,11 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 
     // open file
     std::ifstream in(m_fname.c_str());
-    if (not in.good()) { MsgLogRoot(error, "Failed to open file: "+m_fname); return; }
+    if (not in.good()) { 
+        MsgLogRoot(error, "Failed to open file: "+m_fname); 
+	m_status=std::string("file is unreadable");
+        return;
+    }
   
     // read and process all strings
     std::string str; 
@@ -81,6 +113,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 
     //close file
     in.close();
+    m_status=std::string("loaded from file");
 }
 
 //-----------------------------
@@ -89,13 +122,13 @@ template <typename TDATA, unsigned NDIM>
 bool NDArrIOV1<TDATA, NDIM>::file_is_available()
 {
   if(m_fname.empty()) {
-    MsgLog(__name__(), warning, "File name IS EMPTY!");
+    if( m_print_bits & 4 ) MsgLog(__name__(), warning, "File name IS EMPTY! Use default calibration parameters.");
     return false;
   }
 
   std::ifstream file(m_fname.c_str());
   if(!file.good()) {
-      MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST!");
+      if( m_print_bits & 8 ) MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST! Use default calibration parameters.");
       return false;
   }
   file.close();
@@ -173,8 +206,10 @@ void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
     p_data = p_nda->data();
     m_size = p_nda->size();
 
-    if (fill_def) std::fill_n (p_data, m_size, m_val_def);
-
+    if (fill_def) {
+      if (m_ctor==2) std::memcpy (p_data, m_nda_def.data(), m_size*sizeof(TDATA));
+      else           std::fill_n (p_data, m_size, m_val_def);
+    }
     //MsgLog(__name__(), info, "Begin to load data p_nda->size(): " << m_size);
 }
 
@@ -279,6 +314,7 @@ void NDArrIOV1<TDATA, NDIM>::print_file()
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::print_ndarray()
 {
+    //const ndarray<const TDATA, NDIM> nda = get_ndarray();
     if (! p_nda) load_ndarray();
     if (! p_nda) return;
 
@@ -288,6 +324,38 @@ void NDArrIOV1<TDATA, NDIM>::print_ndarray()
          << "> of sise=" << p_nda->size()
          << ":\n" << *p_nda;
     MsgLog(__name__(), info, smsg.str());
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+std::string NDArrIOV1<TDATA, NDIM>::str_ndarray_info()
+{
+  //const ndarray<const TDATA, NDIM>& nda = get_ndarray();
+    if (! p_nda) load_ndarray();
+    if (! p_nda) return std::string("ndarray is non-accessible...");
+
+    std::stringstream smsg; 
+    smsg << "ndarray<" << std::setw(8) << std::left << strDataType<TDATA>() 
+         << "," << ndim()
+         << "> of sise=" << p_nda->size()
+         << ":";
+    TDATA* it = p_nda->data();
+    for( unsigned i=0; i<min(size_t(10),p_nda->size()); i++ ) smsg << " " << *it++; smsg << " ...";
+    //MsgLog(__name__(), info, smsg.str());
+    return smsg.str();
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+std::string NDArrIOV1<TDATA, NDIM>::str_shape()
+{
+  std::stringstream smsg;
+  for( unsigned i=0; i<ndim(); i++ ) {
+    smsg << m_shape[i]; if (i<ndim()-1) smsg << ", ";
+  }
+  return smsg.str();
 }
 
 //-----------------------------
@@ -357,22 +425,32 @@ void NDArrIOV1<TDATA, NDIM>::save_ndarray(const ndarray<const TDATA, NDIM>& nda,
 //-----------------------------
 
 template class pdscalibdata::NDArrIOV1<int,1>; 
+template class pdscalibdata::NDArrIOV1<unsigned,1>; 
+template class pdscalibdata::NDArrIOV1<unsigned short,1>; 
 template class pdscalibdata::NDArrIOV1<float,1>; 
 template class pdscalibdata::NDArrIOV1<double,1>; 
 
 template class pdscalibdata::NDArrIOV1<int,2>; 
+template class pdscalibdata::NDArrIOV1<unsigned,2>; 
+template class pdscalibdata::NDArrIOV1<unsigned short,2>; 
 template class pdscalibdata::NDArrIOV1<float,2>; 
 template class pdscalibdata::NDArrIOV1<double,2>; 
 
 template class pdscalibdata::NDArrIOV1<int,3>; 
+template class pdscalibdata::NDArrIOV1<unsigned,3>; 
+template class pdscalibdata::NDArrIOV1<unsigned short,3>; 
 template class pdscalibdata::NDArrIOV1<float,3>; 
 template class pdscalibdata::NDArrIOV1<double,3>; 
 
 template class pdscalibdata::NDArrIOV1<int,4>; 
+template class pdscalibdata::NDArrIOV1<unsigned,4>; 
+template class pdscalibdata::NDArrIOV1<unsigned short,4>; 
 template class pdscalibdata::NDArrIOV1<float,4>; 
 template class pdscalibdata::NDArrIOV1<double,4>; 
 
 template class pdscalibdata::NDArrIOV1<int,5>; 
+template class pdscalibdata::NDArrIOV1<unsigned,5>; 
+template class pdscalibdata::NDArrIOV1<unsigned short,5>; 
 template class pdscalibdata::NDArrIOV1<float,5>; 
 template class pdscalibdata::NDArrIOV1<double,5>; 
 
