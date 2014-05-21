@@ -13,9 +13,7 @@
 //-----------------
 #include <iostream>
 #include <string>
-//#include <vector>
-//#include <map>
-//#include <fstream>  // open, close etc.
+#include <map>
 #include <stdint.h> // for uint8_t, uint16_t etc.
 
 //-------------------------------
@@ -24,15 +22,10 @@
 
 #include "ndarray/ndarray.h"
 
-// #include "pdscalibdata/PnccdPedestalsV1.h"
-// #include "pdscalibdata/PnccdPixelStatusV1.h"
-// #include "pdscalibdata/PnccdCommonModeV1.h"
-// #include "pdscalibdata/PnccdPixelGainV1.h"
-// #include "pdscalibdata/PnccdPixelRmsV1.h"
-
 //-----------------------------
 
 namespace PSCalib {
+
 
 /// @addtogroup PSCalib PSCalib
 
@@ -58,21 +51,16 @@ namespace PSCalib {
 
 //----------------
 
+enum CALIB_TYPE { PEDESTALS=0, PIXEL_STATUS, PIXEL_RMS, PIXEL_GAIN, COMMON_MODE };
+
 class CalibPars  {
 public:
 
-  // Destructor
-  virtual ~CalibPars () {}
 
+  //typedef unsigned shape_t;
   typedef float    pixel_nrms_t;
   typedef float    pixel_bkgd_t;
   typedef uint16_t pixel_mask_t;
-
-  //typedef pdscalibdata::PnccdPixelStatusV1::pars_t pixel_status_t;
-  //typedef pdscalibdata::PnccdCommonModeV1::pars_t  common_mode_t;
-  //typedef pdscalibdata::PnccdPedestalsV1::pars_t   pedestals_t;
-  //typedef pdscalibdata::PnccdPixelGainV1::pars_t   pixel_gain_t;
-  //typedef pdscalibdata::PnccdPixelRmsV1::pars_t    pixel_rms_t;
 
   typedef uint16_t pixel_status_t;
   typedef double   common_mode_t;
@@ -80,42 +68,54 @@ public:
   typedef float    pixel_gain_t;
   typedef float    pixel_rms_t;
 
+  std::map<CALIB_TYPE, std::string> map_type2str;
+
+  // Destructor
+  virtual ~CalibPars () {}
+
+  //typedef pdscalibdata::PnccdPixelStatusV1::pars_t pixel_status_t;
+  //typedef pdscalibdata::PnccdCommonModeV1::pars_t  common_mode_t;
+  //typedef pdscalibdata::PnccdPedestalsV1::pars_t   pedestals_t;
+  //typedef pdscalibdata::PnccdPixelGainV1::pars_t   pixel_gain_t;
+  //typedef pdscalibdata::PnccdPixelRmsV1::pars_t    pixel_rms_t;
+
+
   // NOTE1: THE METHOD DECLARED AS
   // virtual ndarray<pedestals_t, 1> pedestals() = 0; IS PURE VIRTUAL,
   // THIS IS NOT OVERLOADABLE BECAUSE THE METHOD SIGNATURE IS DEFINED BY INPUT PARS IN RHS
 
-  // NOTE2: PURE VIRTUAL METHOD NEEDS TO BE INPLEMENTED IN DERIVED CLASS 
+  // NOTE2: PURE VIRTUAL METHOD NEEDS TO BE IMPLEMENTED IN DERIVED CLASS 
   //        OR IT SHOULD NOT BE "PURE" VIRTUAL, BUT JUST A VIRUAL
 
-  /// Partial print of all types of calibration parameters
-  virtual void printCalibPars      () = 0;
-  //virtual void printInputPars      () = 0;
-  //virtual void printCalibParsStatus() = 0;
-  //virtual int  getCalibTypeStatus(const std::string&  type) = 0;
-
   /// Returns number of dimensions in ndarray
-  virtual const size_t          ndim()         = 0;
+  virtual const size_t ndim();
 
   /// Returns size (number of elements) in calibration type
-  virtual const size_t          size()         = 0;
+  virtual const size_t size();
 
   /// Returns shape of the ndarray with calibration parameters
-  virtual const unsigned*       shape()        = 0;
+  virtual const unsigned* shape();
 
   /// Returns the pointer to array with pedestals 
-  virtual const pedestals_t*    pedestals()    = 0;
+  virtual const pedestals_t* pedestals();
 
   /// Returns the pointer to array with pixel_status
-  virtual const pixel_status_t* pixel_status() = 0;
+  virtual const pixel_status_t* pixel_status();
+
+  /// Returns the pointer to array with pixel_gain 
+  virtual const pixel_gain_t* pixel_gain();
+
+  /// Returns the pointer to array with pixel_gain 
+  virtual const pixel_rms_t* pixel_rms();
 
   /// Returns the pointer to array with common_mode 
-  virtual const common_mode_t*  common_mode()  = 0;
+  virtual const common_mode_t* common_mode();
 
-  /// Returns the pointer to array with pixel_gain 
-  virtual const pixel_gain_t*   pixel_gain()   = 0;
+  /// Partial print of all types of calibration parameters
+  virtual void printCalibPars ();
 
-  /// Returns the pointer to array with pixel_gain 
-  virtual const pixel_rms_t*    pixel_rms()   = 0;
+  /// Print map for known calibration types
+  void printCalibTypes();
 
   /*
   virtual ndarray<pedestals_t, 3> pedestals() = 0; 
@@ -138,6 +138,18 @@ public:
   virtual void pixel_gain( ndarray<pixel_gain_t, 3>& nda ) { nda = make_ndarray<pixel_gain_t>(2, 2, 2); };
   virtual void pixel_gain( ndarray<pixel_gain_t, 4>& nda ) { nda = make_ndarray<pixel_gain_t>(2, 2, 2, 2); };
   */
+
+protected:
+
+  // Default constructor
+  CalibPars () { fill_map_type2str(); }
+
+private:
+
+  void default_msg(const std::string& msg=std::string());
+
+  void fill_map_type2str(); 
+
 };
 
 } // namespace PSCalib

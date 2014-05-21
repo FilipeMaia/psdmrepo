@@ -113,18 +113,9 @@ namespace PSCalib {
 // Constructors --
 //----------------
 
-
-CalibFileFinder::CalibFileFinder (const std::string& calibDir,
-                                  const std::string& typeGroupName)
-  : m_calibDir(calibDir)
-  , m_typeGroupName(typeGroupName)
-  , m_print_bits(255)
-{
-}
-
 CalibFileFinder::CalibFileFinder (const std::string& calibDir,
                                   const std::string& typeGroupName,
-                                  unsigned           print_bits)
+                                  const unsigned&    print_bits)
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_print_bits(print_bits)

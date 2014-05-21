@@ -64,13 +64,7 @@ public:
     
   CalibFileFinder (const std::string& calibDir,
                    const std::string& className,
-                   unsigned print_bits);
-
-  /**
-   *  @brief For unknown reason need to keep it for backward compatability...
-   */
-  CalibFileFinder (const std::string& calibDir,
-                   const std::string& className);
+                   const unsigned& print_bits=255);
 
   // Destructor
   ~CalibFileFinder () ;

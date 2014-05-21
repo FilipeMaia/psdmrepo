@@ -27,8 +27,9 @@
 #include "PSCalib/CalibPars.h"
 
 #include "PSCalib/PnccdCalibPars.h"
-#include "CSPad2x2CalibIntensity.h"
-#include "CSPadCalibIntensity.h"
+#include "PSCalib/PrincetonCalibPars.h"
+#include "PSCalib/CSPad2x2CalibIntensity.h"
+#include "PSCalib/CSPadCalibIntensity.h"
 
 //-----------------------------
 
@@ -115,25 +116,41 @@ public:
   {
 
         std::string str_src = ImgAlgos::srcToString(src); 
-        MsgLog("CalibParsStore", info, "Get calibration parameters for source: " << str_src);  
 
-        if ( str_src.find(":pnCCD.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Load calibration parameters for pnCCD");
-	   std::string type_group = (group==std::string()) ? "PNCCD::CalibV1" : group;
-	   return new PSCalib::PnccdCalibPars(calibdir, type_group, src, runnum, print_bits);
+        if ( str_src.find(":Cspad.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
+	   unsigned prbits = (print_bits & 1) ? 255 : 0;
+	   return new PSCalib::CSPadCalibIntensity(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":Cspad2x2.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Load calibration parameters for Cspad2x2");
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad2x2 source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad2x2::CalibV1" : group;
-	   return new PSCalib::CSPad2x2CalibIntensity(calibdir, type_group, src, runnum, print_bits);
+	   unsigned prbits = (print_bits & 2) ? 255 : 0;
+	   return new PSCalib::CSPad2x2CalibIntensity(calibdir, type_group, src, runnum, prbits);
 	}
 
-        if ( str_src.find(":Cspad.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Load calibration parameters for Cspad");
-	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
-	   return new PSCalib::CSPadCalibIntensity(calibdir, type_group, src, runnum, print_bits);
+        if ( str_src.find(":pnCCD.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for pnCCD source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "PNCCD::CalibV1" : group;
+	   unsigned prbits = (print_bits & 4) ? 255 : 0;
+	   return new PSCalib::PnccdCalibPars(calibdir, type_group, src, runnum, prbits);
 	}
+
+        if ( str_src.find(":Princeton.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Princeton source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Princeton::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::PrincetonCalibPars(calibdir, type_group, src, runnum, prbits);
+	}
+
+	// "CsPad::CalibV1"
+	// "CsPad2x2::CalibV1"
+	// "Princeton::CalibV1'"
+	// "PNCCD::CalibV1"
+	// "Camera::CalibV1"
+	// "Acqiris::CalibV1"
 
 	std::string msg =  "Calibration parameters for source: " + str_src + " are not implemented yet...";
         MsgLog("CalibParsStore", error, msg);  
