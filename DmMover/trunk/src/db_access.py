@@ -14,6 +14,7 @@ __user   = None
 __passwd = None
 __db     = None
 
+__db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
 __dmtable = "data_migration"
 
 # ------------------------------------------------------------------------
@@ -32,27 +33,17 @@ __dmtable = "data_migration"
 #
 # ------------------------------------------------------------------------------
 
+# database connection and table selection
 
-def table_dm():
-    """ Select the data_migration table for ffb datamovers """
-    global __dmtable
-    __dmtable = "data_migration"
-    
-def table_dm_ana():
-    """ Select the data_migration table for ffb datamovers """
-    global __dmtable
-    __dmtable = "data_migration_ana"
+def __connect_db():
+    """ Connect to database. Use default if no connection param were given"""
+    if not __db:
+        select_db(__db_conn)
+    return db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
 
-def table_dm_ffb():
-    """ Select the data_migration table for ffb datamovers """
-    global __dmtable
-    __dmtable = "data_migration_ffb"
-    
 def select_db(conn_file):
-    global __host
-    global __user
-    global __passwd
-    global __db
+    """ Set database connection parameter"""
+    global __host, __user, __passwd, __db
     line = open(conn_file).readline().rstrip()
     key_value = dict([x.split('=', 1) for x in line.split(';') if x])
 
@@ -62,35 +53,40 @@ def select_db(conn_file):
     __db = key_value['Database']
     
 
-def select_testdb(passwd=""):
-    global __host
-    global __user
-    global __passwd
-    
-    __host = 'psdb3.slac.stanford.edu'
-    __user = 'regdb_reader'
-    __passwd = passwd
-    
+def table_dm():
+    """ Select the data_migration table for ffb datamovers """
+    global __dmtable
+    __dmtable = "data_migration"
+
+def table_dm_ana():
+    """ Select the data_migration table for ffb datamovers """
+    global __dmtable
+    __dmtable = "data_migration_ana"
+
+def table_dm_ffb():
+    """ Select the data_migration table for ffb datamovers """
+    global __dmtable
+    __dmtable = "data_migration_ffb"
+
+# ----------------
+# query functions
+# ----------------
 
 def __escape_string(str):
-
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
+    conn = __connect_db()
     return conn.escape_string(str)
 
 def __do_select(statement):
-
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
+    conn = __connect_db()
     cursor = conn.cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute(statement)
     rows = cursor.fetchall()
     if not rows : return None
-
     return rows[0]
 
 def __do_select_many(statement):
-
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
+    conn = __connect_db()
     cursor = conn.cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute(statement)
@@ -105,14 +101,12 @@ def __do_select_many(statement):
 # ------------------------------------------------------------------------------------------
 
 def __do_sql(statement):
-
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
+    conn = __connect_db()
     cursor = conn.cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute("BEGIN")
     cursor.execute(statement)
     cursor.execute("COMMIT")
-
 
 # ------------------------------------------------------------
 # Return the current time expressed in nanoseconds. The result
@@ -131,7 +125,6 @@ def __now_64():
 # ------------------------------------------------------------------------------
 
 def id2name(id):
-
     row = __do_select("SELECT name FROM experiment WHERE id=%s" % id)
     if not row : return None
     return row['name']
@@ -174,13 +167,11 @@ def getexp_datapath(id):
     if not row : return None
     return row['val']
 
-
 def getexp_datapath_all():
     """ return name, id and exper-path for all experiments """
 
     rows = __do_select_many("select e.name, e.id, p.val from experiment `e`, experiment_param `p`"
                             "where p.exper_id=e.id and p.param='DATA_PATH'")
-    
     return rows
 
 # -------------------------------------
@@ -244,7 +235,6 @@ def files2migrate(instr=None,host=None,filetype=None):
 # ------------------------------------
 
 def expr_info():
-    
     data = {}
     exprinfo = __do_select_many("SELECT name,posix_gid,instr_id from experiment")
     for info in exprinfo:
@@ -265,7 +255,6 @@ def expr_info():
 def file4offline(exp_id, host, filetype, fname, dirpath):
     __do_sql("""INSERT INTO data_migration_ana (exper_id,file,file_type,host,dirpath)
              VALUES(%d, '%s','%s','%s','%s')""" % (exp_id, fname, filetype, host, dirpath))
-
 
 # --------------------------------------------------
 # Functions to keep track of file migration to NERSC
@@ -293,7 +282,6 @@ def file_migration2nersc_stop ( exper_id, file_name, file_type, error_msg=None )
     __do_sql ("UPDATE data_migration_nersc SET stop_time=%d %s WHERE exper_id=%d AND file='%s' AND file_type='%s'" % (now, error_msg_sql, exper_id, file_name, file_type))
 
 def files2migrate2nersc(exper_id) :
-
     select_condition = "exper_id=%d AND file_type='xtc' AND stop_time IS NOT NULL AND (error_msg IS NULL OR error_msg='0' OR error_msg='')" % int(exper_id)
 
     # Get a list of files which have already been migrated from OFFLINE
