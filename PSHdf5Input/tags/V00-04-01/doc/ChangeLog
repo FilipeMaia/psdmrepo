@@ -1,0 +1,94 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSHdf5Input
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+ Tag: V00-04-01
+2014-05-22
+- bug fix, skip reading back of the calibstore. 
+
+Tag: V00-04-00
+2014-01-13 Andy Salnikov
+- alias support: input module fills alias map 
+
+Tag: V00-03-00
+2013-12-29 Andy
+- check _mask dataet if present when reading data, test is done at very 
+  high level (in Hdf5InputModule) so that if test fails it can decide to 
+  to store damage in the event; I'm not sure that damage may be neded when 
+  reading HDF5, leave it as an option for now
+
+Tag: V00-02-01
+2013-11-06 David Schneider
+- implemented control() in Hdf5EventId to work with V00-07-03 of PSEvt
+
+Tag: V00-02-00
+2013-10-07 Andy Salnikov
+- adding support for filtering rejected L3T events
+- rejected events are rejected by default, option psana.l3t-accept-only=0
+  can be used to get back to pass-all mode
+
+Tag: V00-01-07
+2013-07-29 Andy Salnikov
+- bug fix in Hdf5InputModule constructor - config service was instantiated 
+  in global context and some parameters were not correct
+
+Tag: V00-01-06
+2013-07-05 Andy Salnikov
+- raise an exception when dataset makes empty list of files
+
+Tag: V00-01-05
+2013-05-22 Andy Salnikov
+- fixing doxygen comments
+
+Tag: V00-01-04
+2013-03-27 Andy Salnikov
+- add support for EPICS aliases
+
+Tag: V00-01-03
+2013-03-25 Andy Salnikov
+- change file access propery list to enable caching of datasets with large
+  chunk sizes
+
+Tag: V00-01-02
+2013-03-21 Andy Salnikov
+- improve event id generatrion for "end" transitions
+
+Tag: V00-01-01
+2013-03-19 Andy Salnikov
+- fixing time of event ID in non-event transitions
+- fix index of the configuration objects
+
+Tag: V00-01-00
+2013-03-18 Andy Salnikov
+- Hdf5DatasetIter now reads blocks of 512 objects from time container, 
+  helps with performance a lot
+
+Tag: V00-00-01
+2013-03-15 Andy Salnikov
+- retagging for nightlies
+
+Tag: andy-20130314
+2013-03-14 Andy Salnikov
+- changes in the instantiation of the EventId
+
+Tag: andy-20121212
+2012-12-12 Andy Salnikov
+- Hdf5EventId gets two new method (from base interface)
+
+Tag: andy-20120502
+2012-05-02 Andy Salnikov
+- few changes, work in progress
+
+Tag: andy-20120125
+2012-01-25 Andy Salnikov
+- first commit to repository, event loop is implemented, but data conversion
+  is still needs to be done
