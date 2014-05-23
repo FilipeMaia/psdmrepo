@@ -11,6 +11,24 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2014-05-23 Mikhail S. Dubrovin
+- New generic algorithms for access to calibration parameters are implemented;
+- remove PrincetonCalibPars
+- add GenericCalibPars
+- in CalibParsStore use GenericCalibPars for all implemented detectors;
+	CsPad, CsPad2x2, Pnccd, Princeton, Andor, Opal1000, Opal4000
+- To add new detector "Det":
+	1) pdscalibdata/DetBaseV1.h
+	2) in PSCalib/src/GenericCalibPars.cpp add
+             #include "pdscalibdata/DetBaseV1.h"
+             ...
+	     template class PSCalib::GenericCalibPars<pdscalibdata::Opal4000BaseV1>;
+	3) in PSCalib/include/CalibParsStore.h add
+             #include "pdscalibdata/DetBaseV1.h"
+             ...
+             return new PSCalib::GenericCalibPars<pdscalibdata::DetBaseV1>(calibdir, type_group, src, runnum, prbits);
+	
 Tag: V00-01-26
 2014-05-21 Mikhail S. Dubrovin
 - add test/ex_princeton_calib_pars.cpp, PrincetonCalibPars

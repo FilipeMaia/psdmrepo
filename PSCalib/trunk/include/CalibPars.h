@@ -57,7 +57,7 @@ class CalibPars  {
 public:
 
 
-  //typedef unsigned shape_t;
+  typedef unsigned shape_t;
   typedef float    pixel_nrms_t;
   typedef float    pixel_bkgd_t;
   typedef uint16_t pixel_mask_t;
@@ -94,7 +94,7 @@ public:
   virtual const size_t size();
 
   /// Returns shape of the ndarray with calibration parameters
-  virtual const unsigned* shape();
+  virtual const shape_t* shape();
 
   /// Returns the pointer to array with pedestals 
   virtual const pedestals_t* pedestals();

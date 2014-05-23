@@ -1,5 +1,5 @@
-#ifndef PSCALIB_PRINCETONCALIBPARS_H
-#define PSCALIB_PRINCETONCALIBPARS_H
+#ifndef PSCALIB_GENERICCALIBPARS_H
+#define PSCALIB_GENERICCALIBPARS_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
@@ -21,16 +21,13 @@
 // Base Class Headers --
 //----------------------
 #include "PSCalib/CalibPars.h"
+#include "pdscalibdata/NDArrIOV1.h"      
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/Src.hh"
-//#include "psddl_psana/princeton.ddl.h"
-
-#include "pdscalibdata/PrincetonBaseV1.h" // shape_base(), Ndim, Rows, Cols, Size, etc.
-#include "pdscalibdata/NDArrIOV1.h"      
 
 //-------------------------------
 
@@ -41,7 +38,7 @@ namespace PSCalib {
 /**
  *  @ingroup PSCalib
  *
- *  @brief PrincetonCalibPars class loads/holds/provides access to the pnCCD
+ *  @brief GenericCalibPars class loads/holds/provides access to the pnCCD
  *  geometry calibration parameters.
  *
  *  This software was developed for the LCLS project. If you use all or 
@@ -61,8 +58,20 @@ namespace PSCalib {
  * 
  *  @li  Include and typedef
  *  @code
- *  #include "PSCalib/PrincetonCalibPars.h"
- *  typedef PSCalib::PrincetonCalibPars CALIB;
+ *  #include "PSCalib/GenericCalibPars.h"
+ *
+ *  #include "pdscalibdata/CsPadBaseV2.h"
+ *  #include "pdscalibdata/CsPad2x2BaseV2.h"
+ *  #include "pdscalibdata/PnccdBaseV1.h"
+ *  #include "pdscalibdata/PrincetonBaseV1.h"
+ *  #include "pdscalibdata/AndorBaseV1.h"
+ *  #include "pdscalibdata/Opal1000BaseV1.h"
+ *  #include "pdscalibdata/Opal4000BaseV1.h"
+ *  ...
+ *
+ *  typedef PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV2>  CALIB;
+ *  typedef PSCalib::GenericCalibPars<pdscalibdata::...BaseV2> ...CALIB;
+ *  ... 
  *  @endcode
  *
  *  @li Instatiation
@@ -78,22 +87,19 @@ namespace PSCalib {
  *  const std::string groupName  = "PNCCD::CalibV1";
  *  const std::string source     = "Camp.0:pnCCD.1";
  *  unsigned long     runNumber  = 10;
+ *  unsigned          print_bits = 255;
  *  Pds::Src src; env.get(source, key, &src);
- *  CALIB *calibpars = new CALIB(calibDir, groupName, src, runNumber);  
+ *  CALIB *calibpars = new CALIB(calibDir, groupName, src, runNumber, print_bits);  
  *  @endcode
  *  \n
- *  For explicit constructor (depricated):
+ *  or similar for explicit constructor (depricated):
  *  @code
- *  const std::string calibDir   = "/reg/d/psdm/AMO/amoa1214/calib";
- *  const std::string groupName  = "PNCCD::CalibV1";
- *  const std::string source     = "Camp.0:pnCCD.1";
- *  unsigned long     runNumber  = 10;
- *  CALIB *calibpars = new CALIB(calibDir, groupName, source, runNumber);  
+ *  CALIB *calibpars = new CALIB(calibDir, groupName, source, runNumber, print_bits);  
  *  @endcode
  *  \n
  *  or for the same list of parameters using polymorphism:
  *  @code
- *  PSCalib::CalibPars *calibpars = new CALIB(calibDir, groupName, source, runNumber);  
+ *  PSCalib::CalibPars *calibpars = new CALIB(calibDir, groupName, source, runNumber, print_bits);  
  *  @endcode
  *  In this case all virtual methods defined in the base class PSCalib::CalibPars will be accessible through the calibpars pointer.
  *  
@@ -122,9 +128,13 @@ namespace PSCalib {
  */
 
 //----------------
-
-  class PrincetonCalibPars: public PSCalib::CalibPars, pdscalibdata::PrincetonBaseV1  {
+template <typename TBASE> // TBASE stands for something like pdscalibdata::PrincetonBaseV1
+class GenericCalibPars: public PSCalib::CalibPars, TBASE  {
 public:
+
+    typedef PSCalib::CalibPars::shape_t shape_t;
+
+    // const static size_t Ndim = TBASE::Ndim; 
 
   /**
    *  @brief DEPRICATED constructor, which use string& source
@@ -135,11 +145,11 @@ public:
    *  @param[in] runNumber  Run number to search the valid file name.
    *  @param[in] print_bits =0-print no messages; +1-input parameters, +2-print msges from  PSCalib::CalibFileFinder, +4-use default, +8-missing type
    */ 
-  PrincetonCalibPars ( const std::string&   calibDir,  //  /reg/d/psdm/AMO/amoa1214/calib
-                       const std::string&   groupName, //  PNCCD::CalibV1
-                       const std::string&   source,    //  Camp.0:pnCCD.0
-                       const unsigned long& runNumber, //  7
-                       unsigned             print_bits=255 );
+  GenericCalibPars ( const std::string&   calibDir,  //  /reg/d/psdm/AMO/amoa1214/calib
+                     const std::string&   groupName, //  PNCCD::CalibV1
+                     const std::string&   source,    //  Camp.0:pnCCD.0
+                     const unsigned long& runNumber, //  7
+                     unsigned             print_bits=255 );
 
   /**
    *  @brief Regular constructor, which use Pds::Src& src
@@ -150,21 +160,21 @@ public:
    *  @param[in] runNumber  Run number to search the valid file name.
    *  @param[in] print_bits =0-print no messages; +1-input parameters, +2-print msges from  PSCalib::CalibFileFinder, +4-use default, +8-missing type
    */ 
-  PrincetonCalibPars ( const std::string&   calibDir,  //  /reg/d/psdm/AMO/amoa1214/calib
-                       const std::string&   groupName, //  PNCCD::CalibV1
-                       const Pds::Src&      src,       //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
-                       const unsigned long& runNumber, //  7
-                       unsigned             print_bits=255 ) ;  
+  GenericCalibPars ( const std::string&   calibDir,  //  /reg/d/psdm/AMO/amoa1214/calib
+                     const std::string&   groupName, //  PNCCD::CalibV1
+                     const Pds::Src&      src,       //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
+                     const unsigned long& runNumber, //  7
+                     unsigned             print_bits=255 ) ;  
 
-  virtual ~PrincetonCalibPars () ;
+  virtual ~GenericCalibPars () ;
 
   /// INTERFACE METHODS
 
-  virtual const size_t   ndim() { return pdscalibdata::PrincetonBaseV1::Ndim; };
-  virtual const size_t   size() { return pdscalibdata::PrincetonBaseV1::Size; };
-  virtual const shape_t* shape(){ return pdscalibdata::PrincetonBaseV1::shape_base(); };
+  virtual const size_t   ndim() { return TBASE::Ndim; }
+  virtual const size_t   size() { return TBASE::Size; }
+  virtual const shape_t* shape(){ return TBASE::shape_base(); }
 
-  virtual const CalibPars::pedestals_t*    pedestals(); //{ return m_pedestals -> pedestals().data(); };
+  virtual const CalibPars::pedestals_t*    pedestals(); 
   virtual const CalibPars::pixel_gain_t*   pixel_gain();
   virtual const CalibPars::pixel_rms_t*    pixel_rms();
   virtual const CalibPars::pixel_status_t* pixel_status();
@@ -176,12 +186,14 @@ public:
 
   void printInputPars();
   void printCalibParsStatus();
+  std::string str_shape();
 
-  const ndarray<const CalibPars::pedestals_t,    2> pedestals_ndarr   (){ return m_pedestals    -> get_ndarray(); };
-  const ndarray<const CalibPars::pixel_status_t, 2> pixel_status_ndarr(){ return m_pixel_status -> get_ndarray(); };
-  const ndarray<const CalibPars::pixel_gain_t,   2> pixel_gain_ndarr  (){ return m_pixel_gain   -> get_ndarray(); };
-  const ndarray<const CalibPars::pixel_rms_t,    2> pixel_rms_ndarr   (){ return m_pixel_rms    -> get_ndarray(); };
-  const ndarray<const CalibPars::common_mode_t,  1> common_mode_ndarr (){ return m_common_mode  -> get_ndarray(); };
+  // What if 0-pointer?
+  //const ndarray<const CalibPars::pedestals_t,    TBASE::Ndim> pedestals_ndarr   (){ return m_pedestals    -> get_ndarray(); }
+  //const ndarray<const CalibPars::pixel_status_t, TBASE::Ndim> pixel_status_ndarr(){ return m_pixel_status -> get_ndarray(); }
+  //const ndarray<const CalibPars::pixel_gain_t,   TBASE::Ndim> pixel_gain_ndarr  (){ return m_pixel_gain   -> get_ndarray(); }
+  //const ndarray<const CalibPars::pixel_rms_t,    TBASE::Ndim> pixel_rms_ndarr   (){ return m_pixel_rms    -> get_ndarray(); }
+  //const ndarray<const CalibPars::common_mode_t,            1> common_mode_ndarr (){ return m_common_mode  -> get_ndarray(); }
 
 private:
 
@@ -192,9 +204,12 @@ private:
   std::string getCalibFileName(const CALIB_TYPE& calibtype);
 
   /// Copy constructor is disabled by default
-  PrincetonCalibPars ( const PrincetonCalibPars& ) ;
+  GenericCalibPars ( const GenericCalibPars& ) ;
   /// Assignment is disabled by default
-  //PrincetonCalibPars operator = ( const PrincetonCalibPars& ) ;
+  //GenericCalibPars operator = ( const GenericCalibPars& ) ;
+
+  /// Request to load all calib pars for printCalibParsStatus() and printCalibPars()
+  void loadAllCalibPars();
 
 //------------------
 // Static Members --
@@ -215,11 +230,11 @@ private:
   // Assuming path: /reg/d/psdm/AMO/amoa1214/calib/PNCCD::CalibV1/Camp.0:pnCCD.1/pedestals/1-end.data
   std::string   m_fname;
 
-  typedef pdscalibdata::NDArrIOV1<CalibPars::pedestals_t,2>    NDAIPEDS;
-  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_gain_t,2>   NDAIGAIN;
-  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_rms_t,2>    NDAIRMS;
-  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_status_t,2> NDAISTATUS;
-  typedef pdscalibdata::NDArrIOV1<CalibPars::common_mode_t,1>  NDAICMOD; 
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pedestals_t,   TBASE::Ndim> NDAIPEDS;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_gain_t,  TBASE::Ndim> NDAIGAIN;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_rms_t,   TBASE::Ndim> NDAIRMS;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_status_t,TBASE::Ndim> NDAISTATUS;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::common_mode_t,           1> NDAICMOD; 
 
   NDAIPEDS   *m_pedestals;
   NDAIGAIN   *m_pixel_gain;
@@ -230,4 +245,4 @@ private:
 
 } // namespace PSCalib
 
-#endif // PSCALIB_PRINCETONCALIBPARS_H
+#endif // PSCALIB_GENERICCALIBPARS_H

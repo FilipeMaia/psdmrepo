@@ -26,10 +26,22 @@
 #include "ImgAlgos/GlobalMethods.h" // ::toString( const Pds::Src& src )
 #include "PSCalib/CalibPars.h"
 
-#include "PSCalib/PnccdCalibPars.h"
-#include "PSCalib/PrincetonCalibPars.h"
-#include "PSCalib/CSPad2x2CalibIntensity.h"
-#include "PSCalib/CSPadCalibIntensity.h"
+//#include "PSCalib/CSPad2x2CalibIntensity.h"
+//#include "PSCalib/CSPadCalibIntensity.h"
+//#include "PSCalib/PnccdCalibPars.h"
+//#include "PSCalib/PrincetonCalibPars.h"
+
+
+#include "PSCalib/GenericCalibPars.h"
+
+#include "pdscalibdata/CsPadBaseV2.h"     // shape_base(), Ndim, Rows, Cols, Size, etc.
+#include "pdscalibdata/CsPad2x2BaseV2.h"
+#include "pdscalibdata/PnccdBaseV1.h"
+#include "pdscalibdata/PrincetonBaseV1.h"
+#include "pdscalibdata/AndorBaseV1.h"
+#include "pdscalibdata/Opal1000BaseV1.h"
+#include "pdscalibdata/Opal4000BaseV1.h"
+
 
 //-----------------------------
 
@@ -117,6 +129,7 @@ public:
 
         std::string str_src = ImgAlgos::srcToString(src); 
 
+	/*
         if ( str_src.find(":Cspad.") != std::string::npos ) {
            MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
@@ -144,13 +157,58 @@ public:
 	   unsigned prbits = (print_bits & 8) ? 40 : 0;
 	   return new PSCalib::PrincetonCalibPars(calibdir, type_group, src, runnum, prbits);
 	}
+	*/
 
-	// "CsPad::CalibV1"
-	// "CsPad2x2::CalibV1"
-	// "Princeton::CalibV1'"
-	// "PNCCD::CalibV1"
-	// "Camera::CalibV1"
-	// "Acqiris::CalibV1"
+	// Generic approach to calibration 
+
+        if ( str_src.find(":Cspad.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPadBaseV2>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":Cspad2x2.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad2x2 source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "CsPad2x2::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPad2x2BaseV2>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":pnCCD.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for pnCCD source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "PNCCD::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":Princeton.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Princeton source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Princeton::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":Andor.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Andor source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Andor::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":Opal1000.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Opal1000 source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
+
+        if ( str_src.find(":Opal4000.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Opal4000 source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;
+	   unsigned prbits = (print_bits & 8) ? 40 : 0;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::Opal4000BaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
 
 	std::string msg =  "Calibration parameters for source: " + str_src + " are not implemented yet...";
         MsgLog("CalibParsStore", error, msg);  
