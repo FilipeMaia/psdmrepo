@@ -9,16 +9,10 @@ import sys
 import time
 import MySQLdb as db
 
-__host   = 'psdb.slac.stanford.edu'
-__user   = 'data_migration'
-__passwd = 'pcds'
-__db     = 'regdb'
-
 __host   = None
 __user   = None
 __passwd = None
 __db     = None
-
 
 __dmtable = "data_migration"
 

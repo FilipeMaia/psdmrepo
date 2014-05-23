@@ -462,6 +462,7 @@ def main():
     elif args.exp:
         exp_id = args.exp
     else:
+        db.select_db("/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn")
         exp_tmp = db.name2id(args.name)
         if exp_tmp == None:
             print "Error getting exper-id from name"
