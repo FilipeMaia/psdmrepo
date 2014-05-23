@@ -16,6 +16,7 @@ import FileMgr.file_status as file_status
 import DmMover.db_access as db 
 
 
+_ws_conn = "/reg/g/psdm/psdatmgr/datamigr/.filemgr-ws"
 _no_experiment_   = -2
 _all_experiments_ = -1
 
@@ -23,6 +24,12 @@ _print_header="""
   ----------+-----------+---------------------------+-----------------------+---------+---------
    exper_id | file type | file name                 | IN MIGRATION DATABASE | ON DISK | ON HPSS
   ----------+-----------+---------------------------+-----------------------+---------+---------"""
+
+
+def ws_conn_para(fname):
+    line = open(fname).readline().rstrip()
+    key_value = dict([x.split('=', 1) for x in line.split(';') if x])
+    return key_value['Url'], key_value['Uid'], key_value['Pwd']
 
 
 class XtcCleanLocal:
@@ -195,7 +202,8 @@ class XtcCleanLocal:
                 lXtcStatusQuery.append( (expid, 'xtc', sFile) )      
 
         self.print_stat = False
-        fs = file_status.file_status(ws_login_user='psdm_reader', ws_login_password='pcds')
+        url,user,pswd = ws_conn_para(_ws_conn)
+        fs = file_status.file_status(ws_login_user=user, ws_login_password=pswd)
         lFilterdQuery = fs.filter(lXtcStatusQuery, self.filter_fileStatus)
     
         lDelFiles = []
