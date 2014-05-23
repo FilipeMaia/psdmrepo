@@ -1,0 +1,108 @@
+#!@PYTHON@
+
+"""
+Create the directories for an experiment. 
+
+Directories are: xtc, hdf5, usr, calib, scratch, ftc, res 
+
+Uses the same tools that the data movers are using.
+
+options: --datapath <default dir for xtc/hdf5/calib 
+         --
+"""
+
+import os
+import argparse
+
+import DmMover.db_access as db
+from DmMover.experiment import ExperimentInfo
+import DmMover.exper_folders as expdir
+
+
+def path_for_ana_data(instr):
+
+    if instr in ("cxi", "mec", "xcs", "mob"):
+        return "/reg/data/ana14"
+    elif instr in ("amo", "sxr", "xpp", "dia", "usr"):
+        return "/reg/data/ana04"
+    
+    raise NameError("Could not get anapath for %s" % instr)
+
+
+usage="Create folders for an experiment"
+help_epilog="""
+
+datapath : path for xtc/hdf5 and usr data
+anapath  : path for res/ftc/scratch 
+
+"""
+
+def main():
+    
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+            
+    parser.add_argument("--test", action="store_true", help="just read config and exit")
+    parser.add_argument("--linkonly", action="store_true", help="create only links")
+    parser.add_argument("--nolink", action="store_true", help="don't create links")
+    parser.add_argument("--datapath", help="physical path for xtc,hdf5 files")
+    parser.add_argument("--anapath", help="physical path for res/ftc/scratch files")
+    parser.add_argument("--dirs", help="directories to create in experiment folder")
+    parser.add_argument("exp_name", help="experiment name")
+    
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    allowed_subdirs = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')    
+    #allowed_subdirs = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch')    
+    if args.dirs:
+        if args.dirs == 'all':
+            dirs_to_create = allowed_subdirs
+        else:
+            dirs_to_create = [d for d in args.dirs.split(',') if d in allowed_subdirs]
+    else:
+        dirs_to_create = []
+
+        
+    exp_id = db.name2id(args.exp_name)
+    exp =  db.getexp(exp_id)
+    instr = db.instr4id(exp_id).lower()
+    posix_grp = exp['posix_gid']
+
+    datapath = args.datapath if args.datapath else db.getexp_datapath(exp_id)
+    anapath = args.anapath if args.anapath else path_for_ana_data(instr)
+    
+    print "Exp: %s Instr: %s Posix-grp: %s  Datapath: %s Anapath: %s" % (
+        args.exp_name, instr, posix_grp, datapath, anapath)
+    
+    
+    do_run = True
+    for dirtype in dirs_to_create:
+        if dirtype in ('xtc', 'hdf5', 'usr'):
+            physpath = datapath
+        elif dirtype == 'calib':
+            #calibpath = os.path.join(anapath, instr, args.exp_name, 'calib')
+            #physpath = anapath if os.path.exists(calibpath) else datapath
+            physpath = anapath
+        else:
+            physpath = anapath
+
+        print "Using physical path", physpath, dirtype
+
+        if args.test:
+            continue
+        
+        if not args.linkonly:
+            expdir.create_exp_path(dirtype, args.exp_name, instr, posix_grp, physpath)
+        if not args.nolink:
+            expdir.create_link(dirtype, args.exp_name, instr, physpath, do_run)
+    
+    
+    return 
+
+
+
+if __name__ == "__main__":
+    main()
