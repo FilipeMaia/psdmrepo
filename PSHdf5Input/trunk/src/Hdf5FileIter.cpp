@@ -150,7 +150,8 @@ Hdf5FileIter::next()
       hdf5pp::GroupIter giter(grp);
       for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
         const std::string& grpname = grp1.basename();
-
+        // skip the calibStore
+        if (grpname == "CalibStore") continue;
         // Epics group is 3-level deep, regular groups are 2-level deep
         if (grpname == "Epics::EpicsPv") {
 
