@@ -1,47 +1,37 @@
 #ifndef PDSCALIBDATA_CSPAD2X2BASEV2_H
 #define PDSCALIBDATA_CSPAD2X2BASEV2_H
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // File and Version Information:
+//      $Revision$
 //      $Id$
+//      $HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pdscalibdata/trunk/include/CsPad2x2BaseV2.h $
+//      $Date$
 //
-// Description:
-//	Class CsPad2x2BaseV2.
-//
+// Author: Mikhail Dubrovin
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-// #include <string>
-
-//----------------------
-// Base Class Headers --
-//----------------------
+//#include <string>
+#include <cstring>  // for memcpy
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-// #include "ndarray/ndarray.h"
-// #include "pdsdata/psddl/cspad2x2.ddl.h"
+//#include "ndarray/ndarray.h"
+//#include "pdsdata/psddl/andor.ddl.h"
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace pdscalibdata {
 
 /**
- *  class CsPad2x2BaseV2 contains common parameters and methods (if any) for CSPAD. 
+ *  class CsPad2x2BaseV2 contains common parameters and methods for CSPAD2x2 camera. 
  *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
+ *  This software was developed for the LCLS project.  
+ *  If you use all or part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
  *
@@ -51,25 +41,34 @@ namespace pdscalibdata {
 class CsPad2x2BaseV2 {
 public:
 
+  typedef unsigned 	shape_t;
+  typedef double  	cmod_t;
+
   const static size_t   Ndim = 3; 
   const static size_t   Segs = 2; 
   const static size_t   Rows = 185; 
   const static size_t   Cols = 388; 
   const static size_t   Size = Rows*Cols*Segs; 
+  const static size_t   SizeCM = 4; 
   
-  // Default constructor
-  CsPad2x2BaseV2 () {};
-  
-  // Destructor
+ 
+  const shape_t* shape_base() { return &m_shape[0]; }
+  const cmod_t*  cmod_base()  { return &m_cmod[0]; }
+
   ~CsPad2x2BaseV2 () {};
 
 protected:
 
+  CsPad2x2BaseV2 (){ 
+    shape_t shape[Ndim]={Rows,Cols,Segs};            
+    cmod_t cmod[SizeCM]={1, 25, 25, 100}; // use algorithm 1
+    std::memcpy(m_shape, &shape[0], sizeof(shape_t)*Ndim);
+    std::memcpy(m_cmod,  &cmod[0],  sizeof(cmod_t)*SizeCM);
+  };
+  
 private:
-
-  // Copy constructor and assignment are disabled by default
-  CsPad2x2BaseV2 ( const CsPad2x2BaseV2& ) ;
-  CsPad2x2BaseV2& operator = ( const CsPad2x2BaseV2& ) ;
+  shape_t m_shape[Ndim];
+  cmod_t  m_cmod[SizeCM];
 };
 
 } // namespace pdscalibdata

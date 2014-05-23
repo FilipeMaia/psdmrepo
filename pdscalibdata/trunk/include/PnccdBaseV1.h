@@ -1,47 +1,37 @@
 #ifndef PDSCALIBDATA_PNCCDBASEV1_H
 #define PDSCALIBDATA_PNCCDBASEV1_H
 
-//--------------------------------------------------------------------------
+//------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//      $Revision$
+//      $Id$
+//      $HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pdscalibdata/trunk/include/PnccdBaseV1.h $
+//      $Date$
 //
-// Description:
-//	Class PnccdBaseV1.
-//
+// Author: Mikhail Dubrovin
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string>
-
-//----------------------
-// Base Class Headers --
-//----------------------
+//#include <string>
+#include <cstring>  // for memcpy
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ndarray/ndarray.h"
-#include "pdsdata/psddl/pnccd.ddl.h"
+//#include "ndarray/ndarray.h"
+//#include "pdsdata/psddl/andor.ddl.h"
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace pdscalibdata {
 
 /**
- *  class PnccdBaseV1 contains common parameters and methods (if any) for pnCCD. 
+ *  class PnccdBaseV1 contains common parameters and methods for pnCCD camera. 
  *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
+ *  This software was developed for the LCLS project.  
+ *  If you use all or part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
  *
@@ -51,25 +41,34 @@ namespace pdscalibdata {
 class PnccdBaseV1 {
 public:
 
+  typedef unsigned 	shape_t;
+  typedef double  	cmod_t;
+
   const static size_t   Ndim = 3; 
   const static size_t   Segs = 4; 
   const static size_t   Rows = 512; 
   const static size_t   Cols = 512; 
   const static size_t   Size = Segs*Rows*Cols; 
+  const static size_t   SizeCM = 4; 
   
-  // Default constructor
-  PnccdBaseV1 () {};
-  
-  // Destructor
+ 
+  const shape_t* shape_base() { return &m_shape[0]; }
+  const cmod_t*  cmod_base()  { return &m_cmod[0]; }
+
   ~PnccdBaseV1 () {};
 
 protected:
 
+  PnccdBaseV1 (){ 
+    shape_t shape[Ndim]={Segs,Rows,Cols};            
+    cmod_t cmod[SizeCM]={3, 50, 10, 128}; // use algorithm 1 to entire image
+    std::memcpy(m_shape, &shape[0], sizeof(shape_t)*Ndim);
+    std::memcpy(m_cmod,  &cmod[0],  sizeof(cmod_t)*SizeCM);
+  };
+  
 private:
-
-  // Copy constructor and assignment are disabled by default
-  PnccdBaseV1 ( const PnccdBaseV1& ) ;
-  PnccdBaseV1& operator = ( const PnccdBaseV1& ) ;
+  shape_t m_shape[Ndim];
+  cmod_t  m_cmod[SizeCM];
 };
 
 } // namespace pdscalibdata

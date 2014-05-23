@@ -168,12 +168,13 @@ template <typename TDATA, unsigned NDIM> // stands for something like ndarray<TD
 class NDArrIOV1 {
 
   static const unsigned int c_ndim = NDIM;
-  typedef TDATA data_t;
 
+public:
+
+  typedef TDATA data_t;
   typedef unsigned int shape_t;
 
 
-public:
   /// Constructors have different default initialization
   /**
    *  @brief creates an object which holds the file name and pointer (0 before load) to ndarray.

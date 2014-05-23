@@ -228,29 +228,33 @@ void NDArrIOV1<TDATA, NDIM>::load_data(std::ifstream& in, const std::string& str
     while (ss >> val and m_count_data != m_size) { 
       *it++ = val;
       ++m_count_data;
-      //cout << "count:data = " << m_count_data << " : " << val << '\n';
+      //if( ndim()==1 ) cout << "count:data = " << m_count_data << " : " << val << '\n';
     }
 
     // load all data by the end
-    while(in and m_count_data != m_size) {
-      in >> *it++;
+    while(in >> val and m_count_data != m_size) {
+      *it++ = val;
       ++m_count_data;
+      //if( ndim()==1 ) cout << "count:data = " << m_count_data << " : " << val << '\n';
     }
 
     // check that we read whole array
     if (m_count_data != m_size) {
-      const std::string msg = "NDArray file does not have enough data: "+m_fname;
-      MsgLogRoot(error, msg);
-      throw std::runtime_error(msg);
+      std::stringstream ss;
+      ss << "NDArray file:\n  " << m_fname << "\n  does not have enough data: "
+         << "read " << m_count_data << " numbers, expecting " << m_size;
+      MsgLog(__name__(), warning, ss.str());
+      if( ndim()>1 ) throw std::runtime_error(ss.str());
     }
 
     // and no data left after we finished reading
     if ( in >> val ) {
       ++ m_count_data;
-      const std::string msg = "NDArray file has extra data: "+m_fname;
-      MsgLogRoot(error, msg);
-      MsgLogRoot(error, "read " << m_count_data << " numbers, expecting " << m_size );
-      throw std::runtime_error(msg);
+      std::stringstream ss;
+      ss << "NDArray file:\n  " << m_fname << "\n  has extra data: "
+         << "read " << m_count_data << " numbers, expecting " << m_size; 
+      MsgLog(__name__(), warning, ss.str());
+      if( ndim()>1 ) throw std::runtime_error(ss.str());
     }
 }
 

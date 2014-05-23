@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-17
+2014-05-23 Mikhail S. Dubrovin
+- add AndorBaseV1.h, Opal1000BaseV1.h, Opal4000BaseV1.h
+- bring to common structure CsPadBaseV2.h, CsPad2x2BaseV2.h, PnccdBaseV1.h
+- in NDArrIOV1.cpp do not throw exceptions for 1-d arrays 
+	in case of variable data length for example for common_mode.
+	
 Tag: V00-05-16
 2014-05-21 Mikhail S. Dubrovin
 - in NDArrIOV1 add options for initialization of dedault constants
