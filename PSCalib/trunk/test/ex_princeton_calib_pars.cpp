@@ -15,7 +15,7 @@
 //-----------------
 
 #include "PSCalib/CalibPars.h"
-#include "PSCalib/PrincetonCalibPars.h"
+#include "PSCalib/GenericCalibPars.h"
 #include "pdscalibdata/PrincetonBaseV1.h"
 
 #include <string>
@@ -35,8 +35,8 @@ int main ()
 
   cout << "Test of PSCalib::PnccdCalibPars\n";     
 
-  PSCalib::PrincetonCalibPars *calibpars = new PSCalib::PrincetonCalibPars(calibDir, groupName, source, runNumber, print_bits);  
-  //PSCalib::PrincetonCalibPars *calibpars = new PSCalib::PrincetonCalibPars(true);  // test mode
+  PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1> *calibpars = new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(calibDir, groupName, source, runNumber, print_bits);  
+  //PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1> *calibpars = new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(true);  // test mode
 
   //calibpars->printCalibPars();
   //calibpars->printCalibParsStatus();
