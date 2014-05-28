@@ -121,6 +121,18 @@ private:
 
 //--------------------
 // Define inage shape in the event for specified type, str_src, and str_key 
+  template <typename T, unsigned NDIM>
+  std::string str_shape( const ndarray<const T,NDIM>& nda ) 
+  {
+    std::stringstream ss;
+    const unsigned* shape = nda.shape();
+    for (unsigned i=0; i<NDIM; ++i)
+      ss << shape[i] << " ";
+    return ss.str();
+  } 
+
+//--------------------
+// Define inage shape in the event for specified type, str_src, and str_key 
   template <typename T>
   bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
   {

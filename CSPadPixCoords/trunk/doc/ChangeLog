@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-24
+2014-05-28 Mikhail S. Dubrovin
+- CSPadImageProducer.h - for full-size array [32, 185, 388] ignore configuration from data 
+- in GlobalMethods.h add str_shape()
+- in CSPadImageProducer.cpp - add and use print_bits, requested by Marcin for PSCalib::CSPadCalibPars
+- in PixCoordsCSPad.cpp, PixCoords2x1V2.cpp - commented out redundant cout-s
+	
 Tag: V00-03-23
 2014-05-06 Mikhail S. Dubrovin
 - in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__

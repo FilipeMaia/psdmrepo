@@ -88,7 +88,7 @@ double max_of_array(const double* arr, unsigned size)
 
 PixCoords2x1V2::PixCoords2x1V2 (bool use_wide_pix_center)
 {
-  cout << "C-tor of PixCoords2x1V2" << endl;
+  //cout << "C-tor of PixCoords2x1V2" << endl;
 
   m_use_wide_pix_center = use_wide_pix_center;
   m_angle_deg = 123456;

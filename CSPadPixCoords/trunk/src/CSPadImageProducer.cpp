@@ -219,7 +219,9 @@ CSPadImageProducer::getCalibPars(Event& evt, Env& env)
 {
   std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
 
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt));
+  unsigned prbits = (m_print_bits & 64) ? 0377 : 0;
+
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt), prbits);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );

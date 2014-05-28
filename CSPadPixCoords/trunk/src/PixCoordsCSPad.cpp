@@ -58,7 +58,7 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
 
   if (m_cspad_calibpar -> getCalibTypeStatus("center_global") == 1) {
 
-      cout << "PixCoordsCSPad:  CSPAD pixel coordinates are evaluated in PixCoordsCSPadV2 using center_global type of constants." << endl;
+    //cout << "PixCoordsCSPad:  CSPAD pixel coordinates are evaluated in PixCoordsCSPadV2 using center_global type of constants." << endl;
       fillArrsOfCSPadPixCoordsFromCenterGlobal();
 
   } else {

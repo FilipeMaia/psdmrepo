@@ -365,16 +365,30 @@ private:
           std::fill(img_nda.begin(), img_nda.end(), T(0));    
 
           const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
+	  //cout << "inp_ndarr.shape():" << str_shape<const T,3>(inp_ndarr) << '\n';
         
           int ind2x1_in_arr = 0;        
-          for (uint32_t q = 0; q < m_numQuads; ++ q) {
-	      const T* data_quad = &inp_ndarr[ind2x1_in_arr][0][0]; 
-              uint32_t qNum = m_quadNumber[q]; 
-              CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);         
 
-              cspadImageFillForType<T,T>(data_quad, quadpars, img_nda);        
-              ind2x1_in_arr += m_num2x1Stored[q];
-          }
+	  if (inp_ndarr.shape()[0] == 32) { // full size array [32, 185, 388]
+
+              for (uint32_t q = 0; q < 4; ++ q) {
+	          const T* data_quad = &inp_ndarr[ind2x1_in_arr][0][0]; 
+                  CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(q, NX_QUAD, NY_QUAD, 8, 255);         	      
+                  cspadImageFillForType<T,T>(data_quad, quadpars, img_nda);        
+                  ind2x1_in_arr += 8;
+              }
+	  }
+	  else { // array shaped as data [N<32, 185, 388]
+
+              for (uint32_t q = 0; q < m_numQuads; ++ q) {
+	              const T* data_quad = &inp_ndarr[ind2x1_in_arr][0][0]; 
+                  uint32_t qNum = m_quadNumber[q]; 
+                  CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);         
+	      
+                  cspadImageFillForType<T,T>(data_quad, quadpars, img_nda);        
+                  ind2x1_in_arr += m_num2x1Stored[q];
+              }
+	  }
         
           //addImageInEventForType<T>(evt, img_nda);
           save2DArrayInEvent<T>(evt, m_src, m_imgkey, img_nda);
