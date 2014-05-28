@@ -49,6 +49,7 @@ CSPadCalibPars::CSPadCalibPars (bool isTestMode)
   , m_typeGroupName(std::string())
   , m_source       (std::string())
   , m_runNumber    (0)
+  , m_print_bits   (0377)
 {
     // Test staff:
     m_isTestMode = isTestMode;
@@ -67,21 +68,25 @@ CSPadCalibPars::CSPadCalibPars (bool isTestMode)
 CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
                                  const std::string&   typeGroupName,      //  CsPad::CalibV1
                                  const std::string&   source,             //  CxiDs1.0:Cspad.0
-                                 const unsigned long& runNumber )         //  10
+                                 const unsigned long& runNumber,          //  10
+                                 const unsigned&      print_bits )        //  0
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_source(source)
 //, m_src(source)
   , m_runNumber(runNumber)
+  , m_print_bits(print_bits)
 {
     m_isTestMode = false;
 
     fillCalibNameVector ();
     loadCalibPars ();
 
-    MsgLog("CSPadCalibPars", info, "Depricated constructor with string& source");
-    printInputPars ();
-    //printCalibPars();
+    if(m_print_bits & 1) {
+      MsgLog("CSPadCalibPars", info, "Depricated constructor with string& source");
+      printInputPars ();
+    }
+    if(m_print_bits & 2) printCalibPars();
 }
 
 //----------------
@@ -89,21 +94,25 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
 CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
                                  const std::string&   typeGroupName,      //  CsPad::CalibV1
                                  const Pds::Src&      src,                //  Pds::Src m_src; <- is defined in get(...,&m_src)
-                                 const unsigned long& runNumber )         //  10
+                                 const unsigned long& runNumber,          //  10
+                                 const unsigned&      print_bits )        //  0
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_source(std::string())
   , m_src(src)
   , m_runNumber(runNumber)
+  , m_print_bits(print_bits)
 {
     m_isTestMode = false;
 
     fillCalibNameVector ();
     loadCalibPars ();
 
-    MsgLog("CSPadCalibPars", info, "Regular constructor with Pds::Src& src, hence m_source is empty...");
-    printInputPars ();
-    //printCalibPars();
+    if(m_print_bits & 1) {
+       MsgLog("CSPadCalibPars", info, "Regular constructor with Pds::Src& src, hence m_source is empty...");
+       printInputPars ();
+    }
+    if(m_print_bits & 2) printCalibPars();
 }
 
 //----------------
@@ -139,7 +148,7 @@ void CSPadCalibPars::loadCalibPars ()
 
         if (m_fname == std::string()) { 
 	  fillDefaultCalibParsV1 ();
-          msgUseDefault ();
+          if(m_print_bits & 4) msgUseDefault ();
           m_calibtype_status[m_cur_calibname] = 0; 
         } 
         else 

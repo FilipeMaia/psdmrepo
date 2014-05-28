@@ -131,23 +131,26 @@ public:
    *  @param[in] typeGroupName  Data type and group names, for example "CsPad::CalibV1";
    *  @param[in] source         The name of the data source, for example "CxiDs1.0:Cspad.0";
    *  @param[in] runNumber      Run number to search the valid file name, for example  =10;
+   *  @param[in] print_bits     Verbosity bits;
    */ 
   CSPadCalibPars ( const std::string&   calibDir,     
                    const std::string&   typeGroupName,
                    const std::string&   source,       
-                   const unsigned long& runNumber ) ;
-
+                   const unsigned long& runNumber,
+                   const unsigned&      print_bits=0 ) ; 
   /**
    *  @brief RECOMMENDED constructor, which gets the source as a \c const \c Pds::Src\& parameter.
    *  @param[in] calibDir       Calibration directory for current experiment, for example "/reg/d/psdm/cxi/cxitut13/calib";
    *  @param[in] typeGroupName  Data type and group names, for example "CsPad::CalibV1";
    *  @param[in] src            The name of the data source, for example Pds::Src m_src; defined in the env.get(...,&m_src)
    *  @param[in] runNumber      Run number to search the valid file name, for example  =10;
+   *  @param[in] print_bits     Verbosity bits;
    */ 
   CSPadCalibPars ( const std::string&   calibDir,     
                    const std::string&   typeGroupName,
                    const Pds::Src&      src,          
-                   const unsigned long& runNumber ) ;
+                   const unsigned long& runNumber,
+                   const unsigned&      print_bits=0 ) ; 
 
   /// Destructor
   virtual ~CSPadCalibPars () ;
@@ -398,6 +401,7 @@ private:
   std::string m_fname;
 
   bool m_isTestMode;
+  unsigned m_print_bits;
 
   //size_t m_nrows; 
   //size_t m_ncols; 
