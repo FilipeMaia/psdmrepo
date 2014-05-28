@@ -12,12 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 	
 =======
-Tag: V00-00-16
+
+Tag: V00-00-15
 2014-04-28 Mikhail S. Dubrovin
 - cspad_image_producer - fix minor problems with member data,
 	add warning that image can be reconstructed for full-size cspad(2x2) ndarrays)
 
-Tag: V00-00-15
 2014-04-18 Mikhail S. Dubrovin
 - ALL modules psvn mktxtprop src/*.py
 	- edit all file headers
