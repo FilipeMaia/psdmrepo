@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-42
+2014-05-28 Mikhail S. Dubrovin
+- fix include/NDArrAverage.h - the non-const ndarray was not checked because of duplication of if(ndim==2)
+- NDArrCalib.cpp - do not load calibration parameters if they are not used
+	
 Tag: V00-03-41
 2014-05-06 Mikhail S. Dubrovin
 - in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__

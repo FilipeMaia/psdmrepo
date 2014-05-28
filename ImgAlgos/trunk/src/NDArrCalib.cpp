@@ -241,11 +241,11 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
 
   if( m_print_bits & 2 ) m_calibpars->printCalibPars();
 
-  m_peds_data = m_calibpars->pedestals();
-  m_gain_data = m_calibpars->pixel_gain();
-  m_stat_data = m_calibpars->pixel_status();
-  m_cmod_data = m_calibpars->common_mode();
-  m_rms_data  = m_calibpars->pixel_rms();
+  m_peds_data = (m_do_peds) ? m_calibpars->pedestals()    : 0;
+  m_gain_data = (m_do_gain) ? m_calibpars->pixel_gain()   : 0;
+  m_cmod_data = (m_do_cmod) ? m_calibpars->common_mode()  : 0;
+  m_rms_data  = (m_do_nrms) ? m_calibpars->pixel_rms()    : 0;
+  m_stat_data = (m_do_stat or m_do_cmod) ? m_calibpars->pixel_status() : 0;
 
   static bool is_done_once = false; 
   if ( ! is_done_once ) {
