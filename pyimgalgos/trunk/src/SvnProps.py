@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 #------------------------------
 """
-Class SvnProps retreives/stores/provide access to svn properties.
+Class SvnProps stores updated by svn properties.
 
-NOTE: In order to always update this file when revision changes, use command:
-svn propset svn:keywords "Revision" SvnProps.py
+NOTE: To update revision number in this file when revision changes, use command:
+psvn mktxtprop src/SvnProps.py
+or
+svn propset svn:keywords "Revision" src/SvnProps.py
 Also see: ~/.subversion/config
 
 This software was developed for the SIT project.
 If you use all or part of it, please give an appropriate acknowledgment.
 
-@version $Id: SvnProps.py 8030 2014-04-18 19:54:37Z dubrovin@SLAC.STANFORD.EDU $
+@version $Id: SvnProps.py 8146 2014-05-05 16:33:57Z dubrovin@SLAC.STANFORD.EDU $
 
 @author Mikhai S. Dubrovin
 """
@@ -27,64 +29,32 @@ import sys
 #------------------------------
 
 class SvnProps :
-
-    revision = "$Revision$"
-    author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
-    id       = "$Id: SvnProps.py 8030 2014-04-18 19:54:37Z dubrovin@SLAC.STANFORD.EDU $"
-    headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pyimgalgos/trunk/src/SvnProps.py $"
-    header   = "$Header:$"
-    datelc   = "$LastChangedDate: 2014-04-18 12:54:37 -0700 (Fri, 18 Apr 2014) $"
-    date     = "$Date: 2014-04-18 12:54:37 -0700 (Fri, 18 Apr 2014) $"
-
-#------------------------------
-
-    def __init__(self) :
-        self.str_revnum = self.get_prop_value(self.revision) # ex: '8029' 
-        self.str_url    = self.get_prop_value(self.headurl)  # ex: 'https://pswww.slac.stanford.edu/svn/...' 
-
-#------------------------------
-        
-    def get_prop_value(self, str_prop) :
-        """Parses thes string of property and returns the value"""
-        return str_prop.split(':')[1].rstrip('$').strip()
-
-#------------------------------
-        
-    def get_pkg_revision(self) :
-        """Returns the package revision number"""
-        return self.str_revnum
+    def __init__(self) : 
+        self.updated  = "2014-05-28"
+        self.revision = "$Revision$"
+        self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
+        self.id       = "$Id: SvnProps.py 8146 2014-05-05 16:33:57Z dubrovin@SLAC.STANFORD.EDU $"
+        self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pyimgalgos/trunk/src/SvnProps.py $"
+        self.header   = "$Header:$"
+        self.datelc   = "$LastChangedDate: 2014-05-05 09:33:57 -0700 (Mon, 05 May 2014) $"
+        self.date     = "$Date: 2014-05-05 09:33:57 -0700 (Mon, 05 May 2014) $"
 
 #------------------------------
 
-    def get_pkg_name_from_path(self) :
-        """Returns the package name"""
-        path = __file__
-        fields = path.split('/')
-        return 'N/A' if len(fields)<3 else fields[-3] 
-
-#------------------------------
-
-    def get_pkg_name(self) :
-        """Returns the package name"""
-        fields = self.str_url.split('/')
-        return 'N/A' if len(fields)<4 else fields[-4] 
-        #return self.get_pkg_name_from_path() if len(fields)<4 else fields[-4] 
-
-#------------------------------
-
-svnprops = SvnProps()  # use it as singleton
+svnprops = SvnProps()  # use it as a singleton
 
 #------------------------------
 
 if __name__ == "__main__" :
     
-    msg  = '__file__   : %s' % __file__
-    msg += '\n__name__   : %s' % __name__
-    msg += '\nsys.argv[0]: %s' % sys.argv[0]
-    print msg
-
-    print 'svnprops.get_pkg_revision():', svnprops.get_pkg_revision()
-    print 'svnprops.get_pkg_name()    :', svnprops.get_pkg_name()
+    print 'svnprops.updated  : %s' % svnprops.updated
+    print 'svnprops.revision : %s' % svnprops.revision
+    print 'svnprops.author   : %s' % svnprops.author
+    print 'svnprops.id       : %s' % svnprops.id
+    print 'svnprops.headurl  : %s' % svnprops.headurl
+    print 'svnprops.header   : %s' % svnprops.header
+    print 'svnprops.datelc   : %s' % svnprops.datelc
+    print 'svnprops.date     : %s' % svnprops.date
 
     sys.exit ( 'End of test' )
 
