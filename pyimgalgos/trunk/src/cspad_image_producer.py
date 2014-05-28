@@ -58,7 +58,11 @@ class cspad_image_producer (object) :
         self.m_key_out    = self.configStr  ('key_out',   'cspad_image')
         self.m_print_bits = self.configInt  ('print_bits', 1)
 
+        self.is_configed = False
         self.counter = 0
+
+        self.is_cspad    = False
+        self.is_cspad2x2 = False
 
         if self.m_print_bits & 1 : self.print_input_pars()
 
@@ -80,13 +84,15 @@ class cspad_image_producer (object) :
 
         #print '\ncspad_image_producer: evt.keys():', evt.keys()
 
+        self.counter +=1     
+
         if env.fwkName() == "psana":
             self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
         else : 
             self.arr = evt.get(self.m_key_in)
 
-        self.counter +=1     
-        if self.counter == 1:
+
+        if self.needs_in_config() :
             self.set_configuration( evt, env )
 
         if self.arr is None :
@@ -98,6 +104,8 @@ class cspad_image_producer (object) :
 
         if self.m_print_bits & 8 : self.print_part_of_cspad_array()
 
+        self.img2d = None
+
         if self.is_cspad :
             self.arr.shape = (32, 185, 388)
             self.img2d = self.coord.get_cspad_image(self.arr, self.config)
@@ -106,12 +114,19 @@ class cspad_image_producer (object) :
             self.arr.shape = (185, 388, 2)
             self.img2d = self.coord.get_cspad2x2_image(self.arr)
 
-        if self.m_print_bits & 16 :
-            msg = __name__ + ': output image shape = ' + str(self.img2d.shape)
-            #logging.info( msg )
-            print msg
+        else :
+            if self.m_print_bits & 32 : 
+                msg = __name__ + ': WARNING! Image can be reconstructed for FULL SIZE CSPAD(2x2) NDARRAYS with shape (32, 185, 388) or (185, 388, 2)'
+                print msg
+            
 
-        evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
+        if self.img2d is not None :
+
+            if self.m_print_bits & 16 :
+                msg = __name__ + ': output image shape = ' + str(self.img2d.shape)
+                print msg
+
+            evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
 
 
 
@@ -124,6 +139,11 @@ class cspad_image_producer (object) :
 
 #-----------------------------
 
+    def needs_in_config( self ) :
+        return False if self.is_configed else True
+
+#-----------------------------
+
     def set_configuration( self, evt, env ) :
 
         self.run    = evt.run()
@@ -131,15 +151,17 @@ class cspad_image_producer (object) :
         if self.arr.shape[0] == 185 : # for (185, 388, 2)
             self.is_cspad    = False
             self.is_cspad2x2 = True
-
+        
             #self.calib  = calp2x2.CSPAD2x2CalibPars()
             self.calib  = calp2x2.CSPAD2x2CalibPars(self.m_calib_dir, self.run)
             self.coord  = pixcoor2x2.CSPAD2x2PixCoords(self.calib)
             self.config = None 
 
             msg = __name__ + ': Set configuration for CSPAD2x2'
+            self.is_configed = True
 
-        elif self.arr.shape[0] == 4 : 
+        # for (4, 8, 185, 388) or for (32, 185, 388)
+        elif self.arr.shape[0] == 4 or self.arr.shape[0] == 32 :
             self.is_cspad    = True
             self.is_cspad2x2 = False
 
@@ -148,6 +170,8 @@ class cspad_image_producer (object) :
             self.config = ccp.CSPadConfigPars()
             
             msg = __name__ + ': Set configuration for CSPAD'
+            self.is_configed = True
+
         else :
             msg = __name__ + ': WARNING: Array for CSPAD of CSPAD2x2 is not defined.'
 

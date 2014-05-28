@@ -51,7 +51,7 @@ class SvnProps :
 #------------------------------
         
     def get_pkg_revision(self) :
-        """Returns the module revision number"""
+        """Returns the package revision number"""
         return self.str_revnum
 
 #------------------------------
