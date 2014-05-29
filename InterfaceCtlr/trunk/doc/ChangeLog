@@ -10,12 +10,17 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-06
 2014-05-21 Wilko Kroeger
 - allow ic-store-files to scan files in <exp>/usr directories. When the usr is scanned
   the hdf5 and xtc folders will be ignored.
 - Added option to ignore files whose mtime is more recent than n-hours.
 - A few more extra option to ic-store-files.
 
+Tag: V01-03-05
+2014-04-30 Wilko Kroeger
+- Added new ic-controller that uses psana for the xtc to hdf5 translation 
+	
 Tag: V01-03-03
 2013-06-13 Andy Salnikov
 - small fix in error message generated when irods registration fails
