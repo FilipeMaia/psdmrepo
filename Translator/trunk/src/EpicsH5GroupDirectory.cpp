@@ -88,60 +88,72 @@ namespace {
     }
   }
 
-  void createAliasLinks(hid_t parentGroup, PSEnv::EpicsStore & epicsStore, 
+  /* ----------------
+     createBeginJobAliasLinksAndGetAliasesForEvents - 
+     This is called during create job. It creates the alias links at that point, for the 
+     ctrl headers. It also fills the argument pv2aliases with all the aliases for a given 
+     pv. There can be more than one alias for a given pv. When a pv first shows up during the 
+     event data, pv2aliases should be queried to see if any aliases should be created for the
+     data.
+     --------------- */
+  void createBeginJobAliasLinksAndGetAliasesForEvents(hid_t parentGroup, PSEnv::EpicsStore & epicsStore, 
                         map<string, vector<string> > & pv2aliases, const string msgLogType) {
 
     vector<string> validTargetsVector = epicsStore.pvNames();
     set<string> validTargets;
     for (unsigned int i = 0; i < validTargetsVector.size(); ++i) validTargets.insert(validTargetsVector.at(i));
 
+    typedef pair<string,string> NormOrigAliasPair;
+    vector<NormOrigAliasPair> normOrigAliasPairs;
     vector<string> aliases = epicsStore.aliases();
     for (size_t idx = 0; idx < aliases.size(); ++idx) {
-      aliases[idx]=normAliasName(aliases[idx]);
-      size_t n = aliases[idx].size();
-      if (n>0 and (aliases[idx][0] == ' ' or aliases[idx][n-1]==' ')) {
-        MsgLog(logger(),warning,"Epics alias has a leading or trailing blank: '" << aliases[idx] << "'");
+      string origAlias = aliases[idx];
+      string normAlias = normAliasName(aliases[idx]);
+      size_t n = normAlias.size();
+      if (n>0 and (normAlias[0] == ' ' or normAlias[n-1]==' ')) {
+        MsgLog(logger(),warning,"Normalized epics alias has a leading or trailing blank: '" << normAlias << "'");
       }
+      normOrigAliasPairs.push_back( pair<string,string>(normAlias, origAlias) );
     }
     pv2aliases.clear();
-    sort(aliases.begin(), aliases.end());
-    for (size_t idx = 0; idx < aliases.size(); ++idx) {
-      string alias = aliases[idx];
-      if (idx>0 and alias==aliases[idx-1]) {
+    sort(normOrigAliasPairs.begin(), normOrigAliasPairs.end());
+    for (size_t idx = 0; idx < normOrigAliasPairs.size(); ++idx) {
+      string normAlias = normOrigAliasPairs[idx].first;
+      if ( (idx>0) and (normAlias == normOrigAliasPairs[idx-1].first) ) {
         MsgLog(logger(), warning, 
-               " normalized alias name is the same as another PV or alias name: '" << alias
-               << "' skipping this alias");
+               " duplicate normalized alias name: " << normAlias << " skipping");
         continue;
       }
-      string targetName = epicsStore.pvName(alias);
+      string targetName = epicsStore.pvName(normOrigAliasPairs[idx].second);
       if (targetName.size()==0) {
-        MsgLog(logger(), warning, "alias '" << alias << "' has an empty target");
+        MsgLog(logger(), warning, "norm alias '" << normAlias << "' has an empty target");
         continue;
       }
       if (validTargets.find(targetName)==validTargets.end()) {
-        MsgLog(logger(), warning, "alias '" << alias << 
-               "' has a target: '"<<targetName<<"' that is not a valid pvname");
+        MsgLog(logger(), warning, "alias '" << normOrigAliasPairs[idx].second << 
+               "' has a target: '" << targetName << "' that is not a valid pvname");
         continue;
       }
-      if (normAliasName(targetName) == alias) {
-        MsgLog(logger(), debug, "alias '" << alias << "' is the same as normalized targetname, skipping.");
+      if (normAliasName(targetName) == normAlias) {
+        MsgLog(logger(), debug, "normAlias '" << normAlias << "' is the same as normalized targetname, skipping.");
         continue;
       } 
-      if (validTargets.find(alias) != validTargets.end()) {
-        MsgLog(logger(), warning, "normalized alias '" << alias << "' (which points to '"<< targetName << "') is the same as existing group. skipping.");
+      if (validTargets.find(normAlias) != validTargets.end()) {
+        MsgLog(logger(), warning, "normalized alias '" << normAlias 
+               << "' (which points to '"<< targetName << "') is the same as existing group. skipping.");
         continue;
       }
 
-      herr_t err = H5Lcreate_soft(targetName.c_str(), parentGroup, alias.c_str(), 
+      herr_t err = H5Lcreate_soft(targetName.c_str(), parentGroup, normAlias.c_str(), 
                                   H5P_DEFAULT, H5P_DEFAULT);
       if ( err < 0 ) {
-        MsgLog(logger(), warning, "H5Lcreate_soft failed for alias= '" 
-               << alias << "' target= '" << targetName 
+        MsgLog(logger(), warning, "H5Lcreate_soft failed for norm alias= '" 
+               << normAlias << "' target= '" << targetName 
                << "' relative to epics src " << msgLogType << " group hid=" << parentGroup);
       } else {
-        pv2aliases[targetName].push_back(alias);
-        MsgLog(logger(),debug,"Created alias link: alias '" << alias << "' target '"<<targetName<<
-               "' parentGroup= " << parentGroup);
+        pv2aliases[targetName].push_back(normAlias);
+        MsgLog(logger(),debug,"Created alias link: norm alias '" << normAlias << "' target '"
+               << targetName << "' parentGroup= " << parentGroup);
       }
     }
   }
@@ -259,7 +271,8 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
   }
   createEpicsPvGroups(m_configEpicsSrcGroup, epicsStore, "config", 
                       m_configEpicsPvGroups);
-  createAliasLinks(m_configEpicsSrcGroup, epicsStore, m_epicsPv2Aliases, "config");
+  createBeginJobAliasLinksAndGetAliasesForEvents(m_configEpicsSrcGroup, epicsStore, 
+                                                 m_epicsPv2Aliases, "config");
 
   // create the datasets for the configure epics groups.  
   vector<string> pvNames = epicsStore.pvNames();

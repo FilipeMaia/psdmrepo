@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2014-05-30 David
+- fix bug that caused epics aliases with a / in them to be discarded.
+
 Tag: V00-01-08
 2014-05-19 David
 - correct how multi value epics pv's are translated.
