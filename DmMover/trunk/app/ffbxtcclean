@@ -433,7 +433,7 @@ def main():
     parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("--instr", dest='type', required=True, help="experiment type (instr)")
+    parser.add_argument("--instr", help="experiment type (instr)")
     parser.add_argument("--name", metavar='EXP-NAME', default="", help="experiment name")
     parser.add_argument("--exp", metavar='EXP-ID', type=int, help="experiment ID")
     #parser.add_argument("--exp", metavar='EXP-ID', type=int, default=_no_experiment_, help="experiment ID")
@@ -464,6 +464,12 @@ def main():
     if args.force: clean_mode = 2
     
     # experiment-id
+
+    if not args.instr and args.name:
+        args.instr = args.name[:3]
+    if not args.instr:
+        print "Need --instr or --name"
+        return 2
     
     if args.all:
         exp_id = _all_experiments_
@@ -477,12 +483,12 @@ def main():
             return 
         else:
             exp_id = exp_tmp
-                    
+
     # exp_id = _all_experiments_ if args.all else args.exp
 
-    print "type: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.type, args.name, exp_id, clean_mode, args.verbose)
+    print "instr: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.instr, args.name, exp_id, clean_mode, args.verbose)
     
-    xtcCleanLocal = XtcCleanLocal(args.type, args.name, exp_id, clean_mode, args.verbose)
+    xtcCleanLocal = XtcCleanLocal(args.instr, args.name, exp_id, clean_mode, args.verbose)
     if args.nodiskcheck:
         xtcCleanLocal.no_check_ana_disk()
 
