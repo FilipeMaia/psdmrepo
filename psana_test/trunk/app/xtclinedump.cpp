@@ -13,8 +13,7 @@
 #include "pdsdata/psddl/epics.ddl.h"
 #include "psana_test/xtciter.h"
 #include "psana_test/printxtc.h"
-
-
+#include "psana_test/epics2str.h"
 
 const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
   dumps xtc files based on first argument:\n\
@@ -25,11 +24,13 @@ const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
     arg2 is the xtcfile to dump. \n\
     The optional last arguments:\n\
       --payload=n    how many bytes of the payload to print for xtc\n\
-      --dgrams=n     how many dgrams to print\n ";
+      --dgrams=n     how many dgrams to print\n\
+      --epics        print extra lines with details on epics, both epicsConfigV1 and the pv's\n";
 
 void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams);           // dg
 void dgramAndItsXtcIterator(int fd, long maxDgrams);                      // xtc1
-void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint); // xtc
+void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint,
+                                                       bool printEpicsConfig); // xtc
 
 const int DEFAULT_MAX_PAYLOAD_PRINT = 1;
 
@@ -38,23 +39,29 @@ int main(int argc, char *argv[]) {
   std::string xtcFileName;
   size_t maxPayloadPrint = DEFAULT_MAX_PAYLOAD_PRINT;
   long maxDgrams = -1;
-
+  bool printEpics = false;
   if (argc > 1) dumpArg = argv[1];
   if (argc > 2)  xtcFileName = argv[2];
   if ((NULL == dumpArg) or (xtcFileName=="")) {
     printf(usage,argv[0]);
     return -1;
   }
-  // check for --payload=n and --dgrams=n
+  // check for --payload=n , --dgrams=n and --epics
   static const char *payload = "--payload=";
   static const char *dgrams = "--dgrams=";
+  static const char *epics = "--epics";
   for (int ii = 3; ii < argc; ii++) {
     bool isPayload = (0 == strncmp(argv[ii], payload, strlen(payload)));
     bool isDgrams = (0 == strncmp(argv[ii], dgrams, strlen(dgrams)));
-    if (not isPayload and not isDgrams) {
-      fprintf(stderr,"Error: argument %s starts out with neither %s nor %s\n",
-              argv[ii], payload, dgrams);
+    bool isEpics = (0 == strncmp(argv[ii], epics, strlen(epics)));
+    if (not isPayload and not isDgrams and not isEpics) {
+      fprintf(stderr,"Error: argument %s starts out with neither %s , %s nor %s\n",
+              argv[ii], payload, dgrams, epics);
       return -1;
+    }
+    if (isEpics) {
+      printEpics = true;
+      continue;
     }
     char * intVal = argv[ii];
     if (isPayload) intVal += strlen(payload);
@@ -83,7 +90,7 @@ int main(int argc, char *argv[]) {
   } else if (strcmp(dumpArg,"xtc1")==0) {
     dgramAndItsXtcIterator(fd, maxDgrams);
   } else if (strcmp(dumpArg,"xtc")==0) {
-    dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(fd, maxDgrams, maxPayloadPrint);
+    dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(fd, maxDgrams, maxPayloadPrint, printEpics);
   } else {
     fprintf(stderr, "ERROR: unexpected, dumpArg=%s not recognized, must be one of 'dg', 'xtc1', 'xtc', 'xtcp'\n",dumpArg);
     fprintf(stderr,usage,argv[0]);
@@ -138,7 +145,8 @@ bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id) {
   return false;
 }
 
-void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint) {
+void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint, 
+                                                       bool printEpics) {
   psana_test::DgramWithXtcPayloadIterator dgIter(fd);
   std::pair<Pds::Dgram *,size_t> dgramOffset = dgIter.nextAndOffsetFromStart();
   int dgNumber = 0;
@@ -163,10 +171,19 @@ void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, s
         const Pds::TypeId &typeId = xtc->contains;
         const Pds::Damage damage = xtc->damage;
         if (validPayload(damage,typeId.id())) {
-          if (typeId.id() == Pds::TypeId::Id_Epics) {
-            Pds::Epics::EpicsPvHeader *pv = static_cast<Pds::Epics::EpicsPvHeader *>(static_cast<void *>(xtc->payload()));
-            fprintf(stdout," dbrType=%d", pv->dbrType());
-            fprintf(stdout," numElements=%d", pv->numElements());
+          if ((not printEpics) and (typeId.id() == Pds::TypeId::Id_Epics)) {
+            // if printEpics is true, a more detailed line will follow this one
+            //   and we do not have to do this
+            Pds::Epics::EpicsPvHeader *pv = 
+              static_cast<Pds::Epics::EpicsPvHeader *>(static_cast<void *>(xtc->payload()));
+            fprintf(stdout," dbr=%d", pv->dbrType());
+            fprintf(stdout," numElem=%d", pv->numElements());
+            fprintf(stdout," pvId=%d", pv->pvId());
+            if (pv->isCtrl()) {
+              Pds::Epics::EpicsPvCtrlHeader *ctrlPv = 
+                static_cast<Pds::Epics::EpicsPvCtrlHeader *>(static_cast<void *>(xtc->payload()));
+              fprintf(stdout," pvName=%s", ctrlPv->pvName());
+            }
           }
           fprintf(stdout," payload=");
           psana_test::printBytes(xtc->payload(), xtc->sizeofPayload(), maxPayloadPrint);
@@ -175,6 +192,25 @@ void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, s
         }
       }
       fprintf(stdout,"\n");
+      if (printEpics) {
+        const Pds::TypeId &typeId = xtc->contains;
+        if (typeId.id() == Pds::TypeId::Id_EpicsConfig) {
+          if (typeId.version() == 1 ) {
+            const Pds::Damage damage = xtc->damage;
+            if (validPayload(damage,typeId.id())) {
+              Pds::Epics::ConfigV1 *cfg = static_cast<Pds::Epics::ConfigV1 *>(static_cast<void *>(xtc->payload()));
+              ndarray<const Pds::Epics::PvConfigV1,1> pvCfg = cfg->getPvConfig();
+              for (int32_t idx = 0; idx < cfg->numPv(); ++idx) {
+                fprintf(stdout,"  pvId=%3d  descr=%s\n", int(pvCfg[idx].pvId()), pvCfg[idx].description());
+              }
+            }
+          }
+        } else if (typeId.id() == Pds::TypeId::Id_Epics) {
+          std::string epicsString = psana_test::epics2Str(xtc);
+          const char *c_str = epicsString.c_str();
+          fprintf(stdout, "  epics: %s\n",c_str);
+        }
+      }
       xtcDepthOffset = xtcIter.nextWithPos();
     }
     if ((maxDgrams > 0) and (dgNumber >= maxDgrams)) return;

@@ -5,10 +5,16 @@ import numpy as np
 
 class dump(object):
     def __init__(self):
-        self.epicsParam = self.configBool('epics', True)
+        self.epicsParam = self.configBool('epics', True)        
         self.aliasesParam  = self.configBool('aliases', True)
+        self.followEpicsAliases = self.configBool('dump_aliases',False)
+        self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
+        # set epics_update to 'regress' to update epics for regression tests.
+        # In this case, an epics pv will only be printed if the timestamp or dbr type differs
+        # and the pvid will not be printed.
         if not self.epicsParam:
             self.aliasesParam = False
+            slf.followEpicsAliases = False
         self.configParam = self.configBool('config', True)
         self.counterParam = self.configBool('counter', True)
         # how much to indent sub objects in the printout
@@ -20,6 +26,7 @@ class dump(object):
         self.exclude = self.configStr('exclude','').split()
         self.include = self.configStr('include','').split()
         self.previousEpics = {}
+        self.previousEpicsAlias = {}
         self.previousConfig = {}
 
     def beginjob(self, evt, env):
@@ -120,20 +127,43 @@ class dump(object):
         if not self.epicsParam:
             return
         epicsStore = env.epicsStore()
+        # dump epics pv's through pv names
         pvNames = epicsStore.pvNames()
+        header = "Epics PV"
+        previous = self.previousEpics
+        self.dumpEpicsImpl(pvNames, header, previous, epicsStore)
+        # dump epics pv's through aliases
+        if self.followEpicsAliases:
+            aliases = epicsStore.aliases()
+            header = "Epics PV Aliases"
+            previous = self.previousEpicsAlias
+            self.dumpEpicsImpl(aliases, header, previous, epicsStore)
+
+    def dumpEpicsImpl(self, pvNames, header, previous, epicsStore):
         printedEpicsHeader = False
         indent = ' ' * self.indent
         for pvName in pvNames:
             pv = epicsStore.getPV(pvName)
             if not pv:
                 continue
-            pvStr = epicsPvToStr(pv)
-            if pvStr != self.previousEpics.get(pvName, ''):
+            if self.epicsPrintForRegressionTests:
+                pvStr = epicsPvToStr(pv,False)
+                if pv.isCtrl():
+                    pvCmpStr = 'ctrl'
+                elif pv.isTime():
+                    pvCmpStr = 'sec=%s nsec=%s' % (pv.stamp().sec(), pv.stamp().nsec())
+                else:
+                    pvCmpStr = pvStr
+            else:
+                pvStr = epicsPvToStr(pv,True)
+                pvCmpStr = pvStr
+            if pvCmpStr != previous.get(pvName, ''):
                 if not printedEpicsHeader:
                     printedEpicsHeader = True
-                    print "Epics PV"
+                    print header
                 print "%spvName=%s %s" % (indent, pvName, pvStr)
-            self.previousEpics[pvName]=pvStr
+            previous[pvName]=pvCmpStr
+        
 
 ######## helper functions ############
 def getEventKeyStr(key, amap=None):

@@ -1,3 +1,9 @@
+# This is a script for managing psana test data. From the release directory do
+#
+#        python psana_test/src/psanaTestLib.py
+#
+# to get the usage commands that are available.
+
 import sys
 import glob
 import subprocess as sb
@@ -9,9 +15,53 @@ import io
 import shutil
 import signal
 import time
-
 import ctypes
+import xml.etree.ElementTree as ET
 
+usage = '''enter one of the commands:
+
+prev   updates psana_test/data/previousDump.txt.
+       For each xtc in the testdata, write the md5 sum of the xtc, the dump of the full xtc,
+       and if the xtc is included in the regressionTests.txt file, the specified dump (usually a
+       smaller number of events, without epics aliases in the dump).
+
+       This file is used by the test command to detect changes.
+
+       optional args:  
+         delete=False    don't delete dump file (they will be in psana_test/data/prev_xtc_dump)
+         all=True        redo dump of all tests - not just new test files. 
+                         Does not append, creates psana_test/data/previousDump.txt from scratch.
+
+links  creates new soft links in /reg/g/psdm/data_test/types that link to the xtc in ../Translator
+       that name a distinct psana type, or distint epics pv (dbr & numElements).
+       Does not remove existing link if it is there. 
+       optional args:
+         noTypes   noEpics
+
+test  default is to do regression test - the tests listed in psana_test/data/regressionTests.txt.
+      For those files, it runs psana_test.dump on the specified number of events (without dumping 
+      epics aliases) and compares to the md5sum to that listed in previousDump.txt. Then it translates 
+      the specified number of events to hdf5 and runs psana_test.dump again. This output is compared
+      with the previous output. Some differences are expected, but other differences raise errors.
+      Expected differences are recorded in regressionTestsExpectedDiffs.xml
+
+       optional args:
+         verbose=True delete=False
+         set=n  or n,m,k            just to those regression test numbers
+         set=full                   not the regression, processes complete xtc of all tests
+         set=full:n or full:n,m,k   a select number of full tests to do
+
+types  find xtc with new types. Make new test_0xx files. Updates psana_test/data/regressionTests.txt.
+       optional args: 
+         datagrams=n  number of datagrams to look at with each new file (remember, each stream is 20hz)
+         regress      just generated the regression test file
+
+curtypes report on current types
+'''
+
+##############################################################
+# to make the number of pds type id's available to python, we wrap a C++ function
+# that returns the value:
 dll = ctypes.cdll.LoadLibrary('libpsana_test.so')
 psana_test_getNumberOfPdsTypeIds = dll.getNumberOfPdsTypeIds
 psana_test_getNumberOfPdsTypeIds.restype = ctypes.c_int
@@ -20,37 +70,22 @@ psana_test_getNumberOfPdsTypeIds.argtypes = []
 def getNumberOfPdsTypeIds():
     return psana_test_getNumberOfPdsTypeIds()
 
-usage = '''enter one of the commands:
 
-prev   updates psana_test/data/previous_dump.txt.
-       File contains md5sum of xtc, and of the dump of the xtc. File is used by test to detect changes.
-       optional args:  
-         delete=False    don't delete dump file (they will be in psana_test/data/prev_xtc_dump)
-         all=True        redo dump of all tests - not just new test files. 
-                         Does not append, creates psana_test/data/previous_dump.txt from scratch.
-
-links  creates new soft links in /reg/g/psdm/data_test/types to find data with a given datatype.
-       Does not remove existing link if it is there.
-
-test   read previous_dump.txt. Dump all xtc, translate, and dump again. Report unexpected differences.
-
-types  find xtc with new types. Make new test_0xx files. 
-       optional args: datagrams=n  number of datagrams to look at with each new file (remember, each stream
-       is 20hz)
-
-curtypes report on current types
-'''
-
+############################################################
+# Exceptions:
 class BadXtcFilename(Exception):
     def __init__(self,msg=''):
         super(BadXtcFilename, self).__init__(msg)
 
+# alarm_handler for timeout when running shell commands
 class Alarm(Exception):
     pass
 
 def alarm_handler(signum, frame):
     raise Alarm
 
+###########################################################
+# testing functions
 def cmdTimeOut(cmd,seconds=5*60):
     '''Runs cmd with seconds timeout - raising exceptoin Alarm if timeout is hit.
     warning: runs cmd with shell=True, considered a security hazard.
@@ -69,9 +104,16 @@ def cmdTimeOut(cmd,seconds=5*60):
     
 def getTestFiles(noTranslator=False):
     '''returns the test files as a dictionary. These are the files
-    of the form test_*.xtc. Returns a dict:
+    of the form test_xxx_*.xtc where xxx is an integer.
+
+    optional arg: noTranslator=True means other than test 42, don't 
+    return tests with Translator in the name.
+
+    Returns a dict:
       res[n]={'basname':basename, 'path':path}
-    where n is the testnumber, path the full path to the xtc file.
+    where n is the testnumber, 
+          basename  is the file basename, such as test_000_exp.xtc
+          path      is the full path to the xtc file.
     '''
     files = glob.glob('/reg/g/psdm/data_test/Translator/test_*.xtc')
     basenames = [os.path.basename(fname) for fname in files]
@@ -84,6 +126,37 @@ def getTestFiles(noTranslator=False):
         res[num] = {'basename':basename, 'path':fullpath}
     return res
 
+def getPreviousDumpFilename():
+    return os.path.join('psana_test', 'data', 'previousDump.txt')
+
+def getRegressionTestFilename():
+    return os.path.join('psana_test','data','regressionTests.txt')
+
+def getRegressionTestExpectedDifferencesFilename():
+    return os.path.join('psana_test','data','regressionTestsExpectedDiffs.xml')
+
+def getRegressionTestExpectedDifferences():
+    tree = ET.parse(getRegressionTestExpectedDifferencesFilename())
+    root = tree.getroot()
+    expectedDiffs = {}
+    for regress in root.findall('regress'):
+        expectedDiffs[int(regress.attrib['number'])]=regress.find('diff').text.strip()
+    return expectedDiffs
+    
+def getFullTestExpectedDifferencesFilename():
+    return os.path.join('psana_test','data','fullTestsExpectedDiffs.xml')
+
+def getFullTestExpectedDifferences():
+    tree = ET.parse(getFullTestExpectedDifferencesFilename())
+    root = tree.getroot()
+    expectedDiffs = {}
+    for full in root.findall('full'):
+        expectedDiffs[int(full.attrib['number'])]=full.find('diff').text.strip()
+    return expectedDiffs
+
+def getPreviousXtcDirsFilename():
+    return os.path.join('psana_test', 'data', 'previousXtcDirs.txt')
+
 def filterPsanaStderr(ln):
     ''' returns True if this line is nothing to worry about from psana output.
     Otherwise False, it is an unexpected line in psana stderr.
@@ -91,29 +164,39 @@ def filterPsanaStderr(ln):
     ignore = ('MsgLogger: Error while parsing MSGLOGCONFIG: unexpected logging level name',
               '[warning')
     for prefix in ignore:
-        if ln.startswith(prefix):
+        if ln.startswith(prefix) or len(ln.strip())==0:
             return True
     return False
 
-def get_md5sum(fname):
+def get_md5sum(fname, verbose=False):
     '''returns md5sum on a file. Calls command line utility md5sum
     IN: fname - fuilename
     OUT: text string - md5sum.
     '''
     assert os.path.exists(fname), "filename %s does not exist" % fname
-    o,e = cmdTimeOut('md5sum %s' % fname, seconds=15*60)
+    cmd = 'md5sum %s' % fname
+    if verbose: print cmd
+    o,e = cmdTimeOut(cmd, seconds=15*60)
     assert len(e)==0
     flds = o.split()
     assert len(flds)==2
     assert flds[1] == fname
     return flds[0]
 
-def psanaDump(infile, outfile):
+def psanaDump(infile, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False):
     '''Runs the  psana_test.dump module on the infile and saves the output
     to outfile. Returns output to stderr from the run, filtered as per the
     filterPsanaStderr function
     '''
-    cmd = 'psana -m psana_test.dump %s' % infile
+    numEventsStr = ''
+    epicAliasStr = ''
+    if events is not None and events > 0:
+        numEventsStr = '-n %d' % events
+    if not dumpEpicsAliases:
+        epicAliasStr = '-o psana_test.dump.aliases=False'
+    regressDumpStr = '-o psana_test.dump.regress_dump=%r' % regressDump
+    cmd = 'psana %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, infile)
+    if verbose: print cmd
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()
     fout = file(outfile,'w')
@@ -124,7 +207,95 @@ def psanaDump(infile, outfile):
     filteredErr =  '\n'.join(filteredErrLines)
     return cmd, filteredErr
 
-def getPsanaTypes(datasource, numEvents=120):
+class XtcLine(object):
+    '''Initialize with a line of output from xtclinedump to obtain an object whose 
+    attributes are the field names from the line (with values from the line as well).
+    Always has the attribute 'contains' that is one of:
+      'dg'      the line was for a datagram,
+      'xtc'     an xtc line that is not an epics pv variable
+      'xtc-pv'  an xtc line for an epics pv variable 
+                object will include the two additional attributes dbrType and numElements
+      'unknown'
+    '''
+    def __init__(self,ln):
+        def inthex(x):
+            return int(x,16)
+        self.ln=ln
+        if ln.startswith('dg='):
+            self.contains='dg'
+            types= [int,    inthex,    str,   str,   int,   int,  inthex,inthex,  inthex,   inthex,  inthex, inthex,inthex]
+            flds = ['dg=',' offset=',' tp=',' sv=',' ex=',' ev=',' sec=',' nano=',' tcks=',' fid=',' ctrl=',' vec=',' env=']
+        elif ln.startswith('xtc'):
+            ln = ln[len('xtc'):]
+            self.contains='xtc'
+            ln = ln.split(' payload=')[0]
+            if ln.find('dbr=')>0:
+                self.contains += '-pv'
+                if ln.find('pvName=')>0:
+                    ln, pvName = ln.split(' pvName=')
+                    setattr(self,'pvName',pvName)
+                ln, pvId = ln.split(' pvId=')
+                ln, numElem = ln.split(' numElem=')
+                ln, dbr = ln.split(' dbr=')
+                setattr(self,'pvId',int(pvId))
+                setattr(self,'numElem',int(numElem))
+                setattr(self,'dbr',int(dbr))
+            if ln.find(' plen=')>=0:
+                ln,val = ln.split(' plen=')
+                setattr(self,'plen',int(val))
+            types= [int,    inthex,    inthex, inthex,    str,    int,          str,      int,      int,       inthex,     int         , int,                    str]
+            flds = [' d=',' offset=',' extent=',' dmg=',' src=', ' level=', ' srcnm=',' typeid=', ' ver=', ' value=',' compr=',' compr_ver=',' type_name=']
+        else:
+            self.contains='unknown'
+            return
+        assert len(types)==len(flds)
+        assert len(ln.split('='))==len(types)+1
+        types.reverse()
+        flds.reverse()
+        for fld,tp in zip(flds,types):
+            try:
+                ln,val = ln.split(fld)
+            except ValueError:
+                print "ln=%s\nfld=%s" % (ln,fld)
+                raise
+            attr = fld.strip().replace('=','')
+            setattr(self,attr,tp(val))
+        
+    def isValid(self):
+        '''For xtc, returns true if damage is 0, or only the user bit for ebeam.
+        For dgrams, always returns True
+        '''
+        if self.contains == 'dg': return True
+        if self.contains == 'unknown': return False
+        if self.dmg == 0: return True
+        if self.typeid == 15:   
+            # the type is Bld.EBeam
+            if ((self.dmg & 0xFFFFFF) == (1<<14)): 
+                # only user damage
+                return True 
+        return False
+            
+    def __str__(self):
+        return self.ln
+
+    def __repr__(self):
+        return str(self)
+        
+def getEpicsTypes(xtc, numDgrams=6, getUndamaged=True):
+    cmd = 'xtclinedump xtc %s' % xtc
+    if numDgrams is not None and isinstance(numDgrams,int):
+        cmd += ' --dgrams=%d' % numDgrams
+    o,e = cmdTimeOut(cmd)    
+    assert len(e)==0, "error running: %s" % cmd
+    dbrNumElem = set()
+    for ln in o.split('\n'):
+        lnObj = XtcLine(ln)
+        if getUndamaged and not lnObj.isValid(): continue
+        if lnObj.contains == 'xtc-pv':
+            dbrNumElem.add((lnObj.dbr,lnObj.numElem))
+    return dbrNumElem
+
+def getPsanaTypes(datasource, numEvents=160):
     '''Returns a set of the Psana types in the first numEvents of the datasource.
     Runs EventKeys.
     '''
@@ -137,7 +308,7 @@ def getPsanaTypes(datasource, numEvents=120):
         timeOut = numEvents
     cmd = 'psana %s -m EventKeys %s | grep type=Psana | sort | uniq' % (numStr, datasource,)
     o,e = cmdTimeOut(cmd, timeOut)    
-    nonWarnings = [ ln for ln in e.split('\n') if not filterPsanaStderr(ln.strip()) ]
+    nonWarnings = [ ln for ln in e.split('\n') if not filterPsanaStderr(ln) ]
     if len(nonWarnings)>0:
         raise Exception("getPsanaTypes: cmd=%s\n failed, error:\n%s" % (cmd, e))
     for ln in o.split('\n'):
@@ -146,7 +317,49 @@ def getPsanaTypes(datasource, numEvents=120):
         typeName = ln.split('type=')[1].split(', src=')[0]
         types.add(typeName)
     return types
-    
+
+def lastDgramForTypes(xtc, dgrams=240, getUndamaged=True):
+    '''For each distinct typid/version pair, and epics dbr/num Elem pair,
+    identifies the first datagram where this occurs as valid data, and the 
+    offset of the next datagram after this type.
+
+    IN: xtc file
+    OUT: typesDict, epicsDict
+      where 
+    typeDict key:  (typeid, version)
+             value: {'first_datagram': int, 'offset_next_datagram': int (or None)}
+    epicsDict keys: (dbrtype,numElements)
+             value: {'first_datagram': int, 'offset_next_datagram': int (or None)}
+
+    '''
+    cmd = 'xtclinedump xtc %s --dgrams=%s' % (xtc, dgrams)
+    o,e = cmdTimeOut(cmd)
+    assert len(e)==0, "error:\ncmd=%s\nstderr=%s" % (cmd,e)
+    earliestTypes = {}
+    earliestEpics = {}
+    lns = o.split('\n')
+    dg2offset={}
+    fileLen = os.stat(xtc).st_size
+    for ln in lns:
+        lnobj=XtcLine(ln)
+        if lnobj.contains == 'dg':
+            dg = lnobj.dg
+            dg2offset[dg]=lnobj.offset
+        if getUndamaged and not lnobj.isValid(): continue
+        if lnobj.contains == 'xtc':
+            typeVer=(lnobj.typeid, lnobj.ver)
+            if typeVer not in earliestTypes:
+                earliestTypes[typeVer]={'first_datagram':dg,'offset_next_datagram':None}
+        elif lnobj.contains == 'xtc-pv':
+            dbrNumElem = (lnobj.dbr, lnobj.numElem)
+            if dbrNumElem not in earliestEpics:
+                earliestEpics[dbrNumElem]={'first_datagram':dg,'offset_next_datagram':None}
+    for earlyDgDict in [earliestTypes, earliestEpics]:
+        for key,value in earlyDgDict.iteritems():
+            dg = value['first_datagram']
+            value['offset_next_datagram'] = dg2offset.get(dg+1,fileLen)
+    return earliestTypes, earliestEpics
+
 def parseArgs(args,cmds):
     '''INPUT:
          args  - a list of aruments, each a string,
@@ -196,10 +409,9 @@ def previousCommand(args):
 
 def previousDumpFile(deleteDump=True, doall=False):
     prevDir = os.path.join('psana_test','data')
-    prevName = 'previous_dump.txt'
     assert os.path.exists(prevDir), ("Directory %s does not exist. " + \
                                      "Run from a release directory with psana_test checked out") % prevDir
-    prevFullName = os.path.join(prevDir, prevName)
+    prevFullName = getPreviousDumpFilename()
     if doall:
         fout = file(prevFullName,'w')
         prev = set()
@@ -208,6 +420,9 @@ def previousDumpFile(deleteDump=True, doall=False):
         prev = set(readPrevious().keys())
         fout = file(prevFullName,'a')
     testTimes = {}
+    regressTests = readRegressionTestFile()
+    print "** prev: carrying out md5 sum of xtc, psana_test.dump of xtc and regression tests."
+    print "   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)"
     for testNumber, fileInfo in getTestFiles().iteritems():
         if testNumber in prev:
             continue
@@ -216,64 +431,122 @@ def previousDumpFile(deleteDump=True, doall=False):
         xtc_md5 = get_md5sum(fullPath)
         dumpBase = baseName + '.dump'
         dumpPath = os.path.join('psana_test', 'data', 'prev_xtc_dump', dumpBase)        
-        cmd, err = psanaDump(fullPath, dumpPath)
+        cmd, err = psanaDump(fullPath, dumpPath, dumpEpicsAliases=True, regressDump=False)
         if len(err)>0:
             fout.close()
-            errMsg = '** FAILURE ** createPrevious: psana_Test.dump produced errors on test %d\n' % testNumber
+            errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on test %d\n' % testNumber
             errMsg += 'cmd: %s\n' % cmd
             errMsg += err
             raise Exception(errMsg)
         dump_md5 = get_md5sum(dumpPath)
         if deleteDump: os.unlink(dumpPath)
-        fout.write("xtc_md5sum=%s   dump_md5sum=%s   xtc=%s\n" % (xtc_md5, dump_md5,baseName))
+        regress_md5 = '0' * 32
+        if testNumber in regressTests:
+            testInfo = regressTests[testNumber]
+            regressXtc, events, dumpEpicsAliases = testInfo['path'], testInfo['events'], \
+                                                   testInfo['dumpEpicsAliases']            
+            assert regressXtc == fullPath, "regression test %d xtc != testData xtc, regress=%s testData=%s" % \
+                (testNumber, regressXtc, fullPath)
+            regressDumpBase = 'regress_' + dumpBase
+            regressDumpPath = os.path.join('psana_test', 'data', 'prev_xtc_dump', regressDumpBase)
+            cmd, err = psanaDump(fullPath, regressDumpPath, events, dumpEpicsAliases=False, regressDump=True)
+            if len(err)>0:
+                fout.close()
+                errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on regress test %d\n' % testNumber
+                errMsg += 'cmd: %s\n' % cmd
+                errMsg += err
+                raise Exception(errMsg)
+            regress_md5 = get_md5sum(regressDumpPath)
+            if deleteDump: os.unlink(regressDumpPath)
+        fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % (xtc_md5, dump_md5, regress_md5, baseName))
         fout.flush()
         testTimes[testNumber] = time.time()-t0
-        print "** prev: testfile %d, did psana_test.dump and recorded md5. time=%.2f seconds" % (testNumber, testTimes[testNumber])
+        print "** prev:  test=%3d time=%.2f seconds" % (testNumber, testTimes[testNumber])
     fout.close()
     testsTime = sum(testTimes.values())
     print "* tests time: %.2f sec, or %.2f min" % (testsTime,testsTime/60.0)
 
 def readPrevious():
-    prevFilename = os.path.join('psana_test', 'data', 'previous_dump.txt')
+    '''A line of this file has
+    xtc_md5sum=... dump_md5sum=... regress_md5sum=... xtc=...
+    which are the md5 sum of the whole xtc file, the md5 sum of a dump of the whole xtc
+    then an md5 sum of a dump of the regression test for this file, or 0 if this file is not
+    included in the reguression test, finally the xtc file for the test.    
+    '''
+    prevFilename = getPreviousDumpFilename()
     assert os.path.exists(prevFilename), "file %s doesn't exist, run prev command" % prevFilename
     res = {}
     for ln in file(prevFilename).read().split('\n'):
         if not ln.startswith('xtc_md5sum='):
             continue
-        ln,xtc = ln.split('xtc=')
+        ln,xtc = ln.split(' xtc=')
+        ln,md5regress = ln.split(' regress_md5sum=')
         ln,md5dump = ln.split('dump_md5sum=')
         ln,md5xtc = ln.split('xtc_md5sum=')
         xtc = xtc.strip()
         assert xtc.startswith('test_'), "xtc file doesn't start with test_: %s" % xtc
         number = int(xtc.split('_')[1])
+        md5regress = md5regress.strip()
         md5dump = md5dump.strip()
         md5xtc = md5xtc.strip()
-        res[number]={'xtc':xtc, 'md5xtc':md5xtc, 'md5dump':md5dump}
+        res[number]={'xtc':xtc, 'md5xtc':md5xtc, 'md5dump':md5dump, 'md5regress':md5regress}
     return res
 
 def makeTypeLinks(args):
+    doTypes = True
+    doEpics = True
+    if 'noTypes' in args:
+        doTypes = False
+    if 'noEpics' in args:
+        doEpics = False
     linksMade = set()
-    for testNum, testInfo in getTestFiles().iteritems():
+    for testNum, testInfo in getTestFiles(noTranslator=True).iteritems():
         basename, fullPath = (testInfo['basename'], testInfo['path'])
-        # I believe all Translator tests are dups of 42, and can be weird, so 
-        # don't make a type link to it
-        if testNum != 42 and basename.find('Translator')>=0:
+        if doTypes:
+            types = getPsanaTypes(fullPath, None)
+            for tp in types:
+                if tp in linksMade: continue
+                tpForFileName = tp.replace('Psana::','')
+                tpForFileName = tpForFileName.replace('::','_')
+                lnk = '/reg/g/psdm/data_test/types/%s.xtc' % tpForFileName
+                if os.path.exists(lnk):
+                    print "    already exists, skipping %s" % lnk
+                    continue
+                lnkCmd = 'ln -s %s %s' % (fullPath, lnk)
+                o,e = cmdTimeOut(lnkCmd)
+                assert len(e)==0, "**Failure with cmd=%s\nerr=%s" % (lnkCmd,e)
+                print lnkCmd
+                linksMade.add(tp)
+        if doEpics:
+            epicsDbrNumElem = getEpicsTypes(fullPath)
+            for dbr,numElem in epicsDbrNumElem:
+                epicsLnk = 'epicsPv_dbr_%d_numElem_%d' % (dbr,numElem)
+                if epicsLnk in linksMade: continue
+                lnk = '/reg/g/psdm/data_test/types/%s.xtc' % epicsLnk
+                if os.path.exists(lnk):
+                    print "    already exists, skipping %s" % lnk
+                    continue
+                lnkCmd = 'ln -s %s %s' % (fullPath, lnk)
+                o,e = cmdTimeOut(lnkCmd)
+                assert len(e)==0, "**Failure with cmd=%s\nerr=%s" % (lnkCmd,e)
+                print lnkCmd
+                linksMade.add(epicsLnk)
+
+def getEpicsTestNumbers():
+    testNumbers = set()
+    for fname in glob.glob('/reg/g/psdm/data_test/types/epicsPv*.xtc'):
+        base = os.path.basename(fname)
+        numElem = int(base.split('_numElem_')[1].split('.xtc')[0])
+        if numElem > 1:
             continue
-        types = getPsanaTypes(fullPath, None)
-        for tp in types:
-            if tp in linksMade:
-                continue
-            tpForFileName = tp.replace('Psana::','')
-            tpForFileName = tpForFileName.replace('::','_')
-            lnk = '/reg/g/psdm/data_test/types/%s.xtc' % tpForFileName
-            if os.path.exists(lnk):
-                print "    already exists, skipping %s" % lnk
-                continue
-            lnkCmd = 'ln -s %s %s' % (fullPath, lnk)
-            o,e = cmdTimeOut(lnkCmd)
-            assert len(e)==0, "**Failure with cmd=%s\nerr=%s" % (lnkCmd,e)
-            print lnkCmd
-            linksMade.add(tp)
+        try:
+            xtcpath = os.readlink(fname)
+        except OSError:
+            sys.stderr.write("Unexpected: os.readlink failed for fname=%s (not a soft link?)\n" % fname)
+            continue
+        xtc = os.path.basename(xtcpath)
+        testNumbers.add(int(xtc.split('test_')[1].split('_')[0]))
+    return list(testNumbers)
 
 def testCommand(args):
     def checkForSameXtcFile(baseName, prevBasename, num, verbose):
@@ -285,32 +558,38 @@ def testCommand(args):
             print "   old: %s" % prevBasename
             print "   new: %s" % baseName
 
-    def checkForSameMd5(fullPath, md5, num, msg):
+    def checkForSameMd5(fullPath, md5, num, verbose, msg):
         current_md5 = get_md5sum(fullPath)
         assert current_md5 == md5, ("%s\n Test no=%d md5 do not agree.\n prev=%s\n curr=%s") % \
             (msg, num, md5, current_md5)
 
-    def translate(infile, outfile, num, verbose):
-        cmd = 'psana -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
-        cmd %= (outfile, infile)
+    def translate(infile, outfile, numEvents, testNum, verbose):
+        numEventsStr = ''
+        if numEvents is not None and numEvents > 0:
+            numEventsStr = ' -n %d' % numEvents
+        cmd = 'psana %s -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
+        cmd %= (numEventsStr, outfile, infile)
+        if verbose: print cmd
         o,e = cmdTimeOut(cmd,20*60)
         e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
         if len(e) > 0:
-            errMsg =  "**Failure** test %d: Translator failure" % num
+            errMsg =  "**Failure** test %d: Translator failure" % testNum
             errMsg += "cmd=%s\n" % cmd
             errMsg += "\n%s" % e
             raise Exception(errMsg)
         if verbose: print "test %d: translation finished, produced: %s" % (num, outfile)
 
-    def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose):
-        cmd = 'diff -u %s %s' % (currentXtcDumpPath, h5DumpPath)
+    def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose, expectedOutput=''):
+        cmd = 'diff %s %s' % (currentXtcDumpPath, h5DumpPath)
+        if verbose: print cmd
         o,e = cmdTimeOut(cmd,5*60)
-        if len(e)>0:
-            msg = "** FAILURE - xtc vs. h5 dump. test=%d" % num
-            msg += "cmd= %s\n" % cmd
+        assert len(e)==0, "** FAILURE running cmd: %s\nstder:\n%s" % (cmd,e)
+        if o.strip() != expectedOutput:
+            msg = "** FAILURE: xtc dump != h5 dump test=%d" % num
+            msg += " cmd= %s\n" % cmd
             msg += "-- output: --\n"
-            msg += e
-            raise Exception(msg)
+            msg += o
+            raise Exception(msg)        
         if verbose: print "test %d: compared dump of xtc and dump of h5 file" % num
 
     def removeFiles(files):
@@ -319,41 +598,76 @@ def testCommand(args):
             os.unlink(fname)
 
     # end helper functions
-    delete,verbose = parseArgs(args,['delete','verbose'])
+    delete,verbose,testSet = parseArgs(args,['delete','verbose', 'set'])
     assert delete.lower() in ['','false','true']
-    assert verbose.lower() in ['','false','true']
+    assert verbose.lower() in ['','false','true']        
+
     delete = not (delete.lower() == 'false')
-    verbose = (versbose.lower() == 'true')
+    verbose = (verbose.lower() == 'true')
     testFiles = getTestFiles(noTranslator=True)
     prev = readPrevious()
-    for num in testFiles:
+    regress = readRegressionTestFile()
+    whichTest = 'regress'
+    testNumberFilter = regress.keys()
+    expectedDiffs = getRegressionTestExpectedDifferences()
+    if testSet.startswith('full'):
+        whichTest = 'full'
+        jnk, afterFull = testSet.split('full')
+        if len(afterFull)>0:
+            assert afterFull.startswith(':'), "must follow full with : to specify tests, not '%s' " % afterFull
+            jnk, afterFull = afterFull.split(':')
+            testNumberFilter = map(int,testSet.split(','))
+        expectedDiffs = getFullTestExpectedDifferences()
+    elif testSet != '':
+        testNumberFilter = map(int,testSet.split(','))
+
+    for num in testNumberFilter:
         assert num in prev, "There is a new xtc test number: %s\n. Run prev command first." % num
     testTimes = {}
-    for num, fileInfo in testFiles.iteritems():
+    for num in testNumberFilter:
+        fileInfo = testFiles[num]
         baseName, fullPath = (fileInfo['basename'], fileInfo['path'])
-        prevBasename, md5xtc, md5dump = (prev[num]['xtc'], prev[num]['md5xtc'], prev[num]['md5dump'])
+        prv = prev[num]
+        prevBasename, md5xtc, md5dump, md5regress = (prv['xtc'], prv['md5xtc'], 
+                                                     prv['md5dump'], prv['md5regress'])
         t0 = time.time()
         checkForSameXtcFile(baseName, prevBasename, num, verbose)
-        checkForSameMd5(fullPath, md5xtc, num, 
+        checkForSameMd5(fullPath, md5xtc, num, verbose,
                         "**DATA INTEGRITY - previously recorded md5 and current for SAME xtc file")
         if verbose: print "test %d: previously recorded md5 for xtcfile same with new md5" % num
-        currentXtcDumpPath = os.path.join('psana_test', 'data', 'current_xtc_dump', baseName + '.dump')
-        cmd, err = psanaDump(fullPath, currentXtcDumpPath)
+        regressStr = ''
+        numEvents = 0
+        dumpEpicsAliases = True
+        prevMd5 = md5dump
+        if whichTest == 'regress': 
+            if num not in regress:
+                print "warning: test number %d not in regress tests, skipping" % num
+                continue
+            regressStr = '.regress'
+            numEvents = regress[num]['events']
+            dumpEpicsAliases = False
+            prevMd5 = md5regress
+        currentXtcDumpPath = os.path.join('psana_test', 'data', 'current_xtc_dump', baseName + regressStr + '.dump')
+        cmd, err = psanaDump(fullPath, currentXtcDumpPath, numEvents, dumpEpicsAliases=False, regressDump=True, verbose=verbose)
         if len(err) > 0:
             raise Exception("**Failure: test=%d, psanaDump failed on xtc.\n cmd=%s\n%s" % (num, cmd, err))
-        checkForSameMd5(currentXtcDumpPath, md5dump, num, "**FAIL - md5 of dump of xtc does not agree with prev")
-        if verbose: print "test %d: previously recorded md5 of dump of xtcfile same as new md5 of dump" % num
+        checkForSameMd5(currentXtcDumpPath, prevMd5, num, verbose, 
+                        ("**FAIL - md5 of dump of xtc does not agree with prev %s" % regressStr))
+        if verbose: 
+            print "test %s %d: previously recorded md5 of dump of xtcfile same as new md5 of dump" % \
+                (regressStr, num)
         h5dir = os.path.join('psana_test', 'data', 'current_h5')
         assert os.path.exists(h5dir), "h5dir: %s doesn't exist" % h5dir
-        h5baseName = os.path.splitext(baseName)[0] + '.h5'
+        h5baseName = os.path.splitext(baseName)[0] + regressStr + '.h5'
         h5file = os.path.join(h5dir, h5baseName)
-        translate(fullPath, h5file, num, verbose)
+        translate(fullPath, h5file, numEvents, num, verbose)
         h5dumpBasename =  h5baseName + '.dump'
         h5DumpPath = os.path.join('psana_test', 'data', 'current_h5_dump', h5dumpBasename)
-        cmd, err = psanaDump(h5file, h5DumpPath)
+        cmd, err = psanaDump(h5file, h5DumpPath, numEvents, dumpEpicsAliases, regressDump=True, verbose=True)
         if len(err) > 0:
             raise Exception("**Failure: test=%d, psanaDump failed on h5.\n cmd=%s\n%s" % (num, cmd, err))
-        compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose)
+        xtc2h5ExpectedDiff = expectedDiffs.get(num,'')
+        compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose, expectedOutput=xtc2h5ExpectedDiff)
         if delete:
             removeFiles([currentXtcDumpPath, h5DumpPath, h5file])
         testTime = time.time()-t0
@@ -367,7 +681,7 @@ def curTypesCommand(args):
     curTypes = getDataTestTypeVersions()
     print "There are %d current typeid/version pairs" % len(curTypes)
 
-def getValidTypeVersions(fullPath, dgrams=-1):
+def getValidTypeVersions(fullPath, dgrams=-1, getCompressedAndUncompressedVersions=False):
     typeVersions = set()
     cmd = 'xtclinedump xtc %s --payload=1' % fullPath
     if dgrams > -1:
@@ -378,12 +692,15 @@ def getValidTypeVersions(fullPath, dgrams=-1):
         ret = getValidTypeVerFromXtcLineDumpLine(ln, fullPath)
         if ret is None: continue
         typeid, version = ret
+        if not getCompressedAndUncompressedVersions:
+            version = 0x7FFF & version
         typeVersions.add((typeid,version))
     return typeVersions
 
 def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
-    '''Takes line of output from xtclinedump and returns (typeId, version) 
-    if valid payload printed and typeid is < 2 * number of pds type ids. 
+    '''Takes line of output from xtclinedump and returns 
+    (typeId, version) for valid data. Data is valid if  payload printed and 
+    typeid is < number of pds type ids. 
     
     returns (typeid, version)  on success, 
             None  otherwise
@@ -399,10 +716,10 @@ def getValidTypeVerFromXtcLineDumpLine(origLn, xtcFileName=''):
         assert dmg != 0, "unexpected, payload says damaged, but dmg is 0.\nln=%s\nxtc=%s" % \
                       (origLn, xtcFileName)
         return None
-    ln, version = ln.split(' version=')
+    ln, version = ln.split(' ver=')
     ln, typeid = ln.split(' typeid=')
     typeid, version = map(int, (typeid, version))
-    if typeid >= 2*numTypes: return None
+    if typeid > numTypes: return None
     return (typeid, version)
 
 def getDataTestTypeVersions():
@@ -420,11 +737,16 @@ def getDataTestTypeVersions():
 #                   set([(83, 1), (78, 1), (75, 1)]), 40)
 
 def updateTestData(xtc, newTypeVers, dgrams):
+    '''Determines number of datagrams to copy from an xtc file to capture all the
+    types listed. Copies on L1Accept beyond last datagram with new data.
+    '''
     dgrams = dgrams + 7
     cmd = 'xtclinedump xtc %s --payload=1 --dgrams=%d' % (xtc, dgrams)
     o,e = cmdTimeOut(cmd, 6*60)
     assert len(e)==0, "Failure running cmd=%s\nError=%s" % (cmd,e)
     # for each type/version, need to find beginning of next datagram that is an event
+    # make dictionary indexed by type/version that will go through the stages
+    # 'xtc_not_seen', 
     l1acceptFollowing = {}
     for typeVer in newTypeVers:
         l1acceptFollowing[typeVer]=['xtc_not_seen',None] # offset of xtc, offset of next dgram
@@ -447,7 +769,7 @@ def updateTestData(xtc, newTypeVers, dgrams):
         elif ln.startswith('xtc'):
             typeVersion = ln.split(' value=')[0].split(' typeid=')[1]
             payloadValid = ln.split(' payload=')[1].startswith('0x')
-            tp,ver = map(int,typeVersion.split(' version='))
+            tp,ver = map(int,typeVersion.split(' ver='))
             tpVer = (tp,ver)
             if tpVer in l1acceptFollowing and payloadValid:
                 if l1acceptFollowing[tpVer][0] == 'xtc_not_seen':
@@ -470,11 +792,28 @@ def updateTestData(xtc, newTypeVers, dgrams):
     copyBytes(xtc, bytesToCopy, newTestFilePath)
 
 def copyBytes(src, n, dest):
-    print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)
+    if isinstance(n,int):
+        intervals = [[0,n]]
+        print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)
+    elif isinstance(n,list):
+        intervals = n
+        print "copying %d sets of bytes:" % len(intervals),
+        for interval in intervals:
+            a,b = interval
+            print " [%d,%d)" % (a,b),
+        print " from src=%s to dest=%s" % (src, dest)
     inFile = io.open(src,'rb')
     outFile = io.open(dest,'wb')
-    bytes = inFile.read(n)
-    outFile.write(bytes)
+    for interval in intervals:
+        assert len(interval)==2
+        a = interval[0]
+        b = interval[1]
+        assert isinstance(a,int)
+        assert isinstance(b,int)
+        inFile.seek(a)
+        n = b-a
+        bytes = inFile.read(n)
+        outFile.write(bytes)
     inFile.close()
     outFile.close()
 
@@ -572,14 +911,17 @@ def getXtcDirsToScan(currentXtcDirList, previousXtcDirs):
 
 def typesCommand(args):
     dgrams = 40
-    assert len(args) in [0,1], "must be 0 or 1 args"
+    assert len(args) in [0,1,2], "must be 0, 1 or 2 args"
+    if 'regress' in args:
+        makeRegressionTestFile()
+        return
     if len(args)==1:
         arg = args[0]
         assert arg.startswith('dgrams='), "type optional argument is dgrams=n, not %s" % arg
         jnk,dgrams=arg.split('dgrams=')
         dgrams=int(dgrams)
 
-    previousXtcDirsFileName = os.path.join('psana_test', 'data', 'previousXtcDirs.txt')
+    previousXtcDirsFileName = getPreviousXtcDirsFilename()
     previousXtcDirs = readPreviousXtcDirs(previousXtcDirsFileName)
     currentXtcDirList = getCurrentXtcDirList()
     xtcDirsToScan = getXtcDirsToScan(currentXtcDirList, previousXtcDirs)
@@ -604,6 +946,52 @@ def typesCommand(args):
         if filesScanned % 50 == 0:
             print "scanned %d of %d files" % (filesScanned, len(filesToScan))
     updatePrevXtcDirs(previousXtcDirsFileName, xtcDirsToScan)
+
+def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
+    typeVerDone = set()
+    epicsDone = set()
+    testFiles = getTestFiles(noTranslator=True)
+    eventsForTest = dict([(num,0) for num in testFiles.keys()])
+    for num, basePath in testFiles.iteritems():
+        base, path = basePath['basename'],basePath['path']
+        fileSize = os.stat(path).st_size
+        earliestTypes, earliestEpics = lastDgramForTypes(path)
+        for earlyDgDict, doneSet in zip([earliestTypes, earliestEpics],
+                                        [typeVerDone, epicsDone]):
+            for typeId,dgDict in earlyDgDict.iteritems():
+                if typeId not in doneSet:
+                    dg = dgDict['first_datagram']
+                    eventsForTest[num] = max(max(6,dg+1), eventsForTest[num])
+                    doneSet.add(typeId)
+    if os.path.exists(regressionTestFile):
+        sys.stderr.write("WARNING: overwriting: %s\n" % regressionTestFile)
+    fout = file(regressionTestFile,'w')
+    testNumbers = testFiles.keys()
+    testNumbers.sort()
+    for num in testNumbers:
+        basePath = testFiles[num]['path']
+        events = eventsForTest[num]
+        if events > 0:
+            fout.write("test=%3.3d  events=%3.3d doNotDumpEpicsAliases=%d xtc=%s\n" % \
+                       (num, events, 1, basePath))
+    fout.close()
+
+def readRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
+    assert os.path.exists(getRegressionTestFilename()), "regression file %s does not exist. Run types regress" % getRegressionTestFilename()
+    fin = file(regressionTestFile)
+    regressTests = {}
+    for ln in fin:
+        ln = ln.strip()
+        if len(ln)==0: continue
+        ln,xtc = ln.split(' xtc=')
+        ln,noEpicsAliases=ln.split(' doNotDumpEpicsAliases=')
+        ln,events=ln.split(' events=')
+        ln,testno = ln.split('test=')
+        events = int(events)
+        noEpicsAliases = int(noEpicsAliases)
+        testno = int(testno)
+        regressTests[testno]={'events':events,'path':xtc,'dumpEpicsAliases':not bool(noEpicsAliases)}
+    return regressTests
 
 cmdDict = {
     'prev':previousCommand,

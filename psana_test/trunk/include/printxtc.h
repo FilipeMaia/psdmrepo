@@ -2,11 +2,8 @@
 #define PSANA_TEST_PRINTXTC_H
 
 #include <stdint.h>
-
-namespace Pds {
-  class Dgram;
-  class Xtc;
-}
+#include "pdsdata/xtc/Xtc.hh"
+#include "pdsdata/xtc/Dgram.hh"
 
 namespace psana_test {
 // writes dgram header to stdout.  Returns pointer to the 
@@ -23,7 +20,9 @@ uint32_t printXtcWithOffsetAndDepth(Pds::Xtc *xtc,int offset, int depth);
 
 void printBytes(char *start, size_t len, size_t maxPrint);
 
- void parseData(char *start, size_t len, size_t maxPrint, Pds::Xtc *xtc);
+void parseData(char *start, size_t len, size_t maxPrint, Pds::Xtc *xtc);
+
+bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id);
 
 }
 

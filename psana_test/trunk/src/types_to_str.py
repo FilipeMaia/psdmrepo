@@ -10,7 +10,7 @@ psana_test_adler32.argtypes = [ctypes.c_void_p, ctypes.c_ulong]
 def doIndent(indent,lvl):
     return ((' '*indent)*lvl)
 
-def epicsPvToStr(pv):
+def epicsPvToStr(pv, addPvId=True):
     def toStr(x):
         return str(x)
 
@@ -20,7 +20,10 @@ def epicsPvToStr(pv):
         else:
             return str(x)
     # all epics pv have these attributes:
-    res = ' pvid=%s' % pv.pvId()
+    if addPvId:
+        res = ' pvid=%s' % pv.pvId()
+    else:
+        res = ''
     dbrType = pv.dbrType()
     res += ' dbrtype=%s' % dbrType 
     if pv.isTime():

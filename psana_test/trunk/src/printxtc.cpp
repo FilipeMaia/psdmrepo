@@ -91,7 +91,7 @@ uint32_t printXtcHeader(Pds::Xtc *xtc) {
   Pds::Src &src = xtc->src;
   Pds::TypeId &typeId = xtc->contains;
   uint32_t extent = xtc->extent;
-  fprintf(stdout,"extent=%8.8X dmg=%5.5X src=%8.8X,%8.8X,level=%d srcnm=%20s typeid=%2d version=%d value=%5.5X compressed=%d compressed_version=%d type_name=%s",
+  fprintf(stdout,"extent=%8.8X dmg=%5.5X src=%8.8X,%8.8X level=%d srcnm=%20s typeid=%2d ver=%d value=%5.5X compr=%d compr_ver=%d type_name=%s",
          extent,
          damage.value(),src.log(),src.phy(),src.level(), srcName(src).c_str(),
          typeId.id(), typeId.version(),typeId.value(),typeId.compressed(),typeId.compressed_version(),
@@ -115,19 +115,6 @@ uint32_t printXtcWithOffsetAndDepth(Pds::Xtc *xtc,int offset, int depth) {
   psana_test::printXtcHeader(xtc);
   fprintf(stdout,"\n");
   return xtc->extent;
-}
-
-Pds::Xtc * printDgramHeader(Pds::Dgram *dgram) {
-  Pds::Sequence & seq = dgram->seq;
-  Pds::Env & env = dgram->env;
-  Pds::Xtc * xtc = & dgram->xtc;
-  const Pds::ClockTime & clock = seq.clock();
-  const Pds::TimeStamp & stamp = seq.stamp();
-  fprintf(stdout,"tp=%d sv=%2d ex=%d ev=%d sec=%8.8X nano=%8.8X tcks=%7.7X fid=%5.5X ctrl=%2.2X vec=%4.4X env=%8.8X",
-         seq.type(),seq.service(),seq.isExtended(),seq.isEvent(),
-         clock.seconds(),clock.nanoseconds(),
-         stamp.ticks(), stamp.fiducials(),stamp.control(), stamp.vector(),env.value());
-  return xtc;
 }
 
 Pds::Xtc * printTranslatedDgramHeader(Pds::Dgram *dgram) {
@@ -168,4 +155,14 @@ void printBytes(char *start, size_t len, size_t maxPrint) {
   if (addElipses) fprintf(stdout,"...");
 }
 
+bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id) {
+  if (damage.value() == 0) return true;
+  if (id == Pds::TypeId::Id_EBeam) {
+    bool userDamageBitSet = (damage.bits() & (1 << Pds::Damage::UserDefined));
+    uint32_t otherDamageBits = (damage.bits() & (~(1 << Pds::Damage::UserDefined)));
+    if (userDamageBitSet and not otherDamageBits) return true;
+  }
+  return false;
 }
+
+} // namespace psana_test
