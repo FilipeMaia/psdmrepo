@@ -199,13 +199,16 @@ class FileNameManager :
 
 #-----------------------------
 
-    def path_metrology_text(self) :
-        return cp.fname_metrology_text.value()
+    def path_metrology_text_def(self) :
+        return cp.dir_work.value() + '/' + cp.fname_metrology_text.value_def()
 
 #-----------------------------
 
-    def path_metrology_text_def(self) :
-        return cp.dir_work.value() + '/' + cp.fname_metrology_text.value_def()
+    def path_metrology_text(self) :
+        if cp.fname_metrology_text.value() == cp.fname_metrology_text.value_def() :
+            return self.path_metrology_text_def()        
+        else :
+            return cp.fname_metrology_text.value()
 
 #-----------------------------
 

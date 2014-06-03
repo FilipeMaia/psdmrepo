@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-45
+2014-06-03 Mikhail S. Dubrovin
+- FileNameManager add path_metrology_text_def(self)
+- GUIMetrology stop processing if the input xlsx or text file is missing
+	
 Tag: V00-00-44
 2014-06-02 Mikhail S. Dubrovin
 - GUIMetrology.py - check that Convert procedure does not change user defined file  

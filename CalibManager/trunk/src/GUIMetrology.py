@@ -377,6 +377,11 @@ class GUIMetrology ( QtGui.QWidget ) :
     def onButConvert(self):
         logger.debug('onButConvert', __name__)
         
+        if not os.path.exists(fnm.path_metrology_xlsx()) :
+            msg = 'Input file %s DOES NOT exist!' % fnm.path_metrology_xlsx() 
+            logger.warning(msg, __name__)
+            return
+
         self.checkTextFileName()
 
         #ifname = fnm.path_metrology_xlsx()
@@ -482,6 +487,11 @@ class GUIMetrology ( QtGui.QWidget ) :
         logger.debug('onButEvaluate', __name__)
         det = self.get_detector_selected()
         if det is None : return
+
+        if not os.path.exists(fnm.path_metrology_text()) :
+            msg = 'Input file %s DOES NOT exist!' % fnm.path_metrology_text() 
+            logger.warning(msg, __name__)
+            return
 
         list_of_metrology_scripts = cp.dict_of_metrology_scripts[det]
 
