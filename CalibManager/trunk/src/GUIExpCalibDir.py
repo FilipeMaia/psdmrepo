@@ -39,7 +39,8 @@ from Logger                 import logger
 class GUIExpCalibDir ( QtGui.QWidget ) :
     """GUI sets the configuration parameters for source calibration directory; exp_name_src and calib_dir_src"""
 
-    char_expand    = u' \u25BC' # down-head triangle
+    char_expand    = cp.char_expand
+    #char_expand    = u' \u25BC' # down-head triangle
     #char_expand    = '' # down-head triangle
 
     def __init__ ( self, parent=None ) :

@@ -45,6 +45,7 @@ from Logger               import logger
 from FileNameManager      import fnm
 from GUIFileBrowser       import *
 from GUIRange             import *
+from FileDeployer         import fd
 import GlobalUtils        as     gu
 from xlsx_parser          import convert_xlsx_to_text
 from OpticAlignmentCspadV1 import *
@@ -64,6 +65,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
+        self.instr_name    = cp.instr_name # for comments in geometry file
         self.fname_prefix  = cp.fname_prefix
         self.fname_metrology_xlsx = cp.fname_metrology_xlsx
         self.fname_metrology_text = cp.fname_metrology_text
@@ -87,7 +89,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.ediFileXlsx = QtGui.QLineEdit ( fnm.path_metrology_xlsx() )
         self.ediFileXlsx.setReadOnly(True)
 
-        self.ediFileText = QtGui.QLineEdit ( fnm.path_metrology_text() )
+        self.ediFileText = QtGui.QLineEdit ( fnm.path_metrology_text() ) # cp.fname_metrology_text.value_def() )
         self.ediFileText.setReadOnly(True)
 
         self.butFileXlsx  = QtGui.QPushButton(' 1. Select xlsx file:')
@@ -285,10 +287,10 @@ class GUIMetrology ( QtGui.QWidget ) :
         but = self.butFileText
         edi = self.ediFileText
         par = self.fname_metrology_text        
-        basename  = os.path.basename( fnm.path_metrology_ptrn() )
+        basename  = os.path.basename( fnm.path_metrology_text() )
         fname, ext = os.path.splitext(basename)
-        filter = 'Text files (' + fname + '*' + ext + ')\nAll files (*)'
-        self.onButFile(but, edi, par, filter, set_path=False)
+        filter = 'Text files (*' + ext + ')\nAll files (*)'
+        self.onButFile(but, edi, par, filter, set_path=True)
 
 
     def onButFile(self, but, edi, par, filter, set_path=True):
@@ -354,12 +356,32 @@ class GUIMetrology ( QtGui.QWidget ) :
             cp.guifilebrowser.show()
 
 
+
+    def checkTextFileName(self):
+
+        edi = self.ediFileText
+        par = self.fname_metrology_text        
+
+        if fnm.path_metrology_text() != fnm.path_metrology_text_def() :
+
+            msg = 'TEXT FILE WILL BE OVERWRITTEN!\nUse default name %s\n for output file' % fnm.path_metrology_text_def()
+            resp = gu.confirm_or_cancel_dialog_box(parent=self.butConvert, text=msg, title='Please confirm or cancel!')
+            if resp :
+                logger.info('Approved:\n' + msg.replace('\n',' '), __name__)
+                par.setDefault()
+                edi.setText(fnm.path_metrology_text_def())
+            else :
+                logger.info('Selected current file name: %s' % fnm.path_metrology_text(), __name__)
+ 
+
     def onButConvert(self):
         logger.debug('onButConvert', __name__)
         
+        self.checkTextFileName()
+
         #ifname = fnm.path_metrology_xlsx()
         #ofname = fnm.path_metrology_text()
-        list_ofnames = convert_xlsx_to_text(fnm.path_metrology_xlsx(), fnm.path_metrology_ptrn(), print_bits=0)
+        list_ofnames = convert_xlsx_to_text(fnm.path_metrology_xlsx(), fnm.path_metrology_text(), print_bits=0)
 
         msg = 'File %s is converted to the temporarty metrology text file(s):\n' % fnm.path_metrology_xlsx()
         for name in list_ofnames : msg += '    %s\n' % name
@@ -469,13 +491,11 @@ class GUIMetrology ( QtGui.QWidget ) :
             return
 
         #print 'list_of_metrology_scripts', list_of_metrology_scripts
-
         #for CSPAD script CSPADV1
         if det == cp.list_of_dets[0] and self.script == list_of_metrology_scripts[0] :            
             msg = 'Evaluate parameters for %s using script %s' % (det, self.script)
             logger.info(msg, __name__)
             self.procCspadV1()
-
 
         # for other detectors and scripts for now...
         else :            
@@ -492,7 +512,8 @@ class GUIMetrology ( QtGui.QWidget ) :
         msg = 'procCspadV1 for metrology data in file %s' % fname_metrology
         logger.info(msg, __name__)       
 
-        optal = OpticAlignmentCspadV1(fname_metrology, print_bits=0, plot_bits=0)
+        optal = OpticAlignmentCspadV1(fname_metrology, print_bits=0, plot_bits=0, \
+                                      exp=self.instr_name.value(), det=self.source_name)
 
         txt_qc_table_xy = optal.txt_qc_table_xy()
         txt_qc_table_z  = optal.txt_qc_table_z()
@@ -583,7 +604,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         dst_calib_dir  = fnm.path_to_calib_dir()
         dst_calib_type = cp.dict_of_det_calib_types[det]
         dst_source     = self.source_name
-        dst_fname      = '%s.data' % cp.guirange.getRange()
+        dst_fname      = '%s.data' % self.guirange.getRange()
 
         #print 'dst_calib_dir  ', dst_calib_dir
         #print 'dst_calib_type ', dst_calib_type

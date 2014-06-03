@@ -44,8 +44,11 @@ from GUIDarkListItemAdd     import *
 class GUIDarkListItem ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
-    char_expand    = u'\u25BC' # solid down-head triangle
-    char_shrink    = u'\u25B2' # solid up-head triangle
+    char_expand    = ' v'
+    char_shrink    = cp.char_shrink
+    #char_expand    = cp.char_expand
+    #char_expand    = u'\u25BC' # solid down-head triangle
+    #char_shrink    = u'\u25B2' # solid up-head triangle
     #char_shrink    = u'\u25B6' # solid right-head triangle
     #char_expand    = u'\u25BD' # open down-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle

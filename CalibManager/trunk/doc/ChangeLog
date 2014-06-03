@@ -12,6 +12,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-44
+2014-06-02 Mikhail S. Dubrovin
+- GUIMetrology.py - check that Convert procedure does not change user defined file  
+	chenged fnm.path_metrology_text() and fnm.path_metrology_text_def()
+- replace unicode symbols by * and ^.
+- in src/OpticAlignmentCspadV1.py transport detector and exp(instrument) name to "geometry" comments
+	
 Tag: V00-00-43
 2014-05-05 Mikhail S. Dubrovin
 - in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__

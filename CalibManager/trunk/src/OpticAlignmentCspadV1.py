@@ -51,7 +51,7 @@ class OpticAlignmentCspadV1 :
 
     pixelSize = 109.92
 
-    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=0377, plot_bits=0377):
+    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=0377, plot_bits=0377, exp='', det=''):
         """Constructor."""
         if print_bits &  1 : print 'Start OpticAlignmentCspadV1'
 
@@ -66,6 +66,8 @@ class OpticAlignmentCspadV1 :
         self.save_calib_files = save_calib_files
         self.print_bits     = print_bits
         self.plot_bits      = plot_bits
+        self.exp            = exp
+        self.det            = det
 
         self.fname_center_um  = os.path.join(self.path, 'center_um-0-end.data')
         self.fname_center     = os.path.join(self.path, 'center-0-end.data')
@@ -500,12 +502,12 @@ class OpticAlignmentCspadV1 :
 
 #----------------------------------
  
-    def txt_geometry_header(self, exp=None, det=None) :
+    def txt_geometry_header(self) :
         txt = '# TITLE      Geometry parameters of CSPAD with moving quads' \
             + '\n# CREATED    %s' % strftime('%Y-%m-%d %H:%M:%S %Z', localtime()) \
             + '\n# CREATOR    %s' % os.environ['LOGNAME'] \
-            + '\n# EXPERIMENT %s' % exp \
-            + '\n# DETECTOR   %s' % det \
+            + '\n# EXPERIMENT %s' % self.exp \
+            + '\n# DETECTOR   %s' % self.det \
             + '\n# CALIB_TYPE geometry' \
             + '\n# COMMENT                Table contains the list of geometry parameters for alignment of 2x1 sensors in quads and quads in CSPAD' \
             + '\n# PARAMETER PARENT     - name and version of the parent object; all translation and rotation pars are defined w.r.t. parent Cartesian frame' \

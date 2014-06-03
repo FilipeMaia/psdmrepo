@@ -46,7 +46,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_pars = []
 
-    char_expand    = u' \u25BC' # down-head triangle
+    char_expand    = ' *' # down-head triangle
+    char_shrink    = ' ^' # down-head triangle
+    #char_expand    = u' \u25BC' # down-head triangle
  
     list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
@@ -250,11 +252,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIFileManager.py
         self.current_fmanager_tab = self.declareParameter( name='CURRENT_FILE_MANAGER_TAB', val_def='Single File', type='str' )
 
-        # GUIGeometry.py
-        self.current_geometry_tab = self.declareParameter( name='CURRENT_GEOMETRY_TAB',    val_def='Metrology',     type='str' )
-        self.fname_metrology_xlsx = self.declareParameter( name='FNAME_METROLOGY_XLSX',    val_def='*.xlsx',        type='str' )
-        self.fname_metrology_text = self.declareParameter( name='FNAME_METROLOGY_TEXT',    val_def='metrology.txt', type='str' )
-
         # GUIMainSplit.py
         ####self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
 
@@ -263,6 +260,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
         self.save_cp_at_exit   = self.declareParameter( name='SAVE_CONFIG_AT_EXIT',   val_def=True,           type='bool')
+
+        # GUIGeometry.py
+        self.current_geometry_tab = self.declareParameter( name='CURRENT_GEOMETRY_TAB',    val_def='Metrology',     type='str' )
+        self.fname_metrology_xlsx = self.declareParameter( name='FNAME_METROLOGY_XLSX',    val_def='*.xlsx',        type='str' )
+        self.fname_metrology_text = self.declareParameter( name='FNAME_METROLOGY_TEXT',    val_def='metrology.txt', type='str' )
 
         # GUIDark.py
         self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=True,          type='bool')
