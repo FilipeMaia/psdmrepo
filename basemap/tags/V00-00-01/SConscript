@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 7966 2014-04-02 02:34:53Z gapon@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package basemap
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "basemap"
+pkg_ver = "1.0.7"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
