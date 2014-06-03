@@ -132,7 +132,7 @@ class XtcCleanLocal:
     def filter_fileStatus(self, triplet,status):  
         """ Filter function called to decide if a file can be removed """
 
-        print triplet,  status.size_bytes()
+        #print triplet,  status.size_bytes()
         if  ( file_status.IN_MIGRATION_DATABASE in status.flags() ) and \
                 ( file_status.DISK in status.flags() or self.ignore_disk_status) and \
                 ( file_status.HPSS in status.flags() ):                
