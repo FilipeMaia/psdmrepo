@@ -67,7 +67,10 @@ class CommandLineCalib () :
         self.print_local_pars()
         self.print_list_of_detectors()
         self.print_list_of_xtc_files()
-        self.print_list_of_sources_from_regdb()
+        try :
+            self.print_list_of_sources_from_regdb()
+        except :
+            pass
 
         gu.create_directory(cp.dir_work.value())
 
@@ -157,13 +160,16 @@ class CommandLineCalib () :
         if self.calibdir == cp.calib_dir.value_def() :
             self.calibdir = fnm.path_to_calib_dir_default()
 
-        cp.calib_dir     .setValue(self.calibdir)
-        cp.dir_work      .setValue(self.workdir)
-        cp.bat_queue     .setValue(self.queue)
-        cp.bat_dark_start.setValue(self.skip_events)
-        cp.bat_dark_end  .setValue(self.num_events+self.skip_events)
-        cp.mask_rms_thr  .setValue(self.thr_rms)
-	cp.det_name      .setValue(self.det_name)
+        self.xtcdir       = cp.xtc_dir_non_std.value_def() if self.opts['xtcdir'] is None else self.opts['xtcdir']
+
+        cp.xtc_dir_non_std.setValue(self.xtcdir)
+        cp.calib_dir      .setValue(self.calibdir)
+        cp.dir_work       .setValue(self.workdir)
+        cp.bat_queue      .setValue(self.queue)
+        cp.bat_dark_start .setValue(self.skip_events)
+        cp.bat_dark_end   .setValue(self.num_events+self.skip_events)
+        cp.mask_rms_thr   .setValue(self.thr_rms)
+	cp.det_name       .setValue(self.det_name)
 
         #cp.log_file      .setValue(self.logfile)          
 
@@ -181,6 +187,7 @@ class CommandLineCalib () :
         + '\n     instr_name    : %s' % self.instr_name\
         + '\n     workdir       : %s' % self.workdir\
         + '\n     calibdir      : %s' % self.calibdir\
+        + '\n     xtcdir        : %s' % self.xtcdir\
         + '\n     det_name      : %s' % self.det_name\
         + '\n     queue         : %s' % self.queue\
         + '\n     num_events    : %d' % self.num_events\

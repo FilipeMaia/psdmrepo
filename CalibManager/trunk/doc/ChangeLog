@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-46
+2014-06-03 Mikhail S. Dubrovin
+- in app/calibrun add option -x for non-standard xtc directory
+	
 Tag: V00-00-45
 2014-06-03 Mikhail S. Dubrovin
 - FileNameManager add path_metrology_text_def(self)

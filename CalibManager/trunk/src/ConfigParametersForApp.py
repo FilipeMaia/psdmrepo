@@ -330,6 +330,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIFileManagerSingleControl.py
         #self.path_fm_selected   = self.declareParameter( name='PATH_FM_SELECTED',  val_def='./work/*.txt',       type='str' )
 
+        # CommandLineCalib.py
+        self.xtc_dir_non_std    = self.declareParameter( name='XTC_DIR_NON_STD',    val_def='',             type='str' ) # './my/xtc'
+
 #-----------------------------
     
         self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris']

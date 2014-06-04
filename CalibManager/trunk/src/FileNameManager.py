@@ -142,6 +142,9 @@ class FileNameManager :
 #-----------------------------
 
     def path_to_xtc_dir(self):
+        if cp.xtc_dir_non_std.value() != cp.xtc_dir_non_std.value_def() :
+            return cp.xtc_dir_non_std.value()
+
         """Returns somthing like /reg/d/psdm/CXI/cxitut13/xtc/ or None"""
         if cp.instr_dir.value()  is None : return None
         if cp.instr_name.value() is None : return None

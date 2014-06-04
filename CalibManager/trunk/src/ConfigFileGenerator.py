@@ -62,11 +62,27 @@ class ConfigFileGenerator :
 #-----------------------------
 #-----------------------------
 
+
+    def list_of_path_to_xtc_files_for_run (self) :
+        """Makes the string of xtc files for non-default directory. For example:
+        './myxtc/xpp/xppi0613/xtc/e319-r0173-s00-c00.xtc ./myxtc/xpp/xppi0613/xtc/e319-r0173-s01-c00.xtc'
+        """
+        xtcdir = fnm.path_to_xtc_dir() # './myxtc/xpp/xppi0613/xtc/'
+        pattern = '-r%s' % cp.str_run_number.value()
+        lst = fnm.get_list_of_xtc_files()
+        lst_for_run = [ os.path.join(xtcdir, path) for path in lst if pattern in os.path.basename(path)]
+        return ' '.join(lst_for_run)
+
+#-----------------------------
+
     def path_to_data_files (self) :
         """Returns something like 'exp=xcs72913:run=49:xtc'
         """
-        #return str(fnm.path_to_xtc_files_for_run())
-        return 'exp=%s:run=%d:xtc' % (cp.exp_name.value(), int(cp.str_run_number.value()))
+        if cp.xtc_dir_non_std.value() != cp.xtc_dir_non_std.value_def() :
+            return self.list_of_path_to_xtc_files_for_run()
+
+        else :
+            return 'exp=%s:run=%d:xtc' % (cp.exp_name.value(), int(cp.str_run_number.value()))
 
 #-----------------------------
 
