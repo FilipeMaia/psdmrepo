@@ -30,6 +30,7 @@ def epicsPvToStr(pv, addPvId=True):
         res += " isTime=1"
     elif pv.isCtrl():
         res += " isCtrl=1" 
+        res += ' pvName=%s' % pv.pvName()
     res += " numElements=%s" % pv.numElements()
     res += ' status=%s' % pv.status()
     res += ' severity=%s' % pv.severity()
