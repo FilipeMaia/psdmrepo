@@ -92,8 +92,6 @@ public:
         if (strfiles.empty()) MsgLog(logger, fatal, "Empty file list");
         for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
           XtcInput::XtcFileName file(*it);
-          // hack: eliminate ioc-recorder runs.  right answer is offline event-builder.
-          if (file.stream()>=80) continue;
           files.push_back(file);
         }
       }
@@ -196,8 +194,20 @@ public:
 };
 
 typedef IndexBase<Pds::Index::CalibNode> IndexCalib;
+typedef IndexBase<Pds::Index::L1AcceptNode> IndexUnixTime;
 
-class IndexEvent : public IndexBase<Pds::Index::L1AcceptNode> {
+// used by the IOC recorders when we want to sort/search
+// using unix timestamp, but not the fiducial
+
+class IndexFiducial : public IndexUnixTime {
+public:
+  IndexFiducial() {}
+  IndexFiducial(uint32_t seconds, uint32_t nanoseconds, uint32_t fiducial) : IndexUnixTime(seconds,nanoseconds) {
+    entry.uFiducial=fiducial;
+  }
+};
+
+class IndexEvent : public IndexFiducial {
 public:
   enum {MaxEpicsSources=4};
   enum {SecondsLimit=5};
@@ -206,9 +216,7 @@ public:
   EpicsInfo einfo[MaxEpicsSources];
   virtual ~IndexEvent() {}
   IndexEvent() {}
-  IndexEvent(uint32_t seconds, uint32_t nanoseconds, uint32_t fiducial) : IndexBase<Pds::Index::L1AcceptNode>(seconds,nanoseconds) {
-    entry.uFiducial=fiducial;
-  }
+  IndexEvent(uint32_t seconds, uint32_t nanoseconds, uint32_t fiducial) : IndexFiducial(seconds,nanoseconds,fiducial) {}
   bool operator<(const IndexEvent& other) const {
     //    return entry.time()<other.entry.time();
     int64_t t1sec = entry.uSeconds;
@@ -243,17 +251,20 @@ ostream& operator<<(ostream& os, const IndexEvent& idx) {
 class IndexRun {
 private:
   // read an index file corresponding to an xtc file
-  void _getidx(const XtcFileName &xtcfile, Pds::Index::IndexList& idxlist) {
+  bool _getidx(const XtcFileName &xtcfile, Pds::Index::IndexList& idxlist) {
     string idxname = xtcfile.path();
     string basename = xtcfile.basename();
     size_t pos = idxname.find(basename,0);
     idxname.insert(pos,"index/");
     idxname.append(".idx");
     int fd = open(idxname.c_str(), O_RDONLY | O_LARGEFILE);
-    if (fd < 0) MsgLog(logger, fatal, "Unable to open xtc index file " << idxname);
+    if (fd < 0) {
+      MsgLog(logger, warning, "Unable to open xtc index file " << idxname);
+      return 1;
+    }
     idxlist.readFromFile(fd);
     ::close(fd);
-    return;
+    return 0;
   }
 
   // this is tricky.  the bit-list of DAQ "detector sources" can be different
@@ -376,6 +387,24 @@ private:
     }
   }
 
+  // look through the ioc index table to find datagrams
+  // within a time window of the DAQ dg, where the fiducials
+  // match precisely
+  void _maybeAddIoc(uint32_t seconds, uint32_t fiducial) {
+    const unsigned window = 5; // in seconds
+    vector<IndexFiducial>::iterator it;
+    it = lower_bound(_idxioc.begin(),_idxioc.end(),IndexFiducial(seconds-window,0,0));
+    while (it!=_idxioc.end()) {
+      if (it->entry.uSeconds>(seconds+window)) return; // out of the window
+      if (it->entry.uFiducial==fiducial) {
+        Pds::Dgram* dg=0;
+        dg = _xtc.jump((*it).file, (*it).entry.i64OffsetXtc);
+        _add(dg); // don't return: there can be a match from another ioc stream
+      }
+      it++;
+    }
+  }
+
   // loop over the _lastEpics list (one per epics source).
   // look in the big IndexEvent table and see if this L1 timestamp needs
   // a new "nonEvent" datagram of epics info.
@@ -411,40 +440,48 @@ private:
   // from epics "bitmask" to Src for each index file.
   void _storeIndex(const vector<XtcFileName> &xtclist, std::map<Pds::Src,int>& src2EpicsArray,
                    vector<epicsmap>& bit2SrcVec, vector<unsigned>& epicsmask) {
+    bool ifirst = 1;
     for (vector<string>::size_type ifile=0; ifile!=xtclist.size(); ifile++) {
       Pds::Index::IndexList idxlist;
-      // get the DAQ index files
-      _getidx(xtclist[ifile], idxlist);
-      // store them in our big event table that includes all runs
-      _store(_idx,idxlist.getL1(),ifile);
-      // begincalibs are a little tricky, I believe.  in principle
-      // a begincalib for an event could be in a previous chunk
-      // so I think we need to put them in one big list for the
-      // whole run and search (although we could also add them
-      // to the one big IndexEvent table, like we do for epics data -cpo
-      _store(_idxcalib,idxlist.getCalib(),ifile);
+      // get the DAQ index file, if it exists
+      if (_getidx(xtclist[ifile], idxlist)) continue;
+      if (xtclist[ifile].stream()<80) {
+        // store them in event table that includes DAQ data
+        _store(_idx,idxlist.getL1(),ifile);
+        // begincalibs are a little tricky, I believe.  in principle
+        // a begincalib for an event could be in a previous chunk
+        // so I think we need to put them in one big list for the
+        // whole run and search (although we could also add them
+        // to the one big IndexEvent table, like we do for epics data -cpo
+        _store(_idxcalib,idxlist.getCalib(),ifile);
 
-      // epics is also tricky, because the ordering of the different
-      // sources can change in the different DAQ index files.
-      // store which array-offset we are using for this epics source.
-      // also store the Pds::Src values in the same order, which
-      // we will use to go lookup the epics data to attach to the requested event
-      epicsmap bit2Src;
-      epicsmask.push_back(_getEpicsBit2SrcMap(idxlist.getSeg(),bit2Src));
-      if (ifile==0) {
-        int i=0;
-        for (epicsmap::const_iterator it=bit2Src.begin(); it!=bit2Src.end(); ++it) {
-          src2EpicsArray[it->second]=i;
-          i++;
-          _epicsSource.push_back(it->second);
+        // epics is also tricky, because the ordering of the different
+        // sources can change in the different DAQ index files.
+        // store which array-offset we are using for this epics source.
+        // also store the Pds::Src values in the same order, which
+        // we will use to go lookup the epics data to attach to the requested event
+        epicsmap bit2Src;
+        epicsmask.push_back(_getEpicsBit2SrcMap(idxlist.getSeg(),bit2Src));
+        if (ifirst) {
+          ifirst = 0;
+          int i=0;
+          for (epicsmap::const_iterator it=bit2Src.begin(); it!=bit2Src.end(); ++it) {
+            src2EpicsArray[it->second]=i;
+            i++;
+            _epicsSource.push_back(it->second);
+          }
         }
+        bit2SrcVec.push_back(bit2Src);
+      } else {
+        // store them in event table that includes ioc data
+        _store(_idxioc,idxlist.getL1(),ifile);
       }
-      bit2SrcVec.push_back(bit2Src);
     }
     _lastEpics.resize(_epicsSource.size());
 
     sort(_idx.begin(),_idx.end());
     sort(_idxcalib.begin(),_idxcalib.end());
+    sort(_idxioc.begin(),_idxioc.end());
   }
 
   // go through the big IndexEvent table, and store nonEvent
@@ -521,6 +558,7 @@ public:
         it++;
       }
       _maybeAddEpics(*it,_epicsSource,dg);
+      _maybeAddIoc(seconds,fiducial);
       _post();
       return 0;
     } else {
@@ -531,6 +569,7 @@ public:
 private:
   IndexXtcReader           _xtc;
   vector<IndexEvent>       _idx;
+  vector<IndexFiducial>    _idxioc;
   vector<Pds::Src>         _epicsSource;
   vector<IndexCalib>       _idxcalib;
   int64_t                  _beginrunOffset;

@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-05
+2014-05-13 Christopher O'Grady
+- Add support for ioc recorder streams that are integrated
+  with the DAQ.  If an index file is not found, now a warning
+  is just printed (before it used to be fatal).
+
 Tag: V00-14-04
 2014-05-13 Christopher O'Grady
 - Forgot to commit two of the files.  Try again.
