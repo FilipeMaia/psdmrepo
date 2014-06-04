@@ -96,6 +96,24 @@ EpicsStoreImpl::store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, 
     boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> ctrl =
         boost::static_pointer_cast<Psana::Epics::EpicsPvCtrlHeader>(pv);
     std::string name = ctrl->pvName();
+    Name2ID::iterator matchingAliasPos = m_alias2id.find(name);
+    if ( matchingAliasPos != m_alias2id.end()) {
+      MsgLog(logger, debug, "EpicsStore::store - alias: " << name
+             << " is also used for a pvName. Discarding its use as an alias");
+      PvId pvId = matchingAliasPos->second;
+      ID2Name::iterator matchingAliasIdPos = m_id2alias.find(pvId);
+      m_alias2id.erase(matchingAliasPos);
+      if (matchingAliasIdPos != m_id2alias.end()) {
+        m_id2alias.erase(matchingAliasIdPos);
+      } else {
+        MsgLog(logger,debug, "EpicsStore::store - while removing alias " << name
+               << " could not find it's pvId: src.log=0x" << std::hex << std::tr1::get<0>(pvId)
+               << " src.phy=0x" << std::hex << std::tr1::get<1>(pvId)
+               << " pvId=" << std::dec << std::tr1::get<2>(pvId)
+               << " in the id2alias map. Unexpected");
+      }
+    }
+      
     m_id2name.insert(std::make_pair(pvid, name));
     m_name2id.insert(std::make_pair(name, pvid));
     m_ctrlMap[name] = ctrl;
@@ -112,6 +130,12 @@ EpicsStoreImpl::store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, 
 void
 EpicsStoreImpl::storeAlias(const Pds::Src& src, int pvId, const std::string& alias)
 {
+  Name2ID::iterator aliasInPvNamesPos = m_name2id.find(alias);
+  if ( aliasInPvNamesPos != m_name2id.end()) {
+    MsgLog(logger, debug, "EpicsStore::storeAlias - alias: " << alias 
+           << " is also used for a pvName. Discarding its use as an alias");
+    return;
+  }
   PvId pvid(src.log(), src.phy(), pvId);
   m_alias2id[alias] = pvid;
   m_id2alias[pvid] = alias;

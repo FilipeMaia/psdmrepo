@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-03
+2014-06-04 David Schneider
+- Discards any epics alias that is also a epics pvname. Most such
+  aliases are harmless (when they have the same name as the pv they alias).
+  However sometimes they alias a different pv. This can be confusing
+  and can mask the pv that has the same name as the alias.
+  Addresses issues in trac tickets #304 #264 #234.
+
 Tag: V00-13-02
 2014-04-30 Mikhail Dubrovin
 - in Env.h - fix doxygen documentation

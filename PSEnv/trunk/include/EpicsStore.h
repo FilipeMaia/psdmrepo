@@ -50,6 +50,14 @@ namespace PSEnv {
  *  loop in the framework. It is updated with the new values whenever 
  *  new EPICS data is read from the input file.
  *
+ *  Epics data is retrieved by specifying a name. The EpicsStore first checks
+ *  if this name is an alias, if not it is assumed to be a pvName.
+ *
+ *  When the initial EPICS data is added, the EpicsStore checks for aliases that 
+ *  have the same name as a pvName. These aliases are discared (debug messages 
+ *  are generated for discared  aliases). A consequence is that users cannot use 
+ *  aliases to swap the names of existing epics pv's.
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
