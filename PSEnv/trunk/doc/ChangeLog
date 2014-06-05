@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-04
+2014-06-05 David Schneider
+- extend store for epics to take optional pvName. Bypasses internal maps that use 
+  src and pvId to lookup name. Addresses trac ticket #305. 
+- extend store for epics to take optional eventTag. Use tag to identify most
+  recent TIME pv when pv comes from multiple sources. See comments in 
+  track ticket #305. 
+- trap for two different aliases to the same src/pvId pair. Keep first, discard others.
+
 Tag: V00-13-03
 2014-06-04 David Schneider
 - Discards any epics alias that is also a epics pvname. Most such

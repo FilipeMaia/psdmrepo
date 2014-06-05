@@ -70,7 +70,7 @@ public:
   ~EpicsStoreImpl () ;
 
   /// Store EPICS PV
-  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src);
+  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src, const std::string *pvName=NULL, long eventTag = -1);
   
   /// Store alias name for EPICS PV.
   void storeAlias(const Pds::Src& src, int pvId, const std::string& alias);
@@ -163,8 +163,11 @@ private:
   /// Type for mapping from PV name to EpicsPvCtrl* objects
   typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> > CrtlMap;
 
+  /// Type for storing TIME EPICs and eventTag
+  typedef std::pair< boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>, long> TimeTagValue;
+
   /// Type for mapping from PV name to EpicsPvTime* objects
-  typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> > TimeMap;
+  typedef std::map<std::string, TimeTagValue > TimeMap;
   
   // Data members
   ID2Name m_id2name;  ///< Mapping from PV ID to its name.

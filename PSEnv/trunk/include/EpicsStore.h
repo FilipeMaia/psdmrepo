@@ -55,8 +55,18 @@ namespace PSEnv {
  *
  *  When the initial EPICS data is added, the EpicsStore checks for aliases that 
  *  have the same name as a pvName. These aliases are discared (debug messages 
- *  are generated for discared  aliases). A consequence is that users cannot use 
- *  aliases to swap the names of existing epics pv's.
+ *  are generated for discared  aliases). This prevents aliases that hide pv's.
+ *  A consequence is that users cannot use aliases to swap the names of existing 
+ *  epics pv's.
+ *
+ *  While the same EPICs pv can come from multiple sources, the EpicsStore does
+ *  not expose the source to the user in the interface to get EPICs data. When a 
+ *  user gets a pv, the EpicsStore returns the last one stored. When the same TIME 
+ *  pv is coming from two or more sources during the same event, users will generally
+ *  prefer the one with the latest internal time stamp value. When storing EPICS data, 
+ *  an optional eventId can be passed. EpicsStore will use this to identify TIME pv's
+ *  from the same event. For multiple pv's from the same event, it will then store the
+ *  one with the most recent stamp.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -172,9 +182,32 @@ public:
   // Destructor
   ~EpicsStore () ;
 
-  /// Store EPICS PV, will add new PV or update existing PV.
-  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src) {
-    m_impl->store(pv, src);
+  /**
+   *  @brief Store EPICS PV
+   *
+   *  storing a pv first requires identifying the pvName. If this is not stored in the 
+   *  pv header (as with TIME pv's), or it is not passed explicitly through the optional 
+   *  argument pvName, then the pvName will be found using the pvid in the pv header and the 
+   *  source. If no pvName is found (this can happen for damaged data missing configuration 
+   *  events) one will be created based on the src and pvId in the header.
+   *
+   *  The optional argument eventTag can be set to a value >= 0 to identify TIME pv's from the 
+   *  same event. When store gets a TIME pv that is from the same event as the last one stored,
+   *  it will only update the internal store if the new pv has a stamp value > than the stamp
+   *  of the previously stored pv. If eventTag < 0, this check of the stamp values is not made.
+   *
+   *  @param[in] pv        pv header
+   *  @param[in] src       src pv
+   *  @param[in] pvName    optional pvName, overrides use of internal mechanism to find pvName
+   *                       based on pvid and src. Note - if passed, this should be a valid pvName 
+   *                       consinstent with the data, not an alias.
+   *  @param[in] eventTag  optional key for grouping TIME pv's from the same event.
+   *                       If eventTag >=0, it is treated as such a key. Can be a simple counter 
+   *                       for identifying events - not related to the EventId of a psana Event.
+   */
+  void store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, const Pds::Src& src, 
+             const std::string *pvName = NULL, long eventTag = -1) {
+    m_impl->store(pv, src, pvName, eventTag);
   }
 
   /// Store alias name for EPICS PV.
