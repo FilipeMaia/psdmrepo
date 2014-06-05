@@ -274,7 +274,7 @@ HdfConverter::convertEpics(const hdf5pp::Group& group, int64_t idx, PSEnv::Epics
           boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx, *hdr);
           if (epics) {
             const Pds::Src& src = this->source(group);
-            eStore.store(epics, src);
+            eStore.store(epics, src, &pvname);
           }
         }
       }

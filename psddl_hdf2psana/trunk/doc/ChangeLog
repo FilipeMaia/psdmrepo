@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-08
+2014-06-05 David Schneider
+- fix trac #305 https://pswww.slac.stanford.edu/trac/psdm/ticket/305
+  pass pvname when storing epics pv to deal with pv's having the same
+  pvId - right thing to do for psana-translate, should be Ok for
+  older o2o-translated files.
+
 Tag: V00-09-07
 2014-05-08 David Schneider
 - regenerate for psddldata V01-00-09.
