@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2014-06-08 David Schneider
+- Add Psana modules to test putting and getting ndarray's from event store
+
 Tag: V00-00-04
 2014-06-08 David Schneider
 - Integrate regression test into build (scons test).

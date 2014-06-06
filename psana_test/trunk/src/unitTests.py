@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 # Description:
-#   Test script for Translator/H5Output event processing
+#   Test script for psana_test
 #   
 #------------------------------------------------------------------------
 
@@ -61,7 +61,7 @@ class Psana( unittest.TestCase ) :
     	"""
         assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
         assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
-        self.cleanUp = False    # delete intermediate files if True
+        self.cleanUp = True    # delete intermediate files if True
         self.verbose = False    # print psana output, ect
 
     def tearDown(self) :
