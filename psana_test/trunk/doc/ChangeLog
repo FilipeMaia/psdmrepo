@@ -11,6 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2014-06-08 David Schneider
+- Integrate regression test into build (scons test).
+- Change dump to sort keys.
+- Change dump to include pvName in EPICS printout.
+- Regenerate previousDump.txt for sorted keys, for PSEnv V00-13-04 
+  and psddl_hdf2psana V00-09-08.
+
 Tag: V00-00-03
 2014-05-16 David Schneider
 - updated dumping of epics in dump and xtclinedump

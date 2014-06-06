@@ -10,29 +10,36 @@ Package author: David A. Schneider
 
 Brief description:
 ==================
-
-Tools for testing - presently a Python psana Dump module generated from the ddl.
+Testing and diagnostic tools. Scripts for maintaining and manage test data.
 
 Detailed description:
 =====================
 
-Package provides a module dump, psana -m psana_test.dump datasource
+Package includes the psana module dump, run as
 
-During the the beginJob, the module will dump everything from the config store.
-During the event, the module will dump all the event keys.
-Epics is skipped.
+psana -m psana_test.dump datasource
 
-Orovides a useful function to write a psana object to a string.
+This is a DDL generated Python Psana module that dumps everything from 
+the data source. See the confluence page 
 
-import psana_test
+https://confluence.slac.stanford.edu/display/PSDM/psana+-+Module+Catalog
 
-...
-print psana_test.obj2str(myobject)
+where a detailed description lives.
 
-for ndarrays, a checksum is printed, as well as quantile statistics 
-(min, 25th, 50th, 75th and max values).
+It also includes the command line tool
 
-Output is intended to test refactoring of Psana, or comparing how Psana 
-processes two different input sources that should produce the same
-output (such as hdf5 vs. xtc).
+xtclinedump
+
+to look at xtc files. Run the program for the help message.
+
+Finally it includes the script
+
+psana_test/src/psanaTestLib.py
+
+for running regression tests, and managing test data.
+The internal confluence page
+
+https://confluence.slac.stanford.edu/display/PCDS/Psana_test+package
+
+includes more information.
 
