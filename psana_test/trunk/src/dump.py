@@ -37,6 +37,7 @@ class dump(object):
             aliases = env.epicsStore().aliases()
             print "Epics Aliases: total = %d" % len(aliases)
             indent = ' '*self.indent
+            aliases.sort()
             for alias in aliases:
                 print "%s%s" % (indent, alias)
         self.dumpEpics(evt, env)
@@ -87,6 +88,7 @@ class dump(object):
         if not self.configParam:
             return
         keys = env.configStore().keys()
+        toPrint = []
         for key in keys:
             objStr = getEventObjectStr(evt, env, key, inEvent=False, indent=self.indent)
             if objStr == '':
@@ -95,12 +97,16 @@ class dump(object):
             if self.filterKey(eventKeyStr):
                 continue
             if objStr != self.previousConfig.get(eventKeyStr, ''):
-                print eventKeyStr
-                print objStr
+                toPrint.append((eventKeyStr,objStr))
             self.previousConfig[eventKeyStr]=objStr
+        toPrint.sort()
+        for eventKeyStr, objStr in toPrint:
+            print eventKeyStr
+            print objStr
             
     def dumpEvent(self, evt, env):
         keys = evt.keys()
+        toPrint = []
         for key in keys:
             objStr = getEventObjectStr(evt, env, key, inEvent=True, indent=self.indent)
             if objStr == '':
@@ -108,6 +114,9 @@ class dump(object):
             eventKeyStr = getEventKeyStr(key, env.aliasMap())
             if self.filterKey(eventKeyStr):
                 continue
+            toPrint.append((eventKeyStr, objStr))
+        toPrint.sort()
+        for eventKeyStr, objStr in toPrint:
             print eventKeyStr
             print objStr
 
@@ -129,12 +138,14 @@ class dump(object):
         epicsStore = env.epicsStore()
         # dump epics pv's through pv names
         pvNames = epicsStore.pvNames()
+        pvNames.sort()
         header = "Epics PV"
         previous = self.previousEpics
         self.dumpEpicsImpl(pvNames, header, previous, epicsStore)
         # dump epics pv's through aliases
         if self.followEpicsAliases:
             aliases = epicsStore.aliases()
+            aliases.sort()
             header = "Epics PV Aliases"
             previous = self.previousEpicsAlias
             self.dumpEpicsImpl(aliases, header, previous, epicsStore)

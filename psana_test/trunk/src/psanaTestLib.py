@@ -585,10 +585,13 @@ def testCommand(args):
         o,e = cmdTimeOut(cmd,5*60)
         assert len(e)==0, "** FAILURE running cmd: %s\nstder:\n%s" % (cmd,e)
         if o.strip() != expectedOutput:
-            msg = "** FAILURE: xtc dump != h5 dump test=%d" % num
+            msg = "** FAILURE: diff in xtc dump and h5 dump test=%d not equal to expected output\n" % num
             msg += " cmd= %s\n" % cmd
-            msg += "-- output: --\n"
+            msg += "-- diff output: --\n"
             msg += o
+            if len(expectedOutput)>0:
+                msg += "-- expected output: --\n"
+                msg += expectedOutput
             raise Exception(msg)        
         if verbose: print "test %d: compared dump of xtc and dump of h5 file" % num
 
@@ -612,19 +615,28 @@ def testCommand(args):
     expectedDiffs = getRegressionTestExpectedDifferences()
     if testSet.startswith('full'):
         whichTest = 'full'
+        expectedDiffs = getFullTestExpectedDifferences()
         jnk, afterFull = testSet.split('full')
         if len(afterFull)>0:
             assert afterFull.startswith(':'), "must follow full with : to specify tests, not '%s' " % afterFull
-            jnk, afterFull = afterFull.split(':')
-            testNumberFilter = map(int,testSet.split(','))
-        expectedDiffs = getFullTestExpectedDifferences()
-    elif testSet != '':
-        testNumberFilter = map(int,testSet.split(','))
+            jnk, testSet = afterFull.split(':')
+    if testSet != '':
+        commaSepTestSet = testSet.split(',')
+        testNumberFilter = []
+        for val in commaSepTestSet:
+            if val.find('-')>0:
+                a,b = map(int,val.split('-'))
+                testNumberFilter.extend(range(a,b+1))
+            else:
+                testNumberFilter.append(int(val))
 
     for num in testNumberFilter:
-        assert num in prev, "There is a new xtc test number: %s\n. Run prev command first." % num
+        if num in testFiles:
+            if (whichTest == 'full') or (whichTest == 'regress' and num in regress):
+                assert num in prev, "There is a new xtc test number: %s\n. Run prev command first." % num
     testTimes = {}
     for num in testNumberFilter:
+        if num not in testFiles: continue
         fileInfo = testFiles[num]
         baseName, fullPath = (fileInfo['basename'], fileInfo['path'])
         prv = prev[num]
@@ -910,6 +922,8 @@ def getXtcDirsToScan(currentXtcDirList, previousXtcDirs):
     return xtcDirsToScan
 
 def typesCommand(args):
+    print "*** types Command not fully implemented, do not run ***"
+    return
     dgrams = 40
     assert len(args) in [0,1,2], "must be 0, 1 or 2 args"
     if 'regress' in args:

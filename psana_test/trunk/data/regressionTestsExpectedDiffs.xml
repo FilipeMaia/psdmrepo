@@ -3,14 +3,10 @@
   <regress number="2">
     <diff>
 <![CDATA[
-84d83
-<   pvName=AMO:R14:IOC:10:ao0:out1  dbrtype=34 isCtrl=1 numElements=1 status=5 severity=2 units=V upper_disp_limit=5.0000e+03 lower_disp_limit=0.0000e+00 upper_alarm_limit=5.0000e+03 upper_warning_limit=5.0000e+03 lower_warning_limit=0.0000e+00 lower_alarm_limit=0.0000e+00 upper_ctrl_limit=5.0000e+03 lower_ctrl_limit=0.0000e+00 data=0.0000e+00
-693d691
-<   pvName=AMO:R14:IOC:10:ao0:out1  dbrtype=20 isTime=1 numElements=1 status=5 severity=2 stamp.sec=742110359 stamp.nsec=360000000 data=0.0000e+00
 ]]>
     </diff>
     <comment>
-In reallity, the epics pv AMO:R14:IOC:10:ao0:out1 points to pvId 134. However that pvName has been
+In reality, the epics pv AMO:R14:IOC:10:ao0:out1 points to pvId 134. However that pvName has been
 reused as a epics alias. The alias points to pvid 44 and that is what psana is doing, letting the 
 epics alias override the pvname. Unfortunately, there is no way to get at the unaliased pvname 
 because of this, so the Translator does not set up these aliases - thus the difference.
@@ -58,16 +54,14 @@ So the pvId can change from one event to the next with psana.
   <regress number="10">
     <diff>
 <![CDATA[
-137d136
-<   pvName=CXI:SC2:MZM:09:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=-2.5000e-02
-868d866
-<   pvName=CXI:SC2:MZM:09:ENCPOSITIONGET  dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=743137696 stamp.nsec=761446000 data=-2.5000e-02
 ]]>
     </diff>
     <comment>
-This is a bug that needs to be fixed, trac #304. See notes at https://pswww.slac.stanford.edu/trac/psdm/ticket/304
+There was a bug here trac #304. See notes at https://pswww.slac.stanford.edu/trac/psdm/ticket/304 that is now fixed.
+See also trac # 305 that is fixed now.
 
-Here are additional notes
+Here are additional notes that make this file interesting:
+
 In the xtclinedump, this pv shows up during configure:
 
 dg=    1 offset=0x00000000 tp=Event sv=      Configure ex=1 ev=0 sec=51E9F8AF nano=0E1A3D7E tcks=0000000 fid=1FFFF ctrl=84 vec=0000 env=000024F4
