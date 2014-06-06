@@ -1125,8 +1125,9 @@ class H5Output( unittest.TestCase ) :
                            extraOpts='--calib-dir /reg/g/psdm/data_test/calib',
                            printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
-        f = h5py.File(output_h5,'r')
-        
+        f = h5py.File(output_h5,'r')  # will crash if file not present
+        f.close()
+        if self.cleanUp: os.unlink(output_h5)
         
     @unittest.skip("disabled no data access")
     def test_calibration(self):
