@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-43
+2014-06-09 Mikhail S. Dubrovin
+- add UsdUsbEncoderFilter
+- add data/mask_cspad_2x1_edges.py	
+
 Tag: V00-03-42
 2014-05-28 Mikhail S. Dubrovin
 - fix include/NDArrAverage.h - the non-const ndarray was not checked because of duplication of if(ndim==2)

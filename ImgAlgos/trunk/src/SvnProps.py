@@ -20,7 +20,7 @@ If you use all or part of it, please give an appropriate acknowledgment.
 #------------------------------
 # Properties substituted by SVN 
 #------------------------------
-# __revision__ = "$Revision: 8149 $"
+# __revision__ = "$Revision$"
 # __author__   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
 #------------------------------
 
@@ -31,10 +31,10 @@ import sys
 class SvnProps :
     def __init__(self) : 
         self.updated  = "2014-05-05"
-        self.revision = "$Revision: 8149 $"
+        self.revision = "$Revision$"
         self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
         self.id       = "$Id: SvnProps.py 8149 2014-05-06 16:46:05Z dubrovin@SLAC.STANFORD.EDU $"
-        self.headurl  = "$HeadURL$"
+        self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/ImgAlgos/trunk/src/SvnProps.py $"
         self.header   = "$Header:$"
         self.datelc   = "$LastChangedDate: 2014-05-06 09:46:05 -0700 (Tue, 06 May 2014) $"
         self.date     = "$Date: 2014-05-06 09:46:05 -0700 (Tue, 06 May 2014) $"
