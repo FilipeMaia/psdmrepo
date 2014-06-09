@@ -88,7 +88,7 @@ UsdUsbEncoderFilter::~UsdUsbEncoderFilter ()
 void 
 UsdUsbEncoderFilter::beginJob(Event& evt, Env& env)
 {
-  if(m_print_bits & 1) printInputParameters();
+  if(m_print_bits & 1) printInputParameters();printData(evt);
   if(m_print_bits & 2) printTimeCodeVector();
 }
 
@@ -194,7 +194,7 @@ UsdUsbEncoderFilter::printTimeCodeVector()
 {
   std::stringstream ss; 
   ss << "\nContent of the input file in vector<TimeCode> of size: " << v_tcode.size() << '\n';
-  ss << "# in vector  tstamp  code   evt# \n";
+  ss << "#    t-stamp sec     nsec    code   evt# \n";
   unsigned counter(0);
   std::vector<TimeCode>::const_iterator it;
   for(it=v_tcode.begin(); it!=v_tcode.end(); it++) {
@@ -222,12 +222,13 @@ UsdUsbEncoderFilter::loadFile()
   }
 
   // read all values and store them in vector
-  tstamp_t ts; 
+  tstamp_t ts_sec; 
+  tstamp_t ts_nsec; 
   unsigned ucode;
-  evnum_t evnum;
-  while(in >> ts && in >> ucode && in >> evnum) {
+  evnum_t  evnum;
+  while(in >> ts_sec && in >> ts_nsec && in >> ucode && in >> evnum) {
     code_t code(ucode);
-    v_tcode.push_back(TimeCode(ts, code, evnum));
+    v_tcode.push_back(TimeCode(ts_sec, ts_nsec, code, evnum));
   }
 
   /*
@@ -255,23 +256,6 @@ UsdUsbEncoderFilter::eventIsSelected(Event& evt, Env& env)
   cout  << "\n====Event #" << m_count_evt << "   Precise current time: " << str_current_time() << '\n';
 
 
-  // --- Get code and timestamp from UsdUsb
-
-  shared_ptr<Psana::UsdUsb::DataV1> data1 = evt.get(m_source);
-  if (data1) {
-    code_t   code   = data1->digital_in() & m_bitmask;
-    tstamp_t tstamp = data1->timestamp();
-
-    //TimeCode tc(tstamp, code, m_count_evt);
-    //p_tc->set_tcode(tstamp, code, m_count_evt);
-    tc_data.set_tcode(tstamp, code, m_count_evt);
-
-    cout << "  TimeCode in data: " << tc_data 
-         << '\n';
-  }
-
-
-
   // --- Get timestamp from EventId
 
   shared_ptr<PSEvt::EventId> eventId = evt.get();
@@ -281,41 +265,52 @@ UsdUsbEncoderFilter::eventIsSelected(Event& evt, Env& env)
          << "or the same in double: "  << fixed << std::setw(20) << std::setprecision(9) << doubleTime(evt)
          << " or as date-time: " << stringTimeStamp(evt)
          << '\n';
+
     // Update the timestamp using eventId
-    //tc_data.set_tstamp(eventId->time().sec())
+    tc_data.set_tst_sec(eventId->time().sec());
+    tc_data.set_tst_nsec(eventId->time().nsec());
+    tc_data.set_evnum(m_count_evt);
   }
 
+
+  // --- Get code from UsdUsb
+
+  shared_ptr<Psana::UsdUsb::DataV1> data1 = evt.get(m_source);
+  if (data1) {
+    //tstamp_t tstamp = data1->timestamp();
+    code_t code = data1->digital_in() & m_bitmask;
+    tc_data.set_code(code);
+  }
+
+  cout << "  TimeCode in data: " << tc_data << '\n';
 
 
   // --- Get timestamp from Evr
-
-  Source src_evr("DetInfo(:Evr)");
-  shared_ptr<Psana::EvrData::DataV3> data3 = evt.get(src_evr);
-  if (data3) {
-    cout << "  EvrData::DataV3: numFifoEvents=" << data3->numFifoEvents();
-    const ndarray<const Psana::EvrData::FIFOEvent, 1>& array = data3->fifoEvents();
-    for (unsigned i = 0; i < array.size(); ++ i) {
-
-      cout  << "\n    fifo event #" << i
-            <<  " timestampHigh=" << array[i].timestampHigh()
-            <<  " timestampLow=" << array[i].timestampLow()
-            <<  " eventCode=" << array[i].eventCode()
-            << "\n";
-    } 
-
-    // Update the timestamp using Evr
-    //tc_data.set_tstamp(array[0].timestampHigh())
-  }
+  // Source src_evr("DetInfo(:Evr)");
+  // shared_ptr<Psana::EvrData::DataV3> data3 = evt.get(src_evr);
+  // if (data3) {
+  //   cout << "  EvrData::DataV3: numFifoEvents=" << data3->numFifoEvents();
+  //   const ndarray<const Psana::EvrData::FIFOEvent, 1>& array = data3->fifoEvents();
+  //   for (unsigned i = 0; i < array.size(); ++ i) {
+  // 
+  //     cout  << "\n    fifo event #" << i
+  //           <<  " timestampHigh=" << array[i].timestampHigh()
+  //           <<  " timestampLow=" << array[i].timestampLow()
+  //           <<  " eventCode=" << array[i].eventCode()
+  //           << "\n";
+  //   } 
+  //   // Update the timestamp using Evr
+  //   //tc_data.set_tst_sec(array[0].timestampHigh())
+  // }
 
 
   // --- Add record to the output file, if needed (if output file name parameter "ofname" is specified)
   if(! m_ofname.empty() && m_out->good()) *m_out << tc_data << '\n'; 
 
 
-
   // --- 
-  // At this stage tc object should be completely defined from data.
-  // Next step: tc object should be compared with content of the input file
+  // At this stage tc_data object should be completely defined from data.
+  // Next step: tc_data object should be compared with content of the input file
   // stored in std::vector<TimeCode> v_tcode;
   // return true/false if the event should be selected/discarded
 
@@ -325,10 +320,10 @@ UsdUsbEncoderFilter::eventIsSelected(Event& evt, Env& env)
 
   while ( *v_tc_iter < tc_data && v_tc_iter != v_tcode.end() ) ++v_tc_iter;
 
-  //=====Selector decision==============
+  //===== Selector decision ============
 
-  if ( *v_tc_iter == tc_data ) return true;
-  else return false;
+  if ( *v_tc_iter == tc_data ) return (m_mode > 0) ? true  : false;
+  else                         return (m_mode > 0) ? false : true;
 
   //return true;  // if event is selected
   //return false; // if event is discarded
