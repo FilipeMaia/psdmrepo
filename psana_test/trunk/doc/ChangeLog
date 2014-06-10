@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2014-06-10 David Schneider
+- fix bug with dumping ndarrays
+
 Tag: V00-00-05
 2014-06-08 David Schneider
 - Add Psana modules to test putting and getting ndarray's from event store

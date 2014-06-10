@@ -6791,6 +6791,6 @@ def obj2str(obj, indent=0, lvl=0, methodsep='\n'):
     if isinstance(obj,np.ndarray):
         fnCvt = getTypeFn(obj.dtype)
         if fnCvt is not None:
-            return ndarray_to_str(obj, len(obj.shape), indent, lvl)
+            return ndarray_to_str(obj, indent, lvl)
     # default to Python str
     return str(obj)
