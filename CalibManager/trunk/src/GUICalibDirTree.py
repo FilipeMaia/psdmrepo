@@ -66,6 +66,7 @@ class GUICalibDirTree (QtGui.QWidget):
         'XppGon.0:Cspad.0'
        ,'XcsEndstation.0:Cspad.0'
        ,'CxiDs1.0:Cspad.0'
+       ,'CxiDs2.0:Cspad.0'
        ,'CxiDsd.0:Cspad.0'
         ]
 

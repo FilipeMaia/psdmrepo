@@ -324,6 +324,10 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
     def onButCopy(self):
         #logger.info('onButCopy', __name__)
+        if os.path.basename(self.str_path()) == 'HISTORY' :
+            logger.warning('File %s copy is NOT allowed' % self.str_path(), __name__)
+            return
+        
         cmd = 'cp %s %s' % (self.str_path(), self.get_out_path())
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)

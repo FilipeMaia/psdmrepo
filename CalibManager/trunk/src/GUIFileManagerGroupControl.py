@@ -46,7 +46,7 @@ from FileNameManager      import fnm
 
 from CorAna.MaskEditor import MaskEditor
 import GlobalUtils     as     gu
-import RegDBUtils      as     ru
+#import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 from FileDeployer           import fd
@@ -321,11 +321,15 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         for fname in list_of_fnames :
             #print '   split fname', fname
             fields = fname.split('/')
+            
             if len(fields) < 5 :
                 logger.info('File %s has a un-expected path: ' % fname, __name__)
                 continue
             if  fields[-5] != 'calib' :
                 logger.info('File %s is not from "calib" directory: ' % fname, __name__)
+                continue
+            if fields[-1] == 'HISTORY' :
+                logger.warning('File %s copy is NOT allowed' % fname, __name__)
                 continue
                 
             dst_path = os.path.join(dst_calib_dir, fields[-4], fields[-3], fields[-2], dst_fname)
