@@ -29,6 +29,7 @@
 #include "PSEnv/Env.h"
 #include "PSEnv/EpicsStore.h"
 #include "PSEvt/Event.h"
+#include "psddl_hdf2psana/NDArrayConverter.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -90,11 +91,14 @@ protected:
   // Get Source for the group (or its parent for EPICS),
   Pds::Src source(const hdf5pp::Group& group, int levels = -1) const;
 
+  // return true if this the parent is an ndarray 
+  bool isNDArray(const hdf5pp::Group& group) const;
 private:
 
   mutable std::map<std::string, int> m_schemaVersionCache;
   mutable std::map<std::string, Pds::Src> m_sourceCache;
 
+  NDArrayConverter m_ndarrayConverter;
 };
 
 } // namespace psddl_hdf2psana

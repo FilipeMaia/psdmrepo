@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-09 
+2014-06-10 David Schneider
+- convert fixed and vlen ndarrays in hdf5 files into the event store.
+- refactor with Translator package
+  move Translator NDArrayParameters class here
+- add schema constants that are shared between both packages
+- track ticket  #308 (for reading ndarrays into psana).
+
 Tag: V00-09-08
 2014-06-05 David Schneider
 - fix trac #305 https://pswww.slac.stanford.edu/trac/psdm/ticket/305

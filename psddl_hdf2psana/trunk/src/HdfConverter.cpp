@@ -14,7 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "psddl_hdf2psana/HdfConverter.h"
-
+#include "psddl_hdf2psana/SchemaConstants.h"
 //-----------------
 // C/C++ Headers --
 //-----------------
@@ -39,18 +39,15 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+using namespace psddl_hdf2psana;
+
 namespace {
 
   const std::string logger = "psddl_hdf2psana.HdfConverter";
 
-  // name of the attribute holding schema version
-  const std::string versionAttrName("_schemaVersion");
-
-  // name of the attributes holding Src info
-  const std::string srcAttrName("_xtcSrc");
-
   // name of the group holding EPICS data
   const std::string epicsGroupName("/Epics::EpicsPv/");
+
 
   // test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
   bool isEpics(const std::string& group)
@@ -109,8 +106,83 @@ namespace {
     boost::shared_ptr<PSEvt::Proxy<Parent> > m_parent;
   };
   
+  void setNDArrayParamsFromGroupAttrs(const hdf5pp::Group &group, 
+                                      NDArrayParameters &ndarrayParams) {
+
+    // dimension
+    hdf5pp::Attribute<uint32_t> dimAttr = group.openAttr<uint32_t>(ndarrayDimAttrName);
+    if (dimAttr.valid()) {
+      ndarrayParams.dim(dimAttr.read());
+    } else {
+      MsgLog(logger, error, " setNDArrayParamsFromGroupAttrs: " << ndarrayDimAttrName 
+             << " is not valid in " << group.name());
+    }
+
+    // element type
+    hdf5pp::Attribute<int16_t> elemTypeAttr = group.openAttr<int16_t>(ndarrayElemTypeAttrName);
+    if (elemTypeAttr.valid()) {
+      ndarrayParams.elemType(NDArrayParameters::ElemType(elemTypeAttr.read()));
+    } else {
+      MsgLog(logger, error, " setNDArrayParamsFromGroupAttrs: " << ndarrayElemTypeAttrName 
+             << " is not valid in " << group.name());
+    }
+
+    // element size bytes
+    hdf5pp::Attribute<uint32_t> sizeBytesAttr = group.openAttr<uint32_t>(ndarraySizeBytesAttrName);
+    if (sizeBytesAttr.valid()) {
+      ndarrayParams.sizeBytes(sizeBytesAttr.read());
+    } else {
+      MsgLog(logger, error, " setNDArrayParamsFromGroupAttrs: " << ndarraySizeBytesAttrName 
+             << " is not valid in " << group.name());
+    }
+
+    // const elem
+    hdf5pp::Attribute<uint8_t> isConstAttr = group.openAttr<uint8_t>(ndarrayConstElemAttrName);
+    if (isConstAttr.valid()) {
+      ndarrayParams.isConstElem(isConstAttr.read());
+    } else {
+      MsgLog(logger, error, " setNDArrayParamsFromGroupAttrs: " << ndarrayConstElemAttrName 
+             << " is not valid in " << group.name());
+    }
+
+    // vlen slow dim
+    hdf5pp::Attribute<uint8_t> vlenAttr = group.openAttr<uint8_t>(vlenAttrName);
+    if (vlenAttr.valid()) {
+      ndarrayParams.isVlen(vlenAttr.read());
+    } else {
+      MsgLog(logger, error, " setNDArrayParamsFromGroupAttrs: " << vlenAttrName  
+             << " is not valid in " << group.name());
+    }
+    MsgLog(logger, debug, "group=" << group.name() << " ndarrayParams: "
+           << " elemType=" << ndarrayParams.elemType()
+           << " sizeBytes=" << ndarrayParams.sizeBytes()
+           << " dim=" << ndarrayParams.dim()
+           << " const=" << ndarrayParams.isConstElem()
+           << " vlen=" << ndarrayParams.isVlen());
+  }
+
+  std::string getEventKey(const hdf5pp::Group & group) {
+    hdf5pp::Attribute<const char *> attr = group.openAttr<const char *>(h5GroupNameKeyAttrName);
+    if (attr.valid()) {
+      char value[1024];
+      const char *p = attr.read();
+      strncpy(value,p,1024);
+      return std::string(value);
+    }
+    MsgLog(logger, warning,"getEventKey - attribute " << h5GroupNameKeyAttrName 
+           << " is not valid for group " << group.name());
+
+    // directly parse from group name
+    std::string key = group.name();
+    std::string::size_type p = key.rfind('/');
+    key.erase(0,p);
+    p = key.find(srcEventKeySeperator);
+    if (p == std::string::npos) return "";
+    key.erase(0,p+srcEventKeySeperator.size());
+    return key;
+  }
   
-}
+} // local namespace
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -204,6 +276,13 @@ HdfConverter::convert(const hdf5pp::Group& group, int64_t idx, PSEvt::Event& evt
     
     return;
 
+    // Special case for NDArray
+  } else if (isNDArray(group)) {
+    NDArrayParameters ndarrayParams;
+    setNDArrayParamsFromGroupAttrs(group.parent(), ndarrayParams);
+    std::string key = getEventKey(group);
+    m_ndarrayConverter.convert(group, idx, ndarrayParams, schema, src, key, evt);
+    return;
   }
 
   hdfConvert(group, idx, typeName, schema, src, evt, env.configStore());
@@ -319,7 +398,7 @@ HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
   }
 
   // look at attribute
-  hdf5pp::Attribute<int> attr = group.openAttr<int>(::versionAttrName);
+  hdf5pp::Attribute<int> attr = group.openAttr<int>(versionAttrName);
   if (attr.valid()) {
     version = attr.read();
     MsgLog(logger, debug, "got schema version " << version << " from group attribute: " << name);
@@ -371,7 +450,7 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
 
   // look at attribute
   Pds::Src src(Pds::Level::NumberOfLevels);
-  hdf5pp::Attribute<uint64_t> attrSrc = group.openAttr<uint64_t>(::srcAttrName);
+  hdf5pp::Attribute<uint64_t> attrSrc = group.openAttr<uint64_t>(srcAttrName);
   if (attrSrc.valid()) {
     // build source from attributes
     src = ::_SrcBuilder(attrSrc.read());
@@ -401,5 +480,15 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
   return src;
 }
 
+bool HdfConverter::isNDArray(const hdf5pp::Group& group) const
+{
+  hdf5pp::Group parent = group.parent();
+  hdf5pp::Attribute<uint8_t> attr = parent.openAttr<uint8_t>(ndarrayAttrName);
+  if (attr.valid()) {
+    uint8_t isNDArray = attr.read();
+    return (isNDArray >= 1);
+  } 
+  return false;
+}
 
 } // namespace psddl_hdf2psana
