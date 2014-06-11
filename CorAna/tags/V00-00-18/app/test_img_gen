@@ -1,0 +1,91 @@
+#!@PYTHON@
+#------------------------------------------------------------
+# File and Version Information:
+#   $Id$
+#   $Revision: 8 $
+#------------------------------------------------------------
+
+"""This script generates random images in time intervals and saves them in specified file.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+#------------------------------
+
+import sys
+import os
+import numpy as np
+from time import sleep
+from optparse import OptionParser
+from CorAna.ArrFileExchange import *
+
+#------------------------------
+#------------------------------
+
+def input_options_parser() :
+    ofname_def ='./img-random'
+    dtype_def  = 'npy'
+    dt_sec_def = 5
+    nimg_def   = 10
+    rblen_def  = 3
+    rows_def   = 1300
+    cols_def   = 1340
+    verb_def   = True
+
+    parser = OptionParser(description='Application %s' % sys.argv[0], usage ='usage: %prog [options] args')
+    parser.add_option('-o', '--ofname',  dest='ofname', default=ofname_def, action='store', type='string', help='output image file name prefix, default: %s' % ofname_def)
+   #parser.add_option('-d', '--dtype',   dest='dtype',  default=dtype_def,  action='store', type='string', help='file data type; txt or npy, default: %s' % dtype_def)
+    parser.add_option('-t', '--dt_sec',  dest='dt_sec', default=dt_sec_def, action='store', type='int',    help='time delay in sec between images, default: %s' % dt_sec_def)
+    parser.add_option('-n', '--nimg',    dest='nimg',   default=nimg_def,   action='store', type='int',    help='number of generated images, default: %s' % nimg_def)
+    parser.add_option('-l', '--rblen',   dest='rblen',  default=rblen_def,  action='store', type='int',    help='ring buffer length, default: %s' % rblen_def)
+    parser.add_option('-r', '--rows',    dest='rows',   default=rows_def,   action='store', type='int',    help='number rows in image, default: %s' % rows_def)
+    parser.add_option('-c', '--cols',    dest='cols',   default=cols_def,   action='store', type='int',    help='number columns in image, default: %s' % cols_def)
+    parser.add_option('-v', '--verbose', dest='verb',   default=verb_def,   action='store_true',           help='allows print on console, default: %s' % verb_def)
+    parser.add_option('-q', '--quiet',   dest='verb',                       action='store_false',          help='supress print on console, default: %s' % (not verb_def))
+
+    (opts, args) = parser.parse_args()
+    return (opts, args)
+ 
+#------------------------------
+
+def get_random_image(shape=(1300, 1340), verb=True) :
+    mu, sigma = 200, 25
+    arr = mu + sigma*np.random.standard_normal(size=shape)
+    #arr = 100*np.random.standard_exponential(size=shape)
+    if verb : print 'Created arr.shape=', arr.shape
+    return arr
+
+#------------------------------
+
+if __name__ == "__main__" :
+
+    (opts, args) = input_options_parser()
+    if opts.verb :
+        print 'opts:\n', opts
+        print 'args:\n', args
+
+    print_bits = 0377 if opts.verb else 0
+    afe = ArrFileExchange(opts.ofname, opts.rblen, print_bits)
+
+    for i in range(opts.nimg) :
+	if opts.verb : print 10*'='+'\nImage %3d' % i 
+        img = get_random_image((opts.rows,opts.cols), opts.verb)
+
+	#fname = opts.ofname + '.' + opts.dtype	
+	#if   opts.dtype == 'txt' : np.savetxt(fname, img, fmt='%6.2f', delimiter=' ', newline='\n')
+	#elif opts.dtype == 'npy' : np.save(fname, img)
+	#else : print 'Unknowd data type: %s' % opts.dtype
+
+        afe.save_arr(img)
+
+	sleep(opts.dt_sec)
+
+    sys.exit('End of %s' % sys.argv[0])
+
+#------------------------------
