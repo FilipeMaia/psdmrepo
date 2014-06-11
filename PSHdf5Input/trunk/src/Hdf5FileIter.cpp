@@ -61,7 +61,7 @@ namespace PSHdf5Input {
 Hdf5FileIter::Hdf5FileIter (const std::string& fileName)
   : m_fileName(fileName)
   , m_file()
-  , m_groups()
+  , m_configureGroups()
   , m_configIter()
   , m_runNumber()
   , m_schemaVersion(0)
@@ -98,12 +98,12 @@ Hdf5FileIter::Hdf5FileIter (const std::string& fileName)
   for (hdf5pp::Group grp = giter.next(); grp.valid(); grp = giter.next()) {
     const std::string& grpname = grp.basename();
     if (grpname == "Configure" or boost::algorithm::starts_with(grpname, "Configure:")) {
-      m_groups.push_back(grp);
+      m_configureGroups.push_back(grp);
     }    
   }
 
   // sort them by name
-  m_groups.sort(GroupCmp());
+  m_configureGroups.sort(GroupCmp());
   
   // might have run number attribute
   if (top.hasAttr("runNumber")) {
@@ -128,18 +128,18 @@ Hdf5FileIter::next()
   if (not m_configIter) {
 
     // no more config groups left - we are done
-    if (m_groups.empty()) {
+    if (m_configureGroups.empty()) {
       MsgLog(logger, debug, "stop iterating in file: " << m_fileName);
       res = value_type(value_type::Stop, boost::shared_ptr<PSEvt::EventId>());
     } else {
 
-      // open next group
-      hdf5pp::Group grp = m_groups.front();
-      m_groups.pop_front();
-      MsgLog(logger, debug, "switching to group: " << grp.name());
+      // open next configure group
+      hdf5pp::Group cfgGrp = m_configureGroups.front();
+      m_configureGroups.pop_front();
+      MsgLog(logger, debug, "switching to configure group: " << cfgGrp.name());
 
-      // make iter for this new group
-      m_configIter.reset(new Hdf5ConfigIter(grp, m_runNumber, m_schemaVersion, m_fullTsFormat));
+      // make iter for this new configure group
+      m_configIter.reset(new Hdf5ConfigIter(cfgGrp, m_runNumber, m_schemaVersion, m_fullTsFormat));
 
       PSTime::Time etime = Hdf5Utils::getTime(m_configIter->group(), "start");
       boost::shared_ptr<PSEvt::EventId> eid;
@@ -147,7 +147,7 @@ Hdf5FileIter::next()
       res = Hdf5IterData(Hdf5IterData::Configure, eid);
       
       // fill result with the configuration object data locations
-      hdf5pp::GroupIter giter(grp);
+      hdf5pp::GroupIter giter(cfgGrp);
       for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
         const std::string& grpname = grp1.basename();
         // skip the calibStore
@@ -168,7 +168,8 @@ Hdf5FileIter::next()
 
         } else if (grpname != "Run" and not boost::algorithm::starts_with(grpname, "Run:")) {
 
-          hdf5pp::GroupIter subgiter(grp1);
+          // Do not include soft links
+          hdf5pp::GroupIter subgiter(grp1, hdf5pp::GroupIter::HardLink);
           for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
             if (grp2.hasChild("time")) {
               res.add(grp2, 0);

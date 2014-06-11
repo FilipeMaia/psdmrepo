@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2014-06-10 David Schneider
+- skip soft links at src level, and config object level
+- change names of some group iterators for readability
+
  Tag: V00-04-01
 2014-05-22
 - bug fix, skip reading back of the calibstore. 

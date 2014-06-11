@@ -85,7 +85,7 @@ private:
 
   std::string m_fileName;
   hdf5pp::File m_file;
-  std::list<hdf5pp::Group> m_groups;
+  std::list<hdf5pp::Group> m_configureGroups;
   boost::scoped_ptr<Hdf5ConfigIter> m_configIter;
   int m_runNumber;
   unsigned m_schemaVersion;  // schema version of the file

@@ -41,9 +41,9 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber,
+Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& calibCycleGrp, int runNumber,
     unsigned schemaVersion, bool fullTsFormat)
-  : m_grp(grp)
+  : m_calibCycleGrp(calibCycleGrp)
   , m_runNumber(runNumber)
   , m_schemaVersion(schemaVersion)
   , m_fullTsFormat(fullTsFormat)
@@ -51,19 +51,23 @@ Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber,
 {
 
   // find all groups with the event data (those which have "time" dataset)
-  hdf5pp::GroupIter giter(grp);
-  for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
-    hdf5pp::GroupIter subgiter(grp1);
+  hdf5pp::GroupIter typeIter(calibCycleGrp, hdf5pp::GroupIter::HardLink);
+  for (hdf5pp::Group typeGrp = typeIter.next(); typeGrp.valid(); typeGrp = typeIter.next()) {
+    hdf5pp::GroupIter srcIter(typeGrp, hdf5pp::GroupIter::HardLink);
     
     // Epics group is 3-level deep, regular groups are 2-level deep
-    if (grp1.basename() == "Epics::EpicsPv") {
+    if (typeGrp.basename() == "Epics::EpicsPv") {
       
-      for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-        hdf5pp::GroupIter subgiter2(grp2, hdf5pp::GroupIter::HardLink);
-        for (hdf5pp::Group grp3 = subgiter2.next(); grp3.valid(); grp3 = subgiter2.next()) {
-          if (grp3.hasChild("time")) {
-            Hdf5DatasetIter begin(grp3, m_fullTsFormat);
-            Hdf5DatasetIter end(grp3, m_fullTsFormat, Hdf5DatasetIter::End);
+      for (hdf5pp::Group epicsSrcGrp = srcIter.next(); 
+           epicsSrcGrp.valid(); 
+           epicsSrcGrp = srcIter.next()) {
+        hdf5pp::GroupIter epicsPvNameIter(epicsSrcGrp, hdf5pp::GroupIter::HardLink);
+        for (hdf5pp::Group epicsPvNameGrp = epicsPvNameIter.next(); 
+             epicsPvNameGrp.valid(); 
+             epicsPvNameGrp = epicsPvNameIter.next()) {
+          if (epicsPvNameGrp.hasChild("time")) {
+            Hdf5DatasetIter begin(epicsPvNameGrp, m_fullTsFormat);
+            Hdf5DatasetIter end(epicsPvNameGrp, m_fullTsFormat, Hdf5DatasetIter::End);
             m_merger.add(begin, end);
           }
         }
@@ -71,10 +75,10 @@ Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber,
 
     } else {
       
-      for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-        if (grp2.hasChild("time")) {
-          Hdf5DatasetIter begin(grp2, m_fullTsFormat);
-          Hdf5DatasetIter end(grp2, m_fullTsFormat, Hdf5DatasetIter::End);
+      for (hdf5pp::Group srcGrp = srcIter.next(); srcGrp.valid(); srcGrp = srcIter.next()) {
+        if (srcGrp.hasChild("time")) {
+          Hdf5DatasetIter begin(srcGrp, m_fullTsFormat);
+          Hdf5DatasetIter end(srcGrp, m_fullTsFormat, Hdf5DatasetIter::End);
           m_merger.add(begin, end);
         }
       }

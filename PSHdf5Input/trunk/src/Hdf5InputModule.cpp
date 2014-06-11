@@ -314,11 +314,8 @@ Hdf5InputModule::fillEventEnv(const Hdf5IterData& data, Event& evt, Env& env)
         } else {
           MsgLog(name(), warning, name() << "failed to find Alias::ConfigV1 in config store");
         }
-
-
       }
     }
-
   }
 
   // call converter for every piece of data
