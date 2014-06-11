@@ -1,6 +1,9 @@
+#include "psddl_hdf2psana/NDArrayConverter.h"
+#include "psddl_hdf2psana/SchemaConstants.h"
+#include "Translator/NDArrayUtil.h"
+
 #include "Translator/H5GroupNames.h"
 #include "Translator/specialKeyStrings.h"
-#include "Translator/NDArrayParams.h"
 
 #include <string>
 #include <sstream>
@@ -18,8 +21,6 @@ using namespace std;
 namespace {
 
   const char * logger = "H5GroupNames";
-
-  const std::string srcKeySepStr = "__";
 
   std::string strDetInfo(const Pds::DetInfo& src, bool detInfoSpecialAsAstrerik)
   {
@@ -108,9 +109,12 @@ H5GroupNames::H5GroupNames(const std::string & calibratedKey, const TypeAliases:
 
 string H5GroupNames::nameForType(const std::type_info *typeInfoPtr, const std::string &key) {
   if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) {
-    bool vlen = false;
-    if (key.size()>0) vlen = hasNDArrayVlenPrefix(key);
-    string groupName = ndarrayGroupName(typeInfoPtr, vlen);
+    enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim = 
+      psddl_hdf2psana::NDArrayParameters::SlowDimNotVlen;
+    if ((key.size()>0) and hasNDArrayVlenPrefix(key)) {
+      vlenDim = psddl_hdf2psana::NDArrayParameters::SlowDimIsVlen;
+    }
+    string groupName = ndarrayGroupName(typeInfoPtr, vlenDim);
     if (groupName.size()>0) return groupName;
     string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
     MsgLog(logger, error, "type " << realName << " matches known NDArrays "
@@ -133,49 +137,58 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr, const std::s
   if ((realName.size()>csPadDataV.size()) and (realName.substr(0,csPadDataV.size()) == csPadDataV)) {
     realName = csPadElementV + realName.substr(csPadDataV.size());
   }
-
+  
   // replace PNCCD::FramesV with PNCCD::FrameV for backward compatibility
   static const string PNCCDFrameV("PNCCD::FrameV");
   static const string PNCCDFramesV("PNCCD::FramesV");
   if ((realName.size()>PNCCDFramesV.size()) and (realName.substr(0,PNCCDFramesV.size()) == PNCCDFramesV)) {
     realName = PNCCDFrameV  + realName.substr(PNCCDFramesV.size());
   }
-
+  
   // replace Acqiris::TdcConfigV with Acqiris::AcqirisTdcConfigV for backward compatibility
   static const string AcqirisTdcConfigV("Acqiris::TdcConfigV");
   static const string AcqirisAcqirisTdcConfigV("Acqiris::AcqirisTdcConfigV");
   if ((realName.size()>AcqirisTdcConfigV.size()) and (realName.substr(0,AcqirisTdcConfigV.size()) == AcqirisTdcConfigV)) {
     realName = AcqirisAcqirisTdcConfigV  + realName.substr(AcqirisTdcConfigV.size());
   }
-
+  
   return realName;
 }
   
 void H5GroupNames::addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr, const std::string & key) 
 {
   if (isNDArray(typeInfoPtr)) {
-    group.createAttr<uint8_t>("_ndarray").store(1);
-    boost::shared_ptr<const NDArrayParameters> params = ndarrayParameters(typeInfoPtr);
+    group.createAttr<uint8_t>(psddl_hdf2psana::ndarrayAttrName).store(1);
+    enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim = 
+      psddl_hdf2psana::NDArrayParameters::SlowDimNotVlen;
+    if (hasNDArrayVlenPrefix(key)) {
+      vlenDim = psddl_hdf2psana::NDArrayParameters::SlowDimIsVlen;
+    }
+    boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> params = 
+      ndarrayParameters(typeInfoPtr, vlenDim);
     if (not params) {
-      MsgLog(logger,error, "addTypeAttributes: group=" << group.name()
+      // addTypeAttributes is supposed to be called after the ndarray parameters
+      // have been stored. If params is null, this is not the case, or the 
+      // parameters were not deduced from this type.
+      MsgLog(logger,warning, "addTypeAttributes: group=" << group.name()
              << " type=" << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr)
-             << " no ndarrayParams found");
-      group.createAttr<uint32_t>("_ndarrayDim").store(0);
-      group.createAttr<int16_t>("_ndarrayElemType").store( 
-                                int16_t(NDArrayParameters::unknownElemType));
-      group.createAttr<uint32_t>("_ndarraySizeBytes").store(0);
-      group.createAttr<uint8_t>("_ndarrayConstElem").store(0);
-      group.createAttr<uint8_t>("_vlen").store(0);
+             << " is ndarray, but no ndarrayParams found.");
+      group.createAttr<uint32_t>(psddl_hdf2psana::ndarrayDimAttrName).store(0);
+      group.createAttr<int16_t>(psddl_hdf2psana::ndarrayElemTypeAttrName).store( 
+                                int16_t(psddl_hdf2psana::NDArrayParameters::unknownElemType));
+      group.createAttr<uint32_t>(psddl_hdf2psana::ndarraySizeBytesAttrName).store(0);
+      group.createAttr<uint8_t>(psddl_hdf2psana::ndarrayConstElemAttrName).store(0);
+      group.createAttr<uint8_t>(psddl_hdf2psana::vlenAttrName).store(0);
     } else {
-      group.createAttr<uint32_t>("_ndarrayDim").store(params->dim());
-      group.createAttr<int16_t>("_ndarrayElemType").store(uint16_t(params->elemType()));
-      group.createAttr<uint32_t>("_ndarraySizeBytes").store(params->sizeBytes());
-      group.createAttr<uint8_t>("_ndarrayConstElem").store(uint8_t(params->isConstElem()));
-      group.createAttr<uint8_t>("_vlen").store(hasNDArrayVlenPrefix(key) ? 1 : 0);
+      group.createAttr<uint32_t>(psddl_hdf2psana::ndarrayDimAttrName).store(params->dim());
+      group.createAttr<int16_t>(psddl_hdf2psana::ndarrayElemTypeAttrName).store(uint16_t(params->elemType()));
+      group.createAttr<uint32_t>(psddl_hdf2psana::ndarraySizeBytesAttrName).store(params->sizeBytes());
+      group.createAttr<uint8_t>(psddl_hdf2psana::ndarrayConstElemAttrName).store(uint8_t(params->isConstElem()));
+      group.createAttr<uint8_t>(psddl_hdf2psana::vlenAttrName).store(uint8_t(params->isVlen()));
     }
   } else {
     // not an ndarray
-    group.createAttr<uint8_t>("_ndarray").store(0);
+    group.createAttr<uint8_t>(psddl_hdf2psana::ndarrayAttrName).store(0);
   }
 }
 
@@ -194,14 +207,10 @@ std::pair<std::string, std::string> H5GroupNames::nameForSrcKey(const Pds::Src &
   }
   string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyWithSpecialPrefixesStripped);
   if (keyWithSpecialPrefixesStripped.size()>0) {
-    srcKeyGroupName += (srcKeySep() + keyStringToAdd);
+    srcKeyGroupName += (psddl_hdf2psana::srcEventKeySeperator + keyStringToAdd);
   }
   return pair<string,string>(srcKeyGroupName,keyStringToAdd);
 }
 
-
-std::string H5GroupNames::srcKeySep() {
-  return ::srcKeySepStr;
-}
 
 } // namespace Translator

@@ -10,22 +10,42 @@
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/TypeInfoUtils.h"
 
-#include "Translator/NDArrayParams.h"
+#include "Translator/NDArrayUtil.h"
 
 using namespace std;
 
 using namespace Translator;
 
+// local namespace - implementation
 namespace {
 
-const char * logger = "NDArrayParams";
+const char * logger = "NDArrayUtil";
 
-typedef std::map<const std::type_info *, 
-                 boost::shared_ptr<const NDArrayParameters>,
-                 PSEvt::TypeInfoUtils::lessTypeInfoPtr> NDArrayParamMap;
+typedef std::map< const std::type_info *, 
+                  boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> ,
+                  PSEvt::TypeInfoUtils::lessTypeInfoPtr> NDArrayParamMap;
 
-NDArrayParamMap paramMap;
+NDArrayParamMap paramMapVlen, paramMapNotVlen;
 
+boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> find(const std::type_info *typeInfoPtr, 
+                                                                 enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim)
+{
+  NDArrayParamMap::iterator pos;
+  bool found = false;
+  switch (vlenDim) {
+  case psddl_hdf2psana::NDArrayParameters::SlowDimNotVlen:
+    pos = paramMapNotVlen.find(typeInfoPtr);
+    found = (pos != paramMapNotVlen.end());
+    break;
+  case psddl_hdf2psana::NDArrayParameters::SlowDimIsVlen:
+    pos = paramMapVlen.find(typeInfoPtr);
+    found = (pos != ::paramMapVlen.end());
+    break;
+  }
+  if (found) return pos->second;;
+  boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> nullPtr;
+  return nullPtr;
+}
 
 vector<string> remove_blanks(vector<string> args) {
   vector<string> removed;
@@ -35,10 +55,13 @@ vector<string> remove_blanks(vector<string> args) {
   return removed;
 }
 
-boost::shared_ptr<const NDArrayParameters> addNDArrayToParamMap(const std::type_info * ndarrayTypeInfoPtr) {
+boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> 
+addNDArrayToParamMap(const std::type_info * ndarrayTypeInfoPtr,
+                     enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim) {
+
   string realName = PSEvt::TypeInfoUtils::typeInfoRealName(ndarrayTypeInfoPtr);
   static string ndarray("ndarray");
-  boost::shared_ptr<const NDArrayParameters> nullPtr;
+  boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> nullPtr;
 
   string::size_type ndarrayPos = realName.find("ndarray");
   if (ndarrayPos == string::npos) {
@@ -146,63 +169,63 @@ boost::shared_ptr<const NDArrayParameters> addNDArrayToParamMap(const std::type_
     return nullPtr;
   }
 
-  enum NDArrayParameters::ElemType elemTypeEnum = NDArrayParameters::unknownElemType;
-  if (isInt and isSigned) elemTypeEnum = NDArrayParameters::intElemType;
-  else if (isInt and not isSigned) elemTypeEnum = NDArrayParameters::uintElemType;
-  else if (isFloat) elemTypeEnum = NDArrayParameters::floatElemType;
-  paramMap[ndarrayTypeInfoPtr] = 
-    boost::make_shared<NDArrayParameters>(elemName, elemTypeEnum, 
-                                          sizeBytes, dim, constElem);
-  return paramMap[ndarrayTypeInfoPtr];
+  enum psddl_hdf2psana::NDArrayParameters::ElemType elemTypeEnum = 
+    psddl_hdf2psana::NDArrayParameters::unknownElemType;
+  if (isInt and isSigned) elemTypeEnum = psddl_hdf2psana::NDArrayParameters::intElemType;
+  else if (isInt and not isSigned) elemTypeEnum = psddl_hdf2psana::NDArrayParameters::uintElemType;
+  else if (isFloat) elemTypeEnum = psddl_hdf2psana::NDArrayParameters::floatElemType;
+
+  boost::shared_ptr<psddl_hdf2psana::NDArrayParameters> params = 
+    boost::make_shared<psddl_hdf2psana::NDArrayParameters>(elemName, elemTypeEnum, 
+                                                           sizeBytes, dim, constElem, vlenDim);
+  switch (vlenDim) {
+  case psddl_hdf2psana::NDArrayParameters::SlowDimNotVlen:
+    paramMapNotVlen[ndarrayTypeInfoPtr] = params;
+    break;
+  case psddl_hdf2psana::NDArrayParameters::SlowDimIsVlen:
+    paramMapVlen[ndarrayTypeInfoPtr] = params;
+    break;
+  }
+  
+  return params;
 }
 
 }; // local namespace
 
-NDArrayParameters::NDArrayParameters()
-  : m_elemName(""), m_elemType(unknownElemType),
-    m_sizeBytes(0), m_dim(0), m_isConstElem(false) 
+
+boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> 
+Translator::ndarrayParameters(const std::type_info *ndarrayTypeInfoPtr,
+                     enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim) 
 {
+  // check cache
+  boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> params = 
+    find(ndarrayTypeInfoPtr, vlenDim);
+  
+  if (not params) {
+    return addNDArrayToParamMap(ndarrayTypeInfoPtr, vlenDim);
+  }
+  return params;
 }
 
-NDArrayParameters::NDArrayParameters(std::string elemName, ElemType elemType,
-                                     unsigned sizeBytes, unsigned dim, bool isConstElem) 
-  : m_elemName(elemName), m_elemType(elemType),
-    m_sizeBytes(sizeBytes), m_dim(dim), m_isConstElem(isConstElem) 
+string Translator::ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr,
+                     enum psddl_hdf2psana::NDArrayParameters::VlenDim vlenDim) 
 {
-}
+  // check cache
+  boost::shared_ptr<const psddl_hdf2psana::NDArrayParameters> params = 
+    find(ndarrayTypeInfoPtr, vlenDim);
+  
+  if (not params) {
+    params = addNDArrayToParamMap(ndarrayTypeInfoPtr, vlenDim);
+  }
+  if (not params) return "";
 
-boost::shared_ptr<const NDArrayParameters> 
-Translator::ndarrayParameters(const std::type_info *ndarrayTypeInfoPtr) {
-  NDArrayParamMap::iterator pos;
-  pos = ::paramMap.find(ndarrayTypeInfoPtr);
-  if (pos == ::paramMap.end()) {
-    return ::addNDArrayToParamMap(ndarrayTypeInfoPtr);
-  }
-  return pos->second;
-}
-
-string Translator::ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr, bool vlen) {
-  NDArrayParamMap::iterator pos;
-  pos = ::paramMap.find(ndarrayTypeInfoPtr);
-  if (pos == ::paramMap.end()) {
-    boost::shared_ptr<const NDArrayParameters> ptr = ::addNDArrayToParamMap(ndarrayTypeInfoPtr);
-    if (not ptr) return "";
-  }
-  pos = ::paramMap.find(ndarrayTypeInfoPtr);
-  if (pos == ::paramMap.end()) {
-    MsgLog(logger, error, "unexpected - successfully added " 
-           << PSEvt::TypeInfoUtils::typeInfoRealName(ndarrayTypeInfoPtr)
-           << " but not found");
-    return "";
-  }
-  const NDArrayParameters &params = *(pos->second);
   string groupName = "ndarray";  
-  if (params.isConstElem()) { groupName += "_const"; }
-  groupName += "_" + params.elemName();
-  groupName += boost::lexical_cast<string>(8*params.sizeBytes());
+  if (params->isConstElem()) { groupName += "_const"; }
+  groupName += "_" + params->elemName();
+  groupName += boost::lexical_cast<string>(8*(params->sizeBytes()));
   groupName += "_";
-  groupName += boost::lexical_cast<string>(params.dim());
-  if (vlen) groupName += "_vlen";
+  groupName += boost::lexical_cast<string>(params->dim());
+  if (params->isVlen()) groupName += "_vlen";
   return groupName;
 }
 

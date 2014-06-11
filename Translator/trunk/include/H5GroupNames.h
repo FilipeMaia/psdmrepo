@@ -121,10 +121,6 @@ class H5GroupNames {
   bool isNDArray(const std::type_info *typeInfoPtr) { 
     return m_ndarrays.find(typeInfoPtr) != m_ndarrays.end(); 
   }
-  /**
-   * @brief returns the string used to separate a src (or alias) from a key
-   */
-  std::string srcKeySep();
 
   /**
    * @brief returns the calibration key.

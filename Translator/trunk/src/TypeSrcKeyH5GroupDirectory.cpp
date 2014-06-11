@@ -4,6 +4,7 @@
 
 #include "ErrSvc/Issue.h"
 #include "MsgLogger/MsgLogger.h"
+#include "psddl_hdf2psana/SchemaConstants.h"
 #include "Translator/TypeSrcKeyH5GroupDirectory.h"
 #include "Translator/H5GroupNames.h"
 #include "Translator/hdf5util.h"
@@ -286,9 +287,9 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
-  srcH5Group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
-  srcH5Group.createAttr<const char *>("_eventKeyStr").store(key.c_str());
-  srcH5Group.createAttr<const char *>("_groupKeyStr").store(keyInName.c_str());
+  srcH5Group.createAttr<uint64_t>(psddl_hdf2psana::srcAttrName).store(srcVal);
+  srcH5Group.createAttr<const char *>(psddl_hdf2psana::eventKeyAttrName).store(key.c_str());
+  srcH5Group.createAttr<const char *>(psddl_hdf2psana::h5GroupNameKeyAttrName).store(keyInName.c_str());
   MsgLog(logger,trace,"addSrcKeyGroup " << srcKeyGroupName);
   return (srcKeyMap[ srcStrPair ] = SrcKeyGroup(srcH5Group,
                                                 eventKey,

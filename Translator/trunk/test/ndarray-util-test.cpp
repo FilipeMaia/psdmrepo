@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Test suite case for the NDArrayParams
+//	Test suite case for the NDArrayUtils
 //
 //------------------------------------------------------------------------
 
@@ -14,13 +14,14 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "Translator/NDArrayParams.h"
+#include "psddl_hdf2psana/NDArrayConverter.h"
+#include "Translator/NDArrayUtil.h"
 #include "ndarray/ndarray.h"
 
 using namespace std ;
 using namespace Translator ;
 
-#define BOOST_TEST_MODULE ndarray-params-unit-test
+#define BOOST_TEST_MODULE ndarray-utils-unit-test
 #include <boost/test/included/unit_test.hpp>
 
 /**
@@ -35,7 +36,7 @@ public:
   }
 };
 
-BOOST_FIXTURE_TEST_SUITE( NDArrayParamsTest, TestFixture );
+BOOST_FIXTURE_TEST_SUITE( NDArrayUtilsTest, TestFixture );
 
 // ==============================================================
 
@@ -75,7 +76,7 @@ BOOST_AUTO_TEST_CASE( test )
     TypeName & typeName = typesNamesList[idx];
     const type_info *typePtr = typeName.first;
     const string & expectedGroupName = typeName.second;
-    BOOST_CHECK_EQUAL( ndarrayGroupName(typePtr), expectedGroupName );
+    BOOST_CHECK_EQUAL( ndarrayGroupName(typePtr, psddl_hdf2psana::NDArrayParameters::SlowDimNotVlen), expectedGroupName );
   }
 
   typesNamesList.clear();
@@ -112,7 +113,7 @@ BOOST_AUTO_TEST_CASE( test )
     TypeName & typeName = typesNamesList[idx];
     const type_info *typePtr = typeName.first;
     const string & expectedGroupName = typeName.second;
-    BOOST_CHECK_EQUAL( ndarrayGroupName(typePtr, true), expectedGroupName );
+    BOOST_CHECK_EQUAL( ndarrayGroupName(typePtr, psddl_hdf2psana::NDArrayParameters::SlowDimIsVlen), expectedGroupName );
   }
 }
 

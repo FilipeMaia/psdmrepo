@@ -16,6 +16,7 @@ import subprocess as sb
 import collections
 import math
 import numpy as np
+import psana
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -149,8 +150,12 @@ class H5Output( unittest.TestCase ) :
         """
         pass
 
-    def runPsanaOnCfg(self,cfgfile,output_h5,extraOpts='',printPsanaOutput=False, errorCheck=True):
-        '''Runs psana on the given cfgfile, to produce the given h5output file.
+    def runPsanaOnCfg(self,cfgfile,output_h5=None,extraOpts='',printPsanaOutput=False, errorCheck=True):
+        '''Runs psana on the given cfgfile and tests output for errors.
+        Optionally specify an output hdf5 file. If the hdf5 file is given, this functions
+        deletes the file if it already exists and tests to make sure that is was
+        created after the psana run.
+
         extraOpts are passed to psana on the command line.
         
         tests that output_h5 is created.
@@ -158,28 +163,29 @@ class H5Output( unittest.TestCase ) :
         If errorCheck is True it tests that psana output does not include: fatal, error,
                         segmentation fault, seg falut, traceback
 
-        returns the output of psana
         '''
-        if os.path.exists(output_h5):
+        if output_h5 is not None and os.path.exists(output_h5):
             os.unlink(output_h5)
         cfgfile.flush()
         assert isinstance(extraOpts,str), "extraOpts for psana command line is %r, not a str" % extraOpts
         psana_cmd = "psana %s -c %s" % (extraOpts,cfgfile.name)
         p = sb.Popen(psana_cmd,shell=True,stdout=sb.PIPE, stderr=sb.PIPE)
         o,e = p.communicate()
-        if not os.path.exists(output_h5):
+        if (output_h5 is not None) and (not os.path.exists(output_h5)):
             print "### h5 file was not created. cfg file: ###"
             print file(cfgfile.name).read()
             print "### psana output: ###"
             print o
             print e
-        self.assertEqual(os.path.exists(output_h5),True)
+        if (output_h5 is not None):
+            self.assertTrue(os.path.exists(output_h5),msg="h5 output file: %s not produced" % output_h5)
         allOutPut = o+'\n'+e
         if printPsanaOutput:
             print allOutPut
             sys.stdout.flush()
-            print "*** Running h5ls -r on output_h5 (%s)"% output_h5
-            os.system('h5ls -r %s | grep -v -i epics' % output_h5)
+            if (output_h5 is not None):
+                print "*** Running h5ls -r on output_h5 (%s)"% output_h5
+                os.system('h5ls -r %s | grep -v -i epics' % output_h5)
         if not errorCheck:
             return allOutPut
         lowerOutput = allOutPut.lower()
@@ -658,11 +664,14 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
         
-    def test_ndarrays_allWrittenToFile(self):
-        '''check that all ndarrays and strings written to the file
+    def test_ndarraysWriteRead(self):
+        '''check that all ndarrays and strings written to the file.
+        We test both the writing of the ndarrays to the hdf5 file, and then
+        the reading back using psana. The latter should be a test of the
+        psddl_hdf2psana package, but we do it here for convenience.
         '''
         input_file = TESTDATA_T1
-        output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
+        output_h5 = os.path.join(OUTDIR,'unit_test_ndarraysWriteRead.h5')
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
 
         cfgfile.file.flush()
@@ -698,7 +707,7 @@ class H5Output( unittest.TestCase ) :
                 expectedValue = 1+entry
                 if dims == 1:
                     expectedShape = (dim0,)
-                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                    self.assertEqual(expectedShape, ndarray.shape, msg="H5OUT: shape not equal, expected=%s found=%s ds=%s" % \
                                      (expectedShape, ndarray.shape, ds.name))
                     for i in range(dim0):
                         self.assertAlmostEqual(expectedValue, ndarray[i], delta=1e-6, msg="not equal, expected = %r found=%r index=%d ds=ndarray%s" % \
@@ -706,7 +715,7 @@ class H5Output( unittest.TestCase ) :
                         expectedValue += 1
                 elif dims == 2:
                     expectedShape = (dim0,2)
-                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                    self.assertEqual(expectedShape, ndarray.shape, msg="H5OUT: shape not equal, expected=%s found=%s ds=%s" % \
                                      (expectedShape, ndarray.shape, ds.name))
                     for i in range(dim0):
                         for j in range(2):
@@ -715,23 +724,79 @@ class H5Output( unittest.TestCase ) :
                             expectedValue += 1
                 elif dims == 3:
                     expectedShape = (dim0,2,2)
-                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                    self.assertEqual(expectedShape, ndarray.shape, msg="H5OUT: shape not equal, expected=%s found=%s ds=%s" % \
                                      (expectedShape, ndarray.shape, ds.name))
                     for i in range(dim0):
                         for j in range(2):
                             for k in range(2):
-                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d,%d] ds=ndarray%s" % \
+                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="H5OUT: not equal, expected = %r found=%r index=[%d,%d,%d] ds=ndarray%s" % \
                                                        (expectedValue, ndarray[i,j,k], i,j,k,ds.name.split('ndarray')[1]))
                                 expectedValue += 1
+                                
+        f.close()
 
+        # check that psana can read the arrays:
+        psana.setConfigFile('')
+        ds = psana.DataSource(output_h5)
+        keyStr2PsanaType = { 'my_int1D': (psana.ndarray_int32_1,1),
+                             'cmy_int1D':(psana.ndarray_int32_1,1),
+                             'my_uint1D':(psana.ndarray_uint32_1,1),
+                             'cmy_uint1D':(psana.ndarray_uint32_1,1),
+                             'my_float2Da':(psana.ndarray_float32_2,2),
+                             'my_float2Db':(psana.ndarray_float32_2,2),
+                            'cmy_float2Da':(psana.ndarray_float32_2,2),
+                             'cmy_float2Db':(psana.ndarray_float32_2,2),
+                             'my_double3D':(psana.ndarray_float64_3,3),
+                             'cmy_double3D':(psana.ndarray_float64_3,3) }
+        for eventNumber, evt in enumerate(ds.events()):
+            for keyStr, psanaTypeAndDim in keyStr2PsanaType.iteritems():
+                psanaType, dims = psanaTypeAndDim
+                ndarray = evt.get(psanaType,keyStr)
+                self.assertFalse(ndarray is None, 
+                                 msg="H5IN: ndarray for key=%s psanaType=%s is None" % (keyStr, psanaType))
+                dim0 = 2
+                expectedValue = 1+eventNumber
+                if dims == 1:
+                    expectedShape = (dim0,)
+                    self.assertEqual(expectedShape, ndarray.shape, 
+                                     msg="H5IN: shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        self.assertAlmostEqual(expectedValue, ndarray[i], delta=1e-6, 
+                                               msg="H5IN: not equal, expected = %r found=%r index=%d keyStr=%s" % \
+                                               (expectedValue, ndarray[i], i, keyStr))
+                        expectedValue += 1
+                elif dims == 2:
+                    expectedShape = (dim0,2)
+                    self.assertEqual(expectedShape, ndarray.shape, 
+                                     msg="H5IN: shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        for j in range(2):
+                            self.assertAlmostEqual(expectedValue, ndarray[i,j], delta=1e-6, 
+                                                   msg="not equal, expected = %r found=%r index=[%d,%d] key=%s" % \
+                                                       (expectedValue, ndarray[i,j], i,j,keyStr))
+                            expectedValue += 1
+                elif dims == 3:
+                    expectedShape = (dim0,2,2)
+                    self.assertEqual(expectedShape, ndarray.shape, 
+                                     msg="H5IN: shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        for j in range(2):
+                            for k in range(2):
+                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, 
+                                                       msg="not equal, expected = %r found=%r index=[%d,%d,%d] keyStr=%s" % \
+                                                       (expectedValue, ndarray[i,j,k], i,j,k,keyStr))
+                                expectedValue += 1
         if self.cleanUp:
             os.unlink(output_h5)
 
-    def test_vlen_ndarrays_allWrittenToFile(self):
-        '''check that vlen ndarrays are written to the file
+    def test_vlenNdarraysWriteRead(self):
+        '''check that vlen ndarrays are written to the file, and then read back from the file
         '''
         input_file = TESTDATA_T1
-        output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
+        output_h5 = os.path.join(OUTDIR,'unit_test_vlenNdarraysWriteRead.h5')
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         cfgfile.file.write("[Translator.TestModuleNDArrayString]\n")
         cfgfile.file.write("vary_array_sizes=true\n")
@@ -786,6 +851,58 @@ class H5Output( unittest.TestCase ) :
                                 self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d,%d] ds=ndarray%s" % \
                                                        (expectedValue, ndarray[i,j,k], i,j,k,ds.name.split('ndarray')[1]))
                                 expectedValue += 1
+
+        f.close()
+
+        # check that psana can read the arrays:
+        psana.setConfigFile('')
+        ds = psana.DataSource(output_h5)
+        keyStr2PsanaType = { 'my_int1D': (psana.ndarray_int32_1,1),
+                             'cmy_int1D':(psana.ndarray_int32_1,1),
+                             'my_uint1D':(psana.ndarray_uint32_1,1),
+                             'cmy_uint1D':(psana.ndarray_uint32_1,1),
+                             'my_float2Da':(psana.ndarray_float32_2,2),
+                             'my_float2Db':(psana.ndarray_float32_2,2),
+                            'cmy_float2Da':(psana.ndarray_float32_2,2),
+                             'cmy_float2Db':(psana.ndarray_float32_2,2),
+                             'my_double3D':(psana.ndarray_float64_3,3),
+                             'cmy_double3D':(psana.ndarray_float64_3,3) }
+        for eventNumber, evt in enumerate(ds.events()):
+            for keyStr, psanaTypeAndDim in keyStr2PsanaType.iteritems():
+                psanaType, dims = psanaTypeAndDim
+                ndarray = evt.get(psanaType,keyStr)
+                self.assertFalse(ndarray is None, 
+                                 msg="H5IN: ndarray for key=%s psanaType=%s is None" % (keyStr, psanaType))
+                dim0 = min(20,1+eventNumber+2)  # the expected variation in ndarray sizes
+                expectedValue = 1+eventNumber
+                if dims == 1:
+                    expectedShape = (dim0,)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        self.assertAlmostEqual(expectedValue, ndarray[i], delta=1e-6, msg="not equal, expected = %r found=%r index=%d key=%s" % \
+                                                       (expectedValue, ndarray[i], i, keyStr))
+                        expectedValue += 1
+                elif dims == 2:
+                    expectedShape = (dim0,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        for j in range(2):
+                            self.assertAlmostEqual(expectedValue, ndarray[i,j], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d] key=%s" % \
+                                                       (expectedValue, ndarray[i,j], i,j,keyStr))
+                            expectedValue += 1
+                elif dims == 3:
+                    expectedShape = (dim0,2,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s key=%s" % \
+                                     (expectedShape, ndarray.shape, keyStr))
+                    for i in range(dim0):
+                        for j in range(2):
+                            for k in range(2):
+                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d,%d] key=%s" % \
+                                                       (expectedValue, ndarray[i,j,k], i,j,k,keyStr))
+                                expectedValue += 1
+
         if self.cleanUp:
             os.unlink(output_h5)
 

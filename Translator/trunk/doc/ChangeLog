@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2014-06-10 David
+- refactor between this package and package psddl_hdf2psana
+  move NDArrayParameters into psddl_hdf2psana
+- extend two unit tests to read back fixed and vlen arrays into psana
+  tests psddl_hdf2psana V00-09-09
+
 Tag: V00-01-10
 2014-05-30 David
 - a unit test was not cleaning up after itself.
