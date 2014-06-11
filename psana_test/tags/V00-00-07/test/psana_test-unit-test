@@ -1,0 +1,17 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# Description:
+#   Test script for Translator/H5Output event processing
+#   
+#------------------------------------------------------------------------
+
+from psana_test.unitTests import *
+from psana_test.psanaTestLib import testCommand
+
+if __name__ == "__main__":
+    # run the long regression test
+    testCommand(["verbose=True"])
+
+    # now run the tests in unitTests, this routine does not return.
+    unittest.main(argv=[sys.argv[0], '-v'])
+
