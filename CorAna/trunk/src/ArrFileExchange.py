@@ -1,5 +1,6 @@
 #------------------------------------------------------------------------
 # File and Version Information:
+# $Id$
 #------------------------------------------------------------------------
 
 """Provides asynchronous exchange of ndarray between independent processes
