@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <stdlib.h>
 #include <boost/make_shared.hpp>
 #include <boost/algorithm/string.hpp>
 
@@ -26,6 +27,7 @@
 //-------------------------------
 #include "hdf5pp/NameIter.h"
 #include "hdf5pp/Utils.h"
+#include "hdf5pp/Exceptions.h"
 #include "MsgLogger/MsgLogger.h"
 #include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/DetInfo.hh"
@@ -161,27 +163,59 @@ namespace {
            << " vlen=" << ndarrayParams.isVlen());
   }
 
-  std::string getEventKey(const hdf5pp::Group & group) {
-    hdf5pp::Attribute<const char *> attr = group.openAttr<const char *>(h5GroupNameKeyAttrName);
-    if (attr.valid()) {
-      char value[1024];
-      const char *p = attr.read();
-      strncpy(value,p,1024);
-      return std::string(value);
+  std::string readH5stringAttribute(const std::string &attrName, const hid_t groupId, bool &success) {
+    success = false;
+    std::string toReturn;
+    htri_t rc = H5Aexists(groupId, attrName.c_str());
+    if ( rc < 0 ) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Aexists"); 
+    if ( rc > 0) {
+      hid_t attrId = H5Aopen (groupId, attrName.c_str(), H5P_DEFAULT);
+      if ( attrId < 0 ) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Aopen");
+      hid_t fileType = H5Aget_type(attrId);
+      H5T_class_t type_class = H5Tget_class(fileType);
+      if (type_class == H5T_STRING) {
+        if (true == H5Tis_variable_str(fileType)) {
+          hid_t memType = H5Tget_native_type(fileType, H5T_DIR_ASCEND);
+          if (memType < 0) throw hdf5pp::Hdf5CallException(ERR_LOC,"H5Tget_native_type");
+          hid_t attrDataSpace = H5Aget_space(attrId);
+          if (attrDataSpace < 0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Aget_space");
+          hssize_t size = H5Sget_simple_extent_npoints(attrDataSpace);
+          if (size == 1) {
+            char * stringData=NULL;
+            if (H5Aread(attrId, memType, &stringData) < 0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Aread");
+            toReturn = stringData;
+            free(stringData);
+          } else {
+            MsgLog(logger, warning, "readH5stringAttribute: dataspace size != 1, it is " << size);
+          }
+          if (H5Sclose(attrDataSpace)<0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Sclose");
+          if (H5Tclose(memType)<0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Tclose");
+        } else {
+          MsgLog(logger, warning, "readH5stringAttribute: non-variable length string. currently not supported");
+        }
+        if (H5Tclose(fileType)<0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Tclose");
+      }
+      if (H5Aclose(attrId)<0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Aclose");
     }
-    MsgLog(logger, warning,"getEventKey - attribute " << h5GroupNameKeyAttrName 
-           << " is not valid for group " << group.name());
-
-    // directly parse from group name
-    std::string key = group.name();
-    std::string::size_type p = key.rfind('/');
-    key.erase(0,p);
-    p = key.find(srcEventKeySeperator);
-    if (p == std::string::npos) return "";
-    key.erase(0,p+srcEventKeySeperator.size());
-    return key;
+    return toReturn;
   }
-  
+
+  std::string getEventKey(const hdf5pp::Group & group) {
+    bool success=false;
+    std::string eventKeyStr = readH5stringAttribute(h5GroupNameKeyAttrName, group.id(), success);
+    if (not success) {
+      // directly parse from group name
+      std::string key = group.name();
+      std::string::size_type p = key.rfind('/');
+      key.erase(0,p);
+      p = key.find(srcEventKeySeperator);
+      if (p == std::string::npos) return "";
+      key.erase(0,p+srcEventKeySeperator.size());
+      eventKeyStr = key;
+    }
+    return eventKeyStr;
+  }
+
 } // local namespace
 
 //		----------------------------------------

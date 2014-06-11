@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-10
+2014-06-11 David Schneider
+- switch to direct hdf5 calls to read string attribute
+  concerned prior code had memory bug with read in data
+	
 Tag: V00-09-09 
 2014-06-10 David Schneider
 - convert fixed and vlen ndarrays in hdf5 files into the event store.
