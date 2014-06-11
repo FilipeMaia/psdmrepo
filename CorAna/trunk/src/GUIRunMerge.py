@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -116,7 +116,7 @@ class GUIRunMerge ( QtGui.QWidget ) :
         """Makes the horizontal box with buttons"""
         self.but_run    = QtGui.QPushButton('Run') 
         self.but_status = QtGui.QPushButton('Status') 
-        self.but_brow   = QtGui.QPushButton('Browse') 
+        self.but_brow   = QtGui.QPushButton('View') 
         self.but_remove = QtGui.QPushButton('Remove files') 
 
         self.hboxB = QtGui.QHBoxLayout()

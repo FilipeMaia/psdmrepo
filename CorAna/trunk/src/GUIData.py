@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -76,7 +76,7 @@ class GUIData ( QtGui.QWidget ) :
         self.but_path   = QtGui.QPushButton('File:')
         self.but_plot   = QtGui.QPushButton('img-Plot')
         self.but_tspl   = QtGui.QPushButton('t-Plot')
-        self.but_brow   = QtGui.QPushButton('Browse')
+        self.but_brow   = QtGui.QPushButton('View')
         self.but_scan   = QtGui.QPushButton('Scan')
         self.but_aver   = QtGui.QPushButton('Average')
         self.but_status = QtGui.QPushButton('Check status')
@@ -162,7 +162,7 @@ class GUIData ( QtGui.QWidget ) :
         self.but_path  .setToolTip('Push this button and select the xtc data file')
         self.but_plot  .setToolTip('Plot image and spectrum for averaged data image')
         self.but_tspl  .setToolTip('Plot for time stamps quality check')
-        self.but_brow  .setToolTip('Browse files for this procedure')
+        self.but_brow  .setToolTip('View files for this procedure')
         self.but_scan  .setToolTip('Scan entire run and \n1) count number of events' + \
                                    '\n2) save time stamps' + \
                                    '\n3) save intensity monitors')

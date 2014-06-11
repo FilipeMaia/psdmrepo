@@ -23,7 +23,7 @@ part of it, please give an appropriate acknowledgement.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 8 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -56,7 +56,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.edi_path.setReadOnly( True )   
         self.but_path = QtGui.QPushButton('File:')
         self.but_plot = QtGui.QPushButton('Plot')
-        self.but_brow = QtGui.QPushButton('Browse')
+        self.but_brow = QtGui.QPushButton('View')
         self.but_med  = QtGui.QPushButton('Mask Editor')
 
         self.grid = QtGui.QGridLayout()
@@ -89,7 +89,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.edi_path   .setToolTip('The path to the blemish mask file')
         self.but_path   .setToolTip('Push this button and select the blemish mask file')
         self.but_plot   .setToolTip('Plot image and spectrum for blemish file')
-        self.but_brow   .setToolTip('Browse blemish file')
+        self.but_brow   .setToolTip('View blemish file')
         self.but_med    .setToolTip('Launch Mask Editor')
         self.cbx_use    .setToolTip('Check box \nto set and use \nblemish mask correction')
         

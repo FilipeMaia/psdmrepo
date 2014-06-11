@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -53,7 +53,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         
         self.titFile     = QtGui.QLabel('File with configuration parameters:')
         self.titPars     = QtGui.QLabel('Operations on configuration parameters:')
-        self.butBrowse   = QtGui.QPushButton("Browse")
+        self.butBrowse   = QtGui.QPushButton("View")
         self.butRead     = QtGui.QPushButton("Read")
         self.butWrite    = QtGui.QPushButton("Save")
         self.butDefault  = QtGui.QPushButton("Reset default")
@@ -92,7 +92,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
-        self.fnameEdit .setToolTip('Type the file path name here,\nor better use "Browse" button.')
+        self.fnameEdit .setToolTip('Type the file path name here,\nor better use "View" button.')
         self.butBrowse .setToolTip('Select the file path name\nto read/write the configuration parameters.')
         self.butRead   .setToolTip('Read the configuration parameters from file.')
         self.butWrite  .setToolTip('Save (write) the configuration parameters in file.')

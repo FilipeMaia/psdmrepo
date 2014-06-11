@@ -20,7 +20,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -81,7 +81,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.widgimage = widgimage
 
 
-        if widgimage != None :
+        if self.widgimage != None :
             self.fig        = self.widgimage.fig
             self.axes       = self.widgimage.get_axim()
 
@@ -97,19 +97,26 @@ class MaskEditorButtons (QtGui.QWidget) :
             #self.set_centers    = DragObjectSet(self.fig, self.axes, DragCenter,    useKeyboard=False, lw=lw, col=col, picker=picker, is_single_obj=True)
             self.set_polygons   = DragObjectSet(self.fig, self.axes, DragPolygon,   useKeyboard=False, lw=lw, col=col, picker=picker)
             self.disconnect_all()
+
+        else :              # for self-testing mode only
+            self.fig = self # in order to get rid of crash... 
+
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
         self.list_of_forms   = ['Rectangle', 'Wedge', 'Circle', 'Line', 'Polygon'] #, 'Center'] 
-        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms']
+        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms', 'Quick Load', 'Quick Save']
         self.list_of_io_tips = ['Load image for \ndisplay from file',
                                 'Load forms of masked \nregions from file',
                                 'Save forms of masked \nregions in text file',
                                 'Save mask as a 2D array \nof ones and zeros in text file',
                                 'Save inversed-mask as a 2D array\n of ones and zeros in text file',
                                 'Prints parameters of \ncurrently entered forms',
-                                'Clear all forms from the image']
+                                'Clear all forms from the image',
+                                'Load image from file with pre-defined name',
+                                'Save mask in file with pre-defined name'
+                                ]
 
-        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None]
+        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None, self.mfname_img, self.mfname_mask]
 
         zoom_tip_msg = 'Zoom mode for image and spactrom.' + \
                        '\nZoom-in image: left mouse button click-drug-release.' + \
@@ -486,6 +493,33 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.setStatus(0, 'Forms\nremoved')
 
 
+        if but_text == self.list_of_io_tits[7] : # 'Quick Load Img'
+            path = path0
+            if not os.path.isfile(path) :
+                self.setStatus(2,'File is \nunavailable')
+                return
+            self.setStatus(2, 'WAIT!\nLoad image')
+            arr = gu.get_array_from_file(path)             
+            self.parent.set_image_array_new(arr, title='Image from '+path )
+            self.setStatus(0, 'Image \nloaded')
+
+
+        if but_text == self.list_of_io_tits[8] : # 'Quick Save Mask'
+            if self.list_of_objs_for_mask_is_empty() : return
+            self.setStatus(2, 'WAIT!\nMask is\nprocessing')
+            self.enforceStatusRepaint()
+            #print 'WAIT for mask processing'
+            mask_total = self.get_mask_total()
+            self.parent.set_image_array_new(mask_total, title='Mask')
+            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            path = path0
+            if path == None :
+                self.setStatus(2,'File name\nis undefined')
+                return
+            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+            self.setStatus(0, 'Mask\nis saved')
+
+
     def get_mask_total(self):       
         shape = self.widgimage.get_img_shape()
         if self.verb : print 'get_img_shape():', shape
@@ -568,7 +602,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             if self.current_form != None : self.stat_msg += '\n' + str(self.current_form)
             self.stat_ind = 0
 
-            if   self.fig.my_mode == 'Zoom' and self.current_form != None :
+            if self.fig.my_mode == 'Zoom' and self.current_form != None :
                 self.stat_ind = 2
                 self.stat_msg = 'What to do\nwith\n' + self.current_form + '?'
 
@@ -601,7 +635,6 @@ class MaskEditorButtons (QtGui.QWidget) :
 def main():
 
     app = QtGui.QApplication(sys.argv)
-
     w = MaskEditorButtons(None)
     w.move(QtCore.QPoint(50,50))
     w.show()
@@ -613,5 +646,6 @@ def main():
 #
 if __name__ == "__main__" :
     main()
+    sys.exit ('Exit test')
 
 #-----------------------------

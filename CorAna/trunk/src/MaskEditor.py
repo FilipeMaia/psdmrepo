@@ -22,7 +22,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -85,7 +85,7 @@ class MaskEditor (QtGui.QWidget) :
         self.setFrame()
 
         if      arr != None : self.arr = arr
-        elif ifname != ''   : self.arr = gu.get_array_from_file(ifname)
+        elif ifname != ''   : self.arr = gu.get_image_array_from_file(ifname)
         else                : self.arr = get_array2d_for_test()
 
         if self.arr == None : self.arr = get_array2d_for_test()

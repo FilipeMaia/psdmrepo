@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -60,7 +60,7 @@ class GUIListOfTau ( QtGui.QWidget ) :
         if cp.ana_tau_list_type.value() == self.list_tau_options[1] : self.rad_tau_list_file.setChecked(True)
 
         self.but_file          = QtGui.QPushButton('File:')
-        self.but_brow          = QtGui.QPushButton('Browse/Edit')
+        self.but_brow          = QtGui.QPushButton('View/Edit')
         self.but_reset         = QtGui.QPushButton('Reset')
         self.edi_tau_list_file = QtGui.QLineEdit( fnm.path_tau_list() )       
         self.edi_tau_list_file.setReadOnly( True )  

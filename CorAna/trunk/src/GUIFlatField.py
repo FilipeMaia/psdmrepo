@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -56,7 +56,7 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.edi_path.setReadOnly( True )   
         self.but_path = QtGui.QPushButton('File:')
         self.but_plot = QtGui.QPushButton('Plot')
-        self.but_brow = QtGui.QPushButton('Browse')
+        self.but_brow = QtGui.QPushButton('View')
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
@@ -86,7 +86,7 @@ class GUIFlatField ( QtGui.QWidget ) :
         self.edi_path   .setToolTip('The path to the flat field correction file')
         self.but_path   .setToolTip('Push this button and select the flat field correction file')
         self.but_plot   .setToolTip('Plot image and spectrum for flat field file')
-        self.but_brow   .setToolTip('Browse flat field file')
+        self.but_brow   .setToolTip('View flat field file')
         self.cbx_use    .setToolTip('Check box \nto set and use \nflat field correction')
         
     def setFrame(self):

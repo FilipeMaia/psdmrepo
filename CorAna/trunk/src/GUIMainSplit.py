@@ -15,7 +15,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id:$
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
@@ -24,7 +24,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -87,7 +87,7 @@ class GUIMainSplit ( QtGui.QWidget ) :
         self.butStop        = QtGui.QPushButton('Stop')
         self.butSave        = QtGui.QPushButton('Save')
         self.butExit        = QtGui.QPushButton('Exit')
-        self.butFBrowser    = QtGui.QPushButton('File Browser')
+        self.butFBrowser    = QtGui.QPushButton('File Viewer')
         #self.butLogger      = QtGui.QPushButton('Logger')
 
         self.hboxW = QtGui.QHBoxLayout() 

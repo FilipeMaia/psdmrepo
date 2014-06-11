@@ -13,7 +13,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -65,9 +65,10 @@ class ThreadWorker (QtCore.QThread) :
         #fstatus, fstatus_str = bjcora.status_for_cora_split_files()
         #status_str = bstatus_str + '   ' + fstatus_str
         #status_str = bstatus_str
-        self.emit( QtCore.SIGNAL('update(QString)'), \
-                   'from work thread ' + str(self.thread_id) +\
-                   '  check counter: ' + str(self.counter) )
+        if not QtCore is None :
+            self.emit( QtCore.SIGNAL('update(QString)'), \
+                       'from work thread ' + str(self.thread_id) +\
+                       '  check counter: ' + str(self.counter) )
         #print status_str
 
 

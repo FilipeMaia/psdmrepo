@@ -23,7 +23,7 @@ part of it, please give an appropriate acknowledgement.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 8 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -49,7 +49,7 @@ from PyQt4 import QtGui, QtCore
 def input_options_parser() :
 
     parser = OptionParser(description='Optional input parameters.', usage ='usage: %prog [options] args')
-    parser.add_option('-i', '--fname_img',   dest='ifname',  default='',           action='store', type='string', help='input image file name')
+    parser.add_option('-i', '--fname_img',   dest='ifname',  default='./img-roi',  action='store', type='string', help='input image file name')
     parser.add_option('-o', '--fname_fig',   dest='ofname',  default='./fig.png',  action='store', type='string', help='output png file name for current canvas')
     parser.add_option('-m', '--path_mask',   dest='mfname',  default='./mask-roi', action='store', type='string', help='common path to I/O files with mask')
     parser.add_option('-t', '--title',       dest='title',   default='Mask editor',action='store', type='string', help='initial title of the garphical window')
@@ -90,7 +90,7 @@ if __name__ == "__main__" :
             'picker' : opts.picker,
             'verb'   : opts.verb,
             'ccd_rot': None, 
-            'updown' : None}
+            'updown' : False}
 
     print 'Start MaskEditor with input parameters:'
     for k,v in pars.items():

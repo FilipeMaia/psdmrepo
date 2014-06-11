@@ -15,7 +15,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id:$
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
@@ -24,7 +24,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -94,7 +94,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butFile        = QtGui.QPushButton(u'GUI \u2192 &File')
         self.butELog        = QtGui.QPushButton(u'GUI \u2192 &ELog')
         self.butLogger      = QtGui.QPushButton('Logger')
-        self.butFBrowser    = QtGui.QPushButton('File Browser')
+        self.butFBrowser    = QtGui.QPushButton('File Viewer')
 
         self.butELog    .setIcon(cp.icon_mail_forward)
         self.butFile    .setIcon(cp.icon_save)
@@ -201,7 +201,7 @@ class GUIMainTB ( QtGui.QWidget ) :
         self.butELog.setToolTip('1. Save current GUI image in PNG file\n'\
                                 '2. Submit PNG file with msg in ELog')
         self.butLogger.setToolTip('On/Off logger widow')
-        self.butFBrowser.setToolTip('On/Off file browser')
+        self.butFBrowser.setToolTip('On/Off file viewer')
         #self.butStop.setToolTip('Not implemented yet...')
 
 

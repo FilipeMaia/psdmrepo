@@ -12,7 +12,7 @@
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@version $Id: template!python!py 4 2008-10-08 19:27:36Z salnikov $
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
@@ -20,7 +20,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -50,6 +50,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
     #@see OtherClass Parameters
     """
 
+    list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000']
     list_pars = []
 
     def __init__ ( self, fname=None ) :
@@ -75,6 +76,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         #self.plotimgspe      = None
         self.plotimgspe_g    = None
+
+        self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
+        
 
 #-----------------------------
 
@@ -273,6 +277,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         #self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(XcsBeamline.0:Princeton.0)', type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
+        self.detector          = self.declareParameter( name='DETECTOR',              val_def=self.list_of_dets[2], type='str' )
 
         # BatchLogParser.py
         self.bat_img_rows      = self.declareParameter( name='BATCH_IMG_ROWS',      val_def= 1300,       type='int' )

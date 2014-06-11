@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -61,7 +61,14 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         else                                                           : self.rad_thickness_nonorm.setChecked(True)
 
         self.char_expand         = u' \u25BE' # down-head triangle
+        self.tit_detector   = QtGui.QLabel('Detector:')
         self.tit_bat_queue  = QtGui.QLabel('Queue:')
+
+        self.list_of_dets   = cp.list_of_dets 
+        self.box_detector   = QtGui.QComboBox( self ) 
+        self.box_detector .addItems(self.list_of_dets)
+        self.box_detector .setCurrentIndex( self.list_of_dets.index(cp.detector.value()) )
+
         self.list_of_queues = ['psnehq','psfehq','psanacsq'] 
         self.box_bat_queue  = QtGui.QComboBox( self ) 
         self.box_bat_queue.addItems(self.list_of_queues)
@@ -76,8 +83,10 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.grid.addWidget(self.rad_thickness_attlen, self.grid_row+4, 1, 1, 3)
         self.grid.addWidget(self.edi_thickness_sample, self.grid_row+3, 4)
         self.grid.addWidget(self.edi_thickness_attlen, self.grid_row+4, 4)
-        self.grid.addWidget(self.tit_bat_queue,        self.grid_row+6, 0, 1, 2)
-        self.grid.addWidget(self.box_bat_queue,        self.grid_row+6, 2, 1, 2)
+        self.grid.addWidget(self.tit_detector,         self.grid_row+6, 0, 1, 2)
+        self.grid.addWidget(self.box_detector,         self.grid_row+6, 2, 1, 2)
+        self.grid.addWidget(self.tit_bat_queue,        self.grid_row+7, 0, 1, 2)
+        self.grid.addWidget(self.box_bat_queue,        self.grid_row+7, 2, 1, 2)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -92,6 +101,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.connect(self.edi_thickness_sample, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_thickness_attlen, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.box_bat_queue,        QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_bat_queue )
+        self.connect(self.box_detector,         QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_detector )
 
         self.showToolTips()
         self.setStyle()
@@ -103,6 +113,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
     def showToolTips(self):
         self.setToolTip('Right pannel of the System Settings GUI')
         self.box_bat_queue.setToolTip('Select the batch queue')
+        self.box_bat_queue.setToolTip('Select the detector type')
 
 
     def setFrame(self):
@@ -133,9 +144,12 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         self.rad_thickness_sample.setStyleSheet(cp.styleLabel)
         self.rad_thickness_attlen.setStyleSheet(cp.styleLabel)
 
+        self.tit_detector        .setStyleSheet(cp.styleTitle)
         self.tit_bat_queue       .setStyleSheet(cp.styleTitle)
+        self.tit_detector        .setAlignment (QtCore.Qt.AlignLeft)
         self.tit_bat_queue       .setAlignment (QtCore.Qt.AlignLeft)
         self.box_bat_queue       .setStyleSheet(cp.styleButton)
+        self.box_detector        .setStyleSheet(cp.styleButton)
 
 
     def setParent(self,parent) :
@@ -193,6 +207,11 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
         queue_selected = self.box_bat_queue.currentText()
         cp.bat_queue.setValue( queue_selected ) 
         logger.info('on_box_bat_queue - queue_selected: ' + queue_selected, __name__)
+
+    def on_box_detector(self):
+        selected = self.box_detector.currentText()
+        cp.detector.setValue( selected ) 
+        logger.info('on_box_detector - selected: ' + selected, __name__)
 
 #-----------------------------
 

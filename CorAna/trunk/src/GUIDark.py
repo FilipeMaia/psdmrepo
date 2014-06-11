@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -75,7 +75,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status  = QtGui.QPushButton('Check status')
         self.but_aver    = QtGui.QPushButton('Pedestal')
         self.but_scan    = QtGui.QPushButton('Scanner')
-        self.but_browse  = QtGui.QPushButton('Browse')
+        self.but_browse  = QtGui.QPushButton('View')
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
 
@@ -149,7 +149,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_status .setToolTip('Print batch job status \nin the logger')
         self.but_aver   .setToolTip('Submit job in batch for dark run \nand produces files with:\n1) pedestals \n2) RMS \n3) hot-pixel mask')
         self.but_scan   .setToolTip('Submit job in batch for dark run scanner, \ncounts number of events in the file,\n and average time interval between events')
-        self.but_browse .setToolTip('Browse files for this GUI')
+        self.but_browse .setToolTip('View files for this GUI')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
         self.cbx_dark   .setToolTip('Check this box \nto process and use \ndark run correction')

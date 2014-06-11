@@ -12,7 +12,7 @@
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
@@ -99,7 +99,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
         #self.tit_sys_ram_size.setToolTip(msg)
         self.but_run   .setToolTip('Submit batch job')  
         self.but_status.setToolTip('Update status info.\nStatus is self-updated by timer')
-        self.but_brow  .setToolTip('Open/close file browser')
+        self.but_brow  .setToolTip('Open/close file viewer')
         self.but_remove.setToolTip('Remove output files')
 
 
@@ -116,7 +116,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
         """Makes the horizontal box with buttons"""
         self.but_run    = QtGui.QPushButton('Run') 
         self.but_status = QtGui.QPushButton('Status') 
-        self.but_brow   = QtGui.QPushButton('Browse') 
+        self.but_brow   = QtGui.QPushButton('View') 
         self.but_remove = QtGui.QPushButton('Remove files') 
 
         self.hboxB = QtGui.QHBoxLayout()
