@@ -222,6 +222,7 @@ class Psana( unittest.TestCase ) :
                        'event0stamp':(742173122, 724943000),
                        'alias': 'DG3 Spectrometer-CXI:DG3:PIC:01.RBV'}
         # test xtc
+        psana.setConfigFile('')
         dsXtc = psana.DataSource(TEST_10)
         estore = dsXtc.env().epicsStore()
         # the alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' to the pv 'CXI:SC2:MZM:10:ENCPOSITIONGET'
@@ -274,6 +275,7 @@ class Psana( unittest.TestCase ) :
         del estore
         del dsXtc
         
+        psana.setConfigFile('')
         dsH5 = psana.DataSource(h5_outfile) 
         estore = dsH5.env().epicsStore()
         # check expected number of aliases and pvNames, have not verified that they are all correct, 193 and 227

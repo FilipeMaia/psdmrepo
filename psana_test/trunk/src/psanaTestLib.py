@@ -195,7 +195,7 @@ def psanaDump(infile, outfile, events=None, dumpEpicsAliases=False, regressDump=
     if not dumpEpicsAliases:
         epicAliasStr = '-o psana_test.dump.aliases=False'
     regressDumpStr = '-o psana_test.dump.regress_dump=%r' % regressDump
-    cmd = 'psana %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, infile)
+    cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, infile)
     if verbose: print cmd
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()
@@ -306,7 +306,7 @@ def getPsanaTypes(datasource, numEvents=160):
     else:
         numStr='-n %d' % numEvents
         timeOut = numEvents
-    cmd = 'psana %s -m EventKeys %s | grep type=Psana | sort | uniq' % (numStr, datasource,)
+    cmd = 'psana  -c "" %s -m EventKeys %s | grep type=Psana | sort | uniq' % (numStr, datasource,)
     o,e = cmdTimeOut(cmd, timeOut)    
     nonWarnings = [ ln for ln in e.split('\n') if not filterPsanaStderr(ln) ]
     if len(nonWarnings)>0:

@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2014-06-10 David Schneider
+- unit tests, make sure command line calls to psana don't accidentally
+  pick up a default psana.cfg file
+
 Tag: V00-00-06
 2014-06-10 David Schneider
 - fix bug with dumping ndarrays
