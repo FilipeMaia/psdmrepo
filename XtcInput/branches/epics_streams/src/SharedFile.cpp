@@ -104,8 +104,14 @@ SharedFile::read(char* buf, size_t size)
           MsgLog(logger, debug, "Live EOF detected");
           break;
         }
-        MsgLog(logger, debug, "Sleep for 1 sec while waiting for more data from file: " << m_impl->path);
-        sleep(1);
+        sleep(1); 
+        struct stat buf;
+        int f_stat = fstat(m_impl->fd, &buf);
+        if ( f_stat == -1 ) {
+          MsgLog(logger, warning, "fstat failed for " << m_impl->path);   
+        } else {
+          MsgLog(logger, debug, "Slept for 1 sec while waiting for more data from file: " << m_impl->path << " size " << buf.st_size);
+        }
       } else {
         // non-live mode, just return what we read so far
         break;

@@ -67,4 +67,12 @@ Dgram::copy(Pds::Dgram* dg)
   return ptr((Pds::Dgram*)buf, &destroy);
 }
 
+bool Dgram::operator< (const Dgram& other) const {
+  // a workaround for the fact that pdsdata clocktime doesn't
+  // implement operator<.
+  if (m_dg->seq.clock() > other.m_dg->seq.clock()) return 0;
+  if (m_dg->seq.clock() == other.m_dg->seq.clock()) return 0;
+  return 1;
+}
+
 } // namespace XtcInput

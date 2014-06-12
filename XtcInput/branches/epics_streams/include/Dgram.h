@@ -78,6 +78,8 @@ public:
 
   bool empty() const { return not m_dg.get(); }
   
+  bool operator< (const Dgram&) const; 
+
 private:
   
   /**
