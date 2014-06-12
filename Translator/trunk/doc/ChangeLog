@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-12
+2014-06-12 David
+- add psana config file to be used during automatic translation
+
 Tag: V00-01-11
 2014-06-10 David
 - refactor between this package and package psddl_hdf2psana
