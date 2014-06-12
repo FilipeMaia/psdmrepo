@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2014-06-12 Mikhail S. Dubrovin
+- integrate ArrFileExchange with src/MaskEditor.py	
+- in app/med add option -f for file exchange mode
+- change src/MaskEditorButtons.py for file exchange mode
+	
 Tag: V00-00-18
 2014-06-10 Mikhail S. Dubrovin
 - add ArrFileExchange.py for ndarray-via-file exchange between processes

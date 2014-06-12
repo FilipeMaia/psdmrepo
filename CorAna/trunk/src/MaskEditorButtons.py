@@ -39,6 +39,7 @@ from Logger                 import logger
 #from FileNameManager        import fnm
 from ConfigParametersCorAna import confpars as cp
 import GlobalUtils          as     gu
+from CorAna.ArrFileExchange import *
 
 from DragWedge     import *
 from DragLine      import *
@@ -61,15 +62,18 @@ class MaskEditorButtons (QtGui.QWidget) :
     #----------------
 
     def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', \
-                 xyc=None, lw=2, col='b', picker=5, verb=False, ccd_rot_n90=0, y_is_flip=False):
+                 xyc=None, lw=2, col='b', picker=5, verb=False, ccd_rot_n90=0, y_is_flip=False, fexmod=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
         self.setFrame()
 
         self.parent      = parent
+        self.ifname      = ifname
         self.ofname      = ofname
         self.mfname      = mfname
+        self.fexmod      = fexmod
+
         self.verb        = verb
         self.ccd_rot_n90 = ccd_rot_n90
         self.y_is_flip   = y_is_flip
@@ -104,19 +108,20 @@ class MaskEditorButtons (QtGui.QWidget) :
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
         self.list_of_forms   = ['Rectangle', 'Wedge', 'Circle', 'Line', 'Polygon'] #, 'Center'] 
-        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms', 'Quick Load', 'Quick Save']
+        #self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms', 'Excg-Load', 'Excg-Save']
+        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms']
         self.list_of_io_tips = ['Load image for \ndisplay from file',
                                 'Load forms of masked \nregions from file',
                                 'Save forms of masked \nregions in text file',
                                 'Save mask as a 2D array \nof ones and zeros in text file',
                                 'Save inversed-mask as a 2D array\n of ones and zeros in text file',
                                 'Prints parameters of \ncurrently entered forms',
-                                'Clear all forms from the image',
-                                'Load image from file with pre-defined name',
-                                'Save mask in file with pre-defined name'
+                                'Clear all forms from the image'
                                 ]
-
-        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None, self.mfname_img, self.mfname_mask]
+                                #'Load image from file with pre-defined name',
+                                #'Save mask in file with pre-defined name'
+        #self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None, self.mfname_img, self.mfname_mask]
+        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None]
 
         zoom_tip_msg = 'Zoom mode for image and spactrom.' + \
                        '\nZoom-in image: left mouse button click-drug-release.' + \
@@ -177,6 +182,10 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.setStyle()
 
         self.setStatus()
+
+        pbits = 377 if self.verb else 0
+        self.afe_rd = ArrFileExchange(prefix=self.ifname, rblen=3, print_bits=pbits)
+        self.afe_wr = ArrFileExchange(prefix=self.mfname, rblen=3, print_bits=pbits)
 
 
     #def updateCenter(self,x,y):
@@ -389,6 +398,10 @@ class MaskEditorButtons (QtGui.QWidget) :
 
 
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
+            if self.fexmod :
+                self.exchange_image_load()
+                return
+            
             self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
             if path == None :
@@ -439,13 +452,20 @@ class MaskEditorButtons (QtGui.QWidget) :
 
 
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
-            if self.list_of_objs_for_mask_is_empty() : return
+            if self.list_of_objs_for_mask_is_empty() :
+                print 'WARNING: Empty mask is NOT saved!'
+                self.setStatus(2, 'Empty mask\nNOT saved!')
+                return
             self.setStatus(2, 'WAIT!\nMask is\nprocessing')
             self.enforceStatusRepaint()
             #print 'WAIT for mask processing'
             mask_total = self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Mask')
-            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+
+            if self.fexmod :
+                self.exchange_mask_save(mask_total)
+                return            
+
             self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None :
@@ -456,11 +476,19 @@ class MaskEditorButtons (QtGui.QWidget) :
 
 
         if but_text == self.list_of_io_tits[4] : # 'Save Inv-Mask'
-            if self.list_of_objs_for_mask_is_empty() : return
+            if self.list_of_objs_for_mask_is_empty() : 
+                print 'WARNING: Empty mask is NOT saved!'
+                self.setStatus(2, 'Empty mask\nNOT saved!')
+                return
             self.setStatus(2, 'Wait!\nInv-mask is\nprocessing')
             self.enforceStatusRepaint()
             mask_total = ~self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Inverse Mask')
+
+            if self.fexmod :
+                self.exchange_mask_save(mask_total)
+                return            
+
             self.setStatus(1, 'Waiting\nfor input')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None : 
@@ -493,31 +521,21 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.setStatus(0, 'Forms\nremoved')
 
 
-        if but_text == self.list_of_io_tits[7] : # 'Quick Load Img'
-            path = path0
-            if not os.path.isfile(path) :
-                self.setStatus(2,'File is \nunavailable')
-                return
+    def exchange_image_load(self):       
+        if self.afe_rd.is_new_arr_available() :
             self.setStatus(2, 'WAIT!\nLoad image')
-            arr = gu.get_array_from_file(path)             
-            self.parent.set_image_array_new(arr, title='Image from '+path )
-            self.setStatus(0, 'Image \nloaded')
+            arr = self.afe_rd.get_arr_latest()             
+            self.parent.set_image_array_new(arr, title='Image from %s...' % self.ifname )
+            self.setStatus(0, 'Image is\nloaded')
+        else :
+            self.setStatus(1, 'New image\nis N/A !')
+            return
 
-
-        if but_text == self.list_of_io_tits[8] : # 'Quick Save Mask'
-            if self.list_of_objs_for_mask_is_empty() : return
-            self.setStatus(2, 'WAIT!\nMask is\nprocessing')
-            self.enforceStatusRepaint()
-            #print 'WAIT for mask processing'
-            mask_total = self.get_mask_total()
-            self.parent.set_image_array_new(mask_total, title='Mask')
-            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
-            path = path0
-            if path == None :
-                self.setStatus(2,'File name\nis undefined')
-                return
-            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
-            self.setStatus(0, 'Mask\nis saved')
+  
+    def exchange_mask_save(self, mask):       
+        self.setStatus(2, 'WAIT!\nSave mask')
+        self.afe_wr.save_arr(mask)
+        self.setStatus(0, 'Mask\nis saved')
 
 
     def get_mask_total(self):       

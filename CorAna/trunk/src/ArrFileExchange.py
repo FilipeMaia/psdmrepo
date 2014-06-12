@@ -31,9 +31,8 @@ Interface
     arr = afe.get_arr_latest()                     # as many times as you need
 
     # optional methods:
-    status = afe.is_new_arr_available()            # True/False if the new array IS/IS NOT available
+    status = afe.is_new_arr_available()            # returns True/False if the new array IS/IS NOT available
                                                    # since last call to arr = afe.get_arr_latest()
-    fname, time = afe.get_fname_time_latest()      # returns the latest file name and its creation time in sec
 
 
 Constructor parameters
@@ -47,6 +46,7 @@ Constructor parameters
                + 2 - info about getting array from file
                + 4 - in get_fname_time_latest() list available in the ring buffer files with creation time
                + 8 - time consumed to rename file
+               +16 - input parameters
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -85,6 +85,15 @@ class ArrFileExchange ( object ) :
         self.arr_old    = None
         self.is_loaded  = False
 
+        if self.print_bits & 16 : self.print_input_pars()
+ 
+#------------------------------
+
+    def print_input_pars(self) :
+        msg = 40*'='+'\nArrFileExchange.print_input_pars():' \
+            + '\n  prefix=%s\n  rblen=%d\n  print_bits=%d' % (self.prefix, self.rblen, self.print_bits)
+        print msg
+
 #------------------------------
 # Methods for writer/producer
 
@@ -107,6 +116,13 @@ class ArrFileExchange ( object ) :
         """
         fname_tmp  = self.get_fname_tmp()
         fname_next = self.get_fname_next()
+
+        dir = os.path.dirname(fname_tmp)
+        if dir == '' : dir = './'
+        if not os.path.exists(dir) :
+            print 'WARNING: Directory "%s" does NOT exist! File is NOT saved!' % dir
+            return
+
         cmd = 'mv %s %s' % (fname_tmp, fname_next)
         t0_sec = time()
         np.save(fname_tmp, arr)
@@ -115,7 +131,6 @@ class ArrFileExchange ( object ) :
         os.system(cmd)
         if self.print_bits & 8 : print 'Time consumed to rename file: %f(sec)' % (time()-t0_sec)
         if self.print_bits & 1 : print 'Numpy array is saved in file %s' % fname_next
-
 
 #------------------------------
 # Methods for reader/consumer
@@ -129,19 +144,30 @@ class ArrFileExchange ( object ) :
         """ Returns latest available file name and its creation time in sec
             or empty string and 0 for time, if the file is non-available.
         """
-        dir = os.path.dirname(self.prefix) # ex.: ./
-        pattern = os.path.basename(self.get_fname_pattern())
-        list_of_files = os.listdir(dir)
-        list_for_pattern = [fname for fname in list_of_files if pattern in fname]
         fname_latest = ''
         t_latest = 0
+
+        dir = os.path.dirname(self.prefix)
+        if dir == '' : dir = './'
+        #print 'dir = ', dir
+        if not os.path.exists(dir) :
+            print 'WARNING: Directory "%s" does NOT exist!' % dir
+            return fname_latest, t_latest
+        
+        list_of_files = os.listdir(dir)
+        pattern = os.path.basename(self.get_fname_pattern())
+        list_for_pattern = [fname for fname in list_of_files if pattern in fname]
+        #print 'list_for_pattern = ', list_for_pattern
+
         for fname in list_for_pattern :
-            ctime = self.get_file_ctime(fname)
+            path = os.path.join(dir,fname)
+            ctime = self.get_file_ctime(path)
             if self.print_bits & 4 : print 'File %s creation time %d(s)' % (fname, ctime)
             if ctime > t_latest :
                 t_latest = ctime
-                fname_latest = fname
+                fname_latest = path
 
+        print 'Found latest file %s created at %d' % (fname_latest, t_latest)
         return fname_latest, t_latest
 
 
@@ -149,13 +175,16 @@ class ArrFileExchange ( object ) :
         """ Returns True/False if the new file is available since last call to get_arr_latest()
         """
         fname, time = self.get_fname_time_latest()
+        if fname == '' : return False      # if file does not exist
+
         if fname == self.fname_old \
         and time == self.time_old \
-        and self.is_loaded : return False
+        and self.is_loaded : return False  # if file name and time were already seen and file is loaded
+
         self.fname_old = fname
         self.time_old  = time
         self.is_loaded = False
-        return True
+        return True                        # new file is available
 
 
     def get_arr_latest(self) :
@@ -164,12 +193,14 @@ class ArrFileExchange ( object ) :
         if self.is_new_arr_available() :
             if os.path.exists(self.fname_old) :
                 if self.print_bits & 2 : print 'Get np.array from latest file: %s' % self.fname_old
+                t0_sec = time()
                 self.arr_old = np.load(self.fname_old)
+                if self.print_bits & 8 : print 'Time consumed to read file : %f(sec)' % (time()-t0_sec)
                 self.is_loaded = True
             else :
                 if self.print_bits & 2 : print 'File "%s" is NOT available!' % self.fname_old
         else :
-            if self.print_bits & 2 : print 'New array is not available, use old for now'
+            if self.print_bits & 2 : print 'New array is not available, return old or None'
 
         return self.arr_old 
 
@@ -178,10 +209,12 @@ class ArrFileExchange ( object ) :
 
 if __name__ == "__main__" :
 
-    afe = ArrFileExchange(prefix='./img-random', print_bits=0377)
+    #print 'sys.argv: ', sys.argv
+    path = './roi-img' if len(sys.argv) < 2 else sys.argv[1]
+    afe = ArrFileExchange(prefix=path, print_bits=0377)
 
     for i in range(10) :
-        print 10*'='+'\ntest #%d' % i
+        print 10*'='+'\nTest #%d' % i
         arr = afe.get_arr_latest()
         sleep(5)
 

@@ -64,7 +64,8 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, xyc=None, ifname='', ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8, verb=False, ccd_rot=None, updown=None):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname='', ofname='./fig.png', mfname='./roi-mask',
+                 title='Mask editor', lw=1, col='b', picker=8, verb=False, ccd_rot=None, updown=None, fexmod=False):
         """List of input parameters:
         @param parent  parent window is used to open other window moved w.r.t. parent.
         @param arr     2D array for image. If None then image will be taken from file or generated as random.
@@ -100,7 +101,7 @@ class MaskEditor (QtGui.QWidget) :
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr, ccd_rot_n90, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, help_msg=self.help_message())
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker, verb, ccd_rot_n90, y_is_flip)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker, verb, ccd_rot_n90, y_is_flip, fexmod)
  
         #---------------------
 
@@ -222,7 +223,7 @@ def get_array2d_for_test() :
     rows, cols = 1300, 1340
     #arr = mu + sigma*np.random.standard_normal(size=rows*cols)
     #arr = 100*np.random.standard_exponential(size=2400)
-    arr = np.arange(rows*cols)
+    arr = np.arange(rows*cols)*0.001
     arr.shape = (rows,cols)
     return arr
 
