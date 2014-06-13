@@ -136,8 +136,7 @@ class BatchJobPedestals (BatchJob) :
         
         err = gu.subproc_in_log(command_seq, fnm.path_peds_aver_batch_log()) # , shell=True)
         if err != '' :
-            logger.error('\nerr: %s' % (err), __name__)
-            logger.warning('Processing for run %s is stopped due to error at execution of the averaging command' % self.str_run_number, __name__)
+            logger.warning('\nWarning/error message from subprocess:\n%s' % (err), __name__)
             return False
         else :
             logger.info('Avereging for run %s is completed' % self.str_run_number, __name__)

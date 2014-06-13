@@ -12,13 +12,19 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-48
+2014-06-13 Mikhail S. Dubrovin
+- cleanup misleading messages in BatchJobPedestals.py and CommandLineCalib.py
+
 Tag: V00-00-47
 2014-06-10 Mikhail S. Dubrovin
-- in GUIFileManagerGroupControl & GUIFileManagerSingleControl protect from copy of the HISTPRY file
+- in GUIFileManagerGroupControl & GUIFileManagerSingleControl protect from copy of the HISTORY file
 
 Tag: V00-00-46
 2014-06-03 Mikhail S. Dubrovin
 - in app/calibrun add option -x for non-standard xtc directory
+- for app/calibrun get rid of RegDB; try : self.print_list_of_sources_from_regdb() ...
+- add CxiDs2.0:Cspad.0 in the self.srcs_cspad in ConfigParametersForApp.py
 	
 Tag: V00-00-45
 2014-06-03 Mikhail S. Dubrovin

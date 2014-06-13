@@ -238,8 +238,8 @@ class CommandLineCalib () :
         self.print_list_of_types_and_sources_from_xtc()
 
         if not self.bjpeds.command_for_peds_aver() :
-            msg = self.sep + 'STATUS OF PROCESSING IS NOT GOOD !!!'\
-                  +'\nSee details in the logfile(s)'
+            msg = self.sep + 'Subprocess for averaging is completed with warning/error message(s);'\
+                  +'\nsee details in the logfile(s).'
             self.log(msg,4)
             #return
 
