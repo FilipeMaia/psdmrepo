@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-06
+2014-06-13 Christopher O'Grady
+- Fix a crash when jumping to last event in a file.
+
 Tag: V00-14-05
 2014-05-13 Christopher O'Grady
 - Add support for ioc recorder streams that are integrated

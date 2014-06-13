@@ -552,12 +552,16 @@ public:
       _maybePostCalib(seconds,nanoseconds);
       _pieces.reset();
       // event-build split-events
+      int ifirst = 1;
       while (it!=_idx.end() && *it==request) {
         dg = _xtc.jump((*it).file, (*it).entry.i64OffsetXtc);
         _add(dg);
+        if (ifirst) {
+          ifirst = 0;
+          _maybeAddEpics(*it,_epicsSource,dg);
+        }
         it++;
       }
-      _maybeAddEpics(*it,_epicsSource,dg);
       _maybeAddIoc(seconds,fiducial);
       _post();
       return 0;
