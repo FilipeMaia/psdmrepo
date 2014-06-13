@@ -56,6 +56,8 @@ _defHdf5FileName = "%(experiment)s-r%(run_number)04d-c{seq2}.h5"
 _defOutputDirTmp = "/reg/d/psdm/%(instrument_lower)s/%(experiment)s/hdf5/%(run_number)04d-%(current_time)s"
 _defLogDir = "/reg/g/psdm/psdatmgr/ic/log/psana/translate-%(experiment)s"
 _defLogName = "translate-%(experiment)s-r%(run_number)04d-%(current_time)s.log"
+_defReleasePath = "/reg/g/psdm/sw/releases/ana-current"
+_defCfgFileName = "data/Translator/automatic_translation.cfg"
 
 # shutil.Error has rather weird content that needs special formatting
 def _shutilErrFmt(ex):
@@ -283,16 +285,22 @@ class TranslatorJob(object) :
         and the translate_uri destination for the translator output"""
 
         cmd_list = []
-        cmd_list.append("psana")
         #cmd_list.append("/reg/neh/home1/wilko/releases/psana_translator/ffb_run_trans.sh")
+        cmd_list.append("psana")
 
-        # modules  
-        if self._get_config('calib-enable', 0) != 0:
-            modules = "cspad_mod.CsPadCalib,Translator.H5Output"
-        else:
-            modules = "Translator.H5Output"
-        cmd_list.append("-m")
-        cmd_list.append(modules)
+        # configuration file
+        cfgFilePath = os.path.join(self._get_config('release', _defReleasePath, True),
+                                   self._get_config('config',  _defCfgFileName, True))
+        cmd_list.append("-c")
+        cmd_list.append(cfgFilePath)
+
+        ## modules  
+        #if self._get_config('calib-enable', 0) != 0:
+        #    modules = "cspad_mod.CsPadCalib,Translator.H5Output"
+        #else:
+        #    modules = "Translator.H5Output"
+        #cmd_list.append("-m")
+        #cmd_list.append(modules)
         
         # translator module options 
         cmd_list.extend("-o Translator.H5Output.overwrite=True".split())
