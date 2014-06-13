@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-18
+2014-06-13 Mikhail S. Dubrovin
+- in SConscript add DOCGEN="doxy-all psana-modules-doxy"
+	
 Tag: V00-05-17
 2014-05-23 Mikhail S. Dubrovin
 - add AndorBaseV1.h, Opal1000BaseV1.h, Opal4000BaseV1.h
