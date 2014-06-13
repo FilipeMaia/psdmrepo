@@ -24,6 +24,32 @@
 
 }
 
+//------------------ BldDataFEEGasDetEnergyV1 ------------------
+/* Four energy measurements from Front End Enclosure Gas Detector.
+   PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, 
+	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, 
+	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC 
+    *363* and *364* are duplicate measurements of *361* and *362* respectively. 
+    The difference is that they cover a smaller (10%) dynamic range. 
+    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs kick in. */
+
+@type BldDataFEEGasDetEnergyV1
+  [[type_id(Id_FEEGasDetEnergy, 1)]]
+  [[value_type]]
+  [[pack(4)]]
+{
+  double _f_11_ENRC -> f_11_ENRC; /* Value of GDET:FEE1:241:ENRC, in mJ. */
+  double _f_12_ENRC -> f_12_ENRC; /* Value of GDET:FEE1:242:ENRC, in mJ. */
+  double _f_21_ENRC -> f_21_ENRC; /* Value of GDET:FEE1:361:ENRC, in mJ. */
+  double _f_22_ENRC -> f_22_ENRC; /* Value of GDET:FEE1:362:ENRC, in mJ. */
+  double _f_63_ENRC -> f_63_ENRC; /* Value of GDET:FEE1:363:ENRC, in mJ. */
+  double _f_64_ENRC -> f_64_ENRC; /* Value of GDET:FEE1:364:ENRC, in mJ. */
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto, inline]];
+
+}
+
 
 //------------------ BldDataEBeamV0 ------------------
 /* Beam parameters. */
