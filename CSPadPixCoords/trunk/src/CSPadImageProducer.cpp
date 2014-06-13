@@ -72,7 +72,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_print_bits    = config   ("print_bits",    0);
 
   m_source        = Source(m_str_src);
-  m_count_wornings= 0;
+  m_count_msg= 0;
 
 //checkTypeImplementation();
 }
@@ -206,9 +206,9 @@ CSPadImageProducer::getConfigPars(Env& env)
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
 
-  m_count_wornings++;
-  if (m_count_wornings < 20) MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
-  if (m_count_wornings ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS !!!")
+  m_count_msg++;
+  if (m_count_msg < 20) MsgLog(name(), warning, "CsPad::ConfigV2-V5 is not available in this run, event:" << m_count << " for source:" << m_str_src);
+  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src);
 }
 
 //--------------------
@@ -244,7 +244,9 @@ CSPadImageProducer::getCSPadConfigFromData(Event& evt)
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) return;
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) return;
 
-  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
+  m_count_msg++;
+  if (m_count_msg < 20) MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV#,ElementV# for #=1,2 is not available in event:"<< m_count << " for source:" << m_str_src);
+  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src);
 }
 
 //--------------------
@@ -265,7 +267,9 @@ CSPadImageProducer::procEvent(Event& evt, Env& env)
   if ( procCSPadNDArrForType <int16_t>  (evt) ) return;
   if ( procCSPadNDArrForType <uint16_t> (evt) ) return;
 
-  MsgLog(name(), warning, "procEvent(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
+  m_count_msg++;
+  if (m_count_msg < 20) MsgLog(name(), warning, "procEvent(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in event:"<< m_count << " for source:" << m_str_src << " key:" << m_inkey);
+  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_inkey);
 }
 
 //--------------------

@@ -136,6 +136,7 @@ private:
   unsigned    m_print_bits;
   unsigned    m_count;
   unsigned    m_count_cfg;
+  long        m_count_msg;        // number of messages counter
   DATA_TYPE   m_dtype;
 
   uint32_t m_roiMask;

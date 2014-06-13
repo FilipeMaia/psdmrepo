@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-25
+2014-06-13 Mikhail S. Dubrovin
+- in CSPad2x2ImageProducer and CSPadImageProducer clean-up warning messages
+- in CSPad2x2ImageProducer - do not terminate processing if data object is missing
+	
 Tag: V00-03-24
 2014-05-28 Mikhail S. Dubrovin
 - CSPadImageProducer.h - for full-size array [32, 185, 388] ignore configuration from data 

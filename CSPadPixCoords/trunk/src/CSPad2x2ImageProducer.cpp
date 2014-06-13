@@ -62,6 +62,7 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   , m_useWidePixCenter()
   , m_print_bits()
   , m_count(0)
+  , m_count_msg(0)
 {
   // get the values from configuration or use defaults
   m_calibDir         = configStr("calibDir",      ""); // if not provided, default from env will be used
@@ -129,8 +130,7 @@ CSPad2x2ImageProducer::beginJob(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::beginRun(Event& evt, Env& env)
 {
-  getConfigPars(env);      // get m_src here
-  getCalibPars(evt, env);  // use m_src here
+  m_count_cfg = 0; 
 }
 
 //--------------------
@@ -146,8 +146,14 @@ CSPad2x2ImageProducer::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::event(Event& evt, Env& env)
 {
-  ++m_count; //cout << "Event: " << m_count;
+  ++m_count;
   if( m_print_bits & 4 ) printTimeStamp(evt, m_count);
+
+  if ( m_count_cfg==0 ) {
+    getConfigPars(env);           // get m_src here
+    if ( m_count_cfg==0 ) return; // skip event processing if configuration is missing
+    getCalibPars(evt, env);       // use m_src here
+  }
 
   processEvent(evt, env);
 }
@@ -181,12 +187,13 @@ CSPad2x2ImageProducer::endJob(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::getConfigPars(Env& env)
 {
-  m_count_cfg = 0; 
   if ( getConfigParsForType <Psana::CsPad2x2::ConfigV1> (env) ) return;
   if ( getConfigParsForType <Psana::CsPad2x2::ConfigV2> (env) ) return;
 
-  MsgLog(name(), error, "No CsPad2x2 configuration objects found, terminating.");
-  terminate();
+  m_count_msg++;
+  if (m_count_msg < 20) MsgLog(name(), warning, "No CsPad2x2 configuration objects found. event:"<< m_count << " for source:" << m_source);
+  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_source);
+  //terminate();
 }
 
 //--------------------
@@ -222,8 +229,11 @@ CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
   if ( procCSPad2x2NDArrForType <int16_t>  (evt) ) return;
   if ( procCSPad2x2NDArrForType <uint16_t> (evt) ) return;
 
-  MsgLog(name(), warning, "processEvent(...): cspad2x2 data or ndarr is not available in this event for source:" 
-         << m_source << " key:" << m_inkey);
+  m_count_msg++;
+  if (m_count_msg < 20) MsgLog(name(), warning, "processEvent(...): cspad2x2 data or ndarr is not available in event:" << m_count << " for source:"
+			       << m_source << " key:" << m_inkey);
+  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:"
+			       << m_source << " key:" << m_inkey);
 }
 
 //--------------------

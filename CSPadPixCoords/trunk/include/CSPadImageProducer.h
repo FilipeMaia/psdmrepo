@@ -155,7 +155,7 @@ private:
   unsigned m_print_bits;
   long     m_count;
   long     m_count_cfg;
-  long     m_count_wornings;
+  long     m_count_msg;
   DATA_TYPE   m_dtype;
 
   // Parameters form Psana::CsPad::ConfigV# object
