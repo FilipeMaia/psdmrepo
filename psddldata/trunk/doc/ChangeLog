@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag:  V01-00-10
+2014-06-13 Jana
+- Added 2 PMT values to Gas Detector BLD data type
+	
 Tag: V01-00-09
 2014-05-08 Tomy
 - BldDataGMDV2
