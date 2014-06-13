@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-45
+2014-06-13 Mikhail S. Dubrovin
+- clean-up messages for missing data
+
 Tag: V00-03-44
 2014-06-09 Mikhail S. Dubrovin
 - in UsdUsbEncoderFilter add nsec in time stamp

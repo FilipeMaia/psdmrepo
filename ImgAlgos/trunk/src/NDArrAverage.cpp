@@ -294,9 +294,9 @@ NDArrAverage::collectStat(Event& evt)
   else if (dtype == UNSIGNED && collectStatForType<unsigned>(evt)) return true;
 
   static unsigned m_count_msg=0; m_count_msg ++;
-  if (m_count_msg < 50)
-     MsgLog(name(), warning, "ndarray object is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
-  if (m_count_msg == 50)
+  if (m_count_msg < 20)
+    MsgLog(name(), warning, "ndarray object is not available in the event: " << m_count_ev << " for source:" << m_str_src << " key:" << m_key);
+  if (m_count_msg == 20)
      MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key);
   return false;
 }

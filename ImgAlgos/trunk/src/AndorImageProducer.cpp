@@ -51,6 +51,7 @@ AndorImageProducer::AndorImageProducer (const std::string& name)
   , m_key_out()
   , m_outtype()
   , m_print_bits()
+  , m_count(0)
   , m_count_msg(0)
 {
     m_str_src    = configSrc("source",     "DetInfo(:Andor)");  // DetInfo(MecTargetChamber.0:Andor.1)
@@ -119,6 +120,7 @@ AndorImageProducer::beginCalibCycle(Event& evt, Env& env)
 void 
 AndorImageProducer::event(Event& evt, Env& env)
 {
+  ++ m_count;
   procEvent(evt, env);
 }
 

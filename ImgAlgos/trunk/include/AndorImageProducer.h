@@ -83,7 +83,8 @@ private:
   std::string m_key_out;
   std::string m_outtype;
   unsigned    m_print_bits;
-  unsigned long  m_count_msg; 
+  unsigned    m_count; 
+  unsigned    m_count_msg; 
 
   DATA_TYPE   m_dtype;
 
@@ -147,9 +148,9 @@ private:
     //if ( procDataForIOTypes <Psana::Camera::FrameV2, TOUT> (evt) ) return true;
 
     m_count_msg ++;
-    if (m_count_msg < 50)
-    MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
-    if (m_count_msg == 50)
+    if (m_count_msg < 20)
+    MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event:" << m_count << " for source:" << m_str_src << " key:" << m_key_in);
+    if (m_count_msg == 20)
     MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
 
     return false;
