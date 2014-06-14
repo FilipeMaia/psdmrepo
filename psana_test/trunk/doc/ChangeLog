@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2014-06-14 David Schneider
+- regenerate dump module from psddldata V01-00-10
+- trac ticket #309
+
 Tag: V00-00-07
 2014-06-10 David Schneider
 - unit tests, make sure command line calls to psana don't accidentally

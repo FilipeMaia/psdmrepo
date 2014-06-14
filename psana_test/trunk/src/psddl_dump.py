@@ -1083,6 +1083,32 @@ def Bld_BldDataFEEGasDetEnergy_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataFEEGasDetEnergyV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataFEEGasDetEnergyV1.TypeId
+    assert obj.Version == psana.Bld.BldDataFEEGasDetEnergyV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_11_ENRC: %s' % double_to_str( obj.f_11_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_12_ENRC: %s' % double_to_str( obj.f_12_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_21_ENRC: %s' % double_to_str( obj.f_21_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_22_ENRC: %s' % double_to_str( obj.f_22_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_63_ENRC: %s' % double_to_str( obj.f_63_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'f_64_ENRC: %s' % double_to_str( obj.f_64_ENRC() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Bld_BldDataEBeamV0_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV0.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV0.Version
@@ -6672,6 +6698,7 @@ objFunctionTable = {
     (psana.Bld.BldDataEBeamV4.TypeId,4) : Bld_BldDataEBeamV4_to_str,
     (psana.Bld.BldDataEBeamV5.TypeId,5) : Bld_BldDataEBeamV5_to_str,
     (psana.Bld.BldDataFEEGasDetEnergy.TypeId,0) : Bld_BldDataFEEGasDetEnergy_to_str,
+    (psana.Bld.BldDataFEEGasDetEnergyV1.TypeId,1) : Bld_BldDataFEEGasDetEnergyV1_to_str,
     (psana.Bld.BldDataGMDV0.TypeId,0) : Bld_BldDataGMDV0_to_str,
     (psana.Bld.BldDataGMDV1.TypeId,1) : Bld_BldDataGMDV1_to_str,
     (psana.Bld.BldDataGMDV2.TypeId,2) : Bld_BldDataGMDV2_to_str,
