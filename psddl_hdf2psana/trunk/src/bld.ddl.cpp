@@ -143,6 +143,142 @@ void store_at(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group
 }
 
 
+hdf5pp::Type ns_BldDataFEEGasDetEnergyV1_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataFEEGasDetEnergyV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("f_11_ENRC", offsetof(DsType, f_11_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("f_12_ENRC", offsetof(DsType, f_12_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("f_21_ENRC", offsetof(DsType, f_21_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("f_22_ENRC", offsetof(DsType, f_22_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("f_63_ENRC", offsetof(DsType, f_63_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("f_64_ENRC", offsetof(DsType, f_64_ENRC), hdf5pp::TypeTraits<double>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataFEEGasDetEnergyV1_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataFEEGasDetEnergyV1_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataFEEGasDetEnergyV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("f_11_ENRC", offsetof(DsType, f_11_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("f_12_ENRC", offsetof(DsType, f_12_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("f_21_ENRC", offsetof(DsType, f_21_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("f_22_ENRC", offsetof(DsType, f_22_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("f_63_ENRC", offsetof(DsType, f_63_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("f_64_ENRC", offsetof(DsType, f_64_ENRC), hdf5pp::TypeTraits<double>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataFEEGasDetEnergyV1_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::dataset_data(const Psana::Bld::BldDataFEEGasDetEnergyV1& psanaobj)
+  : f_11_ENRC(psanaobj.f_11_ENRC())
+  , f_12_ENRC(psanaobj.f_12_ENRC())
+  , f_21_ENRC(psanaobj.f_21_ENRC())
+  , f_22_ENRC(psanaobj.f_22_ENRC())
+  , f_63_ENRC(psanaobj.f_63_ENRC())
+  , f_64_ENRC(psanaobj.f_64_ENRC())
+{
+}
+
+ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::~dataset_data()
+{
+}
+boost::shared_ptr<Psana::Bld::BldDataFEEGasDetEnergyV1>
+Proxy_BldDataFEEGasDetEnergyV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+{
+  if (not m_data) {
+    boost::shared_ptr<Bld::ns_BldDataFEEGasDetEnergyV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataFEEGasDetEnergyV1_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->f_11_ENRC, ds_data->f_12_ENRC, ds_data->f_21_ENRC, ds_data->f_22_ENRC, ds_data->f_63_ENRC, ds_data->f_64_ENRC));
+  }
+  return m_data;
+}
+
+
+void make_datasets_BldDataFEEGasDetEnergyV1_v0(const Psana::Bld::BldDataFEEGasDetEnergyV1& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataFEEGasDetEnergyV1_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_BldDataFEEGasDetEnergyV1_v0(const Psana::Bld::BldDataFEEGasDetEnergyV1* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Bld::ns_BldDataFEEGasDetEnergyV1_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergyV1> > make_BldDataFEEGasDetEnergyV1(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<Proxy_BldDataFEEGasDetEnergyV1_v0>(group, idx);
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataFEEGasDetEnergyV1> >(boost::shared_ptr<Psana::Bld::BldDataFEEGasDetEnergyV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergyV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_BldDataFEEGasDetEnergyV1_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataFEEGasDetEnergyV1", version);
+  }
+}
+
+void store_BldDataFEEGasDetEnergyV1(const Psana::Bld::BldDataFEEGasDetEnergyV1* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_BldDataFEEGasDetEnergyV1_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataFEEGasDetEnergyV1", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataFEEGasDetEnergyV1& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataFEEGasDetEnergyV1(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Bld::BldDataFEEGasDetEnergyV1* obj, hdf5pp::Group group, long index, int version)
+{
+  store_BldDataFEEGasDetEnergyV1(obj, group, index, version, true);
+}
+
+
 hdf5pp::Type ns_BldDataEBeamV0_v0_dataset_data_stored_type()
 {
   typedef ns_BldDataEBeamV0_v0::dataset_data DsType;

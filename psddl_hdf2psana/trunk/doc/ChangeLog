@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-11
+2014-06-14 David Schneider
+- regenerate whole thing from psddldata V01-00-10
+- trac ticket #309
+
 Tag: V00-09-10
 2014-06-11 David Schneider
 - switch to direct hdf5 calls to read string attribute

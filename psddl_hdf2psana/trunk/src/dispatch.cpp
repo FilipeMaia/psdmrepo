@@ -571,6 +571,10 @@ try {
     // Lusi::PimImageConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_PimImageConfigV1(schema_version, group, idx), src);
     break;
+  case 3607424182:
+    // Bld::BldDataFEEGasDetEnergyV1
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergyV1(schema_version, group, idx), src);
+    break;
   case 3654144449:
     // EvrData::DataV3
     evt.putProxy(psddl_hdf2psana::EvrData::make_DataV3(schema_version, group, idx), src);

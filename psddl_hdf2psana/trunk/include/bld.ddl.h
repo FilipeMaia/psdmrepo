@@ -66,6 +66,56 @@ void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group 
 void store_at(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
+namespace ns_BldDataFEEGasDetEnergyV1_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataFEEGasDetEnergyV1& psanaobj);
+  ~dataset_data();
+
+  double f_11_ENRC;
+  double f_12_ENRC;
+  double f_21_ENRC;
+  double f_22_ENRC;
+  double f_63_ENRC;
+  double f_64_ENRC;
+
+  operator Psana::Bld::BldDataFEEGasDetEnergyV1() const { return Psana::Bld::BldDataFEEGasDetEnergyV1(f_11_ENRC, f_12_ENRC, f_21_ENRC, f_22_ENRC, f_63_ENRC, f_64_ENRC); }
+
+};
+}
+class Proxy_BldDataFEEGasDetEnergyV1_v0 : public PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergyV1> {
+public:
+  typedef Psana::Bld::BldDataFEEGasDetEnergyV1 PsanaType;
+
+  Proxy_BldDataFEEGasDetEnergyV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~Proxy_BldDataFEEGasDetEnergyV1_v0() {}
+
+protected:
+
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
+
+private:
+
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
+};
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergyV1> > make_BldDataFEEGasDetEnergyV1(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataFEEGasDetEnergyV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergyV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Bld::BldDataFEEGasDetEnergyV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
 namespace ns_BldDataEBeamV0_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
