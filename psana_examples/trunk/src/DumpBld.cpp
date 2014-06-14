@@ -191,14 +191,27 @@ DumpBld::event(Event& evt, Env& env)
     }
   }
   
-  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
-  if (fee) {
+  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergyV1> feeV1 = evt.get(m_feeSrc);
+  if (feeV1) {
     WithMsgLog(name(), info, str) {
-      str << "Bld::BldDataFEEGasDetEnergy:"
-          << "\n  f_11_ENRC=" << fee->f_11_ENRC()
-          << "\n  f_12_ENRC=" << fee->f_12_ENRC()
-          << "\n  f_21_ENRC=" << fee->f_21_ENRC()
-          << "\n  f_22_ENRC=" << fee->f_22_ENRC();
+      str << "Bld::BldDataFEEGasDetEnergyV1:"
+          << "\n  f_11_ENRC=" << feeV1->f_11_ENRC()
+          << "\n  f_12_ENRC=" << feeV1->f_12_ENRC()
+          << "\n  f_21_ENRC=" << feeV1->f_21_ENRC()
+          << "\n  f_22_ENRC=" << feeV1->f_22_ENRC()
+          << "\n  f_63_ENRC=" << feeV1->f_63_ENRC()
+          << "\n  f_64_ENRC=" << feeV1->f_64_ENRC();
+    }
+  } else {
+    shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(m_feeSrc);
+    if (fee) {
+      WithMsgLog(name(), info, str) {
+        str << "Bld::BldDataFEEGasDetEnergy:"
+            << "\n  f_11_ENRC=" << fee->f_11_ENRC()
+            << "\n  f_12_ENRC=" << fee->f_12_ENRC()
+            << "\n  f_21_ENRC=" << fee->f_21_ENRC()
+            << "\n  f_22_ENRC=" << fee->f_22_ENRC();
+      }
     }
   }
 

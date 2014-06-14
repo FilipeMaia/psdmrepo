@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-17
+2014-06-14 David Schneider
+- update DumpBld.cpp for BldDataFEEGasDetEnergyV1
+
 Tag: V00-04-16
 2014-04-30 Mikhail Dubrovin
 - DumpDamage.h - fix doxygen documentation problem
