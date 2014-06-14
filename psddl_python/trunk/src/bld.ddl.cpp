@@ -46,6 +46,21 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
+  class_<Psana::Bld::BldDataFEEGasDetEnergyV1 >("BldDataFEEGasDetEnergyV1", "Four energy measurements from Front End Enclosure Gas Detector.\n   PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, \n	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, \n	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC \n    *363* and *364* are duplicate measurements of *361* and *362* respectively. \n    The difference is that they cover a smaller (10%) dynamic range. \n    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs kick in.", no_init)
+    .def("f_11_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_11_ENRC,"Value of GDET:FEE1:241:ENRC, in mJ.")
+    .def("f_12_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_12_ENRC,"Value of GDET:FEE1:242:ENRC, in mJ.")
+    .def("f_21_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_21_ENRC,"Value of GDET:FEE1:361:ENRC, in mJ.")
+    .def("f_22_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_22_ENRC,"Value of GDET:FEE1:362:ENRC, in mJ.")
+    .def("f_63_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_63_ENRC,"Value of GDET:FEE1:363:ENRC, in mJ.")
+    .def("f_64_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_64_ENRC,"Value of GDET:FEE1:364:ENRC, in mJ.")
+  ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FEEGasDetEnergy);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataFEEGasDetEnergyV1> >(Pds::TypeId::Id_FEEGasDetEnergy));
+
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataEBeamV0 >("BldDataEBeamV0", "Beam parameters.", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV0::damageMask,"Damage mask.")
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV0::ebeamCharge,"Beam charge in nC.")
