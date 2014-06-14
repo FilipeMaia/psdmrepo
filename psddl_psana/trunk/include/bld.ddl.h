@@ -48,6 +48,49 @@ private:
   double	_f_22_ENRC;	/**< Value of GDET:FEE1:22:ENRC, in mJ. */
 };
 
+/** @class BldDataFEEGasDetEnergyV1
+
+  Four energy measurements from Front End Enclosure Gas Detector.
+   PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, 
+	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, 
+	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC 
+    *363* and *364* are duplicate measurements of *361* and *362* respectively. 
+    The difference is that they cover a smaller (10%) dynamic range. 
+    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs kick in.
+*/
+
+
+class BldDataFEEGasDetEnergyV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_FEEGasDetEnergy /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  BldDataFEEGasDetEnergyV1(double arg__f_11_ENRC, double arg__f_12_ENRC, double arg__f_21_ENRC, double arg__f_22_ENRC, double arg__f_63_ENRC, double arg__f_64_ENRC)
+    : _f_11_ENRC(arg__f_11_ENRC), _f_12_ENRC(arg__f_12_ENRC), _f_21_ENRC(arg__f_21_ENRC), _f_22_ENRC(arg__f_22_ENRC), _f_63_ENRC(arg__f_63_ENRC), _f_64_ENRC(arg__f_64_ENRC)
+  {
+  }
+  BldDataFEEGasDetEnergyV1() {}
+  /** Value of GDET:FEE1:241:ENRC, in mJ. */
+  double f_11_ENRC() const { return _f_11_ENRC; }
+  /** Value of GDET:FEE1:242:ENRC, in mJ. */
+  double f_12_ENRC() const { return _f_12_ENRC; }
+  /** Value of GDET:FEE1:361:ENRC, in mJ. */
+  double f_21_ENRC() const { return _f_21_ENRC; }
+  /** Value of GDET:FEE1:362:ENRC, in mJ. */
+  double f_22_ENRC() const { return _f_22_ENRC; }
+  /** Value of GDET:FEE1:363:ENRC, in mJ. */
+  double f_63_ENRC() const { return _f_63_ENRC; }
+  /** Value of GDET:FEE1:364:ENRC, in mJ. */
+  double f_64_ENRC() const { return _f_64_ENRC; }
+  static uint32_t _sizeof() { return 48; }
+private:
+  double	_f_11_ENRC;	/**< Value of GDET:FEE1:241:ENRC, in mJ. */
+  double	_f_12_ENRC;	/**< Value of GDET:FEE1:242:ENRC, in mJ. */
+  double	_f_21_ENRC;	/**< Value of GDET:FEE1:361:ENRC, in mJ. */
+  double	_f_22_ENRC;	/**< Value of GDET:FEE1:362:ENRC, in mJ. */
+  double	_f_63_ENRC;	/**< Value of GDET:FEE1:363:ENRC, in mJ. */
+  double	_f_64_ENRC;	/**< Value of GDET:FEE1:364:ENRC, in mJ. */
+};
+
 /** @class BldDataEBeamV0
 
   Beam parameters.
