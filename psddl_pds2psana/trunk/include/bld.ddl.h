@@ -16,6 +16,8 @@ namespace psddl_pds2psana {
 namespace Bld {
 Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergy pds);
 
+Psana::Bld::BldDataFEEGasDetEnergyV1 pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergyV1 pds);
+
 Psana::Bld::BldDataEBeamV0 pds_to_psana(Pds::Bld::BldDataEBeamV0 pds);
 
 Psana::Bld::BldDataEBeamV1 pds_to_psana(Pds::Bld::BldDataEBeamV1 pds);

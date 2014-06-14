@@ -982,6 +982,16 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergy>(data), xtc->src);
         }
         break;
+      case 1:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataFEEGasDetEnergyV1& xdata = *(Pds::Bld::BldDataFEEGasDetEnergyV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataFEEGasDetEnergyV1& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergyV1>(data), xtc->src);
+        }
+        break;
       case 32768:
         {
           // XTC data object
@@ -990,6 +1000,16 @@ try {
           const Psana::Bld::BldDataFEEGasDetEnergy& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
           // store data
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergy>(data), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataFEEGasDetEnergyV1& xdata = *(Pds::Bld::BldDataFEEGasDetEnergyV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataFEEGasDetEnergyV1& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergyV1>(data), xtc->src);
         }
         break;
       } // end switch (version)
@@ -2474,8 +2494,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 0:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergy) );
       break;
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergyV1) );
+      break;
     case 32768:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergy) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergyV1) );
       break;
     } // end version switch
     break;

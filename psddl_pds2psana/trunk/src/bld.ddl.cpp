@@ -14,6 +14,11 @@ Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergy
   return Psana::Bld::BldDataFEEGasDetEnergy(pds.f_11_ENRC(), pds.f_12_ENRC(), pds.f_21_ENRC(), pds.f_22_ENRC());
 }
 
+Psana::Bld::BldDataFEEGasDetEnergyV1 pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergyV1 pds)
+{
+  return Psana::Bld::BldDataFEEGasDetEnergyV1(pds.f_11_ENRC(), pds.f_12_ENRC(), pds.f_21_ENRC(), pds.f_22_ENRC(), pds.f_63_ENRC(), pds.f_64_ENRC());
+}
+
 Psana::Bld::BldDataEBeamV0::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV0::DamageMask e)
 {
   return Psana::Bld::BldDataEBeamV0::DamageMask(e);
