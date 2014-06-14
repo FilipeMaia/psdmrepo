@@ -147,6 +147,7 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet FEEGasDetEnergy;
   FEEGasDetEnergy.insert( & typeid(Psana::Bld::BldDataFEEGasDetEnergy));
+  FEEGasDetEnergy.insert( & typeid(Psana::Bld::BldDataFEEGasDetEnergyV1));
   m_alias2TypesMap["FEEGasDetEnergy"] = FEEGasDetEnergy;
 
   TypeInfoSet Fccd;

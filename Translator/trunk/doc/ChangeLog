@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-14
+2014-06-14 David Schneider
+- regenerate with psddl V00-13-12: move default_psana.cfg into data subdir
+- regenerate with psddldata V01-00-10: trac ticket #309
+	
 Tag: V00-01-13
 2014-06-12 David
 - move automatic translation config file into data subdir.
