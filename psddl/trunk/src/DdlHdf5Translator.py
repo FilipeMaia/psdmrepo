@@ -388,7 +388,7 @@ class DdlHdf5Translator ( object ) :
             lns += ' # %s' % ', '.join(typeList)
             lns += '\n'
             type_filter_options += lns
-        fname = os.path.join(self.packageDir, "default_psana.cfg")
+        fname = os.path.join(self.packageDir, "data", "default_psana.cfg")
         fout = file(fname,'w')
         fout.write(tmpl.render(locals()))
         

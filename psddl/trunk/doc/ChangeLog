@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-12
+2014-06-14 David
+- Translator backend: move default_psana.cfg into data subdir.
+- python backend: check for mix of versioned and unversioned types,
+  do not generate unversioned list of versioned types in there is a mix.
+  trac ticket: https://pswww.slac.stanford.edu/trac/psdm/ticket/309#comment:2
+
 Tag: V00-13-11
 2014-05-13 David
 - Adjust backend for psana_test package.

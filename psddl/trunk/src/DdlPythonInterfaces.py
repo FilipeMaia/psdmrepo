@@ -262,14 +262,26 @@ class DdlPythonInterfaces ( object ) :
                 self._parseType(ns, ndconverters)
 
         # make the unversioned objects containing versioned types
-        unmap = dict()
+        unversioned2verMap = dict()
+        typeNamesNotEndingWithVer = set()
+
         for type in self.pkg.namespaces() :
             if isinstance(type, Type) and type.version is not None:
                 vstr = "V"+str(type.version)
                 if type.name.endswith(vstr):
                     unvtype = type.name[:-len(vstr)]
-                    unmap.setdefault(unvtype, []).append(type.name)
-        for unvtype, types in unmap.items():
+                    unversioned2verMap.setdefault(unvtype, []).append(type.name)
+                else:
+                    typeNamesNotEndingWithVer.add(type.name)
+
+        for nameNotEndingWithVer in typeNamesNotEndingWithVer:
+            if nameNotEndingWithVer in unversioned2verMap:
+                sys.stdout.write("DdlPythonInterfaces - info: %s is a type family including\n" % nameNotEndingWithVer)
+                sys.stdout.write("  names ending with and without the version string.\n")
+                sys.stdout.write("  Not generating the unversioned object containing the versioned types.\n")
+                del unversioned2verMap[nameNotEndingWithVer]
+
+        for unvtype, types in unversioned2verMap.items():
             print >>self.cpp, T('  {\n    PyObject* unvlist = PyList_New($len);')(len=len(types))
             for i, type in enumerate(types):
                 print >>self.cpp, T('    PyList_SET_ITEM(unvlist, $i, PyObject_GetAttrString(submodule, "$type"));')(locals())
