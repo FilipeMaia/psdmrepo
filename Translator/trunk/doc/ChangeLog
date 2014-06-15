@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-15
+2014-06-14 David Schneider
+- add option to translate epics on every shot (don't check for change)
+  short term solution for problem with translating timetool pv's that
+  don't set sec/nsec
+	
 Tag: V00-01-14
 2014-06-14 David Schneider
 - regenerate with psddl V00-13-12: move default_psana.cfg into data subdir

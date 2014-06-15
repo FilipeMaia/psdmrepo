@@ -259,10 +259,11 @@ void H5Output::readConfigParameters() {
   validStoreEpicsInput["no"]=EpicsH5GroupDirectory::DoNotStoreEpics;
   validStoreEpicsInput["calib_repeat"]=EpicsH5GroupDirectory::RepeatEpicsEachCalib;
   validStoreEpicsInput["updates_only"]=EpicsH5GroupDirectory::OnlyStoreEpicsUpdates;
+  validStoreEpicsInput["always"]=EpicsH5GroupDirectory::StoreAllEpicsOnEveryShot;
   string storeEpics = configReportIfNotDefault(string("store_epics"), string("calib_repeat"));
   map<string, EpicsH5GroupDirectory::EpicsStoreMode>::iterator userInput = validStoreEpicsInput.find(storeEpics);
   if (userInput == validStoreEpicsInput.end()) {
-    MsgLog(logger(), fatal, "config parameter 'epics_store' must be one of 'calib_repeat' 'updates_only' or 'no'. The value: '"
+    MsgLog(logger(), fatal, "config parameter 'epics_store' must be one of 'calib_repeat' 'updates_only' 'always' or 'no'. The value: '"
            << storeEpics << "' is invalid");
   }
   m_storeEpics = userInput->second;

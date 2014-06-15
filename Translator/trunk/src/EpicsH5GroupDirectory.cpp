@@ -366,11 +366,11 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
       lastWriteTime = m_lastWriteMap.find(pvName);
       debugMsg << ", first event data - createDataset=true, appendToDataset=true";
     } else {
-      if ((pvStamp.sec() != lastWriteTime->second.secPastEpoch) or (pvStamp.nsec() != lastWriteTime->second.nsec)) {
-        debugMsg << ", previously seen, new timestamp, appendTODataset=true";
+      if (pvHasChanged(pvStamp, lastWriteTime->second)) {
+        debugMsg << ", pv timestamp has changed (or we are writing on every event), appendTODataset=true";
         appendToDataset = true;
       } else {
-        debugMsg << ", previously seen and same timestamp";
+        debugMsg << ", previously seen and no change to timestamp";
       }
     }
     if (not appendToDataset) {
@@ -422,6 +422,14 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
   }
 }
 
+bool EpicsH5GroupDirectory::pvHasChanged(const Psana::Epics::epicsTimeStamp &pvStamp, 
+                                         const Unroll::epicsTimeStamp &lastWriteTime) {
+  if (m_epicsStoreMode == StoreAllEpicsOnEveryShot) return true;
+  if ((pvStamp.sec() != lastWriteTime.secPastEpoch) or 
+      (pvStamp.nsec() != lastWriteTime.nsec)) return true;
+  return false;
+}
+
 void EpicsH5GroupDirectory::processEndCalibCycle() {
   if (not checkIfStoringEpics()) return;
   std::map<std::string, hid_t>::iterator iter;
@@ -453,7 +461,9 @@ void EpicsH5GroupDirectory::processEndCalibCycle() {
 
 void EpicsH5GroupDirectory::processEndJob() {
   if (not checkIfStoringEpics()) return;
-  if (m_epicsStoreMode == RepeatEpicsEachCalib) {
+  if ((m_epicsStoreMode == RepeatEpicsEachCalib) or 
+      (m_epicsStoreMode == StoreAllEpicsOnEveryShot)) 
+  {
     m_lastWriteMap.clear();
   }
   m_configEpicsPvGroups.clear();
@@ -474,6 +484,7 @@ std::string EpicsH5GroupDirectory::epicsStoreMode2str(const EpicsStoreMode store
   if (storeMode == DoNotStoreEpics) return string("DoNotStoreEpics");
   if (storeMode == RepeatEpicsEachCalib) return string("RepeatEpicsEachCalib");
   if (storeMode == OnlyStoreEpicsUpdates) return string("OnlyStoreEpicsUpdates");
+  if (storeMode == StoreAllEpicsOnEveryShot) return string("StoreAllEpicsOnEveryShot");
   if (storeMode == Unknown) return string("Unknown");
   return string("**Invalid**");
 }

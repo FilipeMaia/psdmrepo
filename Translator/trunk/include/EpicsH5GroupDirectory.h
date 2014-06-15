@@ -39,7 +39,8 @@ namespace Translator {
  */  
 class EpicsH5GroupDirectory {
  public:
-  typedef enum {Unknown, DoNotStoreEpics, RepeatEpicsEachCalib, OnlyStoreEpicsUpdates} EpicsStoreMode;
+  typedef enum {Unknown, DoNotStoreEpics, RepeatEpicsEachCalib, 
+                OnlyStoreEpicsUpdates, StoreAllEpicsOnEveryShot} EpicsStoreMode;
   static std::string epicsStoreMode2str(const EpicsStoreMode storeMode);
 
   EpicsH5GroupDirectory();
@@ -56,6 +57,8 @@ class EpicsH5GroupDirectory {
   void processEndCalibCycle();
   void processEndJob();
 
+  bool pvHasChanged(const Psana::Epics::epicsTimeStamp &pvStamp, 
+                    const Unroll::epicsTimeStamp &lastWriteTime);
  private:
   EpicsStoreMode m_epicsStoreMode;
   bool checkIfStoringEpics();
