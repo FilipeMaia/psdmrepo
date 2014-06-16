@@ -1,0 +1,43 @@
+SciPy
+-----
+upgraded to version 0.14.0
+
+pdsdata
+-------
+update to pdsdata 8.0.9 with BldDataFEEGasDetEnergyV1
+
+psddl
+-----
+Translator backend: move default_psana.cfg into data subdir.
+python backend: check for mix of versioned and unversioned types,do not 
+generate unversioned list of versioned types in there is a mix.
+
+Translator
+----------
+regenerate with psddl V00-13-12 which moves default_psana.cfg into data 
+subdir, regenerate with psddldata V01-00-10
+
+psana_test
+----------
+regenerate dump module from psddldata V01-00-10
+
+psana_examples
+--------------
+update DumpBld.cpp for BldDataFEEGasDetEnergyV1
+
+PSXtcInput
+----------
+fixed an indexing bug jumping to the last event in a file
+
+CSPadPixCoords
+--------------
+in CSPad2x2ImageProducer - do not terminate processing if data object is missing,
+improve messages
+
+ImgAlgos
+--------
+improve messages
+
+CalibManager
+------------
+cleanup misleading messages
