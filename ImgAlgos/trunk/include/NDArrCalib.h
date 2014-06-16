@@ -132,6 +132,7 @@ private:
   unsigned        m_print_bits;       // bit mask for print options
   long            m_count_event;      // local event counter
   long            m_count_get;        // local successful get() counter
+  long            m_count_msg;        // counts messages to constrain printout
   NDArrPars*      m_ndarr_pars;       // holds input data ndarray parameters
   unsigned        m_ndim;             // rank of the input data ndarray 
   unsigned        m_size;             // number of elements in the input data ndarray 

@@ -71,6 +71,7 @@ NDArrCalib::NDArrCalib (const std::string& name)
   , m_print_bits()
   , m_count_event(0)
   , m_count_get(0)
+  , m_count_msg(0)
 {
   // get the values from configuration or use defaults
   m_str_src           = configSrc("source",   "DetInfo(:Camera)");
@@ -190,9 +191,9 @@ NDArrCalib::beginCalibCycle(Event& evt, Env& env)
 void 
 NDArrCalib::event(Event& evt, Env& env)
 {
+  ++ m_count_event;
   if( m_print_bits & 16 ) printEventRecord(evt);
   procEvent(evt, env);
-  ++ m_count_event;
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -302,7 +303,10 @@ NDArrCalib::procEvent(Event& evt, Env& env)
   else if (m_dtype == UINT8    && procEventForType<uint8_t,  data_out_t> (evt) ) return;
   else if (m_dtype == DOUBLE   && procEventForType<double,   data_out_t> (evt) ) return;
 
-  MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
+  if (++m_count_msg < 21) {
+    MsgLog(name(), info, "Image is not available in the event:" << m_count_event << " for source:" << m_str_src << " key:" << m_key_in);
+    if (m_count_msg == 20) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key_in);    
+  }
 }
 
 //--------------------

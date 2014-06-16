@@ -119,6 +119,7 @@ private:
   unsigned        m_print_bits;       // bit mask for print options
   long            m_count_event;      // local event counter
   long            m_count_get;        // local successful get() counter
+  long            m_count_msg;        // counts messages to constrain printout
 
   unsigned        m_shape[2];         // image shape
   unsigned        m_cols;             // number of columns in the image 
