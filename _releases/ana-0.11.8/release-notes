@@ -1,0 +1,33 @@
+This is a bug fix relese for the HDF5 translator. Here is a summary of
+changes in specific packages:
+
+Translator:
+- fix bug with translating timetool EPICS pv's.
+- translate EPICS pv when they arrive in the xtc rather than when their time stamp
+  changes. EPICs datasets will generally be longer.
+- add option to translate EPICS on every shot - store most recent pv seen.
+
+psddl_pds2psana:
+- take optional event tag for storing epics pvs. Allows epicsStore to save later
+  of pvs from multiple recorders, allows modules to identify the events when
+  an epics pv has been stored
+
+psana_test:
+- regenerate previousDump.txt based on new epics storage model add unit test
+  for storing most recent pv from multiple sources
+
+psana:
+- add newline after dumping contents of config file
+
+PSXtcInput:
+- pass counter when storing epics pv, for storing most recent pv from multiple
+  recorders and identifying events when a pv has been stored
+
+
+PSEnv:
+- rework epics store eventTag interface and logic, add method to 
+  EpicsStoreImpl so psana modules can get eventTag and see whan a pv has 
+  been stored
+
+ImgAlgos:
+- minor improvements in the diagnostic messages printouts
