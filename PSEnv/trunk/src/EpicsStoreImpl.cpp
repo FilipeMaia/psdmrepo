@@ -103,30 +103,31 @@ EpicsStoreImpl::store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, 
     }
     boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> tpv =
         boost::static_pointer_cast<Psana::Epics::EpicsPvTimeHeader>(pv);
+    bool updatePv = true;
     bool eventTagSpecified = eventTag >= 0;
     if (eventTagSpecified) {
       TimeMap::iterator pos = m_timeMap.find(name);
       if (pos != m_timeMap.end()) {
-        TimeTagValue &previousTimeTag = pos->second;
-        long previousEventTag = previousTimeTag.second;
-        if (previousEventTag == eventTag) {
+        TimeHeaderAndEventTag &storedTimeHeaderAndEventTag = pos->second;
+        long storedEventTag = storedTimeHeaderAndEventTag.eventTag;
+        if (storedEventTag == eventTag) {
           // check stamps
-          boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> previousTimePV = previousTimeTag.first;
-          const Psana::Epics::epicsTimeStamp previousStamp = previousTimePV->stamp();
+          boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> storedTimePV = storedTimeHeaderAndEventTag.pv;
+          const Psana::Epics::epicsTimeStamp storedStamp = storedTimePV->stamp();
           const Psana::Epics::epicsTimeStamp currentStamp = tpv->stamp();
-          bool currentIsMoreRecent = ((currentStamp.sec() > previousStamp.sec()) or
-                                      ((currentStamp.sec() == previousStamp.sec()) and 
-                                       (currentStamp.nsec() > previousStamp.nsec())));
-          if (currentIsMoreRecent) {
-            m_timeMap[name] = TimeTagValue(tpv,eventTag);
+          bool currentPvIsOlderThanStoredPv = ((currentStamp.sec() < storedStamp.sec()) or
+                                               ((currentStamp.sec() == storedStamp.sec()) and 
+                                                (currentStamp.nsec() < storedStamp.nsec())));
+          if (currentPvIsOlderThanStoredPv) {
+            updatePv = false;
           }
         }
       }
-    } else {
-      // not eventTagSpecified
-      m_timeMap[name] = TimeTagValue(tpv,eventTag);
     }
-
+    if (updatePv) {
+      m_timeMap[name] = TimeHeaderAndEventTag(tpv,eventTag);
+    }
+    
   } else if (pv->isCtrl()) {
 
     MsgLog(logger, debug, "EpicsStore::store - storing CTRL PV with id=" << pv->pvId());
@@ -281,7 +282,7 @@ EpicsStoreImpl::getAny(const std::string& name) const
 
   // try TIME objects first
   TimeMap::const_iterator time_it = m_timeMap.find(pvName);
-  if (time_it != m_timeMap.end()) return (time_it->second).first;
+  if (time_it != m_timeMap.end()) return (time_it->second).pv;
 
   // try CTRL objects
   CrtlMap::const_iterator ctrl_it = m_ctrlMap.find(pvName);
@@ -302,7 +303,7 @@ EpicsStoreImpl::getStatus(const std::string& name, int& status, int& severity, P
   // try TIME objects first
   TimeMap::const_iterator time_it = m_timeMap.find(pvName);
   if (time_it != m_timeMap.end()) {
-    Psana::Epics::EpicsPvTimeHeader* tpv = (time_it->second).first.get();
+    Psana::Epics::EpicsPvTimeHeader* tpv = (time_it->second).pv.get();
     status = tpv->status();
     severity = tpv->severity();
     const Psana::Epics::epicsTimeStamp& stamp = tpv->stamp();
@@ -347,7 +348,20 @@ EpicsStoreImpl::getTimeImpl(const std::string& name) const
 
   TimeMap::const_iterator pvit = m_timeMap.find(pvName);
   if (pvit == m_timeMap.end()) return boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>();
-  return (pvit->second).first;
+  return (pvit->second).pv;
+}
+
+// return the timeHeader and eventTag. If the name is not stored, return
+// the a default TimeHeaderAndEventTag where the pv is NULL
+EpicsStoreImpl::TimeHeaderAndEventTag EpicsStoreImpl::getTimeAndEventTag(const std::string& name) const
+{
+  // check for alias
+  std::string pvName = this->pvName(name);
+  if (pvName.empty()) pvName = name;
+
+  TimeMap::const_iterator pvit = m_timeMap.find(pvName);
+  if (pvit == m_timeMap.end()) return TimeHeaderAndEventTag();
+  return pvit->second;
 }
 
 } // namespace PSEnv

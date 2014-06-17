@@ -104,6 +104,19 @@ public:
     return boost::dynamic_pointer_cast<T>(ptr);
   }
 
+  /// Type for storing TIME EPICs pv and eventTag used when storing
+  struct TimeHeaderAndEventTag {
+    boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> pv;
+    long eventTag;
+  TimeHeaderAndEventTag() : pv(), eventTag(-1) {};
+    TimeHeaderAndEventTag(boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> _pv, 
+                          long _eventTag) : pv(_pv), eventTag(_eventTag) {};
+  }; 
+
+  /// Get TimeHeader and EventTag for a given EPICS PV name. If name not found,
+  /// return default TimeHeaderAndEventTag wher pv is NULL.
+  TimeHeaderAndEventTag getTimeAndEventTag(const std::string& name) const;
+
   /// Get base class object for given EPICS PV name
   boost::shared_ptr<Psana::Epics::EpicsPvHeader> getAny(const std::string& name) const ;
 
@@ -163,11 +176,8 @@ private:
   /// Type for mapping from PV name to EpicsPvCtrl* objects
   typedef std::map<std::string, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader> > CrtlMap;
 
-  /// Type for storing TIME EPICs and eventTag
-  typedef std::pair< boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>, long> TimeTagValue;
-
   /// Type for mapping from PV name to EpicsPvTime* objects
-  typedef std::map<std::string, TimeTagValue > TimeMap;
+  typedef std::map<std::string, TimeHeaderAndEventTag > TimeMap;
   
   // Data members
   ID2Name m_id2name;  ///< Mapping from PV ID to its name.

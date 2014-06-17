@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-05
+2014-06-16 David Schneider
+- rework epics store eventTag interface and logic
+- add method to EpicsStoreImpl to get eventTag
+	
 Tag: V00-13-04
 2014-06-05 David Schneider
 - extend store for epics to take optional pvName. Bypasses internal maps that use 
