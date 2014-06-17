@@ -137,6 +137,25 @@ class Psana( unittest.TestCase ) :
         self.runPsanaOnCfg(cmdLineOptions=cmdLine)
         self.assertTrue(os.path.exists(outFile), msg="Translation did not produce outfile: %s" % outFile)
         
+    def test_MoreRecentEpicsStored(self):
+        '''When the same epics pv is recorded from several sources, or several times in the same source, 
+        the most recent one should be stored. test_073 is a case where this occurs, and before the code
+        was changed to add the most recent one, it was the earlier one that was stored.
+        The earlier one, from pvid 192, has stamp.sec=767233751 stamp.nsec= 40108031 
+        while the later one, from pvid 9    stamp.sec=767233751 stamp.nsec=140115967
+        '''
+        TEST_73 = os.path.join(DATADIR,'test_073_cxi_cxid5514_e423-r0049-s00-c00.xtc')
+        assert os.path.exists(TEST_73), "input file: %s does not exist, can't run test" % TEST_73
+        psana.setConfigFile('')
+        ds = psana.DataSource(TEST_73)
+        epicsStore = ds.env().epicsStore()
+        ds.events().next()  # advance to event 0
+        pvName = 'CXI:R56:SHV:VHS2:CH1:CurrentMeasure'
+        pv = epicsStore.getPV(pvName)
+        self.assertFalse(pv is None, msg="could not get %s from epics store" % pvName)
+        self.assertEqual(pv.stamp().nsec(), 140115967, msg="pv %s does not have expected nano-seconds"  % pvName)
+        self.assertEqual(pv.stamp().sec(), 767233751, msg="pv %s does not have expected seconds"  % pvName)
+
     def test_EpicsIssues1(self):
         '''Test a number of issues:
         * That a epics pv that is accidentally masked by an alias is accessible. 

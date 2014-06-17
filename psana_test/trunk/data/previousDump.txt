@@ -6,7 +6,7 @@ xtc_md5sum=95c79476d08c465627931da66adae9a5   dump_md5sum=59ba4a8508629db5c98cb5
 xtc_md5sum=4988ec68c4a2a796972ee2430624c8b8   dump_md5sum=d0bf506ac8e5c764a70e5d7e60876c75   regress_md5sum=0e801583da159c03b3fce257e4488d37   xtc=test_005_cxi_cxi22010_e60-r0357-s00-c00.xtc
 xtc_md5sum=bf4233e4bcc61c08b32fd22bc97de076   dump_md5sum=46560a6ebd3887eba959cd8d0b2225d3   regress_md5sum=e090a7844f3903a5e1261f4208c03cae   xtc=test_006_cxi_cxi29111_e96-r0211-s00-c00.xtc
 xtc_md5sum=aef59b79f4017eb3958c49ebbb622b60   dump_md5sum=26036512a81433c19d2eb45eaed9397b   regress_md5sum=7374a090d15d33e4f7e57facf9a4e427   xtc=test_007_cxi_cxi63112_e207-r0068-s00-c00.xtc
-xtc_md5sum=bb6465443f6a3808988cee0d5a904365   dump_md5sum=07bb6d9875bfd79474d3f5d3a0f409c9   regress_md5sum=c469a3b1118d8776561b38a495e571f7   xtc=test_008_cxi_cxi69113_e256-r0104-s00-c00.xtc
+xtc_md5sum=bb6465443f6a3808988cee0d5a904365   dump_md5sum=e1fab06bb32caf2aee0bbc05ca091e2e   regress_md5sum=6ef9db0b44a54a84a217faceb1e7f962   xtc=test_008_cxi_cxi69113_e256-r0104-s00-c00.xtc
 xtc_md5sum=927f3d6508215ef03ef135181a16db28   dump_md5sum=a701e6b579289cf9822fdbec3fa70877   regress_md5sum=5317eb431fd72c7801535ba70d59d3b3   xtc=test_009_cxi_cxi76413_e275-r0033-s00-c00.xtc
 xtc_md5sum=3f3ebec6cfcf95aac667ff4225a3f708   dump_md5sum=f36ef7bd42ff1c9ba4dae7aeadad845f   regress_md5sum=535fc3b00e7890d5b6bfe24a1abdcb10   xtc=test_010_cxi_cxia4113_e325-r0002-s00-c00.xtc
 xtc_md5sum=2cc40e07690d83b8a9a54ecf0fc4ddde   dump_md5sum=436f178656df7642e61fbaa9ee6bf4a3   regress_md5sum=9fee891ab3ccd93369e54e083b627274   xtc=test_011_cxi_cxis0913_e387-r0315-s00-c00.xtc
@@ -71,7 +71,7 @@ xtc_md5sum=5723f8a6713e5e982150e25c5a5331ac   dump_md5sum=4e55524f8afd102de0955f
 xtc_md5sum=5d4151ac4924fc63019a7d7e33d43de0   dump_md5sum=c17fcb93fa8ed842ef0b6433a3171be7   regress_md5sum=00000000000000000000000000000000   xtc=test_070_cxi_cxib6714_e350-r0002-s10-c00.xtc
 xtc_md5sum=254d7d3dca29c3ab554de88b95ba9736   dump_md5sum=5d1b1557ad8d76a61ea0751394870f0a   regress_md5sum=00000000000000000000000000000000   xtc=test_071_xcs_xcs84213_e360-r0148-s01-c00.xtc
 xtc_md5sum=5f53658fbabec8bd68495b7ec06ae7d9   dump_md5sum=d40b7ac6113f87911fc2d42181bf08a9   regress_md5sum=00000000000000000000000000000000   xtc=test_072_xcs_xcsi0213_e323-r0060-s05-c00.xtc
-xtc_md5sum=a875a3816e7d87508d38f3b1ed8fcce9   dump_md5sum=ede8fa8de83d1cdae2bd7d3e36a328dd   regress_md5sum=00000000000000000000000000000000   xtc=test_073_cxi_cxid5514_e423-r0049-s00-c00.xtc
+xtc_md5sum=a875a3816e7d87508d38f3b1ed8fcce9   dump_md5sum=de4ba3dde57019101f4b32ba7221f439   regress_md5sum=00000000000000000000000000000000   xtc=test_073_cxi_cxid5514_e423-r0049-s00-c00.xtc
 xtc_md5sum=0ad9f47f65f2b64a725779833586f5d8   dump_md5sum=46f75a88580ffd23e6d493d0da97993d   regress_md5sum=00000000000000000000000000000000   xtc=test_074_cxi_cxi74613_e270-r0156-s05-c00.xtc
 xtc_md5sum=2c32bc91d77cc2a3b117fd97b7a4e835   dump_md5sum=de5a695381f43a7dc3427329c6e09240   regress_md5sum=00000000000000000000000000000000   xtc=test_075_cxi_cxi74613_e270-r0156-s02-c00.xtc
 xtc_md5sum=ec9ca64fe8030ae4b3ab4ba32a6df19c   dump_md5sum=105446c2dde0a9b4ae65aa3e458f5dd8   regress_md5sum=45e74dd72401ce1fe7cfd5fa7260b6c8   xtc=test_076_dia_diasxr13_e310-r0003-s00-c00.xtc
@@ -79,3 +79,4 @@ xtc_md5sum=3df4bf64e5946c5e3d066bbe4c01eac1   dump_md5sum=1ece6c1f7ad7dcc56d2b28
 xtc_md5sum=111d17e392b3cf8f3ad5ceaec28aa0df   dump_md5sum=ae3daea85f0e5921bba058b61ce448af   regress_md5sum=00000000000000000000000000000000   xtc=test_078_cxi_cxi74613_e270-r0156-s01-c00.xtc
 xtc_md5sum=aea2f96fbec0388d032b769922844d33   dump_md5sum=f646f0b5f1a3df7d44f412d96d15edda   regress_md5sum=00000000000000000000000000000000   xtc=test_079_cxi_cxi74613_e270-r0156-s04-c00.xtc
 xtc_md5sum=a210071e0e842ec8fc8493410e541b42   dump_md5sum=62f62739d55e155867a7a9424c86beaf   regress_md5sum=00000000000000000000000000000000   xtc=test_080_cxi_cxi83714_e379-r0121-s00-c00_calibdamage.xtc
+xtc_md5sum=5bde2b940ac1d3fd549ea7c59b8d82d8   dump_md5sum=6e4b5f164d208b064c0c71762d9c18fb   regress_md5sum=00000000000000000000000000000000   xtc=test_081_xpp_xppi0214_e439-r0054-s00-c00.xtc
