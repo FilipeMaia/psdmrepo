@@ -80,7 +80,7 @@ public:
   /**
    *  @brief Convert one object and store it in the epics store.
    */
-  void convertEpics(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore);
+  void convertEpics(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore, long epicsStoreTag=-1);
 
 protected:
   
