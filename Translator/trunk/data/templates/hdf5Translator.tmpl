@@ -41,18 +41,25 @@ overwrite = false
 
 # # # # # # # # # # # # # # # # # # # # #
 # EPICS FILTERING
-# The Translator can store epics pv's in one of two ways, or not at all.
+# The Translator can store epics pv's in one of three ways, or not at all.
 # set store_epics below, to one of the following:
 #
-# updates_only   stores an epic pv when it has changed. The pv is stored 
-#                in the current calib cycle.  For mutli calib cycle experiments, 
-#                users may have to look back through several calib cycle's to 
-#                find the latest value of a pv.
+# updates_only   stores an EPICS pv when it has been updated in the psana epics store.
+#                For xtc input this happens whenever EPICS data is present in a datagram.
+#                Note - many EPICS pvs are not present in every shot. A dataset
+#                for an EPIC pv is often shorter than the total number of events.
+#                Experiments with many short calib cycles may have some calib cycles where
+#                no EPICS pv's show up. Users would then have to look back through several 
+#                calib cycle's to find the latest value of a pv.
 #
-# calib_repeat   each calib cycle will include the latest value of all the epics 
-#                pv's.  This can make it easier to find pv's for a calib cycle. 
-#                For experiments with many short calib cycles, it produces 
-#                many more datasets than neccessary.
+# calib_repeat   This is the same as updates_only except that each calib cycle starts with
+#                the most recent value of each pv. This makes it easier to find pv's in a 
+#                calib cycle. For experiments with many short calib cycles, it can produce
+#                more datasets than neccessary.
+#
+# always         For each event, store the most recent value of the EPICs pv. Produces 
+#                longer datasets than neccessary, but makes it easier to find the latest
+#                pv for an event.
 #
 # no             epics pv's will not be stored. You may also want to set Epics=exclude
 #                (see below) if you do not want the epics configuration data stored
