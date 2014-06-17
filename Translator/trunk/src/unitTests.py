@@ -42,6 +42,7 @@ TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.
 TESTDATA_PARTITION = os.path.join(DATADIR,"test_051_sxr_sxrdaq10_e19-r057-s01-c00.xtc")
 TESTDATA_EPICS = os.path.join(DATADIR, "test_020_sxr_sxr33211_e103-r0845-s00-c00.xtc")
 TESTDATA_CALIBDAMAGE = os.path.join(DATADIR, "test_080_cxi_cxi83714_e379-r0121-s00-c00_calibdamage.xtc")
+TESTDATA_TIMETOOL = os.path.join(DATADIR, "test_081_xpp_xppi0214_e439-r0054-s00-c00.xtc")
 
 #------------------
 # Utility functions 
@@ -1353,6 +1354,38 @@ class H5Output( unittest.TestCase ) :
         lnsWithNDarray = [ln for ln in lns if ln.lower().find('ndarray')>=0]
         self.assertEqual(len(lns), len(lnsWithNDarray), 
                          msg="There are %d lines with XppSb2_Ipm in it, but only %d of those have ndarray in it" % (len(lns), len(lnsWithNDarray)))
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_timetool(self):
+        '''test_081 has three events with timetool data in all three.
+        Check that all of the timetool data gets translated.
+        '''
+        input_file = TESTDATA_TIMETOOL
+        output_h5 = makeH5OutputNameFromXtc(input_file)
+        cfgfile = writeCfgFile(input_file, output_h5)
+        self.runPsanaOnCfg(cfgfile, output_h5)
+        cfgfile.close()        
+        h5=h5py.File(output_h5,'r')
+        ttgroups = ['/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:AMPL',
+                    '/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:AMPLNXT',
+                    '/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:FLTPOS',
+                    '/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:FLTPOSFWHM',
+                    '/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:FLTPOS_PS',
+                    '/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/TTSPEC:REFAMPL']
+        eventSeconds = [1402756826L,1402756826L,1402756826L]
+        eventNanoSeconds = [623769017L,657148262L,707163632L]
+        for ttgroup in ttgroups:
+            gr = h5[ttgroup]
+            tm = gr['time']
+            data = gr['data']
+            self.assertEqual(len(tm),3,msg="len(time) != 3 for %s" % ttgroup)
+            self.assertEqual(len(data),3,msg="len(data) != 3 for %s" % ttgroup)
+            tmData = tm[:]
+            for idx,tmRec,sec,nano in zip(range(len(tmData)),tmData, eventSeconds, eventNanoSeconds):
+                self.assertEqual(tmRec['seconds'], sec, msg="seconds disagree for event=%d of time dataset, group=%s" % (idx,ttgroup))
+                self.assertEqual(tmRec['nanoseconds'], nano, msg="nanoseconds disagree for event=%d of time dataset, group=%s" % (idx,ttgroup))
+
         if self.cleanUp:
             os.unlink(output_h5)
 

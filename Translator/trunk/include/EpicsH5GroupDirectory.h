@@ -57,8 +57,8 @@ class EpicsH5GroupDirectory {
   void processEndCalibCycle();
   void processEndJob();
 
-  bool pvHasChanged(const Psana::Epics::epicsTimeStamp &pvStamp, 
-                    const Unroll::epicsTimeStamp &lastWriteTime);
+  bool writeCurrentPv(long currentEventTag, long previousEventTag);
+
  private:
   EpicsStoreMode m_epicsStoreMode;
   bool checkIfStoringEpics();
@@ -76,10 +76,10 @@ class EpicsH5GroupDirectory {
   // map epics pv name to group id
   std::map<std::string, hid_t> m_calibEpicsPvGroups;
 
-  // For epics that occur outside of the configure 
+  // keep For epics that occur outside of the configure 
   // transition, we map epics pvid 2 timestamp of the last time
   // the epics was written.
-  std::map<std::string, Unroll::epicsTimeStamp> m_lastWriteMap;
+  std::map<std::string, long> m_lastPvEventTag;
 
   typedef enum {unknown, hasEpics, noEpics} EpicsStatus;
   EpicsStatus m_epicsStatus;

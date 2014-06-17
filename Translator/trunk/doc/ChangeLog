@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-16
+2014-06-16 David Schneider
+- switch from using stamp to event tag for deciding when to write
+  epics pvs. trac ticket #310
+- add unit test for translating timetool data
+
 Tag: V00-01-15
 2014-06-14 David Schneider
 - add option to translate epics on every shot (don't check for change)

@@ -335,10 +335,14 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
   if (not checkIfStoringEpics()) return;
   vector<string> pvNames = epicsStore.pvNames();
   vector<string>::iterator pvIter;
+  const PSEnv::EpicsStoreImpl& epicsStoreImpl = epicsStore.internal_implementation();
   for (pvIter = pvNames.begin(); pvIter != pvNames.end(); ++pvIter) {
     string &pvName = *pvIter;
     // we only expect time epics pv's
-    boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> pvTime = epicsStore.getPV(pvName);
+    PSEnv::EpicsStoreImpl::TimeHeaderAndEventTag timeHeaderAndEventTag = 
+      epicsStoreImpl.getTimeAndEventTag(pvName);
+    boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> pvTime = timeHeaderAndEventTag.pv;
+    long pvTimeEventTag = timeHeaderAndEventTag.eventTag;
     if (not pvTime) {
       boost::shared_ptr<Psana::Epics::EpicsPvHeader> pvHdr = epicsStore.getPV(pvName);
       if (not pvHdr) {
@@ -354,23 +358,22 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
     }
     ostringstream debugMsg;
     debugMsg << pvName;
-    const Psana::Epics::epicsTimeStamp &pvStamp = pvTime->stamp();
+    //    const Psana::Epics::epicsTimeStamp &pvStamp = pvTime->stamp();
     bool createDataset = false;
     bool appendToDataset = false;
-    map<string, Unroll::epicsTimeStamp>::iterator lastWriteTime;
-    lastWriteTime = m_lastWriteMap.find(pvName);
-    if (lastWriteTime == m_lastWriteMap.end()) {
+    map<string, long>::iterator lastPvEventTagPos = m_lastPvEventTag.find(pvName);
+    if (lastPvEventTagPos == m_lastPvEventTag.end()) {
       createDataset = true;
       appendToDataset = true;
-      m_lastWriteMap[pvName] = Unroll::epicsTimeStamp();
-      lastWriteTime = m_lastWriteMap.find(pvName);
+      m_lastPvEventTag[pvName] = -1;
+      lastPvEventTagPos = m_lastPvEventTag.find(pvName);
       debugMsg << ", first event data - createDataset=true, appendToDataset=true";
     } else {
-      if (pvHasChanged(pvStamp, lastWriteTime->second)) {
-        debugMsg << ", pv timestamp has changed (or we are writing on every event), appendTODataset=true";
+      if (writeCurrentPv(pvTimeEventTag, lastPvEventTagPos->second)) {
+        debugMsg << ", pv event tag has changed (or we are writing on every event), appendTODataset=true";
         appendToDataset = true;
       } else {
-        debugMsg << ", previously seen and no change to timestamp";
+        debugMsg << ", previously seen and no change to tag";
       }
     }
     if (not appendToDataset) {
@@ -417,16 +420,14 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
       cout << except.what() << endl;
       MsgLog(logger(),fatal,"error with create and or append: " << debugMsg.str());
     }
-    lastWriteTime->second.secPastEpoch = pvStamp.sec();
-    lastWriteTime->second.nsec = pvStamp.nsec();
+    lastPvEventTagPos->second = pvTimeEventTag;
   }
 }
 
-bool EpicsH5GroupDirectory::pvHasChanged(const Psana::Epics::epicsTimeStamp &pvStamp, 
-                                         const Unroll::epicsTimeStamp &lastWriteTime) {
+bool EpicsH5GroupDirectory::writeCurrentPv(long currentEventTag, long previousEventTag) {
   if (m_epicsStoreMode == StoreAllEpicsOnEveryShot) return true;
-  if ((pvStamp.sec() != lastWriteTime.secPastEpoch) or 
-      (pvStamp.nsec() != lastWriteTime.nsec)) return true;
+  if ((previousEventTag < 0) or (currentEventTag < 0)) return true;
+  if (currentEventTag != previousEventTag) return true;
   return false;
 }
 
@@ -464,7 +465,7 @@ void EpicsH5GroupDirectory::processEndJob() {
   if ((m_epicsStoreMode == RepeatEpicsEachCalib) or 
       (m_epicsStoreMode == StoreAllEpicsOnEveryShot)) 
   {
-    m_lastWriteMap.clear();
+    m_lastPvEventTag.clear();
   }
   m_configEpicsPvGroups.clear();
   if (m_configEpicsSrcGroup>=0) {
