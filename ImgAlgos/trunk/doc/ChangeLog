@@ -11,11 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-47
+2014-06-17 Mikhail S. Dubrovin
+- fix doc/ChangeLog
+
 Tag: V00-03-46
 2014-06-16 Mikhail S. Dubrovin
--in ImgCalib - add processing for int16_t, constrain number of printed wornings
--in NDArrCalib - constrain number of printed wornings
--EventCounterFilter fix -> v_evnum.end()-1
+-in ImgCalib - add processing for int16_t, constrain number of printed warnings
+-in NDArrCalib - constrain number of printed warnings
+-add EventCounterFilter
 
 Tag: V00-03-45
 2014-06-13 Mikhail S. Dubrovin
@@ -88,7 +92,7 @@ Tag: V00-03-33
 
 Tag: V00-03-32
 2014-02-14 Mikhail S. Dubrovin
-- in PnccdNDArrProducer and PnccdImageProducer hide wornings under print_bits control	
+- in PnccdNDArrProducer and PnccdImageProducer hide warnings under print_bits control	
 
 Tag: V00-03-31
 2014-02-09 Mikhail S. Dubrovin
