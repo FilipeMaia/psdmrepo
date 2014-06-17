@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <climits>
 #include <algorithm>
 #include <iterator>
 #include <vector>
@@ -79,6 +80,11 @@ namespace {
     return false;
   }
 
+  long nextNonNegativeValue(const long v) {
+    if ((v >=0) and (v < LONG_MAX)) return (v+1);
+    return 0;
+  }
+
 }
 
 
@@ -104,6 +110,7 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
   , m_skipEpics(true)
   , m_l3tAcceptOnly(true)
   , m_l1Count(0)
+  , m_eventTagEpicsStore(0)
   , m_simulateEOR(0)
   , m_run(-1)
 {
@@ -131,6 +138,8 @@ void
 XtcInputModuleBase::beginJob(Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in beginJob()");
+
+  m_eventTagEpicsStore = nextNonNegativeValue(m_eventTagEpicsStore);
 
   // call initialization method for external datagram source
   m_dgsource->init();
@@ -220,6 +229,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
   MsgLog(name(), debug, name() << ": in event() - m_l1Count=" << m_l1Count
       << " m_maxEvents=" << m_maxEvents << " m_skipEvents=" << m_skipEvents);
 
+  m_eventTagEpicsStore = nextNonNegativeValue(m_eventTagEpicsStore);
   // are we in the simulated EOR/EOF
   if (m_simulateEOR > 0) {
     // fake EndRun, prepare to stop on next call
@@ -585,7 +595,7 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
     if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
       // call the converter which will fill config store
       boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
-      m_cvt.convertEpics(xptr, env.epicsStore());
+      m_cvt.convertEpics(xptr, env.epicsStore(), m_eventTagEpicsStore);
     }
     
   }
