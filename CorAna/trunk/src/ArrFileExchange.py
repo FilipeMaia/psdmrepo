@@ -47,6 +47,7 @@ Constructor parameters
                + 4 - in get_fname_time_latest() list available in the ring buffer files with creation time
                + 8 - time consumed to rename file
                +16 - input parameters
+               +32 - latest found file
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -167,7 +168,7 @@ class ArrFileExchange ( object ) :
                 t_latest = ctime
                 fname_latest = path
 
-        print 'Found latest file %s created at %d' % (fname_latest, t_latest)
+        if self.print_bits & 32 : print 'Found latest file %s created at %d' % (fname_latest, t_latest)
         return fname_latest, t_latest
 
 
