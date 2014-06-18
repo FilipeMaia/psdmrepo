@@ -66,7 +66,7 @@ class PlotImgSpe (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ifname='', ofname='./fig.png', title='Plot 2d array', orient=0, y_is_flip=False, is_expanded=False ):
+    def __init__(self, parent=None, arr=None, ifname='', ofname='./fig.png', title='Plot 2d array', orient=0, y_is_flip=False, is_expanded=False, verb=False, fexmod=False ):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 700, 800)
@@ -74,13 +74,14 @@ class PlotImgSpe (QtGui.QWidget) :
         self.setFrame()
 
         if      arr != None : self.arr = arr
-        elif ifname != ''   : self.arr = gu.get_image_array_from_file(ifname)
-        else                : self.arr = get_array2d_for_test()
+        elif ifname != '' \
+             and os.path.exists(ifname) : self.arr = gu.get_image_array_from_file(ifname)
+        else                            : self.arr = get_array2d_for_test()
 
         self.ext_ref = None
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(self, self.arr, orient, y_is_flip)
-        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, None, is_expanded)
+        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, None, is_expanded, fexmod, verb)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  
         #---------------------
@@ -164,7 +165,7 @@ def main():
     app = QtGui.QApplication(sys.argv)
 
     #w  = PlotImgSpe(None, get_array2d_for_test())
-    w  = PlotImgSpe(None, is_expanded=False)
+    w  = PlotImgSpe(None, expand=False)
     w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(50,50))
     w.show()

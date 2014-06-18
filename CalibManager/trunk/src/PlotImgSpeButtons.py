@@ -41,6 +41,8 @@ from GUIRangeIntensity      import *
 from FileNameManager        import fnm
 from ConfigParametersForApp import cp
 
+from CorAna.ArrFileExchange import *
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -53,17 +55,19 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None, is_expanded=False):
+    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None, expand=False, fexmod=False, verb=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
         self.setFrame()
 
-        self.parent    = parent
-        self.ifname    = ifname
-        self.ofname    = ofname
-        self.is_expanded = is_expanded
-        self.guirange  = None
+        self.parent      = parent
+        self.ifname      = ifname
+        self.ofname      = ofname
+        self.is_expanded = expand
+        self.guirange    = None
+        self.fexmod      = fexmod
+        self.verb        = verb
 
         self.widgimage = widgimage
         if widgimage is None :
@@ -132,6 +136,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.setPanelLayout()        
         self.showToolTips()
         #self.setFixedHeight(50)
+
+        pbits = 377 if self.verb else 0
+        self.afe_rd = ArrFileExchange(prefix=self.ifname, rblen=3, print_bits=pbits)
 
 
     def setIcons(self) :
@@ -334,6 +341,21 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
     def on_but_load(self):
         logger.debug('on_but_load', __name__ )
+
+        if self.fexmod :
+            if self.afe_rd.is_new_arr_available() :
+                logger.info('WAIT for image loading', __name__ )
+                arr = self.afe_rd.get_arr_latest()             
+                self.widgimage.set_image_array_new(arr,
+                                               rot_ang_n90 = self.widgimage.rot_ang_n90,
+                                               y_is_flip   = self.widgimage.y_is_flip)
+                                               #title='Image from %s...' % self.ifname,
+                logger.info('Image is loaded', __name__ )
+                return
+            else :
+                logger.info('New image is N/A !', __name__ )
+                return
+        
 
         path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with image', filter='*.txt *.npy')
         if path == None or path == '' :

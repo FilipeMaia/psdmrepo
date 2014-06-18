@@ -41,13 +41,26 @@ from PyQt4 import QtGui, QtCore
 
 def input_options_parser() :
 
+    #ifname_def = ''        
+    ifname_def = './roi-img'        
+    ofname_def = './fig.png'
+    title_def  = 'Mask editor'
+    rot90_def  = 0           
+    mirror_def = False       
+    expand_def = True
+    fexmod_def = False
+    verb_def   = False       
+
     parser = OptionParser(description='Optional input parameters.', usage ='usage: %prog [options] args')
-    parser.add_option('-i', '--fname_img',   dest='ifname',  default='',           action='store', type='string', help='input image file name')
-    parser.add_option('-o', '--fname_fig',   dest='ofname',  default='./fig.png',  action='store', type='string', help='output png file name for current canvas')
-    parser.add_option('-t', '--title',       dest='title',   default='Mask editor',action='store', type='string', help='initial title of the garphical window')
-    parser.add_option('-r', '--rot90',       dest='rot90',   default=0,            action='store', type='int',    help='index for rotation angle by i*90 degree')
-    parser.add_option('-m', '--mirror',      dest='mirror',  default=False,        action='store_false',          help='mirror reflection of the image around y axis')
-    parser.add_option('-v', '--visible',     dest='visible', default=True,         action='store_true',           help='make visible load and diff buttons')
+    parser.add_option('-i', '--ifname',  dest='ifname', default=ifname_def, action='store', type='string', help='input image file name, default = %s' % ifname_def)
+    parser.add_option('-o', '--ofname',  dest='ofname', default=ofname_def, action='store', type='string', help='output png file name for current canvas, default = %s' % ofname_def)
+    parser.add_option('-t', '--title',   dest='title',  default=title_def,  action='store', type='string', help='initial title of the garphical window, default = %s' % title_def)
+    parser.add_option('-r', '--rot90',   dest='rot90',  default=rot90_def,  action='store', type='int',    help='index for rotation angle by i*90 degree, default = %d' % rot90_def)
+    parser.add_option('-m', '--mirror',  dest='mirror', default=mirror_def, action='store_true',           help='mirror reflection of the image around y axis, default = %s' % str(mirror_def))
+    parser.add_option('-e', '--expand',  dest='expand', default=expand_def, action='store_true',           help='expand button panel, default = %s' % str(expand_def))
+    parser.add_option('-v', '--verb',    dest='verb',   default=verb_def,   action='store_true',           help='verbosity, default = %s' % str(verb_def))
+    parser.add_option('-f', '--fexmod',  dest='fexmod', default=fexmod_def, action='store_true',           help='file exchange mode on/off (True/False), default = %s' % fexmod_def)
+
 
     (opts, args) = parser.parse_args()
     return (opts, args)
@@ -67,9 +80,12 @@ if __name__ == "__main__" :
             'arr'             : None, 
             'ifname'          : opts.ifname, 
             'ofname'          : opts.ofname, 
+            'title'           : opts.title, 
             'orient'          : opts.rot90, 
             'y_is_flip'       : opts.mirror,
-            'load_is_visible' : opts.visible}
+            'is_expanded'     : opts.expand,
+            'verb'            : opts.verb,
+            'fexmod'          : opts.fexmod}
 
     if args != [] :
         if args[0] is not '' : pars['ifname'] = args[0]
@@ -83,6 +99,6 @@ if __name__ == "__main__" :
     w.move(QtCore.QPoint(300,10))
     w.show()
     app.exec_()
-    sys.exit('End of application plims')
+    sys.exit('End of %s' % sys.argv[0])
 
 #---------------------------------

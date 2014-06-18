@@ -12,6 +12,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-49
+2014-06-17 Mikhail S. Dubrovin
+- in app/plims change the list of options
+- in PlotImgSpe - transfer parameters
+- in PlotImgSpeButtons add ArrFileExchange for Load button
+	
 Tag: V00-00-48
 2014-06-13 Mikhail S. Dubrovin
 - cleanup misleading messages in BatchJobPedestals.py and CommandLineCalib.py
