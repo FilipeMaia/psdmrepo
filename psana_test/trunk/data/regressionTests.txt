@@ -43,3 +43,4 @@ test=061  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translato
 test=066  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_066_xcs_xcsd7814_e414-r0166-s03-c00.xtc
 test=069  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_069_mec_meca2614_e358-r0113-s01-c00.xtc
 test=076  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_076_dia_diasxr13_e310-r0003-s00-c00.xtc
+test=082  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_082_mec_mecd6714_e441-r0009-s00-c00.xtc

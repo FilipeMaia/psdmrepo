@@ -80,3 +80,4 @@ xtc_md5sum=111d17e392b3cf8f3ad5ceaec28aa0df   dump_md5sum=ae3daea85f0e5921bba058
 xtc_md5sum=aea2f96fbec0388d032b769922844d33   dump_md5sum=f646f0b5f1a3df7d44f412d96d15edda   regress_md5sum=00000000000000000000000000000000   xtc=test_079_cxi_cxi74613_e270-r0156-s04-c00.xtc
 xtc_md5sum=a210071e0e842ec8fc8493410e541b42   dump_md5sum=62f62739d55e155867a7a9424c86beaf   regress_md5sum=00000000000000000000000000000000   xtc=test_080_cxi_cxi83714_e379-r0121-s00-c00_calibdamage.xtc
 xtc_md5sum=5bde2b940ac1d3fd549ea7c59b8d82d8   dump_md5sum=6e4b5f164d208b064c0c71762d9c18fb   regress_md5sum=00000000000000000000000000000000   xtc=test_081_xpp_xppi0214_e439-r0054-s00-c00.xtc
+xtc_md5sum=4cc7a05559d87c759a19dc3346e77c91   dump_md5sum=6196fa2efd88ff29cb7ab53d7e9ea8bf   regress_md5sum=d4894fe2a922c7b1f41b604532713c0a   xtc=test_082_mec_mecd6714_e441-r0009-s00-c00.xtc
