@@ -1,0 +1,82 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script tcdpe...
+#
+#------------------------------------------------------------------------
+
+"""This script starts the analysis shell GUI.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from PyQt4 import QtGui
+from CorAna.GUIMainTB import GUIMainTB
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class TimeCorrelationDataProcessingEnvironment:
+
+    def __init__ ( self ) :
+        """Constructor : This is a regular stuff for PyQt4"""
+
+        self.input_parameters()
+
+	print "Start the main GUI"
+        app = QtGui.QApplication(sys.argv)
+        gui = GUIMainTB(None,app)
+        gui.show()
+        ##app.setActiveWindow(gui)
+        sys.exit(app.exec_())
+
+    def input_parameters(self):	
+        msg = """tcdpe (Time Correlation Data Processing Environment):
+         To run this application use command "tcdpe" without parameters or with a single parameter - the configuration file name. 
+         All necessary parameters will be set through the GUIs of this application. 
+         By default all configuration parameters are taken from the file "confpars.txt". 
+         If this file is missing, the default values of parameters will be used at start, 
+         untill the "confpars.txt" is not created.
+        """
+	if len(sys.argv) > 2 : 
+            sys.exit(90*'-' + '\n' + msg + '\n' + 90*'-')
+	
+
+#---------------------------------
+#
+# run application when launched as a main module
+#
+
+if __name__ == "__main__" :
+
+    app = TimeCorrelationDataProcessingEnvironment()
+    #sys.exit(app.exec_())
+    sys.exit('End of application AnalysisShell')
+
+#---------------------------------
