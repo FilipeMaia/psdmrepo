@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2014-06-18 David Schneider
+- improve error messages when md5sum call fails
+
 Tag: V00-00-10
 2014-06-18 David Schneider
 - add test_082 to regression tests, new test data with 

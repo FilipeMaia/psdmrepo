@@ -170,17 +170,20 @@ def filterPsanaStderr(ln):
 
 def get_md5sum(fname, verbose=False):
     '''returns md5sum on a file. Calls command line utility md5sum
-    IN: fname - fuilename
+    IN: fname - fullname
     OUT: text string - md5sum.
     '''
     assert os.path.exists(fname), "filename %s does not exist" % fname
     cmd = 'md5sum %s' % fname
     if verbose: print cmd
-    o,e = cmdTimeOut(cmd, seconds=15*60)
-    assert len(e)==0
+    secondsTimeOut = 15*60
+    t0=time.time()
+    o,e = cmdTimeOut(cmd, seconds=secondsTimeOut)
+    totalTime = time.time()-t0
+    assert len(e.strip())==0, "cmd: %s produced errors. secondsTimeOut=%s and total time was %s\nerrors:\n%s" % (cmd, secondsTimeOut, totalTime, e)
     flds = o.split()
-    assert len(flds)==2
-    assert flds[1] == fname
+    assert len(flds)==2, "output of md5 did not have 2 fields, output is: %s" % o
+    assert flds[1] == fname, "output of md5 did not have filename in second field, flds[1]=%s, while filename=%s and flds[0]=%s" % (flds[1], fname, flds[0])
     return flds[0]
 
 def psanaDump(infile, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False):
