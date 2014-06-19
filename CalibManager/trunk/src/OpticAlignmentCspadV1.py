@@ -523,7 +523,7 @@ class OpticAlignmentCspadV1 :
             + '\n# PARAMETER TILT_Z     - new object tilt angle [deg] around Z axis of the parent frame' \
             + '\n# PARAMETER TILT_Y     - new object tilt angle [deg] around Y axis of the parent frame' \
             + '\n# PARAMETER TILT_X     - new object tilt angle [deg] around X axis of the parent frame' \
-            + '\n\n# PARENT   IND  OBJECT     IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-Y'
+            + '\n\n# PARENT   IND  OBJECT     IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
         return txt + '\n\n'
 
 #----------------------------------

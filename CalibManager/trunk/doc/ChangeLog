@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-50
+2014-06-19 Mikhail S. Dubrovin
+- OpticAlignmentCspadV1 - fix typo in geometry title
+- ConfigParametersForApp - add comma in the list of srcs_cspad
+	
 Tag: V00-00-49
 2014-06-17 Mikhail S. Dubrovin
 - in app/plims change the list of options

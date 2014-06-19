@@ -434,7 +434,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
      
         self.srcs_cspad = [ 
             'CxiDs1.0:Cspad.0'
-            'CxiDs2.0:Cspad.0'
+           ,'CxiDs2.0:Cspad.0'
            ,'CxiDsd.0:Cspad.0'
            ,'MecTargetChamber.0:Cspad.0'
            ,'XcsEndstation.0:Cspad.0'
