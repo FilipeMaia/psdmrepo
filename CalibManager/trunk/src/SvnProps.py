@@ -12,7 +12,7 @@ Also see: ~/.subversion/config
 This software was developed for the SIT project.
 If you use all or part of it, please give an appropriate acknowledgment.
 
-@version $Id: SvnProps.py 8443 2014-06-18 00:04:30Z dubrovin@SLAC.STANFORD.EDU $
+@version $Id$
 
 @author Mikhai S. Dubrovin
 """
@@ -33,7 +33,7 @@ class SvnProps :
         self.updated  = "2014-05-05"
         self.revision = "$Revision$"
         self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
-        self.id       = "$Id: SvnProps.py 8443 2014-06-18 00:04:30Z dubrovin@SLAC.STANFORD.EDU $"
+        self.id       = "$Id$"
         self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/CalibManager/trunk/src/SvnProps.py $"
         self.header   = "$Header:$"
         self.datelc   = "$LastChangedDate: 2014-06-17 17:04:30 -0700 (Tue, 17 Jun 2014) $"

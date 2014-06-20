@@ -356,8 +356,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
                 logger.info('New image is N/A !', __name__ )
                 return
         
-
-        path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with image', filter='*.txt *.npy')
+        file_filter = 'Files (*.txt *.data *.npy)\nAll files (*)'
+        path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with image', filter=file_filter)
         if path == None or path == '' :
             logger.info('Loading is cancelled...', __name__ )
             return
