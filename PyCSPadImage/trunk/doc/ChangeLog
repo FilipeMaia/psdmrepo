@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2014-06-20 Mikhail S. Dubrovin
+Tag: V00-00-22
+-       src/PixCoords2x1.py - add get_xyz_maps_um(sp), add singleton cspad2x1_one
+-       src/Alignment.py - add allignment for new optical data
+	
+#---------------------
 2014-03-27 Mikhail S. Dubrovin
 Tag: V00-00-21
 - move GlobalGraphics and AngularIntegrator in pyimgalgos

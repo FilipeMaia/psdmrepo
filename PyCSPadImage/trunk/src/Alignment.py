@@ -22,7 +22,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #----------
@@ -138,6 +138,9 @@ def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_r
     image = coord.get_cspad_image(nda*mask_cspad_nda, config)    
     print 'image.shape =', image.shape
 
+
+    #image_cropped = image[700:1050,700:1050]
+
     #gg.plotImageLarge(mask, amp_range=amps, figsize=(12,11))
     axis = gg.plotImageLarge(image, amp_range=amps, figsize=(12,11))
     #gg.plotImageLarge(img2d, amp_range=None, figsize=(12,11))
@@ -146,8 +149,8 @@ def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_r
     ysize, xsize = image.shape
     
     #-------- find corrections to center position
-    if True :
-    #if False :
+    #if True :
+    if False :
         dc_list = xrange(-4,5,1)
         
         dxmax = 0
@@ -192,7 +195,20 @@ def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_r
 
 if __name__ == "__main__" :
 
-    if len(sys.argv)==1 :
+    if len(sys.argv)==1 or len(sys.argv)>2:
+        print 'Use %s command with one argument - test number [0-2]' % sys.argv[0]
+
+    elif sys.argv[1]=='0' :
+        fname  = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxii0114-r0227.dat'
+        amps   = (0,500)    
+        center = (880,873)
+        rad_range = (600,720,120)
+        radius = 664
+        amps_rad  = (0,20000)
+        path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 1
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
+
+    elif sys.argv[1]=='1' :
         fname  = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxii0114-r0227.dat'
         amps   = (0,500)    
         center = (877.0,875.5)
@@ -203,7 +219,7 @@ if __name__ == "__main__" :
         #path_calib, runnum = '/reg/d/psdm/CXI/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 227
         alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
 
-    elif sys.argv[1]=='1' :
+    elif sys.argv[1]=='2' :
         fname     = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxi83714-r0136.dat'
         amps      = (0,0.5)
         center    = (882,875)
@@ -214,6 +230,21 @@ if __name__ == "__main__" :
         #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 1 # for v1 of offset_corr
         path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 136
         alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
+
+    elif sys.argv[1]=='3' :
+        basedir =  '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/'
+        fname  = basedir + 'cspad-arr-cxid2714-r0023-lysozyme-rings.txt'
+        amps   = (0,2000)    
+        center = (904.0,887)
+        rad_range = (50,300,250)
+        radius = 117
+        amps_rad  = (0,12000)
+        path_calib, runnum = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        #path_calib, runnum = '/reg/d/psdm/CXI/cxid2714/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
+
+    else :
+        print 'Command argument "%s" - is not recognized as a test number...' % sys.argv[1]
 
     #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )

@@ -41,7 +41,7 @@ The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,y
 #--------------------------------
 #  Module's version from CVS --
 #--------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 #--------------------------------
 
@@ -189,8 +189,21 @@ class PixCoords2x1() :
             sp.y_map2x1_pix_offset = sp.y_map2x1_pix - y_min_pix
         return sp.x_map2x1_pix_offset, sp.y_map2x1_pix_offset
 
+    def get_pix_size_um(sp) : 
+        return sp.pixs
+    
 #------------------------------
-# cspad2x1 = PixCoords2x1(use_wide_pix_center=False)
+# INTERFACE METHODS
+#------------------------------
+
+    def get_xyz_maps_um(sp) : 
+        """Interface method"""
+        return sp.x_map2x1_um, sp.y_map2x1_um, np.zeros((sp.rows,sp.cols))
+
+#------------------------------
+
+cspad2x1_one = PixCoords2x1(use_wide_pix_center=False)
+
 #------------------------------
 #------------------------------
 #------------------------------
