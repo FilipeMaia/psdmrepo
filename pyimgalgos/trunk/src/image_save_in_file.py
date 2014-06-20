@@ -30,12 +30,18 @@ import tempfile
 
 #from pypdsdata.xtc import *
 #from psana import *
+
+import psana
+
 import numpy as np
 import scipy.misc as scim
+from time import sleep
 #import tifffile as tiff
 #from PythonMagick import Image
 #from PIL import Image
 import Image
+from CorAna.ArrFileExchange import *
+
 from cspad_arr_producer import *
 
 class image_save_in_file (object) :
@@ -48,16 +54,36 @@ class image_save_in_file (object) :
         @param source      string, address of Detector.Id:Device.ID
         @param key_in      string, keyword for input image array of variable shape
         @param ofname      string, output file name (type is selected by extention) supported formats: txt, tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz
+        @param mode        int, 0-save one event per event, >0-length of the ring buffer (or round robin) for event browser
+        @param delay_sec   int, additional sleep time in sec between events for event browser
         @param print_bits  int, bit-word for verbosity control 
         """
 
         self.m_src        = self.configSrc  ('source', '*-*|Cspad-*')
         self.m_key_in     = self.configStr  ('key_in',    'image')
-        self.m_ofname     = self.configStr  ('ofname',    'img.npy')
+        self.m_ofname     = self.configStr  ('ofname',    './roi-img')
+        self.m_mode       = self.configInt  ('mode',       0)
+        self.m_delay_sec  = self.configInt  ('delay_sec',  0)
         self.m_print_bits = self.configInt  ('print_bits', 1)
 
         if self.m_print_bits & 1 : self.print_input_pars()
 
+        if self.m_mode > 0 :
+            pbits = 0377 if self.m_print_bits & 16 else 0
+            self.afe = ArrFileExchange(self.m_ofname, self.m_mode, pbits)
+
+        self.list_of_dtypes = [
+                               psana.ndarray_float32_2,
+                               psana.ndarray_float64_2,
+                               psana.ndarray_int8_2, 
+                               psana.ndarray_int16_2, 
+                               psana.ndarray_int32_2,
+                               psana.ndarray_int64_2,
+                               psana.ndarray_uint8_2, 
+                               psana.ndarray_uint16_2, 
+                               psana.ndarray_uint32_2,
+                               psana.ndarray_uint64_2
+                               ]        
 
     def beginjob( self, evt, env ) : pass
 
@@ -76,8 +102,17 @@ class image_save_in_file (object) :
         @param evt    event data object
         @param env    environment object
         """
+
+        self.image = None
+        
         if env.fwkName() == "psana":
-            self.image = evt.get(np.ndarray, self.m_src, self.m_key_in)
+            #self.image = evt.get(psana.ndarray_float32_2, self.m_src, self.m_key_in)
+
+            for dtype in self.list_of_dtypes :
+                self.image = evt.get(dtype, self.m_src, self.m_key_in)
+                if self.image is not None:
+                    break
+
         else : 
             self.image = evt.get(self.m_key_in)       
 
@@ -96,6 +131,12 @@ class image_save_in_file (object) :
         self.evnum += 1
 
         if self.m_print_bits & 8 : self.print_part_of_image_array()
+
+        if self.m_mode > 0 :
+            self.afe.save_arr(self.image)
+            sleep(self.m_delay_sec)
+            return
+
 
         name_pref, name_ext = os.path.splitext(self.m_ofname)
         fname = '%s-%s-r%04d-ev%06d%s' % (name_pref, self.exp, self.run, self.evnum, name_ext)

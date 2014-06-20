@@ -25,7 +25,7 @@ import logging
 # Imports for other modules --
 #-----------------------------
 #from psana import *
-
+import psana
 import numpy as np
 
 class image_crop (object) :
@@ -59,6 +59,19 @@ class image_crop (object) :
 
         if self.m_print_bits & 1 : self.print_input_pars()
 
+        self.list_of_dtypes = [
+                               psana.ndarray_float32_2,
+                               psana.ndarray_float64_2,
+                               psana.ndarray_int8_2, 
+                               psana.ndarray_int16_2, 
+                               psana.ndarray_int32_2,
+                               psana.ndarray_int64_2,
+                               psana.ndarray_uint8_2, 
+                               psana.ndarray_uint16_2, 
+                               psana.ndarray_uint32_2,
+                               psana.ndarray_uint64_2
+                               ]        
+
 
     def beginjob( self, evt, env ) : pass
  
@@ -80,9 +93,16 @@ class image_crop (object) :
 
         #print '\nimage_crop: evt.keys():', evt.keys()
 
+        self.arr = None
+
         if env.fwkName() == "psana":
             #self.arr = evt.get(np.ndarray, self.m_key_in)
-            self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
+            #self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
+            for dtype in self.list_of_dtypes :
+                self.arr = evt.get(dtype, self.m_src, self.m_key_in)
+                if self.arr is not None:
+                    break
+            
         else : 
             self.arr = evt.get(self.m_key_in)
 

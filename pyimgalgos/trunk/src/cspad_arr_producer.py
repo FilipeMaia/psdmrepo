@@ -31,7 +31,7 @@ from psana import *
 import numpy as np
 
 class cspad_arr_producer (object) :
-    """Produces from CSPAD data numpy array of shape=(4, 8, 185, 388) and specified data type."""
+    """Produces from CSPAD data numpy array of shape=(4, 8, 185, 388) or (185, 388, 2) and specified data type."""
 
     dic_dtypes = { 'int'    : np.int, \
                    'int8'   : np.int8, \
@@ -75,8 +75,13 @@ class cspad_arr_producer (object) :
 
 
     def set_dtype( self ) :
-        try    : self.m_dtype = self.dic_dtypes[self.m_dtype_str]
-        except : self.m_dtype = np.int16 
+        try    :
+            self.m_dtype = self.dic_dtypes[self.m_dtype_str]
+        except :
+            msg = __name__ + ' WARNING: specified data_type = %s is not implemented' % self.m_dtype_str
+            print msg
+            self.print_dtypes()    
+            self.m_dtype = np.int16 
 
         #if   self.m_dtype_str == 'int'    : self.m_dtype = np.int
         #elif self.m_dtype_str == 'int8'   : self.m_dtype = np.int8
@@ -147,13 +152,21 @@ class cspad_arr_producer (object) :
         @param env    environment object
         """
 
+        self.arr = None
+
         if   self.is_cspad    : self.proc_event_for_cspad    (evt, env)
         elif self.is_cspad2x2 : self.proc_event_for_cspad2x2 (evt, env)            
+
+
+        if self.arr is None :
+            msg =  __name__ + 'WARNING!: image is non-available' 
+            print msg
+            return
 
         if self.m_print_bits & 8 : self.print_part_of_output_array()
 
         #print 'self.arr.dtype =', self.arr.dtype
-        evt.put( self.arr, self.m_key_out )
+        evt.put( self.arr, self.m_src, self.m_key_out )
 
         #print '\ncspad_arr_producer: evt.keys():', evt.keys()
 

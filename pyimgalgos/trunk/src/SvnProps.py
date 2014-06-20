@@ -21,7 +21,7 @@ If you use all or part of it, please give an appropriate acknowledgment.
 # Properties substituted by SVN 
 #------------------------------
 # __revision__ = "$Revision$"
-# __author__   = "$Author$"
+# __author__   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
 #------------------------------
 
 import sys
@@ -32,12 +32,12 @@ class SvnProps :
     def __init__(self) : 
         self.updated  = "2014-05-28"
         self.revision = "$Revision$"
-        self.author   = "$Author$"
+        self.author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
         self.id       = "$Id$"
         self.headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/pyimgalgos/trunk/src/SvnProps.py $"
         self.header   = "$Header:$"
-        self.datelc   = "$LastChangedDate$"
-        self.date     = "$Date$"
+        self.datelc   = "$LastChangedDate: 2014-05-28 11:22:30 -0700 (Wed, 28 May 2014) $"
+        self.date     = "$Date: 2014-05-28 11:22:30 -0700 (Wed, 28 May 2014) $"
 
 #------------------------------
 

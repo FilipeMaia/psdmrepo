@@ -5,17 +5,12 @@
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@version $Id: 2008-09-28$
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
-
-#------------------------------
-#  Module's version from CVS --
-#------------------------------
+#--------------------------------
 __version__ = "$Revision$"
-# $Source$
-
 #--------------------------------
 
 from time import time

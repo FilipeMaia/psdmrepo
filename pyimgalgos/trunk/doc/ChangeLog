@@ -13,6 +13,16 @@ reverse time order.
 	
 =======
 
+Tag: V00-00-16
+2014-06-20 Mikhail S. Dubrovin
+M       src/AngularIntegrator.py
+A       src/GeometryObject.py - "generic" geometry
+A       src/TestImageGenerator.py - a bunch of test images
+M       src/cspad_image_producer.py - in all python modules in evt.get change np.ndarray to np.int16, ...
+M       src/cspad_arr_producer.py
+M       src/image_crop.py
+M       src/image_save_in_file.py
+
 Tag: V00-00-15
 2014-04-28 Mikhail S. Dubrovin
 - cspad_image_producer - fix minor problems with member data,

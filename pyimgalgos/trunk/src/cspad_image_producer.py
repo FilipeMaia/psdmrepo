@@ -29,6 +29,7 @@ import logging
 #from psana import *
 
 import numpy as np
+import psana
 
 import PyCSPadImage.CalibPars         as calp
 import PyCSPadImage.CSPadConfigPars   as ccp
@@ -64,6 +65,21 @@ class cspad_image_producer (object) :
         self.is_cspad    = False
         self.is_cspad2x2 = False
 
+        self.list_of_dtypes = [
+                               psana.ndarray_int16_3, 
+                               psana.ndarray_int32_3,
+                               psana.ndarray_float32_3,
+                               psana.ndarray_float64_3,
+                               psana.ndarray_int8_3, 
+                               psana.ndarray_int64_3, 
+                               psana.ndarray_int16_4, 
+                               psana.ndarray_int32_4,
+                               psana.ndarray_float32_4,
+                               psana.ndarray_float64_4,
+                               psana.ndarray_int8_4, 
+                               psana.ndarray_int64_4
+                               ]        
+
         if self.m_print_bits & 1 : self.print_input_pars()
 
 
@@ -86,8 +102,16 @@ class cspad_image_producer (object) :
 
         self.counter +=1     
 
+
+        self.arr = None
+
         if env.fwkName() == "psana":
-            self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
+
+            for dtype in self.list_of_dtypes :
+                self.arr = evt.get(dtype, self.m_src, self.m_key_in)
+                if self.arr is not None:
+                    break
+            
         else : 
             self.arr = evt.get(self.m_key_in)
 
@@ -147,6 +171,7 @@ class cspad_image_producer (object) :
     def set_configuration( self, evt, env ) :
 
         self.run    = evt.run()
+        if self.arr is None : return
 
         if self.arr.shape[0] == 185 : # for (185, 388, 2)
             self.is_cspad    = False
