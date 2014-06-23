@@ -58,7 +58,7 @@ public:
 
   // Default constructor
   XtcMergeIterator(const boost::shared_ptr<RunFileIterI>& runIter, 
-      double l1OffsetSec = 0);
+                   double l1OffsetSec, int firstControlStream);
 
   // Destructor
   ~XtcMergeIterator () ;
@@ -83,6 +83,7 @@ private:
   
   boost::shared_ptr<RunFileIterI> m_runIter;
   double m_l1OffsetSec;
+  int m_firstControlStream;
   boost::shared_ptr<XtcStreamMerger> m_dgiter ;  ///< Datagram iterator for current run
 
 };

@@ -119,6 +119,31 @@ DgramQueue::pop()
   return p ;
 }
 
+// get reference to datagram at the head of the queue, if the queue is
+// empty then wait until somebody calls push()
+DgramQueue::value_type  
+DgramQueue::front() {
+
+  boost::mutex::scoped_lock qlock ( m_mutex ) ;
+
+  // wait until we have something in the queue
+  while (m_exception.empty() and m_queue.empty()) {
+
+    m_condEmpty.wait( qlock ) ;
+
+    // throw exception if non-empty, reset exception message
+    if (not m_exception.empty()) {
+      std::string msg;
+      msg.swap(m_exception);
+      throw std::runtime_error(msg);
+    }
+
+    if (not m_queue.empty()) break;
+  }
+
+  return m_queue.front();
+}
+
 // completely erase all queue
 void 
 DgramQueue::clear()

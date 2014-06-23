@@ -69,8 +69,10 @@ public:
    *  Constructor accepts iterator object which iterators over chunks in a stream.
    *
    *  @param[in]  chunkIter Iterator over chunks in a stream
+   *  @param[in]  should we sort L1Accepts by clockTime
    */
-  XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter);
+  XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
+                  bool clockSort);
 
   // Destructor
   ~XtcStreamDgIter () ;
@@ -105,7 +107,7 @@ private:
   boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk
   HeaderQueue m_headerQueue;            ///< Queue for read-ahead headers
-
+  bool m_clockSort;                     ///< sort datagrams by clock time
 };
 
 } // namespace XtcInput

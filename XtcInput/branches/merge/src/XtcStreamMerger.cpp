@@ -38,6 +38,48 @@ namespace {
 
   const char* logger = "XtcInput.XtcStreamMerger" ;
 
+  const int MAX_CLOCK_DRIFT_SECONDS = 120;
+
+  // return index of dgramList with earliest clocktime, or -1 if all
+  // dgrams are empty
+  int findEarliestClockTime(const std::vector<XtcInput::Dgram> &dgrams) {
+    unsigned n = dgrams.size();
+    int stream = -1;
+    for ( unsigned i = 0 ; i < n ; ++ i ) {
+      if (not dgrams[i].empty()) {
+        if ( stream < 0 or 
+             dgrams[stream].dg()->seq.clock() > dgrams[i].dg()->seq.clock() ) {
+          stream = i ;
+        }
+      }
+    }
+    return stream;
+  }
+
+  // return index of dgram that is an L1Accept with earliest fiducial time, or -1 if no 
+  // L1Accepts in dgram list
+  int findEarliestL1AcceptFidTime(const std::vector<XtcInput::Dgram> &dgrams,
+                                  const XtcInput::FiducialsCompare &fidCmp) {
+    unsigned n = dgrams.size();
+    int stream = -1;
+    for ( unsigned i = 0 ; i < n ; ++ i ) {
+      if (not dgrams[i].empty() and (dgrams[i].dg()->seq.service() == Pds::TransitionId::L1Accept)) {
+        if (stream < 0 or fidCmp.fiducialsGreater(*dgrams[stream].dg(), *dgrams[i].dg())) {
+          stream = i ;
+        }
+      }
+    }
+    return stream;
+  }
+
+  float clockTimeDiffInSeconds(XtcInput::Dgram::ptr A, XtcInput::Dgram::ptr B) {
+    float res = A->seq.clock().seconds() - B->seq.clock().seconds();
+    float nanoDiff = A->seq.clock().nanoseconds() - B->seq.clock().nanoseconds();
+    nanoDiff /= 1e9;
+    res += nanoDiff;
+    return res;
+  }
+
 }
 
 //		----------------------------------------
@@ -46,16 +88,22 @@ namespace {
 
 namespace XtcInput {
 
+const unsigned XtcStreamMerger::maxSizeOutputQueue = 100;
+
 //----------------
 // Constructors --
 //----------------
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-        double l1OffsetSec)
-  : m_streams()
-  , m_dgrams()
+                                 double l1OffsetSec, int firstControlStream)
+  : m_DAQstreams()
+  , m_DAQdgrams()
+  , m_controlStreams()
+  , m_controlDgrams()
   , m_l1OffsetSec(int(l1OffsetSec))
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
+  , m_firstControlStream(firstControlStream)
   , m_outputQueue()
+  , m_fidCmp(120)
 {
 
   // create all streams
@@ -63,16 +111,25 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
     const boost::shared_ptr<ChunkFileIterI>& chunkFileIter = streamIter->next();
     if (not chunkFileIter) break;
 
-    MsgLog(logger, trace, "XtcStreamMerger -- stream: " << streamIter->stream());
+    bool controlStream = int(streamIter->stream()) >= m_firstControlStream;
+    bool clockSort = not controlStream;
+    MsgLog(logger, trace, "XtcStreamMerger -- stream: " << streamIter->stream()
+           << " is control stream=" << controlStream);
 
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
-        boost::make_shared<XtcStreamDgIter>(chunkFileIter) ;
-    m_streams.push_back(stream) ;
+      boost::make_shared<XtcStreamDgIter>(chunkFileIter, clockSort) ;
     Dgram dg(stream->next());
-    if (not dg.empty()) updateDgramTime(*dg.dg());
-    m_dgrams.push_back( dg ) ;
-
+    if (controlStream) {
+      m_controlStreams.push_back(stream) ;
+      m_controlDgrams.push_back(dg);
+    } else {
+      m_DAQstreams.push_back(stream) ;
+      // only adjust times of dgrams for typical streams, this allows one to
+      // correct for too much clock drift with fiducial merge streams
+      if (not dg.empty()) updateDgramTime(*dg.dg());
+      m_DAQdgrams.push_back( dg ) ;
+    }
   }
 
 }
@@ -84,7 +141,6 @@ XtcStreamMerger::~XtcStreamMerger ()
 {
 }
 
-
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
 Dgram
@@ -93,40 +149,30 @@ XtcStreamMerger::next()
 
   if (m_outputQueue.empty()) {
 
-    unsigned ns =  m_streams.size() ;
-
     // find datagram with lowest timestamp
-    int stream = -1 ;
-    for ( unsigned i = 0 ; i < ns ; ++ i ) {
-      if (not m_dgrams[i].empty()) {
-        if ( stream < 0 or m_dgrams[stream].dg()->seq.clock() > m_dgrams[i].dg()->seq.clock() ) {
-          stream = i ;
-        }
-      }
-    }
+    int DAQstream = findEarliestClockTime(m_DAQdgrams);
 
-    MsgLog( logger, debug, "next -- stream: " << stream ) ;
+    MsgLog( logger, debug, "next -- DAQ stream: " << DAQstream ) ;
 
-    if (stream >= 0) {
-
-      // send all datagrams with this timestamp to output queue
-      Pds::ClockTime ts = m_dgrams[stream].dg()->seq.clock();
-      for ( unsigned i = 0 ; i < ns ; ++ i ) {
-        if (not m_dgrams[i].empty()) {
-          if (m_dgrams[i].dg()->seq.clock() == ts) {
-
-            m_outputQueue.push(m_dgrams[i]);
-
-            // get next datagram from that stream
-            Dgram ndg(m_streams[i]->next());
-            MsgLog( logger, debug, "next -- read datagram from file: " << ndg.file().basename() ) ;
-            if (not ndg.empty()) updateDgramTime(*ndg.dg());
-            m_dgrams[i] = ndg ;
-
+    if (DAQstream >= 0) {
+      XtcInput::Dgram::ptr DAQdg = m_DAQdgrams[DAQstream].dg();
+      Pds::TransitionId::Value targetTrans = DAQdg->seq.service();
+      if (targetTrans == Pds::TransitionId::Configure) {
+        int controlStream = findEarliestL1AcceptFidTime(m_controlDgrams, fidCmp());
+        if (controlStream >= 0) {
+          XtcInput::Dgram::ptr controlDg = m_controlDgrams[controlStream].dg();
+          if (clockTimeDiffInSeconds(controlDg, DAQdg) > MAX_CLOCK_DRIFT_SECONDS) {
+            MsgLog(logger, error, "configure transition in DAQ streams, but next control streams include L1Accept more than " << MAX_CLOCK_DRIFT_SECONDS << " in the future");
           }
+          sendFidMatchL1AcceptsToOutputQueue(controlDg, true);
         }
       }
-
+          
+      // send all datagrams with this timestamp to output queue
+      Pds::ClockTime ts = m_DAQdgrams[DAQstream].dg()->seq.clock();
+      bool isControl = false;
+      sendClockMatchToOutputQueue(ts, isControl);
+      
     }
 
   }
@@ -138,14 +184,57 @@ XtcStreamMerger::next()
     m_outputQueue.pop();
 
     Dgram::ptr dgptr = dg.dg();
-    MsgLog( logger, debug, "next -- m_dgrams[stream].clock: "
+    MsgLog( logger, debug, "next -- m_DAQdgrams[stream].clock: "
         << dgptr->seq.clock().seconds() << " sec " << dgptr->seq.clock().nanoseconds() << " nsec" ) ;
-    MsgLog( logger, debug, "next -- m_dgrams[stream].service: " << Pds::TransitionId::name(dgptr->seq.service()) ) ;
+    MsgLog( logger, debug, "next -- m_DAQdgrams[stream].service: " << Pds::TransitionId::name(dgptr->seq.service()) ) ;
   }
 
   return dg ;
 }
 
+int XtcStreamMerger::sendClockMatchToOutputQueue(const Pds::ClockTime  &ts, 
+                                                 bool control) {
+  std::vector<Dgram> &dgrams = control ? m_controlDgrams : m_DAQdgrams;
+  std::vector<boost::shared_ptr<XtcStreamDgIter> > &streams = control ? m_controlStreams : m_DAQstreams;
+  int numSent = 0;
+  unsigned n = dgrams.size();
+  for ( unsigned i = 0 ; i < n ; ++ i ) {
+    if (not dgrams[i].empty()) {
+      if (dgrams[i].dg()->seq.clock() == ts) {
+        m_outputQueue.push(dgrams[i]);
+        ++numSent;
+        // get next datagram from that stream
+        Dgram ndg(streams[i]->next());
+        MsgLog( logger, debug, " read datagram from file: " << ndg.file().basename() ) ;
+        if (not ndg.empty() and (not control)) updateDgramTime(*ndg.dg());
+        dgrams[i] = ndg ;
+      }
+    }
+  }
+  return numSent;
+}
+
+int XtcStreamMerger::sendFidMatchL1AcceptsToOutputQueue(XtcInput::Dgram::ptr dg, 
+                                                        bool control) {
+  std::vector<Dgram> &dgrams = control ? m_controlDgrams : m_DAQdgrams;
+  std::vector<boost::shared_ptr<XtcStreamDgIter> > &streams = control ? m_controlStreams : m_DAQstreams;
+  int numSent = 0;
+  unsigned n = dgrams.size();
+  for ( unsigned i = 0 ; i < n ; ++ i ) {
+    if (not dgrams[i].empty()) {
+      if (fidCmp().fiducialsEqual(*dgrams[i].dg(), *dg)) {
+        m_outputQueue.push(dgrams[i]);
+        ++numSent;
+        // get next datagram from that stream
+        Dgram ndg(streams[i]->next());
+        MsgLog( logger, debug, " read datagram from file: " << ndg.file().basename() ) ;
+        if (not ndg.empty() and (not control)) updateDgramTime(*ndg.dg());
+        dgrams[i] = ndg ;
+      }
+    }
+  }
+  return numSent;
+}
 
 void 
 XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const

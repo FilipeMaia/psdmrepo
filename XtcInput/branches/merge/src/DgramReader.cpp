@@ -182,8 +182,8 @@ try {
     }
   }
 
-  // make instance of file iterator
-  boost::shared_ptr<RunFileIterI> fileIter;
+  // make instance of run file iterator
+  boost::shared_ptr<RunFileIterI> runFileIter;
   if (liveMode == Dead) {
 
     // if one-stream is active filter file names
@@ -248,7 +248,7 @@ try {
     }
     
     if (not files.empty()) {
-      fileIter = boost::make_shared<RunFileIterList>(files.begin(), files.end(), m_mode);
+      runFileIter = boost::make_shared<RunFileIterList>(files.begin(), files.end(), m_mode);
     }
 
   } else {
@@ -263,14 +263,14 @@ try {
     if (not numbers.empty()) {
       // use default table name if none was given
       if (m_liveDbConn.empty()) m_liveDbConn = "Server=psdb.slac.stanford.edu;Database=regdb;Uid=regdb_reader";
-      fileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, streams,
+      runFileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, streams,
           m_liveTimeout, m_liveDbConn, m_liveTable, liveDir);
     }
   }
 
-  if (fileIter) {
+  if (runFileIter) {
 
-    XtcMergeIterator iter(fileIter, m_l1OffsetSec);
+    XtcMergeIterator iter(runFileIter, m_l1OffsetSec, m_firstControlStream);
     Dgram dg;
     while ( not boost::this_thread::interruption_requested() ) {
 

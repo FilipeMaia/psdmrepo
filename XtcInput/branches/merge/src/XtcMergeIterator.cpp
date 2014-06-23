@@ -45,9 +45,10 @@ namespace XtcInput {
 // Constructors --
 //----------------
 XtcMergeIterator::XtcMergeIterator (const boost::shared_ptr<RunFileIterI>& runIter, 
-    double l1OffsetSec)
+                                    double l1OffsetSec, int firstControlStream)
   : m_runIter(runIter)
   , m_l1OffsetSec(l1OffsetSec)
+  , m_firstControlStream(firstControlStream)
 {
 }
 
@@ -75,10 +76,11 @@ XtcMergeIterator::next()
 
       // open next xtc file if there is none open
       MsgLog(logger, trace, "processing run #" << m_runIter->run()) ;
-      m_dgiter = boost::make_shared<XtcStreamMerger>(fileNameIter, m_l1OffsetSec);
+      m_dgiter = boost::make_shared<XtcStreamMerger>(fileNameIter, m_l1OffsetSec, 
+                                                     m_firstControlStream);
     }
 
-    // try to read next event from it
+    // try to read next datagram from it
     dgram = m_dgiter->next() ;
 
     // if failed to read go to next file

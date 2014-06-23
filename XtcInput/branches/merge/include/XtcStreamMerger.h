@@ -29,6 +29,7 @@
 #include "XtcInput/StreamFileIterI.h"
 #include "XtcInput/XtcStreamDgIter.h"
 #include "XtcInput/XtcFileName.h"
+#include "XtcInput/FiducialsCompare.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -66,9 +67,10 @@ public:
    *
    *  @param[in]  streamIter  Iterator for input files
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
+   *  @param[in]  firstControlStream starting stream number for fiducial merge
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-      double l1OffsetSec = 0 ) ;
+                  double l1OffsetSec, int firstControlStream) ;
 
   // Destructor
   ~XtcStreamMerger () ;
@@ -92,14 +94,30 @@ protected:
   // update time in datagram
   void updateDgramTime(Pds::Dgram& dgram) const ;
 
-private:
+  // return the number of dgrams moved to the output queue
+  int synchControlToTransition(XtcInput::Dgram::ptr transDg);
 
-  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_streams ;   ///< Set of datagram iterators for individual streams
-  std::vector<Dgram> m_dgrams ;               ///< Current datagram for each of the streams
+  // return number of dgrams moved to output queue
+  // control means use control queues
+  int sendClockMatchToOutputQueue(const Pds::ClockTime  &ts, 
+                                  bool control);
+
+  int sendFidMatchL1AcceptsToOutputQueue(XtcInput::Dgram::ptr dg, 
+                                         bool control);
+
+  const FiducialsCompare & fidCmp() const { return m_fidCmp; }; 
+
+private:
+  static const unsigned maxSizeOutputQueue;
+  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_DAQstreams ;   ///< Set of datagram iterators for typical individual streams
+  std::vector<Dgram> m_DAQdgrams ;               ///< Current datagram for each of the typical streams
+  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_controlStreams ;   ///< Set of datagram iterators for control streams
+  std::vector<Dgram> m_controlDgrams ;        ///< Current datagram for each of the control streams
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
+  int m_firstControlStream ;                  ///< starting stream number for control streams
   std::queue<Dgram> m_outputQueue;            ///< Output queue for datagrams
-
+  FiducialsCompare m_fidCmp;                  ///< Comparing fiducial/second time
 };
 
 } // namespace XtcInput
