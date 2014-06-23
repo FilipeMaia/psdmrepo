@@ -59,7 +59,7 @@ namespace PSXtcInput {
 class DgramSourceFile : public IDatagramSource, public psana::Configurable {
 public:
 
-  // Constructor tagkes the name of the input module, used for accessing module 
+  // Constructor takes the name of the input module, used for accessing module 
   // configuration parameters. 
   DgramSourceFile(const std::string& name);
 
@@ -96,11 +96,14 @@ public:
 
 protected:
 
+  bool sameEvent(const XtcInput::Dgram &eventDg, const XtcInput::Dgram &otherDg) const;
+
 private:
 
   boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;  ///< Input datagram queue
   boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
   std::vector<std::string> m_fileNames;               ///< List of file names/datasets to read data from
+  int m_firstControlStream;                           ///< Starting index of control streams
 
 };
 

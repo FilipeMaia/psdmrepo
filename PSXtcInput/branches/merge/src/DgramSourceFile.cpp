@@ -39,6 +39,62 @@ using namespace XtcInput;
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
+namespace {
+
+  const unsigned MAX_SEC_DRIFT_FOR_FIDUCIAL_MATCH = 120;
+
+  bool isL1Accept(const XtcInput::Dgram &dg) {
+    if (dg.empty()) return false;
+    XtcInput::Dgram::ptr pDg = dg.dg();
+    return pDg->seq.service() == Pds::TransitionId::L1Accept;
+  }
+
+  bool transitionsMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) {
+    if (dgA.empty() or dgB.empty()) return false;
+    XtcInput::Dgram::ptr pDgA = dgA.dg();
+    XtcInput::Dgram::ptr pDgB = dgB.dg();
+    return pDgA->seq.service() == pDgB->seq.service();
+  }
+
+  bool isFiducialMatchStream(const XtcInput::Dgram &dg, const int firstControlStream) {
+    if (dg.empty()) return false;
+    const XtcFileName& fileName = dg.file();
+    if (fileName.empty()) return false;
+    return (int(fileName.stream()) >= firstControlStream);
+  }
+  
+  unsigned absDiff(unsigned a, unsigned b) {
+    if (b >= a) return b-a;
+    return a-b;
+  }
+
+  bool fiducialSecondsMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) {
+    if (dgA.empty() or dgB.empty()) return false;
+    XtcInput::Dgram::ptr pDgA = dgA.dg();
+    XtcInput::Dgram::ptr pDgB = dgB.dg();
+    unsigned fidA = pDgA->seq.stamp().fiducials();
+    unsigned fidB = pDgB->seq.stamp().fiducials();
+    if (fidA != fidB) return false;
+    unsigned secA = pDgA->seq.clock().seconds();
+    unsigned secB = pDgB->seq.clock().seconds();
+    unsigned drift = absDiff(secA,secB);
+    return drift < MAX_SEC_DRIFT_FOR_FIDUCIAL_MATCH;
+  }
+
+  bool clockTimesMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) {
+    if (dgA.empty() or dgB.empty()) return false;
+    XtcInput::Dgram::ptr pDgA = dgA.dg();
+    XtcInput::Dgram::ptr pDgB = dgB.dg();
+    unsigned secA = pDgA->seq.clock().seconds();
+    unsigned secB = pDgB->seq.clock().seconds();
+    if (secA != secB) return false;
+    unsigned nanoA = pDgA->seq.clock().nanoseconds();
+    unsigned nanoB = pDgB->seq.clock().nanoseconds();
+    return nanoA == nanoB;
+  }
+
+}
+
 namespace PSXtcInput {
 
 //----------------
@@ -50,6 +106,8 @@ DgramSourceFile::DgramSourceFile (const std::string& name)
   , m_dgQueue(new XtcInput::DgramQueue(10))
   , m_readerThread()
   , m_fileNames()
+  , m_firstControlStream(80)
+
 {
   m_fileNames = configList("files");
   if ( m_fileNames.empty() ) {
@@ -88,8 +146,14 @@ DgramSourceFile::init()
   unsigned liveTimeout = config("liveTimeout", 120U);
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
-  m_readerThread.reset( new boost::thread( DgramReader ( m_fileNames.begin(), m_fileNames.end(),
-      *m_dgQueue, merge, liveDbConn, liveTable, liveTimeout, l1offset) ) );
+  m_firstControlStream = config("first_control_stream",80);
+  m_readerThread.reset( new boost::thread( DgramReader ( m_fileNames.begin(), 
+                                                         m_fileNames.end(),
+                                                         *m_dgQueue, 
+                                                         merge, liveDbConn, 
+                                                         liveTable, liveTimeout, 
+                                                         l1offset, 
+                                                         m_firstControlStream) ) );
 }
 
 
@@ -100,10 +164,38 @@ DgramSourceFile::next(std::vector<XtcInput::Dgram>& eventDg, std::vector<XtcInpu
   XtcInput::Dgram dg = m_dgQueue->pop();
   if (not dg.empty()) {
     eventDg.push_back(dg);
+    bool foundDgramForDifferentEvent = false;
+    while (not foundDgramForDifferentEvent) {
+      XtcInput::Dgram nextDg =  m_dgQueue->front();
+      if (sameEvent(dg, nextDg)) {
+        nextDg = m_dgQueue->pop();
+        eventDg.push_back(dg);
+      } else {
+        foundDgramForDifferentEvent = true;
+      }
+    }
     return true;
   } else {
     return false;
   }
 }
+
+bool DgramSourceFile::sameEvent(const XtcInput::Dgram &eventDg, const XtcInput::Dgram &otherDg) const
+{
+  if (isL1Accept(otherDg) and isL1Accept(eventDg) and 
+      (isFiducialMatchStream(otherDg, m_firstControlStream) or
+       isFiducialMatchStream(eventDg, m_firstControlStream)) and
+      fiducialSecondsMatch(eventDg, otherDg)) {
+    return true;
+  }
+  if ((not isL1Accept(otherDg)) and
+      (not isL1Accept(eventDg)) and 
+      transitionsMatch(otherDg, eventDg) and
+      clockTimesMatch(otherDg, eventDg)) {
+    return true;
+  }
+  return false;
+}
+
 
 } // namespace PSXtcInput
