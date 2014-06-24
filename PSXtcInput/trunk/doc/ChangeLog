@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-08
+2014-06-23 Christopher O'Grady
+- Handle large events more intelligently (previously would crash if
+  event exceeded maximum size).  Also fix bug where
+  if an index file was missing, it was still in the xtc file list.
+  Now those two lists of files should be more "synchronized".
+
 Tag: V00-14-07
 2014-06-16 David Schneider
 - keep counter for events to pass to epicsStore.store function:
