@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 	
 =======
+Tag: V00-00-18
+2014-06-24 Mikhail S. Dubrovin
+- add ex_peaks_nda to test results of ImgAlgos.CSPadArrPeakFinder 
+
 Tag: V00-00-17
 2014-06-24 Mikhail S. Dubrovin
 - add GeometryAccess to work with list of geos
