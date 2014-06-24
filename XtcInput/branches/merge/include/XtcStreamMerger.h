@@ -25,11 +25,10 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "XtcInput/Dgram.h"
+#include "XtcInput/StreamDgram.h"
 #include "XtcInput/StreamFileIterI.h"
 #include "XtcInput/XtcStreamDgIter.h"
 #include "XtcInput/XtcFileName.h"
-#include "XtcInput/FiducialsCompare.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -94,30 +93,24 @@ protected:
   // update time in datagram
   void updateDgramTime(Pds::Dgram& dgram) const ;
 
-  // return the number of dgrams moved to the output queue
-  int synchControlToTransition(XtcInput::Dgram::ptr transDg);
+  typedef std::pair<Pds::TransitionId::Value, uint64_t> TransBlock;            ///< transition id and L1 block number of a dgram
 
-  // return number of dgrams moved to output queue
-  // control means use control queues
-  int sendClockMatchToOutputQueue(const Pds::ClockTime  &ts, 
-                                  bool control);
-
-  int sendFidMatchL1AcceptsToOutputQueue(XtcInput::Dgram::ptr dg, 
-                                         bool control);
-
-  const FiducialsCompare & fidCmp() const { return m_fidCmp; }; 
+  // utilities for managing TransBlock
+  static TransBlock makeTransBlock(const Dgram &dg, uint64_t block);
+  static TransBlock getInitialTransBlock(const Dgram &dg);
+  static uint64_t getNextBlock(const TransBlock & prevTransBlock, const Dgram &dg);
 
 private:
-  static const unsigned maxSizeOutputQueue;
-  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_DAQstreams ;   ///< Set of datagram iterators for typical individual streams
-  std::vector<Dgram> m_DAQdgrams ;               ///< Current datagram for each of the typical streams
+  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_DAQstreams ;       ///< Set of datagram iterators for typical individual streams
   std::vector<boost::shared_ptr<XtcStreamDgIter> > m_controlStreams ;   ///< Set of datagram iterators for control streams
-  std::vector<Dgram> m_controlDgrams ;        ///< Current datagram for each of the control streams
+  std::vector<TransBlock> m_DAQ_priorTransBlock;                        ///< TransBlock for last dgram from m_DAQstreams put in queue
+  std::vector<TransBlock> m_control_priorTransBlock;                    ///< TransBlock for last dgram from m_controlStreams put in queue
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   int m_firstControlStream ;                  ///< starting stream number for control streams
-  std::queue<Dgram> m_outputQueue;            ///< Output queue for datagrams
-  FiducialsCompare m_fidCmp;                  ///< Comparing fiducial/second time
+  StreamDgramCmp m_streamDgramCmp;            ///< for comparing two dgrams in the priority queue
+  typedef std::priority_queue<StreamDgram, std::vector<StreamDgram>, StreamDgramCmp> OutputQueue;
+  OutputQueue m_outputQueue;                  ///< Output queue for datagrams
 };
 
 } // namespace XtcInput

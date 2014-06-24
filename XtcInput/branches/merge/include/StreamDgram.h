@@ -40,8 +40,8 @@ typedef enum {DAQ, controlUnderDAQ, controlIndependent} StreamType;
 class StreamDgram : public Dgram {
  public:
 
-  StreamDgram(const Dgram &dgram, StreamType streamType, int64_t L1block) 
-    : Dgram(dgram), m_streamType(streamType), m_L1block(L1block)
+ StreamDgram(const Dgram &dgram, StreamType streamType, int64_t L1block, int streamIndex) 
+   : Dgram(dgram), m_streamType(streamType), m_L1block(L1block), m_streamIndex(streamIndex)
     {}
 
   /**
@@ -50,8 +50,10 @@ class StreamDgram : public Dgram {
   StreamDgram() : Dgram(), m_streamType(DAQ), m_L1block(-1) {}
 
   
-  /// if this dgram is an L1Accept, returns the block of L1Accepts that
-  /// this datagram is a part of in the stream. If this dgram is a Transition,
+  /// The L1Block is relative to the run within a stream. Code that constructs StreamDgram
+  /// must guarentee this, so that code that uses StreamDgram can rely on this.
+  /// If this dgram is an L1Accept, returns the block of L1Accepts that
+  /// this datagram is a part of in its run of the stream. If this dgram is a Transition,
   /// returns the number of L1Accept blocks that preceded it in the stream.
   /// if this dgram is empty, returns, -1.
   int64_t L1Block() const { 
@@ -60,14 +62,20 @@ class StreamDgram : public Dgram {
   };
 
   StreamType streamType() const { return m_streamType; }
-private:
+
+  int streamIndex() const { return m_streamIndex; }
+
+ private:
 
   StreamType m_streamType;
   int64_t m_L1block;
+  int m_streamIndex;
 };
 
-/// determines if this dgram should appear earlier in a merge with others
-class LessStreamDgram {
+/// Implements operator() which returns true if a > b, (Greater than) for use
+/// with a priority queue where we want the first element is the one with the
+/// least time (as opposed to highest)
+class StreamDgramCmp {
  public:
   /// typedefs for defining clock drift between different experiments
   typedef std::pair<unsigned, unsigned> ExperimentPair;
@@ -75,11 +83,11 @@ class LessStreamDgram {
   typedef std::map<ExperimentPair, ClockDiff> ExperimentClockDiffMap;
 
   /// constructor, optional clock drift map can be passed in
-  LessStreamDgram(const boost::shared_ptr<ExperimentClockDiffMap> expClockDiff = 
+  StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> expClockDiff = 
                   boost::shared_ptr<ExperimentClockDiffMap>(),
                   unsigned maxClockDrift = 120);
 
-  /// operator < for two StreamDgram's
+  /// operator greater than for two StreamDgram's
   bool operator()(const StreamDgram &a, const StreamDgram &b) const;
 
   /// determine if two StreamDgram's are part of the same event
@@ -95,10 +103,10 @@ class LessStreamDgram {
 
   /// the different kinds of comparisons
   typedef enum {clockCmp, fidCmp, blockCmp, mapCmp} CompareMethod;  
-  bool lessClockCmp(const StreamDgram &a, const StreamDgram &b) const;
-  bool lessFidCmp(const StreamDgram &a, const StreamDgram &b) const;
-  bool lessBlockCmp(const StreamDgram &a, const StreamDgram &b) const;
-  bool lessMapCmp(const StreamDgram &a, const StreamDgram &b) const;
+  bool doClockCmp(const StreamDgram &a, const StreamDgram &b) const;
+  bool doFidCmp(const StreamDgram &a, const StreamDgram &b) const;
+  bool doBlockCmp(const StreamDgram &a, const StreamDgram &b) const;
+  bool doMapCmp(const StreamDgram &a, const StreamDgram &b) const;
  private:
   const boost::shared_ptr<ExperimentClockDiffMap> m_expClockDiff;
   std::map<DgramCategoryAB, CompareMethod> m_LUT;
@@ -106,11 +114,11 @@ class LessStreamDgram {
 
  public:
  // UnknownCmp is thrown when two dgrams are compared for which no comparision
- // method is known - most likely an internal logic error in LessDgramCmp
+ // method is known - most likely an internal logic error in StreamDgramCmp
  class UnknownCmp : public psana::Exception {
  public:
  UnknownCmp(const ErrSvc::Context &ctx) : 
-   psana::Exception(ctx, "unknown cmp method - LessDgramCmp") {}
+   psana::Exception(ctx, "unknown cmp method - StreamDgramCmp") {}
  };
 
  // NoClockDiff is thrown when a mapCmp is requries, but either the experiments for the
