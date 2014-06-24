@@ -34,6 +34,7 @@
 #include "PSEvt/EventId.h"
 #include "cspad_mod/DataT.h"
 #include "cspad_mod/ElementT.h"
+#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -59,6 +60,7 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   : CSPadBaseModule(name)
   , m_key_signal_out()  
   , m_key_peaks_out()  
+  , m_key_peaks_nda()  
   , m_maskFile_inp()
   , m_maskFile_out()
   , m_fracFile_out()
@@ -86,8 +88,9 @@ CSPadArrPeakFinder::CSPadArrPeakFinder (const std::string& name)
   , m_count_mask_accum(0)
 {
   // get the values from configuration or use defaults
-  m_key_signal_out    = configStr("key_signal_out", "");
-  m_key_peaks_out     = configStr("key_peaks_out", "peaks");
+  m_key_signal_out    = configStr("key_signal_out",        "");
+  m_key_peaks_out     = configStr("key_peaks_out",    "peaks");
+  m_key_peaks_nda     = configStr("key_peaks_nda",         "");
   m_maskFile_inp      = configStr("hot_pix_mask_inp_file", ""); // "cspad-pix-mask-in.dat"
   m_maskFile_out      = configStr("hot_pix_mask_out_file", "cspad-pix-mask-out.dat");
   m_fracFile_out      = configStr("frac_noisy_evts_file",  "cspad-pix-frac-out.dat");
@@ -144,6 +147,7 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n key                   : " << inputKey()
         << "\n m_key_signal_out      : " << m_key_signal_out
         << "\n m_key_peaks_out       : " << m_key_peaks_out 
+        << "\n m_key_peaks_nda       : " << m_key_peaks_nda 
         << "\n m_maskFile_inp        : " << m_maskFile_inp    
         << "\n m_maskFile_out        : " << m_maskFile_out    
         << "\n m_fracFile_out        : " << m_fracFile_out    
@@ -221,7 +225,10 @@ CSPadArrPeakFinder::event(Event& evt, Env& env)
 
   makeUnitedPeakVector();
 
-  savePeaksInEvent(evt);
+  if( v_peaks.size() > 0 ) {
+    savePeaksInEvent(evt);
+    savePeaksInEventAsNDArr(evt);
+  }
 
   bool isSelected = eventSelector();
 
@@ -1066,14 +1073,45 @@ CSPadArrPeakFinder::savePeaksInFile (std::string& fname, std::vector<Peak> peaks
 }
 
 //--------------------
-// Save vector of peaks in the event
+// Save vector of peaks in the event asstd::vector<Peak>
 void 
 CSPadArrPeakFinder::savePeaksInEvent(Event& evt)
 {
+  if(m_key_peaks_out.empty()) return;
+
   shared_ptr< std::vector<Peak> >  sppeaks( new std::vector<Peak>(v_peaks) );
-  if( v_peaks.size() > 0 ) evt.put(sppeaks, source(), m_key_peaks_out);
+  evt.put(sppeaks, source(), m_key_peaks_out);
 }
 
+//--------------------
+// Save vector of peaks in the event as ndarray<const float,2>
+void 
+CSPadArrPeakFinder::savePeaksInEventAsNDArr(Event& evt)
+{
+  if(m_key_peaks_nda.empty()) return;
+
+  ndarray<float, 2> peaks_nda = make_ndarray<float>(int(v_peaks.size()), 12);
+
+  int i=-1;
+  for(vector<Peak>::const_iterator itv  = v_peaks.begin();
+                                   itv != v_peaks.end(); itv++) {
+    i++;
+    peaks_nda[i][0] = float(itv->quad);
+    peaks_nda[i][1] = float(itv->sect);
+    peaks_nda[i][2] = float(itv->col);
+    peaks_nda[i][3] = float(itv->row);
+    peaks_nda[i][4] = float(itv->sigma_col);
+    peaks_nda[i][5] = float(itv->sigma_row); 
+    peaks_nda[i][6] = float(itv->ampmax);
+    peaks_nda[i][7] = float(itv->amptot);
+    peaks_nda[i][8] = float(itv->bkgdtot); 
+    peaks_nda[i][9] = float(itv->noise); 
+    peaks_nda[i][10]= float(itv->SoN);
+    peaks_nda[i][11]= float(itv->npix);
+  }
+
+  save2DArrayInEvent<float>(evt, source(), m_key_peaks_nda, peaks_nda);
+}
 
 //--------------------
 // Print current selection statistics

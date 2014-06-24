@@ -77,7 +77,7 @@ struct Peak{
   double bkgdtot;
   double noise;
   double SoN;
-  unsigned npix;
+  unsigned npix;  
 };
 
 // Stuff for the peak finding algorithm in thread-safe mode
@@ -175,6 +175,7 @@ protected:
     std::string strRunNumber(Event& evt);
     void doOperationsForSelectedEvent(Event& evt);
     void savePeaksInEvent(Event& evt);
+    void savePeaksInEventAsNDArr(Event& evt);
     void savePeaksInFile(std::string& fname, std::vector<Peak> peaks);
     void printSelectionStatistics();
     void printSelectionStatisticsByCounter();
@@ -182,7 +183,8 @@ protected:
 
 private:
   std::string    m_key_signal_out;   // string with key for signal cspad array (background subtracted by median algorithm) 
-  std::string    m_key_peaks_out;    // string with key for found peaks in selected events
+  std::string    m_key_peaks_out;    // string with key for found peaks (vector<Peak>) in selected events
+  std::string    m_key_peaks_nda;    // string with key for found peaks (ndarray<float,2>)in selected events
   std::string    m_maskFile_inp;     // [in]  file with mask 
   std::string    m_maskFile_out;     // [out] file with mask 
   std::string    m_fracFile_out;     // [out] file with pixel status info: fraction of noisy images (events)
