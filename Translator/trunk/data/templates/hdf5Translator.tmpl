@@ -344,10 +344,24 @@ max_saved_split_events = 3000
 # ---------------------------------------
 # HDF5 FILE PROPERTIES
 #
-# split large files, presently we only support NoSplit. Future options may be: Family and SplitScan
-# for future splitting, splitSize defaults to 10 GB
+# split large files, presently we support NoSplit. In the future we will support SplitScan. 
 split = NoSplit
-splitSize = 10737418240
+
+# In splitScan mode, in addtion to the output File, one file will be made for every
+# calib cycle. The output file will include links to the other files. Several translator
+# jobs may run simultaneously do divide the work of creating the calib cycle files.
+
+# if SplitScan is specified, one can also specify which of the calib cycle files this
+# translator job should create. The default is total jobs is 1, and job number is 0:
+
+# splitJobTotal = 1
+# splitJobNumber = 0
+
+# If numberSplitJobs were 10 and splitJobNumber=3, this Translator will process 
+# calibCycle 3, 13, 23, etc.
+# The user must make sure to launch all 10 Translator jobs to get all the calib cycle
+# files written. splitJobNumber=0 will write the master file with links to the calib
+# cycle files.
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: type_aliases_cpp

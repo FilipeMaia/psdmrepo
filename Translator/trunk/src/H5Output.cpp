@@ -234,12 +234,11 @@ void H5Output::readConfigParameters() {
   if (not m_quiet) MsgLog(logger(), info, "output file: " << m_h5fileName);
   string splitStr = configReportIfNotDefault(string("split"),string("NoSplit"));
   if (splitStr == "NoSplit") m_split = NoSplit;
-  else if (splitStr == "Family") m_split = Family;
   else if (splitStr == "SplitScan") m_split = SplitScan;
-  else MsgLog(logger(),fatal,"config parameter 'split' must be one of 'NoSplit' 'Family' or 'SplitScan' (default is NoSplit)");
+  else MsgLog(logger(),fatal,"config parameter 'split' must be 'NoSplit' or 'SplitScan' (default is NoSplit)");
   if (m_split != NoSplit) MsgLog(logger(),info,"split = " << splitStr << " (non-default value)");
-  m_splitSize = configReportIfNotDefault("splitSize",10*1073741824ULL);
-
+  m_splitJobNumber = configReportIfNotDefault("splitJobNumber",0);
+  m_splitJobTotal = configReportIfNotDefault("splitJobTotal",1);
   // default list for type_filter, src_filter, ndarray_key_filter and std_string_key_filter
   list<string> include_all;
   include_all.push_back("include");
@@ -414,10 +413,12 @@ void H5Output::openH5OutputFile() {
   
   // we want to create new file
   hdf5pp::PListFileAccess fapl ;
-  if ( m_split != NoSplit ) {
-    MsgLog(logger(), fatal, "hdf5 splitting is not implemented.  Only NoSplit is presently supported");
+  if ( m_split == Family ) {
+    MsgLog(logger(), fatal, "hdf5 family splitting is not implemented.  Only NoSplit and SplitScan are presently supported");
   }
-  
+  if (m_split == SplitScan) {
+    MsgLog(logger(), fatal, "SplitScan not yet implemented");
+  }
   m_h5file = hdf5pp::File::create(m_h5fileName, mode, fcpl, fapl);
 
   // store schema version for this file
@@ -438,7 +439,8 @@ void H5Output::openH5OutputFile() {
 
   // add some metadata to the top group
   m_startTime = LusiTime::Time::now();
-  if (not m_quiet) MsgLog(logger(),info,"Starting translation process " << m_startTime);
+  m_translatorTime = 0.0;
+  if (not m_quiet) MsgLog(logger(), info, "Starting translation process " << m_startTime);
   m_h5file.createAttr<const char*> ("origin").store ( "psana-translator" ) ;
   m_h5file.createAttr<const char*> ("created").store ( m_startTime.toString().c_str() ) ;
 
@@ -565,6 +567,7 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
 
 void H5Output::event(Event& evt, Env& env) 
 {
+  LusiTime::Time startTime = LusiTime::Time::now();
   setEventVariables(evt,env);
   try {
     eventImpl();
@@ -574,6 +577,10 @@ void H5Output::event(Event& evt, Env& env)
     throw;
   }
   ++m_currentEventCounter;
+  LusiTime::Time endTime = LusiTime::Time::now();
+  double processingTime = (endTime.sec()-startTime.sec()) + (endTime.nsec()-startTime.nsec())/1e9;
+  m_translatorTime += processingTime;
+
 }
 
 void H5Output::setDamageMapFromEvent() {
@@ -1246,6 +1253,10 @@ void H5Output::endJob(Event& evt, Env& env)
   MsgLog(logger(),info,": endJob " << m_endTime);
   MsgLog(logger(), info, "real time (finish - start): " << deltaTime << " (sec) =  " 
          << deltaTime/60.0 << " (min)");
+  MsgLog(logger(), info, "Translator event processing time: " << m_translatorTime << " (sec) = "
+         << deltaTime/60.0 << " (min)");
+  MsgLog(logger(), info, "Translator event proceesing as percent of total: " 
+         << 100.0 * (m_translatorTime/deltaTime) << "%");
 }
 
 ////////////////////////////////////////////////////

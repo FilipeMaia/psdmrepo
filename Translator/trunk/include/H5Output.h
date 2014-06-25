@@ -184,6 +184,7 @@ private:
   // key parameters 
   std::string m_h5fileName;
   SplitMode m_split;
+  int m_splitJobNumber, m_splitJobTotal;
   hsize_t m_splitSize;
 
   bool m_overwrite;
@@ -221,6 +222,7 @@ private:
   boost::shared_ptr<H5GroupNames> m_h5groupNames;
 
   LusiTime::Time m_startTime, m_endTime;
+  double m_translatorTime;
 }; // class H5Output
 
 } // namespace
