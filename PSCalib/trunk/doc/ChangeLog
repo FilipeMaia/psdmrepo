@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2014-06-26 Mikhail S. Dubrovin
+- add CalibFileFinder.py - analogous to src/CalibFileFinder.cpp for pythonic-psana modules
+
 Tag: V00-02-03
 2014-05-28 Mikhail S. Dubrovin
 - in CSPadCalibPars - use print_bits to control warning messages
