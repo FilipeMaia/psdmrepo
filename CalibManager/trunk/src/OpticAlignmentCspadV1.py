@@ -556,10 +556,12 @@ class OpticAlignmentCspadV1 :
         name_segm   = 'QUAD:V1'
         name_parent = 'CSPAD:V1'
         num_parent, x0, y0, z0, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ = 0,0,0,0,0,0,0,0,0
-        quad_rotation = [270,0,90,180]
+        q_rot = [90,0,270,180]
+        q_x0  = [-4500,-4500, 4500, 4500]
+        q_y0  = [-4500, 4500, 4500,-4500]
         for quad in range(4) :
             txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
-                (name_parent.ljust(10), num_parent, name_segm.ljust(10), quad, x0, y0, z0, quad_rotation[quad], rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+                (name_parent.ljust(10), num_parent, name_segm.ljust(10), quad, q_x0[quad], q_y0[quad], z0, q_rot[quad], rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
         return txt + '\n' 
 
 #----------------------------------
