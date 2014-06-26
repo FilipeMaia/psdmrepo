@@ -1,0 +1,149 @@
+import time
+import numpy as np
+from psmon.psdata import ImageData, MultiData, HistData, XYPlotData
+
+class Helper(object):
+    def __init__(self, publisher, topic, title=None, pubrate=None):
+        self.publisher = publisher
+        self.topic = topic
+        self.data = None
+        self.title = title or self.topic
+        self.pubrate = pubrate
+        self.__last_pub = time.time()
+
+    def publish(self):
+        current_time = time.time()
+        if self.pubrate is None or self.pubrate * (current_time - self.__last_pub) >= 1:
+            self.__last_pub = current_time
+            self.publisher(self.topic, self.data)
+
+
+class MultiHelper(Helper):
+    def __init__(self, publisher, topic, num_data, title=None, pubrate=None):
+        super(MultiHelper, self).__init__(publisher, topic, title, pubrate)
+        self.data = MultiData(None, self.title, [None] * num_data)
+
+    def set_data(self, index, type, *args, **kwargs):
+        self.data.data_con[index] = type(*args, **kwargs)
+
+
+class ImageHelper(Helper):
+    def __init__(self, publisher, topic, title=None, pubrate=None):
+        super(ImageHelper, self).__init__(publisher, topic, title, pubrate)
+        self.data = ImageData(None, self.title, None)
+
+    def set_image(self, image, image_title=None):
+        if image_title is not None:
+            self.data.ts = image_title
+        self.data.image = image
+
+
+class MultiImageHelper(MultiHelper):
+    def __init__(self, publisher, topic, num_image, title=None, pubrate=None):
+        super(MultiImageHelper, self).__init__(publisher, topic, num_image, title=None, pubrate=None)
+
+    def set_image(self, index, image, image_title=None):
+        self.set_data(index, ImageData, image_title, None, image)
+
+
+class XYPlotHelper(Helper):
+    DEFAULT_ARR_SIZE = 100
+
+    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, format='.', pubrate=None):
+        super(XYPlotHelper, self).__init__(publisher, topic, title, pubrate)
+        self.index = 0
+        self.xdata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
+        self.ydata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
+        self.data = XYPlotData(
+            None,
+            self.title,
+            None,
+            None,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            formats=format
+        )
+
+    def add(self, xval,  yval, entry_title=None):
+        if entry_title is not None:
+            self.data.ts = entry_title
+        if self.index == self.xdata.size:
+            # double the size if we need to reallocate
+            self.xdata = np.resize(self.xdata, 2*self.index)
+            self.ydata = np.resize(self.ydata, 2*self.index)
+        self.xdata[self.index] = xval
+        self.ydata[self.index] = yval
+        self.index += 1
+        self.data.xdata = self.xdata[:self.index]
+        self.data.ydata = self.ydata[:self.index]
+
+    def clear(self):
+        self.index = 0
+
+
+class HistHelper(Helper):
+    def __init__(self, publisher, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='.', pubrate=None):
+        super(HistHelper, self).__init__(publisher, topic, title, pubrate)
+        self.nbins = int(nbins)
+        self.bmin = float(bmin)
+        self.bmax = float(bmax)
+        self.range = (bmin, bmax)
+        self.data = HistData(
+            None,
+            self.title,
+            np.arange(self.bmin,self.bmax,(self.bmax-self.bmin)/self.nbins),
+            np.zeros(self.nbins),
+            xlabel=xlabel,
+            ylabel=ylabel,
+            formats=format
+        )
+
+    def add(self, value, entry_title=None):
+        if entry_title is not None:
+            self.data.ts = entry_title
+        self.data.values += np.histogram(value, self.nbins, range=self.range)[0]
+
+    def clear(self):
+        self.data.values[:] = 0
+
+
+class HistOverlayHelper(Helper):
+    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, pubrate=None):
+        super(HistOverlayHelper, self).__init__(publisher, topic, title, pubrate)
+        self.nhist = 0
+        self.nbins = []
+        self.ranges = []
+        self.bins = []
+        self.values = []
+        self.formats = []
+        self.data = HistData(
+            None,
+            self.title,
+            self.bins,
+            self.values,
+            xlabel=xlabel,
+            ylabel=ylabel,
+            formats=self.formats
+        )
+
+    def make_hist(self, nbins, bmin, bmax, format='.'):
+        index = self.nhist
+        self.nbins.append(nbins)
+        self.ranges.append((bmin, bmax))
+        self.bins.append(np.arange(bmin,bmax,(bmax-bmin)/nbins))
+        self.values.append(np.zeros(nbins))
+        self.formats.append(format)
+        self.nhist += 1
+        return index
+
+    def add(self, index, value, entry_title=None):
+        if entry_title is not None:
+            self.data.ts = entry_title
+        self.values[index] += np.histogram(value, self.nbins[index], range=self.ranges[index])[0]
+
+    def clear(self, index=None):
+        if index is None:
+            for value in self.values:
+                value[:] = 0
+        else:
+            self.values[index][:] = 0
