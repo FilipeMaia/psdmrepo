@@ -18,6 +18,7 @@ __version__ = "$Revision$"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
+import os
 import sys
 import logging
 
@@ -38,8 +39,12 @@ import PyCSPadImage.CSPADPixCoords    as pixcoor
 import PyCSPadImage.CSPAD2x2CalibPars as calp2x2
 import PyCSPadImage.CSPAD2x2PixCoords as pixcoor2x2
 
+#-----------------------------
+
 class cspad_image_producer (object) :
     """Produces cspad image from input array of shape (4, 8, 185, 388)"""
+
+#-----------------------------
 
     def __init__ ( self ) :
         """Class constructor.
@@ -54,7 +59,7 @@ class cspad_image_producer (object) :
         """
 
         self.m_src        = self.configSrc  ('source', '*-*|Cspad-*')
-        self.m_calib_dir  = self.configStr  ('calib_dir', '')
+        self.m_path_ctypes= self.configStr  ('calib_dir', '')
         self.m_key_in     = self.configStr  ('key_in',    'cspad_array')
         self.m_key_out    = self.configStr  ('key_out',   'cspad_image')
         self.m_print_bits = self.configInt  ('print_bits', 1)
@@ -83,11 +88,15 @@ class cspad_image_producer (object) :
         if self.m_print_bits & 1 : self.print_input_pars()
 
 
+#-----------------------------
+
     def beginjob( self, evt, env ) : pass
  
     def beginrun( self, evt, env ) : pass
 
     def begincalibcycle( self, evt, env ) : pass
+
+#-----------------------------
 
     def event( self, evt, env ) :
         """This method is called for every L1Accept transition.
@@ -153,13 +162,13 @@ class cspad_image_producer (object) :
             evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
 
 
+#-----------------------------
 
     def endcalibcycle( self, evt, env ) : pass
 
     def endrun       ( self, evt, env ) : pass
 
     def endjob       ( self, evt, env ) : pass
-
 
 #-----------------------------
 
@@ -176,9 +185,12 @@ class cspad_image_producer (object) :
         if self.arr.shape[0] == 185 : # for (185, 388, 2)
             self.is_cspad    = False
             self.is_cspad2x2 = True
-        
+            self.group = 'CsPad2x2::CalibV1'
+            
+            self.set_path_to_calib_types(env)
+
             #self.calib  = calp2x2.CSPAD2x2CalibPars()
-            self.calib  = calp2x2.CSPAD2x2CalibPars(self.m_calib_dir, self.run)
+            self.calib  = calp2x2.CSPAD2x2CalibPars(self.m_path_ctypes, self.run)
             self.coord  = pixcoor2x2.CSPAD2x2PixCoords(self.calib)
             self.config = None 
 
@@ -189,8 +201,11 @@ class cspad_image_producer (object) :
         elif self.arr.shape[0] == 4 or self.arr.shape[0] == 32 :
             self.is_cspad    = True
             self.is_cspad2x2 = False
+            self.group = 'CsPad::CalibV1'
 
-            self.calib  = calp.CalibPars(self.m_calib_dir, self.run)
+            self.set_path_to_calib_types(env)
+    
+            self.calib  = calp.CalibPars(self.m_path_ctypes, self.run)
             self.coord  = pixcoor.CSPADPixCoords(self.calib)
             self.config = ccp.CSPadConfigPars()
             
@@ -207,9 +222,33 @@ class cspad_image_producer (object) :
 
 #-----------------------------
 
+    def set_path_to_calib_types( self, env ) :
+        """Sets self.m_path_ctypes - path to calibration types, if it does not defined in
+           user parameter 'calib_dir', for example:
+           '/reg/d/psdm/mec/meca6113/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/'
+        """
+        # str(self.m_src) = Source("DetInfo(XcsEndstation.0:Cspad.0)")
+        # str_src = 'DetInfo(XcsEndstation.0:Cspad.0'    
+        str_src = str(self.m_src).split('DetInfo(')[1].split(')"')[0]
+
+        cdir = env.calibDir()
+
+        msg = '[%s] Variables for path to calib types:\n  : user defined m_path_ctypes = "%s"\n  : %s\n  : %s\n  : %s\n' %\
+              (__name__, self.m_path_ctypes, cdir, self.group, str_src)
+
+        if  self.m_path_ctypes == '' :
+            self.m_path_ctypes = os.path.join(cdir, self.group, str_src)
+            msg += '  : Use default calib path: %s' % (self.m_path_ctypes)
+        else :
+            msg += '  : Use user-defined calib path: %s' % (self.m_path_ctypes)
+
+        if self.m_print_bits & 64 : print msg
+
+#-----------------------------
+
     def print_input_pars( self ) :
-        msg = '\n%s: List of input parameters\n  calib_dir %s\n  source %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' % \
-              (__name__ , self.m_calib_dir, self.m_src, self.m_key_in, self.m_key_out, self.m_print_bits)
+        msg = '\n[%s] List of input parameters\n  path %s\n  source %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' %\
+              (__name__, self.m_path_ctypes, self.m_src, self.m_key_in, self.m_key_out, self.m_print_bits)
         #logging.info( msg )
         print msg
 

@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 	
 =======
+Tag: V00-00-19
+2014-06-27 Mikhail S. Dubrovin
+- in cspad_image_producer.py use default path to calibration directory if parameter "calib_dir" is empty
+
 Tag: V00-00-18
 2014-06-24 Mikhail S. Dubrovin
 - add ex_peaks_nda to test results of ImgAlgos.CSPadArrPeakFinder 
