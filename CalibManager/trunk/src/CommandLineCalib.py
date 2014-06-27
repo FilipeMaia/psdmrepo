@@ -95,12 +95,14 @@ class CommandLineCalib () :
         self.print_bits = self.opts['print_bits']
         logger.setPrintBits(self.print_bits)
 
+	docfg = self.loadcfg = self.opts['loadcfg']
+
 	if self.opts['runnum'] is None :
             appname = os.path.basename(sys.argv[0])
 	    msg = self.sep + 'This command line calibration interface should be launched with parameters.'\
                   +'\nTo see the list of parameters use command: %s -h' % appname\
                   +'\nIf the "%s" is launched after "calibman" most of parameters may be already set.' % appname\
-	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number>'%(appname)\
+	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number> -L'%(appname)\
                   + self.sep
             self.log(msg,4)
 	    return False
@@ -112,16 +114,15 @@ class CommandLineCalib () :
         else :
             self.str_run_range = self.opts['runrange'] 
 
-
-	self.exp_name = cp.exp_name.value() if self.opts['exp'] is None else self.opts['exp']
-        if self.exp_name == cp.exp_name.value_def() :
+        self.exp_name = cp.exp_name.value_def()
+	self.exp_name = cp.exp_name.value() if docfg and self.opts['exp'] is None else self.opts['exp']
+        if self.exp_name is None or self.exp_name == cp.exp_name.value_def() :
 	    self.log('\nWARNING: EXPERIMENT NAME IS NOT DEFINED...'\
                      + '\nAdd optional parameter -e <exp-name>',4)
 	    return False
 
-
         if self.opts['detector'] is None :
-            self.det_name = cp.det_name.value()
+            self.det_name = cp.det_name.value() if docfg else cp.det_name.value_def()
         else :
             self.det_name = self.opts['detector'].replace(","," ")
 
@@ -139,7 +140,6 @@ class CommandLineCalib () :
                      + '\nAdd optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc',4)
 	    return False
 
-
         self.skip_events = cp.bat_dark_start.value() if self.opts['skip_events'] is None else self.opts['skip_events']
         self.num_events  = cp.bat_dark_end.value() - cp.bat_dark_start.value() if self.opts['num_events'] is None else self.opts['num_events']
         self.thr_rms     = cp.mask_rms_thr.value() if self.opts['thr_rms'] is None else self.opts['thr_rms']
@@ -156,7 +156,7 @@ class CommandLineCalib () :
         cp.exp_name      .setValue(self.exp_name)
         cp.instr_name    .setValue(self.instr_name)
 
-        self.calibdir     = cp.calib_dir.value() if self.opts['calibdir'] is None else self.opts['calibdir']
+        self.calibdir     = cp.calib_dir.value() if docfg and self.opts['calibdir'] is None else self.opts['calibdir']
         if self.calibdir == cp.calib_dir.value_def() :
             self.calibdir = fnm.path_to_calib_dir_default()
 
@@ -195,6 +195,7 @@ class CommandLineCalib () :
         + '\n     thr_rms       : %f' % self.thr_rms\
         + '\n     process       : %s' % self.process\
         + '\n     deploy        : %s' % self.deploy\
+        + '\n     loadcfg       : %s' % self.loadcfg\
         + '\n     print_bits    : %s' % self.print_bits
         #+ '\nself.logfile       : ' % self.logfile     
 

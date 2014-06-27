@@ -12,6 +12,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-53
+2014-06-27 Mikhail S. Dubrovin
+- by request from Jason Koglin
+  in app/calibrun add -L which allows to load parameters from config file created by app/calibman
+  By default major parameters need to be specified.
+	
 Tag: V00-00-52
 2014-06-23 Mikhail S. Dubrovin
 - OpticAlignmentCspadV1 - fix quad rotation default angles, add default xy-offsets
