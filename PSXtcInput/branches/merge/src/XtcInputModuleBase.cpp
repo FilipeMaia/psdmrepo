@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
+#include <sstream>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
 
@@ -51,6 +52,31 @@ using namespace XtcInput;
 
 namespace {
 
+
+  const char * logger = "XtcInputModuleBase";
+
+  std::string dumpStr(const XtcInput::Dgram &dg) {
+    if (dg.empty()) return "empty dgram";
+    std::ostringstream msg;
+    const Pds::Dgram *dgram = dg.dg().get();
+    const Pds::Sequence & seq = dgram->seq;
+    const Pds::Env & env = dgram->env;
+    const Pds::ClockTime & clock = seq.clock();
+    const Pds::TimeStamp & stamp = seq.stamp();
+    msg << "tp=" << int(seq.type())
+        << " sv=" << Pds::TransitionId::name(seq.service())
+        << " ex=" << seq.isExtended()
+        << " ev=" << seq.isEvent()
+        << " sec=" << std::hex << clock.seconds()
+        << " nano=" << std::hex << clock.nanoseconds()
+        << " tcks=" << std::hex << stamp.ticks()
+        << " fid=" << stamp.fiducials()
+        << " ctrl=" << stamp.control()
+        << " vec=" << stamp.vector()
+        << " env=" << env.value()
+        << " file=" << dg.file().path();
+    return msg.str();
+  }
 
   // return true if all datagrams contains EPICS data only
   bool epicsOnly(const std::vector<XtcInput::Dgram>& dgs)
@@ -83,6 +109,27 @@ namespace {
   long nextNonNegativeValue(const long v) {
     if ((v >=0) and (v < LONG_MAX)) return (v+1);
     return 0;
+  }
+
+  class LessStream {
+  public:
+    LessStream() {}
+    bool operator()(const XtcInput::Dgram &a, const XtcInput::Dgram &b) {
+      return a.file().stream() < b.file().stream();
+    }
+  };
+
+  bool allDgsHaveSameTransition(const std::vector<XtcInput::Dgram> &dgs) {
+    Pds::TransitionId::Value last = Pds::TransitionId::Unknown;
+    BOOST_FOREACH(const XtcInput::Dgram& dg, dgs) {
+      if (not dg.empty()) {
+        if ((last != Pds::TransitionId::Unknown) and (last != dg.dg()->seq.service())) {
+          return false;
+        }
+        last = dg.dg()->seq.service();
+      }
+    }
+    return true;
   }
 
 }
@@ -163,10 +210,9 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
       }
     }
 
-    // for now we only expect one event datagram, can't handle other cases yet
-    if (eventDg.size() != 1 or not nonEventDg.empty()) {
-      throw UnexpectedInput(ERR_LOC);
-    }
+    // order the datagrams by stream number so that we get DAQ streams first    
+    sort(eventDg.begin(), eventDg.end(), LessStream());
+    sort(nonEventDg.begin(), nonEventDg.end(), LessStream());
 
     // push non-event stuff to environment
     // usually first transition (Configure) should not have any non-event attached data
@@ -174,7 +220,17 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
       fillEnv(dg, env);
     }
 
-    // get type of a transition
+    MsgLog(logger,trace,"beginJob datagrams: ");
+    int idx=0;
+    BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+      MsgLog(logger,trace,"  dg " << idx << ": " << dumpStr(dg));
+      ++idx;
+    }
+
+    if (not allDgsHaveSameTransition(eventDg)) {
+      MsgLog(name(), warning, name() << "first datagrams do not have same transition.");
+    }
+
     Pds::TransitionId::Value transition = Pds::TransitionId::Map;
     if (not eventDg.empty()) {
       transition = eventDg.front().dg()->seq.service();
@@ -196,30 +252,27 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
       break;
     }
 
-    bool first = true;
+    // get the transition clock time, event id, and event datagram from the first
+    // event in the list which should have the smallest stream number based on prior sort. 
+    // TODO: update to add list of all eventId's and all Dgrams
+    XtcInput::Dgram firstDg = eventDg.front();
+
+    m_transitions[firstDg.dg()->seq.service()] = firstDg.dg()->seq.clock();
+
+    fillEventDg(firstDg, evt);
+    fillEventId(firstDg, evt);
+
+    boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
+    evt.put(damageMap);
+
     BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-
-      XtcInput::Dgram::ptr dgptr = dg.dg();
-
-      if (first) {
-        m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
-  
-        // TODO: we only store one datagram in event, for multiple datagrams we need to review our model
-        fillEventDg(dg, evt);
-        fillEventId(dg, evt);
-        boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
-        evt.put(damageMap);
-      }
 
       // Store configuration info in the environment
       fillEnv(dg, env);
 
       // there is BLD data in Configure which is event-like data
       fillEvent(dg, evt, env);
-
-      first = false;
     }
-
   }
 }
 
@@ -251,7 +304,6 @@ XtcInputModuleBase::event(Event& evt, Env& env)
   bool found = false;
   while (not found) {
 
-
     std::vector<XtcInput::Dgram> eventDg;
     std::vector<XtcInput::Dgram> nonEventDg;
 
@@ -268,6 +320,9 @@ XtcInputModuleBase::event(Event& evt, Env& env)
         MsgLog(name(), debug, "EOF seen");
         return Stop;
       }
+      // sort by stream number to get typical DAQ stream in the front
+      sort(eventDg.begin(), eventDg.end(), LessStream());
+      sort(nonEventDg.begin(), nonEventDg.end(), LessStream());
 
     }
 
@@ -281,16 +336,27 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       continue;
     }
 
-    // TODO: here we assume that all datagrams in eventDg come from the same
-    // transition so they have same timestamp and transition id. May be worth
-    // checking it later.
+    if (not allDgsHaveSameTransition(eventDg)) {
+      MsgLog(name(), warning, name() 
+             << ": eventDg's do not all have the same transition. Using first transition.");
+      // print the dgram headers since they don't have the same transition
+      int idx = 0;
+      BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        MsgLog(name(),info,"  dg " << idx <<": " << dumpStr(dg));
+        ++idx;
+      }
+    }
+    // We use the first datagram in eventDg for the transition, and clock.
+    // The clock will differ between DAQ and control streams - 
+    // TODO: revisit model to deal with different clocks in the events should look into 
+    // propogat
     const Pds::Sequence& seq = eventDg.front().dg()->seq;
     const Pds::ClockTime& clock = seq.clock();
     Pds::TransitionId::Value trans = seq.service();
-
+    
     MsgLog(name(), debug, name() << ": found " << eventDg.size() << " new datagram(s), transition = "
-          << Pds::TransitionId::name(trans));
-
+           << Pds::TransitionId::name(trans));
+    
     switch (trans) {
     
     case Pds::TransitionId::Configure:
@@ -406,15 +472,11 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
       } else {
 
-        bool first = true;
+        boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
+        evt.put(damageMap);
         BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-          if (first) {
-            boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
-            evt.put(damageMap);
-          }
           fillEnv(dg, env);
           fillEvent(dg, evt, env);
-          first = false;
         }
         fillEventId(eventDg.front(), evt);
         fillEventDg(eventDg.front(), evt);
