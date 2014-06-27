@@ -521,6 +521,16 @@ def previousDumpFile(deleteDump=True, doall=False):
                 if src == 'xtc':
                     assert regressInput == inputDatasource, "xtc file regression test %d xtc != testData xtc, regress=%s testData=%s" % \
                         (testNumber, regressInput, inputDatasource)
+                elif src == 'multi':
+                    # see if there is a dir= on the datasource and that it matches the testinfo
+                    # datasource
+                    assert len(inputDatasource.split('dir='))==2, "There is no dir= on the testData"
+                    inputDir = inputDatasource.split('dir=')[1]
+                    failMsg = "regress multi test %d - regress datasource != testData dir\n" % testNumber
+                    failMsg += "regress specifies: %s\n searching test data found: %s" % \
+                               ( testInfo['datasource'], inputDir)
+                    assert inputDir == testInfo['datasource'], failMsg
+
                 cmd, err = psanaDump(inputDatasource, regressOutput, events, dumpEpicsAliases=dumpEpicsAliases, 
                                      regressDump=True)
                 if len(err)>0:
@@ -1070,6 +1080,10 @@ def updateTestData(xtc, newTypeVers, dgrams):
     copyBytes(xtc, bytesToCopy, newTestFilePath)
 
 def copyBytes(src, n, dest):
+    '''copies the fist n bytes, or a set of invervals, the intervals are 
+    treated as [a,b), i.e, copyBytes(fileA,[[10,13]],fileB) copies bytes
+    10,11 and 12 from fileA to make fileB.
+    '''
     if isinstance(n,int):
         intervals = [[0,n]]
         print "copying %d bytes from src=%s to dest=%s" % (n,src,dest)

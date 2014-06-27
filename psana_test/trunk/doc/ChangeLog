@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2014-06-27 David Schneider
+- add multi test 001. 4 streams with two calib cycles.
+
 Tag: V00-00-12
 2014-06-27 David Schneider
 - update code to handle single or multi file (psana dataset) tests
