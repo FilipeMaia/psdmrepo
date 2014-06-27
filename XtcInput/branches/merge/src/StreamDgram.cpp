@@ -1,22 +1,70 @@
+#include <iomanip>
+
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/StreamDgram.h"
 
+#define DVDMSG debug
+
 namespace {
   char *logger = "StreamDgram";
-  
+
+  std::string bool2str(bool val) {
+    if (val) return "true";
+    return "false";
+  }
+
 };
 
 namespace XtcInput {
 
+std::string StreamDgram::streamType2str(const StreamDgram::StreamType val) {
+  switch (val) {
+  case StreamDgram::DAQ:
+    return "DAQ";
+  case StreamDgram::controlUnderDAQ:
+    return "controlUnderDAQ";
+  case StreamDgram::controlIndependent:
+    return "controlIndependent";
+  }
+    return "*unknown*";
+}
+
+std::string StreamDgram::dumpStr(const StreamDgram & dg) {
+  std::ostringstream msg;
+  if (dg.empty()) return "empty dgram";
+  const Pds::Dgram *dgram = dg.dg().get();
+  const Pds::Sequence & seq = dgram->seq;
+  //  const Pds::Env & env = dgram->env;
+  const Pds::ClockTime & clock = seq.clock();
+  const Pds::TimeStamp & stamp = seq.stamp();
+  msg << streamType2str(dg.streamType())
+      << " streamId=" << dg.streamId()
+      << " L1Block=" << dg.L1Block()
+    //      << " tp=" << int(seq.type())
+      << " sv=" << Pds::TransitionId::name(seq.service())
+    //      << " ex=" << seq.isExtended()
+      << " ev=" << seq.isEvent()
+      << " sec=" << std::hex << std::setw(9) << clock.seconds()
+      << " nano=" << std::hex << std::setw(9) << clock.nanoseconds()
+    //      << " tcks=" << std::hex << std::setw(12) << stamp.ticks()
+      << " fid=" << std::hex << std::setw(7) << stamp.fiducials()
+      << " ctrl=" << stamp.control()
+      << " vec=" << stamp.vector()
+    //      << " env=" << env.value()
+      << " streamNo=" << std::setw(2) << dg.file().stream()
+      << " file=" << dg.file().path();
+  return msg.str();
+}
+
 StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> expClockDiff, 
                                  unsigned maxClockDriftSeconds) 
   : m_expClockDiff(expClockDiff), m_fidCompare(maxClockDriftSeconds) {
-  DgramCategory LD(L1Accept, DAQ);
-  DgramCategory LC(L1Accept, controlUnderDAQ);
-  DgramCategory LI(L1Accept, controlIndependent);
-  DgramCategory TD(otherTrans, DAQ);
-  DgramCategory TC(otherTrans, controlUnderDAQ);
-  DgramCategory TI(otherTrans, controlIndependent);
+  DgramCategory LD(L1Accept, StreamDgram::DAQ);
+  DgramCategory LC(L1Accept, StreamDgram::controlUnderDAQ);
+  DgramCategory LI(L1Accept, StreamDgram::controlIndependent);
+  DgramCategory TD(otherTrans, StreamDgram::DAQ);
+  DgramCategory TC(otherTrans, StreamDgram::controlUnderDAQ);
+  DgramCategory TI(otherTrans, StreamDgram::controlIndependent);
 
   /* -------------------------------------------------------------------
      Below we encode the 21 cases for comparing the 6 Dgram catagorires (LD, LC, LI, TD, TC, TI) 
@@ -33,27 +81,37 @@ StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> e
         The clocks are different and fiducials in both are not available, and the C stream
         L1 accept need not have a matching L1 in the Daq stream. This is when the block number 
         is used.
-     * a T vs L comparison from D to I can't be done without help. They have different
-       clocks and fiducials in both are not available. These comparisions will use the expClockDiff
-       map, and throw an exception if a clockDiff is not available.
+     *  Comparing a DAQ L1 accept against a DAQ Transition also requires history. We are not
+        guaranteed that the clock for an L1 accept following a DAQ transition has a later time
+        than the clock for the transition. We assume that all L1 accepts before the transition 
+        should appear earlier, and likewise all L1 accepts after should appear after.
+      
+     *  Comparing from a D to a I stream is difficult. The clocks are different, and the 
+        Transitions are not synchronized. A fiducial compare is reasonable for L1 vs. L1, but 
+        to compare Transitions between D and I, we are stuck. If we knew the difference in the 
+        clocks down to the nanosecond we could determine when two transitions are equal, but 
+        also, how is that useful? If we compare a Transition in a DAQ stream against a L1 accept
+        in a Independent stream, we are more stuck. We can't rely on clocks to compare T vs L1,
+        and comparing block numbers doesn't make sense between I and D. We call all these badCmp
+    
      ------------------------------------------------------------------- */
   m_LUT[makeDgramCategoryAB(LD,LD)] = clockCmp;
   m_LUT[makeDgramCategoryAB(LD,LC)] = fidCmp;
   m_LUT[makeDgramCategoryAB(LD,LI)] = fidCmp;
-  m_LUT[makeDgramCategoryAB(LD,TD)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(LD,TC)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(LD,TI)] = mapCmp;
+  m_LUT[makeDgramCategoryAB(LD,TD)] = blockCmp;
+  m_LUT[makeDgramCategoryAB(LD,TC)] = blockCmp;
+  m_LUT[makeDgramCategoryAB(LD,TI)] = badCmp; 
 
   m_LUT[makeDgramCategoryAB(LC,LC)] = fidCmp;
   m_LUT[makeDgramCategoryAB(LC,LI)] = fidCmp;
   m_LUT[makeDgramCategoryAB(LC,TD)] = blockCmp;
   m_LUT[makeDgramCategoryAB(LC,TC)] = blockCmp;
-  m_LUT[makeDgramCategoryAB(LC,TI)] = mapCmp; 
+  m_LUT[makeDgramCategoryAB(LC,TI)] = badCmp; 
 
   m_LUT[makeDgramCategoryAB(LI,LI)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(LI,TD)] = mapCmp;
-  m_LUT[makeDgramCategoryAB(LI,TC)] = mapCmp;
-  m_LUT[makeDgramCategoryAB(LI,TI)] = clockCmp;
+  m_LUT[makeDgramCategoryAB(LI,TD)] = badCmp;
+  m_LUT[makeDgramCategoryAB(LI,TC)] = badCmp;
+  m_LUT[makeDgramCategoryAB(LI,TI)] = blockCmp;
 
   m_LUT[makeDgramCategoryAB(TD,TD)] = clockCmp;
   m_LUT[makeDgramCategoryAB(TD,TC)] = clockCmp;
@@ -68,7 +126,7 @@ StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> e
 StreamDgramCmp::DgramCategory StreamDgramCmp::getDgramCategory(const StreamDgram &dg) {
   if (dg.empty()) {
     MsgLog(logger, warning, "getDgramCategory called on empty dgram");
-    return StreamDgramCmp::DgramCategory(L1Accept, DAQ);
+    return StreamDgramCmp::DgramCategory(L1Accept, StreamDgram::DAQ);
   }
 
   TransitionType trans;
@@ -114,6 +172,8 @@ bool StreamDgramCmp::operator()(const StreamDgram &a, const StreamDgram &b) cons
     return doBlockCmp(a,b);
   case mapCmp:
     return doMapCmp(a,b);
+  case badCmp:
+    return doBadCmp(a,b);
   }
 
   MsgLog(logger, fatal, "StreamDgramCmp: unexpected error. compare method in look up table = " 
@@ -127,14 +187,23 @@ bool StreamDgramCmp::doClockCmp(const StreamDgram &a, const StreamDgram &b) cons
   if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
   const Pds::ClockTime & clockA = a.dg()->seq.clock();
   const Pds::ClockTime & clockB = b.dg()->seq.clock();
-  return (clockA > clockB);
+  bool res = clockA > clockB;
+  MsgLog(logger,DVDMSG, "doClockCmp: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+         << "A: " << StreamDgram::dumpStr(a) << std::endl
+         << "B: " << StreamDgram::dumpStr(b));
+  return res;
 }
 
 // return true is a > b
 bool StreamDgramCmp::doFidCmp(const StreamDgram &a, const StreamDgram &b) const
 { 
   if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
-  return (m_fidCompare.fiducialsGreater(*a.dg(), *b.dg()));
+  bool res = m_fidCompare.fiducialsGreater(*a.dg(), *b.dg());
+  MsgLog(logger,DVDMSG, "doFidCmp: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+         << "A: " << StreamDgram::dumpStr(a) << std::endl
+         << "B: " << StreamDgram::dumpStr(b));
+  
+  return res;
 }
 
 bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) const
@@ -150,9 +219,10 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
                            "either L1Accept or otherTrans. They must be mixed");
   }
 
-  // first compare runs. Block numbers can only be compared between datagrams in the same
-  // xtcfile or run. Prior runs may not have recorded the s80 stream (or possibly the 
-  // DAQ streams? though unlikely) so a running block number could get out of sync. The block 
+  // first compare runs. The block number should be reset 0 when processing a new run
+  // in the same stream. One could imagine implement a running block count accross runs
+  // but if a run omitted one stream, a running block number across all
+  // the runs would get out of sync (accross different streams).
 
   // compare runs
   unsigned runA = a.file().run();
@@ -167,6 +237,10 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
       MsgLog(logger, warning, "doBlockCmp: dgram A is in earler run but clock is more than "
              << m_fidCompare.maxClockDriftSeconds() << " seconds later than dgram B");
     }
+    MsgLog(logger, DVDMSG, "doBlockCmp: A > B = false as runA=" << runA << " runB=" << runB 
+           << " dgrams:" << std::endl
+           << "A: " << StreamDgram::dumpStr(a) << std::endl
+           << "B: " << StreamDgram::dumpStr(b));
     return false;
   }
   if (runA > runB) {
@@ -174,16 +248,30 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
       MsgLog(logger, warning, "doBlockCmp: dgram A is in later run but clock is more than "
              << m_fidCompare.maxClockDriftSeconds() << " seconds earlier than dgram B");
     }
+    MsgLog(logger, DVDMSG, "doBlockCmp: A > B = true as runA=" << runA << " runB=" << runB 
+           << " dgrams:" << std::endl
+           << "A: " << StreamDgram::dumpStr(a) << std::endl
+           << "B: " << StreamDgram::dumpStr(b));
     return true;
   }
 
   // same run, compare block number.
 
   if ((transA == L1Accept) and (transB == otherTrans)) {
-    return ( (a.L1Block()) >= (b.L1Block()));
+    bool res = a.L1Block() >= b.L1Block();
+    MsgLog(logger, DVDMSG, "doBlockCmp: same run. A > B = " << bool2str(res)
+           << " dgrams:" << std::endl
+           << "A: " << StreamDgram::dumpStr(a) << std::endl
+           << "B: " << StreamDgram::dumpStr(b));
+    return res;
   } 
   // (transA == otherTrans) and (transB == L1Accept)
-  return ( (a.L1Block()) > (b.L1Block()));
+  bool res = a.L1Block() > b.L1Block();
+  MsgLog(logger, DVDMSG, "doBlockCmp: same run. A > B = " << bool2str(res)
+         << " dgrams:" << std::endl
+         << "A: " << StreamDgram::dumpStr(a) << std::endl
+         << "B: " << StreamDgram::dumpStr(b));
+  return res;
 }
 
 bool StreamDgramCmp::doMapCmp(const StreamDgram &a, const StreamDgram &b) const
@@ -208,6 +296,11 @@ bool StreamDgramCmp::doMapCmp(const StreamDgram &a, const StreamDgram &b) const
   // or add it to the clockTime for b's clockTime (if abInMap is false) and do the 
   // normal clock comparison
   throw psana::Exception(ERR_LOC, "doMapCmp: not implmented");
+}
+
+bool StreamDgramCmp::doBadCmp(const StreamDgram &, const StreamDgram &) const
+{ 
+  throw psana::Exception(ERR_LOC, "doBadCmp called");
 }
 
 bool StreamDgramCmp::sameEvent(const StreamDgram &a, const StreamDgram &b) const {

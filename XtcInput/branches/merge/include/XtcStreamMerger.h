@@ -13,7 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <vector>
+#include <map>
 #include <queue>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -93,18 +93,28 @@ protected:
   // update time in datagram
   void updateDgramTime(Pds::Dgram& dgram) const ;
 
-  typedef std::pair<Pds::TransitionId::Value, uint64_t> TransBlock;            ///< transition id and L1 block number of a dgram
+  struct TransBlock {
+    Pds::TransitionId::Value trans;
+    uint64_t block;
+    int run;
+    TransBlock() :trans(Pds::TransitionId::Unknown), block(0), run(0) {};
+    TransBlock(Pds::TransitionId::Value _trans, uint64_t _block, int _run) : trans(_trans), block(_block), run(_run) {};
+    TransBlock(const TransBlock &o) : trans(o.trans), block(o.block), run(o.run) {};
+    TransBlock & operator=(const TransBlock &o) { trans = o.trans; block = o.block; run = o.run; return *this; }
+  };
 
   // utilities for managing TransBlock
   static TransBlock makeTransBlock(const Dgram &dg, uint64_t block);
   static TransBlock getInitialTransBlock(const Dgram &dg);
   static uint64_t getNextBlock(const TransBlock & prevTransBlock, const Dgram &dg);
+  bool processingDAQ() const { return m_processingDAQ; }
 
 private:
-  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_DAQstreams ;       ///< Set of datagram iterators for typical individual streams
-  std::vector<boost::shared_ptr<XtcStreamDgIter> > m_controlStreams ;   ///< Set of datagram iterators for control streams
-  std::vector<TransBlock> m_DAQ_priorTransBlock;                        ///< TransBlock for last dgram from m_DAQstreams put in queue
-  std::vector<TransBlock> m_control_priorTransBlock;                    ///< TransBlock for last dgram from m_controlStreams put in queue
+  typedef std::pair<StreamDgram::StreamType, int> StreamIndex;
+  static std::string dumpStr(const StreamIndex &streamIndex);              // for debugging
+  std::map<StreamIndex, boost::shared_ptr<XtcStreamDgIter> > m_streams ;       ///< Set of datagram iterators for streams
+  std::map<StreamIndex, TransBlock> m_priorTransBlock;                        ///< TransBlock for last dgram from each stream
+  bool m_processingDAQ;                       ///< set to true if DAQ streams exist in the merge
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   int m_firstControlStream ;                  ///< starting stream number for control streams

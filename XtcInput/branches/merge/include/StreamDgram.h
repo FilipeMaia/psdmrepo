@@ -35,13 +35,14 @@
 
 namespace XtcInput {
 
-typedef enum {DAQ, controlUnderDAQ, controlIndependent} StreamType;  
-
 class StreamDgram : public Dgram {
  public:
+  typedef enum {DAQ, controlUnderDAQ, controlIndependent} StreamType;  
 
- StreamDgram(const Dgram &dgram, StreamType streamType, int64_t L1block, int streamIndex) 
-   : Dgram(dgram), m_streamType(streamType), m_L1block(L1block), m_streamIndex(streamIndex)
+  // streamId is for clients to keep track of StreamDgram's that go in and out of
+  // a priority queue. It is not used for comparisons.
+ StreamDgram(const Dgram &dgram, StreamType streamType, int64_t L1block, int streamId) 
+   : Dgram(dgram), m_streamType(streamType), m_L1block(L1block), m_streamId(streamId)
     {}
 
   /**
@@ -49,13 +50,27 @@ class StreamDgram : public Dgram {
    */
   StreamDgram() : Dgram(), m_streamType(DAQ), m_L1block(-1) {}
 
-  
-  /// The L1Block is relative to the run within a stream. Code that constructs StreamDgram
-  /// must guarentee this, so that code that uses StreamDgram can rely on this.
-  /// If this dgram is an L1Accept, returns the block of L1Accepts that
-  /// this datagram is a part of in its run of the stream. If this dgram is a Transition,
-  /// returns the number of L1Accept blocks that preceded it in the stream.
-  /// if this dgram is empty, returns, -1.
+  /**
+   *  If this dgram is an L1Accept, L1Block returns a 0-up counter that is the
+   *  block of L1Accepts that this Dgram is a part of.  If this dgram is a 
+   *  Transition, returns the number of L1Accept blocks that precede it.
+   *  For example:
+   *  dgram stream: T T L L L L L L T T L L L L T T L L T T L L L T L L T  
+   *  L1Block:      0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4
+   *
+   *  The L1Block is relative to a run. When the run changes, the L1Block should be
+   *  reset to 0.
+   *
+   *  It is important to construct StreamDgram with the correct L1Block value so that
+   *  StreamDgramCmp will function correctly.
+   *
+   *  If this dgram is empty, returns, -1.
+   *
+   *  From the above example, one sees that within a run, 
+   *
+   *           T > L     if      L1Block(T) > L1Block(L) 
+   *           L > T     if      L1Block(L) >= L1Block(T) 
+  */
   int64_t L1Block() const { 
     if (empty()) return -1; 
     return m_L1block; 
@@ -63,13 +78,16 @@ class StreamDgram : public Dgram {
 
   StreamType streamType() const { return m_streamType; }
 
-  int streamIndex() const { return m_streamIndex; }
+  int streamId() const { return m_streamId; }
+
+  static std::string streamType2str(const StreamType type); // get string rep
+  static std::string dumpStr(const StreamDgram &dg);  // dump object to string, for debugging
 
  private:
 
   StreamType m_streamType;
   int64_t m_L1block;
-  int m_streamIndex;
+  int m_streamId;
 };
 
 /// Implements operator() which returns true if a > b, (Greater than) for use
@@ -96,17 +114,18 @@ class StreamDgramCmp {
  protected:
   // types for determining the category of a StreamDgram, and a pair of StreamDgram's
   typedef enum {L1Accept, otherTrans} TransitionType;
-  typedef std::pair<TransitionType, StreamType> DgramCategory;
+  typedef std::pair<TransitionType, StreamDgram::StreamType> DgramCategory;
   typedef std::pair<DgramCategory, DgramCategory> DgramCategoryAB;
   static DgramCategory getDgramCategory(const StreamDgram &dg);
   static DgramCategoryAB makeDgramCategoryAB(DgramCategory a, DgramCategory b);
 
   /// the different kinds of comparisons
-  typedef enum {clockCmp, fidCmp, blockCmp, mapCmp} CompareMethod;  
+  typedef enum {clockCmp, fidCmp, blockCmp, mapCmp, badCmp} CompareMethod;  
   bool doClockCmp(const StreamDgram &a, const StreamDgram &b) const;
   bool doFidCmp(const StreamDgram &a, const StreamDgram &b) const;
   bool doBlockCmp(const StreamDgram &a, const StreamDgram &b) const;
   bool doMapCmp(const StreamDgram &a, const StreamDgram &b) const;
+  bool doBadCmp(const StreamDgram &a, const StreamDgram &b) const;
  private:
   const boost::shared_ptr<ExperimentClockDiffMap> m_expClockDiff;
   std::map<DgramCategoryAB, CompareMethod> m_LUT;

@@ -34,10 +34,12 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+#define DVDMSG debug
+
 namespace {
 
   const char* logger = "XtcInput.XtcStreamMerger" ;
-      
+
 }
 
 //		----------------------------------------
@@ -51,46 +53,56 @@ namespace XtcInput {
 //----------------
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
                                  double l1OffsetSec, int firstControlStream)
-  : m_DAQstreams()
-  , m_controlStreams()
-  , m_DAQ_priorTransBlock()
-  , m_control_priorTransBlock()
+  : m_streams()
+  , m_priorTransBlock()
+  , m_processingDAQ(false)
   , m_l1OffsetSec(int(l1OffsetSec))
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_firstControlStream(firstControlStream)
   , m_streamDgramCmp()
   , m_outputQueue(m_streamDgramCmp)
+    
 {
 
   // create all streams
-  int daqStreamIndex = 0;
-  int controlStreamIndex = 0;
+  int idxDAQ = 0;
+  int idxCtrl = 0;
   while (true) {
     const boost::shared_ptr<ChunkFileIterI>& chunkFileIter = streamIter->next();
     if (not chunkFileIter) break;
 
     bool controlStream = int(streamIter->stream()) >= m_firstControlStream;
     bool clockSort = not controlStream;
-    MsgLog(logger, trace, "XtcStreamMerger -- stream: " << streamIter->stream()
-           << " is control stream=" << controlStream);
 
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
       boost::make_shared<XtcStreamDgIter>(chunkFileIter, clockSort) ;
     if (controlStream) {
-      StreamDgram dg(stream->next(), controlUnderDAQ, 0, controlStreamIndex++);
-      m_controlStreams.push_back(stream);
-      m_control_priorTransBlock.push_back(getInitialTransBlock(dg));
+      StreamDgram dg(stream->next(), StreamDgram::controlUnderDAQ, 0, idxCtrl);
+      StreamIndex streamIndex(StreamDgram::controlUnderDAQ, idxCtrl);
+      ++idxCtrl;
+      m_streams[streamIndex] = stream;
+      m_priorTransBlock[streamIndex] = getInitialTransBlock(dg);
       m_outputQueue.push(dg);
+      MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. Added " 
+             << StreamDgram::dumpStr(dg)); 
     } else {
-      StreamDgram dg(stream->next(), DAQ, 0, daqStreamIndex++);
-      m_DAQstreams.push_back(stream) ;
-      m_DAQ_priorTransBlock.push_back(getInitialTransBlock(dg));
+      StreamDgram dg(stream->next(), StreamDgram::DAQ, 0, idxDAQ);
+      StreamIndex streamIndex(StreamDgram::DAQ, idxDAQ);
+      ++idxDAQ;
+      m_streams[streamIndex] = stream;
+      m_priorTransBlock[streamIndex] = getInitialTransBlock(dg);
       // only adjust times of dgrams for typical streams, this allows one to
       // correct for too much clock drift with fiducial merge streams
       if (not dg.empty()) updateDgramTime(*dg.dg());
       m_outputQueue.push(dg);
+      MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. Added " 
+             << StreamDgram::dumpStr(dg));
     }
+  }
+  if (idxDAQ > 0) {
+    MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. processing DAQ is true.");
+    m_processingDAQ = true;
   }
 }
 
@@ -106,35 +118,60 @@ XtcStreamMerger::~XtcStreamMerger ()
 Dgram
 XtcStreamMerger::next()
 {
-  if (not m_outputQueue.empty()) {
-    StreamDgram nextStreamDg = m_outputQueue.top();
-    m_outputQueue.pop();
-    int replaceStreamIdx = nextStreamDg.streamIndex();
-    Dgram replaceDg;
-    TransBlock lastTransBlock;
-    uint64_t replaceBlock=0;
-    switch (nextStreamDg.streamType()) {
-    case DAQ:
-      replaceDg = m_DAQstreams[replaceStreamIdx]->next();
-      lastTransBlock = m_DAQ_priorTransBlock[replaceStreamIdx];
-      replaceBlock = getNextBlock(lastTransBlock, replaceDg);
-      m_DAQ_priorTransBlock[replaceStreamIdx] = makeTransBlock(replaceDg, replaceBlock);
-      break;
-    case controlUnderDAQ:
-      replaceDg = m_controlStreams[replaceStreamIdx]->next();
-      lastTransBlock = m_control_priorTransBlock[replaceStreamIdx];
-      replaceBlock = getNextBlock(lastTransBlock, replaceDg);
-      m_control_priorTransBlock[replaceStreamIdx] = makeTransBlock(replaceDg, replaceBlock);
-      break;
-    case controlIndependent:
-      throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() controlIndependent not implemented");
-      break;
-    }
-    StreamDgram replaceStreamDg(replaceDg, nextStreamDg.streamType(), replaceBlock, replaceStreamIdx);
-    m_outputQueue.push(replaceStreamDg);
-    return nextStreamDg;
+  if (m_outputQueue.empty()) return Dgram();
+
+  StreamDgram nextStreamDg = m_outputQueue.top();
+  m_outputQueue.pop();
+  int replaceStreamId = nextStreamDg.streamId();
+  StreamIndex replaceStreamIndex(nextStreamDg.streamType(), replaceStreamId);
+    
+  if (m_streams.find(replaceStreamIndex) == m_streams.end()) {
+    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found (streams)");
   }
-  return Dgram();
+  if (m_priorTransBlock.find(replaceStreamIndex) == m_priorTransBlock.end()) {
+    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found (priorTransBlock)");
+  }
+
+  MsgLog(logger,DVDMSG,">>>>>>>>>" << std::endl << "next() returning: " << StreamDgram::dumpStr(nextStreamDg));
+
+  bool replaced = false;
+  while (not replaced) {
+    Dgram replaceDg = m_streams[replaceStreamIndex]->next();
+    TransBlock lastTransBlock = m_priorTransBlock[replaceStreamIndex];
+    uint64_t replaceBlock = getNextBlock(lastTransBlock, replaceDg);
+    m_priorTransBlock[replaceStreamIndex] = makeTransBlock(replaceDg, replaceBlock);
+    
+    // skip over transition dgrams in control streams if we are processing DAQ streams -
+    // they should contain no event data and comparing them is more difficult
+    bool skip = false;
+    if (processingDAQ()) {
+      if ((nextStreamDg.streamType() == StreamDgram::controlUnderDAQ) or 
+          (nextStreamDg.streamType() == StreamDgram::controlIndependent)) {
+        if (not replaceDg.empty()) {
+          Pds::TransitionId::Value replaceTrans = replaceDg.dg()->seq.service();
+          if (replaceTrans == Pds::TransitionId::Configure) {
+            // the first configure was put in the queue during initialization. Now we have a
+            // configure in the midst of the stream. This may happen if we are processing 
+            // multiple runs
+            MsgLog(logger, warning, "Discarding Configure transition found in " 
+                   << replaceDg.file().path());
+          }
+          if (replaceTrans != Pds::TransitionId::L1Accept) {
+            MsgLog(logger, DVDMSG, "next() skipping non L1Accept in " 
+                   << dumpStr(replaceStreamIndex));
+            skip = true;
+          }
+        }
+      }
+    }
+    if (not skip) {
+      StreamDgram replaceStreamDg(replaceDg, nextStreamDg.streamType(), replaceBlock, replaceStreamId);
+      m_outputQueue.push(replaceStreamDg);
+      MsgLog(logger, DVDMSG, "next() replacement dg: " << StreamDgram::dumpStr(replaceStreamDg));
+      replaced = true;
+    }
+  }
+  return nextStreamDg;
 }
 
 void 
@@ -163,9 +200,9 @@ XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const
 
 XtcStreamMerger::TransBlock XtcStreamMerger::makeTransBlock(const Dgram &dg, uint64_t block) {
   if (dg.empty()) {
-    return TransBlock(Pds::TransitionId::Unknown, block);
+    return TransBlock();
   }
-  return TransBlock(dg.dg()->seq.service(), block);
+  return TransBlock(dg.dg()->seq.service(), block, dg.file().run());
 }
 
 XtcStreamMerger::TransBlock XtcStreamMerger::getInitialTransBlock(const Dgram &dg) {
@@ -174,13 +211,23 @@ XtcStreamMerger::TransBlock XtcStreamMerger::getInitialTransBlock(const Dgram &d
 
 uint64_t  XtcStreamMerger::getNextBlock(const TransBlock & prevTransBlock, const Dgram &dg) {
   if (dg.empty()) {
-    return prevTransBlock.second;
+    return prevTransBlock.block;
   }
+  int nextRun = dg.file().run();
+  if (nextRun != prevTransBlock.run) return 0;
   Pds::TransitionId::Value nextService = dg.dg()->seq.service();
-  if ((prevTransBlock.first != Pds::TransitionId::L1Accept) and (nextService == Pds::TransitionId::L1Accept)) {
-    return prevTransBlock.second + 1;
+  if ((prevTransBlock.trans == Pds::TransitionId::L1Accept) and (nextService != Pds::TransitionId::L1Accept)) {
+    return prevTransBlock.block + 1;
   }
-  return prevTransBlock.second;
+  return prevTransBlock.block;
 }
-  
+
+std::string XtcStreamMerger::dumpStr(const StreamIndex &streamIndex) {
+  std::ostringstream msg;
+  msg << "streamType=" 
+      << StreamDgram::streamType2str(streamIndex.first) 
+      << " streamId=" << std::setw(2) << streamIndex.second;
+  return msg.str();
+} 
+
 } // namespace XtcInput
