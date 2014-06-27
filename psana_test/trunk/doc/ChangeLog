@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2014-06-27 David Schneider
+- update code to handle single or multi file (psana dataset) tests
+- add test for the first multifile test set
+
 Tag: V00-00-11
 2014-06-18 David Schneider
 - improve error messages when md5sum call fails

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <data>
-  <regress number="2">
+  <regress src="xtc" number="2">
     <diff>
 <![CDATA[
 ]]>
@@ -13,7 +13,7 @@ because of this, so the Translator does not set up these aliases - thus the diff
     </comment>
   </regress>
 
-  <regress number="8">
+  <regress src="xtc" number="8">
     <diff>
 <![CDATA[
 ]]>
@@ -51,7 +51,7 @@ So the pvId can change from one event to the next with psana.
     </comment>
   </regress>
 
-  <regress number="10">
+  <regress src="xtc" number="10">
     <diff>
 <![CDATA[
 ]]>
@@ -110,7 +110,7 @@ I see that I am skipping the alias, but why did the group get skipped?
     </comment>
   </regress>
 
-  <regress number="11">
+  <regress src="xtc" number="11">
     <diff>
 <![CDATA[
 ]]>
@@ -120,7 +120,7 @@ This looks like the same thing as test 8
     </comment>
   </regress>
 
-  <regress number="23">
+  <regress src="xtc" number="23">
     <diff>
 <![CDATA[
 ]]>
@@ -165,7 +165,7 @@ From the dump, in the config:
     </comment>
   </regress>
 
-  <regress number="99999">
+  <regress src="xtc" number="99999">
     <diff>
 <![CDATA[
 ]]>
@@ -175,44 +175,5 @@ This looks like the same thing as test 8
     </comment>
   </regress>
 
-  <regress number="99999">
-    <diff>
-<![CDATA[
-]]>
-    </diff>
-    <comment>
-This looks like the same thing as test 8
-    </comment>
-  </regress>
-
-  <regress number="99999">
-    <diff>
-<![CDATA[
-]]>
-    </diff>
-    <comment>
-This looks like the same thing as test 8
-    </comment>
-  </regress>
-
-  <regress number="99999">
-    <diff>
-<![CDATA[
-]]>
-    </diff>
-    <comment>
-This looks like the same thing as test 8
-    </comment>
-  </regress>
-
-  <regress number="99999">
-    <diff>
-<![CDATA[
-]]>
-    </diff>
-    <comment>
-This looks like the same thing as test 8
-    </comment>
-  </regress>
 
 </data>

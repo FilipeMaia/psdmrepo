@@ -47,9 +47,11 @@ test  default is to do regression test - the tests listed in psana_test/data/reg
 
        optional args:
          verbose=True delete=False
-         set=n  or n,m,k            just to those regression test numbers
-         set=full                   not the regression, processes complete xtc of all tests
-         set=full:n or full:n,m,k   a select number of full tests to do
+         set=xtc:n   or xtc:n,m,k    just do those regression test numbers for xtc files
+         set=multi:n or multi:n,m,k  just regression test 0 from multi test set files
+         set=full                    not the regression, processes complete xtc of all tests
+         set=multi:full or xtc:full  limit full to that dataset
+         set=multi:full:n or multi:full:n,m,k   a select number of full tests to do
 
 types  find xtc with new types. Make new test_0xx files. Updates psana_test/data/regressionTests.txt.
        optional args: 
@@ -104,13 +106,14 @@ def cmdTimeOut(cmd,seconds=5*60):
     
 def getTestFiles(noTranslator=False):
     '''returns the test files as a dictionary. These are the files
-    of the form test_xxx_*.xtc where xxx is an integer.
+    of the form test_xxx_*.xtc where xxx is an integer. These are the single
+    xtc files, not the multi file datasets.
 
     optional arg: noTranslator=True means other than test 42, don't 
     return tests with Translator in the name.
 
     Returns a dict:
-      res[n]={'basname':basename, 'path':path}
+      res[n]={'basename':basename, 'path':path}
     where n is the testnumber, 
           basename  is the file basename, such as test_000_exp.xtc
           path      is the full path to the xtc file.
@@ -126,6 +129,55 @@ def getTestFiles(noTranslator=False):
         res[num] = {'basename':basename, 'path':fullpath}
     return res
 
+def getMultiDatasets():
+    '''returns the multi file datasets as a dictionary. 
+    If at the base directory we have
+
+    ./test_000_amo01509
+    ./test_000_amo01509/e8-r0125-s00-c00.xtc
+    ./test_000_amo01509/e8-r0125-s01-c00.xtc
+
+    Then the dict will be 
+    
+    res[0]={'basedir':'test_000_amo01509',
+            'basepath':'/reg/g/psdm/data_test/multifile/test_000_amo01509',
+            'xtcs':['e8-r0125-s00-c00.xtc','e8-r0125-s01-c00.xtc']
+            'runs':[125]
+            'dspec':'exp=amo01509:run=125:dir=/reg/g/psdm/data_test/multifile/test_000_amo01509'}
+
+    The fields are for the most part self explanatory. dspec will always be a psana dataset
+    specification to process all the runs in the directory.
+    '''
+    multiBaseDir = '/reg/g/psdm/data_test/multifile'
+    assert os.path.exists(multiBaseDir), "multifile directory does not exist: %s" % multiBasedir
+    multiDirPaths = glob.glob(os.path.join(multiBaseDir, 'test_*'))
+    res = {}
+    for multiDirPath in multiDirPaths:
+        multiDir = os.path.basename(multiDirPath)
+        number = int(multiDir.split('_')[1])
+        xtcPaths = glob.glob(os.path.join(multiDirPath,"*.xtc"))
+        xtcFiles = []
+        runs = set()
+        for xtcFilePath in xtcPaths:
+            xtcFile = os.path.basename(xtcFilePath)
+            flds = xtcFile.split('-')
+            assert len(flds)==4, "xtcFile %s doesn't have 4 fields separated by '-'" % xtcFile
+            assert flds[0].startswith('e'), "xtcFile %s doesn't start with e" % xtcFile
+            assert flds[1].startswith('r'), "xtcFile %s doesn't have -r in fld1" % xtcFile
+            assert flds[2].startswith('s'), "xtcFile %s doesn't have -s in fld2" % xtcFile
+            assert flds[3].startswith('c'), "xtcFile %s doesn't have -c in fld3" % xtcFile
+            runs.add(int(flds[1][1:]))
+            xtcFiles.append(xtcFile)
+        runs = list(runs)
+        runs.sort()
+        expname = '_'.join(multiDir.split('_')[2:])
+        res[number] = {'basedir': multiDir,
+                       'basepath': multiDirPath,
+                       'xtcs': xtcFiles,
+                       'runs':runs,
+                       'dspec':'exp=%s:run=%s:dir=%s' % (expname, ','.join(map(str,runs)), multiDirPath)}
+    return res
+
 def getPreviousDumpFilename():
     return os.path.join('psana_test', 'data', 'previousDump.txt')
 
@@ -137,23 +189,26 @@ def getRegressionTestExpectedDifferencesFilename():
 
 def getRegressionTestExpectedDifferences():
     tree = ET.parse(getRegressionTestExpectedDifferencesFilename())
-    root = tree.getroot()
-    expectedDiffs = {}
-    for regress in root.findall('regress'):
-        expectedDiffs[int(regress.attrib['number'])]=regress.find('diff').text.strip()
-    return expectedDiffs
-    
+    return parseXmlTreeForExpectedDiffs(tree)
+
 def getFullTestExpectedDifferencesFilename():
     return os.path.join('psana_test','data','fullTestsExpectedDiffs.xml')
 
 def getFullTestExpectedDifferences():
     tree = ET.parse(getFullTestExpectedDifferencesFilename())
-    root = tree.getroot()
-    expectedDiffs = {}
-    for full in root.findall('full'):
-        expectedDiffs[int(full.attrib['number'])]=full.find('diff').text.strip()
-    return expectedDiffs
+    return parseXmlTreeForExpectedDiffs(tree)
 
+def parseXmlTreeForExpectedDiffs(tree):
+    root = tree.getroot()
+    expectedDiffs = {'xtc':{},'multi':{}}
+    for regress in root.findall('regress'):
+        assert regress.attrib['src'] in ['xtc','multi'], "src attribute is not in xtc or multi"
+        if regress.attrib['src']=='xtc':
+            expectedDiffs['xtc'][int(regress.attrib['number'])]=regress.find('diff').text.strip()
+        elif regress.attrib['src']=='multi':
+            expectedDiffs['multi'][int(regress.attrib['number'])]=regress.find('diff').text.strip()
+    return expectedDiffs
+    
 def getPreviousXtcDirsFilename():
     return os.path.join('psana_test', 'data', 'previousXtcDirs.txt')
 
@@ -186,8 +241,8 @@ def get_md5sum(fname, verbose=False):
     assert flds[1] == fname, "output of md5 did not have filename in second field, flds[1]=%s, while filename=%s and flds[0]=%s" % (flds[1], fname, flds[0])
     return flds[0]
 
-def psanaDump(infile, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False):
-    '''Runs the  psana_test.dump module on the infile and saves the output
+def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False):
+    '''Runs the  psana_test.dump module on the inDataset and saves the output
     to outfile. Returns output to stderr from the run, filtered as per the
     filterPsanaStderr function
     '''
@@ -198,7 +253,7 @@ def psanaDump(infile, outfile, events=None, dumpEpicsAliases=False, regressDump=
     if not dumpEpicsAliases:
         epicAliasStr = '-o psana_test.dump.aliases=False'
     regressDumpStr = '-o psana_test.dump.regress_dump=%r' % regressDump
-    cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, infile)
+    cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, inDataset)
     if verbose: print cmd
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()
@@ -417,71 +472,141 @@ def previousDumpFile(deleteDump=True, doall=False):
     prevFullName = getPreviousDumpFilename()
     if doall:
         fout = file(prevFullName,'w')
-        prev = set()
+        prevXtc = set()
+        prevMulti = set()
     else:
         assert os.path.exists(prevFullName), "file %s does not exist, run with all=True" % prevFullName
-        prev = set(readPrevious().keys())
+        prevXtcDict, prevMultiDict = readPrevious()
+        prevXtc = prevXtcDict.keys()
+        prevMulti = prevMultiDict.keys()
         fout = file(prevFullName,'a')
-    testTimes = {}
+    testTimes = {'xtc':{}, 'multi':{}}
     regressTests = readRegressionTestFile()
     print "** prev: carrying out md5 sum of xtc, psana_test.dump of xtc and regression tests."
     print "   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)"
-    for testNumber, fileInfo in getTestFiles().iteritems():
-        if testNumber in prev:
-            continue
-        t0 = time.time()
-        baseName, fullPath = (fileInfo['basename'], fileInfo['path'])
-        xtc_md5 = get_md5sum(fullPath)
-        dumpBase = baseName + '.dump'
-        dumpPath = os.path.join('psana_test', 'data', 'prev_xtc_dump', dumpBase)        
-        cmd, err = psanaDump(fullPath, dumpPath, dumpEpicsAliases=True, regressDump=False)
-        if len(err)>0:
-            fout.close()
-            errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on test %d\n' % testNumber
-            errMsg += 'cmd: %s\n' % cmd
-            errMsg += err
-            raise Exception(errMsg)
-        dump_md5 = get_md5sum(dumpPath)
-        if deleteDump: os.unlink(dumpPath)
-        regress_md5 = '0' * 32
-        if testNumber in regressTests:
-            testInfo = regressTests[testNumber]
-            regressXtc, events, dumpEpicsAliases = testInfo['path'], testInfo['events'], \
-                                                   testInfo['dumpEpicsAliases']            
-            assert regressXtc == fullPath, "regression test %d xtc != testData xtc, regress=%s testData=%s" % \
-                (testNumber, regressXtc, fullPath)
-            regressDumpBase = 'regress_' + dumpBase
-            regressDumpPath = os.path.join('psana_test', 'data', 'prev_xtc_dump', regressDumpBase)
-            cmd, err = psanaDump(fullPath, regressDumpPath, events, dumpEpicsAliases=False, regressDump=True)
+    testFiles = getTestFiles()
+    multiTests = getMultiDatasets()
+    for src,srcDict in zip(['xtc','multi'],[testFiles, multiTests]):
+        for testNumber, info in srcDict.iteritems():
+            if (src == 'xtc') and (testNumber in prevXtc): continue
+            if (src == 'multi') and (testNumber in prevMulti): continue
+            t0 = time.time()
+            xtc_md5s = {}
+            dumpOutputDir = os.path.join('psana_test', 'data', 'prev_xtc_dump')
+            if src == 'xtc':
+                inputDatasource = info['path']
+                xtc_md5s[info['basename'] ] = get_md5sum(inputDatasource)
+                dumpOutput = os.path.join(dumpOutputDir, 'xtc_' + info['basename'] + '.dump')
+                regressOutput = os.path.join(dumpOutputDir, 'regress_xtc_' + info['basename'] + '.dump')
+            elif src == 'multi':
+                inputDatasource = info['dspec']
+                for xtc in info['xtcs']:
+                    xtc_md5s[xtc] = get_md5sum(os.path.join(info['basepath'], xtc))
+                dumpOutput = os.path.join(dumpOutputDir, 'multi_' + info['basedir'] + '.dump')
+                regressOutput = os.path.join(dumpOutputDir, 'regress_multi_' + info['basedir'] + '.dump')
+            cmd, err = psanaDump(inputDatasource, dumpOutput, dumpEpicsAliases=True, regressDump=False)
             if len(err)>0:
                 fout.close()
-                errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on regress test %d\n' % testNumber
+                errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on test %d\n' % testNumber
                 errMsg += 'cmd: %s\n' % cmd
                 errMsg += err
                 raise Exception(errMsg)
-            regress_md5 = get_md5sum(regressDumpPath)
-            if deleteDump: os.unlink(regressDumpPath)
-        fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % (xtc_md5, dump_md5, regress_md5, baseName))
-        fout.flush()
-        testTimes[testNumber] = time.time()-t0
-        print "** prev:  test=%3d time=%.2f seconds" % (testNumber, testTimes[testNumber])
+            dump_md5 = get_md5sum(dumpOutput)
+            if deleteDump: os.unlink(dumpOutput)
+            regress_md5 = '0' * 32
+            if testNumber in regressTests[src]:
+                testInfo = regressTests[src][testNumber]
+                regressInput, events, dumpEpicsAliases = testInfo['datasource'], testInfo['events'], \
+                                                       testInfo['dumpEpicsAliases']
+                if src == 'xtc':
+                    assert regressInput == inputDatasource, "xtc file regression test %d xtc != testData xtc, regress=%s testData=%s" % \
+                        (testNumber, regressInput, inputDatasource)
+                cmd, err = psanaDump(inputDatasource, regressOutput, events, dumpEpicsAliases=dumpEpicsAliases, 
+                                     regressDump=True)
+                if len(err)>0:
+                    fout.close()
+                    errMsg = '** FAILURE ** createPrevious: psana_test.dump produced errors on regress test %d\n' % testNumber
+                    errMsg += 'cmd: %s\n' % cmd
+                    errMsg += err
+                    raise Exception(errMsg)
+                regress_md5 = get_md5sum(regressOutput)
+                if deleteDump: os.unlink(regressOutput)
+            if src == 'xtc':
+                fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   xtc=%s\n" % \
+                           (xtc_md5s.values()[0], dump_md5, regress_md5, info['basename']))
+            elif src == 'multi':
+                fout.write("xtc_md5sum=%s   dump_md5sum=%s   regress_md5sum=%s   multi=%s" % \
+                           ('0' * 32, dump_md5, regress_md5, info['basedir']))
+                xtcs = xtc_md5s.keys()
+                xtcs.sort()
+                for xtc in xtcs:
+                    md5 = xtc_md5s[xtc]
+                    fout.write(" %s_md5sum=%s" % (xtc, md5))
+                fout.write('\n')
+            fout.flush()
+            testTimes[src][testNumber] = time.time()-t0
+            print "** prev:  %s test=%3d time=%.2f seconds" % (src, testNumber, testTimes[src][testNumber])
     fout.close()
-    testsTime = sum(testTimes.values())
+    testsTime = sum(testTimes['xtc'].values())+sum(testTimes['multi'].values())
     print "* tests time: %.2f sec, or %.2f min" % (testsTime,testsTime/60.0)
 
 def readPrevious():
-    '''A line of this file has
+    '''This parses the file of previous md5 resuls for the 
+    test data, a psana_test.dump of the test data, and possibly 
+    a psana_test.dump of a regression test of the test data.
+    Regression tests may not run on all of the input and use special
+    parameters for the dump.
+
+    There are two kinds of test data. Single .xtc files, and 
+    multifile datasets. A record of single file data looks like:
+
     xtc_md5sum=... dump_md5sum=... regress_md5sum=... xtc=...
-    which are the md5 sum of the whole xtc file, the md5 sum of a dump of the whole xtc
-    then an md5 sum of a dump of the regression test for this file, or 0 if this file is not
-    included in the reguression test, finally the xtc file for the test.    
+
+    A record for multifile data looks like
+
+    xtc_md5sum=... dump_md5sum=... regress_md5sum=... multifile=... filename1.xtc_md5sum=... filename2.xtc_md5sum=...
+
+    For a signle xtc file, the four fields record:
+
+    xtc_md5sum      md5 sum of the xtc file
+    dump_md5sum     md5 sum of running psana_test.dump with no parameters on the whole xtc file
+    regress_md5sum  md5 sum of regression test output for this xtc file, or 0 if not part of regression tests
+    xtc             base name of the xtc file (not the full path).
+
+    For a multifile dataset, the fields are
+
+    xtc_md5sum      0 not used for multifile
+    dump_md5sum     md5sum of the dump on the entire dataset, all runs in consecutive order
+    regress_md5sum= md5sum of fthe dump of the regression test
+    multifile= directory name for the dataset
+    # next the md5sum's and filenames of all the files in the dataset are recorded.
+    # the filenames are part of the keys, the md5sum is the value
+    filename1.xtc_md5sum= the md5sum of the file named filename1.xtc
+    filename2.xtc_md5sum= likewise the md5sum of the file named filename2.xtc
+
+    What is returned is two dictionaries. One for the individual xtc test files, and
+    another for the multifile test sets.
+    
+    xtcPrev, multiPrev
+
+    The keys will be test numbers (there is one set of test numbers for xtc files, and another
+    for multifile test sets). Where the keys are:
+
+    xtcPrev[0]['xtc'] = xtc file basename
+    xtcPrev[0]['md5xtc'] = md5 of xtc
+    xtcPrev[0]['md5dump'] = md5 of dump of xtc
+    xtcPrev[0]['md5regress'] = md5 dump of regress
+
+    for multi, 
+    xtcPrev[0]['xtcs'] = ['filename1', 'filename2', ...]
+    xtcPrev[0]['md5xtcs']['filename1'] = md5 of filename1, 
+    xtcPrev[0]['md5xtcs']['filename2'] = md5 of filename2, 
+    ...
+    xtcPrev[0]['md5dump'] = md5 of dump of whole dataset
+    xtcPrev[0]['md5regress'] = md5 of regress test dump output
     '''
-    prevFilename = getPreviousDumpFilename()
-    assert os.path.exists(prevFilename), "file %s doesn't exist, run prev command" % prevFilename
-    res = {}
-    for ln in file(prevFilename).read().split('\n'):
-        if not ln.startswith('xtc_md5sum='):
-            continue
+
+    def parseXtcLine(ln):
         ln,xtc = ln.split(' xtc=')
         ln,md5regress = ln.split(' regress_md5sum=')
         ln,md5dump = ln.split('dump_md5sum=')
@@ -492,8 +617,46 @@ def readPrevious():
         md5regress = md5regress.strip()
         md5dump = md5dump.strip()
         md5xtc = md5xtc.strip()
-        res[number]={'xtc':xtc, 'md5xtc':md5xtc, 'md5dump':md5dump, 'md5regress':md5regress}
-    return res
+        return number, xtc, md5xtc, md5dump, md5regress
+
+    def parseMultiLine(ln):
+        ln,multiAndXtcs = ln.split(' multi=')
+        ln,md5regress = ln.split(' regress_md5sum=')
+        ln,md5dump = ln.split('dump_md5sum=')
+        ln,md5xtc = ln.split('xtc_md5sum=')
+        md5xtcs={}
+        flds = multiAndXtcs.rsplit('_md5sum=',1)
+        while len(flds)==2:
+            md5sum = flds[1].strip()
+            nextFlds = flds[0].split()
+            assert len(nextFlds)>=2, "expecting 'm5sumvalue filename' (with space) but got %s" % flds[0]
+            xtc = nextFlds[-1].strip()
+            md5xtcs[xtc]=md5sum
+            multiAndXtcs = ' '.join(nextFlds[0:-1])
+            flds = multiAndXtcs.rsplit('_md5sum=',1)
+        xtcs = md5xtcs.keys()
+        multi = multiAndXtcs.strip()
+        assert multi.startswith('test_'), "multi name doesn't start with test_: %s" % multi
+        number = int(multi.split('_')[1])
+        md5regress = md5regress.strip()
+        md5dump = md5dump.strip()
+        md5xtc = md5xtc.strip()
+        return number, xtcs, md5xtcs, md5dump, md5regress
+
+    prevFilename = getPreviousDumpFilename()
+    assert os.path.exists(prevFilename), "file %s doesn't exist, run prev command" % prevFilename
+    xtcRes = {}
+    multiRes = {}
+    for ln in file(prevFilename).read().split('\n'):
+        if not ln.startswith('xtc_md5sum='):
+            continue
+        if ln.find(' xtc=') >=0:
+            number, xtc, md5xtc, md5dump, md5regress = parseXtcLine(ln)
+            xtcRes[number]={'xtc':xtc, 'md5xtc':md5xtc, 'md5dump':md5dump, 'md5regress':md5regress}
+        elif ln.find(' multi=') >= 0:
+            number, xtcs, md5xtcs, md5dump, md5regress = parseMultiLine(ln)
+            multiRes[number]={'xtcs':xtcs, 'md5xtcs':md5xtcs, 'md5dump':md5dump, 'md5regress':md5regress}
+    return xtcRes, multiRes
 
 def makeTypeLinks(args):
     doTypes = True
@@ -552,43 +715,88 @@ def getEpicsTestNumbers():
     return list(testNumbers)
 
 def testCommand(args):
-    def checkForSameXtcFile(baseName, prevBasename, num, verbose):
-        assert baseName == prevBasename, ("Test no=%d xtc mismatch: previous_dump.txt says " + \
-                                          "xtc files is:\n %s\n but for files on disk, " + \
-                                          "it is:\n %s") % (num, prevBasename, baseName)
-        if verbose: 
-            print "test %d: xtc filename is the same as what was recorded in previous_dump.txt" % num
-            print "   old: %s" % prevBasename
-            print "   new: %s" % baseName
+    # helper functions
+    def checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose):
+        assert src in ['xtc','multi'], "unknown src: %s" % src
+        if src == 'xtc':
+            failMsg = "src=%s Test no=%d xtc mismatch: previous_dump.txt says "
+            failMsg += "xtc files is:\n %s\n but for files on disk, it is:\n %s"
+            failMsg %= (src, num, prevInfo['xtc'], testDataInfo['basename'])
+            assert testDataInfo['basename'] == prevInfo['xtc'], failMsg
+            if verbose: 
+                msg = "src=%s test %d: xtc filename is the same as what was "
+                msg += "recorded in previous_dump.txt. old=%s new=%s"
+                msg %= (src, num, prevInfo['xtc'], testDataInfo['basename'])
+                print msg
+        elif src == 'multi':
+            prevXtcs = prevInfo['xtcs']
+            prevXtcs.sort()
+            testXtcs = testDataInfo['xtcs']
+            testXtcs.sort()
+            lenFailMsg = "src=%s test=%d, %d != %d, that is previous number of xtc"
+            lenFailMsg += " files in test != current number of xtc files in test"
+            lenFailMsg %= (src, num, len(prevXtcs), len(testXtcs))
+            assert len(prevXtcs)==len(testXtcs), lenFailMsg
+            for prevXtc, testXtc in zip(prevXtcs, testXtcs):
+                xtcFailMsg = "src=%s test=%d, xtc files differ: %s != %s"
+                xtcFailMsg %= (src, num, prevXtc, testXtc)
+                assert prevXtc == testXtc, xtcFailMsg
+            if verbose:
+                msg = "src=%s test %d: all xtc filenames the same"
+                msg %= (src, num)
+                print msg
 
-    def checkForSameMd5(fullPath, md5, num, verbose, msg):
-        current_md5 = get_md5sum(fullPath)
-        assert current_md5 == md5, ("%s\n Test no=%d md5 do not agree.\n prev=%s\n curr=%s") % \
-            (msg, num, md5, current_md5)
+    def checkForSameMd5sOfXtcFiles(testDataInfo, prevInfo, src, num, verbose):
+        assert src in ['xtc','multi'], "unknown src: %s" % src
+        if src == 'xtc':
+            assert prevInfo['xtc'] == testDataInfo['basename']
+            prevMd5s = [prevInfo['md5xtc']]
+            testXtcs = [testDataInfo['path']]
+        elif src == 'multi':
+            prevXtcs = prevInfo['xtcs']
+            prevXtcs.sort()
+            testXtcs = testDataInfo['xtcs']
+            testXtcs.sort()
+            testXtcs = [os.path.join(testDataInfo['basepath'], xtc) for xtc in testXtcs]
+            prevMd5s = [prevInfo['md5xtcs'][xtc] for xtc in prevXtcs]
+        assert len(testXtcs)==len(prevMd5s)
+        for testXtc, prevMd5 in zip(testXtcs, prevMd5s):
+            current_md5 = get_md5sum(testXtc)
+            failMsg = "src=%s test=%d md5 of xtc file has changed.\n"
+            failMsg += "xtc=%s\n"
+            failMsg += "prevMd5=%s\n"
+            failMsg += "currMsg=%s\n"
+            failMsg %= (src, num, testXtc, prevMd5, current_md5)
+            assert current_md5 == prevMd5, failMsg
+        if verbose:
+            msg = "src=%s test=%d: calculated md5 of xtc files."
+            msg += " They agree with previously recorded md5s"
+            msg %= (src, num)
+            print msg
 
-    def translate(infile, outfile, numEvents, testNum, verbose):
+    def translate(inDataset, outfile, numEvents, testLabel, verbose):
         numEventsStr = ''
         if numEvents is not None and numEvents > 0:
             numEventsStr = ' -n %d' % numEvents
         cmd = 'psana %s -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
-        cmd %= (numEventsStr, outfile, infile)
+        cmd %= (numEventsStr, outfile, inDataset)
         if verbose: print cmd
         o,e = cmdTimeOut(cmd,20*60)
         e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
         if len(e) > 0:
-            errMsg =  "**Failure** test %d: Translator failure" % testNum
+            errMsg =  "**Failure** %s: Translator failure" % testLabel
             errMsg += "cmd=%s\n" % cmd
             errMsg += "\n%s" % e
             raise Exception(errMsg)
-        if verbose: print "test %d: translation finished, produced: %s" % (num, outfile)
+        if verbose: print "%s: translation finished, produced: %s" % (testLabel, outfile)
 
-    def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose, expectedOutput=''):
+    def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, testLabel, verbose, expectedOutput=''):
         cmd = 'diff %s %s' % (currentXtcDumpPath, h5DumpPath)
         if verbose: print cmd
         o,e = cmdTimeOut(cmd,5*60)
         assert len(e)==0, "** FAILURE running cmd: %s\nstder:\n%s" % (cmd,e)
         if o.strip() != expectedOutput:
-            msg = "** FAILURE: diff in xtc dump and h5 dump test=%d not equal to expected output\n" % num
+            msg = "** FAILURE: diff in xtc dump and h5 dump %s not equal to expected output\n" % testLabel
             msg += " cmd= %s\n" % cmd
             msg += "-- diff output: --\n"
             msg += o
@@ -596,13 +804,14 @@ def testCommand(args):
                 msg += "-- expected output: --\n"
                 msg += expectedOutput
             raise Exception(msg)        
-        if verbose: print "test %d: compared dump of xtc and dump of h5 file" % num
+        if verbose: print "%s: compared dump of xtc and dump of h5 file" % testLabel
 
     def removeFiles(files):
         for fname in files:
             assert os.path.exists(fname)
             os.unlink(fname)
 
+    ##################################
     # end helper functions
     delete,verbose,testSet = parseArgs(args,['delete','verbose', 'set'])
     assert delete.lower() in ['','false','true']
@@ -610,12 +819,22 @@ def testCommand(args):
 
     delete = not (delete.lower() == 'false')
     verbose = (verbose.lower() == 'true')
-    testFiles = getTestFiles(noTranslator=True)
-    prev = readPrevious()
+    xtcTestFiles = getTestFiles(noTranslator=True)
+    multiTestSets = getMultiDatasets()
+    testFiles = {'xtc':xtcTestFiles, 'multi':multiTestSets}
+    prev = {'xtc':None, 'multi':None}
+    prev['xtc'], prev['multi'] = readPrevious()
     regress = readRegressionTestFile()
     whichTest = 'regress'
-    testNumberFilter = regress.keys()
+    testNumberFilter = {'xtc':regress['xtc'].keys(), 'multi':regress['multi'].keys()}
     expectedDiffs = getRegressionTestExpectedDifferences()
+    srcs = ['xtc','multi']
+    if testSet.startswith('xtc:'):
+        srcs = ['xtc']
+        testSet = testSet.split('xtc:')[1]
+    elif testSet.startswith('multi:'):
+        srcs = ['multi']
+        testSet = testSet.split('multi:')[1]
     if testSet.startswith('full'):
         whichTest = 'full'
         expectedDiffs = getFullTestExpectedDifferences()
@@ -625,71 +844,115 @@ def testCommand(args):
             jnk, testSet = afterFull.split(':')
     if testSet != '':
         commaSepTestSet = testSet.split(',')
-        testNumberFilter = []
+        testNumberFilter['xtc'] = []
+        testNumberFilter['multi'] = []
         for val in commaSepTestSet:
             if val.find('-')>0:
                 a,b = map(int,val.split('-'))
-                testNumberFilter.extend(range(a,b+1))
+                for src in srcs:
+                    testNumberFilter[src].extend(range(a,b+1))
             else:
-                testNumberFilter.append(int(val))
+                for src in srcs:
+                    testNumberFilter[src].append(int(val))
 
-    for num in testNumberFilter:
-        if num in testFiles:
-            if (whichTest == 'full') or (whichTest == 'regress' and num in regress):
-                assert num in prev, "There is a new xtc test number: %s\n. Run prev command first." % num
-    testTimes = {}
-    for num in testNumberFilter:
-        if num not in testFiles: continue
-        fileInfo = testFiles[num]
-        baseName, fullPath = (fileInfo['basename'], fileInfo['path'])
-        prv = prev[num]
-        prevBasename, md5xtc, md5dump, md5regress = (prv['xtc'], prv['md5xtc'], 
-                                                     prv['md5dump'], prv['md5regress'])
-        t0 = time.time()
-        checkForSameXtcFile(baseName, prevBasename, num, verbose)
-        checkForSameMd5(fullPath, md5xtc, num, verbose,
-                        "**DATA INTEGRITY - previously recorded md5 and current for SAME xtc file")
-        if verbose: print "test %d: previously recorded md5 for xtcfile same with new md5" % num
-        regressStr = ''
-        numEvents = 0
-        dumpEpicsAliases = True
-        prevMd5 = md5dump
-        if whichTest == 'regress': 
-            if num not in regress:
-                print "warning: test number %d not in regress tests, skipping" % num
-                continue
-            regressStr = '.regress'
-            numEvents = regress[num]['events']
-            dumpEpicsAliases = False
-            prevMd5 = md5regress
-        currentXtcDumpPath = os.path.join('psana_test', 'data', 'current_xtc_dump', baseName + regressStr + '.dump')
-        cmd, err = psanaDump(fullPath, currentXtcDumpPath, numEvents, dumpEpicsAliases=False, regressDump=True, verbose=verbose)
-        if len(err) > 0:
-            raise Exception("**Failure: test=%d, psanaDump failed on xtc.\n cmd=%s\n%s" % (num, cmd, err))
-        checkForSameMd5(currentXtcDumpPath, prevMd5, num, verbose, 
-                        ("**FAIL - md5 of dump of xtc does not agree with prev %s" % regressStr))
-        if verbose: 
-            print "test %s %d: previously recorded md5 of dump of xtcfile same as new md5 of dump" % \
-                (regressStr, num)
-        h5dir = os.path.join('psana_test', 'data', 'current_h5')
-        assert os.path.exists(h5dir), "h5dir: %s doesn't exist" % h5dir
-        h5baseName = os.path.splitext(baseName)[0] + regressStr + '.h5'
-        h5file = os.path.join(h5dir, h5baseName)
-        translate(fullPath, h5file, numEvents, num, verbose)
-        h5dumpBasename =  h5baseName + '.dump'
-        h5DumpPath = os.path.join('psana_test', 'data', 'current_h5_dump', h5dumpBasename)
-        cmd, err = psanaDump(h5file, h5DumpPath, numEvents, dumpEpicsAliases, regressDump=True, verbose=True)
-        if len(err) > 0:
-            raise Exception("**Failure: test=%d, psanaDump failed on h5.\n cmd=%s\n%s" % (num, cmd, err))
-        xtc2h5ExpectedDiff = expectedDiffs.get(num,'')
-        compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, num, verbose, expectedOutput=xtc2h5ExpectedDiff)
-        if delete:
-            removeFiles([currentXtcDumpPath, h5DumpPath, h5file])
-        testTime = time.time()-t0
-        testTimes[num]=testTime
-        print "test %3d success: total time: %.2f sec or %.2f min" % (num,testTime,testTime/60.0)
+    for src in srcs:
+        for num in testNumberFilter[src]:
+            if num in testFiles[src]:
+                # for full, make sure every test number has a previous entry.
+                # for regress, its ok to specify numbers that aren't in the regression set,
+                # but if they are, make sure there is a previous entry
+                if (whichTest == 'full') or (whichTest == 'regress' and num in regress[src]):
+                    assert num in prev[src], "There is a new %s test number: %s\n. Run prev command first." % (src,num)
 
-    totalTestTimes = sum(testTimes.values())
+    if verbose:
+        print "psanaTestLib - about to run %s tests:" % whichTest
+        xtcTests = testNumberFilter['xtc']
+        multiTests = testNumberFilter['multi']
+        xtcTests.sort()
+        multiTests.sort()
+        if whichTest == 'regress':
+            xtcTests = [x for x in xtcTests if x in regress['xtc']]
+            multiTests = [x for x in multiTests if x in regress['multi']]
+        print "  xtc: %s" % ','.join(map(str,xtcTests))
+        print " multi: %s" % ','.join(map(str,multiTests))
+
+    testTimes = {'xtc':{}, 'multi':{}}
+    for src in srcs:
+        for num in testNumberFilter[src]:
+            if num not in testFiles[src]: continue
+            t0 = time.time()
+            testDataInfo = testFiles[src][num]
+            prevInfo = prev[src][num]
+            checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose)            
+            checkForSameMd5sOfXtcFiles(testDataInfo, prevInfo, src, num, verbose)
+            # set parameters passed to psana_test.dump to default, for full test
+            regressStr = ''
+            numEvents = 0
+            dumpEpicsAliases=True
+            regressDump=False
+            md5prev = prev[src][num]['md5dump']
+            if whichTest == 'regress':
+                if num not in regress[src]:
+                    print "warning: src=%s test=%d not in regress tests, skipping" % (src,num)
+                    continue
+                regressStr = 'regress_'
+                numEvents = regress[src][num]['events']
+                dumpEpicsAliases=False
+                regressDump=True
+                md5prev = prev[src][num]['md5regress']
+            if src == 'xtc':
+                inputDataSource = testDataInfo['path']
+                dumpOutputBase = regressStr + 'xtc_' + testDataInfo['basename']
+                h5OutputBase = regressStr + 'xtc_' + testDataInfo['basename']
+            elif src == 'multi':
+                inputDataSource = testDataInfo['dspec']
+                dumpOutputBase = regressStr + 'multi_' + testDataInfo['basedir']
+                h5OutputBase = regressStr + 'multi_' + testDataInfo['basedir']
+            dumpOutputBase += '.dump'
+            h5OutputBase = os.path.splitext(h5OutputBase)[0] + '.h5'
+            h5OutputDumpBase = h5OutputBase + '.dump'
+            testLabel = "%s%s_test_%3.3d" % (regressStr, src, num)
+            dumpOutputPath = os.path.join('psana_test', 'data', 'current_xtc_dump', 
+                                          dumpOutputBase)
+            cmd, err = psanaDump(inputDataSource, dumpOutputPath, 
+                                 numEvents, dumpEpicsAliases=dumpEpicsAliases, 
+                                 regressDump=regressDump, verbose=verbose)
+            if len(err) > 0:
+                raise Exception("**Failure: %s, psanaDump call failed.\n cmd=%s\n%s" % (testLabel, cmd, err))
+           
+            md5current = get_md5sum(dumpOutputPath)
+            failMsg = "**FAIL: %s" % testLabel
+            failMsg += " md5 of dump does not agree with previously recorded\n."
+            failMsg += "cmd=%s\n" % cmd
+            failMsg += "prev_md5=%s\n" % md5prev
+            failMsg += "curr_md5=%s" % md5current
+            assert md5prev == md5current, failMsg
+
+            if verbose: 
+                msg = "%s%s test=%d: success: same md5 for xtc data as previously recorded" 
+                msg %= (regressStr, src, num)
+                print msg
+
+            h5dir = os.path.join('psana_test', 'data', 'current_h5')
+            assert os.path.exists(h5dir), "h5dir: %s doesn't exist" % h5dir
+            h5file = os.path.join(h5dir, h5OutputBase)
+            translate(inputDataSource, h5file, numEvents, testLabel, verbose)
+            h5DumpPath = os.path.join('psana_test', 'data', 'current_h5_dump', h5OutputDumpBase)
+            cmd, err = psanaDump(h5file, h5DumpPath, numEvents, 
+                                 dumpEpicsAliases=dumpEpicsAliases, regressDump=regressDump, verbose=verbose)
+            if len(err) > 0:
+                raise Exception("**Failure: test=%d, psanaDump failed on h5.\n cmd=%s\n%s" % (num, cmd, err))
+            # skip h5 vs xtc dump compare for full
+            if whichTest == 'regress':
+                xtc2h5ExpectedDiff = expectedDiffs[src].get(num,'')
+                compareXtcH5Dump(dumpOutputPath, h5DumpPath, num, verbose, expectedOutput=xtc2h5ExpectedDiff)
+            if delete:
+                removeFiles([dumpOutputPath, h5DumpPath, h5file])
+            testTime = time.time()-t0
+            testTimes[src][num]=testTime
+            print "%s success: total time: %.2f sec or %.2f min" % (testLabel,testTime,testTime/60.0)
+
+    totalTestTimes = sum(testTimes['xtc'].values()) + sum(testTimes['multi'].values())
     print "total test times: %.2f sec or %.2f min" % (totalTestTimes, totalTestTimes/60.0)
 
 def curTypesCommand(args):
@@ -996,18 +1259,26 @@ def makeRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
 def readRegressionTestFile(regressionTestFile = getRegressionTestFilename()):
     assert os.path.exists(getRegressionTestFilename()), "regression file %s does not exist. Run types regress" % getRegressionTestFilename()
     fin = file(regressionTestFile)
-    regressTests = {}
+    regressTests = {'xtc':{},'multi':{}}
     for ln in fin:
         ln = ln.strip()
         if len(ln)==0: continue
-        ln,xtc = ln.split(' xtc=')
+        if ln.startswith('#'): continue
+        if ln.find('xtc=')>0:
+            ln,ds = ln.split(' xtc=')
+            src = 'xtc'
+        elif ln.find('multi=')>0:
+            ln,ds = ln.split(' multi=')
+            src = 'multi'
+        else:
+            raise Exception("regression test file contains line with neither xtc= or multi=, ln:\n%s" % ln)
         ln,noEpicsAliases=ln.split(' doNotDumpEpicsAliases=')
         ln,events=ln.split(' events=')
         ln,testno = ln.split('test=')
         events = int(events)
         noEpicsAliases = int(noEpicsAliases)
         testno = int(testno)
-        regressTests[testno]={'events':events,'path':xtc,'dumpEpicsAliases':not bool(noEpicsAliases)}
+        regressTests[src][testno]={'events':events,'datasource':ds,'dumpEpicsAliases':not bool(noEpicsAliases)}
     return regressTests
 
 cmdDict = {
