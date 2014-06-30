@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-54
+2014-06-30 Mikhail S. Dubrovin
+- ConfigParametersForApp, ConfigFileGenerator add support for OrcaFl40
+- ConfigFileGenerator, scripts/psana-module-peds-aver-camera.cfg add parameter ftype to save metatxt
+
 Tag: V00-00-53
 2014-06-27 Mikhail S. Dubrovin
 - by request from Jason Koglin

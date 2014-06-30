@@ -147,7 +147,7 @@ class ConfigFileGenerator :
                 self.ind += 1 
                 #print self.ind, self.source, self.fname_ave, self.fname_rms
 
-                # list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris'] 
+                #list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Acqiris']
                 #if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPadPedestals')
                 #elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPad2x2Pedestals')
                 if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPadNDArrProducer')
@@ -158,8 +158,11 @@ class ConfigFileGenerator :
                 elif det_name == cp.list_of_dets[4] : self.add_cfg_module_peds_aver_camera()
                 elif det_name == cp.list_of_dets[5] : self.add_cfg_module_peds_aver_camera()
                 elif det_name == cp.list_of_dets[6] : self.add_cfg_module_peds_aver_camera()
-                elif det_name == cp.list_of_dets[7] : self.add_cfg_module_peds_aver_acqiris()
-                elif det_name == cp.list_of_dets[8] : self.print_warning()
+                elif det_name == cp.list_of_dets[7] : self.add_cfg_module_peds_aver_camera()
+                elif det_name == cp.list_of_dets[8] : self.add_cfg_module_peds_aver_camera()
+                elif det_name == cp.list_of_dets[9] : self.add_cfg_module_peds_aver_camera(metadata=True)
+                elif det_name == cp.list_of_dets[10]: self.add_cfg_module_peds_aver_acqiris()
+                elif det_name == cp.list_of_dets[11]: self.print_warning()
                 else : logger.warning('UNKNOWN DETECTOR: %s' % det_name, __name__)
 
         if self.ind > 0 : return True
@@ -285,7 +288,7 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def add_cfg_module_peds_aver_camera (self, module='ImgAlgos.CameraImageProducer') :
+    def add_cfg_module_peds_aver_camera (self, module='ImgAlgos.CameraImageProducer', metadata=False) :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-camera.cfg').path()
         mod_img_rec = '%s:%i' % (module, self.ind)
         mod         = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
@@ -297,10 +300,13 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'FTYPE'                : str('txt'),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
                          }
+
+        if metadata : self.d_subs['FTYPE'] = 'metatxt'
 
         self.add_module_in_cfg ('%s %s' % (mod_img_rec, mod))
 
