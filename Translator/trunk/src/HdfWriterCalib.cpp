@@ -51,9 +51,17 @@ namespace {
         (int(pdscalibdata::CsPadPedestalsV1::Rows) != int(pdscalibdata::CsPadPixelStatusV1::Rows)) or \
         (int(pdscalibdata::CsPad2x2PedestalsV1::Sections) != int(pdscalibdata::CsPad2x2PixelStatusV1::Sections)) or \
         (int(pdscalibdata::CsPad2x2PedestalsV1::Columns) != int(pdscalibdata::CsPad2x2PixelStatusV1::Columns)) or \
-        (int(pdscalibdata::CsPad2x2PedestalsV1::Rows) != int(pdscalibdata::CsPad2x2PixelStatusV1::Rows)))
+        (int(pdscalibdata::CsPad2x2PedestalsV1::Rows) != int(pdscalibdata::CsPad2x2PixelStatusV1::Rows)) or \
+        (int(pdscalibdata::CsPadPixelGainV1::Quads) != int(pdscalibdata::CsPadPixelStatusV1::Quads)) or \
+        (int(pdscalibdata::CsPadPixelGainV1::Sections) != int(pdscalibdata::CsPadPixelStatusV1::Sections)) or \
+        (int(pdscalibdata::CsPadPixelGainV1::Columns) != int(pdscalibdata::CsPadPixelStatusV1::Columns)) or \
+        (int(pdscalibdata::CsPadPixelGainV1::Rows) != int(pdscalibdata::CsPadPixelStatusV1::Rows)) or \
+        (int(pdscalibdata::CsPad2x2PixelGainV1::Sections) != int(pdscalibdata::CsPad2x2PixelStatusV1::Sections)) or \
+        (int(pdscalibdata::CsPad2x2PixelGainV1::Columns) != int(pdscalibdata::CsPad2x2PixelStatusV1::Columns)) or \
+        (int(pdscalibdata::CsPad2x2PixelGainV1::Rows) != int(pdscalibdata::CsPad2x2PixelStatusV1::Rows))
+        )
       {
-        throw std::runtime_error("cspad constants differ between pedestal and pixel status pdscalibdata classes");
+        throw std::runtime_error("cspad constants differ between pedestal/gain and pixel status pdscalibdata classes");
       }
   } // checkConstants
 
@@ -81,6 +89,23 @@ struct CsPadCommonModeSubV1 {
 struct CsPadFilterV1 {
   uint32_t mode;
   double data[pdscalibdata::CsPadFilterV1::DataSize];
+  static hid_t createHDF5Type(const void *calibObject);
+  static const void * fillHdf5WriteBuffer(const void *calibObject);
+};
+
+struct CsPadPixelGainV1 {
+  pdscalibdata::CsPadPixelGainV1::pixelGain_t pixelGain[pdscalibdata::CsPadPedestalsV1::Quads]
+                                                       [pdscalibdata::CsPadPedestalsV1::Sections]
+                                                       [pdscalibdata::CsPadPedestalsV1::Columns]
+                                                       [pdscalibdata::CsPadPedestalsV1::Rows];
+  static hid_t createHDF5Type(const void *calibObject);
+  static const void * fillHdf5WriteBuffer(const void *calibObject);
+};
+
+struct CsPad2x2PixelGainV1 {
+  pdscalibdata::CsPad2x2PixelGainV1::pixelGain_t pixelGain[pdscalibdata::CsPadPedestalsV1::Sections]
+                                                          [pdscalibdata::CsPadPedestalsV1::Columns]
+                                                          [pdscalibdata::CsPadPedestalsV1::Rows];
   static hid_t createHDF5Type(const void *calibObject);
   static const void * fillHdf5WriteBuffer(const void *calibObject);
 };
@@ -312,6 +337,26 @@ const void * CsPad2x2PixelStatusV1::fillHdf5WriteBuffer(const void *calibObject)
   return p;
 }
 
+hid_t CsPad2x2PixelGainV1::createHDF5Type(const void *calibObject) {
+  return calibStoreCommonTypes(float_3D_CsPad2x2);
+}
+
+const void * CsPad2x2PixelGainV1::fillHdf5WriteBuffer(const void *calibObject) {
+  const pdscalibdata::CsPad2x2PixelGainV1 * obj = (const pdscalibdata::CsPad2x2PixelGainV1 *)calibObject; 
+  const float * p = obj->pixelGains().data();
+  return p;
+}
+
+hid_t CsPadPixelGainV1::createHDF5Type(const void *calibObject) {
+  return calibStoreCommonTypes(float_4D_CsPad);
+}
+
+const void * CsPadPixelGainV1::fillHdf5WriteBuffer(const void *calibObject) {
+  const pdscalibdata::CsPadPixelGainV1 * obj = (const pdscalibdata::CsPadPixelGainV1 *)calibObject; 
+  const float * p = obj->pixelGains().data();
+  return p;
+}
+
 } // Calib namespace
 
 // --------------------------------------------
@@ -349,6 +394,16 @@ void getHdfWritersForCalibStore(std::vector< boost::shared_ptr<HdfWriterNew> > &
                                                      "status",
                                                      Calib::CsPad2x2PixelStatusV1::createHDF5Type,
                                                      Calib::CsPad2x2PixelStatusV1::fillHdf5WriteBuffer));
+  calibStoreWriters.push_back(
+                    boost::make_shared<HdfWriterNew>(&typeid(pdscalibdata::CsPadPixelGainV1),
+                                                     "pixel_gain",
+                                                     Calib::CsPadPixelGainV1::createHDF5Type,
+                                                     Calib::CsPadPixelGainV1::fillHdf5WriteBuffer));
+  calibStoreWriters.push_back(
+                    boost::make_shared<HdfWriterNew>(&typeid(pdscalibdata::CsPad2x2PixelGainV1),
+                                                     "pixel_gain",
+                                                     Calib::CsPad2x2PixelGainV1::createHDF5Type,
+                                                     Calib::CsPad2x2PixelGainV1::fillHdf5WriteBuffer));
 }
 
 void getType2CalibTypesMap(Type2CalibTypesMap & type2calibTypeMap) {

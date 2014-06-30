@@ -101,7 +101,7 @@ def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4,verbose=Fal
                                        msg = "%s, dsname=%s" % (msg,ds.name))
 
                 
-def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output"):
+def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output", psanaCfg=''):
     '''Starts to write a psana cfg file.  This is a temporary file.
     Returns the file like object so the user may add more options. This starts to 
     fill out the H5Output module options.
@@ -110,6 +110,8 @@ def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output"):
     cfgfile.write("[psana]\n")
     cfgfile.write("modules = %s\n"%moduleList)
     cfgfile.write("files = %s\n" % input_file)
+    if len(psanaCfg)>0:
+        cfgfile.write("%s\n" % psanaCfg)
     cfgfile.write("[Translator.H5Output]\n")
     cfgfile.write("output_file = %s\n" % output_h5)
     cfgfile.write("overwrite = true\n")
@@ -1208,7 +1210,9 @@ class H5Output( unittest.TestCase ) :
         '''
         input_file = "exp=xpptut13:run=71"
         output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
-        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile = writeCfgFile(input_file, output_h5, 
+                               moduleList="cspad_mod.CsPadCalib Translator.H5Output",
+                               psanaCfg='calib-dir=/reg/g/psdm/data_test/calib')
         cfgfile.write("deflate = -1\n")
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
@@ -1217,14 +1221,17 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(set(calibStore.keys()), 
                          set([u'pdscalibdata::CsPad2x2PedestalsV1', 
                               u'pdscalibdata::CsPad2x2PixelStatusV1',
-                              u'pdscalibdata::CsPadCommonModeSubV1']),
-                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1")
+                              u'pdscalibdata::CsPadCommonModeSubV1',
+                              u'pdscalibdata::CsPad2x2PixelGainV1']),
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1, pdscalibdata::CsPad2x2PixelGainV1")
         pedestalsA = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.0/pedestals'][:]
         pedestalsB = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.1/pedestals'][:]
         status = calibStore['pdscalibdata::CsPad2x2PixelStatusV1/XppGon.0:Cspad2x2.0/status'][:]
         commonMode = calibStore['pdscalibdata::CsPadCommonModeSubV1/XppGon.0:Cspad2x2.0/data']
+        pixel_gain = calibStore['pdscalibdata::CsPad2x2PixelGainV1/XppGon.0:Cspad2x2.0/pixel_gain'][:]
         self.assertEqual(pedestalsA.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
         self.assertEqual(pedestalsB.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
+        self.assertEqual(pixel_gain.shape,(185,388,2),msg="gain for 2x2 shape is not 185 388 2")
         self.assertEqual(status.shape,(185,388,2),msg="status for 2x2 shape is not 185 388 2")
         self.assertEqual(commonMode['mode'],1,msg="CsPadCommonModeSubV1.mode != 1, it was 1 when test was developed")
         self.assertEqual(commonMode['data'][0],24.,msg="CsPadCommonModeSubV1.data[0] != 24., it was 24. when test was developed")
