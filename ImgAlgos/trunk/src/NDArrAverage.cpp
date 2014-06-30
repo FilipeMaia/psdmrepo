@@ -20,6 +20,7 @@
 //-----------------
 #include <fstream>
 #include <cmath>
+#include <sstream>   // for stringstream
 #include <boost/filesystem.hpp>
 
 //-------------------------------
@@ -58,6 +59,7 @@ NDArrAverage::NDArrAverage (const std::string& name)
   , m_rmsFile()
   , m_mskFile()
   , m_hotFile()
+  , m_file_type()
   , m_thr_rms()
   , m_thr_min()
   , m_thr_max()
@@ -70,13 +72,14 @@ NDArrAverage::NDArrAverage (const std::string& name)
   , m_gate_width2()
 {
   // get the values from configuration or use defaults
-  m_str_src =  configSrc("source",      "DetInfo(:Cspad)");
-  m_key     =  configStr("key",         "");
-  m_sumFile =  configStr("sumfile",     "");
-  m_aveFile =  configStr("avefile",     "");
-  m_rmsFile =  configStr("rmsfile",     "");
-  m_mskFile =  configStr("maskfile",    "");
-  m_hotFile =  configStr("hotpixfile",  "");
+  m_str_src     = configSrc("source",      "DetInfo(:Cspad)");
+  m_key         = configStr("key",         "");
+  m_sumFile     = configStr("sumfile",     "");
+  m_aveFile     = configStr("avefile",     "");
+  m_rmsFile     = configStr("rmsfile",     "");
+  m_mskFile     = configStr("maskfile",    "");
+  m_hotFile     = configStr("hotpixfile",  "");
+  m_file_type   = configStr("ftype",    "txt");
   m_thr_rms     = config("thr_rms_ADU",   10000.);
   m_thr_min     = config("thr_min_ADU", -100000.);
   m_thr_max     = config("thr_max_ADU",  100000.);
@@ -107,6 +110,7 @@ NDArrAverage::NDArrAverage (const std::string& name)
   }
 
   m_ndarr_pars = 0;
+  setFileMode();
 
   if( m_print_bits & 1 ) printInputParameters();
  }
@@ -126,6 +130,7 @@ NDArrAverage::printInputParameters()
         << "\n m_rmsFile  : " << m_rmsFile    
         << "\n m_mskFile  : " << m_mskFile    
         << "\n m_hotFile  : " << m_hotFile    
+        << "\n m_ftype    : " << m_file_type
         << "\n m_thr_rms  : " << m_thr_rms  
         << "\n m_thr_min  : " << m_thr_min  
         << "\n m_thr_max  : " << m_thr_max
@@ -142,6 +147,24 @@ NDArrAverage::printInputParameters()
         << "\n";     
   }
 }
+
+//--------------------
+
+void
+NDArrAverage::setFileMode()
+{
+  m_file_mode = TEXT;
+  if (m_file_type == "bin")     { m_file_mode = BINARY;    return; }
+  if (m_file_type == "txt")     { m_file_mode = TEXT;      return; }
+  if (m_file_type == "metatxt") { m_file_mode = METADTEXT; return; }
+
+  const std::string msg = "The output file type: " + m_file_type + " is not recognized. Known types are: bin, txt, metatxt. Will use txt";
+  MsgLog(name(), warning, msg);
+  //MsgLogRoot(error, msg);
+  //throw std::runtime_error(msg);
+}
+
+
 
 //--------------
 // Destructor --
@@ -160,9 +183,15 @@ NDArrAverage::beginJob(Event& evt, Env& env)
 void 
 NDArrAverage::beginRun(Event& evt, Env& env)
 {
+  m_str_exp     = stringExperiment(env);
+  m_str_run_num = stringRunNumber(evt);
+
   boost::filesystem::path path = m_aveFile;
   if ( path.extension().string() == string(".txt") ) m_fname_ext = "";
-  else                                               m_fname_ext = "-" + stringExperiment(env) + "-r" + stringRunNumber(evt) + ".dat";
+  else                                               m_fname_ext = "-" + m_str_exp + "-r" + m_str_run_num + ".dat";
+
+  std::stringstream ss; ss << m_str_src;
+  m_str_source = ss.str();
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -206,11 +235,24 @@ NDArrAverage::endJob(Event& evt, Env& env)
 
   procStatArrays();
 
-  if (m_do_sum)  saveNDArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_ndarr_pars, m_print_bits & 16, TEXT ); // or BINARY
-  if (m_do_ave)  saveNDArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_ndarr_pars, m_print_bits & 16, TEXT );
-  if (m_do_rms)  saveNDArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_ndarr_pars, m_print_bits & 16, TEXT );
-  if (m_do_msk)  saveNDArrayInFile<int>    ( m_mskFile+m_fname_ext, m_msk, m_ndarr_pars, m_print_bits & 16, TEXT );
-  if (m_do_hot)  saveNDArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_ndarr_pars, m_print_bits & 16, TEXT );
+  std::vector<std::string> v_com;
+  std::string com1;
+  com1="PRODUCER   "; v_com.push_back(com1 + "ImgAlgos/NDArrAverage");
+  com1="EXPERIMENT "; v_com.push_back(com1 + m_str_exp);
+  com1="RUN        "; v_com.push_back(com1 + m_str_run_num);
+  com1="SOURCE     "; v_com.push_back(com1 + m_str_source);
+
+  std::vector<std::string> v_com1(v_com); v_com1.push_back("TYPE       Sum of events");
+  std::vector<std::string> v_com2(v_com); v_com2.push_back("TYPE       Average");
+  std::vector<std::string> v_com3(v_com); v_com3.push_back("TYPE       RMS");
+  std::vector<std::string> v_com4(v_com); v_com4.push_back("TYPE       Mask of bad pixels");
+  std::vector<std::string> v_com5(v_com); v_com5.push_back("TYPE       Pixel status");
+
+  if (m_do_sum)  saveNDArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com1 );
+  if (m_do_ave)  saveNDArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com2 );
+  if (m_do_rms)  saveNDArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com3 );
+  if (m_do_msk)  saveNDArrayInFile<int>    ( m_mskFile+m_fname_ext, m_msk, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com4 );
+  if (m_do_hot)  saveNDArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com5 );
 
   if( m_print_bits & 32 ) printSummaryForParser(evt);
   if( m_print_bits & 64 ) printStatBadPix();
@@ -393,7 +435,7 @@ NDArrAverage::evaluateThresholdOnRMS()
 void 
 NDArrAverage::printEventRecord(Event& evt)
 {
-  MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
+  MsgLog( name(), info,  "Run="    << m_str_run_num 
                      << " Evt="    << stringFromUint(m_count_ev) 
                      << " Img="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 

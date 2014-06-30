@@ -104,6 +104,7 @@ public:
 protected:
 
   void printInputParameters();
+  void setFileMode();
   bool setCollectionMode(Event& evt);
   bool collectStat(Event& evt);
   void resetStatArrays();
@@ -124,6 +125,7 @@ private:
   std::string    m_rmsFile;
   std::string    m_mskFile;
   std::string    m_hotFile;
+  std::string    m_file_type;       // File type "txt", "metatxt", or "bin"
 
   std::string    m_fname_ext;       // file name extension, for example for run 123: "-r0123.dat" 
 
@@ -140,11 +142,18 @@ private:
 
   double         m_gate_width;
 
+  /// Enumerated file type for "txt", "bin", etc.
+  FILE_MODE      m_file_mode;
+
   bool           m_do_sum;
   bool           m_do_ave;
   bool           m_do_rms;
   bool           m_do_msk;
   bool           m_do_hot;
+
+  std::string    m_str_exp;
+  std::string    m_str_run_num;
+  std::string    m_str_source;
 
   NDArrPars*     m_ndarr_pars;
   unsigned       m_size;

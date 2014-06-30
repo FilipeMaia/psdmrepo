@@ -36,6 +36,8 @@
 #include "MsgLogger/MsgLogger.h"
 #include "CSPadPixCoords/Image2D.h"
 
+#include "pdscalibdata/NDArrIOV1.h"
+
 //For save in PNG and TIFF formats
 //#define png_infopp_NULL (png_infopp)NULL
 //#define int_p_NULL (int*)NULL
@@ -102,9 +104,9 @@ using namespace std;
 //typedef image<gray_double_pixel_t,false> gray_double_image_t;
 //typedef gray_double_image_t::view_t      gray_double_view_t; 
 
-enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+ enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
-enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+ enum FILE_MODE {BINARY, TEXT, TIFF, PNG, METADTEXT};
 
  enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2, PNCCD, PRINCETON, ACQIRIS, TM6740, OPAL1000, OPAL2000, OPAL4000, OPAL8000};
 
@@ -716,7 +718,8 @@ private:
 //--------------------
 /// Save ndarray in file
   template <typename T>
-  void saveNDArrayInFile(const std::string& fname, const T* arr, NDArrPars* ndarr_pars, bool print_msg, FILE_MODE file_type=TEXT)
+    void saveNDArrayInFile(const std::string& fname, const T* arr, NDArrPars* ndarr_pars, bool print_msg, FILE_MODE file_type=TEXT,
+                           const std::vector<std::string>& comments = std::vector<std::string>())
   {  
     if (fname.empty()) {
       MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
@@ -730,6 +733,47 @@ private:
 
     unsigned cols = shape[ndim-1];
     unsigned rows = (ndim>1) ? ndarr_pars->size()/cols : 1; 
+
+    //======================
+
+    if (file_type == METADTEXT) {
+
+      //std::vector<std::string> comments;
+      //comments.push_back("PRODUCER   pdscalibdata/GlobalMethods/saveNDArrayInFile");
+
+      if (ndim == 2) {
+        ndarray<const T,2> nda(arr, shape);
+        pdscalibdata::NDArrIOV1<T,2>::save_ndarray(nda, fname, comments);
+      }
+
+      else if (ndim == 3) {
+        ndarray<const T,3> nda(arr, shape);
+        pdscalibdata::NDArrIOV1<T,3>::save_ndarray(nda, fname, comments);
+      }
+
+      else if (ndim == 4) {
+        ndarray<const T,4> nda(arr, shape);
+        pdscalibdata::NDArrIOV1<T,4>::save_ndarray(nda, fname, comments);
+      }
+
+      else if (ndim == 5) {
+        ndarray<const T,5> nda(arr, shape);
+        pdscalibdata::NDArrIOV1<T,5>::save_ndarray(nda, fname, comments);
+      }
+
+      else if (ndim == 1) {
+        ndarray<const T,1> nda(arr, shape);
+        pdscalibdata::NDArrIOV1<T,1>::save_ndarray(nda, fname, comments);
+      }
+
+      else {
+        if( print_msg ) MsgLog("pdscalibdata/GlobalMethods/saveNDArrayInFile", error, 
+                               "ndarray of type " << strOfDataTypeAndSize<T>()
+			       << " Ndim=" << ndim << " can not be saved in file: " << fname.c_str() ); 	
+      }
+
+      return;
+    }
 
     //======================
     if (file_type == TEXT) {

@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-49
+2014-06-29 Mikhail S. Dubrovin
+- NDArrAverage - add parameter ftype (=txt by def.) and option to save ndarray in file with metadata when ftype=metatxt 
+- GlobalMethods.h in saveNDArrayInFile add ndarray saving for file_type == METADTEXT using pdscalibdata::NDArrIOV1
+	
+Tag: V00-03-48
+2014-06-24 Mikhail S. Dubrovin
+- in CSPadArrPeakFinder add saving peaks in ndarray<const float,2> shape={Npeaks,12}
+	
 Tag: V00-03-47
 2014-06-17 Mikhail S. Dubrovin
 - fix doc/ChangeLog
