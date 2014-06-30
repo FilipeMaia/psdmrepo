@@ -32,6 +32,23 @@ namespace pdscalibdata {
 
 template <typename TDATA, unsigned NDIM>
 NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
+                                  , const unsigned print_bits ) 
+  : p_nda(0)
+  , m_fname(fname)
+  , m_val_def(0)
+  , m_nda_def(ndarray<const TDATA, NDIM>())
+  , m_print_bits(print_bits)
+  , m_ctor(0)
+{
+  init();
+  m_size = 1; // actual size is loaded from metadata
+  //m_shape = 0;
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
 				  , const shape_t* shape_def
 				  , const TDATA& val_def 
                                   , const unsigned print_bits ) 
@@ -43,7 +60,7 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   , m_ctor(1)
 {
   init();
-  if (shape_def != 0) std::memcpy (m_shape, shape_def, c_ndim*sizeof(shape_t));  
+  std::memcpy (m_shape, shape_def, c_ndim*sizeof(shape_t));  
 }
 
 //-----------------------------
@@ -77,7 +94,7 @@ template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 {
     // if file is not available - create default ndarray
-    if (! file_is_available()) { 
+    if (! file_is_available() && m_ctor>0) { 
         create_ndarray(true);
         m_status=std::string("loaded default");
         return; 
@@ -148,14 +165,13 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 
     ss >> field;
 
-
-    if (field=="TYPE") { 
+    if (field=="DTYPE") { 
        ss >> m_str_type;
        m_enum_type = enumDataTypeForString(m_str_type);
 
        if (m_enum_type != enumDataType<TDATA>()) {
 	   std::stringstream smsg; 
-	   smsg << "(enum) TYPE in file metadata: " << m_enum_type 
+	   smsg << "(enum) DTYPE in file metadata: " << m_enum_type 
                 << " is different from declaration: " << enumDataType<TDATA>();
            MsgLog(__name__(), warning, smsg.str());
        }
@@ -177,7 +193,13 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
         int dim = atoi(&field[4]); 
 	shape_t val;    
         ss >> val;
-	if (m_shape[dim] !=val) {
+
+	if (m_ctor == 0) { // get ndarray shape and size from metadata
+            m_shape[dim] = val;
+	    m_size *= val;
+	    // cout << "Current m_size = " << m_size << '\n';
+	}
+	else if (m_shape[dim] !=val) { // check that metadata is consistent with expected
 	   std::stringstream smsg; 
 	   smsg << "NDArray metadata shape field " << field
                 << " = " << val 
@@ -202,15 +224,19 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
 {
+    // shape should already be available for
+    // m_ctor = 0 - from parsing input file header,
+    // m_ctor = 1,2 - from input pars
     p_nda = new ndarray<TDATA, NDIM>(m_shape);
     p_data = p_nda->data();
     m_size = p_nda->size();
-
-    if (fill_def) {
-      if (m_ctor==2) std::memcpy (p_data, m_nda_def.data(), m_size*sizeof(TDATA));
-      else           std::fill_n (p_data, m_size, m_val_def);
-    }
-    //MsgLog(__name__(), info, "Begin to load data p_nda->size(): " << m_size);
+    
+    if (m_ctor>0 && fill_def) {
+      if      (m_ctor==2) std::memcpy (p_data, m_nda_def.data(), m_size*sizeof(TDATA));
+      else if (m_ctor==1) std::fill_n (p_data, m_size, m_val_def);
+      else return; // There is no default initialization for ctor=0 w/o shape
+    }    
+    if( m_print_bits & 16 ) MsgLog(__name__(), info, "Created ndarray of the shape=[" << str_shape() << "]");
 }
 
 //-----------------------------
@@ -398,7 +424,7 @@ void NDArrIOV1<TDATA, NDIM>::save_ndarray(const ndarray<const TDATA, NDIM>& nda,
 
     // write metadata
     out << "# Metadata for " << sstype.str() << '\n';
-    out << "# TYPE     " << str_dtype << '\n';
+    out << "# DTYPE    " << str_dtype << '\n';
     out << "# NDIM     " << ndim << '\n';
     //shape_t shape = nda.shape()
     for(unsigned i=0; i<ndim; i++) out << "# DIM:" << i << "    " << nda.shape()[i] << '\n';

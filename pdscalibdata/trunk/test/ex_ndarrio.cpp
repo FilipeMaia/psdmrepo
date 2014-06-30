@@ -46,7 +46,7 @@ int main ()
   cout << "\nTest local print:\n" << nda << '\n';
 
   //---------------------------
-  std::string fname_test("/tmp/test_ndarrio.txt");
+  std::string fname_test("/tmp/test_ndarrio_m.txt");
   cout << "\nTest save_ndarray:\n" << nda 
        << "\nin file: " << fname_test << '\n';
   std::vector<std::string> v_comments;
@@ -68,6 +68,11 @@ int main ()
   unsigned int shape_bwc[] = {2,3,4};
   NDAIO *ndaio3 = new NDAIO(fname_bwc, shape_bwc);  
   ndaio3->print_ndarray();
+
+  //---------------------------
+  cout << "\nTest read ndarray from file with unknown shape: " << fname_test << '\n';
+  NDAIO *ndaio4 = new NDAIO(fname_test);  
+  ndaio4->print_ndarray();
 
   return 0;
 }

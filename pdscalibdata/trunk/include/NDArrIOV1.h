@@ -101,7 +101,7 @@ namespace pdscalibdata {
  *  where shape is used for 
  *  \n 1) cross-check of metadata shape from file,
  *  \n 2) creation of ndarray<TYPE,NDIM> with default parameters if file is missing.
- *
+ *  \n
  *  \n Constractor 2:
  *  @code
  *  CalibPars::common_mode_t data_def[] = {1, 50, 10, Size};
@@ -185,6 +185,10 @@ public:
    *  @param[in] val_def value to fill all data elements by default(in case of missing file or metadata)
    *  @param[in] print_bits unsigned bit-word to control verbosity
    */ 
+
+  NDArrIOV1 ( const std::string& fname
+	    , const unsigned print_bits=0377 );
+
   NDArrIOV1 ( const std::string& fname
 	    , const shape_t* shape_def
 	    , const TDATA& val_def=TDATA(0) 

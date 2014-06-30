@@ -13,7 +13,7 @@
 # CALIB_TYPE pedestals
  
 # Mandatory fields to define the ndarray<TYPE,NDIM> and its shape as unsigned shape[NDIM] = {DIM:1,DIM:2,DIM:3}
-# TYPE        float
+# DTYPE       float
 # NDIM        3
 # DIM:0       3
 # DIM:1       4
