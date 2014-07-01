@@ -233,7 +233,42 @@ class FileDeployer :
         #print 'path_history   = ', path_history
         #print 'rec            = ', rec
 
-        msg = 'Save record: \n%sin history file: %s' % (rec,path_history)
+        msg = 'Add record: \n%s to history file: %s' % (rec,path_history)
+        logger.info(msg, __name__)
+
+        gu.save_textfile(rec, path_history, mode='a')
+
+        #self.changeFilePermissions(path_history)
+
+
+
+    def addHistoryRecordOnDelete(self, cmd, comment='file-manager'):
+        """Add record in the hystory file on delete command if the hystory file exists
+        """
+        #print 'cmd  = ', cmd
+        fname_history  = cp.fname_history.value()
+        if fname_history == '' : return
+
+        user   = gu.get_enviroment(env='USER')
+        login  = gu.get_enviroment(env='LOGNAME')
+        host   = socket.gethostname()
+        tstamp = gu.get_current_local_time_stamp(fmt='%Y-%m-%dT%H:%M:%S  zone:%Z')
+
+        cmd_rm, path = cmd.split() 
+        dir, fname = path.rsplit('/',1)
+        path_history = os.path.join(dir,fname_history)
+
+        if not os.path.exists(path_history) : return
+
+        rec = 'file:%s  cmd:%s  comment:%s  user:%s  host:%s  cptime:%s\n' % \
+              (fname.ljust(14),
+               cmd_rm.ljust(4),
+               comment.ljust(10),
+               user,
+               host,
+               tstamp.ljust(29))
+
+        msg = 'Add record: \n%s to history file: %s' % (rec, path_history)
         logger.info(msg, __name__)
 
         gu.save_textfile(rec, path_history, mode='a')

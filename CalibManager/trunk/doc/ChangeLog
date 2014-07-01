@@ -12,6 +12,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+??? Tag: V00-00-56
+2014-07-01 Mikhail S. Dubrovin
+- GUIConfigPars - add field for number of events to scan
+- ConfigParametersForApp add cp.bat_dark_scan
+- ConfigFileGenerator use cp.bat_dark_scan in make_psana_cfg_file_for_peds_scan(...)
+- in FileDeployer - add method addHistoryRecordOnDelete(...)
+- in GUIFileManagerGroupControl.py and GUIFileManagerSingleControl.py add record in hystory file on delete
+	
 Tag: V00-00-55
 2014-06-30 Mikhail S. Dubrovin
 - ConfigFileGenerator - all camera-type detector (Tm6740, Opal#000, OrcaFl40) files will be saved with metadata

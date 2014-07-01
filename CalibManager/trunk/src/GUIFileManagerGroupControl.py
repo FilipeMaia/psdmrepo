@@ -256,6 +256,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
             for cmd in list_of_cmds :
                 os.system(cmd)
+                fd.addHistoryRecordOnDelete(cmd, comment='group-file-manager')
 
             if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
             if cp.guidirtree is not None : cp.guidirtree.update_dir_tree()

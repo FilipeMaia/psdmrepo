@@ -340,6 +340,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         cmd = 'rm %s' % self.str_path()
         if self.approveCommand(self.but_delete, cmd) :
             os.system(cmd)
+            fd.addHistoryRecordOnDelete(cmd, comment='single-file-manager')
             self.resetFieldsOnDelete()
             if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
             

@@ -313,6 +313,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',     val_def=-1,       type='int' )
         self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END',        val_def=1000,     type='int' )
+        self.bat_dark_scan     = self.declareParameter( name='BATCH_DARK_SCAN',       val_def=10,       type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
         self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=    0,  type='float' )
@@ -415,20 +416,28 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_rms'
             ]
 
-        self.const_types_pnccd = [
+        self.const_types_princeton = [
             'pedestals'
            ,'pixel_status'
-           ,'common_mode'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'common_mode'
             ]
 
         self.const_types_pnccd = [
             'pedestals'
            ,'pixel_status'
-           ,'common_mode'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'common_mode'
+            ]
+
+        self.const_types_camera = [
+            'pedestals'
+           ,'pixel_status'
+           ,'pixel_gain'
+           ,'pixel_rms'
+           ,'common_mode'
             ]
 
         self.const_types_orcafl40 = [
@@ -436,17 +445,19 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'common_mode'
             ]
 
         #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Acqiris', etc.
         self.dict_of_det_const_types = dict( zip(self.list_of_dets, [ self.const_types_cspad 
                                                                      ,self.const_types_cspad2x2
-                                                                     ,['pedestals']
+                                                                     ,self.const_types_princeton
                                                                      ,self.const_types_pnccd
-                                                                     ,['pedestals']
-                                                                     ,['pedestals']
-                                                                     ,['pedestals']
-                                                                     ,['pedestals']
+                                                                     ,self.const_types_camera
+                                                                     ,self.const_types_camera
+                                                                     ,self.const_types_camera
+                                                                     ,self.const_types_camera
+                                                                     ,self.const_types_camera
                                                                      ,self.const_types_orcafl40
                                                                      ,['pedestals']
                                                                       ]) )

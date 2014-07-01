@@ -90,7 +90,7 @@ class ConfigFileGenerator :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-scan.cfg').path()
         self.d_subs   = {'FNAME_XTC' : self.path_to_data_files(),
                          'SKIP'      : str( cp.bat_dark_start.value() - 1 ),
-                         'EVENTS'    : '10',
+                         'EVENTS'    : str( cp.bat_dark_scan.value() ),
                          }
 
         txt_cfg = self.text_for_section ()
@@ -122,7 +122,7 @@ class ConfigFileGenerator :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-header.cfg').path()
         self.d_subs   = {'FNAME_XTC' : self.path_to_data_files(),
                          'SKIP'      : str( cp.bat_dark_start.value() - 1 ),
-                         'EVENTS'    : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
+                         'EVENTS'    : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() ),
                          'MODULES'   : self.str_of_modules
                          }
 
