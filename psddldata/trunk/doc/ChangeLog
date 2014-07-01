@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag:  V01-00-11
+2014-06-30 Christopher O'Grady
+- Added 3 photon-energy related doubles to Ebeam BLD (now V6).
+	
 Tag:  V01-00-10
 2014-06-13 Jana
 - Added 2 PMT values to Gas Detector BLD data type
