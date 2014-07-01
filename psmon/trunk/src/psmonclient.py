@@ -150,9 +150,6 @@ def mpl_client(renderer, client_info, plot_info):
 
 def main():
     try:
-        # initialize the basic logging environment
-        psapp.log_init()
-
         args = parse_cmdline()
 
         # set levels for loggers that we care about

@@ -73,10 +73,6 @@ def parse_args(*args):
     return pos_args, keyval_args
 
 
-def log_init():
-    logging.basicConfig(format=psconfig.LOG_FORMAT, level=psconfig.LOG_LEVEL_ROOT)
-
-
 def log_level_parse(log_level):
     return getattr(logging, log_level.upper(), psconfig.LOG_LEVEL_ROOT)
 

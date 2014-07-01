@@ -149,9 +149,6 @@ def parse_cmdline():
 
 def main():
     try:
-        # initialize the logging system
-        psapp.log_init()
-
         # grab the cli args
         args = parse_cmdline()
 
