@@ -12,8 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
-??? Tag: V00-00-56
+Tag: V00-00-57
+2014-07-02 Mikhail S. Dubrovin
+- GUIInsExpDirDet - on Browse protect selection of non-"calib" directory
+	
+Tag: V00-00-56
 2014-07-01 Mikhail S. Dubrovin
 - GUIConfigPars - add field for number of events to scan
 - ConfigParametersForApp add cp.bat_dark_scan

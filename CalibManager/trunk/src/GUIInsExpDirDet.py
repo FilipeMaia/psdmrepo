@@ -264,9 +264,12 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
                                                             'Select non-standard calib directory',
                                                             dir,
                                                             QtGui.QFileDialog.ShowDirsOnly | QtGui.QFileDialog.DontResolveSymlinks) )
-
         if path1 == ''    : return # if nothing is selected
         if path1 == path0 : return # is selected the same directory
+        if path1.rsplit('/',1)[1] != 'calib' :
+            msg = 'Selection of non-"calib" directory "%s" IS FORBIDDEN!' % path1
+            logger.warning(msg, __name__)
+            return 
         self.setDir(path1)
 
 
