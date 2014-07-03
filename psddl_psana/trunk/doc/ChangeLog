@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-09
+2014-07-03 David Schneider
+- regenerate for new pdsdata/psddldata with BldEBeamV6
+
 Tag: V00-06-08
 2014-06-14 David
 - regenerate whole thing from psddldata V01-00-10
