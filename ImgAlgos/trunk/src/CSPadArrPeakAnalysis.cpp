@@ -49,7 +49,7 @@ CSPadArrPeakAnalysis::CSPadArrPeakAnalysis (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
-  , m_fname_root()
+//, m_fname_root()
   , m_print_bits()
   , m_count(0)
   , m_selected(0)
@@ -57,7 +57,7 @@ CSPadArrPeakAnalysis::CSPadArrPeakAnalysis (const std::string& name)
   // get the values from configuration or use defaults
   m_str_src    = configSrc("source", "DetInfo(:Cspad)");
   m_key        = configStr("key",   "peaks");
-  m_fname_root = configStr("fname_root","file.root");
+  //m_fname_root = configStr("fname_root","file.root");
   m_print_bits = config   ("print_bits",  0);
 }
 
@@ -74,7 +74,7 @@ CSPadArrPeakAnalysis::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
 
-  initStatistics();
+  // initStatistics();
 }
 
 /// Method which is called at the beginning of the run
@@ -117,7 +117,7 @@ void
 CSPadArrPeakAnalysis::endJob(Event& evt, Env& env)
 {
   if( m_print_bits & 2 ) MsgLog(name(), info, "Number of collected in root file events = " << m_selected << " of total " << m_count);
-  summStatistics();
+  // summStatistics();
 }
 
 //--------------------
@@ -133,12 +133,12 @@ CSPadArrPeakAnalysis::procEvent(Event& evt)
     m_peaks = peaks.get();
     if( m_print_bits & 4 ) printPeaks();
 
-    collectStatistics();
+    // collectStatistics();
   }
 }
 
 //--------------------
-
+/*
 void 
 CSPadArrPeakAnalysis::initStatistics()
 {
@@ -147,9 +147,9 @@ CSPadArrPeakAnalysis::initStatistics()
   m_tree  = new TTree("peakTuple", "Tuple for peak data");
   m_branch= m_tree->Branch("peak", &m_peak, "quad/I:sect/I:col/D:row/D:sigma_c/D:sigma_r/D:amax/D:atot/D:btot/D:noise/D:son/D:npix/I");
 }
-
+*/
 //--------------------
-
+/*
 void 
 CSPadArrPeakAnalysis::summStatistics()
 {
@@ -157,9 +157,9 @@ CSPadArrPeakAnalysis::summStatistics()
   m_tree  -> Write();
   m_tfile -> Close();
 }
-
+*/
 //--------------------
-
+/*
 void 
 CSPadArrPeakAnalysis::collectStatistics()
 {
@@ -186,7 +186,7 @@ CSPadArrPeakAnalysis::collectStatistics()
 
   ++ m_selected;
 }
-
+*/
 //--------------------
 
 void 
@@ -221,7 +221,7 @@ CSPadArrPeakAnalysis::printInputParameters()
     log << "\nInput parameters:"
         << "\nsource       : "     << m_str_src
 	<< "\nkey          : "     << m_key      
-        << "\nm_fname_root : "     << m_fname_root
+      //<< "\nm_fname_root : "     << m_fname_root
         << "\nm_print_bits : "     << m_print_bits;
   }
 }

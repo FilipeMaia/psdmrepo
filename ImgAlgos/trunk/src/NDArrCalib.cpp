@@ -266,7 +266,7 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
 
   if( m_do_nrms ) { for(unsigned i=0; i<m_size; i++) m_nrms_data[i] = m_low_nrms * m_rms_data[i]; }
 
-  if( m_print_bits & 4 ) printCommonModePars();
+  if( m_do_cmod && m_print_bits & 4 ) printCommonModePars();
 }
 
 //--------------------
@@ -338,7 +338,7 @@ NDArrCalib::printCommonModePars()
 {
      std::stringstream ss; ss << "Common mode parameters: "; 
      for (int i=0; i<16;  ++i) ss << " " << m_cmod_data[i];
-     MsgLog( name(), info, ss.str());
+     MsgLog(name(), info, ss.str());
 }
 
 //--------------------

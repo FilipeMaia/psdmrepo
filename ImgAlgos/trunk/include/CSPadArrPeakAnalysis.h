@@ -25,10 +25,10 @@
 //-------------------------------
 #include "ImgAlgos/CSPadArrPeakFinder.h"
 
-#include "root/TFile.h"
-#include "root/TH1D.h"
-#include "root/TTree.h"
-#include "root/TBranch.h"
+//#include "root/TFile.h"
+//#include "root/TH1D.h"
+//#include "root/TTree.h"
+//#include "root/TBranch.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -88,9 +88,9 @@ public:
 
 protected:
   void procEvent(Event& evt);
-  void collectStatistics();
-  void initStatistics();
-  void summStatistics();
+  //void collectStatistics();
+  //void initStatistics();
+  //void summStatistics();
   void printPeaks();
   void printInputParameters();
   void printEventId(Event& evt);
@@ -100,7 +100,7 @@ private:
   Pds::Src    m_src;
   Source      m_str_src;
   std::string m_key;
-  std::string m_fname_root;
+  //std::string m_fname_root;
   unsigned m_print_bits;
   long     m_count;
   long     m_selected;
@@ -109,10 +109,10 @@ private:
 
   Peak     m_peak;
 
-  TFile*   m_tfile;
-  TH1D*    m_his01;
-  TTree*   m_tree;
-  TBranch* m_branch;
+  //TFile*   m_tfile;
+  //TH1D*    m_his01;
+  //TTree*   m_tree;
+  //TBranch* m_branch;
 };
 
 } // namespace ImgAlgos

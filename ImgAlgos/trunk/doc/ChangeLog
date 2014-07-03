@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-50
+2014-07-02 Mikhail S. Dubrovin
+- NDArrCalib - do not print common mode parameters for print_bits=4 if they are not defined, do_cmod=no
+- CSPadArrPeakAnalysis - get rid of root dependency, histogram, and n-tuple by Igor's request. Module prints peak info only.
+
 Tag: V00-03-49
 2014-06-29 Mikhail S. Dubrovin
 - NDArrAverage - add parameter ftype (=txt by def.) and option to save ndarray in file with metadata when ftype=metatxt 
