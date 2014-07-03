@@ -1361,6 +1361,77 @@ def Bld_BldDataEBeamV5_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataEBeamV6_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataEBeamV6.TypeId
+    assert obj.Version == psana.Bld.BldDataEBeamV6.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str( obj.ebeamPkCurrBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosX: %s' % double_to_str( obj.ebeamUndPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosY: %s' % double_to_str( obj.ebeamUndPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngX: %s' % double_to_str( obj.ebeamUndAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngY: %s' % double_to_str( obj.ebeamUndAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVAmpl: %s' % double_to_str( obj.ebeamXTCAVAmpl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVPhase: %s' % double_to_str( obj.ebeamXTCAVPhase() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamDumpCharge: %s' % double_to_str( obj.ebeamDumpCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPhotonEnergy: %s' % double_to_str( obj.ebeamPhotonEnergy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTU250: %s' % double_to_str( obj.ebeamLTU250() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTU450: %s' % double_to_str( obj.ebeamLTU450() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Bld_BldDataPhaseCavity_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataPhaseCavity.TypeId
     assert obj.Version == psana.Bld.BldDataPhaseCavity.Version
@@ -6697,6 +6768,7 @@ objFunctionTable = {
     (psana.Bld.BldDataEBeamV3.TypeId,3) : Bld_BldDataEBeamV3_to_str,
     (psana.Bld.BldDataEBeamV4.TypeId,4) : Bld_BldDataEBeamV4_to_str,
     (psana.Bld.BldDataEBeamV5.TypeId,5) : Bld_BldDataEBeamV5_to_str,
+    (psana.Bld.BldDataEBeamV6.TypeId,6) : Bld_BldDataEBeamV6_to_str,
     (psana.Bld.BldDataFEEGasDetEnergy.TypeId,0) : Bld_BldDataFEEGasDetEnergy_to_str,
     (psana.Bld.BldDataFEEGasDetEnergyV1.TypeId,1) : Bld_BldDataFEEGasDetEnergyV1_to_str,
     (psana.Bld.BldDataGMDV0.TypeId,0) : Bld_BldDataGMDV0_to_str,
