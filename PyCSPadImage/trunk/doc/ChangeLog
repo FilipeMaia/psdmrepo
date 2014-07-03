@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2014-07-02 Mikhail S. Dubrovin
+Tag: V00-00-23
+- CSPADPixCoords.py - use offset for pixel coordinates by default - add do_crop=True
+
+#---------------------
 2014-06-20 Mikhail S. Dubrovin
 Tag: V00-00-22
 -       src/PixCoords2x1.py - add get_xyz_maps_um(sp), add singleton cspad2x1_one

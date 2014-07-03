@@ -105,7 +105,7 @@ class CSPADPixCoords (PixCoords2x1) :
 
 #------------------------------
 
-    def __init__ (sp, calib=None, xc_um=None, yc_um=None, tilt_deg=None, use_wide_pix_center=False) :
+    def __init__ (sp, calib=None, xc_um=None, yc_um=None, tilt_deg=None, use_wide_pix_center=False, do_crop=True) :
         #print 'CSPAD2x2PixCoords.__init__(...)'
 
         PixCoords2x1.__init__ (sp, use_wide_pix_center)
@@ -131,7 +131,7 @@ class CSPADPixCoords (PixCoords2x1) :
         sp.orient = sp.orient_def
         sp.calib  = calib
 
-        sp.make_cspad_pix_coordinate_arrays (sp.xc, sp.yc, sp.orient, sp.tilt)
+        sp.make_cspad_pix_coordinate_arrays (sp.xc, sp.yc, sp.orient, sp.tilt, do_crop)
 
 #------------------------------
 
@@ -147,7 +147,7 @@ class CSPADPixCoords (PixCoords2x1) :
 
 #------------------------------
 
-    def make_cspad_pix_coordinate_arrays (sp, xc_um, yc_um, orient_deg, tilt_deg=None, do_crop=False) : # All lists of [4,8]
+    def make_cspad_pix_coordinate_arrays (sp, xc_um, yc_um, orient_deg, tilt_deg=None, do_crop=True) : # All lists of [4,8]
         """Makes [4,8,185,388] cspad pixel x and y coordinate arrays"""        
         sp.make_maps_of_2x1_pix_coordinates()
 
