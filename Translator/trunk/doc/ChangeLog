@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-20
+2014-07-03 David Schneider
+- update to new pdsdata with BldEBeamV6
+
 Tag: V00-01-19
 2014-06-30 David Schneider
 - Translate pixel gain V1 calibration data if present

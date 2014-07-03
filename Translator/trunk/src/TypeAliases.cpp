@@ -99,6 +99,7 @@ TypeAliases::TypeAliases() {
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV3));
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV4));
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV5));
+  EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV6));
   m_alias2TypesMap["EBeam"] = EBeam;
 
   TypeInfoSet Encoder;
