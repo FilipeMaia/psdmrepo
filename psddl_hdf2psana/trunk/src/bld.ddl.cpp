@@ -1191,6 +1191,187 @@ void store_at(const Psana::Bld::BldDataEBeamV5* obj, hdf5pp::Group group, long i
 }
 
 
+hdf5pp::Type ns_BldDataEBeamV6_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataEBeamV6_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("uDamageMask", offsetof(DsType, uDamageMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("fEbeamCharge", offsetof(DsType, fEbeamCharge), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamL3Energy", offsetof(DsType, fEbeamL3Energy), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUPosX", offsetof(DsType, fEbeamLTUPosX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUPosY", offsetof(DsType, fEbeamLTUPosY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUAngX", offsetof(DsType, fEbeamLTUAngX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUAngY", offsetof(DsType, fEbeamLTUAngY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamPkCurrBC2", offsetof(DsType, fEbeamPkCurrBC2), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamEnergyBC2", offsetof(DsType, fEbeamEnergyBC2), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamPkCurrBC1", offsetof(DsType, fEbeamPkCurrBC1), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamEnergyBC1", offsetof(DsType, fEbeamEnergyBC1), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndPosX", offsetof(DsType, fEbeamUndPosX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndPosY", offsetof(DsType, fEbeamUndPosY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndAngX", offsetof(DsType, fEbeamUndAngX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndAngY", offsetof(DsType, fEbeamUndAngY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamXTCAVAmpl", offsetof(DsType, fEbeamXTCAVAmpl), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamXTCAVPhase", offsetof(DsType, fEbeamXTCAVPhase), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamDumpCharge", offsetof(DsType, fEbeamDumpCharge), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamPhotonEnergy", offsetof(DsType, fEbeamPhotonEnergy), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTU250", offsetof(DsType, fEbeamLTU250), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTU450", offsetof(DsType, fEbeamLTU450), hdf5pp::TypeTraits<double>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV6_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataEBeamV6_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV6_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataEBeamV6_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("uDamageMask", offsetof(DsType, uDamageMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("fEbeamCharge", offsetof(DsType, fEbeamCharge), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamL3Energy", offsetof(DsType, fEbeamL3Energy), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUPosX", offsetof(DsType, fEbeamLTUPosX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUPosY", offsetof(DsType, fEbeamLTUPosY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUAngX", offsetof(DsType, fEbeamLTUAngX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUAngY", offsetof(DsType, fEbeamLTUAngY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamPkCurrBC2", offsetof(DsType, fEbeamPkCurrBC2), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamEnergyBC2", offsetof(DsType, fEbeamEnergyBC2), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamPkCurrBC1", offsetof(DsType, fEbeamPkCurrBC1), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamEnergyBC1", offsetof(DsType, fEbeamEnergyBC1), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndPosX", offsetof(DsType, fEbeamUndPosX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndPosY", offsetof(DsType, fEbeamUndPosY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndAngX", offsetof(DsType, fEbeamUndAngX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndAngY", offsetof(DsType, fEbeamUndAngY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamXTCAVAmpl", offsetof(DsType, fEbeamXTCAVAmpl), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamXTCAVPhase", offsetof(DsType, fEbeamXTCAVPhase), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamDumpCharge", offsetof(DsType, fEbeamDumpCharge), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamPhotonEnergy", offsetof(DsType, fEbeamPhotonEnergy), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTU250", offsetof(DsType, fEbeamLTU250), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTU450", offsetof(DsType, fEbeamLTU450), hdf5pp::TypeTraits<double>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV6_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataEBeamV6_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataEBeamV6_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataEBeamV6_v0::dataset_data::dataset_data(const Psana::Bld::BldDataEBeamV6& psanaobj)
+  : uDamageMask(psanaobj.damageMask())
+  , fEbeamCharge(psanaobj.ebeamCharge())
+  , fEbeamL3Energy(psanaobj.ebeamL3Energy())
+  , fEbeamLTUPosX(psanaobj.ebeamLTUPosX())
+  , fEbeamLTUPosY(psanaobj.ebeamLTUPosY())
+  , fEbeamLTUAngX(psanaobj.ebeamLTUAngX())
+  , fEbeamLTUAngY(psanaobj.ebeamLTUAngY())
+  , fEbeamPkCurrBC2(psanaobj.ebeamPkCurrBC2())
+  , fEbeamEnergyBC2(psanaobj.ebeamEnergyBC2())
+  , fEbeamPkCurrBC1(psanaobj.ebeamPkCurrBC1())
+  , fEbeamEnergyBC1(psanaobj.ebeamEnergyBC1())
+  , fEbeamUndPosX(psanaobj.ebeamUndPosX())
+  , fEbeamUndPosY(psanaobj.ebeamUndPosY())
+  , fEbeamUndAngX(psanaobj.ebeamUndAngX())
+  , fEbeamUndAngY(psanaobj.ebeamUndAngY())
+  , fEbeamXTCAVAmpl(psanaobj.ebeamXTCAVAmpl())
+  , fEbeamXTCAVPhase(psanaobj.ebeamXTCAVPhase())
+  , fEbeamDumpCharge(psanaobj.ebeamDumpCharge())
+  , fEbeamPhotonEnergy(psanaobj.ebeamPhotonEnergy())
+  , fEbeamLTU250(psanaobj.ebeamLTU250())
+  , fEbeamLTU450(psanaobj.ebeamLTU450())
+{
+}
+
+ns_BldDataEBeamV6_v0::dataset_data::~dataset_data()
+{
+}
+boost::shared_ptr<Psana::Bld::BldDataEBeamV6>
+Proxy_BldDataEBeamV6_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+{
+  if (not m_data) {
+    boost::shared_ptr<Bld::ns_BldDataEBeamV6_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataEBeamV6_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->uDamageMask, ds_data->fEbeamCharge, ds_data->fEbeamL3Energy, ds_data->fEbeamLTUPosX, ds_data->fEbeamLTUPosY, ds_data->fEbeamLTUAngX, ds_data->fEbeamLTUAngY, ds_data->fEbeamPkCurrBC2, ds_data->fEbeamEnergyBC2, ds_data->fEbeamPkCurrBC1, ds_data->fEbeamEnergyBC1, ds_data->fEbeamUndPosX, ds_data->fEbeamUndPosY, ds_data->fEbeamUndAngX, ds_data->fEbeamUndAngY, ds_data->fEbeamXTCAVAmpl, ds_data->fEbeamXTCAVPhase, ds_data->fEbeamDumpCharge, ds_data->fEbeamPhotonEnergy, ds_data->fEbeamLTU250, ds_data->fEbeamLTU450));
+  }
+  return m_data;
+}
+
+
+void make_datasets_BldDataEBeamV6_v0(const Psana::Bld::BldDataEBeamV6& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV6_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_BldDataEBeamV6_v0(const Psana::Bld::BldDataEBeamV6* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Bld::ns_BldDataEBeamV6_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV6> > make_BldDataEBeamV6(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<Proxy_BldDataEBeamV6_v0>(group, idx);
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV6> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV6>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV6& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV6_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV6", version);
+  }
+}
+
+void store_BldDataEBeamV6(const Psana::Bld::BldDataEBeamV6* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_BldDataEBeamV6_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV6", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataEBeamV6& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataEBeamV6(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Bld::BldDataEBeamV6* obj, hdf5pp::Group group, long index, int version)
+{
+  store_BldDataEBeamV6(obj, group, index, version, true);
+}
+
+
 hdf5pp::Type ns_BldDataPhaseCavity_v0_dataset_data_stored_type()
 {
   typedef ns_BldDataPhaseCavity_v0::dataset_data DsType;
