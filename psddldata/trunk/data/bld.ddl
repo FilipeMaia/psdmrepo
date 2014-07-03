@@ -22,6 +22,8 @@
   /* Constructor which takes values for every attribute */
   @init()  [[auto, inline]];
 
+
+
 }
 
 //------------------ BldDataFEEGasDetEnergyV1 ------------------
