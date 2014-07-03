@@ -6,7 +6,7 @@ class Data(object):
         self.ylabel = ylabel
 
 
-class MultiData(object):
+class MultiPlot(object):
     def __init__(self, ts, title, data_con=None):
         self.ts = ts
         self.title = title
@@ -26,32 +26,32 @@ class MultiData(object):
         return len(self.data_con)
 
 
-class ImageData(Data):
+class Image(Data):
     """
     A data container for image data
     """
 
     def __init__(self, ts, title, image, xlabel=None, ylabel=None):
-        super(ImageData, self).__init__(ts, title, xlabel, ylabel)
+        super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
 
 
-class HistData(Data):
+class Hist(Data):
     """
     A data container for 1-d histogram data
     """
 
     def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, formats='.'):
-        super(HistData, self).__init__(ts, title, xlabel, ylabel)
+        super(Hist, self).__init__(ts, title, xlabel, ylabel)
         self.bins = bins
         self.values = values
         self.formats = formats
 
 
-class XYPlotData(Data):
+class XYPlot(Data):
 
     def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None, formats='-'):
-        super(XYPlotData, self).__init__(ts, title, xlabel, ylabel)
+        super(XYPlot, self).__init__(ts, title, xlabel, ylabel)
         self.xdata = xdata
         self.ydata = ydata
         self.formats = formats

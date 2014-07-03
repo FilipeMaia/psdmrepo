@@ -7,18 +7,18 @@ from itertools import chain, izip
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-import psconfig
-from psmon.psdata import HistData, ImageData, XYPlotData, MultiData
+import config
+from psmon.data import Hist, Image, XYPlot, MultiPlot
 
 
 LOG = logging.getLogger(__name__)
 
 
 TypeMap = {
-    HistData: 'Hist',
-    ImageData: 'Image',
-    XYPlotData: 'XYPlot',
-    MultiData: 'MultiPlot',
+    Hist: 'HistClient',
+    Image: 'ImageClient',
+    XYPlot: 'XYPlotClient',
+    MultiPlot: 'MultiPlotClient',
 }
 
 
@@ -32,7 +32,7 @@ class Plot(object):
         if 'figax' in kwargs:
             self.figure, self.ax = kwargs['figax']
         else:
-            self.figure, self.ax = plt.subplots(facecolor=info.bkg_col, edgecolor=info.bkg_col, subplot_kw={'axis_bgcolor': info.bkg_col or psconfig.MPL_AXES_BKG_COLOR})
+            self.figure, self.ax = plt.subplots(facecolor=info.bkg_col, edgecolor=info.bkg_col, subplot_kw={'axis_bgcolor': info.bkg_col or config.MPL_AXES_BKG_COLOR})
             self.figure.canvas.set_window_title(init.title)
         self.info = info
         self.set_title(init.ts)
@@ -123,7 +123,7 @@ class Plot(object):
             plots[0].set_data(x_vals, y_vals)
 
 
-class MultiPlot(object):
+class MultiPlotClient(object):
     def __init__(self, init, framegen, info, rate):
         self.figure, self.ax = plt.subplots(nrows=1, ncols=init.size, facecolor=info.bkg_col, edgecolor=info.bkg_col)
         self.figure.canvas.set_window_title(init.title)
@@ -145,11 +145,11 @@ class MultiPlot(object):
         yield self.framegen.next()
 
 
-class Image(Plot):
+class ImageClient(Plot):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
-        super(Image, self).__init__(init_im, framegen, info, rate, **kwargs)
+        super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         # if a color palette is specified check to see if it valid
-        cmap = plt.get_cmap(psconfig.MPL_COLOR_PALETTE)
+        cmap = plt.get_cmap(config.MPL_COLOR_PALETTE)
         if self.info.palette is not None:
             try:
                 cmap = plt.get_cmap(self.info.palette)
@@ -177,9 +177,9 @@ class Image(Plot):
             self.set_ax_col(self.cb.ax)
 
 
-class Hist(Plot):
+class HistClient(Plot):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
-        super(Hist, self).__init__(init_hist, datagen, info, rate, **kwargs)
+        super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
         plot_args = self.arg_inflate(1, init_hist.bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args)
         self.set_aspect()
@@ -194,9 +194,9 @@ class Hist(Plot):
         return self.hists
 
 
-class XYPlot(Plot):
+class XYPlotClient(Plot):
     def __init__(self, init_plot, datagen, info, rate=1, **kwargs):
-        super(XYPlot, self).__init__(init_plot, datagen, info, rate, **kwargs)
+        super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
         plot_args = self.arg_inflate(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
         self.plots = self.ax.plot(*plot_args)
         self.set_aspect()

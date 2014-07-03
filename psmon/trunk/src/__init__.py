@@ -1,5 +1,5 @@
 import logging as pslogging
-from psmon import psconfig
+from psmon import config
 
 # initialize logging for the package
-pslogging.basicConfig(format=psconfig.LOG_FORMAT, level=psconfig.LOG_LEVEL_ROOT)
+pslogging.basicConfig(format=config.LOG_FORMAT, level=config.LOG_LEVEL_ROOT)

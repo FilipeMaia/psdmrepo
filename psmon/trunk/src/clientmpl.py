@@ -5,8 +5,8 @@ import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
-import psmon.psplotmpl as psplot
-from psmon import psapp, psconfig
+import psmon.plotmpl as psplot
+from psmon import app, config
 
 
 LOG = logging.getLogger(__name__)
@@ -14,10 +14,10 @@ LOG = logging.getLogger(__name__)
 
 def main(client_info, plot_info):
     # initial all the socket connections
-    context, sub_socket, reset_socket = psapp.init_client_sockets(client_info)
+    context, sub_socket, reset_socket = app.init_client_sockets(client_info)
 
     # grab an initial datagram from the server
-    init_data = psapp.socket_recv(sub_socket)
+    init_data = app.socket_recv(sub_socket)
 
     # attempt to decode its type and go from there
     try:
@@ -26,7 +26,7 @@ def main(client_info, plot_info):
         LOG.exception('Server returned an unknown datatype: %s', type(init_data))
         return 1
 
-    plot = data_type(init_data, psapp.get_socket_gen(sub_socket), plot_info, rate=1.0/client_info.rate)
+    plot = data_type(init_data, app.get_socket_gen(sub_socket), plot_info, rate=1.0/client_info.rate)
     plot_ani = plot.animate()
 
     # auto zoom button params
@@ -53,7 +53,7 @@ def main(client_info, plot_info):
     # define signal sender function
     pending_req = threading.Event()
     def send_reset_signal(*args):
-        sender_thread = threading.Thread(target=psapp.reset_signal, args=(reset_socket, pending_req))
+        sender_thread = threading.Thread(target=app.reset_signal, args=(reset_socket, pending_req))
         sender_thread.daemon = True
         sender_thread.start()
 

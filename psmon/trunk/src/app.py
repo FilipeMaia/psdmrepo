@@ -6,7 +6,7 @@ import pwd
 import socket
 import logging
 
-from psmon import psconfig
+from psmon import config
 
 
 LOG = logging.getLogger(__name__)
@@ -32,9 +32,9 @@ def reset_signal(sock, pending_flag):
     # check to see if there is another pending reset req
     if not pending_flag.is_set():
         pending_flag.set()
-        sock.send(psconfig.RESET_REQ_STR%socket.gethostname())
+        sock.send(config.RESET_REQ_STR%socket.gethostname())
         reply = sock.recv()
-        if reply != psconfig.RESET_REP_STR%socket.gethostname():
+        if reply != config.RESET_REP_STR%socket.gethostname():
             LOG.error(reply)
         pending_flag.clear()
 
@@ -42,7 +42,7 @@ def reset_signal(sock, pending_flag):
 def init_client_sockets(client_info):
     context = zmq.Context()
     sub_socket = context.socket(zmq.SUB)
-    sub_socket.setsockopt(zmq.SUBSCRIBE, client_info.topic + psconfig.ZMQ_TOPIC_DELIM_CHAR)
+    sub_socket.setsockopt(zmq.SUBSCRIBE, client_info.topic + config.ZMQ_TOPIC_DELIM_CHAR)
     sub_socket.set_hwm(client_info.buffer)
     sub_socket.connect("tcp://%s:%d" % (client_info.server, client_info.port))
     reset_socket = context.socket(zmq.REQ)
@@ -74,13 +74,13 @@ def parse_args(*args):
 
 
 def log_level_parse(log_level):
-    return getattr(logging, log_level.upper(), psconfig.LOG_LEVEL_ROOT)
+    return getattr(logging, log_level.upper(), config.LOG_LEVEL_ROOT)
 
 
 def default_run_chooser():
     # get offline defaults
-    exp = psconfig.APP_EXP_DEFAULT
-    run = psconfig.APP_RUN_DEFAULT
+    exp = config.APP_EXP_DEFAULT
+    run = config.APP_RUN_DEFAULT
 
     # check if the current user is one of the opr accounts - if so default to online
     match_obj = re.search('^(.*)opr$', pwd.getpwuid(os.getuid()).pw_name)

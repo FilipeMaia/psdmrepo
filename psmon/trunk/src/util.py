@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from psmon.psdata import ImageData, MultiData, HistData, XYPlotData
+from psmon.data import Image, MultiPlot, Hist, XYPlot
 
 class Helper(object):
     def __init__(self, publisher, topic, title=None, pubrate=None):
@@ -21,7 +21,7 @@ class Helper(object):
 class MultiHelper(Helper):
     def __init__(self, publisher, topic, num_data, title=None, pubrate=None):
         super(MultiHelper, self).__init__(publisher, topic, title, pubrate)
-        self.data = MultiData(None, self.title, [None] * num_data)
+        self.data = MultiPlot(None, self.title, [None] * num_data)
 
     def set_data(self, index, type, *args, **kwargs):
         self.data.data_con[index] = type(*args, **kwargs)
@@ -30,7 +30,7 @@ class MultiHelper(Helper):
 class ImageHelper(Helper):
     def __init__(self, publisher, topic, title=None, pubrate=None):
         super(ImageHelper, self).__init__(publisher, topic, title, pubrate)
-        self.data = ImageData(None, self.title, None)
+        self.data = Image(None, self.title, None)
 
     def set_image(self, image, image_title=None):
         if image_title is not None:
@@ -43,7 +43,7 @@ class MultiImageHelper(MultiHelper):
         super(MultiImageHelper, self).__init__(publisher, topic, num_image, title=None, pubrate=None)
 
     def set_image(self, index, image, image_title=None):
-        self.set_data(index, ImageData, image_title, None, image)
+        self.set_data(index, Image, image_title, None, image)
 
 
 class XYPlotHelper(Helper):
@@ -54,7 +54,7 @@ class XYPlotHelper(Helper):
         self.index = 0
         self.xdata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
         self.ydata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
-        self.data = XYPlotData(
+        self.data = XYPlot(
             None,
             self.title,
             None,
@@ -88,7 +88,7 @@ class HistHelper(Helper):
         self.bmin = float(bmin)
         self.bmax = float(bmax)
         self.range = (bmin, bmax)
-        self.data = HistData(
+        self.data = Hist(
             None,
             self.title,
             np.arange(self.bmin,self.bmax,(self.bmax-self.bmin)/self.nbins),
@@ -116,7 +116,7 @@ class HistOverlayHelper(Helper):
         self.bins = []
         self.values = []
         self.formats = []
-        self.data = HistData(
+        self.data = Hist(
             None,
             self.title,
             self.bins,

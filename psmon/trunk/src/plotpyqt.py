@@ -7,18 +7,18 @@ from itertools import chain, izip
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
-import psconfig
-from psmon.psdata import HistData, ImageData, XYPlotData, MultiData
+import config
+from psmon.data import Hist, Image, XYPlot, MultiPlot
 
 
 LOG = logging.getLogger(__name__)
 
 
 TypeMap = {
-    HistData: 'Hist',
-    ImageData: 'Image',
-    XYPlotData: 'XYPlot',
-#    MultiData: 'MultiPlot',
+    Hist: 'HistClient',
+    Image: 'ImageClient',
+    XYPlot: 'XYPlotClient',
+#    MultiPlot: 'MultiPlotClient',
 }
 
 
@@ -101,15 +101,15 @@ class Plot(object):
             self.plot_view.setYRange(*self.info.yrange)
 
 
-class Image(Plot):
+class ImageClient(Plot):
     def __init__(self, init_im, framegen, info, rate=1):
-        super(Image, self).__init__(init_im, framegen, info, rate)
+        super(ImageClient, self).__init__(init_im, framegen, info, rate)
         self.set_aspect()
-        self.im = pg.ImageItem(image=init_im.image, border=psconfig.PYQT_BORDERS)
+        self.im = pg.ImageItem(image=init_im.image, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)
 
         # Setting up the color map to use
-        cm = psconfig.PYQT_COLOR_PALETTE
+        cm = config.PYQT_COLOR_PALETTE
         if self.info.palette is not None:
             if self.info.palette in pg.graphicsItems.GradientEditorItem.Gradients:
                 cm = self.info.palette
@@ -136,10 +136,10 @@ class Image(Plot):
         return self.im
 
 
-class XYPlot(Plot):
+class XYPlotClient(Plot):
     def __init__(self, init_plot, framegen, info, rate=1):
-        super(XYPlot, self).__init__(init_plot, framegen, info, rate)
-        self.plot = self.plot_view.plot(x=init_plot.xdata, y=init_plot.ydata, pen=psconfig.PYQT_PLOT_PEN)
+        super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
+        self.plot = self.plot_view.plot(x=init_plot.xdata, y=init_plot.ydata, pen=config.PYQT_PLOT_PEN)
 
     def update(self, data):
         """
@@ -147,13 +147,13 @@ class XYPlot(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            self.plot.setData(x=data.xdata, y=data.ydata, pen=psconfig.PYQT_PLOT_PEN, symbol=psconfig.PYQT_PLOT_SYMBOL)
+            self.plot.setData(x=data.xdata, y=data.ydata, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
         return self.plot
 
 
-class Hist(Plot):
+class HistClient(Plot):
     def __init__(self, init_hist, framegen, info, rate=1):
-        super(Hist, self).__init__(init_hist, framegen, info, rate)
+        super(HistClient, self).__init__(init_hist, framegen, info, rate)
         self.hist = self.plot_view.plot(x=init_hist.bins, y=init_hist.values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
 
     def update(self, data):
