@@ -79,6 +79,16 @@ Psana::Bld::BldDataEBeamV5 pds_to_psana(Pds::Bld::BldDataEBeamV5 pds)
   return Psana::Bld::BldDataEBeamV5(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2(), pds.ebeamPkCurrBC1(), pds.ebeamEnergyBC1(), pds.ebeamUndPosX(), pds.ebeamUndPosY(), pds.ebeamUndAngX(), pds.ebeamUndAngY(), pds.ebeamXTCAVAmpl(), pds.ebeamXTCAVPhase(), pds.ebeamDumpCharge());
 }
 
+Psana::Bld::BldDataEBeamV6::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV6::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV6::DamageMask(e);
+}
+
+Psana::Bld::BldDataEBeamV6 pds_to_psana(Pds::Bld::BldDataEBeamV6 pds)
+{
+  return Psana::Bld::BldDataEBeamV6(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2(), pds.ebeamPkCurrBC1(), pds.ebeamEnergyBC1(), pds.ebeamUndPosX(), pds.ebeamUndPosY(), pds.ebeamUndAngX(), pds.ebeamUndAngY(), pds.ebeamXTCAVAmpl(), pds.ebeamXTCAVPhase(), pds.ebeamDumpCharge(), pds.ebeamPhotonEnergy(), pds.ebeamLTU250(), pds.ebeamLTU450());
+}
+
 Psana::Bld::BldDataPhaseCavity pds_to_psana(Pds::Bld::BldDataPhaseCavity pds)
 {
   return Psana::Bld::BldDataPhaseCavity(pds.fitTime1(), pds.fitTime2(), pds.charge1(), pds.charge2());

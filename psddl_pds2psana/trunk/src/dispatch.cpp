@@ -572,6 +572,16 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV5>(data), xtc->src);
         }
         break;
+      case 6:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataEBeamV6& xdata = *(Pds::Bld::BldDataEBeamV6*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV6& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV6>(data), xtc->src);
+        }
+        break;
       case 32768:
         {
           // XTC data object
@@ -630,6 +640,16 @@ try {
           const Psana::Bld::BldDataEBeamV5& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
           // store data
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV5>(data), xtc->src);
+        }
+        break;
+      case 32774:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataEBeamV6& xdata = *(Pds::Bld::BldDataEBeamV6*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV6& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV6>(data), xtc->src);
         }
         break;
       } // end switch (version)
@@ -2336,6 +2356,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 5:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV5) );
       break;
+    case 6:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV6) );
+      break;
     case 32768:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV0) );
       break;
@@ -2353,6 +2376,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     case 32773:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV5) );
+      break;
+    case 32774:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV6) );
       break;
     } // end version switch
     break;
