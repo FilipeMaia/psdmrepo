@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 import config
-from psmon.data import Hist, Image, XYPlot, MultiPlot
+from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
 LOG = logging.getLogger(__name__)

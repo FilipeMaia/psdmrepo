@@ -6,7 +6,7 @@ import logging
 import argparse
 import multiprocessing as mp
 
-from psmon import psapp, psconfig
+from psmon import app, config
 
 
 LOG = logging.getLogger(os.path.splitext(os.path.basename(__file__))[0])
@@ -27,8 +27,8 @@ def parse_cmdline():
         '-s',
         '--server',
         metavar='SERVER',
-        default=psconfig.APP_SERVER,
-        help='the host name of the server (default: %s)'%psconfig.APP_SERVER
+        default=config.APP_SERVER,
+        help='the host name of the server (default: %s)'%config.APP_SERVER
     )
 
     parser.add_argument(
@@ -36,8 +36,8 @@ def parse_cmdline():
         '--port',
         metavar='PORT',
         type=int,
-        default=psconfig.APP_PORT,
-        help='the tcp port of the server (default: %d)'%psconfig.APP_PORT
+        default=config.APP_PORT,
+        help='the tcp port of the server (default: %d)'%config.APP_PORT
     )
 
     parser.add_argument(
@@ -45,8 +45,8 @@ def parse_cmdline():
         '--rate',
         metavar='RATE',
         type=float,
-        default=psconfig.APP_RATE,
-        help='update rate of the histogram in Hz (default: %.2fHz)'%psconfig.APP_RATE
+        default=config.APP_RATE,
+        help='update rate of the histogram in Hz (default: %.2fHz)'%config.APP_RATE
     )
 
     parser.add_argument(
@@ -54,8 +54,8 @@ def parse_cmdline():
         '--buffer',
         metavar='BUFFER',
         type=int,
-        default=psconfig.APP_BUFFER,
-        help='the size in messages of recieve buffer (default: %d)'%psconfig.APP_BUFFER
+        default=config.APP_BUFFER,
+        help='the size in messages of recieve buffer (default: %d)'%config.APP_BUFFER
     )
 
     parser.add_argument(
@@ -129,22 +129,22 @@ def parse_cmdline():
     parser.add_argument(
         '--client',
         metavar='CLIENT',
-        default=psconfig.APP_CLIENT,
-        help='the client backend used for rendering (default: %s)'%psconfig.APP_CLIENT
+        default=config.APP_CLIENT,
+        help='the client backend used for rendering (default: %s)'%config.APP_CLIENT
     )
 
     parser.add_argument(
         '--log',
         metavar='LOG',
-        default=psconfig.LOG_LEVEL,
-        help='the logging level of the client (default %s)'%psconfig.LOG_LEVEL
+        default=config.LOG_LEVEL,
+        help='the logging level of the client (default %s)'%config.LOG_LEVEL
     )
 
     return parser.parse_args()
 
 
 def mpl_client(renderer, client_info, plot_info):
-    render_mod = __import__('psmon.psclient%s'%renderer, fromlist=['main'])
+    render_mod = __import__('psmon.client%s'%renderer, fromlist=['main'])
 
     render_mod.main(client_info, plot_info)
 
@@ -153,10 +153,10 @@ def main():
         args = parse_cmdline()
 
         # set levels for loggers that we care about
-        LOG.setLevel(psapp.log_level_parse(args.log))
+        LOG.setLevel(app.log_level_parse(args.log))
 
         # create the plot info object from cmd args
-        plot_info = psapp.PlotInfo(
+        plot_info = app.PlotInfo(
             xrange=args.x_range,
             yrange=args.y_range,
             zrange=args.z_range,
@@ -169,7 +169,7 @@ def main():
 
         proc_list = []
         for topic in args.topics:
-            client_info = psapp.ClientInfo(args.server, args.port, args.buffer, args.rate, topic)
+            client_info = app.ClientInfo(args.server, args.port, args.buffer, args.rate, topic)
             proc = mp.Process(name='%s-client'%topic, target=mpl_client, args=(args.client, client_info, plot_info))
             proc.daemon = True
             LOG.info('Starting client for topic: %s', topic)

@@ -35,7 +35,7 @@ def main(client_info, plot_info):
         return 1
 
     # start the QtApp
-    app = QtGui.QApplication([])
+    qtapp = QtGui.QApplication([])
     # set widget background/foreground color if specified
     set_color_opt('background', plot_info.bkg_col)
     set_color_opt('foreground', plot_info.fore_col)

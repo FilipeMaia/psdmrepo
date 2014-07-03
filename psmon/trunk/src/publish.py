@@ -29,12 +29,12 @@ def init(port=config.APP_PORT, bufsize=config.APP_BUFFER):
     __socket.set_hwm(bufsize)
     __socket.bind("tcp://*:%d" % port)
     __socket.set_hwm(bufsize)
-    __reset_socket.bind("tcp://*:%d" % port+1)
+    __reset_socket.bind("tcp://*:%d" % (port+1))
     __initialized = True
-    LOG.info('Initialized publish. Data port: %d, Reset port: %d', port, reset_port)
+    LOG.info('Initialized publish. Data port: %d', port)
 
 
-def send_data(topic, data):
+def send(topic, data):
     if __initialized:
         __socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
         __socket.send_pyobj(data)

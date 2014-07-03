@@ -1,14 +1,17 @@
+#display plot with "psplot -s psanacs031 -p 12301 ACQSINGLETRACE"
+
 from psana import *
 
-from psmon import pszmq
+from psmon import publish
+from psmon.plots import XYPlot
 import sys
-from psmon.psdata import XYPlotData
 
 ds = DataSource('exp=CXI/cxitut13:run=22')
 
 acqsrc  =Source('DetInfo(CxiEndstation.0:Acqiris.0)')
 
-pszmq.socket_init(12323, 12324, 10)
+#optional port, buffer-depth arguments.
+publish.init()
 
 nbad = 0
 ngood = 0
@@ -28,5 +31,5 @@ for evt in ds.events():
 
     if (nbad+ngood)%10 == 0:
         ax = range(0,len(wf))
-        acqSingleTrace = XYPlotData(ngood, "ACQIRIS SINGLE TRACE", ax, wf)
-        pszmq.send_data("ACQSINGLETRACE", acqSingleTrace)
+        acqSingleTrace = XYPlot(ngood, "ACQIRIS SINGLE TRACE", ax, wf)
+        publish.send("ACQSINGLETRACE", acqSingleTrace)
