@@ -208,7 +208,7 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
     MsgLog("GlobalMethods::defineImageShape", warning, msg);
   }
   if (counter == 50)
-     MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINTING WARNINGS for source:" 
+     MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINT WARNINGS for source:" 
              << boost::lexical_cast<std::string>(src) << " key:" << key);
   //throw std::runtime_error("EXIT psana...");
   return false;
@@ -219,12 +219,8 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
 
 // Define ndarray parameters or throw message that can not do that.
 bool
-defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars)
+defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars, bool print_wng)
 {
-
-  //std::cout << "defineNDArrPars src:" << boost::lexical_cast<std::string>(src) << " key:" << key << "\n";
-  std::cout << "defineNDArrPars src:" << src << " key:" << key << "\n";
-
   if ( defineNDArrParsForType<double>  (evt, src, key, DOUBLE,   ndarr_pars) ) return true;
   if ( defineNDArrParsForType<float>   (evt, src, key, FLOAT,    ndarr_pars) ) return true;
   if ( defineNDArrParsForType<int>     (evt, src, key, INT,      ndarr_pars) ) return true;
@@ -238,15 +234,16 @@ defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& 
 
   static long counter = 0; counter ++;
 
-  if (counter < 50) {
+  if (print_wng && counter < 11) {
     const std::string msg = "ndarray shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
                         + boost::lexical_cast<std::string>(src) + " key:" + key;
     MsgLog("GlobalMethods::defineNDArrPars", warning, msg);
+    if (counter == 10)
+       MsgLog("GlobalMethods::defineNDArrPars", warning, "STOP PRINT WARNINGS for source:" 
+              << boost::lexical_cast<std::string>(src) << " key:" << key);
+    //throw std::runtime_error("EXIT psana...");
   }
-  if (counter == 50)
-     MsgLog("GlobalMethods::defineNDArrPars", warning, "STOP PRINTING WARNINGS for source:" 
-            << boost::lexical_cast<std::string>(src) << " key:" << key);
-  //throw std::runtime_error("EXIT psana...");
+
   return false;
 }
 

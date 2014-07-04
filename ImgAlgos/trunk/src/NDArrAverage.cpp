@@ -270,11 +270,14 @@ NDArrAverage::setCollectionMode(Event& evt)
 
     m_ndarr_pars = new NDArrPars();
 
-    if ( ! defineNDArrPars(evt, m_str_src, m_key, m_ndarr_pars) ) return false;
+    if ( ! defineNDArrPars(evt, m_str_src, m_key, m_ndarr_pars, m_print_bits & 256) ) return false;
 
     m_size = m_ndarr_pars -> size();
 
-    if( m_print_bits & 1 ) m_ndarr_pars -> print();
+    if( m_print_bits & 1 ) {
+      MsgLog(name(), info, "NDArrPars parameters are found in event: " << m_count_ev << " for source:" << m_str_src << " key:" << m_key);
+      m_ndarr_pars -> print();
+    }
     m_stat = new unsigned[m_size];
     m_sum  = new double  [m_size];
     m_sum2 = new double  [m_size];
@@ -336,10 +339,11 @@ NDArrAverage::collectStat(Event& evt)
   else if (dtype == UNSIGNED && collectStatForType<unsigned>(evt)) return true;
 
   static unsigned m_count_msg=0; m_count_msg ++;
-  if (m_count_msg < 20)
+  if (m_count_msg < 21) {
     MsgLog(name(), warning, "ndarray object is not available in the event: " << m_count_ev << " for source:" << m_str_src << " key:" << m_key);
-  if (m_count_msg == 20)
-     MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key);
+    if (m_count_msg == 20)
+       MsgLog(name(), warning, "STOP PRINT WARNINGS for source:" << m_str_src << " key:" << m_key);
+  }
   return false;
 }
 

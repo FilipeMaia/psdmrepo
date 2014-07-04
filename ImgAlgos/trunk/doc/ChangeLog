@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-51
+2014-07-03 Mikhail S. Dubrovin
+- NDArrAverage.cpp, GlobalMethods - constrain output
+
 Tag: V00-03-50
 2014-07-02 Mikhail S. Dubrovin
 - NDArrCalib - do not print common mode parameters for print_bits=4 if they are not defined, do_cmod=no
