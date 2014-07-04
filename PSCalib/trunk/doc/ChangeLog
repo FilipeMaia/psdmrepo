@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-05
+2014-07-03 Mikhail S. Dubrovin
+- in CalibParsStore.h, GenericCalibPars.h, GenericCalibPars.cpp - add calibration for variable size ndarrays 
+	
 Tag: V00-02-04
 2014-06-26 Mikhail S. Dubrovin
 - add CalibFileFinder.py - analogous to src/CalibFileFinder.cpp for pythonic-psana modules

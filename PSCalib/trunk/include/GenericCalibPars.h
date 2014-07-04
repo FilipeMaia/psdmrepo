@@ -127,12 +127,16 @@ namespace PSCalib {
  *  @see CalibFileFinder
  */
 
+
+
+typedef PSCalib::CalibPars::shape_t shape_t;
+
+
 //----------------
 template <typename TBASE> // TBASE stands for something like pdscalibdata::PrincetonBaseV1
 class GenericCalibPars: public PSCalib::CalibPars, TBASE  {
-public:
 
-    typedef PSCalib::CalibPars::shape_t shape_t;
+public:
 
     // const static size_t Ndim = TBASE::Ndim; 
 
@@ -171,8 +175,8 @@ public:
   /// INTERFACE METHODS
 
   virtual const size_t   ndim() { return TBASE::Ndim; }
-  virtual const size_t   size() { return TBASE::Size; }
-  virtual const shape_t* shape(){ return TBASE::shape_base(); }
+  virtual const size_t   size();
+  virtual const shape_t* shape();
 
   virtual const CalibPars::pedestals_t*    pedestals(); 
   virtual const CalibPars::pixel_gain_t*   pixel_gain();
@@ -183,6 +187,10 @@ public:
   virtual void printCalibPars();
 
   /// ADDITIONAL METHODS
+
+  const size_t   size_of_ndarray();
+  const shape_t* shape_of_ndarray();
+
 
   void printInputPars();
   void printCalibParsStatus();

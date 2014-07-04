@@ -33,8 +33,9 @@
 #include "pdscalibdata/PnccdBaseV1.h"
 #include "pdscalibdata/PrincetonBaseV1.h" // shape_base(), Ndim, Rows, Cols, Size, etc.
 #include "pdscalibdata/AndorBaseV1.h"
-#include "pdscalibdata/Opal1000BaseV1.h"
-#include "pdscalibdata/Opal4000BaseV1.h"
+#include "pdscalibdata/VarShapeCameraBaseV1.h"
+//#include "pdscalibdata/Opal1000BaseV1.h"
+//#include "pdscalibdata/Opal4000BaseV1.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -140,7 +141,8 @@ GenericCalibPars<TBASE>::pedestals()
 {
   if (m_pedestals == 0) {
       std::string fname = getCalibFileName(PEDESTALS);
-      m_pedestals = new NDAIPEDS(fname, shape(), pedestals_t(0), m_prbits_type);
+      if (size()) m_pedestals = new NDAIPEDS(fname, shape(), pedestals_t(0), m_prbits_type);
+      else        m_pedestals = new NDAIPEDS(fname, m_prbits_type);
   }
   return m_pedestals->get_ndarray().data();
 }
@@ -153,7 +155,8 @@ GenericCalibPars<TBASE>::pixel_status()
 {
   if (m_pixel_status == 0) {
       std::string fname = getCalibFileName(PIXEL_STATUS);
-      m_pixel_status = new NDAISTATUS(fname, shape(), pixel_status_t(1), m_prbits_type);
+      if (size()) m_pixel_status = new NDAISTATUS(fname, shape(), pixel_status_t(1), m_prbits_type);
+      else        m_pixel_status = new NDAISTATUS(fname, m_prbits_type);
   }
   return m_pixel_status->get_ndarray().data();
 }
@@ -166,7 +169,8 @@ GenericCalibPars<TBASE>::pixel_gain()
 {
   if (m_pixel_gain == 0) {
       std::string fname = getCalibFileName(PIXEL_GAIN);
-      m_pixel_gain = new NDAIGAIN(fname, shape(), pixel_gain_t(1), m_prbits_type);
+      if (size()) m_pixel_gain = new NDAIGAIN(fname, shape(), pixel_gain_t(1), m_prbits_type);
+      else        m_pixel_gain = new NDAIGAIN(fname, m_prbits_type);
   }
   return m_pixel_gain->get_ndarray().data();
 }
@@ -179,7 +183,8 @@ GenericCalibPars<TBASE>::pixel_rms()
 {
   if (m_pixel_rms == 0) {
       std::string fname = getCalibFileName(PIXEL_RMS);
-      m_pixel_rms = new NDAIRMS(fname, shape(), pixel_rms_t(1), m_prbits_type);
+      if (size()) m_pixel_rms = new NDAIRMS(fname, shape(), pixel_rms_t(1), m_prbits_type);
+      else        m_pixel_rms = new NDAIRMS(fname, m_prbits_type);
   }
   return m_pixel_rms->get_ndarray().data();
 }
@@ -196,6 +201,58 @@ GenericCalibPars<TBASE>::common_mode()
       m_common_mode = new NDAICMOD(fname, nda, m_prbits_type);
   }
   return m_common_mode->get_ndarray().data();
+}
+
+//----------------
+
+template <typename TBASE> 
+const size_t
+GenericCalibPars<TBASE>::size() 
+{ 
+  if(TBASE::Size) return TBASE::Size; 
+  else return size_of_ndarray();
+}
+
+//----------------
+
+template <typename TBASE> 
+const shape_t*
+//const unsigned*
+GenericCalibPars<TBASE>::shape()
+{ 
+  if(TBASE::Size) return TBASE::shape_base(); 
+  else return shape_of_ndarray();
+}
+
+//----------------
+
+template <typename TBASE> 
+const size_t
+GenericCalibPars<TBASE>::size_of_ndarray() 
+{ 
+  if      (m_pedestals   ) return m_pedestals   ->get_ndarray().size();
+  else if (m_pixel_status) return m_pixel_status->get_ndarray().size();
+  else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().size();
+  else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().size();
+
+  MsgLog(m_name, error, "CAN'T RETURN SIZE of non-loaded ndarray"); 
+  return TBASE::Size;
+}
+
+//----------------
+
+template <typename TBASE> 
+const shape_t*
+//const unsigned*
+GenericCalibPars<TBASE>::shape_of_ndarray()
+{ 
+  if      (m_pedestals   ) return m_pedestals   ->get_ndarray().shape();
+  else if (m_pixel_status) return m_pixel_status->get_ndarray().shape();
+  else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().shape();
+  else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().shape();
+ 
+  MsgLog(m_name, error, "CAN'T RETURN SHAPE of non-loaded ndarray");
+  return TBASE::shape_base(); 
 }
 
 //----------------
@@ -281,8 +338,8 @@ void GenericCalibPars<TBASE>::printCalibPars()
     	<< "\n  pedestals    : " << m_pedestals    -> str_ndarray_info()
     	<< "\n  pixel_status : " << m_pixel_status -> str_ndarray_info()
     	<< "\n  pixel_gain   : " << m_pixel_gain   -> str_ndarray_info()
-    	<< "\n  pixel_rms    : " << m_pixel_rms    -> str_ndarray_info()
-    	<< "\n  common_mode  : " << m_common_mode  -> str_ndarray_info();
+        << "\n  pixel_rms    : " << m_pixel_rms    -> str_ndarray_info()
+        << "\n  common_mode  : " << m_common_mode  -> str_ndarray_info();
     MsgLog(m_name, info, smsg.str());
 }
 
@@ -306,8 +363,9 @@ template class PSCalib::GenericCalibPars<pdscalibdata::CsPad2x2BaseV2>;
 template class PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV1>;
 template class PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>;
 template class PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>;
-template class PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>;
-template class PSCalib::GenericCalibPars<pdscalibdata::Opal4000BaseV1>;
+template class PSCalib::GenericCalibPars<pdscalibdata::VarShapeCameraBaseV1>;
+//template class PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>;
+//template class PSCalib::GenericCalibPars<pdscalibdata::Opal4000BaseV1>;
 
 //----------------
 //----------------
