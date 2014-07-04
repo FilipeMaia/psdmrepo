@@ -84,7 +84,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.titFile = QtGui.QLabel('File:')
+        self.titFile = QtGui.QLabel('Image file:')
         self.lab_status = QtGui.QLabel('Status: ')
 
         self.ediFile = QtGui.QLineEdit ( self.path_mask_img.value() )

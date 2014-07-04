@@ -84,7 +84,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         if help_msg==None : self.help_msg = self.help_message()
         else              : self.help_msg = help_msg
 
-        self.but_more  = QtGui.QPushButton('&More')
+        tit_more_less  = '&Less' if expand else '&More'
+        self.but_more  = QtGui.QPushButton(tit_more_less)
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
         self.but_load  = QtGui.QPushButton('Load')

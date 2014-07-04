@@ -44,7 +44,7 @@ def input_options_parser() :
     #ifname_def = ''        
     ifname_def = './roi-img'        
     ofname_def = './fig.png'
-    title_def  = 'Mask editor'
+    title_def  = 'Image viewer'
     rot90_def  = 0           
     mirror_def = False       
     expand_def = True

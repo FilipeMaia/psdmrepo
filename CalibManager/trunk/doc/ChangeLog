@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-07-03 Mikhail S. Dubrovin
+Tag: V00-00-58
+- GUIMaskEditor, plims, PlotImgSpeButtons - cosmetic improvements of titles, comments, etc.
+	
 Tag: V00-00-57
 2014-07-02 Mikhail S. Dubrovin
 - GUIInsExpDirDet - on Browse protect selection of non-"calib" directory
