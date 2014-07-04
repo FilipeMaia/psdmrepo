@@ -112,6 +112,9 @@ public:
   // returns true if there is a real object behind
   bool valid() const { return m_id.get() ; }
 
+  // returns file id if valid object, otherwise -1
+  hid_t id() { return valid() ? *m_id : -1; }
+
 protected:
 
   friend class Group;
