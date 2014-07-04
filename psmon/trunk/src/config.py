@@ -11,11 +11,13 @@ LOG_FORMAT = '[%(levelname)-8s] %(message)s' #'%(asctime)s:%(levelname)s:%(messa
 ### GENERAL APP CONFIG ###
 APP_SERVER = 'localhost'
 APP_PORT = 12301
+APP_COMM_OFFSET = 1
 APP_RATE = 5.0
 APP_BUFFER = 10
 APP_CLIENT = 'pyqt'
 APP_RUN_DEFAULT = '12'
 APP_EXP_DEFAULT = 'xppb0114'
+APP_BIND_ATTEMPT = 20
 ### PYQT DEFAULT APPEARANCE CONFIG ###
 PYQT_BORDERS = {'color': (150, 150, 150), 'width': 1.0}
 PYQT_PLOT_PEN = None
