@@ -1,0 +1,29 @@
+- extent File interface for internal use (hdf5pp)
+- new pdsdata type: BldEBeamV6
+
+CalibManager:
+- protect selection of non-"calib" directory
+- add configured parameter for number of events to scan
+- add record in hystory file on delete
+- all camera-type detector (Tm6740, Opal#000, OrcaFl40) files will be saved with metadata
+- add support for OrcaFl40
+- in app/calibrun add -L which allows to load parameters from config file on-demand only
+- fix quad rotation default angles in "geometry" type, add default xy-offsets
+
+pdscalibdata.NDArrIOV1:
+- add constructor to load ndarray from file with metadata, w/o default initialization
+- add VarShapeCameraBaseV1.h - for calibration of cameras with variable size arrays
+
+PSCalib
+- add calibration for variable size ndarrays in calibration params classes
+- add CalibFileFinder.py - analogous to src/CalibFileFinder.cpp for pythonic-psana modules
+
+ImgAlgos V00-03-51
+- NDArrAverage - add saving calib files with metadata in NDArrAverage
+- CSPadArrPeakAnalysis - get rid of root dependency in CSPadArrPeakAnalysis
+
+pyimgalgos.cspad_image_producer.py:
+- use default path to calibration directory if parameter "calib_dir" is empty
+
+PyCSPadImage:
+- use offset for cspad pixel indexes by default
