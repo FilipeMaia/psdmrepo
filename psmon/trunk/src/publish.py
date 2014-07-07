@@ -8,7 +8,7 @@ LOG = logging.getLogger(__name__)
 
 
 LOG.info('Importing publish')
-__publisher = app.ZMQPublisher(config.APP_COMM_OFFSET)
+__publisher = app.ZMQPublisher()
 __reset_listener = app.ZMQListener(config.RESET_REQ_STR%'(.*)', config.RESET_REP_STR, __publisher.comm_socket)
 
 

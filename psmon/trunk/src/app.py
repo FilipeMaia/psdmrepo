@@ -3,7 +3,6 @@ import re
 import sys
 import zmq
 import pwd
-import socket
 import logging
 import threading
 
@@ -13,82 +12,8 @@ from psmon import config
 LOG = logging.getLogger(__name__)
 
 
-def socket_recv(sock):
-    topic = sock.recv()
-    return sock.recv_pyobj()
-
-
-def get_socket_gen(sock):
-    poller = zmq.Poller()
-    poller.register(sock, zmq.POLLIN)
-    while True:
-        socks = dict(poller.poll(25))
-        if socks.get(sock) == zmq.POLLIN:
-            yield socket_recv(sock)
-        else:
-            yield
-
-
-def reset_signal(sock, pending_flag):
-    # check to see if there is another pending reset req
-    if not pending_flag.is_set():
-        pending_flag.set()
-        sock.send(config.RESET_REQ_STR%socket.gethostname())
-        reply = sock.recv()
-        if reply != config.RESET_REP_STR%socket.gethostname():
-            LOG.error(reply)
-        pending_flag.clear()
-
-
-def init_client_sockets(client_info):
-    context = zmq.Context()
-    sub_socket = context.socket(zmq.SUB)
-    sub_socket.setsockopt(zmq.SUBSCRIBE, client_info.topic + config.ZMQ_TOPIC_DELIM_CHAR)
-    sub_socket.set_hwm(client_info.buffer)
-    sub_socket.connect("tcp://%s:%d" % (client_info.server, client_info.port))
-    reset_socket = context.socket(zmq.REQ)
-    reset_socket.connect("tcp://%s:%d" % (client_info.server, client_info.port+1))
-
-    return context, sub_socket, reset_socket
-
-
-def parse_args(*args):
-    keyval_re = re.compile('\s*=+\s*')
-
-    pos_args = []
-    keyval_args = {}
-    
-    for arg in args:
-        tokens = keyval_re.split(arg)
-
-        if len(tokens) > 2:
-            LOG.warning('Invalid input argument format: %s', arg)
-            continue
-
-        try:
-            key, value = tokens
-            keyval_args[key] = value
-        except ValueError:
-            pos_args.append(arg)
-
-    return pos_args, keyval_args
-
-
 def log_level_parse(log_level):
     return getattr(logging, log_level.upper(), config.LOG_LEVEL_ROOT)
-
-
-def default_run_chooser():
-    # get offline defaults
-    exp = config.APP_EXP_DEFAULT
-    run = config.APP_RUN_DEFAULT
-
-    # check if the current user is one of the opr accounts - if so default to online
-    match_obj = re.search('^(.*)opr$', pwd.getpwuid(os.getuid()).pw_name)
-    if match_obj:
-        exp = match_obj.group(1)
-        run = 'online'
-    return exp, run
 
 
 class ClientInfo(object):
@@ -113,7 +38,7 @@ class PlotInfo(object):
 
 
 class ZMQPublisher(object):
-    def __init__(self, comm_offset):
+    def __init__(self, comm_offset=config.APP_COMM_OFFSET):
         self.context = zmq.Context()
         self.data_socket = self.context.socket(zmq.PUB)
         self.comm_socket = self.context.socket(zmq.REP)
@@ -171,6 +96,43 @@ class ZMQPublisher(object):
         sock.unbind('tcp://*:%d' % port)
 
 
+class ZMQSubscriber(object):
+    def __init__(self, client_info, comm_offset=config.APP_COMM_OFFSET, connect=True):
+        self.client_info = client_info
+        self.context = zmq.Context()
+        self.data_socket = self.context.socket(zmq.SUB)
+        self.data_socket.setsockopt(zmq.SUBSCRIBE, self.client_info.topic + config.ZMQ_TOPIC_DELIM_CHAR)
+        self.data_socket.set_hwm(self.client_info.buffer)
+        self.comm_socket = self.context.socket(zmq.REQ)
+        self.comm_offset = comm_offset
+        self.connected = False
+        if connect:
+            self.connect()
+
+    def connect(self):
+        if not self.connected:
+            self.sock_init(self.data_socket, self.client_info.server, self.client_info.port)
+            self.sock_init(self.comm_socket, self.client_info.server, self.client_info.port + self.comm_offset)
+            self.connected = True
+
+    def sock_init(self, sock, server, port):
+        sock.connect('tcp://%s:%d' % (server, port))
+
+    def data_recv(self):
+        topic = self.data_socket.recv()
+        return self.data_socket.recv_pyobj()
+
+    def get_socket_gen(self):
+        poller = zmq.Poller()
+        poller.register(self.data_socket, zmq.POLLIN)
+        while True:
+            socks = dict(poller.poll(25))
+            if socks.get(self.data_socket) == zmq.POLLIN:
+                yield self.data_recv()
+            else:
+                yield
+
+
 class ZMQListener(object):
     def __init__(self, request_pattern, reply_str, comm_socket):
         self.signal = re.compile(request_pattern)
@@ -208,4 +170,28 @@ class ZMQListener(object):
             self.reset_flag.clear()
 
     def start(self):
+        self.thread.start()
+
+
+class ZMQRequester(object):
+    def __init__(self, request, req_reply, comm_socket):
+        self.request = request
+        self.req_reply = req_reply
+        self.comm_socket = comm_socket
+        self.pending_flag = threading.Event()
+        self.thread = None
+
+    def reset_signal(self):
+        # check to see if there is another pending reset req
+        if not self.pending_flag.is_set():
+            self.pending_flag.set()
+            self.comm_socket.send(self.request)
+            reply = self.comm_socket.recv()
+            if reply != self.req_reply:
+                LOG.error(reply)
+            self.pending_flag.clear()
+
+    def send_reset_signal(self, *args):
+        self.thread = threading.Thread(target=self.reset_signal)
+        self.thread.daemon = True
         self.thread.start()

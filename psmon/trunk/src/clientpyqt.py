@@ -1,4 +1,5 @@
 import sys
+import socket
 import logging
 import threading
 
@@ -22,10 +23,10 @@ def set_color_opt(option, value):
 
 def main(client_info, plot_info):
     # initial all the socket connections
-    context, sub_socket, reset_socket = app.init_client_sockets(client_info)
+    zmqsub = app.ZMQSubscriber(client_info)
 
     # grab an initial datagram from the server
-    init_data = app.socket_recv(sub_socket)
+    init_data = zmqsub.data_recv()
 
     # attempt to decode its type and go from there
     try:
@@ -41,15 +42,15 @@ def main(client_info, plot_info):
     set_color_opt('foreground', plot_info.fore_col)
 
     # start the plotting rendering routine
-    plot = data_type(init_data, app.get_socket_gen(sub_socket), plot_info, rate=1.0/client_info.rate)
+    plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
     plot.animate()
 
     # define signal sender function
-    pending_req = threading.Event()
-    def send_reset_signal(*args):
-        sender_thread = threading.Thread(target=app.reset_signal, args=(reset_socket, pending_req))
-        sender_thread.daemon = True
-        sender_thread.start()
+    reset_req = app.ZMQRequester(
+        config.RESET_REQ_STR%socket.gethostname(),
+        config.RESET_REP_STR%socket.gethostname(),
+        zmqsub.comm_socket
+    )
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
