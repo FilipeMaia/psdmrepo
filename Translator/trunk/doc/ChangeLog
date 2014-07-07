@@ -11,6 +11,15 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-21
+2014-07-07 David Schneider
+- Add SplitScan mode.
+  Basic implementation of master file:
+  some external links are dangling during translation.
+- Re-enable calibration unit tests.
+  Use snapshot of calibration files. 
+  pedestal appears to have changed, adjust unit test
+ 
 Tag: V00-01-20
 2014-07-03 David Schneider
 - update to new pdsdata with BldEBeamV6

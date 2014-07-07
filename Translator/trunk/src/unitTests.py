@@ -26,6 +26,8 @@ import h5py
 # Test data
 # -----------------------------
 DATADIR = "/reg/g/psdm/data_test/Translator"
+XPPTUTDATADIR="/reg/g/psdm/data_test/multifile/test_003_xpptut13"
+CALIBDATADIR="/reg/g/psdm/data_test/calib"
 OUTDIR = "data/Translator"
 TESTDATA_T1= os.path.join(DATADIR, "test_042_Translator_t1.xtc")
 TESTDATA_T1_INITIAL_DAMAGE = os.path.join(DATADIR,"test_046_Translator_t1_initial_damage.xtc")
@@ -192,6 +194,9 @@ class H5Output( unittest.TestCase ) :
         if not errorCheck:
             return allOutPut
         lowerOutput = allOutPut.lower()
+        self.checkOutputForErrors(lowerOutput)
+
+    def checkOutputForErrors(self, lowerOutput):
         self.assertEqual(lowerOutput.find('fatal'),-1,msg="'fatal' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('fatal')-100:lowerOutput.find('fatal')+100])
         self.assertEqual(lowerOutput.find('error'),-1,msg="'error' found in psana output: ... %s ..."  % lowerOutput[lowerOutput.find('error')-100:lowerOutput.find('error')+100])
         self.assertEqual(lowerOutput.find('segmentation fault'),-1,msg="'segmentation fault' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('segmentation fault')-100:lowerOutput.find('segmentation fault')+100])
@@ -1202,17 +1207,17 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
-    @unittest.skip("disabled no data access")
+#    @unittest.skip("disabled no data access")
     def test_calibstore(self):
         '''runs on xpptut data to see if calibration stuff gets written.
         Note - this data is not in the translator test directory. It has to be on disk
         for the test to succeed.
         '''
-        input_file = "exp=xpptut13:run=71"
+        input_file = "exp=xpptut13:run=71:dir=%s" % XPPTUTDATADIR
         output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
         cfgfile = writeCfgFile(input_file, output_h5, 
                                moduleList="cspad_mod.CsPadCalib Translator.H5Output",
-                               psanaCfg='calib-dir=/reg/g/psdm/data_test/calib')
+                               psanaCfg='calib-dir=%s' % CALIBDATADIR)
         cfgfile.write("deflate = -1\n")
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
@@ -1254,7 +1259,7 @@ class H5Output( unittest.TestCase ) :
         f.close()
         if self.cleanUp: os.unlink(output_h5)
         
-    @unittest.skip("disabled no data access")
+#    @unittest.skip("disabled no data access")
     def test_calibration(self):
         '''runs on xpptut data to see if calibration occurs. We are testing against 
         calibrated values seen when running on 4/16/2014 - if different calibration 
@@ -1266,19 +1271,21 @@ class H5Output( unittest.TestCase ) :
         '''
         idx = [100,100,0]  # the index for the below values
         cspad0raw = 499
-        cspad0calib = 4
+        cspad0calib = 3
         cspad1raw = 409
         cspad1calib = 8
 
         cspad0DataPath = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.0/data'
         cspad1DataPath = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.1/data'
 
-        input_file = "exp=xpptut13:run=71"
+        input_file = "exp=xpptut13:run=71:dir=%s" % XPPTUTDATADIR
         output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
 
         #######################################
         # test that calibrated data written where uncalibrated would be:
-        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile = writeCfgFile(input_file, output_h5, 
+                               moduleList="cspad_mod.CsPadCalib Translator.H5Output",
+                               psanaCfg='calib-dir=%s' % CALIBDATADIR)
         cfgfile.write("deflate = -1\n")
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
@@ -1301,8 +1308,9 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(set(calibStore.keys()), 
                          set([u'pdscalibdata::CsPad2x2PedestalsV1', 
                               u'pdscalibdata::CsPad2x2PixelStatusV1',
+                              u'pdscalibdata::CsPad2x2PixelGainV1',
                               u'pdscalibdata::CsPadCommonModeSubV1']),
-                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1")
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPad2x2PixelGainV1, pdscalibdata::CsPadCommonModeSubV1")
         del f
         os.unlink(output_h5)
 
@@ -1363,6 +1371,86 @@ class H5Output( unittest.TestCase ) :
                          msg="There are %d lines with XppSb2_Ipm in it, but only %d of those have ndarray in it" % (len(lns), len(lnsWithNDarray)))
         if self.cleanUp:
             os.unlink(output_h5)
+
+    def test_splitscan(self):
+        writeDir = "data/Translator"
+        nosplit_h5 = os.path.join(writeDir,"unit_test_splitscan_nosplit.h5")
+        split_h5   = os.path.join(writeDir,"unit_test_splitscan_split.h5")
+        input_ds = "exp=xppd9714:run=16:dir=/reg/g/psdm/data_test/multifile/test_002_xppd9714"
+        input_dir = input_ds.split(':dir=')[1]
+        nosplit_dump = os.path.join(writeDir,"unit_test_nosplit.dump")
+        split_dump   = os.path.join(writeDir,"unit_test_split.dump")
+        NUMBERCALIBCYCLES=7
+        assert os.path.exists(writeDir), "write directory=%s for h5 output doesn't exist" % writeDir
+        assert os.path.exists(input_dir), "input ds dir=%s doesn't exist" % input_dir
+
+        nosplit_cmd = 'psana -m cspad_mod.CsPadCalib,Translator.H5Output '
+        nosplit_cmd += '-o Translator.H5Output.overwrite=True -o '
+        nosplit_cmd += 'Translator.H5Output.output_file=%s %s' % (nosplit_h5, input_ds)
+
+        split_cmd_job0 = 'psana -m cspad_mod.CsPadCalib,Translator.H5Output '
+        split_cmd_job0 += '-o Translator.H5Output.overwrite=True -o '
+        split_cmd_job0 += 'Translator.H5Output.output_file=%s ' % split_h5
+        split_cmd_job0 += '-o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=0 '
+        split_cmd_job0 += '-o Translator.H5Output.jobTotal=2 %s' % input_ds
+
+        split_cmd_job1 = split_cmd_job0.replace('.jobNumber=0','.jobNumber=1')
+
+        for cmd in [nosplit_cmd, split_cmd_job0, split_cmd_job1]:
+            p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+            o,e=p.communicate()
+            self.checkOutputForErrors(o + '\n' + e)
+        self.assertTrue(os.path.exists(split_h5), msg="master split file output %s not found" % split_h5)
+        self.assertTrue(os.path.exists(nosplit_h5), msg="nosplit file %s not found" % nosplit_h5)
+        ccnames = []
+        for cc in range(NUMBERCALIBCYCLES):
+            ccname,ext = os.path.splitext(split_h5)
+            ccname += '_cc%4.4d' % cc
+            ccname += ext
+            ccnames.append(ccname)
+            self.assertTrue(os.path.exists(ccname), msg="cc file %s not found" % ccname)
+        # compare dumps from this directory and the directory where they are written
+        for whichDir in ['release', 'output-dir']:
+            if whichDir == 'release':
+                nosplit_input = nosplit_h5
+                split_input = split_h5
+                dump_cmd_nosplit = ''
+                dump_cmd_split = ''
+                nosplit_output = nosplit_dump
+                split_output = split_dump
+            elif whichDir == 'output-dir':
+                nosplit_input = os.path.split(nosplit_h5)[1]
+                split_input = os.path.split(split_h5)[1]
+                dump_cmd_nosplit = 'cd %s && ' % os.path.split(nosplit_h5)[0]
+                dump_cmd_split = 'cd %s && ' %  os.path.split(split_h5)[0]
+                nosplit_output = os.path.split(nosplit_dump)[1]
+                split_output = os.path.split(split_dump)[1]
+            dump_cmd_nosplit += "psana -m psana_test.dump %s > %s" % (nosplit_input, nosplit_output)
+            dump_cmd_split += "psana -m psana_test.dump %s > %s" % (split_input, split_output)
+            p = sb.Popen(dump_cmd_nosplit, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+            o,e=p.communicate()
+            self.checkOutputForErrors(e)
+            p = sb.Popen(dump_cmd_split, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+            o,e=p.communicate()
+            self.checkOutputForErrors(e)
+            diff_cmd = 'diff %s %s' % (nosplit_output, split_output)
+            p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+            diff_output,e = p.communicate()
+            if len(diff_output) != 0:
+                print "TEST FAILED: cmds"
+                print nosplit_cmd
+                print split_cmd_job0
+                print split_cmd_job1
+                print dump_cmd_nosplit
+                print dump_cmd_split
+                print diff_cmd
+                print "---- diff output -----"
+                print diff_output
+                self.assertTrue(False, msg="%s: split and nosplit dumps are NOT equal" % whichDir)
+        toDelete = ccnames + [nosplit_h5, split_h5, split_dump, nosplit_dump]
+        if self.cleanUp:
+            for fname in toDelete:
+                os.unlink(fname)
 
     def test_timetool(self):
         '''test_081 has three events with timetool data in all three.

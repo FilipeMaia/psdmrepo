@@ -31,6 +31,7 @@
 #include "Translator/ChunkManager.h"
 #include "Translator/H5GroupNames.h"
 #include "Translator/HdfWriterCalib.h"
+#include "Translator/SplitScanMgr.h"
 
 namespace Translator {
 
@@ -88,13 +89,14 @@ protected:
                                                       const std::list<std::string> &defaultValue) const;
   void addCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
-  void openH5OutputFile();
+  void createH5OutputFile();
   void createNextConfigureGroup();
   void setEventVariables(Event &evt, Env &env);
   void addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
                       hdf5pp::Group & parentGroup);
   void createNextRunGroup();
   void createNextCalibCycleGroup();
+  void createNextCalibCycleExtLink(const char *linkName, hdf5pp::Group &runGroup);
   void lookForAndStoreCalibData();
   void eventImpl();
   void setDamageMapFromEvent();
@@ -129,6 +131,8 @@ private:
   size_t m_currentRunCounter;
   size_t m_currentCalibCycleCounter;
   size_t m_currentEventCounter; // reset when a CalibCycle begins
+  size_t m_totalEventsProcessed;
+  size_t m_totalCalibCyclesProcessed;
   size_t m_filteredEventsThisCalibCycle;
   size_t m_maxSavedPreviousSplitEvents;
   hdf5pp::Group m_currentConfigureGroup;
@@ -184,7 +188,7 @@ private:
   // key parameters 
   std::string m_h5fileName;
   SplitMode m_split;
-  int m_splitJobNumber, m_splitJobTotal;
+  int m_jobNumber, m_jobTotal;
   hsize_t m_splitSize;
 
   bool m_overwrite;
@@ -223,6 +227,8 @@ private:
 
   LusiTime::Time m_startTime, m_endTime;
   double m_translatorTime;
+  boost::shared_ptr<SplitScanMgr> m_splitScanMgr;
+  bool m_printedNotFilteringWarning;
 }; // class H5Output
 
 } // namespace

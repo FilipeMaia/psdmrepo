@@ -236,13 +236,15 @@ EpicsH5GroupDirectory::EpicsH5GroupDirectory() :
 void EpicsH5GroupDirectory::initialize(EpicsStoreMode epicsStoreMode,
                                        boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
                                        const DataSetCreationProperties & oneElemEpicsPvCreateDsetProp,
-                                       const DataSetCreationProperties & manyElemEpicsPvCreateDsetProp) 
+                                       const DataSetCreationProperties & manyElemEpicsPvCreateDsetProp,
+                                       boost::shared_ptr<SplitScanMgr> splitScanMgr) 
 {
   m_epicsStoreMode = epicsStoreMode;
   if (m_epicsStoreMode == Unknown) MsgLog(logger(), fatal, "epics store mode is unknown");
   m_hdfWriterEpicsPv = boost::make_shared<HdfWriterEpicsPv>(oneElemEpicsPvCreateDsetProp, 
                                                             manyElemEpicsPvCreateDsetProp, 
                                                             hdfWriterEventId);
+  m_splitScanMgr = splitScanMgr;
 }
 
 bool EpicsH5GroupDirectory::checkIfStoringEpics() {
@@ -256,14 +258,18 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
                                             boost::shared_ptr<PSEvt::EventId> eventId) 
 {
   if (not checkIfStoringEpics()) return;
-  if (currentConfigGroup<0) MsgLog(logger(), fatal, "processBeginJob passed invalid group");
-  m_configureGroup = currentConfigGroup;
+  if (m_splitScanMgr->noSplitOrJob0()) {
+    if (currentConfigGroup<0) MsgLog(logger(), fatal, "processBeginJob passed invalid group");
+    m_configureGroup = currentConfigGroup;
+  } 
   if (not thereAreEpics(epicsStore)) {
     m_epicsStatus = noEpics;
     return;
   }
   m_epicsStatus = hasEpics;
 
+  if (not m_splitScanMgr->noSplitOrJob0()) return;
+  
   createEpicsTypeAndSrcGroups(m_configureGroup, "config",  
                               m_configEpicsTypeGroup, m_configEpicsSrcGroup);
   WithMsgLog(logger(),debug,str) {
