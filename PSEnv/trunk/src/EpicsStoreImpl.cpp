@@ -98,6 +98,7 @@ EpicsStoreImpl::store(const boost::shared_ptr<Psana::Epics::EpicsPvHeader>& pv, 
           ":src_phy=" + boost::lexical_cast<std::string>(src.phy());
         m_id2name.insert(std::make_pair(pvid, name));
         m_name2id.insert(std::make_pair(name, pvid));
+        MsgLog(logger, warning, "EpicsStore::store - no name found. Created fictional name: " << name);
       }
       MsgLog(logger, debug, "EpicsStore::store - storing TIME PV with id=" << pv->pvId());
     }

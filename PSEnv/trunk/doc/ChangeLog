@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-06
+2014-07-08 David Schneider
+- print warning when fictional pvnames are created
+  trac ticket #313
+
 Tag: V00-13-05
 2014-06-16 David Schneider
 - rework epics store eventTag interface and logic
