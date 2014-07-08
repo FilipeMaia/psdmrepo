@@ -157,7 +157,7 @@ class CommandLineCalib () :
         cp.instr_name    .setValue(self.instr_name)
 
         self.calibdir     = cp.calib_dir.value() if docfg and self.opts['calibdir'] is None else self.opts['calibdir']
-        if self.calibdir == cp.calib_dir.value_def() :
+        if self.calibdir == cp.calib_dir.value_def() or self.calibdir is None :
             self.calibdir = fnm.path_to_calib_dir_default()
 
         self.xtcdir       = cp.xtc_dir_non_std.value_def() if self.opts['xtcdir'] is None else self.opts['xtcdir']

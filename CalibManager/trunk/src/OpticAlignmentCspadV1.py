@@ -504,26 +504,27 @@ class OpticAlignmentCspadV1 :
  
     def txt_geometry_header(self) :
         txt = '# TITLE      Geometry parameters of CSPAD with moving quads' \
-            + '\n# CREATED    %s' % strftime('%Y-%m-%d %H:%M:%S %Z', localtime()) \
-            + '\n# CREATOR    %s' % os.environ['LOGNAME'] \
+            + '\n# DATE_TIME  %s' % strftime('%Y-%m-%d %H:%M:%S %Z', localtime()) \
+            + '\n# AUTHOR     %s' % os.environ['LOGNAME'] \
             + '\n# EXPERIMENT %s' % self.exp \
             + '\n# DETECTOR   %s' % self.det \
             + '\n# CALIB_TYPE geometry' \
-            + '\n# COMMENT                Table contains the list of geometry parameters for alignment of 2x1 sensors in quads and quads in CSPAD' \
-            + '\n# PARAMETER PARENT     - name and version of the parent object; all translation and rotation pars are defined w.r.t. parent Cartesian frame' \
-            + '\n# PARAMETER PARENT_IND - index of the parent object' \
-            + '\n# PARAMETER OBJECT     - name and version of the new object' \
-            + '\n# PARAMETER OBJECT_IND - index of the new object' \
-            + '\n# PARAMETER X0         - x-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAMETER Y0         - y-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAMETER Z0         - z-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAMETER ROTATION_Z - new object design rotation angle [deg] around Z axis of the parent frame' \
-            + '\n# PARAMETER ROTATION_Y - new object design rotation angle [deg] around Y axis of the parent frame' \
-            + '\n# PARAMETER ROTATION_X - new object design rotation angle [deg] around X axis of the parent frame' \
-            + '\n# PARAMETER TILT_Z     - new object tilt angle [deg] around Z axis of the parent frame' \
-            + '\n# PARAMETER TILT_Y     - new object tilt angle [deg] around Y axis of the parent frame' \
-            + '\n# PARAMETER TILT_X     - new object tilt angle [deg] around X axis of the parent frame' \
-            + '\n\n# PARENT   IND  OBJECT     IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
+            + '\n# COMMENT  Table contains the list of geometry parameters for alignment of 2x1 sensors in quads and quads in CSPAD' \
+            + '\n# PARAM:01 PARENT     - name and version of the parent object; all translation and rotation pars are defined w.r.t. parent Cartesian frame' \
+            + '\n# PARAM:02 PARENT_IND - index of the parent object' \
+            + '\n# PARAM:03 OBJECT     - name and version of the new object' \
+            + '\n# PARAM:04 OBJECT_IND - index of the new object' \
+            + '\n# PARAM:05 X0         - x-coordinate [um] of the new object origin in the parent frame' \
+            + '\n# PARAM:06 Y0         - y-coordinate [um] of the new object origin in the parent frame' \
+            + '\n# PARAM:07 Z0         - z-coordinate [um] of the new object origin in the parent frame' \
+            + '\n# PARAM:08 ROT_Z      - new object design rotation angle [deg] around Z axis of the parent frame' \
+            + '\n# PARAM:09 ROT_Y      - new object design rotation angle [deg] around Y axis of the parent frame' \
+            + '\n# PARAM:10 ROT_X      - new object design rotation angle [deg] around X axis of the parent frame' \
+            + '\n# PARAM:11 TILT_Z     - new object tilt angle [deg] around Z axis of the parent frame' \
+            + '\n# PARAM:12 TILT_Y     - new object tilt angle [deg] around Y axis of the parent frame' \
+            + '\n# PARAM:13 TILT_X     - new object tilt angle [deg] around X axis of the parent frame' \
+            + '\n\n# HDR PARENT IND    OBJECT IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
+
         return txt + '\n\n'
 
 #----------------------------------

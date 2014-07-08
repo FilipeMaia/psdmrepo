@@ -290,7 +290,7 @@ if __name__ == "__main__" :
     print "\n\nTest list_of_run_nums('XPP','xppc7014'):\n", l 
 
     #det_name = 'cspad'
-    #det_name = 'cspad2x2'
+    det_name = 'cspad2x2'
     #det_name = 'princeton'
     #det_name = 'pnccd'
     #det_name = 'tm6740'
@@ -298,7 +298,7 @@ if __name__ == "__main__" :
     #det_name = 'opal2000'
     #det_name = 'opal4000'
     #det_name = 'opal8000'
-    det_name = 'orcafl40'
+    #det_name = 'orcafl40'
     #det_name = 'Acqiris'
     print "\n\nTest : list_of_sources_for_det ('%s')" % det_name
     print_list_of_sources_for_det (det_name)
