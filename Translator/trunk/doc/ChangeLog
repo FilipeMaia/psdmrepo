@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-23
+2014-07-08 David Schneider
+- Fix timing message
+
 Tag: V00-01-22
 2014-07-07 David Schneider
 - Fix spelling in default_psana.cfg

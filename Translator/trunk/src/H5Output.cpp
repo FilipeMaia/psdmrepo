@@ -1333,7 +1333,7 @@ void H5Output::endJob(Event& evt, Env& env)
   MsgLog(logger(), info, "Translator + psana processing, real time (finish - start): " << deltaTime << " (sec) =  " 
          << deltaTime/60.0 << " (min)");
   MsgLog(logger(), info, "Translator processing time: " << m_translatorTime << " (sec) = "
-         << deltaTime/60.0 << " (min)");
+         << m_translatorTime/60.0 << " (min)");
   MsgLog(logger(), info, "Translator proceesing as percentage of Translator+psana: " 
          << 100.0 * (m_translatorTime/deltaTime) << "%");
   if (m_splitScanMgr->splitScanMode()) {
