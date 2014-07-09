@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-24
+2014-07-09 David Schneider
+- Better implementation of master file. Only last
+  few calib cycles may be dangling.
+
 Tag: V00-01-23
 2014-07-08 David Schneider
 - Fix timing message

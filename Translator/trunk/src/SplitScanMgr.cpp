@@ -1,5 +1,6 @@
 #include <uuid/uuid.h>
 #include <climits>
+#include <vector>
 
 #include "Translator/SplitScanMgr.h"
 #include "hdf5/hdf5.h"
@@ -116,13 +117,46 @@ void SplitScanMgr::newCalibCycleExtLink(const char *linkName,
   if (not splitScanMode()) {
     MsgLog(logger, warning, "SplitScanMgr file operation but splitScanMode is FALSE");
   }
-  createCalibCycleExtLink(linkName, calibCycle, linkGroupLoc);
+  if (m_masterLnksToWrite.find(calibCycle) != m_masterLnksToWrite.end()) {
+    MsgLog(logger, error, "newCalibCycleExtLink has already been called for calibCycle: " 
+           << calibCycle << " are multiple runs being translated? No entry added.");
+    return;
+  }
+  m_masterLnksToWrite[calibCycle]=MasterLinkToWrite(linkName, linkGroupLoc);
+  MsgLog(logger, trace, "received notice of external link to add to master file, linkName="
+         << linkName<< " calibCycle=" << calibCycle << " linkGroupLoc=" << linkGroupLoc);
 }
 
 void SplitScanMgr::updateCalibCycleExtLinks(enum UpdateExtLinksMode updateMode) {
   if (not splitScanMode()) {
     MsgLog(logger, warning, "SplitScanMgr file operation but splitScanMode is FALSE");
   }
+  std::vector<size_t> calibsToErase;
+  std::map< size_t, MasterLinkToWrite>::iterator lnks;
+  for (lnks = m_masterLnksToWrite.begin(); lnks != m_masterLnksToWrite.end(); ++lnks) {
+    size_t calibCycle = lnks->first;
+    MasterLinkToWrite & masterLinkToWrite = lnks->second;
+    if ((updateMode == writeAll) or 
+        (updateMode == writeFinishedOnly) and calibFileIsFinished(calibCycle)) {
+      createCalibCycleExtLink(masterLinkToWrite.linkName.c_str(), 
+                              calibCycle, 
+                              masterLinkToWrite.linkGroupLoc);
+      calibsToErase.push_back(calibCycle);
+    }
+  }
+  MsgLog(logger, trace, "updateCalibCycleExtLinks updateMode=" << updateModeToStr(updateMode)
+         << " created " << calibsToErase.size() << " external links.");
+
+  for (std::vector<size_t>::iterator ccIter = calibsToErase.begin();
+       ccIter != calibsToErase.end(); ++ccIter) {
+    m_masterLnksToWrite.erase(*ccIter);
+  }
+}
+
+bool SplitScanMgr::calibFileIsFinished(size_t calibCycle) {
+  size_t nextCalibCycle = calibCycle + jobTotal();
+  std::string nextPath = getExtCalibCycleFilePath(nextCalibCycle);
+  return boost::filesystem::exists(nextPath);
 }
 
 bool SplitScanMgr::createCalibCycleExtLink(const char *linkName,
@@ -150,6 +184,10 @@ bool SplitScanMgr::createCalibCycleExtLink(const char *linkName,
   }
   err = H5Fflush(linkGroupLoc.id(), H5F_SCOPE_GLOBAL);
   if (err < 0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Fflush");
+
+  MsgLog(logger,trace,"added external link to master file. targetFile=" 
+         << targetFile << " targetName=" << targetName 
+         << " linkGroupLoc=" << linkGroupLoc << " linkName=" << linkName);
   return true;
 }
 
@@ -165,3 +203,8 @@ std::string SplitScanMgr::getExtCalibCycleFilePath(size_t calibCycle) {
   return newh5path.string();
 }
 
+std::string SplitScanMgr::updateModeToStr(enum UpdateExtLinksMode mode) {
+  if (mode == writeAll) return std::string("writeAll");
+  if (mode == writeFinishedOnly) return std::string("writeFinishedOnly");
+  return std::string("*unknown*");
+}

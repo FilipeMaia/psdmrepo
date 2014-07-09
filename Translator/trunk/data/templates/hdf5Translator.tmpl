@@ -284,21 +284,21 @@ split = NoSplit
 # jobNumber = 0
 
 # which default to 1 job that is numbered 0. However if jobTotal=3 and jobNumber=1, this 
-# Translator will process calibCycle 1, 4, 7, etc.
-# The user MUST make sure to launch all 3 Translator jobs to get all the calib cycle
+# Translator will process calibCycle 1, 4, 7, etc. If jobTotal is 3, the user MUST
+# make sure to launch 3 Translator jobs with jobNumber being 0,1 and 2 to get all the calib cycle
 # files written. jobNumber=0 will write the master file with the external links to the calib
 # cycle files. 
 #
 # For example, the following two command lines:
 #
-# psana -m Translator.H5Output -o Translator.H5Output.output_file=split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=0 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
-# psana -m Translator.H5Output -o Translator.H5Output.output_file=split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=1 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
+# psana -m Translator.H5Output -o Translator.H5Output.output_file=mydir/split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=0 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
+# psana -m Translator.H5Output -o Translator.H5Output.output_file=mydir/split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=1 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
 #
 # will divide the work into two translator jobs. When they finish, the output will be
 # 
-# split.h5
-# split_cc0000.h5
-# split_cc0001.h5
+# mydir/split.h5
+# mydir/split_cc0000.h5
+# mydir/split_cc0001.h5
 # ...
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 

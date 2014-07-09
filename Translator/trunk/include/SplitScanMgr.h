@@ -136,6 +136,8 @@ namespace Translator {
     enum UpdateExtLinksMode {writeAll,            /// add all links to the master file
                              writeFinishedOnly};  /// only add links for finished files
 
+    static std::string updateModeToStr(enum UpdateExtLinksMode mode);
+
     /**
      *  @brief updates the external links in the master file.
      *
@@ -187,6 +189,21 @@ namespace Translator {
      */
     std::string getExtCalibCycleFilePath(size_t calibCycle);
 
+    /**
+     * @brief returns true if the given calib cycle is finished.
+     *
+     * For example, if there are 3 jobs, and calibCycle is 2, 
+     * checks to see if calibcyle 5 exists on disk - as that is
+     * the next file that job 2 will make after finishing cc 2.
+     *
+     * If there is no 5th calib cycle to write, the routine will
+     * return false even though cc2 may be done.
+     *
+     * @param[in] calibCycle   - the calib cycle number
+     * @return true if file is ready
+     */
+    bool calibFileIsFinished(size_t calibCycle);
+
   private:
     std::string m_h5filePath;
     bool m_splitScanMode;
@@ -196,15 +213,22 @@ namespace Translator {
     int m_fileSchemaVersion;
 
     struct ExtCalib {
-      bool linkAddedToMaster;
       hdf5pp::File file;
       hdf5pp::Group group;
-      size_t calibNumber;
       LusiTime::Time startTime;
     };
     std::map< size_t, ExtCalib > m_extCalib;
+
+    struct MasterLinkToWrite {
+      std::string linkName;
+      hdf5pp::Group linkGroupLoc;
+      MasterLinkToWrite()  {};
+      MasterLinkToWrite(const char *_linkName, hdf5pp::Group &_group) :
+        linkName(_linkName), linkGroupLoc(_group) {}
+    };
+
+    std::map< size_t, MasterLinkToWrite> m_masterLnksToWrite;
   };
 
 } // namespace
-
 #endif  // TRANSLATOR_H5OUTPUT_H
