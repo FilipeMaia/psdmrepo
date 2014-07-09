@@ -1,6 +1,6 @@
 import time
 import numpy as np
-from psmon.data import Image, MultiPlot, Hist, XYPlot
+from psmon.plots import Image, MultiPlot, Hist, XYPlot
 
 class Helper(object):
     def __init__(self, publisher, topic, title=None, pubrate=None):
