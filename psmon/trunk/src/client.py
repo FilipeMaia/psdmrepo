@@ -6,7 +6,7 @@ import logging
 import argparse
 import multiprocessing as mp
 
-from psmon import app, config
+from psmon import app, config, log_level_parse
 
 
 LOG = logging.getLogger(os.path.splitext(os.path.basename(__file__))[0])
@@ -153,7 +153,7 @@ def main():
         args = parse_cmdline()
 
         # set levels for loggers that we care about
-        LOG.setLevel(app.log_level_parse(args.log))
+        LOG.setLevel(log_level_parse(args.log))
 
         # create the plot info object from cmd args
         plot_info = app.PlotInfo(

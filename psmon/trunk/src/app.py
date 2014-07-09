@@ -12,10 +12,6 @@ from psmon import config
 LOG = logging.getLogger(__name__)
 
 
-def log_level_parse(log_level):
-    return getattr(logging, log_level.upper(), config.LOG_LEVEL_ROOT)
-
-
 class ClientInfo(object):
     def __init__(self, server, port, buffer, rate, topic):
         self.server = server
