@@ -1,66 +1,93 @@
+#!/usr/bin/env python
 import time
 import numpy
 from psana import *
-from psmon.psutil import MultiData, ImageData, XYPlotData
-from psmon.psmonserver import ServerScript
+from psmon import publish
+from psmon.plots import MultiPlot, Image, XYPlot
 
-class MyAnalysis(ServerScript):
-    def __init__(self):
-        super(MyAnalysis, self).__init__()
 
-    def run(self, expname, *args, **kwargs):
-        counter = 0
-        myrate = .2 # sleep time between data sends - crudely limit rate to < 5 Hz
-        # A good run for this is xcs84213 run 4
-        events = DataSource(expname).events()
-        input_srcs = [
-            (Source('DetInfo(XcsBeamline.1:Tm6740.5)'), Camera.FrameV1, Camera.FrameV1.data16, 'yag5'),
-            (Source('DetInfo(XcsEndstation.1:Opal1000.1)'), Camera.FrameV1, Camera.FrameV1.data16, 'xcs-spectrometer'),
-        ]
-        ipimb_srcs = [
-            (Source('BldInfo(XCS-IPM-02)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-02', [], []),
-            #(Source('DetInfo(XcsBeamline.1:Ipimb.4)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-04', [], []),
-        ]
-        multi_plot_topic = 'xcs-multi-plot'
+def main():
+    exp = 'xcsc0114'
+    run = '9'
+    counter = 0
+    status_rate = 100
+    myrate = .2 # sleep time between data sends - crudely limit rate to < 5 Hz
 
-        for evt in events:
-            evt_data = evt.get(EventId)
-            evt_ts = evt_data.time()
-            # convert the ts
-            evt_ts_str = '%.4f'%(evt_ts[0] + evt_ts[1] / 1e9)
+    # create expname string for psana
+    if run == 'online':
+        expname='shmem=%s.0:stop=no'%exp
+    else:
+        expname='exp=%s:run=%s'%(exp, run)
 
-            img_index = 0
+    input_srcs = [
+        (Source('DetInfo(XcsBeamline.1:Tm6740.5)'), Camera.FrameV1, Camera.FrameV1.data16, 'yag5'),
+        (Source('DetInfo(XcsEndstation.1:Opal1000.1)'), Camera.FrameV1, Camera.FrameV1.data16, 'xcs-spectrometer'),
+    ]
+    ipimb_srcs = [
+        (Source('BldInfo(XCS-IPM-02)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-02', [], []),
+        #(Source('DetInfo(XcsBeamline.1:Ipimb.4)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-04', [], []),
+    ]
+    multi_plot_topic = 'xcs-multi-plot'
 
-            multi_plot_data = MultiData(evt_ts_str, multi_plot_topic)
+    # initialize socket connections
+    publish.init()
+    # start reset listener
+    publish.start_reset_listener()
 
-            # clear accumulated ipm event data if flag is sent
-            if self.get_reset_flag():
-                for _, _, _, _, xvals, yvals in ipimb_srcs:
-                    xvals[:] = []
-                    yvals[:] = []
-                self.clear_reset_flag()
+    # Start processing events
+    if run == 'online':
+        print "Running psana example script: shared-mem %s" % exp
+    else:
+        print "Running psana example script: experiment %s, run %s" % (exp, run)
+    events = DataSource(expname).events()
 
-            for src, data_type, data_func, topic in input_srcs:
-                frame = evt.get(data_type, src)
-                image_data = ImageData(evt_ts_str, topic, data_func(frame))
-                multi_plot_data.add(image_data)
-                self.send_data(topic, image_data)
-                img_index += 1
-            for src, data_type, data_func, topic, xvals, yvals in ipimb_srcs:
-                ipm = evt.get(data_type, src)
-                xvals.append(data_func(ipm)[0])
-                yvals.append(data_func(ipm)[2])
-                ipm_data0v2 = XYPlotData(
-                    evt_ts_str,
-                    topic+' chan 0 vs 2',
-                    numpy.array(xvals),
-                    numpy.array(yvals),
-                    xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
-                    ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
-                    formats='.'
-                )
-                multi_plot_data.add(ipm_data0v2)
-                self.send_data(topic+'-0v2', ipm_data0v2)
-            self.send_data(multi_plot_topic, multi_plot_data)
-            counter += 1
-            time.sleep(myrate)
+    for evt in events:
+        evt_data = evt.get(EventId)
+        evt_ts = evt_data.time()
+        # convert the ts
+        evt_ts_str = '%.4f'%(evt_ts[0] + evt_ts[1] / 1e9)
+
+        img_index = 0
+
+        multi_plot_data = MultiPlot(evt_ts_str, multi_plot_topic)
+
+        # clear accumulated ipm event data if flag is sent
+        if publish.get_reset_flag():
+            for _, _, _, _, xvals, yvals in ipimb_srcs:
+                xvals[:] = []
+                yvals[:] = []
+            publish.clear_reset_flag()
+
+        for src, data_type, data_func, topic in input_srcs:
+            frame = evt.get(data_type, src)
+            image_data = Image(evt_ts_str, topic, data_func(frame))
+            multi_plot_data.add(image_data)
+            publish.send(topic, image_data)
+            img_index += 1
+        for src, data_type, data_func, topic, xvals, yvals in ipimb_srcs:
+            ipm = evt.get(data_type, src)
+            xvals.append(data_func(ipm)[0])
+            yvals.append(data_func(ipm)[2])
+            ipm_data0v2 = XYPlot(
+                evt_ts_str,
+                topic+' chan 0 vs 2',
+                numpy.array(xvals),
+                numpy.array(yvals),
+                xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
+                ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
+                formats='.'
+            )
+            multi_plot_data.add(ipm_data0v2)
+            publish.send(topic+'-0v2', ipm_data0v2)
+        publish.send(multi_plot_topic, multi_plot_data)
+        counter += 1
+        if counter % status_rate == 0:
+            print "Processed %d events so far" % counter
+        time.sleep(myrate)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print '\nExitting script!'

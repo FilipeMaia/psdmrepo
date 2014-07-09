@@ -1,33 +1,58 @@
+#!/usr/bin/env python
 import time
 from psana import *
-from psmon.psutil import MultiData, ImageData
-from psmon.psmonserver import ServerScript
+from psmon import publish
+from psmon.plots import MultiPlot, Image
 
-class MyAnalysis(ServerScript):
-    def __init__(self):
-        super(MyAnalysis, self).__init__()
 
-    def run(self, expname, *args, **kwargs):
-        counter = 0
-        myrate = .2 # sleep time between data sends - crudely limit rate to < 5 Hz
-        # set the psana config file
-        setConfigFile(os.path.join(os.path.dirname(__file__), 'cfg', 'xcs_cspad.cfg'))
-        # A good run for this is xcs84213 run 115
-        events = DataSource(expname).events()
-        input_srcs = [
-            (Source('DetInfo(XcsEndstation.0:Cspad.0)'), ndarray_int16_2, 'image0', 'cspad'),
-        ]
+def main():
+    exp = 'xcsc9114'
+    run = '7'
+    counter = 0
+    status_rate = 100
+    myrate = .2 # sleep time between data sends - crudely limit rate to < 5 Hz
+    # set the psana config file
+    setConfigFile(os.path.join(os.path.dirname(__file__), 'cfg', 'xcs_cspad.cfg'))
 
-        for evt in events:
-            evt_data = evt.get(EventId)
-            evt_ts = evt_data.time()
+    # create expname string for psana
+    if run == 'online':
+        expname='shmem=%s.0:stop=no'%exp
+    else:
+        expname='exp=%s:run=%s'%(exp, run)
 
-            # convert the ts
-            evt_ts_str = '%.4f'%(evt_ts[0] + evt_ts[1] / 1e9)
+    input_srcs = [
+        (Source('DetInfo(XcsEndstation.0:Cspad.0)'), ndarray_int16_2, 'image0', 'cspad'),
+    ]
 
-            for src, data_type, data_key, topic in input_srcs:
-                frame = evt.get(data_type, src, data_key)
-                image_data = ImageData(evt_ts_str, topic, frame)
-                self.send_data(topic, image_data)
-            counter += 1
-            time.sleep(myrate)
+    # initialize socket connections
+    publish.init()
+
+    # Start processing events
+    if run == 'online':
+        print "Running psana example script: shared-mem %s" % exp
+    else:
+        print "Running psana example script: experiment %s, run %s" % (exp, run)
+    events = DataSource(expname).events()
+
+    for evt in events:
+        evt_data = evt.get(EventId)
+        evt_ts = evt_data.time()
+
+        # convert the ts
+        evt_ts_str = '%.4f'%(evt_ts[0] + evt_ts[1] / 1e9)
+
+        for src, data_type, data_key, topic in input_srcs:
+            frame = evt.get(data_type, src, data_key)
+            image_data = Image(evt_ts_str, topic, frame)
+            publish.send(topic, image_data)
+        counter += 1
+        if counter % status_rate == 0:
+            print "Processed %d events so far" % counter
+        time.sleep(myrate)
+
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        print '\nExitting script!'

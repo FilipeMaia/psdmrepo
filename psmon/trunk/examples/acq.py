@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #display plot with "psplot -s psanacs031 -p 12301 ACQSINGLETRACE"
 
 from psana import *
