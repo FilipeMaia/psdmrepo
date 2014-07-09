@@ -52,6 +52,8 @@ def main():
 
         for src, data_type, data_func, topic, xvals, yvals in ipimb_srcs:
             ipm = evt.get(data_type, src)
+            if ipm is None:
+                continue
             xvals[0].append(data_func(ipm)[0])
             yvals[0].append(data_func(ipm)[2])
             xvals[1].append(data_func(ipm)[1])

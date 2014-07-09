@@ -143,16 +143,19 @@ def main():
         img_index = 0
 
         multi_image_data = MultiPlot(evt_ts_str, multi_image_topic)
+        # flag for indicating if all needed pieces of the multi_data are there
+        multi_data_good = True
 
         for src, data_type, data_func, topic in input_srcs:
             frame = evt.get(data_type, src)
             if frame is None:
+                multi_data_good = False
                 continue
             image_data = Image(evt_ts_str, topic, data_func(frame))
             multi_image_data.add(image_data)
             publish.send(topic, image_data)
             img_index += 1
-        if len(input_srcs) > 0:
+        if len(input_srcs) > 1 and multi_data_good:
             publish.send(multi_image_topic, multi_image_data)
         counter += 1
         if counter % status_rate == 0:

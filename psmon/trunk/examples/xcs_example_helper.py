@@ -90,12 +90,16 @@ def main():
 
         for src, data_type, data_func, helper in input_srcs:
             frame = evt.get(data_type, src)
+            if frame is None:
+                continue
             multi_image_helper.set_image(img_index, data_func(frame), evt_ts_str)
             helper.set_image(data_func(frame), evt_ts_str)
             helper.publish()
             img_index += 1
         for src, data_type, data_func, helper, hist_helper in ipimb_srcs:
             ipm = evt.get(data_type, src)
+            if ipm is None:
+                continue
             helper.add(data_func(ipm)[0], data_func(ipm)[2], evt_ts_str)
             helper.publish()
             hist_helper.add(data_func(ipm)[0], evt_ts_str)

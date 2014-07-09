@@ -50,6 +50,8 @@ def main():
         img_index = 0
 
         multi_plot_data = MultiPlot(evt_ts_str, multi_plot_topic)
+        # flag for indicating if all needed pieces of the multi_data are there
+        multi_data_good = True
 
         # clear accumulated ipm event data if flag is sent
         if publish.get_reset_flag():
@@ -60,12 +62,18 @@ def main():
 
         for src, data_type, data_func, topic in input_srcs:
             frame = evt.get(data_type, src)
+            if frame is None:
+                multi_data_good = False
+                continue
             image_data = Image(evt_ts_str, topic, data_func(frame))
             multi_plot_data.add(image_data)
             publish.send(topic, image_data)
             img_index += 1
         for src, data_type, data_func, topic, xvals, yvals in ipimb_srcs:
             ipm = evt.get(data_type, src)
+            if ipm is None:
+                multi_data_good = False
+                continue
             xvals.append(data_func(ipm)[0])
             yvals.append(data_func(ipm)[2])
             ipm_data0v2 = XYPlot(
@@ -79,7 +87,8 @@ def main():
             )
             multi_plot_data.add(ipm_data0v2)
             publish.send(topic+'-0v2', ipm_data0v2)
-        publish.send(multi_plot_topic, multi_plot_data)
+        if multi_data_good:
+            publish.send(multi_plot_topic, multi_plot_data)
         counter += 1
         if counter % status_rate == 0:
             print "Processed %d events so far" % counter

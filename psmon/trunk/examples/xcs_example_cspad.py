@@ -43,6 +43,8 @@ def main():
 
         for src, data_type, data_key, topic in input_srcs:
             frame = evt.get(data_type, src, data_key)
+            if frame is None:
+                continue
             image_data = Image(evt_ts_str, topic, frame)
             publish.send(topic, image_data)
         counter += 1
