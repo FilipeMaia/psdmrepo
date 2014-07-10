@@ -113,15 +113,15 @@ public:
 
 class IndexXtcReader {
 public:
-  IndexXtcReader(const vector<XtcFileName> &xtclist) {
-    _nfiles = xtclist.size();
-    _fd.resize(_nfiles);
+  IndexXtcReader() : _nfiles(0) {}
 
-    for (vector<string>::size_type ifile=0; ifile!=_nfiles; ifile++) {
-      _fd[ifile] = ::open(xtclist[ifile].path().c_str(), O_RDONLY | O_LARGEFILE);
-      if (_fd[ifile]==-1) MsgLog(logger, fatal,
-                                 "File " << xtclist[ifile].path().c_str() << " not found");
-    }
+  void add(const XtcFileName& xtcfile) {
+    _fd.resize(_nfiles+1);
+
+    _fd[_nfiles] = ::open(xtcfile.path().c_str(), O_RDONLY | O_LARGEFILE);
+    if (_fd[_nfiles]==-1) MsgLog(logger, fatal,
+                               "File " << xtcfile.path().c_str() << " not found");
+    _nfiles++;
   }
 
   ~IndexXtcReader() {
@@ -136,17 +136,21 @@ public:
       MsgLog(logger, error, ss.str());
       throw IndexSeekFailed(ERR_LOC);
     }
-    Pds::Dgram* dg = (Pds::Dgram*)new char[MaxDgramSize];
-    if (::read(_fd[file], dg, sizeof(*dg))==0) {
+    Pds::Dgram dghdr;
+    if (::read(_fd[file], &dghdr, sizeof(dghdr))==0) {
       return 0;
     } else {
+      if (dghdr.xtc.sizeofPayload()>MaxDgramSize)
+        MsgLog(logger, fatal, "Datagram size exceeds sanity check. Size: " << dghdr.xtc.sizeofPayload() << " Limit: " << MaxDgramSize);
+      Pds::Dgram* dg = (Pds::Dgram*)new char[sizeof(dghdr)+dghdr.xtc.sizeofPayload()];
+      *dg = dghdr;
       ::read(_fd[file], dg->xtc.payload(), dg->xtc.sizeofPayload());
       return dg;
     }
   }
 
 private:
-  enum {MaxDgramSize=0x800000};
+  enum {MaxDgramSize=0x2000000};
   unsigned _nfiles;
   vector<int> _fd;
 };
@@ -441,11 +445,13 @@ private:
   void _storeIndex(const vector<XtcFileName> &xtclist, std::map<Pds::Src,int>& src2EpicsArray,
                    vector<epicsmap>& bit2SrcVec, vector<unsigned>& epicsmask) {
     bool ifirst = 1;
-    for (vector<string>::size_type ifile=0; ifile!=xtclist.size(); ifile++) {
+    int ifile = 0;
+    for (std::vector<XtcFileName>::const_iterator it = xtclist.begin(); it!=xtclist.end(); ++it) {
       Pds::Index::IndexList idxlist;
-      // get the DAQ index file, if it exists
-      if (_getidx(xtclist[ifile], idxlist)) continue;
-      if (xtclist[ifile].stream()<80) {
+      // get the DAQ index file, if it exists, otherwise ignore both idx/xtc files.
+      if (_getidx(*it, idxlist)) continue;
+      _xtc.add(*it);
+      if ((*it).stream()<80) {
         // store them in event table that includes DAQ data
         _store(_idx,idxlist.getL1(),ifile);
         // begincalibs are a little tricky, I believe.  in principle
@@ -476,6 +482,7 @@ private:
         // store them in event table that includes ioc data
         _store(_idxioc,idxlist.getL1(),ifile);
       }
+      ifile++;
     }
     _lastEpics.resize(_epicsSource.size());
 
@@ -515,7 +522,7 @@ private:
 public:
 
   IndexRun(queue<DgramPieces>& queue, const vector<XtcFileName> &xtclist) :
-    _xtc(xtclist), _beginrunOffset(0), _lastcalib(0,0), _queue(queue) {
+    _xtc(), _beginrunOffset(0), _lastcalib(0,0), _queue(queue) {
 
     // store the index files in our table, and get some information about epics
     std::map<Pds::Src,int> src2EpicsArray;
