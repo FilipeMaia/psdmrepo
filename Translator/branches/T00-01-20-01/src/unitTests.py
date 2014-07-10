@@ -686,8 +686,10 @@ class H5Output( unittest.TestCase ) :
         float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db/data']
         int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D/data']
         uint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1/noSrc__my_uint1D/data']
-        str1=str(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...])
-        str2=str(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...])
+        str1ar =f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...]
+        str2ar =f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...]
+        str1 = ' '.join(str1ar)
+        str2 = ' '.join(str2ar)
 
         cdouble3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D/data']
         cfloat2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Da/data']
@@ -696,8 +698,8 @@ class H5Output( unittest.TestCase ) :
         cuint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1/noSrc__cmy_uint1D/data']
         
 
-        str1expected = "[This is event number: 1 This is event number: 2]"
-        str2expected = "[This is a second string.  10 * event number is 10\n This is a second string.  10 * event number is 20]"
+        str1expected = "This is event number: 1 This is event number: 2"
+        str2expected = "This is a second string.  10 * event number is 10 This is a second string.  10 * event number is 20"
         
         self.assertEqual(str1, str1expected, msg="str1=%s does not have expected value=%s" % (str1,str1expected))
         self.assertEqual(str2, str2expected, msg="str2=%s does not have expected value=%s" % (str2,str2expected))
