@@ -14,7 +14,7 @@ class dump(object):
         # and the pvid will not be printed.
         if not self.epicsParam:
             self.aliasesParam = False
-            slf.followEpicsAliases = False
+            self.followEpicsAliases = False
         self.configParam = self.configBool('config', True)
         self.counterParam = self.configBool('counter', True)
         # how much to indent sub objects in the printout
