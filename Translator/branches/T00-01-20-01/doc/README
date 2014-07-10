@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package Translator
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Brief description:
+==================
+
+The Translator package contains the Psana module based hdf5 translator.
+The module name is H5Output.
+
+Detailed description:
+=====================
+
