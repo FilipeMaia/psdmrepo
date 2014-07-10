@@ -1,6 +1,29 @@
 import time
 import numpy as np
+from itertools import chain, izip
+
 from psmon.plots import Image, MultiPlot, Hist, XYPlot
+
+
+def is_py_iter(obj):
+        """
+        Check if the object is an iterable python object excluding ndarrays
+        """
+        return hasattr(obj, '__iter__') and not isinstance(obj, np.ndarray)
+
+
+def arg_inflate(index, *args):
+        if is_py_iter(args[index]):
+            args = list(args)
+            for i in range(len(args)):
+                if i == index:
+                    continue
+                if not is_py_iter(args[i]):
+                    args[i] = [args[i]] * len(args[index])
+            return list(chain.from_iterable(izip(*args)))
+        else:
+            return args
+
 
 class Helper(object):
     def __init__(self, publisher, topic, title=None, pubrate=None):

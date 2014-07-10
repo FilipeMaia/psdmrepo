@@ -1,13 +1,12 @@
 import sys
 import logging
 import collections
-import numpy as np
-from itertools import chain, izip
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 import config
+from psmon.util import is_py_iter, arg_inflate
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -95,28 +94,8 @@ class Plot(object):
             ax.xaxis.label.set_color(self.info.fore_col)
 
     @staticmethod
-    def is_py_iter(obj):
-        """
-        Check if the object is an iterable python object excluding ndarrays
-        """
-        return hasattr(obj, '__iter__') and not isinstance(obj, np.ndarray)
-
-    @staticmethod
-    def arg_inflate(index, *args):
-        if Plot.is_py_iter(args[index]):
-            args = list(args)
-            for i in range(len(args)):
-                if i == index:
-                    continue
-                if not Plot.is_py_iter(args[i]):
-                    args[i] = [args[i]] * len(args[index])
-            return list(chain.from_iterable(izip(*args)))
-        else:
-            return args
-
-    @staticmethod
     def update_plot_data(plots, x_vals, y_vals):
-        if Plot.is_py_iter(y_vals):
+        if is_py_iter(y_vals):
             for plot, x_val, y_val in zip(plots, x_vals, y_vals):
                 plot.set_data(x_val, y_val)
         else:
@@ -180,7 +159,7 @@ class ImageClient(Plot):
 class HistClient(Plot):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
-        plot_args = self.arg_inflate(1, init_hist.bins, init_hist.values, init_hist.formats)
+        plot_args = arg_inflate(1, init_hist.bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args)
         self.set_aspect()
         self.set_xy_ranges()
@@ -197,7 +176,7 @@ class HistClient(Plot):
 class XYPlotClient(Plot):
     def __init__(self, init_plot, datagen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
-        plot_args = self.arg_inflate(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
+        plot_args = arg_inflate(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
         self.plots = self.ax.plot(*plot_args)
         self.set_aspect()
         self.set_xy_ranges()
