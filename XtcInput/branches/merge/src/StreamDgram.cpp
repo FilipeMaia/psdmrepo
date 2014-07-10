@@ -185,6 +185,12 @@ bool StreamDgramCmp::operator()(const StreamDgram &a, const StreamDgram &b) cons
 bool StreamDgramCmp::doClockCmp(const StreamDgram &a, const StreamDgram &b) const
 { 
   if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
+  int runResult = runLessGreater(a,b);
+  if (runResult > 0) return true;
+  if (runResult < 0) return false;
+  int blockResult = blockLessGreater(a,b);
+  if (blockResult > 0) return true;
+  if (blockResult < 0) return false;
   const Pds::ClockTime & clockA = a.dg()->seq.clock();
   const Pds::ClockTime & clockB = b.dg()->seq.clock();
   bool res = clockA > clockB;
@@ -198,6 +204,12 @@ bool StreamDgramCmp::doClockCmp(const StreamDgram &a, const StreamDgram &b) cons
 bool StreamDgramCmp::doFidCmp(const StreamDgram &a, const StreamDgram &b) const
 { 
   if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
+  int runResult = runLessGreater(a,b);
+  if (runResult > 0) return true;
+  if (runResult < 0) return false;
+  int blockResult = blockLessGreater(a,b);
+  if (blockResult > 0) return true;
+  if (blockResult < 0) return false;
   bool res = m_fidCompare.fiducialsGreater(*a.dg(), *b.dg());
   MsgLog(logger,DVDMSG, "doFidCmp: A > B is " << bool2str(res) << " dgrams: " << std::endl 
          << "A: " << StreamDgram::dumpStr(a) << std::endl
@@ -298,9 +310,28 @@ bool StreamDgramCmp::doMapCmp(const StreamDgram &a, const StreamDgram &b) const
   throw psana::Exception(ERR_LOC, "doMapCmp: not implmented");
 }
 
-bool StreamDgramCmp::doBadCmp(const StreamDgram &, const StreamDgram &) const
+bool StreamDgramCmp::doBadCmp(const StreamDgram &a, const StreamDgram &b) const
 { 
   throw psana::Exception(ERR_LOC, "doBadCmp called");
+}
+
+int StreamDgramCmp::runLessGreater(const StreamDgram &a, const StreamDgram &b) const 
+{
+  unsigned runA = a.file().run();
+  unsigned runB = b.file().run();
+  if (runA < runB) return -1;
+  if (runA > runB) return 1;
+  return 0;
+}
+
+int StreamDgramCmp::blockLessGreater(const StreamDgram &a, const StreamDgram &b) const
+{
+  int64_t blockA = a.L1Block();
+  int64_t blockB = b.L1Block();
+
+  if (blockA < blockB) return -1;
+  if (blockA > blockB) return 1;
+  return 0;
 }
 
 bool StreamDgramCmp::sameEvent(const StreamDgram &a, const StreamDgram &b) const {

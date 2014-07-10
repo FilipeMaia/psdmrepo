@@ -15,6 +15,7 @@
 //-----------------
 #include <map>
 #include <queue>
+#include <deque>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -93,14 +94,17 @@ protected:
   // update time in datagram
   void updateDgramTime(Pds::Dgram& dgram) const ;
 
+  // Struct to keep track of previous transition, block and run. 
   struct TransBlock {
     Pds::TransitionId::Value trans;
     uint64_t block;
     int run;
     TransBlock() :trans(Pds::TransitionId::Unknown), block(0), run(0) {};
-    TransBlock(Pds::TransitionId::Value _trans, uint64_t _block, int _run) : trans(_trans), block(_block), run(_run) {};
+    TransBlock(Pds::TransitionId::Value _trans, uint64_t _block, int _run) 
+    : trans(_trans), block(_block), run(_run) {};
     TransBlock(const TransBlock &o) : trans(o.trans), block(o.block), run(o.run) {};
-    TransBlock & operator=(const TransBlock &o) { trans = o.trans; block = o.block; run = o.run; return *this; }
+    TransBlock & operator=(const TransBlock &o) 
+    { trans = o.trans; block = o.block; run = o.run; return *this; }
   };
 
   // utilities for managing TransBlock
@@ -114,6 +118,7 @@ private:
   static std::string dumpStr(const StreamIndex &streamIndex);              // for debugging
   std::map<StreamIndex, boost::shared_ptr<XtcStreamDgIter> > m_streams ;       ///< Set of datagram iterators for streams
   std::map<StreamIndex, TransBlock> m_priorTransBlock;                        ///< TransBlock for last dgram from each stream
+
   bool m_processingDAQ;                       ///< set to true if DAQ streams exist in the merge
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)

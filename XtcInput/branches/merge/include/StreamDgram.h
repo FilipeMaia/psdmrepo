@@ -58,8 +58,14 @@ class StreamDgram : public Dgram {
    *  dgram stream: T T L L L L L L T T L L L L T T L L T T L L L T L L T  
    *  L1Block:      0 0 0 0 0 0 0 0 1 1 1 1 1 1 1 1 2 2 2 2 3 3 3 3 4 4 4
    *
+   *  The counter must increment for 'empty' L1Blocks, that can occur when a enable
+   *  Transition is followed a disable transtion. 
+   *
    *  The L1Block is relative to a run. When the run changes, the L1Block should be
    *  reset to 0.
+   *
+   *  Within a run, the L1Block counts the number of disable transitions up to and 
+   *  including the current transition.
    *
    *  It is important to construct StreamDgram with the correct L1Block value so that
    *  StreamDgramCmp will function correctly.
@@ -103,7 +109,7 @@ class StreamDgramCmp {
   /// constructor, optional clock drift map can be passed in
   StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> expClockDiff = 
                   boost::shared_ptr<ExperimentClockDiffMap>(),
-                  unsigned maxClockDrift = 120);
+                  unsigned maxClockDrift = 90);
 
   /// operator greater than for two StreamDgram's
   bool operator()(const StreamDgram &a, const StreamDgram &b) const;
@@ -126,6 +132,14 @@ class StreamDgramCmp {
   bool doBlockCmp(const StreamDgram &a, const StreamDgram &b) const;
   bool doMapCmp(const StreamDgram &a, const StreamDgram &b) const;
   bool doBadCmp(const StreamDgram &a, const StreamDgram &b) const;
+
+  // helper function for above. Based on run #, returns
+  // a < b: -1,   a==b 0   a > b: 1
+  int runLessGreater(const StreamDgram &a, const StreamDgram &b) const;
+
+  // helper function for above. Based on block #, returns
+  // a < b: -1,   a==b 0   a > b: 1
+  int blockLessGreater(const StreamDgram &a, const StreamDgram &b) const;
  private:
   const boost::shared_ptr<ExperimentClockDiffMap> m_expClockDiff;
   std::map<DgramCategoryAB, CompareMethod> m_LUT;

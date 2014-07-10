@@ -33,12 +33,40 @@
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
+namespace {
+  const char * logger = "FiducialsCompare";
+
+  const unsigned MaxFiducials = Pds::TimeStamp::MaxFiducials;
+  const unsigned HalfFiducials = Pds::TimeStamp::MaxFiducials/2;
+
+  /// how many fiducials does it take to get from A to B?
+  /// take into account wrap around.
+  unsigned fidDistanceWrap(unsigned fidA, unsigned fidB) {
+    if (fidA >= MaxFiducials) MsgLog(logger, warning, "comparing fiducial value that is greater than max. "
+                                     << " value=" << fidA << " max: " << MaxFiducials);
+    if (fidB >= MaxFiducials) MsgLog(logger, warning, "comparing fiducial value that is greater than max. "
+                                     << " value=" << fidB << " max: " << MaxFiducials);
+    unsigned res;
+    if (fidB >= fidA) {
+      res = fidB - fidA;
+    } else {
+      res = fidB + (MaxFiducials-fidA);
+    }
+    return res;
+  }
+
+};
+
 namespace XtcInput {
 
 FiducialsCompare::FiducialsCompare(unsigned maxClockDriftSeconds) : 
   m_maxClockDriftSeconds(maxClockDriftSeconds) 
 {
-  // TODO: error checking clock drift, make sure it is within fiducials cycle length
+  if (maxClockDriftSeconds > HalfFiducials/2) {
+    MsgLog(logger, 
+           error, "FiducialsCompare initialized with "
+           << maxClockDriftSeconds << " which is greater than 1/4 fiducial cycle");
+  }
 }
   
 bool FiducialsCompare::fiducialsGreater(const Pds::Dgram& A, const Pds::Dgram& B) const
@@ -50,13 +78,37 @@ bool FiducialsCompare::fiducialsGreater(const Pds::Dgram& A, const Pds::Dgram& B
 bool FiducialsCompare::fiducialsGreater(const uint32_t secondsA, const unsigned fiducialsA, 
                                         const uint32_t secondsB, const unsigned fiducialsB) const
 {
-  int64_t secondsDiff = int64_t(secondsA)-int64_t(secondsB);
-  if (secondsDiff >  int64_t(m_maxClockDriftSeconds)) return true;
-  if (secondsDiff < -int64_t(m_maxClockDriftSeconds)) return false;
-  
-  return fiducialsA > fiducialsB;
-}
+  if (secondsA >= (secondsB + maxClockDriftSeconds())) return true;
+  if ((secondsA + maxClockDriftSeconds()) <= secondsB) return false;
 
+  // the clocks are within maxClockDriftSeconds of one another
+  if (fiducialsA == fiducialsB) return false;
+  
+  // assuming maxClockDriftSeconds is < 1/4 Fiducial cycle, it is less than 
+  // 1/2 way around the fiducials to get from one to the other.
+  // If B to A is shorter, than B occurs before A in clock time, and A is greater.
+  unsigned fidBtoA = fidDistanceWrap(fiducialsB, fiducialsA);
+  bool AisGreater = (fidBtoA < HalfFiducials);
+  
+  // we can do some checking of the clocks to see if the drift is what we expect.
+  // we print a warning if not. This code could be removed for performance purposes.
+  float BtoAdriftSec, fidBtoAsec;
+  if (AisGreater) {
+    fidBtoAsec = fidBtoA/360.0;
+  } else {
+    fidBtoAsec = -((MaxFiducials - fidBtoA)/360.0);
+  }
+  BtoAdriftSec = float(secondsA) - float(secondsB) - fidBtoAsec;
+  if (BtoAdriftSec > maxClockDriftSeconds() or -BtoAdriftSec > maxClockDriftSeconds()) {
+      MsgLog(logger, warning, "clock drift " << BtoAdriftSec 
+             << " exceeds " << maxClockDriftSeconds()
+             << " secondsA=" << secondsA << " fidA=" << fiducialsA
+             << " secondsB=" << secondsB << " fidB=" << fiducialsB);
+  }
+
+  return AisGreater;
+}
+  
 bool FiducialsCompare::fiducialsEqual(const Pds::Dgram& A, const Pds::Dgram& B) const
 {
   return fiducialsEqual(A.seq.clock().seconds(), A.seq.stamp().fiducials(),
@@ -67,7 +119,12 @@ bool FiducialsCompare::fiducialsEqual(const uint32_t secondsA, const unsigned fi
                                       const uint32_t secondsB, const unsigned fiducialsB) const 
 {
   if (fiducialsA != fiducialsB) return false;
-  return std::abs(int64_t(secondsA) - int64_t(secondsB)) < m_maxClockDriftSeconds;
+  if (secondsA >= secondsB) {
+    if ((secondsA - secondsB) < maxClockDriftSeconds()) return true;
+  } else {
+    if ((secondsB - secondsA) < maxClockDriftSeconds()) return true;
+  }
+  return false;
 }
 
 } // namespace XtcInput

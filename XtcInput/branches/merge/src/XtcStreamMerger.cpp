@@ -38,7 +38,13 @@
 
 namespace {
 
-  const char* logger = "XtcInput.XtcStreamMerger" ;
+const char* logger = "XtcInput.XtcStreamMerger" ;
+
+bool isDisable(const XtcInput::Dgram &dg) {
+  if (dg.empty()) return false;
+  Pds::TransitionId::Value nextService = dg.dg()->seq.service();
+  return (nextService == Pds::TransitionId::Disable);
+}
 
 }
 
@@ -140,7 +146,7 @@ XtcStreamMerger::next()
     TransBlock lastTransBlock = m_priorTransBlock[replaceStreamIndex];
     uint64_t replaceBlock = getNextBlock(lastTransBlock, replaceDg);
     m_priorTransBlock[replaceStreamIndex] = makeTransBlock(replaceDg, replaceBlock);
-    
+
     // skip over transition dgrams in control streams if we are processing DAQ streams -
     // they should contain no event data and comparing them is more difficult
     bool skip = false;
@@ -216,7 +222,9 @@ uint64_t  XtcStreamMerger::getNextBlock(const TransBlock & prevTransBlock, const
   int nextRun = dg.file().run();
   if (nextRun != prevTransBlock.run) return 0;
   Pds::TransitionId::Value nextService = dg.dg()->seq.service();
-  if ((prevTransBlock.trans == Pds::TransitionId::L1Accept) and (nextService != Pds::TransitionId::L1Accept)) {
+  // increment the block count if we see a Disable, and the prior transition was not a disable
+  // generally there should not be two disable's in a row, this protects against problems in the data
+  if ((prevTransBlock.trans != Pds::TransitionId::Disable) and (nextService == Pds::TransitionId::Disable)) {
     return prevTransBlock.block + 1;
   }
   return prevTransBlock.block;
