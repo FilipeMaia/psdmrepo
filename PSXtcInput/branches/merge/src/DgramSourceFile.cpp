@@ -41,7 +41,7 @@ using namespace XtcInput;
 
 namespace {
 
-  const unsigned MAX_SEC_DRIFT_FOR_FIDUCIAL_MATCH = 120;
+  const unsigned MAX_SEC_DRIFT_FOR_FIDUCIAL_MATCH = 90;
 
   bool isL1Accept(const XtcInput::Dgram &dg) {
     if (dg.empty()) return false;
