@@ -20,12 +20,11 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "numpy"
-pkg_ver = "1.6.2"
+pkg_ver = "1.8.1"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 
 libdir = 'lib'
-if env['PYTHON'] == 'python2.4': libdir = '$LIB_ABI'
 PYDIR = pjoin(libdir, '$PYTHON', "site-packages", pkg)
 PYDIRSEP = True
 INCDIR = pjoin(PYDIR, "core", "include", pkg)
