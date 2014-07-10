@@ -137,7 +137,7 @@ void SplitScanMgr::updateCalibCycleExtLinks(enum UpdateExtLinksMode updateMode) 
     size_t calibCycle = lnks->first;
     MasterLinkToWrite & masterLinkToWrite = lnks->second;
     if ((updateMode == writeAll) or 
-        (updateMode == writeFinishedOnly) and calibFileIsFinished(calibCycle)) {
+        ((updateMode == writeFinishedOnly) and calibFileIsFinished(calibCycle))) {
       createCalibCycleExtLink(masterLinkToWrite.linkName.c_str(), 
                               calibCycle, 
                               masterLinkToWrite.linkGroupLoc);

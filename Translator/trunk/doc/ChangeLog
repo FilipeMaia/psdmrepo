@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-25
+2014-07-10 David Schneider
+- Adjust unit test for new version of numpy
+  address warning on rhel6
+
 Tag: V00-01-24
 2014-07-09 David Schneider
 - Better implementation of master file. Only last
