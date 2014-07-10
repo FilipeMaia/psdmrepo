@@ -20,8 +20,8 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "tables"
-pkg_ver = "3.0.0"
-pkg_dir = "3.0.0-1.8.6-$PYTHON"
+pkg_ver = "3.0.0a"
+pkg_dir = "3.0.0a"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
@@ -33,8 +33,8 @@ standardExternalPackage(pkg, **locals())
 
 # numexpr is needed by tables
 pkg = "numexpr"
-pkg_ver = "2.2.2"
-pkg_dir = "2.2.2-$PYTHON"
+pkg_ver = "2.2.2a"
+pkg_dir = "2.2.2a"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
