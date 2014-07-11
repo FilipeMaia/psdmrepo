@@ -2,12 +2,12 @@ import sys
 import logging
 import collections
 import numpy as np
-from itertools import chain, izip
 
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
 import config
+from psmon.util import is_py_iter, arg_inflate_tuple
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -139,7 +139,9 @@ class ImageClient(Plot):
 class XYPlotClient(Plot):
     def __init__(self, init_plot, framegen, info, rate=1):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
-        self.plot = self.plot_view.plot(x=init_plot.xdata, y=init_plot.ydata, pen=config.PYQT_PLOT_PEN)
+        self.plots = []
+        for xdata, ydata, format in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
+            self.plots.append(self.plot_view.plot(x=xdata, y=ydata, pen=config.PYQT_PLOT_PEN))
 
     def update(self, data):
         """
@@ -147,14 +149,18 @@ class XYPlotClient(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            self.plot.setData(x=data.xdata, y=data.ydata, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
-        return self.plot
+            for plot, data_tup in zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats)):
+                xdata, ydata, formats = data_tup
+                plot.setData(x=xdata, y=ydata, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
+        return self.plots
 
 
 class HistClient(Plot):
     def __init__(self, init_hist, framegen, info, rate=1):
         super(HistClient, self).__init__(init_hist, framegen, info, rate)
-        self.hist = self.plot_view.plot(x=init_hist.bins, y=init_hist.values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+        self.hists = []
+        for bins, values, format in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
+            self.hists.append(x=bins, y=values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
 
     def update(self, data):
         """
@@ -162,5 +168,7 @@ class HistClient(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            self.hist.setData(x=data.bins, y=data.values, stepMode=True)
-        return self.hist
+            for hist, data_tup in zip(self.hists, arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats)):
+                bins, values, formats = data_tup
+                hist.setData(x=bins, y=values, stepMode=True)
+        return self.hists

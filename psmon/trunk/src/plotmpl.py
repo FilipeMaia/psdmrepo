@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
 import config
-from psmon.util import is_py_iter, arg_inflate
+from psmon.util import is_py_iter, arg_inflate_flat
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -159,7 +159,7 @@ class ImageClient(Plot):
 class HistClient(Plot):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
-        plot_args = arg_inflate(1, init_hist.bins, init_hist.values, init_hist.formats)
+        plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args)
         self.set_aspect()
         self.set_xy_ranges()
@@ -176,7 +176,7 @@ class HistClient(Plot):
 class XYPlotClient(Plot):
     def __init__(self, init_plot, datagen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
-        plot_args = arg_inflate(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
+        plot_args = arg_inflate_flat(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
         self.plots = self.ax.plot(*plot_args)
         self.set_aspect()
         self.set_xy_ranges()
