@@ -293,6 +293,8 @@ class TranslatorJob(object) :
                                    self._get_config('config',  _defCfgFileName, True))
         cmd_list.append("-c")
         cmd_list.append(cfgFilePath)
+        cmd_list.append("-o")
+        cmd_list.append("psana.dump_config_file")
 
         ## modules  
         #if self._get_config('calib-enable', 0) != 0:

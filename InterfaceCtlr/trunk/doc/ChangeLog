@@ -10,6 +10,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-09
+2014-07-11 Igor Gaponenko
+- forcing the Translator job to dump the configuration file into STDOUT
+in TranslatorJobPsana.py
+
 Tag: V01-03-07
 2014-06-12 Igor Gaponenko
 - configuring psana modules of the Translator via a configuration file rather than
