@@ -68,19 +68,6 @@ namespace {
     return a-b;
   }
 
-  bool fiducialSecondsMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) {
-    if (dgA.empty() or dgB.empty()) return false;
-    XtcInput::Dgram::ptr pDgA = dgA.dg();
-    XtcInput::Dgram::ptr pDgB = dgB.dg();
-    unsigned fidA = pDgA->seq.stamp().fiducials();
-    unsigned fidB = pDgB->seq.stamp().fiducials();
-    if (fidA != fidB) return false;
-    unsigned secA = pDgA->seq.clock().seconds();
-    unsigned secB = pDgB->seq.clock().seconds();
-    unsigned drift = absDiff(secA,secB);
-    return drift < MAX_SEC_DRIFT_FOR_FIDUCIAL_MATCH;
-  }
-
   bool clockTimesMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) {
     if (dgA.empty() or dgB.empty()) return false;
     XtcInput::Dgram::ptr pDgA = dgA.dg();
@@ -147,13 +134,15 @@ DgramSourceFile::init()
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
   m_firstControlStream = config("first_control_stream",80);
+  m_maxStreamClockDiffSec = config("max_stream_clock_diff",85);
   m_readerThread.reset( new boost::thread( DgramReader ( m_fileNames.begin(), 
                                                          m_fileNames.end(),
                                                          *m_dgQueue, 
                                                          merge, liveDbConn, 
                                                          liveTable, liveTimeout, 
                                                          l1offset, 
-                                                         m_firstControlStream) ) );
+                                                         m_firstControlStream,
+                                                         m_maxStreamClockDiffSec) ) );
 }
 
 
@@ -169,7 +158,7 @@ DgramSourceFile::next(std::vector<XtcInput::Dgram>& eventDg, std::vector<XtcInpu
       XtcInput::Dgram nextDg =  m_dgQueue->front();
       if (sameEvent(dg, nextDg)) {
         nextDg = m_dgQueue->pop();
-        eventDg.push_back(dg);
+        eventDg.push_back(nextDg);
       } else {
         foundDgramForDifferentEvent = true;
       }
@@ -182,19 +171,32 @@ DgramSourceFile::next(std::vector<XtcInput::Dgram>& eventDg, std::vector<XtcInpu
 
 bool DgramSourceFile::sameEvent(const XtcInput::Dgram &eventDg, const XtcInput::Dgram &otherDg) const
 {
-  if (isL1Accept(otherDg) and isL1Accept(eventDg) and 
-      (isFiducialMatchStream(otherDg, m_firstControlStream) or
-       isFiducialMatchStream(eventDg, m_firstControlStream)) and
+  if (::isL1Accept(otherDg) and ::isL1Accept(eventDg) and 
+      (::isFiducialMatchStream(otherDg, m_firstControlStream) or
+       ::isFiducialMatchStream(eventDg, m_firstControlStream)) and
       fiducialSecondsMatch(eventDg, otherDg)) {
     return true;
   }
-  if ((not isL1Accept(otherDg)) and
-      (not isL1Accept(eventDg)) and 
-      transitionsMatch(otherDg, eventDg) and
-      clockTimesMatch(otherDg, eventDg)) {
+  if ((not ::isL1Accept(otherDg)) and
+      (not ::isL1Accept(eventDg)) and 
+      ::transitionsMatch(otherDg, eventDg) and
+      ::clockTimesMatch(otherDg, eventDg)) {
     return true;
   }
   return false;
+}
+
+bool DgramSourceFile::fiducialSecondsMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) const {
+  if (dgA.empty() or dgB.empty()) return false;
+  XtcInput::Dgram::ptr pDgA = dgA.dg();
+  XtcInput::Dgram::ptr pDgB = dgB.dg();
+  unsigned fidA = pDgA->seq.stamp().fiducials();
+  unsigned fidB = pDgB->seq.stamp().fiducials();
+  if (fidA != fidB) return false;
+  unsigned secA = pDgA->seq.clock().seconds();
+  unsigned secB = pDgB->seq.clock().seconds();
+  unsigned drift = ::absDiff(secA,secB);
+  return drift < m_maxStreamClockDiffSec;
 }
 
 

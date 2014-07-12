@@ -22,7 +22,6 @@
 #include <algorithm>
 #include <iterator>
 #include <vector>
-#include <sstream>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
 
@@ -41,6 +40,7 @@
 #include "XtcInput/XtcFileName.h"
 #include "XtcInput/XtcIterator.h"
 #include "XtcInput/MergeMode.h"
+#include "XtcInput/DgramList.h"
 
 #include "PSEvt/DamageMap.h"
 
@@ -54,29 +54,6 @@ namespace {
 
 
   const char * logger = "XtcInputModuleBase";
-
-  std::string dumpStr(const XtcInput::Dgram &dg) {
-    if (dg.empty()) return "empty dgram";
-    std::ostringstream msg;
-    const Pds::Dgram *dgram = dg.dg().get();
-    const Pds::Sequence & seq = dgram->seq;
-    const Pds::Env & env = dgram->env;
-    const Pds::ClockTime & clock = seq.clock();
-    const Pds::TimeStamp & stamp = seq.stamp();
-    msg << "tp=" << int(seq.type())
-        << " sv=" << Pds::TransitionId::name(seq.service())
-        << " ex=" << seq.isExtended()
-        << " ev=" << seq.isEvent()
-        << " sec=" << std::hex << clock.seconds()
-        << " nano=" << std::hex << clock.nanoseconds()
-        << " tcks=" << std::hex << stamp.ticks()
-        << " fid=" << stamp.fiducials()
-        << " ctrl=" << stamp.control()
-        << " vec=" << stamp.vector()
-        << " env=" << env.value()
-        << " file=" << dg.file().path();
-    return msg.str();
-  }
 
   // return true if all datagrams contains EPICS data only
   bool epicsOnly(const std::vector<XtcInput::Dgram>& dgs)
@@ -210,20 +187,27 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
       }
     }
 
-    // order the datagrams by stream number so that we get DAQ streams first    
+    // If the same EventKey is in both the DAQ and Control stream,
+    // we want the DAQ stream to take precedence.
+    // For the Env, we can do this by processing the DAQ stream last 
+    // (it will overwrite the entry from the Control stream).
+    // For the Event, we process the DAQ stream first, then an error will
+    // be generated when processing the Control stream.
     sort(eventDg.begin(), eventDg.end(), LessStream());
     sort(nonEventDg.begin(), nonEventDg.end(), LessStream());
 
-    // push non-event stuff to environment
-    // usually first transition (Configure) should not have any non-event attached data
-    BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
+    // push non-event stuff to environment. 
+    // Iterate in reverse to process DAQ streams last and overwrite 
+    // duplicate entries with the Control streams.
+    // Usually first transition (Configure) should not have any non-event attached data
+    BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
       fillEnv(dg, env);
     }
 
     MsgLog(logger,trace,"beginJob datagrams: ");
     int idx=0;
     BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-      MsgLog(logger,trace,"  dg " << idx << ": " << dumpStr(dg));
+      MsgLog(logger,debug,"  dg " << idx << ": " << Dgram::dumpStr(dg));
       ++idx;
     }
 
@@ -254,22 +238,24 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
 
     // get the transition clock time, event id, and event datagram from the first
     // event in the list which should have the smallest stream number based on prior sort. 
-    // TODO: update to add list of all eventId's and all Dgrams
     XtcInput::Dgram firstDg = eventDg.front();
 
     m_transitions[firstDg.dg()->seq.service()] = firstDg.dg()->seq.clock();
 
-    fillEventDg(firstDg, evt);
+    fillEventDgList(eventDg, evt);
     fillEventId(firstDg, evt);
 
     boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
     evt.put(damageMap);
 
-    BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-
+    // process in reverse to get DAQ streams after control streams
+    BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
       // Store configuration info in the environment
       fillEnv(dg, env);
+    }
 
+    // process in in order to get DAQ streams before control streams
+    BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
       // there is BLD data in Configure which is event-like data
       fillEvent(dg, evt, env);
     }
@@ -289,7 +275,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     MsgLog(name(), debug, name() << ": simulated EOR");
     if (m_putBack.size()) {
       fillEventId(m_putBack[0], evt);
-      fillEventDg(m_putBack[0], evt);
+      fillEventDgList(m_putBack, evt);
     }
     // negative means stop at next call
     m_simulateEOR = -1;
@@ -320,14 +306,15 @@ XtcInputModuleBase::event(Event& evt, Env& env)
         MsgLog(name(), debug, "EOF seen");
         return Stop;
       }
-      // sort by stream number to get typical DAQ stream in the front
+      // sort by stream number to get DAQ stream in the front
       sort(eventDg.begin(), eventDg.end(), LessStream());
       sort(nonEventDg.begin(), nonEventDg.end(), LessStream());
 
     }
 
-    // push all non-event stuff into environment
-    BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
+    // push all non-event stuff into environment, reverse order to 
+    // process DAQ streams after Control streams
+    BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
       fillEnv(dg, env);
     }
 
@@ -342,14 +329,12 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       // print the dgram headers since they don't have the same transition
       int idx = 0;
       BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-        MsgLog(name(),info,"  dg " << idx <<": " << dumpStr(dg));
+        MsgLog(name(),info,"  dg " << idx <<": " << Dgram::dumpStr(dg));
         ++idx;
       }
     }
     // We use the first datagram in eventDg for the transition, and clock.
     // The clock will differ between DAQ and control streams - 
-    // TODO: revisit model to deal with different clocks in the events should look into 
-    // propogat
     const Pds::Sequence& seq = eventDg.front().dg()->seq;
     const Pds::ClockTime& clock = seq.clock();
     Pds::TransitionId::Value trans = seq.service();
@@ -362,7 +347,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::Configure:
       if (not (clock == m_transitions[trans])) {
         m_transitions[trans] = clock;
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
         }
       }
@@ -382,7 +367,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       // signal new run, content is not relevant
       if (not (clock == m_transitions[trans])) {
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         status = BeginRun;
         found = true;
         m_transitions[trans] = clock;
@@ -393,7 +378,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       // signal end of run, content is not relevant
       if (not (clock == m_transitions[trans])) {
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         // reset run number, so that if next BeginRun is missing we don't reuse this run
         m_run = -1;
         status = EndRun;
@@ -405,11 +390,11 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::BeginCalibCycle:
       // copy config data and signal new calib cycle
       if (not (clock == m_transitions[trans])) {
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
         }
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         status = BeginCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -420,7 +405,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       // stop calib cycle
       if (not (clock == m_transitions[trans])) {
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         status = EndCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -434,7 +419,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
         // did not pass L3, its payload is usually empty but if there is Epics
         // data in the event it may be preserved, so try to save it
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
         }
 
@@ -442,7 +427,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
         // datagram is likely filtered, has only epics data and users do not need to
         // see it. Do not count it as an event too, just save EPICS data and move on.
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
         }
 
@@ -451,7 +436,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
         // reached event limit, will go in simulated end-of-run
         MsgLog(name(), debug, name() << ": event limit reached, simulated EndCalibCycle");
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         found = true;
         status = EndCalibCycle;
         m_simulateEOR = 1;
@@ -462,7 +447,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
         // skipping the events, note that things like environment and EPICS need to be updated
         MsgLog(name(), debug, name() << ": skipping event");
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
         }
         found = true;
@@ -474,12 +459,14 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
         boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
         evt.put(damageMap);
-        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEnv(dg, env);
+        }
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
           fillEvent(dg, evt, env);
         }
         fillEventId(eventDg.front(), evt);
-        fillEventDg(eventDg.front(), evt);
+        fillEventDgList(eventDg, evt);
         found = true;
         status = DoEvent;
 
@@ -548,7 +535,6 @@ XtcInputModuleBase::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
   }
 }
 
-// Fill event with datagram contents
 void
 XtcInputModuleBase::fillEventId(const XtcInput::Dgram& dg, Event& evt)
 {
@@ -570,16 +556,20 @@ XtcInputModuleBase::fillEventId(const XtcInput::Dgram& dg, Event& evt)
   evt.put(eventId);
 }
 
-// Fill event with datagram contents
 void
-XtcInputModuleBase::fillEventDg(const XtcInput::Dgram& dg, Event& evt)
+XtcInputModuleBase::fillEventDgList(const std::vector<XtcInput::Dgram> & dgList, Event& evt)
 {
-  MsgLog(name(), debug, name() << ": in fillEventDg()");
+  MsgLog(name(), debug, name() << ": in fillEventDgList()");
 
-  Dgram::ptr dgptr = dg.dg();
+  boost::shared_ptr< XtcInput::DgramList > dgramList = 
+    boost::make_shared< XtcInput::DgramList >();
 
-  // Store datagram itself in the event
-  evt.put(dgptr);
+  BOOST_FOREACH(const XtcInput::Dgram & dg, dgList) {
+    dgramList->push_back(dg);
+  }
+
+  // Store list of datagrams in the event
+  evt.put(dgramList);
 }
 
 // Fill environment with datagram contents
@@ -605,9 +595,7 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
       while (Pds::Xtc* xtc = iter1.next()) {
         if (xtc->contains.id() == Pds::TypeId::Id_AliasConfig) {
 
-          // need to fill alias maps, clear it first from old entries
           boost::shared_ptr<PSEvt::AliasMap> amap = env.aliasMap();
-          amap->clear();
 
           if (xtc->contains.version() == 1) {
             const Pds::Alias::ConfigV1* cfgV1 = (const Pds::Alias::ConfigV1*)xtc->payload();

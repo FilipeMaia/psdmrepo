@@ -89,8 +89,8 @@ protected:
   /// Fill event with EventId information
   void fillEventId(const XtcInput::Dgram& dg, Event& evt);
 
-  /// Fill event with Datagram
-  void fillEventDg(const XtcInput::Dgram& dg, Event& evt);
+  /// Fill event with Datagram list
+  void fillEventDgList(const std::vector<XtcInput::Dgram>& dgList, Event& evt);
 
   /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);

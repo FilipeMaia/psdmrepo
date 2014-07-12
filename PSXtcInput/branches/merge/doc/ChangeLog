@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-00
+2014-07-xx David Schneider
+- Control stream support: trac ticket #279. Before, we never merged dg's into 
+  the same event, now merge it if least on dgram is from control (sec/fid match)
+- do not clear AliasMap, merge aliases, trac ticket #314
+- API change: store XtcInput::DgramList rather than Pds::Dgram in Event
+- new [psana] config parameter: first_control_stream  (defaults to 80)
+
 Tag: V00-14-08
 2014-06-23 Christopher O'Grady
 - Handle large events more intelligently (previously would crash if

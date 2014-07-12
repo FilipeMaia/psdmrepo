@@ -96,7 +96,30 @@ public:
 
 protected:
 
+  /**
+   *  @brief returns true if two datagrams are part of the same event.
+   *
+   *  For regular data (L1Accept transitions) will only return true if at least one
+   *  is a ControlStream and there is a sec/fid match. Two non-L1's match if the
+   *  clocks are the same.
+   *
+   *  @param eventDg first datagram
+   *  @param otherDg second datagram
+   *  @return false if not part of the same event, true if they are
+   */
   bool sameEvent(const XtcInput::Dgram &eventDg, const XtcInput::Dgram &otherDg) const;
+
+  /**
+   *  @brief returns true if two datagrams fiducials match, and their seconds are close
+   *
+   *  max difference in seconds for clocks can be changed with psana option 
+   *  max_stream_clock_diff, however this should not be neccessary.
+   *
+   *  @param eventDg first datagram
+   *  @param otherDg second datagram
+   *  @return true if they match, false otherwise
+   */
+  bool fiducialSecondsMatch(const XtcInput::Dgram &dgA, const XtcInput::Dgram &dgB) const;
 
 private:
 
@@ -104,7 +127,7 @@ private:
   boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
   std::vector<std::string> m_fileNames;               ///< List of file names/datasets to read data from
   int m_firstControlStream;                           ///< Starting index of control streams
-
+  unsigned m_maxStreamClockDiffSec;                   ///< Maximum clock difference between streams (in seconds)
 };
 
 } // namespace PSXtcInput
