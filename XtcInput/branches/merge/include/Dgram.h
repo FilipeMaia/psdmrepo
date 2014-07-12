@@ -80,6 +80,8 @@ public:
   
   bool operator< (const Dgram&) const; 
 
+  static std::string dumpStr(const XtcInput::Dgram &dg);
+
 private:
   
   /**
@@ -97,6 +99,7 @@ private:
   ptr m_dg;
   XtcFileName m_file;
 };
+
 
 } // namespace XtcInput
 

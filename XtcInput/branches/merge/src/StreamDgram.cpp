@@ -3,7 +3,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/StreamDgram.h"
 
-#define DVDMSG debug
+#define DBGMSGLVL debug
 
 namespace {
   char *logger = "StreamDgram";
@@ -56,9 +56,8 @@ std::string StreamDgram::dumpStr(const StreamDgram & dg) {
   return msg.str();
 }
 
-StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> expClockDiff, 
-                                 unsigned maxClockDriftSeconds) 
-  : m_expClockDiff(expClockDiff), m_fidCompare(maxClockDriftSeconds) {
+StreamDgramGreater::StreamDgramGreater(unsigned maxClockDriftSeconds) 
+  : m_fidCompare(maxClockDriftSeconds) {
   DgramCategory LD(L1Accept, StreamDgram::DAQ);
   DgramCategory LC(L1Accept, StreamDgram::controlUnderDAQ);
   DgramCategory LI(L1Accept, StreamDgram::controlIndependent);
@@ -74,9 +73,9 @@ StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> e
      The 21 cases cover all combinations we may see when merging dgrams from streams. 
      Issues that go into the merging rules:
      *  There may be multiple C streams (s80, s81)
-     *  Not all L1 accepts in a C stream will have a matching L1 Accept in the DAQ stream. 
-        We want to order them properly, the consumer class can decide if it wants to use 
-        non-matching C stream L1 accepts.
+     *  Not all L1Accepts in a C stream will have a matching L1Accept in the DAQ stream. 
+     *  We do not want to throw away L1Accepts from the s80, if they do not match a 
+        DAQ stream, we want to order them correctly.
      *  Comparing a C stream L1 accept against D or C stream Transitions requires history.
         The clocks are different and fiducials in both are not available, and the C stream
         L1 accept need not have a matching L1 in the Daq stream. This is when the block number 
@@ -85,48 +84,52 @@ StreamDgramCmp::StreamDgramCmp(const boost::shared_ptr<ExperimentClockDiffMap> e
         guaranteed that the clock for an L1 accept following a DAQ transition has a later time
         than the clock for the transition. We assume that all L1 accepts before the transition 
         should appear earlier, and likewise all L1 accepts after should appear after.
-      
      *  Comparing from a D to a I stream is difficult. The clocks are different, and the 
         Transitions are not synchronized. A fiducial compare is reasonable for L1 vs. L1, but 
         to compare Transitions between D and I, we are stuck. If we knew the difference in the 
-        clocks down to the nanosecond we could determine when two transitions are equal, but 
-        also, how is that useful? If we compare a Transition in a DAQ stream against a L1 accept
-        in a Independent stream, we are more stuck. We can't rely on clocks to compare T vs L1,
-        and comparing block numbers doesn't make sense between I and D. We call all these badCmp
-    
+        clocks down to the nanosecond we could determine when two transitions are equal. However
+        what calib cycles should we present to the user? 
+     *  At this point, the C and I streams are not supposed to have anything useful in their
+        Transition dgrams (other than the Configure transition). 
+     *  We cannot compare anything from independent streams. One the one hand, a LD vs. an LI is
+        fiducials based, but we first check the run and L1Block count. Before we compare anything
+        from an independent stream, we need a process that assigns L1Block numbers to Dgrams from
+        the Independent streams that are synchronized with those of the DAQ/Control streams. 
+        Hence all comparisions involving a TI or LI (even against themselves) are presently marked
+        badGreater.
      ------------------------------------------------------------------- */
-  m_LUT[makeDgramCategoryAB(LD,LD)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(LD,LC)] = fidCmp;
-  m_LUT[makeDgramCategoryAB(LD,LI)] = fidCmp;
-  m_LUT[makeDgramCategoryAB(LD,TD)] = blockCmp;
-  m_LUT[makeDgramCategoryAB(LD,TC)] = blockCmp;
-  m_LUT[makeDgramCategoryAB(LD,TI)] = badCmp; 
+  m_LUT[makeDgramCategoryAB(LD,LD)] = fidGreater;
+  m_LUT[makeDgramCategoryAB(LD,LC)] = fidGreater;
+  m_LUT[makeDgramCategoryAB(LD,LI)] = badGreater;
+  m_LUT[makeDgramCategoryAB(LD,TD)] = blockGreater;
+  m_LUT[makeDgramCategoryAB(LD,TC)] = blockGreater;
+  m_LUT[makeDgramCategoryAB(LD,TI)] = badGreater; 
 
-  m_LUT[makeDgramCategoryAB(LC,LC)] = fidCmp;
-  m_LUT[makeDgramCategoryAB(LC,LI)] = fidCmp;
-  m_LUT[makeDgramCategoryAB(LC,TD)] = blockCmp;
-  m_LUT[makeDgramCategoryAB(LC,TC)] = blockCmp;
-  m_LUT[makeDgramCategoryAB(LC,TI)] = badCmp; 
+  m_LUT[makeDgramCategoryAB(LC,LC)] = fidGreater;
+  m_LUT[makeDgramCategoryAB(LC,LI)] = badGreater;
+  m_LUT[makeDgramCategoryAB(LC,TD)] = blockGreater;
+  m_LUT[makeDgramCategoryAB(LC,TC)] = blockGreater;
+  m_LUT[makeDgramCategoryAB(LC,TI)] = badGreater; 
 
-  m_LUT[makeDgramCategoryAB(LI,LI)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(LI,TD)] = badCmp;
-  m_LUT[makeDgramCategoryAB(LI,TC)] = badCmp;
-  m_LUT[makeDgramCategoryAB(LI,TI)] = blockCmp;
+  m_LUT[makeDgramCategoryAB(LI,LI)] = badGreater;
+  m_LUT[makeDgramCategoryAB(LI,TD)] = badGreater;
+  m_LUT[makeDgramCategoryAB(LI,TC)] = badGreater;
+  m_LUT[makeDgramCategoryAB(LI,TI)] = badGreater;
 
-  m_LUT[makeDgramCategoryAB(TD,TD)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(TD,TC)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(TD,TI)] = mapCmp;
+  m_LUT[makeDgramCategoryAB(TD,TD)] = clockGreater;
+  m_LUT[makeDgramCategoryAB(TD,TC)] = clockGreater;
+  m_LUT[makeDgramCategoryAB(TD,TI)] = badGreater;
 
-  m_LUT[makeDgramCategoryAB(TC,TC)] = clockCmp;
-  m_LUT[makeDgramCategoryAB(TC,TI)] = mapCmp;
+  m_LUT[makeDgramCategoryAB(TC,TC)] = clockGreater;
+  m_LUT[makeDgramCategoryAB(TC,TI)] = badGreater;
 
-  m_LUT[makeDgramCategoryAB(TI,TI)] = clockCmp;
+  m_LUT[makeDgramCategoryAB(TI,TI)] = badGreater;
 }
   
-StreamDgramCmp::DgramCategory StreamDgramCmp::getDgramCategory(const StreamDgram &dg) {
+StreamDgramGreater::DgramCategory StreamDgramGreater::getDgramCategory(const StreamDgram &dg) {
   if (dg.empty()) {
     MsgLog(logger, warning, "getDgramCategory called on empty dgram");
-    return StreamDgramCmp::DgramCategory(L1Accept, StreamDgram::DAQ);
+    return StreamDgramGreater::DgramCategory(L1Accept, StreamDgram::DAQ);
   }
 
   TransitionType trans;
@@ -135,15 +138,15 @@ StreamDgramCmp::DgramCategory StreamDgramCmp::getDgramCategory(const StreamDgram
   } else {
     trans = otherTrans;
   }
-  return StreamDgramCmp::DgramCategory(trans, dg.streamType());
+  return StreamDgramGreater::DgramCategory(trans, dg.streamType());
 }
 
-StreamDgramCmp::DgramCategoryAB StreamDgramCmp::makeDgramCategoryAB(DgramCategory a, DgramCategory b) {
-  return StreamDgramCmp::DgramCategoryAB(a,b);
+StreamDgramGreater::DgramCategoryAB StreamDgramGreater::makeDgramCategoryAB(DgramCategory a, DgramCategory b) {
+  return StreamDgramGreater::DgramCategoryAB(a,b);
 }
 
 // implement greater than, 
-bool StreamDgramCmp::operator()(const StreamDgram &a, const StreamDgram &b) const {
+bool StreamDgramGreater::operator()(const StreamDgram &a, const StreamDgram &b) const {
   // two empty datagrams are equal to one another
   if (a.empty() and b.empty()) return false;
  
@@ -152,39 +155,36 @@ bool StreamDgramCmp::operator()(const StreamDgram &a, const StreamDgram &b) cons
   if (a.empty()) return true;
   if (b.empty()) return false;
 
-  StreamDgramCmp::DgramCategory dgramCategA = getDgramCategory(a);
-  StreamDgramCmp::DgramCategory dgramCategB = getDgramCategory(b);
-  StreamDgramCmp::DgramCategoryAB dgramCategAB = makeDgramCategoryAB(dgramCategA, dgramCategB);
+  StreamDgramGreater::DgramCategory dgramCategA = getDgramCategory(a);
+  StreamDgramGreater::DgramCategory dgramCategB = getDgramCategory(b);
+  StreamDgramGreater::DgramCategoryAB dgramCategAB = makeDgramCategoryAB(dgramCategA, dgramCategB);
   std::map<DgramCategoryAB, CompareMethod>::const_iterator pos = m_LUT.find(dgramCategAB);
   if (pos == m_LUT.end()) {
-    StreamDgramCmp::DgramCategoryAB dgramCategBA = makeDgramCategoryAB(dgramCategB, dgramCategA);
+    StreamDgramGreater::DgramCategoryAB dgramCategBA = makeDgramCategoryAB(dgramCategB, dgramCategA);
     pos = m_LUT.find(dgramCategBA);
-    if (pos == m_LUT.end()) throw UnknownCmp(ERR_LOC);
+    if (pos == m_LUT.end()) throw UnknownGreater(ERR_LOC);
   }
-  StreamDgramCmp::CompareMethod compareMethod = pos->second;
+  StreamDgramGreater::CompareMethod compareMethod = pos->second;
   
   switch (compareMethod) {
-  case clockCmp:
-    return doClockCmp(a,b);
-  case fidCmp:
-    return doFidCmp(a,b);
-  case blockCmp:
-    return doBlockCmp(a,b);
-  case mapCmp:
-    return doMapCmp(a,b);
-  case badCmp:
-    return doBadCmp(a,b);
+  case clockGreater:
+    return doClockGreater(a,b);
+  case fidGreater:
+    return doFidGreater(a,b);
+  case blockGreater:
+    return doBlockGreater(a,b);
+  case badGreater:
+    return doBadGreater(a,b);
   }
 
-  MsgLog(logger, fatal, "StreamDgramCmp: unexpected error. compare method in look up table = " 
+  MsgLog(logger, fatal, "StreamDgramGreater: unexpected error. compare method in look up table = " 
          << int(compareMethod) << " was not handled in switch statement");
   return false;
 }
 
-// return true is a > b
-bool StreamDgramCmp::doClockCmp(const StreamDgram &a, const StreamDgram &b) const
+bool StreamDgramGreater::doClockGreater(const StreamDgram &a, const StreamDgram &b) const
 { 
-  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
+  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramGreater: empty dgs");
   int runResult = runLessGreater(a,b);
   if (runResult > 0) return true;
   if (runResult < 0) return false;
@@ -194,16 +194,15 @@ bool StreamDgramCmp::doClockCmp(const StreamDgram &a, const StreamDgram &b) cons
   const Pds::ClockTime & clockA = a.dg()->seq.clock();
   const Pds::ClockTime & clockB = b.dg()->seq.clock();
   bool res = clockA > clockB;
-  MsgLog(logger,DVDMSG, "doClockCmp: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+  MsgLog(logger,DBGMSGLVL, "doClockGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
   return res;
 }
 
-// return true is a > b
-bool StreamDgramCmp::doFidCmp(const StreamDgram &a, const StreamDgram &b) const
+bool StreamDgramGreater::doFidGreater(const StreamDgram &a, const StreamDgram &b) const
 { 
-  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
+  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramGreater: empty dgs");
   int runResult = runLessGreater(a,b);
   if (runResult > 0) return true;
   if (runResult < 0) return false;
@@ -211,23 +210,23 @@ bool StreamDgramCmp::doFidCmp(const StreamDgram &a, const StreamDgram &b) const
   if (blockResult > 0) return true;
   if (blockResult < 0) return false;
   bool res = m_fidCompare.fiducialsGreater(*a.dg(), *b.dg());
-  MsgLog(logger,DVDMSG, "doFidCmp: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+  MsgLog(logger,DBGMSGLVL, "doFidGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
   
   return res;
 }
 
-bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) const
+bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram &b) const
 { 
-  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
+  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramGreater: empty dgs");
 
   TransitionType transA = getDgramCategory(a).first;
   TransitionType transB = getDgramCategory(b).first;
 
   if (((transA == L1Accept) and (transB == L1Accept)) or
       ((transA == otherTrans) and (transB == otherTrans))) {
-    throw psana::Exception(ERR_LOC, "DoBlockCmp: both datagrams are "
+    throw psana::Exception(ERR_LOC, "DoBlockGreater: both datagrams are "
                            "either L1Accept or otherTrans. They must be mixed");
   }
 
@@ -246,10 +245,10 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
 
   if (runA < runB) {
     if (AminusB > m_fidCompare.maxClockDriftSeconds()) {
-      MsgLog(logger, warning, "doBlockCmp: dgram A is in earler run but clock is more than "
+      MsgLog(logger, warning, "doBlockGreater: dgram A is in earler run but clock is more than "
              << m_fidCompare.maxClockDriftSeconds() << " seconds later than dgram B");
     }
-    MsgLog(logger, DVDMSG, "doBlockCmp: A > B = false as runA=" << runA << " runB=" << runB 
+    MsgLog(logger, DBGMSGLVL, "doBlockGreater: A > B = false as runA=" << runA << " runB=" << runB 
            << " dgrams:" << std::endl
            << "A: " << StreamDgram::dumpStr(a) << std::endl
            << "B: " << StreamDgram::dumpStr(b));
@@ -257,10 +256,10 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
   }
   if (runA > runB) {
     if (AminusB < (-1.0*double(m_fidCompare.maxClockDriftSeconds()))) {
-      MsgLog(logger, warning, "doBlockCmp: dgram A is in later run but clock is more than "
+      MsgLog(logger, warning, "doBlockGreater: dgram A is in later run but clock is more than "
              << m_fidCompare.maxClockDriftSeconds() << " seconds earlier than dgram B");
     }
-    MsgLog(logger, DVDMSG, "doBlockCmp: A > B = true as runA=" << runA << " runB=" << runB 
+    MsgLog(logger, DBGMSGLVL, "doBlockGreater: A > B = true as runA=" << runA << " runB=" << runB 
            << " dgrams:" << std::endl
            << "A: " << StreamDgram::dumpStr(a) << std::endl
            << "B: " << StreamDgram::dumpStr(b));
@@ -271,7 +270,7 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
 
   if ((transA == L1Accept) and (transB == otherTrans)) {
     bool res = a.L1Block() >= b.L1Block();
-    MsgLog(logger, DVDMSG, "doBlockCmp: same run. A > B = " << bool2str(res)
+    MsgLog(logger, DBGMSGLVL, "doBlockGreater: same run. A > B = " << bool2str(res)
            << " dgrams:" << std::endl
            << "A: " << StreamDgram::dumpStr(a) << std::endl
            << "B: " << StreamDgram::dumpStr(b));
@@ -279,43 +278,19 @@ bool StreamDgramCmp::doBlockCmp(const StreamDgram &a, const StreamDgram &b) cons
   } 
   // (transA == otherTrans) and (transB == L1Accept)
   bool res = a.L1Block() > b.L1Block();
-  MsgLog(logger, DVDMSG, "doBlockCmp: same run. A > B = " << bool2str(res)
+  MsgLog(logger, DBGMSGLVL, "doBlockGreater: same run. A > B = " << bool2str(res)
          << " dgrams:" << std::endl
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
   return res;
 }
 
-bool StreamDgramCmp::doMapCmp(const StreamDgram &a, const StreamDgram &b) const
+bool StreamDgramGreater::doBadGreater(const StreamDgram &a, const StreamDgram &b) const
 { 
-  if (a.empty() or b.empty()) throw psana::Exception(ERR_LOC, "StreamDgramCmp: empty dgs");
-  if (not m_expClockDiff) throw psana::Exception(ERR_LOC, "doMapCmp: expClockDiff map is null");
-  unsigned expA = a.file().expNum();
-  unsigned expB = b.file().expNum();
-  if ((expA == 0) or (expB == 0)) throw psana::Exception(ERR_LOC, "doMapCmp: an experiment number is 0");
-  ExperimentPair experimentsAB(expA, expB);
-  bool abInMap = true;
-  ExperimentClockDiffMap::const_iterator pos = m_expClockDiff->find(experimentsAB);
-  if (pos == m_expClockDiff->end()) {
-    ExperimentPair experimentsBA(expB, expA);
-    pos = m_expClockDiff->find(experimentsBA);
-    if (pos == m_expClockDiff->end()) {
-      throw NoClockDiff(ERR_LOC, expA, expB);
-    }
-    abInMap = false;
-  }
-  // now we need to add the clockDiff found in the map to a's clockTime (if abInMap is true)
-  // or add it to the clockTime for b's clockTime (if abInMap is false) and do the 
-  // normal clock comparison
-  throw psana::Exception(ERR_LOC, "doMapCmp: not implmented");
+  throw psana::Exception(ERR_LOC, "doBadGreater called");
 }
 
-bool StreamDgramCmp::doBadCmp(const StreamDgram &a, const StreamDgram &b) const
-{ 
-  throw psana::Exception(ERR_LOC, "doBadCmp called");
-}
-
-int StreamDgramCmp::runLessGreater(const StreamDgram &a, const StreamDgram &b) const 
+int StreamDgramGreater::runLessGreater(const StreamDgram &a, const StreamDgram &b) const 
 {
   unsigned runA = a.file().run();
   unsigned runB = b.file().run();
@@ -324,7 +299,7 @@ int StreamDgramCmp::runLessGreater(const StreamDgram &a, const StreamDgram &b) c
   return 0;
 }
 
-int StreamDgramCmp::blockLessGreater(const StreamDgram &a, const StreamDgram &b) const
+int StreamDgramGreater::blockLessGreater(const StreamDgram &a, const StreamDgram &b) const
 {
   int64_t blockA = a.L1Block();
   int64_t blockB = b.L1Block();
@@ -334,7 +309,7 @@ int StreamDgramCmp::blockLessGreater(const StreamDgram &a, const StreamDgram &b)
   return 0;
 }
 
-bool StreamDgramCmp::sameEvent(const StreamDgram &a, const StreamDgram &b) const {
+bool StreamDgramGreater::sameEvent(const StreamDgram &a, const StreamDgram &b) const {
   if (a.empty() and b.empty()) {
     MsgLog(logger, warning, "sameEvent: comparing two empty dgrams");
     return true;

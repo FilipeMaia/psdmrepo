@@ -24,7 +24,7 @@ using namespace XtcInput ;
 #include <boost/test/included/unit_test.hpp>
 
 /**
- * Simple test suite for module XtcFileName.
+ * Simple test suite for module FiducialsCompare.
  * See http://www.boost.org/doc/libs/1_36_0/libs/test/doc/html/index.html
  */
 
@@ -69,11 +69,14 @@ BOOST_AUTO_TEST_CASE( test_cmp_3 )
 {
   FiducialsCompare fidCompare;
 
-  // Here we set up two times where the clocks are within 90 seconds, but then the
-  // drift based on the fiducials exceeds 90 seconds.
+  // Here we set up two times where the clocks are within 80 seconds, but then the
+  // drift based on the fiducials exceeds 80 seconds.
   // We expect to have fiducialsGreater emit a warning like:
+  //
   // clock drift is -122 exceeds 90 secondsA=1000 fidA=0 secondsB=940 fidB=65520
-
+  //
+  // if the code that generated this warning has been disabled (for performance 
+  // purposes) then this test should be removed.
   std::stringstream buffer;
   std::streambuf * old = std::cerr.rdbuf(buffer.rdbuf());
 
@@ -84,3 +87,19 @@ BOOST_AUTO_TEST_CASE( test_cmp_3 )
   BOOST_CHECK(warning.find("exceeds") != std::string::npos);
 }
 
+BOOST_AUTO_TEST_CASE( test_cmp_4 )
+{
+  FiducialsCompare fidCompare;
+  // the below times generated the drift warning when the drift was calculated with poor
+  // precision float arthimetic, but the drift is only 1 or 2 seconds.
+  // This test is not needed if the warning code is disabled.
+  std::stringstream buffer;
+  std::streambuf * old = std::cerr.rdbuf(buffer.rdbuf());
+  BOOST_CHECK( not fidCompare.fiducialsGreater(1394974655 ,   86835, 1394974656, 86856) );
+  std::string warning = buffer.str();
+  std::cerr.rdbuf(old);
+  std::cout << warning << std::endl;
+  BOOST_CHECK(warning.find("clock drift") == std::string::npos);
+  BOOST_CHECK(warning.find("exceeds") == std::string::npos);
+
+}

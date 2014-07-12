@@ -58,15 +58,16 @@ namespace XtcInput {
 // Constructors --
 //----------------
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-                                 double l1OffsetSec, int firstControlStream)
+                                 double l1OffsetSec, int firstControlStream,
+                                 unsigned maxStreamClockDiffSec)
   : m_streams()
   , m_priorTransBlock()
   , m_processingDAQ(false)
   , m_l1OffsetSec(int(l1OffsetSec))
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_firstControlStream(firstControlStream)
-  , m_streamDgramCmp()
-  , m_outputQueue(m_streamDgramCmp)
+  , m_streamDgramGreater(maxStreamClockDiffSec)
+  , m_outputQueue(m_streamDgramGreater)
     
 {
 

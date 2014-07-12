@@ -38,6 +38,7 @@ namespace {
 
   const unsigned MaxFiducials = Pds::TimeStamp::MaxFiducials;
   const unsigned HalfFiducials = Pds::TimeStamp::MaxFiducials/2;
+  const unsigned QuarterFiducials = Pds::TimeStamp::HalfFiducials/2;
 
   /// how many fiducials does it take to get from A to B?
   /// take into account wrap around.
@@ -62,7 +63,7 @@ namespace XtcInput {
 FiducialsCompare::FiducialsCompare(unsigned maxClockDriftSeconds) : 
   m_maxClockDriftSeconds(maxClockDriftSeconds) 
 {
-  if (maxClockDriftSeconds > HalfFiducials/2) {
+  if (maxClockDriftSeconds > QuarterFiducials) {
     MsgLog(logger, 
            error, "FiducialsCompare initialized with "
            << maxClockDriftSeconds << " which is greater than 1/4 fiducial cycle");
@@ -92,18 +93,26 @@ bool FiducialsCompare::fiducialsGreater(const uint32_t secondsA, const unsigned 
   
   // we can do some checking of the clocks to see if the drift is what we expect.
   // we print a warning if not. This code could be removed for performance purposes.
-  float BtoAdriftSec, fidBtoAsec;
+  double BtoAdriftSec, fidBtoAsec;
   if (AisGreater) {
     fidBtoAsec = fidBtoA/360.0;
   } else {
     fidBtoAsec = -((MaxFiducials - fidBtoA)/360.0);
   }
-  BtoAdriftSec = float(secondsA) - float(secondsB) - fidBtoAsec;
+  // unsigned arthimetic, get small integer before converting to double
+  int BtoAsec;
+  if (secondsA > secondsB) BtoAsec = secondsA-secondsB;
+  else BtoAsec = -(secondsB-secondsA);
+
+  BtoAdriftSec = double(BtoAsec) - fidBtoAsec;
   if (BtoAdriftSec > maxClockDriftSeconds() or -BtoAdriftSec > maxClockDriftSeconds()) {
-      MsgLog(logger, warning, "clock drift " << BtoAdriftSec 
+      MsgLog(logger, warning, "|B to A clock drift|=" << BtoAdriftSec 
              << " exceeds " << maxClockDriftSeconds()
              << " secondsA=" << secondsA << " fidA=" << fiducialsA
-             << " secondsB=" << secondsB << " fidB=" << fiducialsB);
+             << " secondsB=" << secondsB << " fidB=" << fiducialsB
+             << " (fidBtoA=" << fidBtoA << " AisGreater=" << AisGreater
+             << " fidBtoAsec=" << fidBtoAsec << ")" ); 
+
   }
 
   return AisGreater;

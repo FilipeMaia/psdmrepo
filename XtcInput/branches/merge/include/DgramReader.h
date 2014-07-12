@@ -61,7 +61,7 @@ public:
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
-              double l1OffsetSec, int firstControlStream)
+              double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec)
     : m_files(begin, end)
     , m_queue( queue )
     , m_mode( mode )
@@ -70,6 +70,7 @@ public:
     , m_liveTimeout(liveTimeout)
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(firstControlStream)
+    , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
   {}
 
   // Destructor
@@ -92,6 +93,7 @@ private:
   unsigned m_liveTimeout;
   double m_l1OffsetSec ;
   int m_firstControlStream;
+  unsigned m_maxStreamClockDiffSec;
 };
 
 } // namespace XtcInput

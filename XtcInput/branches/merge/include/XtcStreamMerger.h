@@ -70,7 +70,8 @@ public:
    *  @param[in]  firstControlStream starting stream number for fiducial merge
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-                  double l1OffsetSec, int firstControlStream) ;
+                  double l1OffsetSec, int firstControlStream,
+                  unsigned maxStreamClockDiffSec) ;
 
   // Destructor
   ~XtcStreamMerger () ;
@@ -123,8 +124,8 @@ private:
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   int m_firstControlStream ;                  ///< starting stream number for control streams
-  StreamDgramCmp m_streamDgramCmp;            ///< for comparing two dgrams in the priority queue
-  typedef std::priority_queue<StreamDgram, std::vector<StreamDgram>, StreamDgramCmp> OutputQueue;
+  StreamDgramGreater m_streamDgramGreater;            ///< for comparing two dgrams in the priority queue
+  typedef std::priority_queue<StreamDgram, std::vector<StreamDgram>, StreamDgramGreater> OutputQueue;
   OutputQueue m_outputQueue;                  ///< Output queue for datagrams
 };
 
