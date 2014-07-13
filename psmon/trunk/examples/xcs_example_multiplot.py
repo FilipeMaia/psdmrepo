@@ -31,8 +31,6 @@ def main():
 
     # initialize socket connections
     publish.init()
-    # start reset listener
-    publish.start_reset_listener()
 
     # Start processing events
     if run == 'online':

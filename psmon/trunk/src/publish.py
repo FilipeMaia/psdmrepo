@@ -18,6 +18,7 @@ def initialized():
 
 def init(port=config.APP_PORT, bufsize=config.APP_BUFFER):
     __publisher.initialize(port, bufsize)
+    __reset_listener.start()
 
 
 def send(topic, data):
@@ -33,7 +34,3 @@ def get_reset_flag():
 
 def clear_reset_flag():
     __reset_listener.clear_flag()
-
-
-def start_reset_listener():
-    __reset_listener.start()
