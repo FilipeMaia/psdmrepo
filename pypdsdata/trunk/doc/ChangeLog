@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-20
+2014-07-14 Christopher O'Grady
+- Add support for ebeam bld V6 for pyana
+
 Tag: V01-01-19
 2014-05-16 David Schneider
 - quiet compiler warning about unhandled types.
