@@ -83,13 +83,16 @@ class FileMgrIrods ( object ) :
     #  Public methods --
     #-------------------
 
-    def storeFile ( self, src_path, dst_path ) :
+    def storeFile ( self, src_path, dst_path, resc=None ) :
         """
         self.storeFile(src_path: str, dst_path: str) -> int
         
         Store single file, takes the name of file on disk and the name of
         file in iRODS. Returns 0 for success, non-zero on failure, code 
         should be interpreted as a result of os.spawnvp() call.
+        By defaut the file is stored in the irods resource from the env 
+        variable irodsDefResource. It is set in the fm-irods config section. 
+        It can be overwritten with the resc parameter.
         """
         self._log.info ( "FileMgrIrods.storeFile: %s -> %s", src_path, dst_path )
         
@@ -101,10 +104,13 @@ class FileMgrIrods ( object ) :
         if returncode : self._log.warning("imkdir completed with status %d", returncode)
         # this call may fail, but it fails also if directory exists, so just try next thing
         
+        resc_opt = '-R ' + resc if resc else ""
+
         if self._cmd == 'iput' :
-            cmd = [ 'iput', src_path, dst_path ]
-        else :
-            cmd = [ 'ireg', src_path, dst_path ]
+            cmd = "iput %s %s %s" % (resc_opt, src_path, dst_path)
+        else:
+            cmd = "ireg %s %s %s" % (resc_opt, src_path, dst_path)
+        cmd = cmd.split()
         
         returncode = os.spawnvp(os.P_WAIT,cmd[0],cmd)
         if returncode : self._log.warning("%s completed with status %d", self._cmd, returncode)

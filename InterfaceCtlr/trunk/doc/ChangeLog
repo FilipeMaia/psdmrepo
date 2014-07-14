@@ -10,6 +10,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-10
+2014-07-14 Wilko Kroeger
+- Allow to set the resource a file is stored in irods (FileMgrIrods)
+- Register an index file (xtc.idx type) in the irods resource specified by the key 
+  irodsIdxResource in the fm-irods section (FileMgrRegister)
+	
 Tag: V01-03-09
 2014-07-11 Igor Gaponenko
 - forcing the Translator job to dump the configuration file into STDOUT

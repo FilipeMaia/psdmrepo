@@ -118,8 +118,9 @@ class FileMgrRegister ( object ) :
         - instrument: instrument name
         - experiment: experiment nae
         - type: file type name which is also a directory name in experiment data directory
-        
-        If file cannot be registered an exception is raised.        
+          For type = 'xtc.idx' the file will be registered in irodsIdxResource (from config db).
+
+        If file cannot be registered an exception is raised.           
         """
 
         # build object name in irods
@@ -128,11 +129,19 @@ class FileMgrRegister ( object ) :
         if not dst_coll: raise _ConfigError("filemanager-experiment-dir option is not defined")
 
         # make destination path
-        basename = os.path.basename(path)
-        dst_path = "/".join([dst_coll, type,basename])
         
+        if type == 'xtc.idx':
+            irods_resource = self._config.get('irodsIdxResource')
+            data_subdir = 'xtc/index'
+        else:
+            irods_resource = None
+            data_subdir = type
+
+        basename = os.path.basename(path)
+        dst_path = "/".join([dst_coll, data_subdir, basename])
+
         # register
-        self._file_mgr.storeFile(path, dst_path)
+        self._file_mgr.storeFile(path, dst_path, resc=irods_resource)
 
 #
 #  In case someone decides to run this module
