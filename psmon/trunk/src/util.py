@@ -33,7 +33,7 @@ def arg_inflate_tuple(index, *args):
     if is_py_iter(args[index]):
         return zip(*arg_inflate(index, *args))
     else:
-        return args
+        return [args]
 
 
 class Helper(object):
