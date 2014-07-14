@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16 David Schneider
+- add test for data with BldEBeamV6, and two multi tests
+
 Tag: V00-00-15 David Schneider
 - fix bug with epics options
 

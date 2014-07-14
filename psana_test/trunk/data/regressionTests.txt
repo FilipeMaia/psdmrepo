@@ -45,6 +45,7 @@ test=066  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translato
 test=069  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_069_mec_meca2614_e358-r0113-s01-c00.xtc
 test=076  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_076_dia_diasxr13_e310-r0003-s00-c00.xtc
 test=082  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_082_mec_mecd6714_e441-r0009-s00-c00.xtc
+test=083  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_083_cxi_cxie1514_e483-r0004-s00-c00.xtc
 
 # define regression tests for multi file datasets. 
 test=000  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_000_amo01509
