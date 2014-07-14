@@ -190,6 +190,8 @@ class mp_proto ( object ) :
         
         for name, epics in epicsList.iteritems() :
             # send as buffer
+            if name is None:
+                continue
             pipe.send_bytes(name)
             pipe.send_bytes(epics)
         # EOD
