@@ -1,0 +1,136 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-status...
+#
+#------------------------------------------------------------------------
+
+"""Script to cleanup database tables after controller crashes.
+Best run as a cron job every few minutes.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import errno
+import socket
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from LusiTime.Time import Time
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+def _checkProcess(pid):
+    """Returns true if process with given PID still running"""
+    try:
+        os.kill(pid, 0)
+    except OSError, ex:
+        if ex.errno == errno.ESRCH:
+            return False
+    return True
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICStatus ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password,
+                             timeout = 0 )
+
+        # get host name
+        host = socket.getfqdn(socket.gethostname())
+        self.trace('host name: %s', host)
+
+        db = InterfaceDb(conn)
+        controllers = db.controller_status()
+
+        if not controllers:
+            self.info("No active controller instance found.")
+            return 0
+
+        if len(controllers) > 1:
+            self.error("More than one active controller instance found.")
+            return 2
+            
+        info = controllers[0]
+        if info['host'] == host:
+
+            pid = info['pid']
+
+            # check that process is running
+            if _checkProcess(pid):
+                self.info("Process %s is still running.", pid)
+            else:
+                self.info("Process %s is not running, updating database.", pid)
+                db.deactivate_controller(info['id'])
+                db.exit_controller(info['id'])
+
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStatus()
+    rc = app.run()
+    sys.exit(rc)
