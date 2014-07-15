@@ -11,7 +11,7 @@ from __future__ import print_function
 import os
 import time 
 import argparse
-
+import datetime
 
 import DmMover.experiment as experiment
 import DmMover.exper_folders as exper_folders
@@ -58,12 +58,9 @@ def active_experiments():
 
 usage="List and create missing experiment folders"
 help_epilog="""
-Check either all experiments or only the active once. 
+Check either all experiments or only the activated ones. 
 If --allexp is selected only the scratch,res,ftc and calib folders are created.
 """
-
-dirs_to_check = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
-
 
 def main():
 
@@ -76,16 +73,14 @@ def main():
     parser.add_argument('--agereg', type=int, default=90, 
                         help="Select only experiments that were registered in the db less than %(dest)s days ago.")
 
+    parser.add_argument('sel_exper', nargs='*') 
+
+
     try:
         args = parser.parse_args()
     except SystemExit:
         return 0
 
-    #print("ddd")
-    #for name, instr in test_hh():
-    #    print(name, instr)
-
-    #return 
     if args.allexp:
         gen = all_experiments(args.agereg)
         dirs_to_check = ('res', 'ftc', 'scratch', 'calib')
@@ -93,20 +88,38 @@ def main():
         gen = active_experiments()
         dirs_to_check = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
 
-    
+
+    nexp, nmissing, nset = 0,0,0
     for expname, instr in gen:
+        nexp += 1
+        if len(expname) != 8:
+            print("Wrong detector name", expname, instr)
+            continue
+
+        # select experiment
+        if args.sel_exper and expname not in args.sel_exper:
+            continue
+
         exppath = "/reg/d/psdm/%s/%s/" % (instr, expname)
-        missing = []
+        missing_dirs = []
         for dt in dirs_to_check:
             if not os.path.exists(exppath + dt):
-                missing.append(dt)
+                missing_dirs.append(dt)
 
-        print("-", instr, exppath, "missing dirs:", " ".join(missing))
-        if args.mkdir and missing:
+        if missing_dirs:
+            print("-", instr, exppath, "missing dirs:", " ".join(missing_dirs))
+            nmissing += 1
+
+        if args.mkdir and missing_dirs:
+            nset += 1
             print("Create dirs")
             exper = experiment.Experiment(name=expname)
-            exper_folders.check_all_destpath(exper)
-                
+            exper_folders.check_all_destpath(exper, missing_dirs)
+    
+        
+    date = datetime.datetime.now()
+    print("Experiments found:", nexp, "with missing dirs:", nmissing, "nset:", nset, 
+          "date", date.strftime("%Y%m%d %H:%M:%S")) 
 
 
 if __name__ == "__main__":

@@ -21,18 +21,22 @@ mkdir = os.mkdir
 #runcmd =  __print_cmd
 
 
-def check_all_destpath(exper):
+def check_all_destpath(exper, seldirs=None):
     
     datapath = exper.datapath
     print  exper.name, exper.instr_lower, exper.posix_gid, datapath
 
     for folder in ('xtc', 'hdf5', 'usr'):
+        if seldirs and folder not in seldirs:
+            continue
         create_exp_path(folder, exper.name, exper.instr_lower, exper.posix_gid, datapath)
         create_link(folder, exper.name, exper.instr_lower, datapath)
 
     datapath = exper.scratch_datapath
     print  "scratch", datapath
     for folder in ('scratch', 'res', 'ftc', 'calib'):
+        if seldirs and folder not in seldirs:
+            continue
         create_exp_path(folder, exper.name, exper.instr_lower, exper.posix_gid, datapath)
         create_link(folder, exper.name, exper.instr_lower, datapath)
         
