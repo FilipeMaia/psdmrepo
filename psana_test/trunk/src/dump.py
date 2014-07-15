@@ -1,3 +1,5 @@
+import sys
+import os
 import psana
 from psana_test import obj2str, epicsPvToStr
 from psana_test import types_to_str
@@ -9,6 +11,10 @@ class dump(object):
         self.aliasesParam  = self.configBool('aliases', True)
         self.followEpicsAliases = self.configBool('dump_aliases',False)
         self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
+        # if outputFile is set, all output will be written to that file, if 
+        # not in parallel mode, otherwise, that file + '.subproc_n' where n 
+        # n is the subprocess number
+        self.outputFile = self.configStr('output_file','')
         # set epics_update to 'regress' to update epics for regression tests.
         # In this case, an epics pv will only be printed if the timestamp or dbr type differs
         # and the pvid will not be printed.
@@ -17,6 +23,7 @@ class dump(object):
             self.followEpicsAliases = False
         self.configParam = self.configBool('config', True)
         self.counterParam = self.configBool('counter', True)
+        self.headerParam = self.configBool('header',True)
         # how much to indent sub objects in the printout
         self.indent = self.configInt('indent',2)
         # filter options for the keys found. a list of strings that 
@@ -31,18 +38,31 @@ class dump(object):
 
     def beginjob(self, evt, env):
         self.runNumber = -1
-        print "=================="
-        print "=== begin job ===="
+
+        if self.outputFile != '':
+            if env.subprocess() > -1:
+                fullOutputFile = self.outputFile + '.subproc_%d' % env.subprocess()
+            else:
+                fullOutputFile = self.outputFile
+            if os.path.exists(fullOutputFile):
+                print "warning: overwritting %s" % fullOutputFile
+            self.fout = file(fullOutputFile,'w')
+        else:
+            self.fout = sys.stdout
+        if self.headerParam:
+            self.fout.write( "==================\n")
+            self.fout.write( "=== begin job ====\n")
         if self.aliasesParam:
             aliases = env.epicsStore().aliases()
-            print "Epics Aliases: total = %d" % len(aliases)
+            self.fout.write( "Epics Aliases: total = %d\n" % len(aliases))
             indent = ' '*self.indent
             aliases.sort()
             for alias in aliases:
-                print "%s%s" % (indent, alias)
+                self.fout.write( "%s%s\n" % (indent, alias))
         self.dumpEpics(evt, env)
         self.dumpConfig(evt, env)
         self.dumpEvent(evt, env)
+        self.fout.flush()
 
     def beginrun(self, evt, env):
         self.runNumber += 1
@@ -50,11 +70,13 @@ class dump(object):
         if self.counterParam:
             counterStr = '%d' % self.runNumber
         self.calibNumber = -1
-        print "==============================================================="
-        print "=== beginrun %s ===" % counterStr
+        if self.headerParam:
+            self.fout.write( "===============================================================\n")
+            self.fout.write( "=== beginrun %s ===\n" % counterStr)
         self.dumpEpics(evt, env)
         self.dumpConfig(evt, env)
         self.dumpEvent(evt, env)
+        self.fout.flush()
 
     def begincalibcycle(self, evt, env):
         self.calibNumber += 1
@@ -62,11 +84,13 @@ class dump(object):
         counterStr = ''
         if self.counterParam:
             counterStr = 'run=%d step=%d' % (self.runNumber, self.calibNumber)
-        print "==============================================================="
-        print "=== begincalibcycle %s ===" % counterStr
+        if self.headerParam:
+            self.fout.write( "===============================================================\n")
+            self.fout.write( "=== begincalibcycle %s ===\n" % counterStr)
         self.dumpEpics(evt, env)
         self.dumpConfig(evt, env)
         self.dumpEvent(evt, env)
+        self.fout.flush()
 
     def event(self,evt,env):
         self.eventNumber += 1
@@ -77,12 +101,14 @@ class dump(object):
         eventId = evt.get(psana.EventId)
         sec,nsec = eventId.time()
         fid = eventId.fiducials()
-        print "==============================================================="
-        print "=== event: %s seconds= %s nanoseconds= %s fiducials= %s" % \
-            (counterStr, sec, nsec, fid)
+        if self.headerParam:
+            self.fout.write( "===============================================================\n")
+            self.fout.write( "=== event: %s seconds= %s nanoseconds= %s fiducials= %s\n" % \
+                             (counterStr, sec, nsec, fid))
         self.dumpEpics(evt, env)
         self.dumpConfig(evt, env)
         self.dumpEvent(evt, env)
+        self.fout.flush()
 
     def dumpConfig(self, evt, env):
         if not self.configParam:
@@ -101,8 +127,9 @@ class dump(object):
             self.previousConfig[eventKeyStr]=objStr
         toPrint.sort()
         for eventKeyStr, objStr in toPrint:
-            print eventKeyStr
-            print objStr
+            self.fout.write('%s\n' % eventKeyStr)
+            self.fout.write('%s\n' % objStr)
+        self.fout.flush()
             
     def dumpEvent(self, evt, env):
         keys = evt.keys()
@@ -117,8 +144,9 @@ class dump(object):
             toPrint.append((eventKeyStr, objStr))
         toPrint.sort()
         for eventKeyStr, objStr in toPrint:
-            print eventKeyStr
-            print objStr
+            self.fout.write('%s\n' % eventKeyStr)
+            self.fout.write('%s\n' % objStr)
+        self.fout.flush()
 
     def filterKey(self, keyStr):
         if len(self.exclude)>0:
@@ -171,9 +199,10 @@ class dump(object):
             if pvCmpStr != previous.get(pvName, ''):
                 if not printedEpicsHeader:
                     printedEpicsHeader = True
-                    print header
-                print "%spvName=%s %s" % (indent, pvName, pvStr)
+                    self.fout.write("%s\n" % header)
+                self.fout.write( "%spvName=%s %s\n" % (indent, pvName, pvStr))
             previous[pvName]=pvCmpStr
+        self.fout.flush()
         
 
 ######## helper functions ############

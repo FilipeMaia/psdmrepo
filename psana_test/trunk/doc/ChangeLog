@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17 David Schneider
+- add option output_file to psana_test.dump to write mp worker output to separate files
+- add option header to turn off dump of header
+- add unit test for psana parallel mode
+
 Tag: V00-00-16 David Schneider
 - add test for data with BldEBeamV6, and two multi tests
 

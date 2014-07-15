@@ -14,6 +14,7 @@ import tempfile
 import unittest
 import subprocess as sb
 from psana_test import epicsPvToStr
+import psana_test.psanaTestLib as ptl
 import psana
 
 DATADIR = "/reg/g/psdm/data_test/Translator"
@@ -329,5 +330,50 @@ class Psana( unittest.TestCase ) :
 
         if self.cleanUp: os.unlink(h5_outfile)
 
+    def test_mp(self):
+        '''parallel child process mode
+        
+        For testing, I'll just run one process with psana_test.dump to get all the
+        output in one file. For some reason, I frequently get the error message
+
+        Standard exception caught in runApp(): ExceptionErrno: writing to ready pipe failed: Broken pipe [in function next at PSXtcMPInput/src/DgramSourceWorker.cpp:84
+
+        when I run psana_test.dump in parallel mode. Something flakely about the piping.
+        If often seems that I don't get the error message if I run with debug output.
+        
+        So to test, I'm running with debug output, and saving the dump into a separate
+        file that I compare.
+        '''
+
+        # test that mp mode gives us what we saw before on DAQ only streams
+        dumpOutput = 'unittest_test_mp_mpmode.dump'
+        cmd = '''psana -c '' -p 1'''
+        cmd += ' -o psana_test.dump.output_file=%s' % dumpOutput
+        cmd += ''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714'''
+        o,e = ptl.cmdTimeOut(cmd,100)
+        dumpOutput += '.subproc_0'
+        md5 = ptl.get_md5sum(dumpOutput)
+        prev_md5 = 'fbd1b3a999adb4cdef882c7aceb356dd'
+        failMsg  = 'prev md5=%s\n' % prev_md5
+        failMsg += 'curr md5=%s\n' % md5
+        failMsg += 'are not equal. cmd:\n'
+        failMsg += cmd
+        self.assertEqual(prev_md5, md5, msg=failMsg)
+        os.unlink(dumpOutput)
+        
+        # test that mp mode is the same as not mp mode (DAQ only streams)
+        dumpOutput = 'unittest_test_mp_normal.dump'
+        cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
+        cmd += ''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714'''
+        o,e = ptl.cmdTimeOut(cmd,100)
+        md5 = ptl.get_md5sum(dumpOutput)
+        failMsg  = 'prev md5=%s\n' % prev_md5
+        failMsg += 'curr md5=%s\n' % md5
+        failMsg += 'are not equal. cmd:\n'
+        failMsg += cmd
+        self.assertEqual(prev_md5, md5, msg=failMsg)
+        os.unlink(dumpOutput)
+        
+        
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
