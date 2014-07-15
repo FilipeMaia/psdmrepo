@@ -57,23 +57,29 @@ def active_experiments():
 # -------------------------------------------------------------------------------    
 
 usage="List and create missing experiment folders"
-help_epilog="""
+help_epilog='''
 Check either all experiments or only the activated ones. 
 If --allexp is selected only the scratch,res,ftc and calib folders are created.
-"""
+
+Examples:
+    # check all experiments registered last 5 days
+    %% %(prog)s --allexp --agereg 5                            (just list)
+    %% %(prog)s --allexp --agereg 5 --mkdir xppe1214 cxia3215  (select only two experiments) 
+
+    %% %(prog)s --mkdir   (check only active experiments)
+'''
 
 def main():
 
     parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--mkdir', action='store_true', 
                         help="create missing data folder (xtc, hdf5, scratch, ...) otherwise just list them")
     parser.add_argument('--allexp', action='store_true', 
-                        help="checkall experiments. By default check only the active ones.")
+                        help="checkall experiments. By default check only the active experiments.")
     parser.add_argument('--agereg', type=int, default=90, 
-                        help="Select only experiments that were registered in the db less than %(dest)s days ago.")
-
-    parser.add_argument('sel_exper', nargs='*') 
+                        help="Select only experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
+    parser.add_argument('sel_exper', nargs='*', help="list of experiments to check") 
 
 
     try:
