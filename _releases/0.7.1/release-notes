@@ -1,0 +1,5 @@
+- new tools to create missing experiment directories from a cronjob or daemon.
+- use a user defined psana config file and test release for the hdf5 translation 
+  by the Interface Controller.
+- Allow to set the resource for file registration in irods. Needed to register index files.
+- new version of numpy (1.8.1)
