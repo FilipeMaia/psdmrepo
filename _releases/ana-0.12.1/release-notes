@@ -1,0 +1,6 @@
+- integrated openmpi 1.8.1 as a standard external package
+- rebuilt mpi4py against openmpi 1.8.1
+- splitscan HDF5 translator
+- fixed a crash in parallel pyana
+- added support for ebeam bld v6 in pyana
+- fixed default calibration directory in the command line calibration tool
