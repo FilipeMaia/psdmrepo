@@ -258,21 +258,25 @@ public:
 //--------------------
 
   template <typename T>
+    void procCSPad2x2NDArrForTypeAndNDArr(Event& evt, const ndarray<const T,3>& inp_nda) {
+       cspad_image_fill <T> (inp_nda);
+       cspad_image_add_in_event(evt);
+  }
+  
+//--------------------
+
+  template <typename T>
   bool procCSPad2x2NDArrForType (Event& evt) {
  
     if( m_print_bits & 8 ) MsgLog(name(), warning, "Produce image from CSPAD array, source:" << m_source 
                                   << " key:" << m_inkey << " data type:" << typeid(T).name() );
     
-    shared_ptr< ndarray<const T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
-    if (shp.get()) {
+    shared_ptr< ndarray<const T,3> > shp_const = evt.get(m_source, m_inkey, &m_src); // get m_src here
+    if (shp_const.get()) { procCSPad2x2NDArrForTypeAndNDArr<T>(evt, *shp_const.get()); return true; }
     
-       const ndarray<const T,3> inp_nda = *shp.get(); //const T* p_data = shp->data();
-
-       cspad_image_fill <T> (inp_nda);
-       cspad_image_add_in_event(evt);
-
-       return true;
-    } // if (shp.get())
+    shared_ptr< ndarray<T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
+    if (shp.get()) { procCSPad2x2NDArrForTypeAndNDArr<T>(evt, *shp.get()); return true; }
+    
     return false;
   }
   

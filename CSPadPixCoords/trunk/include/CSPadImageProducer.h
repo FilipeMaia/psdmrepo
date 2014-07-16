@@ -351,20 +351,14 @@ private:
    */
 
   template <typename T>
-  bool procCSPadNDArrForType (Event& evt) {
+    void procCSPadNDArrForTypeAndNDArr (Event& evt, const ndarray<const T,3> inp_ndarr) {
  
-        shared_ptr< ndarray<const T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
-        if (shp.get()) {
-        
-          if( m_print_bits & 8 ) MsgLog(name(), info, "Produce image from CSPAD ndarray, source:" << m_source 
-    	                                           << " key:" << m_inkey << " data type:" << typeid(T).name() );
-        
           const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
           ndarray<T,2> img_nda(shape);
           //std::fill_n(img_nda.data(), int(IMG_SIZE), T(0));    
           std::fill(img_nda.begin(), img_nda.end(), T(0));    
 
-          const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
+          //const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
 	  //cout << "inp_ndarr.shape():" << str_shape<const T,3>(inp_ndarr) << '\n';
         
           int ind2x1_in_arr = 0;        
@@ -392,11 +386,28 @@ private:
         
           //addImageInEventForType<T>(evt, img_nda);
           save2DArrayInEvent<T>(evt, m_src, m_imgkey, img_nda);
-        
-          return true;
-        } // if (shp.get())
+  }
 
-    return false;
+//-------------------
+  /**
+   * @brief For requested m_source and m_inkey process CSPAD data ndarray<T,3>
+   * Returns false if data is missing.
+   * Output image data type T is equal to input data type T.
+   */
+
+  template <typename T>
+  bool procCSPadNDArrForType (Event& evt) {
+ 
+        if( m_print_bits & 8 ) MsgLog(name(), info, "Produce image from CSPAD ndarray, source:" << m_source 
+    	                                           << " key:" << m_inkey << " data type:" << typeid(T).name() );
+        
+        shared_ptr< ndarray<const T,3> > shp_const = evt.get(m_source, m_inkey, &m_src); // get m_src here
+        if (shp_const.get()) { procCSPadNDArrForTypeAndNDArr<T>(evt, *shp_const.get()); return true; }
+
+        shared_ptr< ndarray<T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
+        if (shp.get()) { procCSPadNDArrForTypeAndNDArr<T>(evt, *shp.get()); return true; }
+
+        return false;
   }
 
 //-------------------

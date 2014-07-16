@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-26
+2014-07-15 Mikhail S. Dubrovin
+- in PixCoords2x1V2 - add Z coordinate
+- in CSPad2x2ImageProducer and CSPadImageProducer - check input for ndarray<const T,3> and ndarray<T,3>
+
 Tag: V00-03-25
 2014-06-13 Mikhail S. Dubrovin
 - in CSPad2x2ImageProducer and CSPadImageProducer clean-up warning messages

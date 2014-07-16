@@ -135,6 +135,8 @@ void PixCoords2x1V2::make_maps_of_2x1_pix_coordinates()
       m_y_map_2x1_pix[r][c] = m_y_arr_pix[r];
     }
   }
+
+  std::fill_n(&m_z_map_2x1[0][0], int(SIZE2X1), double(0));
 }
 
 //--------------
@@ -165,6 +167,8 @@ void PixCoords2x1V2::print_map_min_max(UNITS units, const double& angle_deg)
   cout << "  xmax =  " << get_max_of_coord_map_2x1 (AXIS_X, units, angle_deg) << "\n";
   cout << "  ymin =  " << get_min_of_coord_map_2x1 (AXIS_Y, units, angle_deg) << "\n";
   cout << "  ymax =  " << get_max_of_coord_map_2x1 (AXIS_Y, units, angle_deg) << "\n";
+  cout << "  zmin =  " << get_min_of_coord_map_2x1 (AXIS_Z, units, angle_deg) << "\n";
+  cout << "  zmax =  " << get_max_of_coord_map_2x1 (AXIS_Z, units, angle_deg) << "\n";
 }
 
 //--------------
@@ -192,6 +196,8 @@ void PixCoords2x1V2::print_coord_arrs_2x1()
 
 double* PixCoords2x1V2::get_coord_map_2x1 (AXIS axis, UNITS units, const double& angle_deg) 
 { 
+  if(axis == AXIS_Z) return &m_z_map_2x1[0][0];
+
   if(angle_deg != m_angle_deg or units != m_units) {
     m_angle_deg = angle_deg;
     m_units     = units;

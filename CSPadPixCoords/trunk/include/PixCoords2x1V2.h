@@ -122,9 +122,9 @@ namespace CSPadPixCoords {
  *       pix_coords_2x1 -> print_coord_arrs_2x1();
  *
  *       double angle = 5;
- *       pix_coords_2x1 -> print_map_min_max(PC2X1::PIX, 0);
+ *       pix_coords_2x1 -> print_map_min_max(PC2X1::PIX);
  *       pix_coords_2x1 -> print_map_min_max(PC2X1::PIX, angle);
- *       pix_coords_2x1 -> print_map_min_max(PC2X1::UM, 0);
+ *       pix_coords_2x1 -> print_map_min_max(PC2X1::UM);
  *       pix_coords_2x1 -> print_map_min_max(PC2X1::UM, angle);
  *  @endcode
  *
@@ -132,11 +132,15 @@ namespace CSPadPixCoords {
  *  @code
  *       double* x_arr = pix_coords_2x1 -> get_x_map_2x1_pix ();
  *       double* y_arr = pix_coords_2x1 -> get_y_map_2x1_pix ();
+ *       double* z_arr = pix_coords_2x1 -> get_z_map_2x1_pix (); // returns 0-s
  *  or
  *       double* x_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM, angle);
  *       double* y_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM, angle);
+ *       double* z_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM, angle); // returns 0-s
  *
  *       double x_min_um  = pix_coords_2x1 -> get_min_of_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM,  angle);
+ *       double y_min_um  = pix_coords_2x1 -> get_min_of_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM,  angle);
+ *       double z_min_um  = pix_coords_2x1 -> get_min_of_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM,  angle);
  *       double y_max_pix = pix_coords_2x1 -> get_max_of_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::PIX, angle);
  *  @endcode
  *  
@@ -222,10 +226,13 @@ public:
   // Access methods
 
   /// Returns pointer to the 2x1 pixel map of x-coordinate [um]
-  double* get_x_map_2x1_um  () { return &m_x_map_2x1_um [0][0]; } 
+  double* get_x_map_2x1_um  () { return &m_x_map_2x1_um[0][0]; } 
 
   /// Returns pointer to the 2x1 pixel map of y-coordinate [um]
-  double* get_y_map_2x1_um  () { return &m_y_map_2x1_um [0][0]; } 
+  double* get_y_map_2x1_um  () { return &m_y_map_2x1_um[0][0]; } 
+
+  /// Returns pointer to the 2x1 pixel map of z-coordinate [um]
+  double* get_z_map_2x1_um  () { return &m_z_map_2x1[0][0]; } 
 
   /// Returns pointer to the 2x1 pixel map of x-coordinate [pix]
   double* get_x_map_2x1_pix () { return &m_x_map_2x1_pix[0][0]; } 
@@ -233,19 +240,26 @@ public:
   /// Returns pointer to the 2x1 pixel map of y-coordinate [pix]
   double* get_y_map_2x1_pix () { return &m_y_map_2x1_pix[0][0]; } 
 
+  /// Returns pointer to the 2x1 pixel map of z-coordinate [pix]
+  double* get_z_map_2x1_pix () { return &m_z_map_2x1[0][0]; } 
+
+  /// Returns sizee of the coordinate arrays
+  const unsigned get_size() {return unsigned(SIZE2X1);}
+
   /**  
    *  @brief Returns pointer to the 2x1 pixel map for specified parameters
    *  @param[in] axis       Axis from the enumerated list for X, Y, and Z
    *  @param[in] units      Units [UM] or [PIX] from the enumerated list
    *  @param[in] angle_deg  2x1 rotation angle [degree] 
    */
-  double* get_coord_map_2x1        (AXIS axis, UNITS units, const double& angle_deg); 
+  double* get_coord_map_2x1        (AXIS axis, UNITS units, const double& angle_deg=0); 
 
   /// Returns minimal value of the 2x1 pixel coordinate for specified parameters
-  double  get_min_of_coord_map_2x1 (AXIS axis, UNITS units, const double& angle_deg);  
+  double  get_min_of_coord_map_2x1 (AXIS axis, UNITS units, const double& angle_deg=0);  
 
   /// Returns miximal value of the 2x1 pixel coordinate for specified parameters
-  double  get_max_of_coord_map_2x1 (AXIS axis, UNITS units, const double& angle_deg);  
+  double  get_max_of_coord_map_2x1 (AXIS axis, UNITS units, const double& angle_deg=0);  
+
 
 protected:
 
@@ -269,6 +283,7 @@ private:
 
   const static unsigned IND_CORNER[NCORNERS];
 
+  double  m_z_map_2x1    [ROWS2X1][COLS2X1]; // contains 0-s and works for all - _um, _pix, and _rot
   double  m_x_map_2x1_um [ROWS2X1][COLS2X1];  
   double  m_y_map_2x1_um [ROWS2X1][COLS2X1];  
   double  m_x_map_2x1_pix[ROWS2X1][COLS2X1];  
@@ -281,7 +296,7 @@ private:
   PixCoords2x1V2& operator = ( const PixCoords2x1V2& ) ;
 };
 
-const static double DEG_TO_RAD = 3.14159265359 / 180; 
+const static double DEG_TO_RAD = 3.141592653589793238463 / 180; 
 
 /// Global method for x and y arrays rotation
 void rotation(const double* x, const double* y, unsigned size, double angle_deg,   double* xrot, double* yrot);
