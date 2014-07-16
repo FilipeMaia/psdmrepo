@@ -51,8 +51,7 @@ class cspad_gainmap (object) :
 
     def event( self, evt, env ) :
         cspad = evt.get(psana.ndarray_float64_3,self.m_src,self.key_in)
-        cspad_corr = np.copy(cspad)
-        cspad_corr *= self.gm
+        cspad_corr = cspad*self.gm
         cspad = evt.put(cspad_corr,self.m_src,self.key_out)
 
     def endjob( self, evt, env ) :
