@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-26
+2014-07-16 David Schneider
+- Protect against distinct configStore keys that map to the same hdf5 path.
+  Such distinct keys should be for duplicate data, see
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/279#comment:16
+
 Tag: V00-01-25
 2014-07-10 David Schneider
 - Adjust unit test for new version of numpy

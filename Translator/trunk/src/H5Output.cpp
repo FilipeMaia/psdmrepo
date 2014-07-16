@@ -1113,20 +1113,28 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
                PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) <<" not in groups.  Added type to groups");
       }
       SrcKeyMap::iterator srcKeyPos = configGroupDirectory.findSrcKey(eventKey);
+      bool alreadyExists = true;
       if (srcKeyPos == configGroupDirectory.endSrcKey(eventKey)) {
         ++newSrcs;
         configGroupDirectory.addSrcKeyGroup(eventKey,hdfWriter);
         MsgLog(logger(addTo), trace,
                " src " << src << " not in type group.  Added src to type group");
         srcKeyPos = configGroupDirectory.findSrcKey(eventKey);
+        alreadyExists = false;
       }
       SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
       if (dataLoc == inConfigStore) {
-        try {
-          srcKeyGroup.storeData(eventKey, inConfigStore, *m_event, *m_env);
-        } catch (ErrSvc::Issue &issue) {
-          configGroupDirectory.dump();
-          throw issue;
+        if (alreadyExists) {
+          MsgLog(logger(addTo),warning,
+               " multiple keys map to same group during addConfigTypes. skipping key: "
+                 << eventKey);
+        } else {
+          try {
+            srcKeyGroup.storeData(eventKey, inConfigStore, *m_event, *m_env);
+          } catch (ErrSvc::Issue &issue) {
+            configGroupDirectory.dump();
+            throw issue;
+          }
         }
       } else if (dataLoc == inEvent) {
         srcKeyGroup.make_datasets(inEvent, *m_event, *m_env, m_defaultCreateDsetProp);
