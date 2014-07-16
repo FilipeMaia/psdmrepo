@@ -50,7 +50,6 @@ class cspad_gainmap (object) :
                         self.gm[i2x1+iquad*8][row][col+iasic*194]=self.gain
 
     def event( self, evt, env ) :
-        evt.put(self.gm,self.m_src,'gm')
         cspad = evt.get(psana.ndarray_float64_3,self.m_src,self.key_in)
         cspad_corr = np.copy(cspad)
         cspad_corr *= self.gm
