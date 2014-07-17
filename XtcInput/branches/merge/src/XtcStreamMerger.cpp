@@ -174,8 +174,8 @@ XtcStreamMerger::next()
             // the first configure was put in the queue during initialization. Now we have a
             // configure in the midst of the stream.
             MsgLog(logger, warning, "Discarding Configure transition found in " 
-                   << replaceDg.file().path())
-              << " expected if processing multiple runs, investigate further if not");
+                   << replaceDg.file().path()
+                   << " expected if processing multiple runs, investigate further if not");
           }
           if (replaceTrans != Pds::TransitionId::L1Accept) {
             MsgLog(logger, DBGMSG, "next() skipping non L1Accept in " 

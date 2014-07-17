@@ -46,7 +46,7 @@ std::string StreamDgram::dumpStr(const StreamDgram & dg) {
       << " fid=0x" << std::hex << std::setw(7) << stamp.fiducials()
       << " ctrl=" << std::dec << stamp.control()
       << " vec=" << std::dec << stamp.vector()
-      << " streamNo=" << std::dec << setw(2) << dg.file().stream()
+      << " streamNo=" << std::dec << std::setw(2) << dg.file().stream()
       << " file=" << dg.file().path();
   return msg.str();
 }
@@ -232,10 +232,6 @@ bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram 
   // compare runs
   unsigned runA = a.file().run();
   unsigned runB = b.file().run();
-
-  double secondsA = a.dg()->seq.clock().asDouble();
-  double secondsB = b.dg()->seq.clock().asDouble();
-  double AminusB = secondsA - secondsB;
 
   if (runA < runB) return false;
   if (runA > runB) return true;
