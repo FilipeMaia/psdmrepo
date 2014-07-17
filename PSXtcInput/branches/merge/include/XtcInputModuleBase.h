@@ -83,6 +83,15 @@ public:
 
 protected:
   
+  /**
+   *  @brief Fill event from list of datagrams.
+   *
+   * Datagrams should be sorted with DAQ streams first, Control streams last. If transition is 
+   * Configure or BeginCalibCycle, uses first DAQ stream (skips others) and all control streams. 
+   * For all other transitions all Dgrams are processed.
+   */
+  void fillEvent(const std::vector<XtcInput::Dgram>& dgList, Event& evt, Env& env);
+
   /// Fill event with datagram contents
   void fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env);
   
@@ -92,10 +101,17 @@ protected:
   /// Fill event with Datagram list
   void fillEventDgList(const std::vector<XtcInput::Dgram>& dgList, Event& evt);
 
+  /**
+   * @brief Fill env from list of datagrams. 
+   *
+   * Datagrams should be sorted with DAQ streams first, Control streams last. If transition is 
+   * Configure or BeginCalibCycle, uses first DAQ stream (skips others) and all control streams. 
+   * For all other transitions all Dgrams are processed.
+   */
+  void fillEnv(const std::vector<XtcInput::Dgram> &dgList, Env &env);
+
   /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);
-  
-protected:
 
   /// Protected since the Indexing input module needs access to it.
   boost::shared_ptr<IDatagramSource> m_dgsource;      ///< Datagram source instance
@@ -110,6 +126,7 @@ private:
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
+  int m_firstControlStream;                           ///< Starting index of control streams
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   long m_eventTagEpicsStore;                          ///< counter to pass to epicsStore
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
