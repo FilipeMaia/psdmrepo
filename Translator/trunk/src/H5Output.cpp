@@ -187,6 +187,9 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
                                         m_printedNotFilteringWarning(false)
 {
   MsgLog(logger(),trace,name() << " constructor()");
+}
+
+void H5Output::init() {
   readConfigParameters();
   m_splitScanMgr = boost::make_shared<SplitScanMgr>(m_h5fileName, 
                                                     m_split == SplitScan,
@@ -550,6 +553,7 @@ void H5Output::checkForNewWriters() {
 void H5Output::beginJob(Event& evt, Env& env) 
 {
   MsgLog(logger(),trace,"H5Output beginJob()");
+  init();
   setEventVariables(evt,env);
   initializeSrcAndKeyFilters();
   m_configureGroupDir.setAliasMap(env.aliasMap());
@@ -1335,6 +1339,10 @@ void H5Output::endJob(Event& evt, Env& env)
   m_chunkManager.endJob();
   ++m_currentConfigureCounter;
 
+  MsgLog(logger(), trace, "closing hdf5 file.");
+  if (m_splitScanMgr->noSplitOrJob0()) {
+    m_h5file.close();
+  }
   m_endTime = LusiTime::Time::now();
   double deltaTime = (m_endTime.sec()-m_startTime.sec()) + (m_endTime.nsec()-m_startTime.nsec())/1e9;
   MsgLog(logger(),info,": endJob " << m_endTime);
@@ -1358,9 +1366,7 @@ void H5Output::endJob(Event& evt, Env& env)
 
 H5Output::~H5Output() 
 {
-  if (m_splitScanMgr->noSplitOrJob0()) {
-    m_h5file.close();
-  }
+  MsgLog(logger(), trace, "desctructor");
 }
 
 //////////////////////////////////////////////////////

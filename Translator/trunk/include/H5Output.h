@@ -63,7 +63,7 @@ public:
 
   H5Output(std::string);
   virtual ~H5Output();
-
+ 
   virtual void beginJob(Event& evt, Env& env);
   virtual void beginRun(Event& evt, Env& env);
   virtual void beginCalibCycle(Event& evt, Env& env);
@@ -75,6 +75,7 @@ public:
   friend class Translator::ChunkManager;
 
 protected:  
+  void init();
   void readConfigParameters();
   template <typename T>
     T configReportIfNotDefault(const std::string &param, const T &defaultValue) const
