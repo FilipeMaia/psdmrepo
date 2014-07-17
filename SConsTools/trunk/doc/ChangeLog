@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-01
+2014-08-17 Igor Gaponenko
+- adding support for RHEL7 and GCC 4.8
+
 Tag: V00-09-15
 2014-04-01 Igor Gaponenko
 - upgraded Qt4 from 4.6.2 to 4.8.5
