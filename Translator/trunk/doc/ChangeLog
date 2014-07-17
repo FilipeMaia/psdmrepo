@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-27
+2014-07-17 David Schneider
+Clarify documentation for calibration filtering
+
 Tag: V00-01-26
 2014-07-16 David Schneider
 - Protect against distinct configStore keys that map to the same hdf5 path.
