@@ -379,7 +379,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_l3tAcceptOnly and not l3acceptAllDaq(eventDg, m_firstControlStream)) {
+      if (m_l3tAcceptOnly and not l3tAcceptPass(eventDg, m_firstControlStream)) {
 
         // did not pass L3, its payload is usually empty but if there is Epics
         // data in the event it may be preserved, so try to save it
