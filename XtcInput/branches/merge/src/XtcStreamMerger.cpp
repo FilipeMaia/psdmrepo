@@ -34,7 +34,7 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
-#define DVDMSG debug
+#define DBGMSG debug
 
 namespace {
 
@@ -90,27 +90,28 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
       ++idxCtrl;
       m_streams[streamIndex] = stream;
       m_priorTransBlock[streamIndex] = getInitialTransBlock(dg);
+      if (not dg.empty()) updateDgramTime(*dg.dg());
       m_outputQueue.push(dg);
-      MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. Added " 
+      MsgLog(logger, DBGMSG, "XtcStreamMerger initialization. Added " 
              << StreamDgram::dumpStr(dg)); 
     } else {
+      // this is a DAQ stream
       StreamDgram dg(stream->next(), StreamDgram::DAQ, 0, idxDAQ);
       StreamIndex streamIndex(StreamDgram::DAQ, idxDAQ);
       ++idxDAQ;
       m_streams[streamIndex] = stream;
       m_priorTransBlock[streamIndex] = getInitialTransBlock(dg);
-      // only adjust times of dgrams for typical streams, this allows one to
-      // correct for too much clock drift with fiducial merge streams
       if (not dg.empty()) updateDgramTime(*dg.dg());
       m_outputQueue.push(dg);
-      MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. Added " 
+      MsgLog(logger, DBGMSG, "XtcStreamMerger initialization. Added " 
              << StreamDgram::dumpStr(dg));
     }
   }
   if (idxDAQ > 0) {
-    MsgLog(logger, DVDMSG, "XtcStreamMerger initialization. processing DAQ is true.");
     m_processingDAQ = true;
   }
+  MsgLog(logger, DBGMSG, "XtcStreamMerger initialization: "
+         << idxDAQ << " DAQ streams and " << idxCtrl << " control streams");
 }
 
 //--------------
@@ -133,13 +134,13 @@ XtcStreamMerger::next()
   StreamIndex replaceStreamIndex(nextStreamDg.streamType(), replaceStreamId);
     
   if (m_streams.find(replaceStreamIndex) == m_streams.end()) {
-    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found (streams)");
+    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found in m_streams");
   }
   if (m_priorTransBlock.find(replaceStreamIndex) == m_priorTransBlock.end()) {
-    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found (priorTransBlock)");
+    throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found in m_priorTransBlock");
   }
 
-  MsgLog(logger,DVDMSG,">>>>>>>>>" << std::endl << "next() returning: " << StreamDgram::dumpStr(nextStreamDg));
+  MsgLog(logger,DBGMSG,">>>>" << std::endl << "next() returning: " << StreamDgram::dumpStr(nextStreamDg));
 
   bool replaced = false;
   while (not replaced) {
@@ -148,23 +149,36 @@ XtcStreamMerger::next()
     uint64_t replaceBlock = getNextBlock(lastTransBlock, replaceDg);
     m_priorTransBlock[replaceStreamIndex] = makeTransBlock(replaceDg, replaceBlock);
 
-    // skip over transition dgrams in control streams if we are processing DAQ streams -
-    // they should contain no event data and comparing them is more difficult
+    // skip over enable and disable transitions in all streams. We use EndCalibCycle for 
+    // the L1Block count as its synchronization across the DAQ streams is more robust.
+    // Sending the Enable/Disable pairs that exist in between Begin/End Calib cycle's 
+    // through the prioriry queue is Ok, but it is cleaner to keep them out.
+    // Downstream processing in PSXtcInput does not use Disable/Enable.
+
+    // For control streams, if we are processing DAQ streams, skip over all transitions.
+    // they should contain no event data. However if we are only processing control streams,
+    // process the control transitions.
     bool skip = false;
-    if (processingDAQ()) {
+    if ((not replaceDg.empty()) and 
+        ((replaceDg.dg()->seq.service() == Pds::TransitionId::Enable) or
+         (replaceDg.dg()->seq.service() == Pds::TransitionId::Disable))) {
+      MsgLog(logger, DBGMSG, "next() skipping Enable or Disable in " 
+             << dumpStr(replaceStreamIndex));
+      skip = true;
+    } else if (processingDAQ()) {
       if ((nextStreamDg.streamType() == StreamDgram::controlUnderDAQ) or 
           (nextStreamDg.streamType() == StreamDgram::controlIndependent)) {
         if (not replaceDg.empty()) {
           Pds::TransitionId::Value replaceTrans = replaceDg.dg()->seq.service();
           if (replaceTrans == Pds::TransitionId::Configure) {
             // the first configure was put in the queue during initialization. Now we have a
-            // configure in the midst of the stream. This may happen if we are processing 
-            // multiple runs
+            // configure in the midst of the stream.
             MsgLog(logger, warning, "Discarding Configure transition found in " 
-                   << replaceDg.file().path());
+                   << replaceDg.file().path())
+              << " expected if processing multiple runs, investigate further if not");
           }
           if (replaceTrans != Pds::TransitionId::L1Accept) {
-            MsgLog(logger, DVDMSG, "next() skipping non L1Accept in " 
+            MsgLog(logger, DBGMSG, "next() skipping non L1Accept in " 
                    << dumpStr(replaceStreamIndex));
             skip = true;
           }
@@ -174,13 +188,14 @@ XtcStreamMerger::next()
     if (not skip) {
       StreamDgram replaceStreamDg(replaceDg, nextStreamDg.streamType(), replaceBlock, replaceStreamId);
       m_outputQueue.push(replaceStreamDg);
-      MsgLog(logger, DVDMSG, "next() replacement dg: " << StreamDgram::dumpStr(replaceStreamDg));
+      MsgLog(logger, DBGMSG, "next() replacement dg: " << StreamDgram::dumpStr(replaceStreamDg));
       replaced = true;
     }
   }
   return nextStreamDg;
 }
 
+// updates the time for non L1 Accepts
 void 
 XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const
 {
@@ -223,9 +238,11 @@ uint64_t  XtcStreamMerger::getNextBlock(const TransBlock & prevTransBlock, const
   int nextRun = dg.file().run();
   if (nextRun != prevTransBlock.run) return 0;
   Pds::TransitionId::Value nextService = dg.dg()->seq.service();
-  // increment the block count if we see a Disable, and the prior transition was not a disable
-  // generally there should not be two disable's in a row, this protects against problems in the data
-  if ((prevTransBlock.trans != Pds::TransitionId::Disable) and (nextService == Pds::TransitionId::Disable)) {
+  // increment the block count if we see a EndCalibCycle, and the prior transition was not also a
+  // EndCalibCycle. generally there should not be two EndCalibCycle's in a row, this protects against 
+  // problems in the data
+  if ((prevTransBlock.trans != Pds::TransitionId::EndCalibCycle) and 
+      (nextService == Pds::TransitionId::EndCalibCycle)) {
     return prevTransBlock.block + 1;
   }
   return prevTransBlock.block;

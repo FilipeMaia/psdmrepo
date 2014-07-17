@@ -69,7 +69,9 @@ public:
    *  Constructor accepts iterator object which iterators over chunks in a stream.
    *
    *  @param[in]  chunkIter Iterator over chunks in a stream
-   *  @param[in]  should we sort L1Accepts by clockTime
+   *  @param[in]  clockSort if we expect out of order L1Accepts, set to true to look for the
+   *              correct spot to place a new L1Accept (does not cross non-L1Accept transition
+   *              boundaries).
    */
   XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
                   bool clockSort);
@@ -107,7 +109,7 @@ private:
   boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk
   HeaderQueue m_headerQueue;            ///< Queue for read-ahead headers
-  bool m_clockSort;                     ///< sort datagrams by clock time
+  bool m_clockSort;                     ///< sort datagrams in between non-L1Accept transitions by clock time
 };
 
 } // namespace XtcInput

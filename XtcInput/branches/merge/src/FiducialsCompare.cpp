@@ -25,6 +25,7 @@
 //-------------------------------
 #include "pdsdata/xtc/Dgram.hh"
 #include "MsgLogger/MsgLogger.h"
+#include "psana/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -38,7 +39,7 @@ namespace {
 
   const unsigned MaxFiducials = Pds::TimeStamp::MaxFiducials;
   const unsigned HalfFiducials = Pds::TimeStamp::MaxFiducials/2;
-  const unsigned QuarterFiducials = Pds::TimeStamp::HalfFiducials/2;
+  const unsigned QuarterFiducials = HalfFiducials/2;
 
   /// how many fiducials does it take to get from A to B?
   /// take into account wrap around.
@@ -63,10 +64,10 @@ namespace XtcInput {
 FiducialsCompare::FiducialsCompare(unsigned maxClockDriftSeconds) : 
   m_maxClockDriftSeconds(maxClockDriftSeconds) 
 {
-  if (maxClockDriftSeconds > QuarterFiducials) {
+  if (maxClockDriftSeconds >= QuarterFiducials) {
     MsgLog(logger, 
            error, "FiducialsCompare initialized with "
-           << maxClockDriftSeconds << " which is greater than 1/4 fiducial cycle");
+           << maxClockDriftSeconds << " which is >= than 1/4 fiducial cycle");
   }
 }
   
@@ -90,9 +91,26 @@ bool FiducialsCompare::fiducialsGreater(const uint32_t secondsA, const unsigned 
   // If B to A is shorter, than B occurs before A in clock time, and A is greater.
   unsigned fidBtoA = fidDistanceWrap(fiducialsB, fiducialsA);
   bool AisGreater = (fidBtoA < HalfFiducials);
-  
-  // we can do some checking of the clocks to see if the drift is what we expect.
-  // we print a warning if not. This code could be removed for performance purposes.
+  return AisGreater;
+}
+
+double FiducialsCompare::fidBasedBtoASecondsDiff(const Pds::Dgram &A, const Pds::Dgram &B) const
+{
+  return fidBasedBtoASecondsDiff(A.seq.clock().seconds(), A.seq.stamp().fiducials(),
+                                 B.seq.clock().seconds(), B.seq.stamp().fiducials());
+}
+
+double FiducialsCompare::fidBasedBtoASecondsDiff(const uint32_t secondsA, const unsigned fiducialsA, 
+                                                   const uint32_t secondsB, const unsigned fiducialsB) const
+{
+  if ( (secondsA >= (secondsB + maxClockDriftSeconds())) or 
+       ((secondsA + maxClockDriftSeconds()) <= secondsB) ) {
+    throw psana::Exception(ERR_LOC,"fidBasedSecondsDiff called when clocks are to far apart");
+  }
+
+  unsigned fidBtoA = fidDistanceWrap(fiducialsB, fiducialsA);
+  bool AisGreater = (fidBtoA < HalfFiducials);
+
   double BtoAdriftSec, fidBtoAsec;
   if (AisGreater) {
     fidBtoAsec = fidBtoA/360.0;
@@ -105,17 +123,7 @@ bool FiducialsCompare::fiducialsGreater(const uint32_t secondsA, const unsigned 
   else BtoAsec = -(secondsB-secondsA);
 
   BtoAdriftSec = double(BtoAsec) - fidBtoAsec;
-  if (BtoAdriftSec > maxClockDriftSeconds() or -BtoAdriftSec > maxClockDriftSeconds()) {
-      MsgLog(logger, warning, "|B to A clock drift|=" << BtoAdriftSec 
-             << " exceeds " << maxClockDriftSeconds()
-             << " secondsA=" << secondsA << " fidA=" << fiducialsA
-             << " secondsB=" << secondsB << " fidB=" << fiducialsB
-             << " (fidBtoA=" << fidBtoA << " AisGreater=" << AisGreater
-             << " fidBtoAsec=" << fidBtoAsec << ")" ); 
-
-  }
-
-  return AisGreater;
+  return BtoAdriftSec;
 }
   
 bool FiducialsCompare::fiducialsEqual(const Pds::Dgram& A, const Pds::Dgram& B) const

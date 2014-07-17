@@ -68,6 +68,8 @@ public:
    *  @param[in]  streamIter  Iterator for input files
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
    *  @param[in]  firstControlStream starting stream number for fiducial merge
+   *  @param[in]  maxStreamClockDiffSec maximum difference between stream clocks in seconds
+   *              should be <= 85 seconds.
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
                   double l1OffsetSec, int firstControlStream,
@@ -95,17 +97,31 @@ protected:
   // update time in datagram
   void updateDgramTime(Pds::Dgram& dgram) const ;
 
-  // Struct to keep track of previous transition, block and run. 
+  // Struct to keep track of previous transition, L1 block number, and run. 
   struct TransBlock {
     Pds::TransitionId::Value trans;
     uint64_t block;
     int run;
-    TransBlock() :trans(Pds::TransitionId::Unknown), block(0), run(0) {};
-    TransBlock(Pds::TransitionId::Value _trans, uint64_t _block, int _run) 
-    : trans(_trans), block(_block), run(_run) {};
-    TransBlock(const TransBlock &o) : trans(o.trans), block(o.block), run(o.run) {};
+    TransBlock() : trans(Pds::TransitionId::Unknown)
+                   , block(0)
+                   , run(0) 
+    {};
+    TransBlock(Pds::TransitionId::Value _trans, uint64_t _block, int _run) : 
+         trans(_trans)
+       , block(_block)
+       , run(_run) 
+    {};
+    TransBlock(const TransBlock &o) : trans(o.trans)
+                                      , block(o.block)
+                                      , run(o.run) 
+    {};
     TransBlock & operator=(const TransBlock &o) 
-    { trans = o.trans; block = o.block; run = o.run; return *this; }
+    { 
+      trans = o.trans; 
+      block = o.block; 
+      run = o.run; 
+      return *this; 
+    }
   };
 
   // utilities for managing TransBlock
@@ -116,15 +132,16 @@ protected:
 
 private:
   typedef std::pair<StreamDgram::StreamType, int> StreamIndex;
-  static std::string dumpStr(const StreamIndex &streamIndex);              // for debugging
-  std::map<StreamIndex, boost::shared_ptr<XtcStreamDgIter> > m_streams ;       ///< Set of datagram iterators for streams
-  std::map<StreamIndex, TransBlock> m_priorTransBlock;                        ///< TransBlock for last dgram from each stream
+  static std::string dumpStr(const StreamIndex &streamIndex);           ///< debugging string for StreamIndex
+  std::map<StreamIndex, boost::shared_ptr<XtcStreamDgIter> > m_streams; ///< Set of datagram iterators for streams
+  std::map<StreamIndex, TransBlock> m_priorTransBlock;                  ///< TransBlock for last dgram from each stream
 
   bool m_processingDAQ;                       ///< set to true if DAQ streams exist in the merge
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   int m_firstControlStream ;                  ///< starting stream number for control streams
-  StreamDgramGreater m_streamDgramGreater;            ///< for comparing two dgrams in the priority queue
+  StreamDgramGreater m_streamDgramGreater;    ///< for comparing two dgrams in the priority queue
+
   typedef std::priority_queue<StreamDgram, std::vector<StreamDgram>, StreamDgramGreater> OutputQueue;
   OutputQueue m_outputQueue;                  ///< Output queue for datagrams
 };

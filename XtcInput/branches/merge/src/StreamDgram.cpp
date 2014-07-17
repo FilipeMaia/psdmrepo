@@ -3,7 +3,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/StreamDgram.h"
 
-#define DBGMSGLVL debug
+#define DBGMSG debug
 
 namespace {
   char *logger = "StreamDgram";
@@ -34,24 +34,19 @@ std::string StreamDgram::dumpStr(const StreamDgram & dg) {
   if (dg.empty()) return "empty dgram";
   const Pds::Dgram *dgram = dg.dg().get();
   const Pds::Sequence & seq = dgram->seq;
-  //  const Pds::Env & env = dgram->env;
   const Pds::ClockTime & clock = seq.clock();
   const Pds::TimeStamp & stamp = seq.stamp();
   msg << streamType2str(dg.streamType())
       << " streamId=" << dg.streamId()
       << " L1Block=" << dg.L1Block()
-    //      << " tp=" << int(seq.type())
       << " sv=" << Pds::TransitionId::name(seq.service())
-    //      << " ex=" << seq.isExtended()
       << " ev=" << seq.isEvent()
-      << " sec=" << std::hex << std::setw(9) << clock.seconds()
-      << " nano=" << std::hex << std::setw(9) << clock.nanoseconds()
-    //      << " tcks=" << std::hex << std::setw(12) << stamp.ticks()
-      << " fid=" << std::hex << std::setw(7) << stamp.fiducials()
-      << " ctrl=" << stamp.control()
-      << " vec=" << stamp.vector()
-    //      << " env=" << env.value()
-      << " streamNo=" << std::setw(2) << dg.file().stream()
+      << " sec=0x" << std::hex << std::setw(9) << clock.seconds()
+      << " nano=0x" << std::hex << std::setw(9) << clock.nanoseconds()
+      << " fid=0x" << std::hex << std::setw(7) << stamp.fiducials()
+      << " ctrl=" << std::dec << stamp.control()
+      << " vec=" << std::dec << stamp.vector()
+      << " streamNo=" << std::dec << setw(2) << dg.file().stream()
       << " file=" << dg.file().path();
   return msg.str();
 }
@@ -77,18 +72,15 @@ StreamDgramGreater::StreamDgramGreater(unsigned maxClockDriftSeconds)
      *  We do not want to throw away L1Accepts from the s80, if they do not match a 
         DAQ stream, we want to order them correctly.
      *  Comparing a C stream L1 accept against D or C stream Transitions requires history.
-        The clocks are different and fiducials in both are not available, and the C stream
+        The clocks are different and fiducials in both are not available. The C stream
         L1 accept need not have a matching L1 in the Daq stream. This is when the block number 
         is used.
      *  Comparing a DAQ L1 accept against a DAQ Transition also requires history. We are not
         guaranteed that the clock for an L1 accept following a DAQ transition has a later time
-        than the clock for the transition. We assume that all L1 accepts before the transition 
-        should appear earlier, and likewise all L1 accepts after should appear after.
-     *  Comparing from a D to a I stream is difficult. The clocks are different, and the 
-        Transitions are not synchronized. A fiducial compare is reasonable for L1 vs. L1, but 
-        to compare Transitions between D and I, we are stuck. If we knew the difference in the 
-        clocks down to the nanosecond we could determine when two transitions are equal. However
-        what calib cycles should we present to the user? 
+        than the clock for the transition. This is most always the case, but there has been 
+        data where it is not true. We assume that all L1 accepts before the transition 
+        should appear earlier, and likewise all L1 accepts after should appear after. The
+        block is used in these cases.
      *  At this point, the C and I streams are not supposed to have anything useful in their
         Transition dgrams (other than the Configure transition). 
      *  We cannot compare anything from independent streams. One the one hand, a LD vs. an LI is
@@ -194,7 +186,7 @@ bool StreamDgramGreater::doClockGreater(const StreamDgram &a, const StreamDgram 
   const Pds::ClockTime & clockA = a.dg()->seq.clock();
   const Pds::ClockTime & clockB = b.dg()->seq.clock();
   bool res = clockA > clockB;
-  MsgLog(logger,DBGMSGLVL, "doClockGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+  MsgLog(logger, DBGMSG, "doClockGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
   return res;
@@ -210,7 +202,7 @@ bool StreamDgramGreater::doFidGreater(const StreamDgram &a, const StreamDgram &b
   if (blockResult > 0) return true;
   if (blockResult < 0) return false;
   bool res = m_fidCompare.fiducialsGreater(*a.dg(), *b.dg());
-  MsgLog(logger,DBGMSGLVL, "doFidGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
+  MsgLog(logger, DBGMSG, "doFidGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
   
@@ -231,9 +223,11 @@ bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram 
   }
 
   // first compare runs. The block number should be reset 0 when processing a new run
-  // in the same stream. One could imagine implement a running block count accross runs
-  // but if a run omitted one stream, a running block number across all
-  // the runs would get out of sync (accross different streams).
+  // in the same stream. One could imagine implement a running block count accross all the runs
+  // for a stream, but if a run is omitted in one stream and not the others, a running block 
+  // number across all the runs would get out of sync. Also sometimes runs are brought to an
+  // end because of DAQ problems with synchronizing the non L1Accept transitions accross the
+  // streams - so a block count they may not be synchronized accross streams at the very end of a run.
 
   // compare runs
   unsigned runA = a.file().run();
@@ -243,34 +237,14 @@ bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram 
   double secondsB = b.dg()->seq.clock().asDouble();
   double AminusB = secondsA - secondsB;
 
-  if (runA < runB) {
-    if (AminusB > m_fidCompare.maxClockDriftSeconds()) {
-      MsgLog(logger, warning, "doBlockGreater: dgram A is in earler run but clock is more than "
-             << m_fidCompare.maxClockDriftSeconds() << " seconds later than dgram B");
-    }
-    MsgLog(logger, DBGMSGLVL, "doBlockGreater: A > B = false as runA=" << runA << " runB=" << runB 
-           << " dgrams:" << std::endl
-           << "A: " << StreamDgram::dumpStr(a) << std::endl
-           << "B: " << StreamDgram::dumpStr(b));
-    return false;
-  }
-  if (runA > runB) {
-    if (AminusB < (-1.0*double(m_fidCompare.maxClockDriftSeconds()))) {
-      MsgLog(logger, warning, "doBlockGreater: dgram A is in later run but clock is more than "
-             << m_fidCompare.maxClockDriftSeconds() << " seconds earlier than dgram B");
-    }
-    MsgLog(logger, DBGMSGLVL, "doBlockGreater: A > B = true as runA=" << runA << " runB=" << runB 
-           << " dgrams:" << std::endl
-           << "A: " << StreamDgram::dumpStr(a) << std::endl
-           << "B: " << StreamDgram::dumpStr(b));
-    return true;
-  }
+  if (runA < runB) return false;
+  if (runA > runB) return true;
 
   // same run, compare block number.
 
   if ((transA == L1Accept) and (transB == otherTrans)) {
     bool res = a.L1Block() >= b.L1Block();
-    MsgLog(logger, DBGMSGLVL, "doBlockGreater: same run. A > B = " << bool2str(res)
+    MsgLog(logger, DBGMSG, "doBlockGreater: same run. A > B = " << bool2str(res)
            << " dgrams:" << std::endl
            << "A: " << StreamDgram::dumpStr(a) << std::endl
            << "B: " << StreamDgram::dumpStr(b));
@@ -278,7 +252,7 @@ bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram 
   } 
   // (transA == otherTrans) and (transB == L1Accept)
   bool res = a.L1Block() > b.L1Block();
-  MsgLog(logger, DBGMSGLVL, "doBlockGreater: same run. A > B = " << bool2str(res)
+  MsgLog(logger, DBGMSG, "doBlockGreater: same run. A > B = " << bool2str(res)
          << " dgrams:" << std::endl
          << "A: " << StreamDgram::dumpStr(a) << std::endl
          << "B: " << StreamDgram::dumpStr(b));
