@@ -36,6 +36,7 @@
 #include "pdsdata/index/IndexFileStruct.hh"
 #include "pdsdata/index/IndexFileReader.hh"
 #include "pdsdata/index/IndexList.hh"
+#include "pdsdata/xtc/Sequence.hh"
 #include "IData/Dataset.h"
 #include "XtcInput/XtcFileName.h"
 
@@ -546,6 +547,17 @@ public:
   // return vector of times that can be used for the "jump" method.
   const vector<psana::EventTime>& times() const {return _times;}
 
+  void endrun() {
+    Pds::Dgram* dg = new Pds::Dgram;
+    Pds::ClockTime ct;
+    Pds::TimeStamp ts;
+    Pds::Sequence seq(Pds::Sequence::Event,
+                      Pds::TransitionId::EndRun,
+                      ct, ts);
+    dg->seq = seq;
+    _postOneDg(dg);
+  }
+
   // jump to an event
   // can't be a const method because it changes the "pieces" object
   int jump(uint64_t timestamp, uint32_t fiducial) {
@@ -616,6 +628,10 @@ void Index::setrun(int run) {
   if (not _rmap->runFiles.count(run)) MsgLog(logger, fatal, "Run " << run << " not found");
   delete _idxrun;
   _idxrun = new IndexRun(_queue,_rmap->runFiles[run]);
+}
+
+void Index::end() {
+  _idxrun->endrun();
 }
 
 const std::vector<unsigned>& Index::runs() {
