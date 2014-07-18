@@ -140,6 +140,7 @@ private:
   NDArrPars& operator = ( const NDArrPars& ) ;
 };
 
+//--------------------
 
 class GlobalMethods  {
 public:

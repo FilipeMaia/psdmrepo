@@ -125,6 +125,7 @@ private:
   std::string    m_rmsFile;
   std::string    m_mskFile;
   std::string    m_hotFile;
+  std::string    m_maxFile;
   std::string    m_file_type;       // File type "txt", "metatxt", or "bin"
 
   std::string    m_fname_ext;       // file name extension, for example for run 123: "-r0123.dat" 
@@ -150,6 +151,7 @@ private:
   bool           m_do_rms;
   bool           m_do_msk;
   bool           m_do_hot;
+  bool           m_do_max;
 
   std::string    m_str_exp;
   std::string    m_str_run_num;
@@ -166,6 +168,7 @@ private:
   double*        m_rms;   // rms per pixel
   int*           m_msk;   // pixel mask per pixel; pixel is hot if rms > m_thr_rms, hot/cold = 0/1 
   int*           m_hot;   // hot-pixel mask per pixel (in style of Phil); pixel is hot if rms > m_thr_rms, hot/cold = 1/0 , 
+  double*        m_max;   // maximal value over events per pixel
 
 protected:
 //-------------------
@@ -234,6 +237,13 @@ protected:
         m_sum [i] += amp;
         m_sum2[i] += amp*amp;
       }
+
+      if (m_do_max) {
+        for (unsigned i=0; i<m_size; ++i) {
+	  amp = (double)data[i];
+          if (amp > m_max[i]) m_max[i] = amp;
+	}
+      } // m_do_max
     }          
 
 //-------------------

@@ -59,6 +59,7 @@ NDArrAverage::NDArrAverage (const std::string& name)
   , m_rmsFile()
   , m_mskFile()
   , m_hotFile()
+  , m_maxFile()
   , m_file_type()
   , m_thr_rms()
   , m_thr_min()
@@ -79,6 +80,7 @@ NDArrAverage::NDArrAverage (const std::string& name)
   m_rmsFile     = configStr("rmsfile",     "");
   m_mskFile     = configStr("maskfile",    "");
   m_hotFile     = configStr("hotpixfile",  "");
+  m_maxFile     = configStr("maxfile",     "");
   m_file_type   = configStr("ftype",    "txt");
   m_thr_rms     = config("thr_rms_ADU",   10000.);
   m_thr_min     = config("thr_min_ADU", -100000.);
@@ -94,6 +96,7 @@ NDArrAverage::NDArrAverage (const std::string& name)
   m_do_rms  = (m_rmsFile.empty()) ? false : true;
   m_do_msk  = (m_mskFile.empty()) ? false : true;
   m_do_hot  = (m_hotFile.empty()) ? false : true;
+  m_do_max  = (m_maxFile.empty()) ? false : true;
 
   // If all file names are empty - save average and rms with default names
   if (    !m_do_msk 
@@ -106,7 +109,6 @@ NDArrAverage::NDArrAverage (const std::string& name)
     m_rmsFile = "arr-rms";
     m_do_ave  = true;
     m_do_rms  = true;
-
   }
 
   m_ndarr_pars = 0;
@@ -130,6 +132,7 @@ NDArrAverage::printInputParameters()
         << "\n m_rmsFile  : " << m_rmsFile    
         << "\n m_mskFile  : " << m_mskFile    
         << "\n m_hotFile  : " << m_hotFile    
+        << "\n m_maxFile  : " << m_maxFile    
         << "\n m_ftype    : " << m_file_type
         << "\n m_thr_rms  : " << m_thr_rms  
         << "\n m_thr_min  : " << m_thr_min  
@@ -139,6 +142,7 @@ NDArrAverage::printInputParameters()
         << "\n m_do_rms   : " << m_do_rms
         << "\n m_do_msk   : " << m_do_msk
         << "\n m_do_hot   : " << m_do_hot
+        << "\n m_do_max   : " << m_do_max
         << "\n print_bits : " << m_print_bits
         << "\n evts_stage1: " << m_nev_stage1   
         << "\n evts_stage2: " << m_nev_stage2  
@@ -247,12 +251,14 @@ NDArrAverage::endJob(Event& evt, Env& env)
   std::vector<std::string> v_com3(v_com); v_com3.push_back("TYPE       RMS");
   std::vector<std::string> v_com4(v_com); v_com4.push_back("TYPE       Mask of bad pixels");
   std::vector<std::string> v_com5(v_com); v_com5.push_back("TYPE       Pixel status");
+  std::vector<std::string> v_com6(v_com); v_com6.push_back("TYPE       Maximal values");
 
   if (m_do_sum)  saveNDArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com1 );
   if (m_do_ave)  saveNDArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com2 );
   if (m_do_rms)  saveNDArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com3 );
   if (m_do_msk)  saveNDArrayInFile<int>    ( m_mskFile+m_fname_ext, m_msk, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com4 );
   if (m_do_hot)  saveNDArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com5 );
+  if (m_do_max)  saveNDArrayInFile<double> ( m_maxFile+m_fname_ext, m_max, m_ndarr_pars, m_print_bits & 16, m_file_mode, v_com6 );
 
   if( m_print_bits & 32 ) printSummaryForParser(evt);
   if( m_print_bits & 64 ) printStatBadPix();
@@ -285,6 +291,7 @@ NDArrAverage::setCollectionMode(Event& evt)
     m_rms  = new double  [m_size]; 
     m_msk  = new int     [m_size]; 
     m_hot  = new int     [m_size]; 
+    m_max  = new double  [m_size]; 
     resetStatArrays();
     m_gate_width = 0;
     if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: evt = " << m_count << " Begin to collect statistics without gate.");
@@ -320,6 +327,7 @@ NDArrAverage::resetStatArrays()
   std::fill_n(m_stat, int(m_size), unsigned(0));
   std::fill_n(m_sum,  int(m_size), double(0.));
   std::fill_n(m_sum2, int(m_size), double(0.));
+  if (m_do_max) std::fill_n(m_max,  int(m_size), double(0.));
 }
 
 //--------------------
