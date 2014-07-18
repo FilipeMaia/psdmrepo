@@ -32,6 +32,7 @@ public:
   ~Index();
   int jump(psana::EventTime t);
   void setrun(int run);
+  void end();
   const std::vector<psana::EventTime>& runtimes();
   const std::vector<unsigned>& runs();
 private:

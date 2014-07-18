@@ -12,12 +12,21 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-15-00
-2014-07-xx David Schneider
-- Control stream support: trac ticket #279. Before, we never merged dg's into 
-  the same event, now merge it if least on dgram is from control (sec/fid match)
+2014-07-18 David Schneider
+- Control stream support: trac ticket #279. Look for matching dgrams for an
+  event. Use rough second and fiducial match.
+- add methods to fill event/env from dgram list. control vs DAQ and transition
+  type affects fill.
 - do not clear AliasMap, merge aliases, trac ticket #314
 - API change: store XtcInput::DgramList rather than Pds::Dgram in Event
 - new [psana] config parameter: first_control_stream  (defaults to 80)
+- new [psana] config parameter: max_stream_clock_diff (defaults to 85)
+  this is max difference in seconds.
+	
+Tag: V00-14-09
+2014-07-18 Christopher O'Grady
+- Add Index::end method to allow user to indicate when they
+  are done with accessing a file randomly (sends an EndRun transition)
 
 Tag: V00-14-08
 2014-06-23 Christopher O'Grady
