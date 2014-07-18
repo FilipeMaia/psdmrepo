@@ -34,10 +34,12 @@ class cspad_gainmap (object) :
     def beginrun( self, evt, env ) :
 
         configStore = env.configStore()
-        cfg = configStore.get(psana.CsPad.ConfigV5,self.m_src)
+        self.cfg = configStore.get(psana.CsPad.ConfigV5,self.m_src)
+        if self.cfg is None:
+            return
         # even running with 1 quad we seem to have 4 quads of config information
-        for iquad in range(cfg.quads_shape()[0]):
-            gm = cfg.quads(iquad).gm().gainMap()
+        for iquad in range(self.cfg.quads_shape()[0]):
+            gm = self.cfg.quads(iquad).gm().gainMap()
             for (row,col), value in np.ndenumerate(gm):
                 for i in range(16):
                     iasic = i%2
@@ -50,7 +52,11 @@ class cspad_gainmap (object) :
                         self.gm[i2x1+iquad*8][row][col+iasic*194]=self.gain
 
     def event( self, evt, env ) :
+        if self.cfg is None:
+            return
         cspad = evt.get(psana.ndarray_float64_3,self.m_src,self.key_in)
+        if cspad is None:
+            return
         cspad_corr = cspad*self.gm
         cspad = evt.put(cspad_corr,self.m_src,self.key_out)
 
