@@ -107,13 +107,13 @@ class CalibParsDefault (object) :
         self.defpars['center_corr'] = np.zeros((3,4,8), dtype=np.float32)
 
         self.defpars['marg_gap_shift'] = np.array(
-                    [[ 15.,  40.,   0.,  38.],
-                     [ 15.,  40.,   0.,  38.],
+                    [[ 15.,  40.,   4.,  40.],
+                     [ 15.,  40.,   4.,  40.],
                      [  0.,   0.,   0.,   0.]])
 
         self.defpars['offset'] = np.array(
-                    [[   0.,    0.,  834.,  834.],
-                     [   0.,  834.,  834.,    0.],
+                    [[   0.,    0.,  820.,  820.],
+                     [   0.,  820.,  820.,    0.],
                      [   0.,    0.,    0.,    0.]])
 
         self.defpars['offset_corr'] = np.array(

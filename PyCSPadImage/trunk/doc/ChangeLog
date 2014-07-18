@@ -12,6 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2014-07-18 Mikhail S. Dubrovin
+Tag: V00-00-24
+- CalibParsDefault.py - change default parameters for marg_gap_shift and offset
+- GlobalMethods.py - in getCSPadArrayFromFile add input from *.npy 	
+- Alignment.py - update
+
+#---------------------
 2014-07-02 Mikhail S. Dubrovin
 Tag: V00-00-23
 - CSPADPixCoords.py - use offset for pixel coordinates by default - add do_crop=True

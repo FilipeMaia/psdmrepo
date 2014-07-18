@@ -118,10 +118,12 @@ def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_r
     print 'quad_rotation:\n',   calib.getCalibPars('quad_rotation')
     print 'quad_tilt:\n',       calib.getCalibPars('quad_tilt')
 
-    coord = pixcoor.CSPADPixCoords(calib)
+    #coord = pixcoor.CSPADPixCoords(calib, do_crop=True)
+    coord = pixcoor.CSPADPixCoords(calib, do_crop=False)
     coord.print_cspad_geometry_pars()
 
     # Make mask of active pixels on image
+    #quads = [1,1,1,1]
     quads = [1,1,1,1]
 
     mask_quad0_nda = np.ones((8, 185, 388)) if quads[0] else np.zeros((8, 185, 388))
@@ -239,8 +241,33 @@ if __name__ == "__main__" :
         rad_range = (50,300,250)
         radius = 117
         amps_rad  = (0,12000)
-        path_calib, runnum = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
-        #path_calib, runnum = '/reg/d/psdm/CXI/cxid2714/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        #path_calib, runnum = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        #path_calib, runnum = '/reg/d/psdm/CXI/cxid6214/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        path_calib, runnum = '/reg/d/psdm/CXI/cxid9114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 23
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
+
+    elif sys.argv[1]=='4' :
+        basedir =  '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds2-2014-05-15/'
+        fname  = basedir + 'cspad-ndarr-ave-cxid9114-r0170-ds2.txt'
+        amps   = (0,50)    
+        center = (892.0,875)
+        rad_range = (380,480,100)
+        radius = 418
+        amps_rad  = (0,1000)
+        path_calib, runnum = basedir + 'calib/CsPad::CalibV1/CxiDs2.0:Cspad.0', 170
+        #path_calib, runnum = '/reg/d/psdm/CXI/cxid9114/calib/CsPad::CalibV1/CxiDs2.0:Cspad.0', 170
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
+
+    elif sys.argv[1]=='5' :
+        basedir =  '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds2-2014-05-15/'
+        fname  = basedir + 'cspad-arr-cxid6014-rxxxx-powder-far-ds2.npy'
+        amps   = (0,100)    
+        center = (892.0,875)
+        rad_range = (100,200,100)
+        radius = 150
+        amps_rad  = (0,1000)
+        #path_calib, runnum = basedir + 'calib/CsPad::CalibV1/CxiDs2.0:Cspad.0', 50
+        path_calib, runnum = '/reg/d/psdm/CXI/cxid9114/calib/CsPad::CalibV1/CxiDs2.0:Cspad.0', 50
         alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
 
     else :
