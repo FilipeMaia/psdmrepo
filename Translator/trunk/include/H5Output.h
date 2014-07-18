@@ -142,8 +142,7 @@ private:
   hdf5pp::Group m_currentFilteredGroup;
 
   TypeSrcKeyH5GroupDirectory m_configureGroupDir;
-  TypeSrcKeyH5GroupDirectory m_calibCycleConfigureGroupDir;
-  TypeSrcKeyH5GroupDirectory m_calibCycleEventGroupDir;
+  TypeSrcKeyH5GroupDirectory m_calibCycleGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibStoreGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;

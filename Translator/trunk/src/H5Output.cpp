@@ -210,8 +210,7 @@ void H5Output::init() {
                              m_splitScanMgr);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibStoreGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
-  m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
-  m_calibCycleEventGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
+  m_calibCycleGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   boost::shared_ptr<HdfWriterDamage> nullHdfWriterDamage;
   m_calibCycleFilteredGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,nullHdfWriterDamage);
   TypeAliases::Alias2TypesMap::const_iterator pos = m_typeAliases.alias2TypesMap().find("ndarray_types");
@@ -220,8 +219,7 @@ void H5Output::init() {
   m_h5groupNames = boost::make_shared<H5GroupNames>(m_calibration_key, pos->second);
   m_configureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibStoreGroupDir.setH5GroupNames(m_h5groupNames);
-  m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
-  m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
+  m_calibCycleGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleFilteredGroupDir.setH5GroupNames(m_h5groupNames);
   createH5OutputFile();
 }
@@ -558,8 +556,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   initializeSrcAndKeyFilters();
   m_configureGroupDir.setAliasMap(env.aliasMap());
   m_calibStoreGroupDir.setAliasMap(env.aliasMap());
-  m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
-  m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
+  m_calibCycleGroupDir.setAliasMap(env.aliasMap());
   m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
 
   // record some info from the env
@@ -599,13 +596,12 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   MsgLog(logger(),debug,name() << ": beginCalibCycle() calib cycle" << m_currentCalibCycleCounter);
   setEventVariables(evt,env);
   createNextCalibCycleGroup();
-  m_calibCycleEventGroupDir.clearMaps();
-  m_calibCycleConfigureGroupDir.clearMaps();
+  m_calibCycleGroupDir.clearMaps();
   m_calibCycleFilteredGroupDir.clearMaps();
   m_currentEventCounter = 0;
   m_filteredEventsThisCalibCycle = 0;
   m_chunkManager.beginCalibCycle(env);
-  addConfigTypes(m_calibCycleConfigureGroupDir, m_currentCalibCycleGroup);
+  addConfigTypes(m_calibCycleGroupDir, m_currentCalibCycleGroup);
   if (m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
     m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
   }
@@ -626,7 +622,7 @@ void H5Output::event(Event& evt, Env& env)
       } 
       if (m_splitScanMgr->splitScanMode() and 
           m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
-        m_calibCycleEventGroupDir.closeGroups();
+        m_calibCycleGroupDir.closeGroups();
         m_currentCalibCycleGroup.close();
         m_splitScanMgr->closeCalibCycleFile(m_currentCalibCycleCounter);
       }
@@ -928,7 +924,7 @@ void H5Output::eventImpl()
     }
   }
 
-  m_calibCycleEventGroupDir.markAllSrcKeyGroupsNotWrittenForEvent();
+  m_calibCycleGroupDir.markAllSrcKeyGroupsNotWrittenForEvent();
   MsgLog(logger(eventImpl),trace,eventPosition() << " eventId: " << *m_eventId);
   list<EventKeyTranslation>::iterator keyIter;
   for (keyIter = toTranslate.begin(); keyIter != toTranslate.end(); ++keyIter) {
@@ -945,18 +941,18 @@ void H5Output::eventImpl()
       m_calibratedEventKeys.insert(eventKey);
       MsgLog(logger(),debug,eventImpl << " eventKey is calibration key. Adding Pds::Src to calibratedSrc Src.");
     }
-    TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(eventKey);
-    if (typePos == m_calibCycleEventGroupDir.endType()) {
-      m_calibCycleEventGroupDir.addTypeGroup(eventKey, m_currentCalibCycleGroup);
+    TypeMapContainer::iterator typePos = m_calibCycleGroupDir.findType(eventKey);
+    if (typePos == m_calibCycleGroupDir.endType()) {
+      m_calibCycleGroupDir.addTypeGroup(eventKey, m_currentCalibCycleGroup);
       MsgLog(logger(eventImpl),trace, "eventKey: " << eventKey 
              << " with group name " << m_h5groupNames->nameForType(eventKey.typeinfo(), eventKey.key())
              << " not in calibCycleEventGroupDir.  Added type to groups");
     }
-    SrcKeyMap::iterator srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
-    if (srcKeyPos == m_calibCycleEventGroupDir.endSrcKey(eventKey)) {
+    SrcKeyMap::iterator srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
+    if (srcKeyPos == m_calibCycleGroupDir.endSrcKey(eventKey)) {
       MsgLog(logger(eventImpl),trace,
              "src " << src << " not in type group.  Adding src to type group");
-      SrcKeyGroup & srcKeyGroup = m_calibCycleEventGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
+      SrcKeyGroup & srcKeyGroup = m_calibCycleGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
       if (writeBlank) {
         MsgLog(logger(eventImpl),trace," initial event is blank.  Only creating time/damage datasets");
         srcKeyGroup.make_timeDamageDatasets();
@@ -964,7 +960,7 @@ void H5Output::eventImpl()
         MsgLog(logger(eventImpl),trace," initial event is nonblank.  Creating event datasets, and time/damage datasets");
         srcKeyGroup.make_datasets(dataTypeLoc, *m_event, *m_env, m_defaultCreateDsetProp);
       }
-      srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
+      srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
     }
     SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
     bool needToAppend = true;
@@ -1041,10 +1037,10 @@ void H5Output::eventImpl()
     map<Pds::Src, vector<PSEvt::EventKey> > droppedSrcsNotWritten;
     vector<PSEvt::EventKey> otherNotWritten;
     vector<PSEvt::EventKey> writtenKeys;
-    m_calibCycleEventGroupDir.getNotWrittenSrcPartition(droppedSrcs,
-                                                        droppedSrcsNotWritten,
-                                                        otherNotWritten,
-                                                        writtenKeys);
+    m_calibCycleGroupDir.getNotWrittenSrcPartition(droppedSrcs,
+                                                   droppedSrcsNotWritten,
+                                                   otherNotWritten,
+                                                   writtenKeys);
     set<Pds::Src>::iterator droppedSrc;
     for (droppedSrc = droppedSrcs.begin(); droppedSrc != droppedSrcs.end(); ++droppedSrc) {
       const Pds::Src & src = *droppedSrc;
@@ -1058,7 +1054,7 @@ void H5Output::eventImpl()
       vector<PSEvt::EventKey> & notWritten = notWrittenIter->second;
       for (size_t notWrittenIdx = 0; notWrittenIdx < notWritten.size(); ++notWrittenIdx) {
         PSEvt::EventKey & eventKey = notWritten[notWrittenIdx];
-        SrcKeyMap::iterator srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
+        SrcKeyMap::iterator srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
         SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
         Pds::Damage damage = src2damage[src];
         long pos = srcKeyGroup.appendBlankTimeAndDamage(eventKey, m_eventId, damage);
@@ -1167,8 +1163,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
   if (m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
     ++m_totalCalibCyclesProcessed;
     m_epicsGroupDir.processEndCalibCycle();
-    m_calibCycleEventGroupDir.closeGroups();
-    m_calibCycleConfigureGroupDir.closeGroups();
+    m_calibCycleGroupDir.closeGroups();
     if (m_eventId) ::storeClock ( m_currentCalibCycleGroup, m_eventId->time(), "end" ) ;
     m_currentCalibCycleGroup.close();
   }
@@ -1415,7 +1410,7 @@ void H5Output::createNextCalibCycleGroup() {
 }
 
 void H5Output::closeH5File() {
-  m_calibCycleEventGroupDir.closeGroups();
+  m_calibCycleGroupDir.closeGroups();
   m_configureGroupDir.closeGroups();
   m_currentCalibCycleGroup.close();
   m_currentRunGroup.close();
