@@ -166,7 +166,8 @@ class ZMQListener(object):
             self.reset_flag.clear()
 
     def start(self):
-        self.thread.start()
+        if not self.thread.isAlive():
+            self.thread.start()
 
 
 class ZMQRequester(object):
