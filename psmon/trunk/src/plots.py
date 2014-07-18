@@ -41,7 +41,7 @@ class Hist(Data):
     A data container for 1-d histogram data
     """
 
-    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, formats='.'):
+    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, formats='-'):
         super(Hist, self).__init__(ts, title, xlabel, ylabel)
         self.bins = bins
         self.values = values

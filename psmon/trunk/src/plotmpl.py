@@ -160,7 +160,7 @@ class HistClient(Plot):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
         plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
-        self.hists = self.ax.plot(*plot_args)
+        self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
         self.set_aspect()
         self.set_xy_ranges()
 

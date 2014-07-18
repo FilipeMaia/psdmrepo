@@ -32,6 +32,7 @@ def main():
                 'xcs-ipm-02-0v2',
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
+                format='.',
                 pubrate=myrate
             ),
             HistHelper(
@@ -54,6 +55,7 @@ def main():
                 'xcs-ipm-04-0v2',
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
+                format='.',
                 pubrate=myrate
             ),
             HistHelper(

@@ -83,7 +83,7 @@ class MultiImageHelper(MultiHelper):
 class XYPlotHelper(Helper):
     DEFAULT_ARR_SIZE = 100
 
-    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, format='.', pubrate=None):
+    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, format='-', pubrate=None):
         super(XYPlotHelper, self).__init__(publisher, topic, title, pubrate)
         self.index = 0
         self.xdata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
@@ -116,7 +116,7 @@ class XYPlotHelper(Helper):
 
 
 class HistHelper(Helper):
-    def __init__(self, publisher, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='.', pubrate=None):
+    def __init__(self, publisher, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='-', pubrate=None):
         super(HistHelper, self).__init__(publisher, topic, title, pubrate)
         self.nbins = int(nbins)
         self.bmin = float(bmin)
@@ -160,7 +160,7 @@ class HistOverlayHelper(Helper):
             formats=self.formats
         )
 
-    def make_hist(self, nbins, bmin, bmax, format='.'):
+    def make_hist(self, nbins, bmin, bmax, format='-'):
         index = self.nhist
         self.nbins.append(nbins)
         self.ranges.append((bmin, bmax))
