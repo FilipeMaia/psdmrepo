@@ -25,6 +25,8 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <boost/foreach.hpp>
+#include <vector>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -32,6 +34,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "PSXtcOutput/Exceptions.h"
+#include "XtcInput/DgramList.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -120,9 +123,13 @@ XtcOutputModule::beginJob(Event& evt, Env& env)
     m_expNum = env.expNum();
   }
 
-  // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
-    // save its data
+  // get datagram(s) from event and save data
+  if ( boost::shared_ptr<XtcInput::DgramList> dgList = evt.get()) {
+    if (dgList->size() > 1) {
+      MsgLog(logger, warning, "only writing one configure transition, there are: " << dgList->size());
+    }
+    saveData(dgList->frontDg().get(), Pds::TransitionId::Configure);
+  } else if (XtcInput::Dgram::ptr dg = evt.get()) {
     saveData(dg.get(), Pds::TransitionId::Configure);
   }
 }
@@ -131,9 +138,10 @@ XtcOutputModule::beginJob(Event& evt, Env& env)
 void 
 XtcOutputModule::beginRun(Event& evt, Env& env)
 {
-  // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
-    // save its data
+  // get datagram(s) from event and save data
+  if ( boost::shared_ptr<XtcInput::DgramList> dgList = evt.get()) {
+    saveData(dgList->frontDg().get(), Pds::TransitionId::BeginRun);
+  } else if (XtcInput::Dgram::ptr dg = evt.get()) {
     saveData(dg.get(), Pds::TransitionId::BeginRun);
   }
 }
@@ -142,9 +150,10 @@ XtcOutputModule::beginRun(Event& evt, Env& env)
 void 
 XtcOutputModule::beginCalibCycle(Event& evt, Env& env)
 {
-  // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
-    // save its data
+  // get datagram(s) from event and save data
+  if ( boost::shared_ptr<XtcInput::DgramList> dgList = evt.get()) {
+    saveData(dgList->frontDg().get(), Pds::TransitionId::BeginCalibCycle);
+  } else if (XtcInput::Dgram::ptr dg = evt.get()) {
     saveData(dg.get(), Pds::TransitionId::BeginCalibCycle);
   }
 }
@@ -155,7 +164,16 @@ void
 XtcOutputModule::event(Event& evt, Env& env)
 {
   // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
+  XtcInput::DgramList::DgramListImpl pdsDgList;
+  boost::shared_ptr<XtcInput::DgramList> dgList = evt.get();
+  if (not dgList) {
+    if (XtcInput::Dgram::ptr dg = evt.get()) {
+      pdsDgList.push_back(dg);
+    }
+  } else {
+    pdsDgList = dgList->getDgrams();
+  }
+  if (pdsDgList.size()>0) {
 
     // check presence of skip flag
     boost::shared_ptr<int> skip = evt.get("__psana_skip_event__");
@@ -163,22 +181,26 @@ XtcOutputModule::event(Event& evt, Env& env)
 
       MsgLog(logger, trace, "XtcOutputModule: storing complete event");
 
-      // save its data
-      saveData(dg.get(), Pds::TransitionId::L1Accept);
+      // save data
+      BOOST_FOREACH(XtcInput::Dgram::ptr& dg, pdsDgList) {
+        saveData(dg.get(), Pds::TransitionId::L1Accept);
+      }
 
     } else if (m_filter) {
 
       // filter out everything except EPICS and save
 
-      // make a buffer big enough
-      size_t bufSize = dg->xtc.sizeofPayload() + sizeof(Pds::Dgram);
-      boost::shared_ptr<char> buf(new char[bufSize], CharArrayDeleter());
+      BOOST_FOREACH(XtcInput::Dgram::ptr& dg, pdsDgList) {
+        // make a buffer big enough
+        size_t bufSize = dg->xtc.sizeofPayload() + sizeof(Pds::Dgram);
+        boost::shared_ptr<char> buf(new char[bufSize], CharArrayDeleter());
 
-      // call filter, if anything left after filtering then save it
-      size_t newSize = m_filter->filter(dg.get(), buf.get());
-      MsgLog(logger, trace, "XtcOutputModule: filtering event, bytes before = " << bufSize << ", bytes after = " << newSize);
-      if (newSize) {
-        saveData((Pds::Dgram*)buf.get(), Pds::TransitionId::L1Accept);
+        // call filter, if anything left after filtering then save it
+        size_t newSize = m_filter->filter(dg.get(), buf.get());
+        MsgLog(logger, trace, "XtcOutputModule: filtering event, bytes before = " << bufSize << ", bytes after = " << newSize);
+        if (newSize) {
+          saveData((Pds::Dgram*)buf.get(), Pds::TransitionId::L1Accept);
+        }
       }
 
     }
@@ -189,8 +211,10 @@ XtcOutputModule::event(Event& evt, Env& env)
 void 
 XtcOutputModule::endCalibCycle(Event& evt, Env& env)
 {
-  // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
+  // get datagram(s) from event and save data
+  if ( boost::shared_ptr<XtcInput::DgramList> dgList = evt.get()) {
+    saveData(dgList->frontDg().get(), Pds::TransitionId::EndCalibCycle);
+  } else if (XtcInput::Dgram::ptr dg = evt.get()) {
     // save its data
     saveData(dg.get(), Pds::TransitionId::EndCalibCycle);
   }
@@ -200,8 +224,10 @@ XtcOutputModule::endCalibCycle(Event& evt, Env& env)
 void 
 XtcOutputModule::endRun(Event& evt, Env& env)
 {
-  // get datagram from event
-  if (XtcInput::Dgram::ptr dg = evt.get()) {
+  // get datagram(s) from event and save data
+  if ( boost::shared_ptr<XtcInput::DgramList> dgList = evt.get()) {
+    saveData(dgList->frontDg().get(), Pds::TransitionId::EndRun);
+  } else if (XtcInput::Dgram::ptr dg = evt.get()) {
     // save its data
     saveData(dg.get(), Pds::TransitionId::EndRun);
   }
