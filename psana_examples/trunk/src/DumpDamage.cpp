@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: EventKeys.cpp 6430 2013-06-24 17:12:58Z salnikov@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
-//	Class EventKeys...
+//	Class DumpDamage
 //
 // Author List:
 //
@@ -36,8 +36,6 @@ using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpDamage)
 
 namespace {
-  
-  const char* logger = "DumpDamage"; 
   
   struct LocationAndDamage {
     bool inCfg;
@@ -134,7 +132,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
   std::list<EventKey>::const_iterator iter;
 
   const PSEvt::HistI * configHist  = env.configStore().proxyDict()->hist();
-  if (not configHist) MsgLog(logger,fatal,"Internal error - no HistI object in configStore");
+  if (not configHist) MsgLog(name(),fatal,"Internal error - no HistI object in configStore");
   
   const std::list<EventKey> configKeys = env.configStore().keys();
 
@@ -154,7 +152,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
   }
 
   const PSEvt::HistI * calibHist  = env.calibStore().proxyDict()->hist();
-  if (not calibHist) MsgLog(logger,fatal,"Internal error - no HistI object in calibStore");
+  if (not calibHist) MsgLog(name(),fatal,"Internal error - no HistI object in calibStore");
 
   const std::list<EventKey> calibKeys = env.calibStore().keys();
 
@@ -202,7 +200,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
       locAndDamage.inEvent = true;
       if ((locAndDamage.inDamageMap != inDamageMap) or (locAndDamage.damage.value() != damage.value())) {
         // Getting different damage values for the same key suggests a bug
-        MsgLog(logger, error, "event key " << eventKey 
+        MsgLog(name(), error, "event key " << eventKey 
                << " was also a config or calib keys but with different damage. old values: "
                << "inDamageMap= " 
                << locAndDamage.inDamageMap  << " damage= 0x" 
@@ -298,7 +296,7 @@ void
 DumpDamage::beginJob(Event& evt, Env& env)
 {
   m_runNumber = -1;
-  MsgLog(logger, info, " beginJob()");
+  MsgLog(name(), info, " beginJob()");
   printKeysAndDamage(std::cout, evt, env);
 }
 
@@ -306,7 +304,7 @@ void
 DumpDamage::beginRun(Event& evt, Env& env)
 {
   m_calibCycleNumber = -1;
-  MsgLog(logger,info," beginRun(): run=" << ++m_runNumber);
+  MsgLog(name(),info," beginRun(): run=" << ++m_runNumber);
   printKeysAndDamage(std::cout, evt, env);
 }
 
@@ -314,14 +312,14 @@ void
 DumpDamage::beginCalibCycle(Event& evt, Env& env)
 {
   m_eventNumber = -1;
-  MsgLog(logger,info," beginCalibCycle() run=" << m_runNumber << " calib=" << ++m_calibCycleNumber);
+  MsgLog(name(),info," beginCalibCycle() run=" << m_runNumber << " calib=" << ++m_calibCycleNumber);
   printKeysAndDamage(std::cout, evt, env);
 }
 
 void 
 DumpDamage::event(Event& evt, Env& env)
 {
-  MsgLog(logger,info," event() run=" << m_runNumber 
+  MsgLog(name(),info," event() run=" << m_runNumber 
          << " calib=" << m_calibCycleNumber << " eventNumber=" 
          << ++m_eventNumber << " totalEvents= " << ++m_totalEvents );
   printKeysAndDamage(std::cout, evt, env);
@@ -331,7 +329,7 @@ DumpDamage::event(Event& evt, Env& env)
 void
 DumpDamage::endCalibCycle(Event& evt, Env& env)
 {
-  MsgLog(logger, info, " endCalibCycle() run=" << m_runNumber << " calib=" << m_calibCycleNumber);
+  MsgLog(name(), info, " endCalibCycle() run=" << m_runNumber << " calib=" << m_calibCycleNumber);
   printKeysAndDamage(std::cout, evt, env);
 }
 
@@ -339,7 +337,7 @@ DumpDamage::endCalibCycle(Event& evt, Env& env)
 void
 DumpDamage::endRun(Event& evt, Env& env)
 {
-  MsgLog(logger, info, " endCalibRun() run=" << m_runNumber);
+  MsgLog(name(), info, " endRun() run=" << m_runNumber);
   printKeysAndDamage(std::cout, evt, env);
 }
 
@@ -347,7 +345,7 @@ DumpDamage::endRun(Event& evt, Env& env)
 void
 DumpDamage::endJob(Event& evt, Env& env)
 {
-  MsgLog(logger, info, " endJob()");
+  MsgLog(name(), info, " endJob()");
   printKeysAndDamage(std::cout, evt, env);
 }
 
