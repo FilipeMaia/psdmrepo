@@ -75,10 +75,13 @@ public:
 protected:
   
   /// send datagram to workers
-  void send(const XtcInput::Dgram& dg);
+  void send(const std::vector<XtcInput::Dgram> & dgList);
 
   /// send datagram to one worker
-  void sendToWorker(int workerId, const XtcInput::Dgram& dg);
+  void sendToWorker(int workerId, const std::vector<XtcInput::Dgram> & dgList);
+
+  /// if datagram has EPICs data then remember it in case it may be needed later
+  void memorizeEpics(const std::vector<XtcInput::Dgram> & dgList);
 
   /// if datagram has EPICs data then remember it in case it may be needed later
   void memorizeEpics(const XtcInput::Dgram& dg);
@@ -86,12 +89,13 @@ protected:
 private:
 
   boost::shared_ptr<PSXtcInput::IDatagramSource> m_dgsource;      ///< Datagram source instance
-  XtcInput::Dgram m_putBack;                          ///< Buffer for one put-back datagram
+  std::vector<XtcInput::Dgram> m_putBack;                         ///< Buffer for one put-back datagram
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
+  int m_firstControlStream;                           ///< Starting index of control streams
   int m_fdReadyPipe;                                  ///< FD for master's end of the ready pipe
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   std::map<Pds::Src, XtcInput::Dgram> m_epicsDgs;     ///< datagrams that contain Epics stuff from previous events

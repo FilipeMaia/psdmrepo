@@ -33,6 +33,7 @@
 #include "XtcInput/XtcIterator.h"
 #include "XtcInput/XtcFilter.h"
 #include "XtcInput/XtcFilterTypeIdSrc.h"
+#include "XtcInput/DgramUtil.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -59,10 +60,15 @@ namespace {
     return true;
   }
 
-  // return true if event passed L3 selection (of there was no L3 defined)
-  bool l3accept(const Pds::Dgram& dg)
-  {
-    return not static_cast<const Pds::L1AcceptEnv&>(dg.env).trimmed();
+  // return true if all Dgrams contain EPICS data only
+  bool epicsOnly(const std::vector<XtcInput::Dgram> & dgList) {
+    BOOST_FOREACH( const XtcInput::Dgram &dg, dgList) {
+      XtcInput::Dgram::ptr dgPtr = dg.dg();
+      if (not dgPtr) continue;
+      Pds::Xtc *xtc = &(dgPtr->xtc);
+      if(not epicsOnly(xtc)) return false;
+    }
+    return true;
   }
 
   // special delete for boost::shared_ptr
@@ -91,6 +97,7 @@ XtcMPMasterInputBase::XtcMPMasterInputBase (const std::string& name, const boost
   , m_maxEvents(0)
   , m_skipEpics(false)
   , m_l3tAcceptOnly(true)
+  , m_firstControlStream(80)
   , m_l1Count(0)
   , m_epicsDgs()
   , m_workers()
@@ -103,6 +110,7 @@ XtcMPMasterInputBase::XtcMPMasterInputBase (const std::string& name, const boost
   m_maxEvents = cfg.get("psana", "events", 0UL);
   m_skipEpics = cfg.get("psana", "skip-epics", true);
   m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
+  m_firstControlStream = cfg.get("psana", "first_control_stream", 80);
 
   m_fdReadyPipe = config("fdReadyPipe");
 }
@@ -141,29 +149,41 @@ XtcMPMasterInputBase::beginJob(Event& evt, Env& env)
     throw EmptyInput(ERR_LOC);
   }
   
-  // for now we only expect one event datagram, can't handle other cases yet
-  if (eventDg.size() != 1 or not nonEventDg.empty()) {
+  // Only handle a datagram source that delivers empty nonEventDg lists
+  if (not nonEventDg.empty()) {
+    MsgLog(name(),error,"nonEventDg list is not empty after dgSource initialization");
     throw UnexpectedInput(ERR_LOC);
+  }
+
+  MsgLog(name(),trace,"beginJob datagrams: ");
+  int idx=0;
+  BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+    MsgLog(name(),debug,"  dg " << idx << ": " << Dgram::dumpStr(dg));
+    ++idx;
+  }
+
+  // make sure a DAQ datagram, if present, is in the front (as opposed to a Control or IOC Dgram)
+  sort(eventDg.begin(), eventDg.end(), XtcInput::LessStream());
+
+  if (not XtcInput::allDgsHaveSameTransition(eventDg)) {
+    MsgLog(name(), warning, name() << "first datagrams do not have the same transition.");
   }
 
   Dgram dg = eventDg.front();
   Dgram::ptr dgptr = dg.dg();
 
-  MsgLog(name(), debug, name() << ": read first datagram, transition = "
-        << Pds::TransitionId::name(dgptr->seq.service()));
-
   if ( dgptr->seq.service() != Pds::TransitionId::Configure ) {
-    // Something else than Configure, store if for event()
+    // Something else than Configure, save it for event()
     MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
            << Pds::TransitionId::name(dgptr->seq.service()) );
-    m_putBack = dg;
+    m_putBack = eventDg;
     return;
   }
   
   m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
   
-  // send it to workers
-  send(dg);
+  // send them to workers
+  send(eventDg);
 
 }
 
@@ -171,18 +191,18 @@ InputModule::Status
 XtcMPMasterInputBase::event(Event& evt, Env& env)
 {
   bool done = false;
+  std::vector<XtcInput::Dgram> eventDg;
   while (not done) {
 
     // get datagram either from saved event or queue
-    Dgram dg;
-    if (not m_putBack.empty()) {
+    eventDg.clear();
+    if (m_putBack.size()) {
 
-      dg = m_putBack;
-      m_putBack = Dgram();
+      eventDg = m_putBack;
+      m_putBack.clear();
 
     } else {
 
-      std::vector<XtcInput::Dgram> eventDg;
       std::vector<XtcInput::Dgram> nonEventDg;
       if (not m_dgsource->next(eventDg, nonEventDg)) {
         // finita
@@ -191,19 +211,33 @@ XtcMPMasterInputBase::event(Event& evt, Env& env)
         break;
       }
 
-      // for now we only expect one event datagram, can't handle other cases yet
-      if (eventDg.size() != 1 or not nonEventDg.empty()) {
+      // only work with DgSource sending empty nonEventDg
+      if (not nonEventDg.empty()) {
+        MsgLog(name(),error,"nonEventDg is non empty during event");
         throw UnexpectedInput(ERR_LOC);
       }
-
-      dg = eventDg.front();
     }
-  
+    // make sure a DAQ datagram is in the front, as opposed to a Control or IOC Dgram
+    sort(eventDg.begin(), eventDg.end(), XtcInput::LessStream());
+
+    if ((not eventDg.size()) or (not eventDg.front().dg())) {
+      MsgLog(name(), error, "eventDg list is empty or first dg in list is empty");
+      done = true;
+      break;
+    }
+
+    XtcInput::Dgram &dg = eventDg.front();
+    
     const Pds::Sequence& seq = dg.dg()->seq ;
     const Pds::ClockTime& clock = seq.clock() ;
     Pds::TransitionId::Value trans = seq.service();
 
-    MsgLog(name(), debug, name() << ": found new datagram, transition = "
+    if (not XtcInput::allDgsHaveSameTransition(eventDg)) {
+      MsgLog(name(), warning, name() << "event datagrams do not have same transition.");
+    }
+
+    MsgLog(name(), debug, name() << ": found " << eventDg.size() 
+           << " new datagram,s transition = "
           << Pds::TransitionId::name(trans));
 
     switch (trans) {
@@ -213,13 +247,13 @@ XtcMPMasterInputBase::event(Event& evt, Env& env)
         MsgLog(name(), warning, name() << ": Multiple Configure transitions encountered");
         m_transitions[trans] = clock;
       } else {
-        dg = Dgram();
+        eventDg.clear();
       }
       break;
       
     case Pds::TransitionId::Unconfigure:
       // do not need this
-      dg = Dgram();
+      eventDg.clear();
       break;
    
     case Pds::TransitionId::BeginRun:
@@ -228,7 +262,7 @@ XtcMPMasterInputBase::event(Event& evt, Env& env)
     case Pds::TransitionId::EndCalibCycle:
       // do not send repeated datagrams
       if (clock == m_transitions[trans]) {
-        dg = Dgram();
+        eventDg.clear();
       } else {
         m_transitions[trans] = clock;
       }
@@ -237,31 +271,31 @@ XtcMPMasterInputBase::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_l3tAcceptOnly and not ::l3accept(*dg.dg())) {
+      if (m_l3tAcceptOnly and (not XtcInput::l3tAcceptPass(eventDg, m_firstControlStream))) {
 
         // did not pass L3, its payload is usually empty but if there is Epics
         // data in the event it may be preserved, so try to save it
-        memorizeEpics(dg);
+        memorizeEpics(eventDg);
 
-      } else if (m_skipEpics and ::epicsOnly(&(dg.dg()->xtc))) {
+      } else if (m_skipEpics and ::epicsOnly(eventDg)) {
 
         // datagram is likely filtered, has only epics data and users do not need to
         // see it. Do not count it as an event too, just save EPICS data and move on.
-        memorizeEpics(dg);
+        memorizeEpics(eventDg);
 
       } else if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
 
         // reached event limit, will go in simulated end-of-run
         MsgLog(name(), debug, name() << ": event limit reached, stopping");
-        dg = Dgram();
+        eventDg.clear();
         done = true;
 
       } else if (m_l1Count < m_skipEvents) {
 
         // skipping the events, note that things like environment and EPICS need to be updated
         MsgLog(name(), debug, name() << ": skipping event");
-        memorizeEpics(dg);
-        dg = Dgram();
+        memorizeEpics(eventDg);
+        eventDg.clear();
         ++m_l1Count;
 
       } else {
@@ -280,20 +314,22 @@ XtcMPMasterInputBase::event(Event& evt, Env& env)
     case Pds::TransitionId::Disable:
     case Pds::TransitionId::NumberOf:
       // Do not do anything for these transitions, just go to next
-      dg = Dgram();
+      eventDg.clear();
       break;
     }
 
-    if (not dg.empty()) {
+    if (eventDg.size()) {
       // send it to worker(s)
-      this->send(dg);
+      this->send(eventDg);
     }
 
   }
 
 
   // we are done on our side, send final empty packet and close all pipes so that workers know it's time to finish
-  this->send(Dgram());
+  eventDg.clear();
+  eventDg.push_back(Dgram());
+  this->send(eventDg);
   for (std::map<int, psana::MPWorkerId>::const_iterator it = m_workers.begin(); it != m_workers.end(); ++ it) {
     ::close(it->second.fdDataPipe());
   }
@@ -312,28 +348,35 @@ XtcMPMasterInputBase::endJob(Event& evt, Env& env)
 
 // send datagram to workers
 void
-XtcMPMasterInputBase::send(const XtcInput::Dgram& dg)
+XtcMPMasterInputBase::send(const std::vector<XtcInput::Dgram>& dgList)
 {
-  Dgram::ptr dgptr = dg.dg();
+  if (not dgList.size()) throw UnexpectedInput(ERR_LOC);
+  Dgram::ptr frontDgPtr = dgList.at(0).dg();
 
-  if (not dgptr) {
+  if (not frontDgPtr) {
     // special case, send final packet to everybody
     for (std::map<int, psana::MPWorkerId>::const_iterator it = m_workers.begin(); it != m_workers.end(); ++ it) {
-      sendToWorker(it->first, dg);
+      sendToWorker(it->first, dgList);
     }
     return;
   }
 
-  // if current datagram contain epics data use it instead of memorized ones
-  XtcInput::XtcIterator iter(&dgptr->xtc);
-  while (Pds::Xtc* xtc = iter.next()) {
-    if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
-      m_epicsDgs.erase(xtc->src);
+  // if current datagrams contain epics data use them instead of memorized ones
+  BOOST_FOREACH(const XtcInput::Dgram & dg, dgList) {
+    Dgram::ptr dgptr = dg.dg();
+    if (dgptr) {
+      XtcInput::XtcIterator iter(&dgptr->xtc);
+      while (Pds::Xtc* xtc = iter.next()) {
+        if (xtc->contains.id() == Pds::TypeId::Id_Epics) {
+          m_epicsDgs.erase(xtc->src);
+        }
+      }
     }
   }
 
   // Keep only EPICS parts from those memorized datagrams
-  for (std::map<Pds::Src, XtcInput::Dgram>::iterator it = m_epicsDgs.begin(); it != m_epicsDgs.begin(); ++ it) {
+  for (std::map<Pds::Src, XtcInput::Dgram>::iterator it = m_epicsDgs.begin(); 
+       it != m_epicsDgs.begin(); ++ it) {
     Dgram::ptr ddg = it->second.dg();
     if (not ::epicsOnly(&(ddg->xtc))) {
       // make a buffer big enough
@@ -349,7 +392,7 @@ XtcMPMasterInputBase::send(const XtcInput::Dgram& dg)
   }
 
 
-  if (dgptr->seq.service() == Pds::TransitionId::L1Accept) {
+  if (frontDgPtr->seq.service() == Pds::TransitionId::L1Accept) {
 
     // L1 Accept is sent to next available worker
 
@@ -362,17 +405,17 @@ XtcMPMasterInputBase::send(const XtcInput::Dgram& dg)
       throw GenericException(ERR_LOC, "All worker processes disconnected prematurely");
     }
 
-    sendToWorker(workerId, dg);
+    sendToWorker(workerId, dgList);
 
     // also may need to remember EPICS stuff from current event
-    memorizeEpics(dg);
+    memorizeEpics(dgList);
 
   } else {
 
     // other types of datagrams go to every worker
 
     for (std::map<int, psana::MPWorkerId>::const_iterator it = m_workers.begin(); it != m_workers.end(); ++ it) {
-      sendToWorker(it->first, dg);
+      sendToWorker(it->first, dgList);
     }
 
     // check that there is somebody left
@@ -387,11 +430,15 @@ XtcMPMasterInputBase::send(const XtcInput::Dgram& dg)
 
 // send datagram to one worker
 void
-XtcMPMasterInputBase::sendToWorker(int workerId, const XtcInput::Dgram& dg)
+XtcMPMasterInputBase::sendToWorker(int workerId, const std::vector<XtcInput::Dgram>& dgList)
 {
-  Dgram::ptr dgptr = dg.dg();
+  if (not dgList.size()) throw UnexpectedInput(ERR_LOC);
+ 
+  Dgram::ptr dgptr = dgList.at(0).dg();
 
-  MsgLog(name(), debug, "sending " << (dgptr ? Pds::TransitionId::name(dg.dg()->seq.service()) : "final") << " datagram to worker #" << workerId);
+  MsgLog(name(), debug, "sending " 
+         << (dgptr ? Pds::TransitionId::name(dgptr->seq.service()) : "final") 
+         <<  " set of " << dgList.size() << " datagrams to worker #" << workerId);
 
   // get data pipe FD for this worker
   std::map<int, psana::MPWorkerId>::iterator witer = m_workers.find(workerId);
@@ -406,7 +453,7 @@ XtcMPMasterInputBase::sendToWorker(int workerId, const XtcInput::Dgram& dg)
   std::vector<XtcInput::Dgram> eventDg;
   std::vector<XtcInput::Dgram> nonEventDg;
   if (dgptr) {
-    eventDg.push_back(dg);
+    eventDg = dgList;
     for (std::map<Pds::Src, XtcInput::Dgram>::const_iterator it = m_epicsDgs.begin(); it != m_epicsDgs.end(); ++ it) {
       nonEventDg.push_back(it->second);
     }
@@ -423,6 +470,14 @@ XtcMPMasterInputBase::sendToWorker(int workerId, const XtcInput::Dgram& dg)
     m_workers.erase(witer);
   }
 }
+
+void 
+XtcMPMasterInputBase::memorizeEpics(const std::vector<XtcInput::Dgram> & dgList) {
+  BOOST_FOREACH(const XtcInput::Dgram &dg, dgList) {
+    memorizeEpics(dg);
+  }
+}
+
 
 // if datagram has EPICs data then remember it in case it may be needed later
 void

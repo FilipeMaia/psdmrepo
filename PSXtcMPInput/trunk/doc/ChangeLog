@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2014-07-16 David Schneider
+- update for control stream merging trac ticket #279 - 
+  PSXtcInput V00-15-00 and XtcInput V00-10-00 (but unable to create these tags)
+  work with list of dgrams as opposed to just one dgram
+
 Tag: V00-00-01
 2014-02-26 Andy Salnikov
 - first version of a package, should be ready for release
