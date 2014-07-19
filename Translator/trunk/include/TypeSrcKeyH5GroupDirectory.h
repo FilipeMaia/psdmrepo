@@ -134,6 +134,12 @@ inline SrcKeyPair getSrcKeyPair(const PSEvt::EventKey &eventKey) {
   return srcKeyPair;
 }
 
+/**
+ * comparison operator for Src's.
+ * It is important that this be coordinated to some extent with H5GroupNames::srcName.
+ * For instance, if all Control level sources get the same name, then we need all 
+ * two Control level sources to be equal to one another in this comparison.
+ */
 class LessSrcKeyPair {
  public:
  LessSrcKeyPair(const std::string &calibKey) : m_calibKey(calibKey) {} 
@@ -141,6 +147,7 @@ class LessSrcKeyPair {
     const Pds::Src & aSrc = a.first;
     const Pds::Src & bSrc = b.first;
     if ((aSrc.level() ==  Pds::Level::Event) and (bSrc.level() ==  Pds::Level::Event)) return false;
+    if ((aSrc.level() ==  Pds::Level::Control) and (bSrc.level() ==  Pds::Level::Control)) return false;    
     if (aSrc < bSrc) return true;
     if (bSrc < aSrc) return false;
     

@@ -21,6 +21,10 @@
 #include "Translator/specialKeyStrings.h"
 #include "Translator/HdfWriterNewDataFromEvent.h"
 
+// headers for problem with translating alias list from both DAQ and Control streams
+#include "pdsdata/xtc/ProcInfo.hh"
+#include "psddl_psana/alias.ddl.h"
+
 using namespace Translator;
 using namespace std;
 
@@ -164,6 +168,36 @@ namespace {
            ostream_iterator<string>(str,", "));
     }
    }
+
+  void problemWithTranslatingBothDAQ_and_Control_AliasLists(list<EventKey> &eventKeys) {
+    // presently the Alias list from the DAQ and Control streams occurs with
+    // the 'Control' source differing only by the ip address, so they would end up in the
+    // same dataset and the Translator will skip the second one. Here we try to get the 
+    // DAQ one first on the assumption that it tends to have 0.0.0.0
+    // for the IP address. This is a hack until we sort out the names for this type of src.
+    list<EventKey>::iterator iter;
+    bool foundDaqAliasKey = false;
+    for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
+      if (*(iter->typeinfo()) == typeid(Psana::Alias::ConfigV1)) {
+        Pds::Src src = iter->src();
+        if (src.level() == Pds::Level::Control) {
+          Pds::ProcInfo *procInfo = static_cast<const Pds::ProcInfo *>(&src);
+          if (procInfo->ipAddr() == 0) {
+            foundDaqAliasKey = true;
+            break;
+          }
+        }
+      }
+    }
+    if (foundDaqAliasKey) {
+      MsgLog(logger(), debug, "hack to deal with alias from both DAQ and control, found 0 ip address, putting in front");
+      EventKey daqAlias = *iter;
+      eventKeys.erase(iter);
+      eventKeys.push_front(daqAlias);
+    } else {
+      MsgLog(logger(), debug, "hack to deal with alias from both DAQ and control, did not find 0 ip address");
+    }
+  }
 
 }; // local namespace
 
@@ -1080,6 +1114,7 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
                               hdf5pp::Group & parentGroup) {
   const string addTo("addConfigTypes");
   list<EventKey> envEventKeys = getUpdatedConfigKeys();
+  problemWithTranslatingBothDAQ_and_Control_AliasLists(envEventKeys);
   if (not m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) return;
   list<EventKey> evtEventKeys = m_event->keys();
   int newTypes=0;

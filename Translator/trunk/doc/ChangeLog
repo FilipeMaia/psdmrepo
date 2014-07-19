@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-29
+2014-07-18 David Schneider
+- add hack to address src alias from s80 and DAQ mapping to same group
+  trac ticket:318 (see also trac ticket:279)
+
 Tag: V00-01-28
 2014-07-18 David Schneider
 - fix issue with event data appearing in both beginCalib and event.
