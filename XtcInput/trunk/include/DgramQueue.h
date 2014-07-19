@@ -79,6 +79,12 @@ public:
   // wit the corresponding message.
   value_type pop() ;
 
+  // get reference to datagram at the head of the queue, if the queue is
+  // empty then wait until somebody calls push(). If push_exception()
+  // method was called then std::runtime_error exception will be thrown
+  // wit the corresponding message.
+  value_type front();
+
   // completely erase all queue
   void clear() ;
 

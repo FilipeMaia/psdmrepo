@@ -78,7 +78,11 @@ public:
 
   bool empty() const { return not m_dg.get(); }
   
+  /// compare clockTime's
   bool operator< (const Dgram&) const; 
+
+  /// dump dgram header and filename to a string
+  static std::string dumpStr(const XtcInput::Dgram &dg);
 
 private:
   
@@ -97,6 +101,7 @@ private:
   ptr m_dg;
   XtcFileName m_file;
 };
+
 
 } // namespace XtcInput
 

@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-00
+2014-07-18 David Schneider
+- trac ticket:279 merge control and DAQ streams into the same event
+  Introduce StreamDgram, keep track of L1Block number
+  Introduce fiducial/second based comparisons
+  Rework XtcStreamMerger
+	
 Tag: V00-09-13
 2014-05-13 Christopher O'Grady
 - add Dgram::operator< so indexing can sort non-event datagrams
