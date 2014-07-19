@@ -215,7 +215,6 @@ public:
 class IndexEvent : public IndexFiducial {
 public:
   enum {MaxEpicsSources=4};
-  enum {SecondsLimit=5};
   // the code would be neater if this was a vector, but I think it would
   // be less performant as well, hence the hardwired number. - cpo
   EpicsInfo einfo[MaxEpicsSources];
@@ -223,19 +222,10 @@ public:
   IndexEvent() {}
   IndexEvent(uint32_t seconds, uint32_t nanoseconds, uint32_t fiducial) : IndexFiducial(seconds,nanoseconds,fiducial) {}
   bool operator<(const IndexEvent& other) const {
-    //    return entry.time()<other.entry.time();
-    int64_t t1sec = entry.uSeconds;
-    int64_t t2sec = other.entry.uSeconds;
-    // if the timestamp has changed by "a lot" use that to decide event ordering
-    if (abs(t1sec-t2sec)>SecondsLimit) return t1sec<t2sec;
-    // if the timestamp has changed by "a little" use the fiducial to decide event ordering
-    // shift the 17-bit fiducial value over so we can use signed-arithmetic
-    int32_t f1 = entry.uFiducial<<15;
-    int32_t f2 = other.entry.uFiducial<<15;
-    // do a sanity check: include a factor of 2 "headroom"
-    const int32_t maxdiff = (SecondsLimit*360*2)<<15;
-    if (abs(f2-f1)>maxdiff) MsgLog(logger, fatal, "Fiducial sanity check failed.  fiducial1 " << entry.uFiducial << " fiducial2" << other.entry.uFiducial);
-    return f1<f2;
+    if (entry.time()==other.entry.time())
+      return entry.uFiducial<other.entry.uFiducial;
+    else
+      return entry.time()<other.entry.time();
   }
   bool operator==(const IndexEvent& other) const {
     return entry.time()==other.entry.time() && entry.uFiducial==other.entry.uFiducial;
