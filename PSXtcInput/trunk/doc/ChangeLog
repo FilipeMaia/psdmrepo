@@ -11,6 +11,18 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-00
+2014-07-18 David Schneider
+- Control stream support: trac ticket #279. Look for matching dgrams for an
+  event. Use rough second and fiducial match.
+- add methods to fill event/env from dgram list. control vs DAQ and transition
+  type affects fill.
+- do not clear AliasMap, merge aliases, trac ticket #314
+- API change: store XtcInput::DgramList rather than Pds::Dgram in Event
+- new [psana] config parameter: first_control_stream  (defaults to 80)
+- new [psana] config parameter: max_stream_clock_diff (defaults to 85)
+  this is max difference in seconds.
+
 Tag: V00-14-10
 2014-07-18 Christopher O'Grady
 - Fix/simplify timestamp sorting.  Previous code failed on
