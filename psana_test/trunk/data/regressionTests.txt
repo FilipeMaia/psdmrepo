@@ -50,3 +50,5 @@ test=083  events=006 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translato
 # define regression tests for multi file datasets. 
 test=000  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_000_amo01509
 test=001  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_001_xppcom10
+test=002  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_002_xppd9714
+test=003  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_003_xpptut13

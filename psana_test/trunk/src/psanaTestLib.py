@@ -794,7 +794,7 @@ def testCommand(args):
         o,e = cmdTimeOut(cmd,20*60)
         e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
         if len(e) > 0:
-            errMsg =  "**Failure** %s: Translator failure" % testLabel
+            errMsg =  "**Failure** %s: Translator failure\n" % testLabel
             errMsg += "cmd=%s\n" % cmd
             errMsg += "\n%s" % e
             raise Exception(errMsg)
@@ -852,6 +852,8 @@ def testCommand(args):
         if len(afterFull)>0:
             assert afterFull.startswith(':'), "must follow full with : to specify tests, not '%s' " % afterFull
             jnk, testSet = afterFull.split(':')
+        else:
+            testSet = ''
     if testSet != '':
         commaSepTestSet = testSet.split(',')
         testNumberFilter['xtc'] = []

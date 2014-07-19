@@ -330,6 +330,86 @@ class Psana( unittest.TestCase ) :
 
         if self.cleanUp: os.unlink(h5_outfile)
 
+
+    def test_s80merge(self):
+        '''tests if the s80 stream is merged properly        
+        '''
+        DAQ_fiducials_with_matching_s80 = [0x0DAE5,   # s0
+                                           0x0DAFD,   # s0
+                                           0x0DADF,   # s1
+                                           0x0DAD9,   # s5
+                                           0x0DAEB,   # s5
+                                           0x0DAF7    # s5
+                                           ]
+        DAQ_fiducials_with_no_matching_s80 = [0x0D95C,  # s0
+                                              0x0DAD6,  # s0
+                                              0x13137,  # s1
+                                              0x0D956, # s1
+                                              0x0DAD3, # s1
+                                              0x0DAF4, # s1
+                                              0x1312B, # s1
+                                              0x0D95F, # s5
+                                              0x0DAC1, # s5
+                                              0x1313A, # s5
+                                              0x0E805, # s5
+                                              0x0E80E, # s0
+                                             ]
+        s80_fiducials_with_no_DAQ = [56049, 56067, 78243]
+
+        def eventHasDaqAndS80Data(evt, opal0, opal1, opal2, orca, xtcav):
+            if evt.get(psana.Camera.FrameV1, opal0) is None: return False
+            if evt.get(psana.Camera.FrameV1, opal1) is None: return False
+            if evt.get(psana.Camera.FrameV1, opal2) is None: return False
+            if evt.get(psana.Camera.FrameV1, orca)  is None: return False
+            if evt.get(psana.Camera.FrameV1, xtcav) is None: return False
+            return True
+            
+        def eventHasOnlyDaq(evt, opal0, opal1, opal2, orca, xtcav):
+            if evt.get(psana.Camera.FrameV1, opal0) is None: return False
+            if evt.get(psana.Camera.FrameV1, opal1) is None: return False
+            if evt.get(psana.Camera.FrameV1, opal2) is None: return False
+            if evt.get(psana.Camera.FrameV1, orca) is None: return False
+            if evt.get(psana.Camera.FrameV1, xtcav) is not None: return False
+            return True
+            
+        def eventHasOnlyS80(evt, opal0, opal1, opal2, orca, xtcav):
+            if evt.get(psana.Camera.FrameV1, opal0) is not None: return False
+            if evt.get(psana.Camera.FrameV1, opal1) is not None: return False
+            if evt.get(psana.Camera.FrameV1, opal2) is not None: return False
+            if evt.get(psana.Camera.FrameV1, orca)  is not None: return False
+            if evt.get(psana.Camera.FrameV1, xtcav) is None: return False
+            return True
+
+        psana.setConfigFile('')
+        ds = psana.DataSource('exp=xppa1714:run=157:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714')
+        # by using the aliases, we test that psana is processing the alias list from
+        # both the s80 and the DAQ streams
+#        opal0 = psana.Source('DetInfo(XppEndstation.0:Opal1000.0)')
+#        opal1 = psana.Source('DetInfo(XppEndstation.0:Opal1000.1)')
+#        opal2 = psana.Source('DetInfo(XppEndstation.0:Opal1000.2)')
+#        orca  = psana.Source('DetInfo(XppEndstation.0:OrcaFl40.0)')
+#        xtcav = psana.Source('DetInfo(XrayTransportDiagnostic.0:Opal1000.0)')
+        opal0 = psana.Source('opal_0')
+        opal1 = psana.Source('opal_1')
+        opal2 = psana.Source('opal_2')
+        orca  = psana.Source('orca')
+        xtcav = psana.Source('xtcav')
+        for calibNumber, calibIter in enumerate(ds.steps()):
+            for eventNumber, evt in enumerate(calibIter.events()):
+                eventId = evt.get(psana.EventId)
+                fid = eventId.fiducials()
+                if fid in DAQ_fiducials_with_matching_s80:
+                    self.assertTrue(eventHasDaqAndS80Data(evt, opal0, opal1, opal2, orca, xtcav),
+                                    msg="fid=%s should have both DAQ and s80" % fid)
+                elif fid in DAQ_fiducials_with_no_matching_s80:
+                    self.assertTrue(eventHasOnlyDaq(evt, opal0, opal1, opal2, orca, xtcav),
+                                    "fid=%s should have only DAQ data" % fid)
+                elif fid in s80_fiducials_with_no_DAQ:
+                    self.assertTrue(eventHasOnlyS80(evt, opal0, opal1, opal2, orca, xtcav),
+                                    "fid=%s should have only s80" % fid)
+            self.assertTrue((calibNumber,eventNumber) in [(0,16), (1,8)], 
+                            msg="should be 16 events in calib 0, and 8 in calib 1")
+
     def test_mp(self):
         '''parallel child process mode
         
