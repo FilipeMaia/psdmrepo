@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-01
+2014-07-18 David Schneider
+- create artificial tag to try to bypass svn protect tags hook
+
 Tag: V00-10-00
 2014-07-18 David Schneider
 - trac ticket:279 merge control and DAQ streams into the same event
