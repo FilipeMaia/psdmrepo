@@ -128,9 +128,13 @@ O2O_XTC_Filter::runApp ()
   // make datagram queue
   XtcInput::DgramQueue dgqueue( m_dgramQSize.value() ) ;
 
+  int firstControlStream = 80;
+  unsigned maxStreamClockDiffSec = 85;
+
   // start datagram reading thread
   boost::thread readerThread( XtcInput::DgramReader ( m_inputFiles.begin(), m_inputFiles.end(), dgqueue,
-      XtcInput::MergeFileName, m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), 0 ) ) ;
+      XtcInput::MergeFileName, m_liveDbConn.value(), m_liveTable.value(), m_liveTimeout.value(), 0,
+      firstControlStream, maxStreamClockDiffSec) ) ;
 
   // seen transitions
   Pds::ClockTime transitions[Pds::TransitionId::NumberOf];
