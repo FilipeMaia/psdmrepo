@@ -1,0 +1,39 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 3589 2012-05-22 14:54:40Z salnikov@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package fftw
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+import os
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = 'fftw'
+pkg_ver = '3.3.4'
+
+PREFIX = '/'.join(["$SIT_ROOT", "sw", "external", pkg, pkg_ver, "$SIT_ARCH"])
+
+INCDIR = "include"
+
+LIBDIR = "lib"
+LINKLIBS = "lib*.so*"
+
+PKGLIBS = "fftw3"
+
+BINDIR = "bin"
+LINKBINS = "*"
+
+standardExternalPackage(pkg, **locals())
