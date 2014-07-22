@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-02
+2014-07-22 David Schneider
+- add backward compatible XtcStreamDgIter constructor for package PSXtcQC
+- also add backward compatiable DgramReader constructor - though doesn't 
+  appear to be needed
+	
+
 Tag: V00-10-01
 2014-07-18 David Schneider
 - create artificial tag to try to bypass svn protect tags hook

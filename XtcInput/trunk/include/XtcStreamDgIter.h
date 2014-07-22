@@ -71,10 +71,11 @@ public:
    *  @param[in]  chunkIter Iterator over chunks in a stream
    *  @param[in]  clockSort if we expect out of order L1Accepts, set to true to look for the
    *              correct spot to place a new L1Accept (does not cross non-L1Accept transition
-   *              boundaries).
+   *              boundaries). Defaults to true. Appropriate for DAQ streams, not neccessary for
+   *              Control streams.
    */
   XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
-                  bool clockSort);
+                  bool clockSort=true);
 
   // Destructor
   ~XtcStreamDgIter () ;

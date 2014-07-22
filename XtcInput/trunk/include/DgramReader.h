@@ -57,7 +57,7 @@ public:
 
   typedef std::vector<std::string> FileList ;
 
-  // Default constructor
+  // full constructor with parameters for handling control streams
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
@@ -71,6 +71,22 @@ public:
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(firstControlStream)
     , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
+  {}
+
+  // constructor with default parameters for parameters for handling control streams
+  template <typename Iter>
+  DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
+      const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
+              double l1OffsetSec=0)
+    : m_files(begin, end)
+    , m_queue( queue )
+    , m_mode( mode )
+    , m_liveDbConn(liveDbConn)
+    , m_liveTable(liveTable)
+    , m_liveTimeout(liveTimeout)
+    , m_l1OffsetSec(l1OffsetSec)
+    , m_firstControlStream(80)
+    , m_maxStreamClockDiffSec(85)
   {}
 
   // Destructor
