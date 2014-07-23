@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package bbcp
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2014-07-23 Wilko Kroeger
+- Created package proxy for external bbcp package. 
+  bbcp version is 14.4.14
+

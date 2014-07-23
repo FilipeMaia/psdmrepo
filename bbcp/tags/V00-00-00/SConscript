@@ -1,0 +1,24 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package bbcp
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+import os
+
+pkg = "bbcp"
+pkg_ver = "14.4.14"
+
+PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+BINDIR = "bin"
+
+standardExternalPackage(pkg, **locals())
+
