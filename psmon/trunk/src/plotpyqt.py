@@ -141,7 +141,16 @@ class XYPlotClient(Plot):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
         self.plots = []
         for xdata, ydata, format in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
-            self.plots.append(self.plot_view.plot(x=xdata, y=ydata, pen=config.PYQT_PLOT_PEN))
+            cval = len(self.plots)
+            self.plots.append(
+                self.plot_view.plot(
+                    x=xdata,
+                    y=ydata,
+                    pen=config.PYQT_PLOT_PEN,
+                    symbol=config.PYQT_PLOT_SYMBOL,
+                    symbolBrush=(cval, config.PYQT_AUTO_COLOR_MAX)
+                )
+            )
 
     def update(self, data):
         """
@@ -151,7 +160,7 @@ class XYPlotClient(Plot):
             self.set_title(data.ts)
             for plot, data_tup in zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats)):
                 xdata, ydata, formats = data_tup
-                plot.setData(x=xdata, y=ydata, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
+                plot.setData(x=xdata, y=ydata) #, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
         return self.plots
 
 
