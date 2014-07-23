@@ -11,6 +11,11 @@ Package author: Dan Damiani
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2014-07-23 Christopher O'Grady
+- Many improvements to the interface and functionality.  This
+  feels like the first real official version.
+
 Tag: V00-00-01
 2014-06-25 Christopher O'Grady
 - First tag of Dan's psmon
