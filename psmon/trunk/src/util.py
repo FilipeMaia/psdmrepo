@@ -36,6 +36,11 @@ def arg_inflate_tuple(index, *args):
         return [args]
 
 
+def make_bins(nbins, bmin, bmax):
+    step = (bmax - bmin)/nbins
+    return np.arange(bmin, bmax + step, step)[:nbins+1]
+
+
 class Helper(object):
     def __init__(self, publisher, topic, title=None, pubrate=None):
         self.publisher = publisher
@@ -125,7 +130,7 @@ class HistHelper(Helper):
         self.data = Hist(
             None,
             self.title,
-            np.arange(self.bmin,self.bmax,(self.bmax-self.bmin)/self.nbins),
+            make_bins(self.nbins, self.bmin, self.bmax),
             np.zeros(self.nbins),
             xlabel=xlabel,
             ylabel=ylabel,

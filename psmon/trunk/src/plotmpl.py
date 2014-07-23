@@ -159,7 +159,11 @@ class ImageClient(Plot):
 class HistClient(Plot):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
-        plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
+        # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
+        if init_hist.bins.size > init_hist.values.size:
+            plot_args = arg_inflate_flat(1, init_hist.bins[:-1], init_hist.values, init_hist.formats)
+        else:
+            plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
         self.set_aspect()
         self.set_xy_ranges()
@@ -167,7 +171,11 @@ class HistClient(Plot):
     def update(self, data):
         if data is not None:
             self.set_title(data.ts)
-            self.update_plot_data(self.hists, data.bins, data.values)
+            # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
+            if data.bins.size > data.values.size:
+                self.update_plot_data(self.hists, data.bins[:-1], data.values)
+            else:
+                self.update_plot_data(self.hists, data.bins, data.values)
             self.ax.relim()
             self.ax.autoscale_view()
         return self.hists

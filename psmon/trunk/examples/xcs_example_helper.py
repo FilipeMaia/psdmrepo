@@ -40,7 +40,7 @@ def main():
                 'xcs-ipm-02-hist0',
                 100,
                 0.0,
-                0.0005,
+                0.6,
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'shots'},
                 pubrate=myrate
@@ -63,7 +63,7 @@ def main():
                 'xcs-ipm-04-hist0',
                 100,
                 0.0,
-                0.0005,
+                1.2,
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'shots'},
                 pubrate=myrate

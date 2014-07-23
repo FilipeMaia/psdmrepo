@@ -169,7 +169,9 @@ class HistClient(Plot):
         super(HistClient, self).__init__(init_hist, framegen, info, rate)
         self.hists = []
         for bins, values, format in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
-            self.hists.append(x=bins, y=values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+            hist = pg.PlotCurveItem(x=bins, y=values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+            self.plot_view.addItem(hist)
+            self.hists.append(hist)
 
     def update(self, data):
         """
@@ -177,7 +179,7 @@ class HistClient(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            for hist, data_tup in zip(self.hists, arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats)):
+            for hist, data_tup in zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats)):
                 bins, values, formats = data_tup
                 hist.setData(x=bins, y=values, stepMode=True)
         return self.hists
