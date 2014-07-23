@@ -169,7 +169,7 @@ class HistOverlayHelper(Helper):
         index = self.nhist
         self.nbins.append(nbins)
         self.ranges.append((bmin, bmax))
-        self.bins.append(np.arange(bmin,bmax,(bmax-bmin)/nbins))
+        self.bins.append(make_bins(nbins, bmin, bmax))
         self.values.append(np.zeros(nbins))
         self.formats.append(format)
         self.nhist += 1

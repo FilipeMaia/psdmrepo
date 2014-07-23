@@ -2,7 +2,7 @@
 import time
 from psana import *
 from psmon import publish
-from psmon.util import ImageHelper, MultiImageHelper, XYPlotHelper, HistHelper
+from psmon.util import ImageHelper, MultiImageHelper, XYPlotHelper, HistHelper, HistOverlayHelper
 
 
 def main():
@@ -71,6 +71,16 @@ def main():
         ),
     ]
     multi_image_helper = MultiImageHelper(publish.send, 'xcs-multi-image', 2, pubrate=myrate)
+    over_histo_helper = HistOverlayHelper(
+        publish.send,
+        'xcs-overlay-histo',
+        xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
+        ylabel={'axis_title': 'shots'},
+        pubrate=myrate
+    )
+    # Create histograms in the overlay for each ipm
+    while over_histo_helper.nhist < len(ipimb_srcs):
+        over_histo_helper.make_hist(100, 0.0, 1.2)
 
     # initialize socket connections
     publish.init()
@@ -89,6 +99,7 @@ def main():
         evt_ts_str = '%.4f'%(evt_ts[0] + evt_ts[1] / 1e9)
 
         img_index = 0
+        ipm_index = 0
 
         for src, data_type, data_func, helper in input_srcs:
             frame = evt.get(data_type, src)
@@ -106,7 +117,10 @@ def main():
             helper.publish()
             hist_helper.add(data_func(ipm)[0], evt_ts_str)
             hist_helper.publish()
+            over_histo_helper.add(ipm_index, data_func(ipm)[0], evt_ts_str)
+            ipm_index += 1
         multi_image_helper.publish()
+        over_histo_helper.publish()
         counter += 1
         if counter % status_rate == 0:
             print "Processed %d events so far" % counter
