@@ -169,7 +169,14 @@ class HistClient(Plot):
         super(HistClient, self).__init__(init_hist, framegen, info, rate)
         self.hists = []
         for bins, values, format in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
-            hist = pg.PlotCurveItem(x=bins, y=values, stepMode=True, fillLevel=0, brush=(0, 0, 255, 80))
+            cval = len(self.hists)
+            hist = pg.PlotCurveItem(
+                x=bins,
+                y=values,
+                stepMode=True,
+                fillLevel=0,
+                brush=pg.intColor(cval, config.PYQT_AUTO_COLOR_MAX, alpha=config.PYQT_HIST_ALPHA)
+            )
             self.plot_view.addItem(hist)
             self.hists.append(hist)
 
