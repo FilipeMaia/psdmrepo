@@ -1,0 +1,29 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 7960 2014-03-31 07:19:27Z gapon@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package pyFFTW
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "pyFFTW"
+pkg_ver = "0.9.2"
+
+PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage( pkg, **locals() )
