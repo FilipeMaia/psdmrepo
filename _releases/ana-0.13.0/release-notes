@@ -1,0 +1,44 @@
+Added architecture support for RHEL7, GCC48:
+- SConsTools
+
+New external packages:
+- fftw
+- pyFFTW
+
+Improved ONLINE monitoring:
+- psmon
+
+Improved XTC indexing:
+- psana
+- psana_python
+- PSXtcInput
+
+Merge DAQ controlled IOC streams with regular ones:
+- XtcInput (change low level stream/datagram processing, use seconds/fiducials to order events)
+- PSXtcInput
+- PSXtcMPInput (merge DAQ controlled IOC streams, work with list of dgrams)
+- PSXtcOutput (affected by the XtcInput migration, work with list of dgrams)
+- Translator (affected by the XtcInput migration)
+- O2OTranslator (affected by the XtcInput migration)
+- psana_examples (demonstrate use of list of dgrams)
+- psana_test (tests for meged streams, also test for psana parallel mode)
+
+Notes on low-level interface changes in psana (by David):
+- we no longer put a Dgram in the Event, we put a new object called a DgramList.
+  It is very unlikely anyone was using Dgram, however I made an example of using
+  DgramList for psana_examples. PSXtcOutput seemed to be the only thing getting
+  a Dgram from the event store. now it gets a DgramList. One could imagine
+  something like CASS using psana to get a list of dgrams rather than using
+  psana's high level interface. That kind of application would now brake.
+
+Notes for the Translator:
+- updates for split scan mode
+- address issue with merging DAQ controlled IOC streams 
+- there is currently a known issue with the Translator, it will not translate
+  the DAQ src alias list from both the DAQ and the IOC streams. It will
+  probably translate the DAQ list, but which one is undefined.
+
+Improvements in calibrations and imaging algorithms:
+- CSPadPixCoords
+- ImgAlgos
+- PyCSPadImage
