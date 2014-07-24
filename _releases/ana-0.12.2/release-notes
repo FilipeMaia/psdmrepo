@@ -1,0 +1,8 @@
+Added architecture support for RHEL7, GCC48:  SConsTools
+New external packages: fftw, pyFFTW
+Improved ONLINE monitoring: psmon
+Improved XTC indexing: psana, psana_python, PSXtcInput
+Improvements in calibrations and imaging algorithms:
+- CSPadPixCoords, ImgAlgos, PyCSPadImage
+Offline event builder (including streams s80, s81):
+- XtcInput, PSXtcMPInput, PSXtcOutput, Translator, psana_examples, psana_test
