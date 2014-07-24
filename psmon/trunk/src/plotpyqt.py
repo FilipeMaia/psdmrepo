@@ -6,9 +6,10 @@ import numpy as np
 import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
-import config
+from psmon import config
 from psmon.util import is_py_iter, arg_inflate_tuple
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
+from psmon.format import parse_fmt_xyplot
 
 
 LOG = logging.getLogger(__name__)
@@ -146,9 +147,7 @@ class XYPlotClient(Plot):
                 self.plot_view.plot(
                     x=xdata,
                     y=ydata,
-                    pen=config.PYQT_PLOT_PEN,
-                    symbol=config.PYQT_PLOT_SYMBOL,
-                    symbolBrush=(cval, config.PYQT_AUTO_COLOR_MAX)
+                    **parse_fmt_xyplot(format, cval)
                 )
             )
 

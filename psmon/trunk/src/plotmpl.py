@@ -5,7 +5,7 @@ import collections
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-import config
+from psmon import config
 from psmon.util import is_py_iter, arg_inflate_flat
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
