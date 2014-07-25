@@ -141,8 +141,10 @@ class XYPlotClient(Plot):
     def __init__(self, init_plot, framegen, info, rate=1):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
         self.plots = []
+        self.formats = []
         for xdata, ydata, format in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
             cval = len(self.plots)
+            self.formats.append((format, cval))
             self.plots.append(
                 self.plot_view.plot(
                     x=xdata,
@@ -157,9 +159,14 @@ class XYPlotClient(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            for plot, data_tup in zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats)):
-                xdata, ydata, formats = data_tup
-                plot.setData(x=xdata, y=ydata) #, pen=config.PYQT_PLOT_PEN, symbol=config.PYQT_PLOT_SYMBOL)
+            for index, (plot, data_tup, format_tup) in enumerate(zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats), self.formats)):
+                xdata, ydata, format = data_tup
+                old_format, cval = format_tup
+                if format != old_format:
+                    self.formats[index] = (format, cval)
+                    plot.setData(x=xdata, y=ydata, **parse_fmt_xyplot(format, cval))
+                else:
+                    plot.setData(x=xdata, y=ydata)
         return self.plots
 
 
