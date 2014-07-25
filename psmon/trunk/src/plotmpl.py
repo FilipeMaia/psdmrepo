@@ -4,9 +4,11 @@ import collections
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib import rcParams
+from matplotlib.axes import _process_plot_format
 
 from psmon import config
-from psmon.util import is_py_iter, arg_inflate_flat
+from psmon.util import is_py_iter, arg_inflate_flat, arg_inflate_tuple, inflate_input
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -93,13 +95,20 @@ class Plot(object):
             ax.yaxis.label.set_color(self.info.fore_col)
             ax.xaxis.label.set_color(self.info.fore_col)
 
-    @staticmethod
-    def update_plot_data(plots, x_vals, y_vals):
-        if is_py_iter(y_vals):
-            for plot, x_val, y_val in zip(plots, x_vals, y_vals):
-                plot.set_data(x_val, y_val)
-        else:
-            plots[0].set_data(x_vals, y_vals)
+    def update_plot_data(self, plots, x_vals, y_vals, new_fmts, old_fmts):
+        for index, (plot, data_tup, old_fmt) in enumerate(zip(plots, arg_inflate_tuple(1, x_vals, y_vals, new_fmts), old_fmts)):
+            x_val, y_val, new_fmt = data_tup
+            plot.set_data(x_val, y_val)
+            if new_fmt != old_fmt:
+                # parse the format string
+                linestyle, marker, color = _process_plot_format(new_fmt)
+                linestyle = linestyle or rcParams['lines.linestyle']
+                marker = marker or rcParams['lines.marker']
+                color = color or rcParams['lines.color']
+                plot.set_linestyle(linestyle)
+                plot.set_marker(marker)
+                plot.set_color(color)
+                old_fmts[index] = new_fmt
 
 
 class MultiPlotClient(object):
@@ -165,6 +174,7 @@ class HistClient(Plot):
         else:
             plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
+        self.formats = inflate_input(init_hist.formats, init_hist.values)
         self.set_aspect()
         self.set_xy_ranges()
 
@@ -173,9 +183,9 @@ class HistClient(Plot):
             self.set_title(data.ts)
             # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
             if data.bins.size > data.values.size:
-                self.update_plot_data(self.hists, data.bins[:-1], data.values)
+                self.update_plot_data(self.hists, data.bins[:-1], data.values, data.formats, self.formats)
             else:
-                self.update_plot_data(self.hists, data.bins, data.values)
+                self.update_plot_data(self.hists, data.bins, data.values, data.formats, self.formats)
             self.ax.relim()
             self.ax.autoscale_view()
         return self.hists
@@ -186,13 +196,14 @@ class XYPlotClient(Plot):
         super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
         plot_args = arg_inflate_flat(1, init_plot.xdata, init_plot.ydata, init_plot.formats)
         self.plots = self.ax.plot(*plot_args)
+        self.formats = inflate_input(init_plot.formats, init_plot.ydata)
         self.set_aspect()
         self.set_xy_ranges()
 
     def update(self, data):
         if data is not None:
             self.set_title(data.ts)
-            self.update_plot_data(self.plots, data.xdata, data.ydata)
+            self.update_plot_data(self.plots, data.xdata, data.ydata, data.formats, self.formats)
             self.ax.relim()
             self.ax.autoscale_view()
         return self.plots

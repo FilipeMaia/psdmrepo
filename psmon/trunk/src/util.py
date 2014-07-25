@@ -36,6 +36,13 @@ def arg_inflate_tuple(index, *args):
         return [args]
 
 
+def inflate_input(input, input_ref):
+    if is_py_iter(input_ref):
+        return arg_inflate(1, input, input_ref)[0]
+    else:
+        return [input]
+
+
 def make_bins(nbins, bmin, bmax):
     step = (bmax - bmin)/nbins
     return np.arange(bmin, bmax + step, step)[:nbins+1]
