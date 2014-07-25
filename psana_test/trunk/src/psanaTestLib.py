@@ -53,6 +53,8 @@ test  default is to do regression test - the tests listed in psana_test/data/reg
          set=multi:full or xtc:full  limit full to that dataset
          set=multi:full:n or multi:full:n,m,k   a select number of full tests to do
 
+testshm test psana shared memory datasource.
+
 types  find xtc with new types. Make new test_0xx files. Updates psana_test/data/regressionTests.txt.
        optional args: 
          datagrams=n  number of datagrams to look at with each new file (remember, each stream is 20hz)
@@ -81,7 +83,8 @@ class BadXtcFilename(Exception):
 
 # alarm_handler for timeout when running shell commands
 class Alarm(Exception):
-    pass
+    def __init__(self,msg=''):
+        super(Alarm, self).__init__(msg)
 
 def alarm_handler(signum, frame):
     raise Alarm
@@ -94,13 +97,13 @@ def cmdTimeOut(cmd,seconds=5*60):
     Returns stdout, stderr for command. stderr has had blank links removed.
     '''
     signal.signal(signal.SIGALRM, alarm_handler)
-    signal.alarm(seconds)  
+    signal.alarm(seconds)
     try:
         p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
         o,e = p.communicate()        
         signal.alarm(0)  # reset the alarm
     except Alarm:
-        raise Exception("cmd: %s\n took more than %d seconds" % (cmd, seconds))
+        raise Alarm("cmd: %s\n took more than %d seconds" % (cmd, seconds))
     e = [ln for ln in e.split('\n') if len(ln.strip())>0]
     return o,'\n'.join(e)
     
@@ -724,6 +727,108 @@ def getEpicsTestNumbers():
         testNumbers.add(int(xtc.split('test_')[1].split('_')[0]))
     return list(testNumbers)
 
+testShmDumpTypes=set(['type=psana.Bld.BldDataEBeamV3, src=BldInfo(EBeam)',
+                      'type=psana.Bld.BldDataFEEGasDetEnergy, src=BldInfo(FEEGasDetEnergy)',
+                      'type=psana.Bld.BldDataPhaseCavity, src=BldInfo(PhaseCavity)',
+                      'type=psana.ControlData.ConfigV2, src=ProcInfo(0.0.0.0, pid=27455)',
+                      'type=psana.Epics.ConfigV1, src=DetInfo(EpicsArch.0:NoDevice.0)',
+                      'type=psana.EvrData.ConfigV7, src=DetInfo(NoDetector.0:Evr.0)',
+                      'type=psana.EvrData.ConfigV7, src=DetInfo(NoDetector.0:Evr.1)',
+                      'type=psana.EvrData.DataV3, src=DetInfo(NoDetector.0:Evr.0)',
+                      'type=psana.Ipimb.ConfigV2, src=BldInfo(XppSb2_Ipm)',
+                      'type=psana.Ipimb.ConfigV2, src=BldInfo(XppSb3_Ipm)',
+                      'type=psana.Ipimb.DataV2, src=BldInfo(XppSb2_Ipm)',
+                      'type=psana.Ipimb.DataV2, src=BldInfo(XppSb3_Ipm)',
+                      'type=psana.Lusi.IpmFexConfigV2, src=BldInfo(XppSb2_Ipm)',
+                      'type=psana.Lusi.IpmFexConfigV2, src=BldInfo(XppSb3_Ipm)',
+                      'type=psana.Lusi.IpmFexV1, src=BldInfo(XppSb2_Ipm)',
+                      'type=psana.Lusi.IpmFexV1, src=BldInfo(XppSb3_Ipm)'])
+
+def testShmCommand(args):
+    ''' it is reccommended that you increase the message size from
+    10 to 32 before running this test:
+    sudo /sbin/sysctl -w fs.mqueue.msg_max=32
+    '''
+    shmemName = 'psana_test'
+    testFile = '/reg/g/psdm/data_test/Translator/test_042_Translator_t1.xtc'
+    assert os.path.exists(testFile), "testfile not found: %s" % testFile
+    xtcservercmd = 'xtcmonserver -f %s -p %s' % (testFile, shmemName)
+    numberOfBuffers = 1
+    xtcservercmd += ' -n %d' % numberOfBuffers
+    sizeOfBuffers = '0x1000000'
+    xtcservercmd += ' -s %s' % sizeOfBuffers
+    ratePerSecond = 1
+    xtcservercmd += ' -r %d' % ratePerSecond
+    numberOfClients = 1
+    xtcservercmd += ' -c %d' % numberOfClients
+    xtcserverCmdStdout = 'testShm.xtcserver.stdout'
+    xtcserverCmdStderr = 'testShm.xtcserver.stderr'
+    dataSource = 'shmem=%s.0' % shmemName
+    dumpcmd = 'psana -m psana_test.dump %s' % dataSource
+    print "about to launch commands:"
+    print xtcservercmd
+    print dumpcmd
+    expectedSharedMemoryFile = "/dev/shm/PdsMonitorSharedMemory_%s" % shmemName
+    if os.path.exists(expectedSharedMemoryFile):
+        print "ERROR: shared memory file exists: %s" % expectedSharedMemoryFile
+        print " delete (if safe) and rerun test"
+        return
+    outputFiles = [xtcserverCmdStderr, xtcserverCmdStdout]
+    for outputFile in outputFiles:
+        if os.path.exists(outputFile):
+            print "warning: test output file exists. deleting: %s" % outputFile
+            os.unlink(outputFile)
+        
+    xtcservercmd += ' > %s 2>%s &' % (xtcserverCmdStdout, xtcserverCmdStderr)
+    # run server in background while running dumpcmd
+    print "running server cmd in bkgnd"
+    try:
+        os.system(xtcservercmd)
+    except Exception,e:
+        print "ERROR running server command."
+        if os.path.exists(expectedSharedMemoryFile):
+            print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+            os.unlink(expectedSharedMemoryFile)
+        raise e
+    time.sleep(.35) # sleep a little in case the server needs time to start up    
+    print "running dump cmd"
+    try:
+        dumpStdout,dumpError = cmdTimeOut(dumpcmd,30)
+    except Alarm, alarm:
+        print "ERROR: psana_test.dump command timed out: %s" % alarm
+        print "  run ps and clean up jobs"
+        print "  try to run test again, or try to increase the message size "
+        print "  from 10 to 32 before running this test with the command: "
+        print "  sudo /sbin/sysctl -w fs.mqueue.msg_max=32"
+        print "===== xtcserver cmd stderr ======="
+        print file(xtcserverCmdStderr).read()
+        print "===== xtcserver cmd stdout ======"
+        print file(xtcserverCmdStdout).read()
+        if os.path.exists(expectedSharedMemoryFile):
+            print "deleteing shared memory server file: %s" % expectedSharedMemoryFile
+            os.unlink(expectedSharedMemoryFile)
+        raise alarm
+
+    # check dump outout
+    print "===== dump stderr ====="
+    print dumpError
+    print "===== test result ====="
+    typeLines = set()
+    for ln in dumpStdout.split('\n'):
+        if ln.startswith('type='):
+            typeLines.add(ln.strip())
+    missingTypeLines = testShmDumpTypes.difference(typeLines)
+    if len(missingTypeLines)>0:
+        print "ERROR: dump output does not list the following types: %r"  % missingTypeLines
+    else:
+        print "SUCCESS! shmem test passed. dump against shared memory appears to have produced expected output"
+    
+    time.sleep(.5)  # sleep a bit in case the server is not finished
+    toDelete = [expectedSharedMemoryFile] + outputFiles    
+    for fname in toDelete:
+        if os.path.exists(fname):
+            os.unlink(fname)
+
 def testCommand(args):
     # helper functions
     def checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose):
@@ -1301,6 +1406,7 @@ cmdDict = {
     'prev':previousCommand,
     'links':makeTypeLinks,
     'test':testCommand,
+    'testshm':testShmCommand,
     'types':typesCommand,
     'curtypes':curTypesCommand
 }

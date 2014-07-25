@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2014-07-25  David Schneider
+- add test for psana shared memory mode.
+  Test is not part of regression for buildbot. Run manually with
+  python psana_test/src/psanaTestLib.py testshm
+
 Tag: V00-00-18
 2014-07-18  David Schneider
 - add unit test for merging control streams
