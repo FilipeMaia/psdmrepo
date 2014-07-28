@@ -41,7 +41,7 @@
   }
   uint32_t _reg7 {
     uint8_t _VRefDac:6 -> VRefDac;
-    uint32_t _z:29;
+    uint32_t _z:26;
   }
   uint32_t _reg8 {
     uint8_t _TpsTComp:1 -> TpsTComp;
@@ -76,7 +76,7 @@
     uint8_t _TC:2 -> TC;
     uint8_t _S2d:3 -> S2d;
     uint8_t _S2dDacBias:3 -> S2dDacBias;
-    uint32_t _z:25;
+    uint32_t _z:24;
   }
   uint32_t _reg14 {
     uint8_t _TpsTcDac:2 -> TpsTcDac;
