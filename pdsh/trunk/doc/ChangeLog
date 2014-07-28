@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pdsh
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2014-07-28 Wilko Kroeger
+- First intall of pdsh. The version is 2.29. It is installed in the external 
+  package area without a version. 
+
