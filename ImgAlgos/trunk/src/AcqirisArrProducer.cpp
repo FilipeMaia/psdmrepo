@@ -49,9 +49,10 @@ AcqirisArrProducer::AcqirisArrProducer (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key_in()
-  , m_key_wform() 
-  , m_key_wtime() 
-  , m_fname_prefix()  
+  , m_key_wform()
+  , m_key_wtime()
+  , m_fname_prefix()
+  , m_correct_t()
   , m_print_bits()
   , m_count_event(0)
   , m_count_calib(0)
@@ -61,6 +62,7 @@ AcqirisArrProducer::AcqirisArrProducer (const std::string& name)
   m_key_wform         = configStr("key_wform",       "acq_wform");
   m_key_wtime         = configStr("key_wtime",       "acq_wtime");
   m_fname_prefix      = configStr("fname_prefix",             "");
+  m_correct_t         = config   ("correct_t",             true );
   m_print_bits        = config   ("print_bits",               0 );
 
   m_do_save_config = (m_fname_prefix.empty()) ? false : true;
@@ -80,6 +82,7 @@ AcqirisArrProducer::printInputParameters()
         << "\n key_wform        : " << m_key_wform
         << "\n key_wtime        : " << m_key_wtime
         << "\n fname_prefix     : " << m_fname_prefix
+        << "\n correct_t        : " << m_correct_t
         << "\n print_bits       : " << m_print_bits
         << "\n do_save_config   : " << m_do_save_config
         << "\n";     
@@ -220,6 +223,16 @@ AcqirisArrProducer::print_wf_in_event(Event& evt, Env& env)
     }
   }
 }
+//-------------------------------
+
+void 
+AcqirisArrProducer::print_wf_index_info(uint32_t indexFirstPoint, int32_t i0_seg, int32_t size)
+{
+  MsgLog(name(), info, "event = " << m_count_event
+	               << "   indexFirstPoint = " << indexFirstPoint   // 0,1,2,3
+	               << "   i0_seg = " << i0_seg	                 // always 0 in my test
+		       << "   iterator size = " << size);  
+}
 
 //-------------------------------
 
@@ -262,34 +275,46 @@ AcqirisArrProducer::proc_and_put_wf_in_event(Event& evt, Env& env)
         const ndarray<const Psana::Acqiris::TimestampV1, 1>& timestamps = elem.timestamp();
         const ndarray<const int16_t, 2>& waveforms = elem.waveforms();
 
-        // loop over segments
+        // loop over segments WITH time correction
         for (unsigned seg = 0; seg < nbrSegments; ++ seg) {
 
+            ndarray<const int16_t, 1> raw(waveforms[seg]);
 	  //double timestamp = timestamps[seg].value();
             double pos       = timestamps[seg].pos();        
 
-       	    int32_t i0_seg = seg * nbrSamplesInSeg + int16_t(pos/sampInterval);
+       	    int32_t i0_seg = (m_correct_t) ? seg * nbrSamplesInSeg + int32_t(pos/sampInterval) : seg * nbrSamplesInSeg;
 
-            ndarray<const int16_t, 1> raw(waveforms[seg]);
+	    // Protection against aray index overflow
+	    int32_t size = (i0_seg + nbrSamplesInSeg <= nbrSamples) ? nbrSamplesInSeg : nbrSamples - i0_seg;
 
-	    // Protection againset aray index overflow
-	    int32_t size = (i0_seg + nbrSamplesInSeg < nbrSamples) ? nbrSamplesInSeg : nbrSamplesInSeg - i0_seg;
-	    size = (indexFirstPoint + size > nbrSamplesInSeg) ? nbrSamplesInSeg - indexFirstPoint : size;
+       	    if (m_correct_t) {
+	      // Protection against aray index overflow
+	      if( indexFirstPoint + size > nbrSamplesInSeg ) size = nbrSamplesInSeg - indexFirstPoint;	    
+              if( m_print_bits & 4 ) print_wf_index_info(indexFirstPoint, i0_seg, size);
+	    
+              for (int32_t i = 0; i < size; ++ i) {
+	        wf[chan][i0_seg + i] = raw[indexFirstPoint + i]*slope - offset;
+                wt[chan][i0_seg + i] = i*sampInterval + pos;		
+              }          	    
+	    
+	    } else {	    
 
-	    //cout << "   event = " << m_count_event
-	    //     << "   indexFirstPoint = " << indexFirstPoint   // 0,1,2,3
-	    //     << "   i0_seg = " << i0_seg	                 // always 0 in my test
-	    //     << "  iterator size = " << size << endl;  
+              if( m_print_bits & 4 ) print_wf_index_info(indexFirstPoint, i0_seg, size);
+	    
+              for (int32_t i = 0; i < size; ++ i) {
+	        wf[chan][i0_seg + i] = raw[i]*slope - offset;
+                wt[chan][i0_seg + i] = i*sampInterval + pos;		
+              }          
 
-            for (int32_t  i = 0; i < size; ++ i) {
-	      wf[chan][i0_seg + i] = raw[indexFirstPoint + i]*slope - offset;
-              wt[chan][i0_seg + i] = i*sampInterval + pos;		
-            }          
-        }
-    }
+            } // if (m_correct_t) 
+
+  	} // for (unsigned seg 
+
+    } // loop over channels
+
     saveNonConst2DArrayInEvent<wform_t> (evt, m_src, m_key_wform, wf);
     saveNonConst2DArrayInEvent<wtime_t> (evt, m_src, m_key_wtime, wt);
-  }
+  } // if (acqData)
 }
 
 } // namespace ImgAlgos

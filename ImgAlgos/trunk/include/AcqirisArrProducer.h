@@ -72,6 +72,9 @@ protected:
   /// Prints part of the waveforms and associated meta-data
   void print_wf_in_event(Event& evt, Env& env);
 
+  /// Prints info about wf indexes
+  void print_wf_index_info(uint32_t indexFirstPoint, int32_t i0_seg, int32_t size);
+
   /// Gets the waveforms from data apply time corrections and put them in current event store
   void proc_and_put_wf_in_event(Event& evt, Env& env);
 
@@ -95,6 +98,9 @@ private:
 
   /// String file name prefix
   std::string     m_fname_prefix;
+
+  /// On/off switch for time correction in array index
+  bool            m_correct_t;
 
   /// Bit mask for print options
   unsigned        m_print_bits;
