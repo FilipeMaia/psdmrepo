@@ -1,0 +1,21 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package pdsh
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Brief description:
+==================
+
+pdsh is a parallel remote shell utility. 
+
+Detailed description:
+=====================
+
+pdsh is a parallel remote shell utility that uses ssh to execute commands on 
+remote hosts. It uses a sliding window of threads to run ssh in parallel.
+ 
