@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-54
+2014-07-28 Mikhail S. Dubrovin
+- AcqirisArrProducer - add print_bits = 16
+
 Tag: V00-03-53
 2014-07-28 Mikhail S. Dubrovin
 - AcqirisArrProducer - add on/off switch correct_t for waveform time correction

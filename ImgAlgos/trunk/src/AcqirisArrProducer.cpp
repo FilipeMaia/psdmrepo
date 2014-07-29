@@ -290,7 +290,7 @@ AcqirisArrProducer::proc_and_put_wf_in_event(Event& evt, Env& env)
        	    if (m_correct_t) {
 	      // Protection against aray index overflow
 	      if( indexFirstPoint + size > nbrSamplesInSeg ) size = nbrSamplesInSeg - indexFirstPoint;	    
-              if( m_print_bits & 4 ) print_wf_index_info(indexFirstPoint, i0_seg, size);
+              if( m_print_bits & 16 ) print_wf_index_info(indexFirstPoint, i0_seg, size);
 	    
               for (int32_t i = 0; i < size; ++ i) {
 	        wf[chan][i0_seg + i] = raw[indexFirstPoint + i]*slope - offset;
