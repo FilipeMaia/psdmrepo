@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-06
+2014-07-30 Mikhail S. Dubrovin
+- move modules PixCoords2x1V2, GeometryAccess.h, GeometryObject.h, and test/ex_geometry_access from ImgAlgos to PSCalib
+
 Tag: V00-02-05
 2014-07-03 Mikhail S. Dubrovin
 - in CalibParsStore.h, GenericCalibPars.h, GenericCalibPars.cpp - add calibration for variable size ndarrays 
