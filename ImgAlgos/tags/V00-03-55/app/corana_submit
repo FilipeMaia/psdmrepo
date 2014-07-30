@@ -1,0 +1,114 @@
+#!@PYTHON@
+####!/usr/bin/env python
+#--------------------
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Module corana_submit...
+#
+#------------------------------------------------------------------------
+
+""" Project: Evaluation of the Image Auto-Correlation Function
+corana_submit works as a main list of procedures launched for
+the python file managing script in the process of evaluation
+of the Image Auto-Correlation Function.
+
+CorAnaSubmit.py contains global methods for file management.
+
+This software was developed for the SIT project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@see RelatedModule: CorAnaSubmit.py CorAnaPars.py CorAna*.cpp
+
+@version $Id: 2012-09-26 15:00:00Z dubrovin$
+
+@author Mikhail Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 1 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+
+#import os
+import sys
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from ImgAlgos.CorAnaSubmit import *
+import ImgAlgos.CorAnaPars as cap
+cp = cap.coranapars
+
+#--------------------
+#--------------------
+
+def do_main() :
+
+# 1)===========
+    print '\n1) Initialize all parameters:'
+    init_pars()
+
+# 2)===========
+    print '\n2) Run psana to split image for files:'
+    submit_job_for_splitter()
+    #submit_job_for_splitter_interactive()
+
+# 3)===========
+    print '\n3) Check that all splitted files are produced:'
+    check_list_of_files('.bin')
+
+# 4)===========
+    print '\n4) Submit job for time-correlation processing:'
+    submit_jobs_for_cor_proc()
+    #submit_jobs_for_cor_proc_interactive()
+
+# 5)===========
+    print '\n5) Check that all processed files are produced:'
+    check_list_of_files('-result.bin')
+
+# 6)===========
+    print '\n6) Submit job for merging:'
+    submit_job_for_merging()
+    #submit_job_for_merging_interactive()
+
+# 7)===========
+    print '\n7) Check that merged file is produced:'
+    check_the_file('-image-result.bin')
+
+# 8)===========
+    print '\n8) Submit job for test processing of the file with results:'
+    submit_job_for_proc_results()
+    #submit_job_for_proc_results_interactive()
+
+# 9)===========
+    print '\n9) List all created files:'
+    print_list_of_files_in_dir(cp.dname_work, cp.fname_com)
+
+# 10)===========
+    print '\n10) Clean work files in the work directory:'
+    remove_file_for_tail(['-time.txt', '-split-log.txt', '-image-result-log.txt', '-proc-results-log.txt'])
+    remove_split_files()
+
+# 11)===========
+    print '\n11) List of preserved files:'
+    print_list_of_files_in_dir(cp.dname_work, cp.fname_com)
+
+#---===========
+#    sys.exit('TEST END')
+#---===========
+
+#--------------------
+
+if __name__ == '__main__' :
+    do_main()
+    sys.exit('The End')
+
+#--------------------
