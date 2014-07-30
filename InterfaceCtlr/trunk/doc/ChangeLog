@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-11
+2014-07-30 Wilko Kroeger
+- The controller will accept an absolute path for the config file
+
 Tag: V01-03-10
 2014-07-14 Wilko Kroeger
 - Allow to set the resource a file is stored in irods (FileMgrIrods)
