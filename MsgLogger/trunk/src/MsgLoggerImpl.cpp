@@ -37,6 +37,9 @@ extern "C" {
 #include <iostream>
 #include <boost/shared_ptr.hpp>
 #include <boost/thread/mutex.hpp>
+#if BOOST_VERSION>105200
+#include <boost/thread/lock_guard.hpp> 
+#endif
 
 //-------------------------------
 // Collaborating Class Headers --
