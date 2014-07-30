@@ -65,7 +65,7 @@ JOB_STAT_USUSP     = lsf.JOB_STAT_USUSP     # job is suspended by user
 JOB_STAT_EXIT      = lsf.JOB_STAT_EXIT      # job exited
 JOB_STAT_DONE      = lsf.JOB_STAT_DONE      # job is completed successfully
 JOB_STAT_PDONE     = lsf.JOB_STAT_PDONE     # post job process done successfully
-JOB_STAT_WAIT      = lsf.JOB_STAT_WAIT      #chunk job waiting its execution turn
+JOB_STAT_WAIT      = lsf.JOB_STAT_WAIT      # chunk job waiting its execution turn
 JOB_STAT_UNKWN     = lsf.JOB_STAT_UNKWN     # unknown status
 
 # options for bjobs() call
@@ -211,7 +211,7 @@ class Job ( object ) :
             lsf.lsb_signaljob(self._jobid, sig)
         
     def __update(self):
-        """ Retrieves job statrus information from LSF and updates internal state."""
+        """ Retrieves job status information from LSF and updates internal state."""
 
         count = lsf.lsb_openjobinfo(self._jobid, None, "all", None, None, lsf.ALL_JOB)
         if count < 1:

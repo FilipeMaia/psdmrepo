@@ -285,12 +285,16 @@ class TranslatorJob(object) :
         and the translate_uri destination for the translator output"""
 
         cmd_list = []
-        #cmd_list.append("/reg/neh/home1/wilko/releases/psana_translator/ffb_run_trans.sh")
         cmd_list.append("psana")
 
         # configuration file
-        cfgFilePath = os.path.join(self._get_config('release', _defReleasePath, True),
-                                   self._get_config('config',  _defCfgFileName, True))
+
+        cfg_file = self._get_config('config',  _defCfgFileName, True)
+        if cfg_file.startswith('/'): 
+            cfgFilePath = cfg_file
+        else:
+            cfgFilePath = os.path.join(self._get_config('release', _defReleasePath, True), cfg_file)
+
         cmd_list.append("-c")
         cmd_list.append(cfgFilePath)
         cmd_list.append("-o")
