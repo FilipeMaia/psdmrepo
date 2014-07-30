@@ -45,6 +45,15 @@ MARKER_MAP = {
     '+': ('+', config.PYQT_MARK_SIZE),
     'x': ('x', config.PYQT_MARK_SIZE),
     'd': ('d', config.PYQT_MARK_SIZE),
+    'D': ('d', config.PYQT_MARK_SIZE),
+    # no matching equivalent in pyqt - use the fallback marker
+    ',': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    'p': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    '*': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    'h': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    'H': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    '|': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
+    '_': (config.PYQT_MARK_FALLBACK, config.PYQT_MARK_FALLBACK_SIZE),
 }
 
 LINE_MAP = {
