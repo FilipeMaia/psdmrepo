@@ -19,6 +19,17 @@ COLOR_LIST = [
     'w', # white
 ]
 
+COLOR_RGB_MAP = {
+    'b': (0, 0, 255), # blue
+    'g': (0, 255, 0), # green
+    'r': (255, 0, 0), # red
+    'c': (0, 255, 255), # cyan
+    'm': (255, 0, 255), # magenta
+    'y': (255, 255, 0), # yellow
+    'k': (0, 0, 0), # black
+    'w': (255, 255, 255), # white
+}
+
 MARKER_MAP = {
     '.': ('o', config.PYQT_MARK_SIZE_SMALL),
     'o': ('o', config.PYQT_MARK_SIZE),
@@ -103,5 +114,30 @@ def parse_fmt_xyplot(fmt_str, color_index=0):
         fmt_dict['symbolBrush'] = color
     if marker_size is not None:
         fmt_dict['symbolSize'] = marker_size
+
+    return fmt_dict
+
+
+def parse_fmt_hist(fmt_str, color_index=0):
+    line = None
+    fmt_dict = {}
+    color, line_style, marker, marker_size = parse_fmt_str(fmt_str, color_index)
+
+    # set color by rotating scheme if none is specified
+    if color is None:
+        color = pg.intColor(color_index, config.PYQT_AUTO_COLOR_MAX, alpha=config.PYQT_HIST_ALPHA)
+    else:
+        color = COLOR_RGB_MAP.get(color) + (config.PYQT_HIST_ALPHA,)
+
+    # create a pen object for line if one is specified
+    if line_style is not None:
+        line = pg.mkPen(config.PTQT_HIST_LINE_COLOR, style=line_style)
+
+    # brush entry should always be present in the output
+    fmt_dict['brush'] = color
+
+    # only pass add these entries if they are non-null
+    if line is not None:
+        fmt_dict['pen'] = line
 
     return fmt_dict

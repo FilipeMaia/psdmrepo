@@ -9,7 +9,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from psmon import config
 from psmon.util import is_py_iter, arg_inflate_tuple
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
-from psmon.format import parse_fmt_xyplot
+from psmon.format import parse_fmt_xyplot, parse_fmt_hist
 
 
 LOG = logging.getLogger(__name__)
@@ -142,14 +142,14 @@ class XYPlotClient(Plot):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
         self.plots = []
         self.formats = []
-        for xdata, ydata, format in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
+        for xdata, ydata, format_val in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
             cval = len(self.plots)
-            self.formats.append((format, cval))
+            self.formats.append((format_val, cval))
             self.plots.append(
                 self.plot_view.plot(
                     x=xdata,
                     y=ydata,
-                    **parse_fmt_xyplot(format, cval)
+                    **parse_fmt_xyplot(format_val, cval)
                 )
             )
 
@@ -160,11 +160,11 @@ class XYPlotClient(Plot):
         if data is not None:
             self.set_title(data.ts)
             for index, (plot, data_tup, format_tup) in enumerate(zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats), self.formats)):
-                xdata, ydata, format = data_tup
+                xdata, ydata, new_format = data_tup
                 old_format, cval = format_tup
-                if format != old_format:
-                    self.formats[index] = (format, cval)
-                    plot.setData(x=xdata, y=ydata, **parse_fmt_xyplot(format, cval))
+                if new_format != old_format:
+                    self.formats[index] = (new_format, cval)
+                    plot.setData(x=xdata, y=ydata, **parse_fmt_xyplot(new_format, cval))
                 else:
                     plot.setData(x=xdata, y=ydata)
         return self.plots
@@ -174,14 +174,16 @@ class HistClient(Plot):
     def __init__(self, init_hist, framegen, info, rate=1):
         super(HistClient, self).__init__(init_hist, framegen, info, rate)
         self.hists = []
-        for bins, values, format in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
+        self.formats = []
+        for bins, values, format_val in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
             cval = len(self.hists)
+            self.formats.append((format_val, cval))
             hist = pg.PlotCurveItem(
                 x=bins,
                 y=values,
                 stepMode=True,
                 fillLevel=0,
-                brush=pg.intColor(cval, config.PYQT_AUTO_COLOR_MAX, alpha=config.PYQT_HIST_ALPHA)
+                **parse_fmt_hist(format_val, cval)
             )
             self.plot_view.addItem(hist)
             self.hists.append(hist)
@@ -192,7 +194,12 @@ class HistClient(Plot):
         """
         if data is not None:
             self.set_title(data.ts)
-            for hist, data_tup in zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats)):
-                bins, values, formats = data_tup
-                hist.setData(x=bins, y=values, stepMode=True)
+            for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats), self.formats)):
+                bins, values, new_format = data_tup
+                old_format, cval = format_tup
+                if new_format != old_format:
+                    self.formats[index] = (new_format, cval)
+                    hist.setData(x=bins, y=values, **parse_fmt_hist(new_format, cval))
+                else:
+                    hist.setData(x=bins, y=values)
         return self.hists
