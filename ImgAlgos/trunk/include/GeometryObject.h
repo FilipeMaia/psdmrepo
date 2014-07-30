@@ -28,13 +28,14 @@
 // Collaborating Class Headers --
 //-------------------------------
 //#include "ndarray/ndarray.h"
-#include "CSPadPixCoords/PixCoords2x1V2.h"
+//#include "CSPadPixCoords/PixCoords2x1V2.h"
+#include "ImgAlgos/PixCoords2x1V2.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
 
-typedef CSPadPixCoords::PixCoords2x1V2 PC2X1;
+typedef ImgAlgos::PixCoords2x1V2 PC2X1;
 
 using namespace std;
 
@@ -44,10 +45,12 @@ using namespace std;
 
 namespace ImgAlgos {
 
+/// @addtogroup ImgAlgos
+
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief C++ class GeometryObject - elementary building block for hierarchial geometry description
+ *  @brief Class elementary building block for hierarchial geometry description
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -55,9 +58,6 @@ namespace ImgAlgos {
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
- *
- *
- *  @see GeometryAccess
  *
  *  @anchor interface
  *  @par<interface> Interface Description

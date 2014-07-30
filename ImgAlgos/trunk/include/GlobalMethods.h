@@ -76,6 +76,27 @@
 
 namespace ImgAlgos {
 
+/**
+ *  @defgroup ImgAlgos ImgAlgos package 
+ *  @brief Package ImgAlgos contains a collection of psana modules and algorithms for LCLS data processing
+ *
+ *  Modules in this package can be destinguished be their names as follows. 
+ *  @li Psana modules:
+ *  \n  Acqiris* - work with acqiris data
+ *  \n  CSPad* - work with CSPAD data
+ *  \n  *detector-name* - work with specific detector data
+ *  \n  *ImageProducer - produces 2-d ndarray from raw data and save it in the event store
+ *  \n  NDArr* - modules for ndarray processing
+ *  \n  Img* - modules for image (2-d ndarray) processing
+ *  
+ *  @li Algorithms:
+ *  \n  CorAna* - modules (psana and standalone) developed for time-correlation analysis 
+ *  \n  Geometry* - unified heirarchial detector geometry description
+ *  \n  Global* - global methods
+ *
+ */
+
+
 /// @addtogroup ImgAlgos
 
 /**

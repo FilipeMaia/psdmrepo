@@ -38,24 +38,17 @@
 
 namespace ImgAlgos {
 
-/**
- *  @defgroup ImgAlgos ImgAlgos package
- *  @brief Package ImgAlgos contains psana modules and algorithms for data processing
- */
-
-/// @addtogroup ImgAlgos ImgAlgos
+/// @addtogroup ImgAlgos
 
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief C++ class GeometryAccess supports universal detector geometry description.
+ *  @brief Class supports universal detector geometry description.
  *
- *  @note This software was developed for the LCLS project.  If you use all or 
+ *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
- *
- *  @author Mikhail S. Dubrovin
  *
  *  @see GeometryObject, PSCalib/CalibFileFinder
  *
@@ -107,14 +100,17 @@ namespace ImgAlgos {
  *    geometry.get_geo("QUAD:V1", 1)->print_geo();
  *    geometry.get_top_geo()->print_geo_children();
  *  @endcode
+ *
+ *  @author Mikhail S. Dubrovin
  */
 
-//typedef boost::shared_ptr<GeometryObject> shpGO;
+class GeometryAccess  {
 
+//typedef boost::shared_ptr<GeometryObject> shpGO;
+/** Use the same declaration of the shared pointer to geometry object like in the class GeometryObject*/
 typedef ImgAlgos::GeometryObject::shpGO shpGO;
 
 
-class GeometryAccess  {
 public:
 
   /**
