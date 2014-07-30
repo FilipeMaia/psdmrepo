@@ -49,12 +49,24 @@ class Plot(object):
     def update(self, data):
         pass
 
+    def update_base(self, data):
+        """
+        Base update function - meant for basic functionality that should happen for all plot/image updates.
+
+        Calls update(self, data) which should be implement an Plot subclass specific update behavior
+        """
+        if data is not None:
+            self.set_title(data.ts)
+            self.set_title_axis('bottom', data.xlabel)
+            self.set_title_axis('left', data.ylabel)
+        return self.update(data)
+
     def animate(self):
         self.ani_func()
 
     def ani_func(self):
         # call the data update function
-        self.update(self.framegen.next())
+        self.update_base(self.framegen.next())
         # setup timer for calling next update call
         QtCore.QTimer.singleShot(self.rate_ms, self.ani_func)
 
@@ -132,7 +144,6 @@ class ImageClient(Plot):
         Updates the data in the image - none means their was no update for this interval
         """
         if data is not None:
-            self.set_title(data.ts)
             self.im.setImage(data.image, autoLevels=False)
         return self.im
 
@@ -158,7 +169,6 @@ class XYPlotClient(Plot):
         Updates the data in the plot - none means their was no update for this interval
         """
         if data is not None:
-            self.set_title(data.ts)
             for index, (plot, data_tup, format_tup) in enumerate(zip(self.plots, arg_inflate_tuple(1, data.xdata, data.ydata, data.formats), self.formats)):
                 xdata, ydata, new_format = data_tup
                 old_format, cval = format_tup
@@ -193,7 +203,6 @@ class HistClient(Plot):
         Updates the data in the histogram - none means their was no update for this interval
         """
         if data is not None:
-            self.set_title(data.ts)
             for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats), self.formats)):
                 bins, values, new_format = data_tup
                 old_format, cval = format_tup
