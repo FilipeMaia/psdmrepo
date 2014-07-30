@@ -20,6 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 boost_ver = "1.49.0"
+if env['SIT_ARCH_OS'] in ('rhel6','rhel7') : boost_ver = "1.55.0"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "boost", boost_ver + '-$PYTHON')
 INCDIR = "include/boost"
