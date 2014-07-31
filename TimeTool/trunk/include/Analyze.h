@@ -92,7 +92,7 @@ private:
 
   Source      m_get_key;  // Key for retrieving camera image
   std::string m_put_key;  // Key for inserting results into Event
-  
+  bool        m_put_ndarrays; // put size 1 ndarray's into Event rather than doubles
   bool m_use_online_config;   // use configuration parameters found in data
 
   int m_eventcode_nobeam; // use this eventcode for detecting no beam

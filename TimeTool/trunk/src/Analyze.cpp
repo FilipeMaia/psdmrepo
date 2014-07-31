@@ -31,6 +31,7 @@
 #include "psddl_psana/lusi.ddl.h"
 #include "psddl_psana/camera.ddl.h"
 #include "psddl_psana/opal1k.ddl.h"
+#include "ndarray/ndarray.h"
 
 #include <iomanip>
 #include <fstream>
@@ -43,6 +44,18 @@
 // This declares this class as psana module
 using namespace TimeTool;
 PSANA_MODULE_FACTORY(Analyze)
+
+namespace {
+  
+  // return shared pointer to 1D ndarray of double with one element that is val
+  inline boost::shared_ptr<ndarray<double, 1> > boost_double_as_ndarray(double val) {
+    unsigned shape[1]={1};
+    shared_ptr< ndarray<double,1> > arrPtr = boost::make_shared< ndarray<double,1> >(shape);
+    ndarray<double,1> &arr = *arrPtr;
+    arr[0]=val;
+    return arrPtr;
+  }
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -59,6 +72,7 @@ Analyze::Analyze (const std::string& name)
   // get the values from configuration or use defaults
   m_get_key = configSrc("get_key","DetInfo(:Opal1000)");
   m_put_key = configStr("put_key","TTSPEC");
+  m_put_ndarrays = config("put_ndarrays",false);
 
   m_use_online_config = config("use_online_config",false);
 
@@ -460,17 +474,29 @@ Analyze::event(Event& evt, Env& env)
         
 #define boost_double(v) boost::shared_ptr<double>(boost::make_shared<double>(v))
 
-        evt.put(boost_double(pFit0[0]) ,m_put_key+std::string(":AMPL"));
-        evt.put(boost_double(xflt)     ,m_put_key+std::string(":FLTPOS"));
-        evt.put(boost_double(xfltc)    ,m_put_key+std::string(":FLTPOS_PS"));
-        evt.put(boost_double(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
-        evt.put(boost_double(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
+        if (not m_put_ndarrays) {
+          evt.put(boost_double(pFit0[0]) ,m_put_key+std::string(":AMPL"));
+          evt.put(boost_double(xflt)     ,m_put_key+std::string(":FLTPOS"));
+          evt.put(boost_double(xfltc)    ,m_put_key+std::string(":FLTPOS_PS"));
+          evt.put(boost_double(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
+          evt.put(boost_double(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
+        } else {
+          evt.put(boost_double_as_ndarray(pFit0[0]) ,m_put_key+std::string(":AMPL"));
+          evt.put(boost_double_as_ndarray(xflt)     ,m_put_key+std::string(":FLTPOS"));
+          evt.put(boost_double_as_ndarray(xfltc)    ,m_put_key+std::string(":FLTPOS_PS"));
+          evt.put(boost_double_as_ndarray(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
+          evt.put(boost_double_as_ndarray(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
+        }
                 
         if (nfits>1) {
           ndarray<double,1> pFit1 = 
             psalg::parab_fit(qwf,*(++peaks.begin()),0.8);
           if (pFit1[2]>0)
-            evt.put(boost_double(pFit1[0]), m_put_key+std::string(":AMPLNXT"));
+            if (not m_put_ndarrays) {
+              evt.put(boost_double(pFit1[0]), m_put_key+std::string(":AMPLNXT"));
+            } else {
+              evt.put(boost_double_as_ndarray(pFit1[0]), m_put_key+std::string(":AMPLNXT"));
+            }
         }
 
 #undef boost_double

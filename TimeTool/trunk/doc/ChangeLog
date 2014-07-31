@@ -11,6 +11,12 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2014-07-31 David Schneider
+- added config file option put_ndarrays to TimeTool.Analyze to put Event
+  results as ndarrays rather than doubles. ndarrays get converted to
+  numpy arrays for Python modules. Allows easier access to results from Python.
+
 Tag: V00-00-02
 2014-05-06 Matthew J. Weaver
 - added doc directory.
