@@ -46,27 +46,27 @@ class Plot(object):
         # set any user specified default axis ranges
         self.set_xy_ranges()
 
-    def update(self, data):
+    def update_sub(self, data):
         pass
 
-    def update_base(self, data):
+    def update(self, data):
         """
         Base update function - meant for basic functionality that should happen for all plot/image updates.
 
-        Calls update(self, data) which should be implement an Plot subclass specific update behavior
+        Calls update_sub(self, data) which should be implement an Plot subclass specific update behavior
         """
         if data is not None:
             self.set_title(data.ts)
             self.set_title_axis('bottom', data.xlabel)
             self.set_title_axis('left', data.ylabel)
-        return self.update(data)
+        return self.update_sub(data)
 
     def animate(self):
         self.ani_func()
 
     def ani_func(self):
         # call the data update function
-        self.update_base(self.framegen.next())
+        self.update(self.framegen.next())
         # setup timer for calling next update call
         QtCore.QTimer.singleShot(self.rate_ms, self.ani_func)
 
@@ -139,7 +139,7 @@ class ImageClient(Plot):
         self.fig_win.addItem(self.cb)
         #print self.plot_view.getViewBox().getState()
 
-    def update(self, data):
+    def update_sub(self, data):
         """
         Updates the data in the image - none means their was no update for this interval
         """
@@ -164,7 +164,7 @@ class XYPlotClient(Plot):
                 )
             )
 
-    def update(self, data):
+    def update_sub(self, data):
         """
         Updates the data in the plot - none means their was no update for this interval
         """
@@ -198,7 +198,7 @@ class HistClient(Plot):
             self.plot_view.addItem(hist)
             self.hists.append(hist)
 
-    def update(self, data):
+    def update_sub(self, data):
         """
         Updates the data in the histogram - none means their was no update for this interval
         """
