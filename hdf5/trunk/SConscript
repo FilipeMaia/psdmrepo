@@ -27,11 +27,11 @@ PKGLIBS = "sz"
 standardExternalPackage('szip', **locals())
 
 
-hdf5_ver = "1.8.6"
+hdf5_ver = "1.8.13"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "hdf5", hdf5_ver)
 INCDIR = "include"
 LIBDIR = "lib"
 BINDIR = "bin"
-PKGLIBS = "hdf5 hdf5_hl"
+PKGLIBS = "hdf5 hdf5_cpp hdf5_hl hdf5_hl_cpp"
 DEPS = "szip"
 standardExternalPackage('hdf5', **locals())
