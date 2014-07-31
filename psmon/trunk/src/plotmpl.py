@@ -43,8 +43,14 @@ class Plot(object):
         self.rate_ms = rate * 1000
         self.multi_plot = False
 
-    def update(self, data):
+    def update_sub(self, data):
         pass
+
+    def update(self, data):
+        if data is not None:
+            self.set_title(data.ts)
+            self.set_labels(data.xlabel, data.ylabel)
+        return self.update_sub(data)
 
     def animate(self):
         return animation.FuncAnimation(self.figure, self.update, self.ani_func, interval=self.rate_ms)
@@ -150,12 +156,11 @@ class ImageClient(Plot):
         self.set_aspect()
         self.set_xy_ranges()
 
-    def update(self, data):
+    def update_sub(self, data):
         """
         Updates the data in the image - none means their was no update for this interval
         """
         if data is not None:
-            self.set_title(data.ts)
             self.im.set_data(data.image)
         return self.im
 
@@ -178,9 +183,8 @@ class HistClient(Plot):
         self.set_aspect()
         self.set_xy_ranges()
 
-    def update(self, data):
+    def update_sub(self, data):
         if data is not None:
-            self.set_title(data.ts)
             # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
             if data.bins.size > data.values.size:
                 self.update_plot_data(self.hists, data.bins[:-1], data.values, data.formats, self.formats)
@@ -200,9 +204,8 @@ class XYPlotClient(Plot):
         self.set_aspect()
         self.set_xy_ranges()
 
-    def update(self, data):
+    def update_sub(self, data):
         if data is not None:
-            self.set_title(data.ts)
             self.update_plot_data(self.plots, data.xdata, data.ydata, data.formats, self.formats)
             self.ax.relim()
             self.ax.autoscale_view()
