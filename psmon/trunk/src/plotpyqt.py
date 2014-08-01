@@ -19,7 +19,7 @@ TypeMap = {
     Hist: 'HistClient',
     Image: 'ImageClient',
     XYPlot: 'XYPlotClient',
-#    MultiPlot: 'MultiPlotClient',
+    MultiPlot: 'MultiPlotClient',
 }
 
 
@@ -29,11 +29,14 @@ def type_getter(data_type, mod_name=__name__):
 
 
 class Plot(object):
-    def __init__(self, init, framegen, info, rate):
+    def __init__(self, init, framegen, info, rate, **kwargs):
         # Boilerplate code from pyqtgraph examples - might not be the ideal way to do this for this case
-        self.fig_win = pg.GraphicsLayoutWidget()
-        self.fig_win.setWindowTitle(init.title)
-        self.fig_win.show()
+        if 'figwin' in kwargs:
+            self.fig_win = kwargs['figwin']
+        else:
+            self.fig_win = pg.GraphicsLayoutWidget()
+            self.fig_win.setWindowTitle(init.title)
+            self.fig_win.show()
         self.plot_view = self.fig_win.addPlot()
         self.set_title(init.ts)
         self.set_title_axis('bottom', init.xlabel)
@@ -115,8 +118,8 @@ class Plot(object):
 
 
 class ImageClient(Plot):
-    def __init__(self, init_im, framegen, info, rate=1):
-        super(ImageClient, self).__init__(init_im, framegen, info, rate)
+    def __init__(self, init_im, framegen, info, rate=1, **kwargs):
+        super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         self.set_aspect()
         self.im = pg.ImageItem(image=init_im.image, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)
@@ -149,8 +152,8 @@ class ImageClient(Plot):
 
 
 class XYPlotClient(Plot):
-    def __init__(self, init_plot, framegen, info, rate=1):
-        super(XYPlotClient, self).__init__(init_plot, framegen, info, rate)
+    def __init__(self, init_plot, framegen, info, rate=1, **kwargs):
+        super(XYPlotClient, self).__init__(init_plot, framegen, info, rate, **kwargs)
         self.plots = []
         self.formats = []
         for xdata, ydata, format_val in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
@@ -181,8 +184,8 @@ class XYPlotClient(Plot):
 
 
 class HistClient(Plot):
-    def __init__(self, init_hist, framegen, info, rate=1):
-        super(HistClient, self).__init__(init_hist, framegen, info, rate)
+    def __init__(self, init_hist, framegen, info, rate=1, **kwargs):
+        super(HistClient, self).__init__(init_hist, framegen, info, rate, **kwargs)
         self.hists = []
         self.formats = []
         for bins, values, format_val in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
@@ -212,3 +215,29 @@ class HistClient(Plot):
                 else:
                     hist.setData(x=bins, y=values)
         return self.hists
+
+
+class MultiPlotClient(object):
+    def __init__(self, init, framegen, info, rate):
+        self.fig_win = pg.GraphicsLayoutWidget()
+        self.fig_win.setWindowTitle(init.title)
+        self.fig_win.show()
+        self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
+        self.framegen = framegen
+        self.rate_ms = rate * 1000
+        self.info = info
+        self.multi_plot = True
+
+    def update(self, data):
+        if data is not None:
+            for plot, plot_data in zip(self.plots, data.data_con):
+                plot.update(plot_data)
+
+    def animate(self):
+        self.ani_func()
+
+    def ani_func(self):
+        # call the data update function
+        self.update(self.framegen.next())
+        # setup timer for calling next update call
+        QtCore.QTimer.singleShot(self.rate_ms, self.ani_func)
