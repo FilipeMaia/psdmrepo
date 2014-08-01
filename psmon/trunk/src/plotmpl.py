@@ -1,4 +1,5 @@
 import sys
+import math
 import logging
 import collections
 
@@ -119,7 +120,17 @@ class Plot(object):
 
 class MultiPlotClient(object):
     def __init__(self, init, framegen, info, rate):
-        self.figure, self.ax = plt.subplots(nrows=1, ncols=init.size, facecolor=info.bkg_col, edgecolor=info.bkg_col)
+        # set default column and row values
+        ncols = init.size
+        nrows = 1
+        # if any column organization data is passed try to use it
+        if init.ncols is not None:
+            if isinstance(init.ncols, int) and 0 < init.ncols <= init.size:
+                ncols = init.ncols
+                nrows = int(math.ceil(init.size/float(init.ncols)))
+            else:
+                LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s', init.ncols, init.size)
+        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col)
         self.figure.canvas.set_window_title(init.title)
         self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax)) for data_obj, subax in zip(init.data_con, self.ax)]
         self.framegen = framegen

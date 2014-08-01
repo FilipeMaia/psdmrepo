@@ -7,9 +7,22 @@ class Data(object):
 
 
 class MultiPlot(object):
-    def __init__(self, ts, title, data_con=None):
+    """
+    A data container of arbitary plot types - can contain an arbitrary number of
+    objects inheiriting 
+
+    Optional arguments
+    - ncols: indicates to the client the number of columns to be used for 
+            displaying the plots
+    - use_windows: tells the client to render the individual plots in separate
+            windows if that feature is supported by the client
+    """
+
+    def __init__(self, ts, title, data_con=None, ncols=None, use_windows=False):
         self.ts = ts
         self.title = title
+        self.ncols = ncols
+        self.use_windows = use_windows
         if data_con is None:
             self.data_con = []
         else:
