@@ -130,6 +130,8 @@ class MultiPlotClient(object):
                 nrows = int(math.ceil(init.size/float(init.ncols)))
             else:
                 LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s', init.ncols, init.size)
+        if init.use_windows:
+            LOG.warning('Separate windows for subplots is not supported in the matplotlib client')
         self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col)
         self.figure.canvas.set_window_title(init.title)
         self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax)) for data_obj, subax in zip(init.data_con, self.ax)]
