@@ -158,13 +158,25 @@ XtcStreamMerger::next()
     // For control streams, if we are processing DAQ streams, skip over all transitions.
     // they should contain no event data. However if we are only processing control streams,
     // process the control transitions.
+
+    // Skip over L1Accepts that have 0x1FFFF as the fiducial value. In older data, the control streams 
+    // were producing these when they had trouble getting the DAQ timestamp. These control 
+    // stream Dgrams cannot be merged and will trigger warnings from FiducialsCompare.
+
     bool skip = false;
-    if ((not replaceDg.empty()) and 
-        ((replaceDg.dg()->seq.service() == Pds::TransitionId::Enable) or
-         (replaceDg.dg()->seq.service() == Pds::TransitionId::Disable))) {
-      MsgLog(logger, DBGMSG, "next() skipping Enable or Disable in " 
-             << dumpStr(replaceStreamIndex));
-      skip = true;
+    if (not replaceDg.empty()) {
+      if ( (replaceDg.dg()->seq.service() == Pds::TransitionId::Enable) or
+           (replaceDg.dg()->seq.service() == Pds::TransitionId::Disable) ) {
+        MsgLog(logger, DBGMSG, "next() skipping Enable or Disable in " 
+               << dumpStr(replaceStreamIndex));
+        skip = true;
+      } else if ( (replaceDg.dg()->seq.service() == Pds::TransitionId::L1Accept) and
+                  (replaceDg.dg()->seq.stamp().fiducials() >= Pds::TimeStamp::MaxFiducials) ) {
+        MsgLog(logger, DBGMSG, "next() skipping L1Accept with fiducials >= " 
+               << Pds::TimeStamp::MaxFiducials << " in " 
+               << dumpStr(replaceStreamIndex));
+        skip = true;
+      }
     } else if (processingDAQ()) {
       if ((nextStreamDg.streamType() == StreamDgram::controlUnderDAQ) or 
           (nextStreamDg.streamType() == StreamDgram::controlIndependent)) {
