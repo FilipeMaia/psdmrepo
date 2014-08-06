@@ -25,9 +25,12 @@ import h5py
 # -----------------------------
 # Test data
 # -----------------------------
-DATADIR = "/reg/g/psdm/data_test/Translator"
-XPPTUTDATADIR="/reg/g/psdm/data_test/multifile/test_003_xpptut13"
-CALIBDATADIR="/reg/g/psdm/data_test/calib"
+SIT_ROOT = os.path.expandvars('$SIT_ROOT')
+assert SIT_ROOT != '$SIT_ROOT', '$SIT_ROOT is not defined. run sit_setup'
+DATADIR = os.path.join(SIT_ROOT,"data_test/Translator")
+SPLITSCANDATADIR = os.path.join(SIT_ROOT,"data_test/multifile/test_002_xppd9714")
+XPPTUTDATADIR=os.path.join(SIT_ROOT,"data_test/multifile/test_003_xpptut13")
+CALIBDATADIR=os.path.join(SIT_ROOT,"data_test/calib")
 OUTDIR = "data/Translator"
 TESTDATA_T1= os.path.join(DATADIR, "test_042_Translator_t1.xtc")
 TESTDATA_T1_INITIAL_DAMAGE = os.path.join(DATADIR,"test_046_Translator_t1_initial_damage.xtc")
@@ -1254,7 +1257,7 @@ class H5Output( unittest.TestCase ) :
         cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
         cfgfile.write("deflate = -1\n")
         self.runPsanaOnCfg(cfgfile,output_h5, 
-                           extraOpts='--calib-dir /reg/g/psdm/data_test/calib',
+                           extraOpts=('--calib-dir %s' % CALIBDATADIR),
                            printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
         f = h5py.File(output_h5,'r')  # will crash if file not present
@@ -1378,7 +1381,7 @@ class H5Output( unittest.TestCase ) :
         writeDir = "data/Translator"
         nosplit_h5 = os.path.join(writeDir,"unit_test_splitscan_nosplit.h5")
         split_h5   = os.path.join(writeDir,"unit_test_splitscan_split.h5")
-        input_ds = "exp=xppd9714:run=16:dir=/reg/g/psdm/data_test/multifile/test_002_xppd9714"
+        input_ds = "exp=xppd9714:run=16:dir=%s" % SPLITSCANDATADIR
         input_dir = input_ds.split(':dir=')[1]
         nosplit_dump = os.path.join(writeDir,"unit_test_nosplit.dump")
         split_dump   = os.path.join(writeDir,"unit_test_split.dump")

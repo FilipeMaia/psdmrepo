@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-30
+2014-08-06 David Schneider
+- adjust unit tests to use $SIT_ROOT environment variable to 
+  construct path to test data
+
 Tag: V00-01-29
 2014-07-18 David Schneider
 - add hack to address src alias from s80 and DAQ mapping to same group
