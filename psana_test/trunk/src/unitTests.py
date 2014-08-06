@@ -17,7 +17,7 @@ from psana_test import epicsPvToStr
 import psana_test.psanaTestLib as ptl
 import psana
 
-DATADIR = "/reg/g/psdm/data_test/Translator"
+DATADIR = ptl.getTestDataDir()
 OUTDIR = "data/psana_test"
 
 #------------------
@@ -381,7 +381,8 @@ class Psana( unittest.TestCase ) :
             return True
 
         psana.setConfigFile('')
-        ds = psana.DataSource('exp=xppa1714:run=157:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714')
+        dataSourceDir = os.path.join(ptl.getMultiFileDataDir(),'test_004_xppa1714')
+        ds = psana.DataSource('exp=xppa1714:run=157:dir=%s' % dataSourceDir)
         # by using the aliases, we test that psana is processing the alias list from
         # both the s80 and the DAQ streams
 #        opal0 = psana.Source('DetInfo(XppEndstation.0:Opal1000.0)')
@@ -425,11 +426,13 @@ class Psana( unittest.TestCase ) :
         file that I compare.
         '''
 
-        # test that mp mode gives us what we saw before on DAQ only streams
+        dataSourceDir = os.path.join(getMultiFileDataDir(), 'test_004_xppa1714')
+
+       # test that mp mode gives us what we saw before on DAQ only streams
         dumpOutput = 'unittest_test_mp_mpmode.dump'
         cmd = '''psana -c '' -p 1'''
         cmd += ' -o psana_test.dump.output_file=%s' % dumpOutput
-        cmd += ''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714'''
+        cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
         o,e = ptl.cmdTimeOut(cmd,100)
         dumpOutput += '.subproc_0'
         md5 = ptl.get_md5sum(dumpOutput)
@@ -444,7 +447,7 @@ class Psana( unittest.TestCase ) :
         # test that mp mode is the same as not mp mode (DAQ only streams)
         dumpOutput = 'unittest_test_mp_normal.dump'
         cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
-        cmd += ''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=/reg/g/psdm/data_test/multifile/test_004_xppa1714'''
+        cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
         o,e = ptl.cmdTimeOut(cmd,100)
         md5 = ptl.get_md5sum(dumpOutput)
         failMsg  = 'prev md5=%s\n' % prev_md5

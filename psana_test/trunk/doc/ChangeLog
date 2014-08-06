@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2014-08-06  David Schneider
+- use $SIT_ROOT environment variable to form path to test data
+
 Tag: V00-00-19
 2014-07-25  David Schneider
 - add test for psana shared memory mode.

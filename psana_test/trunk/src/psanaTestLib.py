@@ -32,7 +32,7 @@ prev   updates psana_test/data/previousDump.txt.
          all=True        redo dump of all tests - not just new test files. 
                          Does not append, creates psana_test/data/previousDump.txt from scratch.
 
-links  creates new soft links in /reg/g/psdm/data_test/types that link to the xtc in ../Translator
+links  creates new soft links in $SIT_ROOT/data_test/types that link to the xtc in ../Translator
        that name a distinct psana type, or distint epics pv (dbr & numElements).
        Does not remove existing link if it is there. 
        optional args:
@@ -107,6 +107,24 @@ def cmdTimeOut(cmd,seconds=5*60):
     e = [ln for ln in e.split('\n') if len(ln.strip())>0]
     return o,'\n'.join(e)
     
+def expandSitRoot():
+    sit_root_envvar = '$SIT_ROOT'
+    sit_root = os.path.expandvars(sit_root_envvar)
+    assert sit_root != sit_root_envvar, "%s not expanded. run sit_setup" % sit_root_envvar
+    return sit_root
+
+def getTestDataDir():
+    testDataDir = os.path.join(expandSitRoot(), 'data_test/Translator')
+    assert os.path.exists(testDataDir), "test data dir does not exist." + \
+        " Is this an external distrubtion? test data not available outside SLAC"
+    return testDataDir
+
+def getMultiFileDataDir():
+    multiDataDir = os.path.join(expandSitRoot(), 'data_test/multifile')
+    assert os.path.exists(multiDataDir), "multifile test data dir does not exist." + \
+        " Is this an external distrubtion? test data not available outside SLAC"
+    return multiDataDir
+
 def getTestFiles(noTranslator=False):
     '''returns the test files as a dictionary. These are the files
     of the form test_xxx_*.xtc where xxx is an integer. These are the single
@@ -121,7 +139,9 @@ def getTestFiles(noTranslator=False):
           basename  is the file basename, such as test_000_exp.xtc
           path      is the full path to the xtc file.
     '''
-    files = glob.glob('/reg/g/psdm/data_test/Translator/test_*.xtc')
+    testDataDir = getTestDataDir()
+    files = glob.glob(os.path.join(testDataDir,'test_*.xtc'))
+    assert len(files)>0, "no test_*.xtc files found in directory: %s" % testDataDir
     basenames = [os.path.basename(fname) for fname in files]
     numbers = [int(basename.split('_')[1]) for basename in basenames]
     res = {}
@@ -140,7 +160,7 @@ def getMultiDatasets():
     ./test_000_amo01509/e8-r0125-s00-c00.xtc
     ./test_000_amo01509/e8-r0125-s01-c00.xtc
 
-    Then the dict will be 
+    Then the dict will be (assuming $SIT_ROOT = /reg/g/psdm):
     
     res[0]={'basedir':'test_000_amo01509',
             'basepath':'/reg/g/psdm/data_test/multifile/test_000_amo01509',
@@ -151,7 +171,7 @@ def getMultiDatasets():
     The fields are for the most part self explanatory. dspec will always be a psana dataset
     specification to process all the runs in the directory.
     '''
-    multiBaseDir = '/reg/g/psdm/data_test/multifile'
+    multiBaseDir = getMultiFileDataDir()
     assert os.path.exists(multiBaseDir), "multifile directory does not exist: %s" % multiBasedir
     multiDirPaths = glob.glob(os.path.join(multiBaseDir, 'test_*'))
     res = {}
@@ -687,7 +707,8 @@ def makeTypeLinks(args):
                 if tp in linksMade: continue
                 tpForFileName = tp.replace('Psana::','')
                 tpForFileName = tpForFileName.replace('::','_')
-                lnk = '/reg/g/psdm/data_test/types/%s.xtc' % tpForFileName
+                lnk = os.path.join(expandSitRoot(),
+                                   'data_test/types/%s.xtc' % tpForFileName)
                 if os.path.exists(lnk):
                     print "    already exists, skipping %s" % lnk
                     continue
@@ -701,7 +722,7 @@ def makeTypeLinks(args):
             for dbr,numElem in epicsDbrNumElem:
                 epicsLnk = 'epicsPv_dbr_%d_numElem_%d' % (dbr,numElem)
                 if epicsLnk in linksMade: continue
-                lnk = '/reg/g/psdm/data_test/types/%s.xtc' % epicsLnk
+                lnk = os.path.join(expandSitRoot(), 'data_test/types/%s.xtc' % epicsLnk)
                 if os.path.exists(lnk):
                     print "    already exists, skipping %s" % lnk
                     continue
@@ -713,7 +734,7 @@ def makeTypeLinks(args):
 
 def getEpicsTestNumbers():
     testNumbers = set()
-    for fname in glob.glob('/reg/g/psdm/data_test/types/epicsPv*.xtc'):
+    for fname in glob.glob(os.path.join(expandSitRoot(),'data_test/types/epicsPv*.xtc')):
         base = os.path.basename(fname)
         numElem = int(base.split('_numElem_')[1].split('.xtc')[0])
         if numElem > 1:
@@ -750,7 +771,7 @@ def testShmCommand(args):
     sudo /sbin/sysctl -w fs.mqueue.msg_max=32
     '''
     shmemName = 'psana_test'
-    testFile = '/reg/g/psdm/data_test/Translator/test_042_Translator_t1.xtc'
+    testFile = os.path.join(getTestDataDir(),'test_042_Translator_t1.xtc')
     assert os.path.exists(testFile), "testfile not found: %s" % testFile
     xtcservercmd = 'xtcmonserver -f %s -p %s' % (testFile, shmemName)
     numberOfBuffers = 1
@@ -1127,10 +1148,6 @@ def getDataTestTypeVersions():
         testTypeVersions = testTypeVersions.union(typeVersions)
     return testTypeVersions
 
-#def testUpdateTestData():
-#    updateTestData('/reg/d/psdm/mob/mob30114/xtc/e459-r0145-s00-c00.xtc', 
-#                   set([(83, 1), (78, 1), (75, 1)]), 40)
-
 def updateTestData(xtc, newTypeVers, dgrams):
     '''Determines number of datagrams to copy from an xtc file to capture all the
     types listed. Copies on L1Accept beyond last datagram with new data.
@@ -1182,7 +1199,7 @@ def updateTestData(xtc, newTypeVers, dgrams):
     n = max(testFiles.keys())
     nextFile = n+1
     newTestFileBaseName = 'test_%3.3d_%s_%s_%s' % (nextFile, inst, expDir, xtcBase)
-    newTestFilePath = os.path.join('/reg/g/psdm/data_test/Translator',newTestFileBaseName)
+    newTestFilePath = os.path.join(expandSitRoot(),'data_test/Translator',newTestFileBaseName)
     bytesToCopy = max([el[1] for el in l1acceptFollowing.values()])
     copyBytes(xtc, bytesToCopy, newTestFilePath)
 
@@ -1261,7 +1278,7 @@ def getCurrentXtcDirList():
     instrumentDirectories = ['amo','cxi','dia','mec','mob','sxr','usr','xcs','xpp']
     currentXtcDirList = []
     for instDir in instrumentDirectories:
-        instPath = os.path.join('/reg/d/psdm', instDir)
+        instPath = os.path.join(expandSitRoot(), instDir)
         expPaths = glob.glob(os.path.join(instPath, '*'))
         for expPath in expPaths:
             xtcPath = os.path.join(expPath, 'xtc')
