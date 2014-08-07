@@ -244,6 +244,22 @@ GeometryAccess::get_pixel_coords( const double*& X,
 
 //-------------------
 
+void
+GeometryAccess::get_pixel_areas( const double*& A, 
+				 unsigned& size,
+                                 const std::string& oname, 
+                                 const unsigned& oindex)
+{
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  if(m_pbits & 32) {
+    std::string msg = "get_pixel_areas(...) for geo:\n" + geo -> string_geo_children();
+    MsgLog(name(), info, msg);
+  }
+  geo -> get_pixel_areas(A, size);
+}
+
+//-------------------
+
 void GeometryAccess::print_list_of_geos()
 {
   std::stringstream ss; ss << "print_list_of_geos():";

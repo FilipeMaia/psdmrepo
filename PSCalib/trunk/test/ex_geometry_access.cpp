@@ -114,6 +114,14 @@ int main (int argc, char* argv[])
   cout << "Z: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << Z[i] << ", "; cout << "...\n"; 
 
   //-----------------
+  cout << "\n\nTest of get_pixel_areas(...):\n";
+  const double* A;
+  geometry.get_pixel_areas(A,size);
+
+  cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
+  cout << "Areas: "; for(unsigned i=190; i<200; ++i) cout << std::setw(10) << A[i] << ", "; cout << "...\n"; 
+
+  //-----------------
   cout << "\n\nTest of print_pixel_coords(...) for quad:\n";
   geometry.print_pixel_coords("QUAD:V1", 1);
   cout << "\n\nTest of print_pixel_coords(...) for CSPAD:\n";

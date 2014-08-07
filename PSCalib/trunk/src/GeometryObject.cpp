@@ -22,6 +22,7 @@
 #include <sstream>  // for stringstream
 #include <iomanip>  // for setw, setfill
 #include <cmath>    // for sqrt, atan2, etc.
+#include <cstring>  // for memcpy
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -72,17 +73,19 @@ namespace PSCalib {
     , m_tilt_x (tilt_x) 
 {
 
-  //m_pix_coords_2x1 = 0;
+  //if      ( m_oname == "SENS2X1:V1" ) { m_algo = SENS2X1V1; m_pix_coords_2x1 = new PC2X1(); }
+  //else if ( m_oname == "SENS2X1:V2" ) { m_algo = SENS2X1V2; }
+  //else                                { m_algo = NONDEF; }
 
-  if      ( m_oname == "SENS2X1:V1" ) { m_algo = SENS2X1V1; m_pix_coords_2x1 = new PC2X1(); }
-  else if ( m_oname == "SENS2X1:V2" ) { m_algo = SENS2X1V2; }
-  else                                { m_algo = NONDEF; }
+  const unsigned print_bits=0; // 0377;
+  m_seggeom = PSCalib::SegGeometryStore::Create(m_oname, print_bits);
 
   m_parent = shpGO();
   v_list_of_children.clear();
   p_xarr = 0;
   p_yarr = 0;
   p_zarr = 0;
+  p_aarr = 0;
   m_size = 0;
 }
 
@@ -184,7 +187,8 @@ void GeometryObject::transform_geo_coord_arrays(const double* X,
 //-------------------
 unsigned GeometryObject::get_size_geo_array()
 {
-  if(m_algo == SENS2X1V1) return m_pix_coords_2x1 -> get_size();
+  // if(m_algo == SENS2X1V1) return m_pix_coords_2x1 -> get_size();
+  if(m_seggeom) return m_seggeom -> size();
 
   unsigned size=0;  
   for(std::vector<shpGO>::iterator it  = v_list_of_children.begin(); 
@@ -204,6 +208,13 @@ void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const 
   size = m_size;
 }
 
+//-------------------
+void GeometryObject::get_pixel_areas(const double*& A, unsigned& size)
+{
+  if(p_aarr==0) evaluate_pixel_coords();
+  A    = p_aarr;
+  size = m_size;
+}
 
 //-------------------
 void GeometryObject::evaluate_pixel_coords()
@@ -215,13 +226,26 @@ void GeometryObject::evaluate_pixel_coords()
   p_yarr = new double [m_size];
   p_zarr = new double [m_size];
 
+  p_aarr = new double [m_size];
 
-  if(m_algo == SENS2X1V1) {
-       const double* x_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM);
-       const double* y_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM);
-       const double* z_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM);
+  //  if(m_algo == SENS2X1V1) {
+  //       const double* x_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM);
+  //       const double* y_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM);
+  //       const double* z_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM);
+  //
+  //       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr);
+  //       return;
+  //  }
+
+  if(m_seggeom) {
+
+       const double* x_arr = m_seggeom -> pixel_coord_array (SG::AXIS_X);
+       const double* y_arr = m_seggeom -> pixel_coord_array (SG::AXIS_Y);
+       const double* z_arr = m_seggeom -> pixel_coord_array (SG::AXIS_Z);
+       const double* a_arr = m_seggeom -> pixel_area_array();
 
        transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr);
+       std::memcpy(&p_aarr[0], a_arr, m_size*sizeof(double));
        return;
   }
 
@@ -241,11 +265,15 @@ void GeometryObject::evaluate_pixel_coords()
     const double* pXch; 
     const double* pYch;
     const double* pZch; 
+    const double* pAch; 
     unsigned      sizech;
 
-    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech);
-       
+    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech);       
     transform_geo_coord_arrays(pXch, pYch, pZch, sizech, &p_xarr[ibase], &p_yarr[ibase], &p_zarr[ibase]);
+
+    (*it)->get_pixel_areas(pAch, sizech);
+    std::memcpy(&p_aarr[ibase], pAch, sizech*sizeof(double));
+
     ibase += sizech;
   }
 }

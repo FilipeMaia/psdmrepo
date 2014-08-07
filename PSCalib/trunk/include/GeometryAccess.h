@@ -50,7 +50,7 @@ namespace PSCalib {
  *
  *  @version $Id$
  *
- *  @see GeometryObject, PSCalib/CalibFileFinder
+ *  @see GeometryObject, PSCalib/CalibFileFinder, PSCalib/test/ex_geometry_access
  *
  *  @anchor interface
  *  @par<interface> Interface Description
@@ -83,6 +83,11 @@ namespace PSCalib {
  *    // or get coordinate arrays for specified geometry object:
  *    geometry.get_pixel_coords(X,Y,Z,size, "QUAD:V1", 1);
  * 
+ *    // Access pixel areas:
+ *    const double* A;
+ *    unsigned   size;
+ *    geometry.get_pixel_areas(A,size);
+ *
  *    // Access and print comments from the calibration "geometry" file:
  *    std::map<std::string, std::string>& dict = geometry.get_dict_of_comments();
  *    cout << "dict['HDR'] = " << dict["HDR"] << '\n';
@@ -137,9 +142,29 @@ public:
   shpGO get_top_geo();
 
   /// Returns pixel coordinate arrays X, Y, Z, of size for specified geometry object 
+  /**
+   *  @param[out] X - pointer to x pixel coordinate array
+   *  @param[out] Y - pointer to y pixel coordinate array
+   *  @param[out] Z - pointer to z pixel coordinate array
+   *  @param[out] size - size of the pixel coordinate array (number of pixels)
+   *  @param[in]  oname - object name
+   *  @param[in]  oindex - object index
+   */
   void  get_pixel_coords(const double*& X, 
                          const double*& Y, 
                          const double*& Z, 
+                         unsigned& size,
+			 const std::string& oname = std::string(), 
+			 const unsigned& oindex = 0);
+
+  /// Returns pixel areas array A, of size for specified geometry object 
+  /**
+   *  @param[out] A - pointer to pixel areas array
+   *  @param[out] size - size of the pixel array (number of pixels)
+   *  @param[in]  oname - object name
+   *  @param[in]  oindex - object index
+   */
+  void  get_pixel_areas (const double*& A, 
                          unsigned& size,
 			 const std::string& oname = std::string(), 
 			 const unsigned& oindex = 0);

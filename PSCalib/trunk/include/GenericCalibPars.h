@@ -129,14 +129,15 @@ namespace PSCalib {
 
 
 
-typedef PSCalib::CalibPars::shape_t shape_t;
-
-
 //----------------
 template <typename TBASE> // TBASE stands for something like pdscalibdata::PrincetonBaseV1
 class GenericCalibPars: public PSCalib::CalibPars, TBASE  {
 
 public:
+
+
+  typedef PSCalib::CalibPars::shape_t shape_t;
+
 
     // const static size_t Ndim = TBASE::Ndim; 
 

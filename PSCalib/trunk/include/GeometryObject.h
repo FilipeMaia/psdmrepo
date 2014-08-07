@@ -29,13 +29,15 @@
 //-------------------------------
 //#include "ndarray/ndarray.h"
 //#include "CSPadPixCoords/PixCoords2x1V2.h"
-#include "PSCalib/PixCoords2x1V2.h"
+//#include "PSCalib/PixCoords2x1V2.h"
+//#include "PSCalib/SegGeometry.h"
+#include "PSCalib/SegGeometryStore.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
 
-typedef PSCalib::PixCoords2x1V2 PC2X1;
+//typedef PSCalib::PixCoords2x1V2 PC2X1;
 
 using namespace std;
 
@@ -88,11 +90,17 @@ namespace PSCalib {
  *
  *  @li Access methods
  *  @code
+ *    // get pixel coordinates
  *    const double* X;
  *    const double* Y;
  *    const double* Z;
  *    unsigned   size;
  *    geo->get_pixel_coords(X, Y, Z, size);
+ *
+ *    // get pixel areas
+ *    const double* A;
+ *    unsigned   size;
+ *    geo->get_pixel_areas(A, size);
  *
  *    shpGO parobj = geo->get_parent();
  *    std::vector<shpGO> lst = geo->get_list_of_children();
@@ -125,10 +133,12 @@ namespace PSCalib {
 class GeometryObject  {
 public:
 
+  typedef PSCalib::SegGeometry SG;
+
   //typedef GeometryObject* shpGO;
   typedef boost::shared_ptr<GeometryObject> shpGO;
 
-  enum ALGO_TYPE  {NONDEF, SENS2X1V1, SENS2X1V2};
+  //enum ALGO_TYPE  {NONDEF, SENS2X1V1, SENS2X1V2};
 
   /**
    *  @brief Class constructor accepts path to the calibration "geometry" file and verbosity control bit-word 
@@ -167,17 +177,37 @@ public:
 
   std::string string_geo();
   std::string string_geo_children();
+
+  /// Prints info about self object
   void print_geo();
+
+  /// Prints info about children objects
   void print_geo_children();
+
+  /// Sets shared pointer to the parent object
   void set_parent(shpGO parent) { m_parent = parent; }
+
+  /// Adds shared pointer of the children geometry object to the vector
   void add_child (shpGO child) { v_list_of_children.push_back(child); }
+
+  /// Returns shared pointer to the parent geometry object
   shpGO get_parent() { return m_parent; }
+
+  /// Returns vector of shared pointers to children geometry objects
   std::vector<shpGO> get_list_of_children() { return v_list_of_children; }
 
+  /// Returns self object name
   std::string get_geo_name()     { return m_oname; }
+
+  /// Returns self object index
   unsigned    get_geo_index()    { return m_oindex; }
+
+  /// Returns parent object name
   std::string get_parent_name()  { return m_pname; }
+
+  /// Returns parent object index
   unsigned    get_parent_index() { return m_pindex; }
+
   /**
    *  @brief Returns pointers to pixel coordinate arrays
    *  @param[out] X - pointer to x pixel coordinate array
@@ -186,6 +216,15 @@ public:
    *  @param[out] size - size of the pixel coordinate array (number of pixels)
    */
   void get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size);
+
+  /**
+   *  @brief Returns pointers to pixel areas array
+   *  @param[out] A - pointer to pixel areas array
+   *  @param[out] size - size of the pixel coordinate array (number of pixels)
+   */
+  void get_pixel_areas(const double*& A, unsigned& size);
+
+  /// Returns size of geometry object array - number of pixels
   unsigned get_size_geo_array();
 
 protected:
@@ -214,13 +253,15 @@ private:
   shpGO m_parent;
   std::vector<shpGO> v_list_of_children;
 
-  ALGO_TYPE m_algo;
-  PC2X1* m_pix_coords_2x1;
+  //ALGO_TYPE m_algo;
+  //PC2X1* m_pix_coords_2x1;
+  SG* m_seggeom;
 
   unsigned m_size;
   double*  p_xarr;
   double*  p_yarr;
   double*  p_zarr;
+  double*  p_aarr;
 
   //  NDA  m_X;
   //  NDA  m_Y;

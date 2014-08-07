@@ -1,0 +1,125 @@
+#ifndef PSCALIB_SEGGEOMETRY_H
+#define PSCALIB_SEGGEOMETRY_H
+
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// $Revision$
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+//#include <iostream>
+//#include <string>
+//#include <vector>
+//#include <map>
+//#include <fstream>  // open, close etc.
+//#include <stdint.h> // for uint8_t, uint16_t etc.
+#include <cstddef>  // for size_t
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+
+//#include "ndarray/ndarray.h"
+
+//-----------------------------
+using namespace std;
+
+
+namespace PSCalib {
+
+/// @addtogroup PSCalib PSCalib
+
+/**
+ *  @ingroup PSCalib
+ *
+ *  @brief Abstract base class SegGeometry defines the interface to access segment pixel coordinates.
+ *
+ *  This software was developed for the LCLS project. If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see CalibFileFinder
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail S. Dubrovin
+ *
+ *  @see CalibFileFinder
+ *
+ */
+
+//-----------------------------
+
+class SegGeometry {
+public:
+
+  /// Enumerator for X, Y, and Z axes
+  enum AXIS { AXIS_X=0,
+              AXIS_Y,
+              AXIS_Z };
+
+  //enum UNITS { UM=0, PIX };
+ 
+  typedef double pixel_coord_t;
+  typedef double pixel_area_t;
+  //typedef int    pixel_index_t;
+
+  // Destructor
+  virtual ~SegGeometry () {}
+
+  /// Prints segment info for selected bits
+  virtual void print_seg_info(const unsigned& pbits=0) = 0;
+
+  /// Returns segment size - total number of pixels in segment
+  virtual const size_t size() = 0;
+
+  /// Returns number of rows in segment
+  virtual const size_t rows() = 0;
+
+  /// Returns number of cols in segment
+  virtual const size_t cols() = 0;
+
+  /// Returns shape of the segment {rows, cols}
+  virtual const size_t* shape() = 0;
+
+  /// Returns pixel size in um for indexing
+  virtual const pixel_coord_t pixel_scale_size() = 0;
+
+  /// Returns shape of the segment {rows, cols}
+  virtual const pixel_area_t* pixel_area_array() = 0;
+
+  /// Returns pointer to the array of pixel size in um for AXIS
+  virtual const pixel_coord_t* pixel_size_array(AXIS axis) = 0;
+
+  /// Returns pointer to the array of segment pixel coordinates in um for AXIS
+  virtual const pixel_coord_t* pixel_coord_array(AXIS axis) = 0;
+
+  /// Returns minimal value in the array of segment pixel coordinates in um for AXIS
+  virtual const pixel_coord_t pixel_coord_min(AXIS axis) = 0;
+
+  /// Returns maximal value in the array of segment pixel coordinates in um for AXIS
+  virtual const pixel_coord_t pixel_coord_max(AXIS axis) = 0;
+};
+
+const static double DEG_TO_RAD = 3.141592653589793238463 / 180; 
+
+/// Global method for x and y arrays rotation
+void rotation_ang(const double* x, const double* y, unsigned size, double angle_deg,   double* xrot, double* yrot);
+
+/// Global method for x and y arrays rotation
+void rotation_cs(const double* x, const double* y, unsigned size, double C, double S, double* xrot, double* yrot);
+
+/// Global method, returns minimal value of the array of specified length 
+double min_of_arr(const double* arr, unsigned size);
+
+/// Global method, returns maximal value of the array of specified length 
+double max_of_arr(const double* arr, unsigned size);
+
+} // namespace PSCalib
+
+#endif // PSCALIB_SEGGEOMETRY_H
+
+//-----------------------------

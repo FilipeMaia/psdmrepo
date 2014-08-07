@@ -216,7 +216,7 @@ GenericCalibPars<TBASE>::size()
 //----------------
 
 template <typename TBASE> 
-const shape_t*
+const CalibPars::shape_t*
 //const unsigned*
 GenericCalibPars<TBASE>::shape()
 { 
@@ -242,7 +242,7 @@ GenericCalibPars<TBASE>::size_of_ndarray()
 //----------------
 
 template <typename TBASE> 
-const shape_t*
+const CalibPars::shape_t*
 //const unsigned*
 GenericCalibPars<TBASE>::shape_of_ndarray()
 { 
