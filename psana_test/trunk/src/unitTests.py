@@ -426,7 +426,7 @@ class Psana( unittest.TestCase ) :
         file that I compare.
         '''
 
-        dataSourceDir = os.path.join(getMultiFileDataDir(), 'test_004_xppa1714')
+        dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_004_xppa1714')
 
        # test that mp mode gives us what we saw before on DAQ only streams
         dumpOutput = 'unittest_test_mp_mpmode.dump'

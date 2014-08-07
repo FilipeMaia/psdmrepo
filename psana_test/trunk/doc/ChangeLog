@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21
+2014-08-07 David Schneider
+- fix bug causing unitTest failure with getMultiFileDataDir() function
+
 Tag: V00-00-20
 2014-08-06  David Schneider
 - use $SIT_ROOT environment variable to form path to test data
