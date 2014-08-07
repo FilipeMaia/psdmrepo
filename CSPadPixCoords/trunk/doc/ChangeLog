@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-27
+2014-08-06 Mikhail S. Dubrovin
+- in CSPadImageProducer get rid of dependency from removed PSCalib::PixCoords2x1.h
+	
 Tag: V00-03-26
 2014-07-15 Mikhail S. Dubrovin
 - in PixCoords2x1V2 - add Z coordinate

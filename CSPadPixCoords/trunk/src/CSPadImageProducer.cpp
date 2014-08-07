@@ -25,7 +25,10 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSEvt/EventId.h"
-//#include "ImgAlgos/GlobalMethods.h"
+#include "PSCalib/CalibFileFinder.h"
+#include "PSCalib/GeometryAccess.h"
+#include "PSCalib/SegGeometryCspad2x1V1.h"
+//#include "PSCalib/PixCoords2x1V2.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -213,15 +216,64 @@ CSPadImageProducer::getConfigPars(Env& env)
 
 //--------------------
 
+bool
+CSPadImageProducer::getGeometryPars(const std::string& calib_dir, const int runnum, const unsigned prbits)
+{
+  PSCalib::CalibFileFinder calibfinder(calib_dir, m_typeGroupName, prbits);
+  const std::string calibtype("geometry");
+  std::string fname = calibfinder.findCalibFile(m_src, calibtype, runnum);
+
+  if( fname.empty() ) return false;
+  if( m_print_bits & 2 ) MsgLog(name(), info, "Use \"geometry\" constants for run: " << runnum << " from file:\n" << fname);
+
+  PSCalib::GeometryAccess geometry(fname, prbits);
+  if( m_print_bits & 2 ) geometry.print_pixel_coords();
+
+  const double* X;
+  const double* Y;
+  const double* Z;
+  unsigned   size;
+  geometry.get_pixel_coords(X,Y,Z,size);
+
+  const double um_to_pix   = PSCalib::SegGeometryCspad2x1V1::UM_TO_PIX;
+  const double pix_size_um = PSCalib::SegGeometryCspad2x1V1::PIX_SCALE_SIZE;
+
+  // find minimal X,Y coordinates
+  double Xmin = 1e6;
+  double Ymin = 1e6;
+  for(unsigned i=0; i<size; ++i) {
+    if(X[i]<Xmin) Xmin=X[i];
+    if(Y[i]<Ymin) Ymin=Y[i];
+  }
+
+  // apply coordinate offset and evaluate indexes
+  m_coor_x_int = new uint32_t[size];
+  m_coor_y_int = new uint32_t[size];
+
+  for(unsigned i=0; i<size; ++i) {
+    m_coor_x_int[i] = uint32_t( (X[i]-Xmin+0.5*pix_size_um)*um_to_pix );
+    m_coor_y_int[i] = uint32_t( (Y[i]-Ymin+0.5*pix_size_um)*um_to_pix );
+  }
+
+  return true;
+  //return false;
+}
+
+//--------------------
+
 /// Method which is called at the beginning of the run
 void 
 CSPadImageProducer::getCalibPars(Event& evt, Env& env)
 {
   std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
-
+  int runnum = getRunNumber(evt);
   unsigned prbits = (m_print_bits & 64) ? 0377 : 0;
 
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt), prbits);
+
+  if( getGeometryPars(calib_dir, runnum, prbits) ) return;
+
+
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_src, runnum, prbits);
   m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );

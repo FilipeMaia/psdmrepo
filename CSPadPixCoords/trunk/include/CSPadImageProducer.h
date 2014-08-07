@@ -125,6 +125,7 @@ protected:
 
   void printInputParameters();
   void getConfigPars(Env& env);
+  bool getGeometryPars(const std::string& calib_dir, const int runnum, const unsigned prbits);
   void getCalibPars(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void getCSPadConfigFromData(Event& evt);
