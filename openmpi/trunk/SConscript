@@ -50,7 +50,7 @@ openmpiinc = pjoin(geninc, pkg)
 if os.path.islink(openmpiinc):    os.remove(openmpiinc)
 if not os.path.isdir(openmpiinc): os.makedirs(openmpiinc)
 
-prefix = str(Dir(env.subst(PREFIX)))
+prefix = pjoin(os.path.dirname(str(Dir(env.subst(PREFIX)))), env['SIT_ARCH_BASE_OPT'])
 
 s_mpi_h         = pjoin(prefix, "include", "mpi.h")
 geninc_t_mpi_h  = pjoin(geninc, "mpi.h")
