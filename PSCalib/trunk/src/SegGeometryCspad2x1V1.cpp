@@ -40,8 +40,22 @@ namespace PSCalib {
 
 //--------------
 
-const size_t SegGeometryCspad2x1V1::IND_CORNER[NCORNERS] = {0, COLS2X1-1, (ROWS2X1-1)*COLS2X1, ROWS2X1*COLS2X1-1};
+// Definition of static parameters (reservation of memory)
 
+const size_t  SegGeometryCspad2x1V1::ROWS2X1; //     = 185;
+const size_t  SegGeometryCspad2x1V1::COLS2X1; //     = 388;
+const size_t  SegGeometryCspad2x1V1::COLS2X1HALF; // = 194;
+const size_t  SegGeometryCspad2x1V1::SIZE2X1; //     = COLS2X1*ROWS2X1; 
+const size_t  SegGeometryCspad2x1V1::NCORNERS; //    =   4;
+
+const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::PIX_SCALE_SIZE = 109.92;
+const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::PIX_SIZE_COLS  = PIX_SCALE_SIZE;
+const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::PIX_SIZE_ROWS  = PIX_SCALE_SIZE;
+const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::PIX_SIZE_WIDE  = 274.80;
+const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::PIX_SIZE_DEPTH = 400.;
+const double                     SegGeometryCspad2x1V1::UM_TO_PIX      = 1./PIX_SCALE_SIZE;
+
+const size_t SegGeometryCspad2x1V1::IND_CORNER[NCORNERS] = {0, COLS2X1-1, (ROWS2X1-1)*COLS2X1, ROWS2X1*COLS2X1-1};
 const size_t SegGeometryCspad2x1V1::ARR_SHAPE[2] = {ROWS2X1, COLS2X1};
 
 //----------------

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-08
+2014-08-08 Mikhail S. Dubrovin
+- in SegGeometryCspad2x1V1 - move definition of static const parameters from *.h to *.cpp 
+
 Tag: V00-02-07
 2014-08-06 Mikhail S. Dubrovin
 - segment geometry is defined through the static factory method, add access to pixel areas

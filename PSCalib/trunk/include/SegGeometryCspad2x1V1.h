@@ -120,37 +120,37 @@ class SegGeometryCspad2x1V1 : public PSCalib::SegGeometry {
 public:
 
   /// Number of pixel rows in 2x1 
-  const static size_t  ROWS2X1     = 185;
+  static const size_t  ROWS2X1     = 185;
 
   /// Number of pixel columnss in 2x1
-  const static size_t  COLS2X1     = 388;
+  static const size_t  COLS2X1     = 388;
 
   /// Half number of pixel columnss in 2x1
-  const static size_t  COLS2X1HALF = 194;
+  static const size_t  COLS2X1HALF = 194;
 
   /// Number of pixels in 2x1
-  const static size_t  SIZE2X1     = COLS2X1*ROWS2X1; 
+  static const size_t  SIZE2X1     = COLS2X1*ROWS2X1; 
 
   /// Number of corners
-  const static size_t  NCORNERS    =   4;
-
-  /// Pixel size [um] in column direction
-  const static pixel_coord_t PIX_SIZE_COLS = 109.92;
-
-  /// Pixel size [um] in row direction
-  const static pixel_coord_t PIX_SIZE_ROWS = 109.92;
-
-  /// Wide pixel length [um] 
-  const static pixel_coord_t PIX_SIZE_WIDE = 274.80;
-
-  /// Pixel size [um] in depth
-  const static pixel_coord_t PIX_SIZE_DEPTH = 400.;
+  static const size_t  NCORNERS    =   4;
 
   /// Pixel scale size [um] for indexing  
-  const static pixel_coord_t PIX_SCALE_SIZE = 109.92;
+  static const pixel_coord_t PIX_SCALE_SIZE; // = 109.92;
+
+  /// Pixel size [um] in column direction
+  static const pixel_coord_t PIX_SIZE_COLS; //  = 109.92;
+
+  /// Pixel size [um] in row direction
+  static const pixel_coord_t PIX_SIZE_ROWS; //  = 109.92;
+
+  /// Wide pixel length [um] 
+  static const pixel_coord_t PIX_SIZE_WIDE; //  = 274.80;
+
+  /// Pixel size [um] in depth
+  static const pixel_coord_t PIX_SIZE_DEPTH; // = 400.;
 
   /// Conversion factor between um and pix 
-  const static double UM_TO_PIX     = 1./109.92;
+  static const double UM_TO_PIX; //             = 1./109.92;
 
   // Constructor
 
