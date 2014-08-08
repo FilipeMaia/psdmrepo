@@ -60,10 +60,10 @@ public:
   static ptr make_ptr(Pds::Dgram* dg) ;
 
   /**
-   *  Constructor takes a smart pointer to XTC datagram object and
-   *  the file name where datagram has originated.
+   *  Constructor takes a smart pointer to XTC datagram object, the file name 
+   *  where datagram has originated, and optionally the offset within the file
    */
-  Dgram(const ptr& dg, XtcFileName file) : m_dg(dg), m_file(file) {}
+ Dgram(const ptr& dg, XtcFileName file, off64_t offset=-1) : m_dg(dg), m_file(file), m_offset(offset) {}
 
   /**
    *  Default ctor
@@ -80,6 +80,9 @@ public:
   
   /// compare clockTime's
   bool operator< (const Dgram&) const; 
+
+  /// dgram position in file, or -1 if no position information
+  off64_t offset() const { return m_offset; }
 
   /// dump dgram header and filename to a string
   static std::string dumpStr(const XtcInput::Dgram &dg);
@@ -100,6 +103,7 @@ private:
   // Data members
   ptr m_dg;
   XtcFileName m_file;
+  off64_t m_offset;
 };
 
 

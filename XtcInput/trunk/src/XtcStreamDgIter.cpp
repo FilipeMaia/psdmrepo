@@ -92,7 +92,7 @@ XtcStreamDgIter::next()
     m_headerQueue.erase(m_headerQueue.begin());
     Dgram::ptr dg = hptr->dgram();
     if (dg) {
-      dgram = Dgram(dg, hptr->path());
+      dgram = Dgram(dg, hptr->path(), hptr->offset());
       break;
     } else {
       // header failed to read datagram, this is likely due to non-fatal

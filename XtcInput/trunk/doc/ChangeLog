@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-04
+2014-08-08 David Schneider
+- add file offset field to XtcInput::Dgram
+- have psana record file offset for standard xtcinput (not indexing)
+  presently information not used by other packages 
+- change a declaration from char * to const char * to fix rhel6 warning
+
 Tag: V00-10-03
 2014-08-01 David Schneider
 - discard L1Accept's that have 0x1FFFF as the fiducial. jira ticket PSAS-13

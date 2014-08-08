@@ -6,7 +6,7 @@
 #define DBGMSG debug
 
 namespace {
-  char *logger = "StreamDgram";
+  const char *logger = "StreamDgram";
 
   std::string bool2str(bool val) {
     if (val) return "true";
