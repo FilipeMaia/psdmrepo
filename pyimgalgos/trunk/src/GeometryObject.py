@@ -24,12 +24,21 @@ from PyCSPadImage.PixCoords2x1 import cspad2x1_one
 
 #------------------------------
 
-def rotation(X, Y, C, S) :
+def rotation_cs(X, Y, C, S) :
     """For numpy arrays X and Y returns the numpy arrays of Xrot and Yrot
     """
     Xrot = X*C - Y*S 
     Yrot = Y*C + X*S 
     return Xrot, Yrot
+
+#------------------------------
+
+def rotation(X, Y, angle_deg) :
+    """For numpy arrays X and Y returns the numpy arrays of Xrot and Yrot rotated by angle_deg
+    """
+    angle_rad = math.radians(angle_deg)
+    S, C = math.sin(angle_rad), math.cos(angle_rad)
+    return rotation_cs(X, Y, C, S)
 
 #------------------------------
 
@@ -115,17 +124,9 @@ class GeometryObject :
         angle_y = self.rot_y + self.tilt_y if do_tilt else self.rot_y
         angle_x = self.rot_x + self.tilt_x if do_tilt else self.rot_x
 
-        angle_rad_z = math.radians(angle_z)
-        angle_rad_y = math.radians(angle_y)
-        angle_rad_x = math.radians(angle_x)
-
-        Sz, Cz = math.sin(angle_rad_z), math.cos(angle_rad_z)
-        Sy, Cy = math.sin(angle_rad_y), math.cos(angle_rad_y)
-        Sx, Cx = math.sin(angle_rad_x), math.cos(angle_rad_x)
-
-        X1, Y1 = rotation(X,  Y,  Cz, Sz)
-        Z2, X2 = rotation(Z,  X1, Cy, Sy)
-        Y3, Z3 = rotation(Y1, Z2, Cx, Sx)
+        X1, Y1 = rotation(X,  Y,  angle_z)
+        Z2, X2 = rotation(Z,  X1, angle_y)
+        Y3, Z3 = rotation(Y1, Z2, angle_x)
 
         Zt = Z3 + self.z0
         Yt = Y3 + self.y0
@@ -142,13 +143,14 @@ class GeometryObject :
             xac, yac, zac = self.algo.get_xyz_maps_um()
             return self.transform_geo_coord_arrays(xac, yac, zac)
 
-        xch, ych, zch = None, None, None        
-        for i, child in enumerate(self.list_of_children) :
-            xch, ych, zch = child.get_pixel_coords()
-            if child.oindex != i :
+        for ind, child in enumerate(self.list_of_children) :
+            if child.oindex != ind :
                 print 'WARNING! Geometry object %s:%d has non-consequtive index in calibration file, reconst index:%d' % \
-                      (child.oname, child.oindex, i)
-            if i==0 :
+                      (child.oname, child.oindex, ind)
+
+            xch, ych, zch = child.get_pixel_coords()
+
+            if ind==0 :
                 xac = xch
                 yac = ych
                 zac = zch
@@ -169,14 +171,10 @@ class GeometryObject :
 
 #------------------------------
 
-    def transform_2d_geo_coord_arrays(self, X, Y) :
-
-        do_tilt = True
+    def transform_2d_geo_coord_arrays(self, X, Y, do_tilt = True) :
 
         angle_z = self.rot_z + self.tilt_z if do_tilt else self.rot_z
-        angle_rad_z = math.radians(angle_z)
-        Sz, Cz = math.sin(angle_rad_z), math.cos(angle_rad_z)
-        X1, Y1 = rotation(X,  Y,  Cz, Sz)
+        X1, Y1 = rotation(X,  Y,  angle_z)
         Xt = X1 + self.x0
         Yt = Y1 + self.y0
         return Xt, Yt
