@@ -125,8 +125,10 @@ DumpDgram::dgramDump(Event &evt, const std::string & hdr)
     }
     MsgLog( name(), info, " " << hdr << ": XtcInput::DgramList found with " << dgrams.size() << " dgrams.");
     std::vector<XtcInput::XtcFileName> files =  dgListptr->getFileNames();
+    std::vector<off64_t> offsets =  dgListptr->getOffsets();
     for (unsigned idx = 0; idx < files.size(); ++idx) {
       XtcInput::XtcFileName &file = files.at(idx);
+      off64_t offset = offsets.at(idx);
       XtcInput::Dgram::ptr &dgptr = dgrams.at(idx);
       const Pds::ClockTime &clock = dgptr->seq.clock();
       const Pds::TimeStamp & stamp = dgptr->seq.stamp();
@@ -135,8 +137,10 @@ DumpDgram::dgramDump(Event &evt, const std::string & hdr)
                 << " nsec=" << clock.nanoseconds()
                 << " fid=" << stamp.fiducials()
                 << " basename=" << file.basename()
-                << " stream=" << file.stream()
                 << " run=" << file.run()
+                << " stream=" << file.stream()
+                << " chunk=" << file.chunk()
+		<< " offset=" << offset
                 << std::endl;
     }
   }

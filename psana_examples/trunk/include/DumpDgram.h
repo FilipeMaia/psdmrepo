@@ -42,16 +42,14 @@ namespace psana_examples {
  *
  *  @brief gets the DgramList or Dgram from the Event. Dumps basic information.
  *
- *  Prior to merging control streams, the Event would contain a shared pointer to the raw data
- *  from which the Event was formed. The raw data type is Pds::Dgram. After adding features to psana to merge
- *  the control streams with the DAQ streams, an event may have been formed from two or more pieces 
- *  of raw data rather than just one. At this point, psana no longer puts a Pds::Dgram in the 
- *  Event, rather it puts a XtcInput::DgramList into the Event.
+ *  This example demonstrates how to deal with the raw xtc dgram, if it is present in
+ *  the event (it will not be if psana's input is hdf5). Ealier versions of psana put 
+ *  a single Pds::Dgram into the event. Later versions that deal with offline event 
+ *  building put a XtcInput::DgramList into the event. 
  *
- *  This example demonstrates how to deal with both - the XtcInput::DgramList and the Pds::Dgram. 
  *  In general users *should not* work with this data. This is the raw data from which psana 
- *  fills the Event. Users should access the data by getting psana Types from the Event. They 
- *  should not, in general be looking at the Datagrams. However looking at the Datagrams could be 
+ *  fills the Event. Users should access the data by getting psana Types from the Event. In general
+ *  they should not be looking at the Datagrams. However looking at the Datagrams could be 
  *  useful for diagnosing problems with event building.
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
