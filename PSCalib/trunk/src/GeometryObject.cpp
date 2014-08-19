@@ -199,6 +199,17 @@ unsigned GeometryObject::get_size_geo_array()
 }
 
 //-------------------
+double GeometryObject::get_pixel_scale_size()
+{
+  if(m_seggeom) return m_seggeom -> pixel_scale_size();
+
+  for(std::vector<shpGO>::iterator it  = v_list_of_children.begin(); 
+                                   it != v_list_of_children.end(); ++it) {
+    return (*it)->get_pixel_scale_size();
+  }    
+}
+
+//-------------------
 void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size)
 {
   if(p_xarr==0) evaluate_pixel_coords();

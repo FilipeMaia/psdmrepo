@@ -17,6 +17,8 @@
 #include "PSCalib/GeometryObject.h"
 #include "PSCalib/GeometryAccess.h"
 
+#include "ImgAlgos/GlobalMethods.h" // for test ONLY
+
 #include <string>
 #include <iostream>
 #include <iomanip>  // for setw, setfill
@@ -72,8 +74,13 @@ int main (int argc, char* argv[])
   //string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data";
   //string fname_data     = basedir + "cspad-ndarr-ave-cxii0114-r0227.dat";
 
-  string basedir = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/";
-  string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data";
+  //string basedir = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/";
+  //string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data";
+  //string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
+ 
+  // Temporary solution for Summer 2014 shutdown:
+  string basedir = "/home/pcds/LCLS/calib/geometry/";
+  string fname_geometry = basedir + "2-end.data";
   string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
  
 
@@ -100,6 +107,12 @@ int main (int argc, char* argv[])
   cout << "\n\nTest of get_top_geo():\n";  
   geometry.get_top_geo()->print_geo_children();
 
+ //-----------------
+  cout << "\n\nTest of print_pixel_coords(...) for quad:\n";
+  geometry.print_pixel_coords("QUAD:V1", 1);
+  cout << "\n\nTest of print_pixel_coords(...) for CSPAD:\n";
+  geometry.print_pixel_coords();
+
   //-----------------
   cout << "\n\nTest of get_pixel_coords(...):\n";
   const double* X;
@@ -114,6 +127,37 @@ int main (int argc, char* argv[])
   cout << "Z: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << Z[i] << ", "; cout << "...\n"; 
 
   //-----------------
+  cout << "\n\nTest of get_pixel_coord_indexes(...):\n";
+  const unsigned * iX;
+  const unsigned * iY;
+  unsigned   isize;
+
+  const std::string ioname = "QUAD:V1";
+  const unsigned ioindex = 1;
+  const double pix_scale_size_um = 109.92;
+  const int xy0_off_pix[] = {200,200};
+  geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix);
+
+  cout << "QUAD size=" << isize << '\n' << std::fixed << std::setprecision(1);  
+  cout << "iX: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << iX[i] << ", "; cout << "...\n"; 
+  cout << "iY: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << iY[i] << ", "; cout << "...\n"; 
+
+  geometry.get_pixel_coord_indexes(iX, iY, isize);
+
+  cout << "CSPAD size=" << isize << '\n' << std::fixed << std::setprecision(1);  
+  cout << "iX: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << iX[i] << ", "; cout << "...\n"; 
+  cout << "iY: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << iY[i] << ", "; cout << "...\n"; 
+
+  //-----------------
+
+  cout << "\n\nTest of PSCalib::img_from_pixel_arrays(...):\n";
+  ndarray<PSCalib::GeometryAccess::image_t, 2> img = 
+          PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, 0, isize);
+  cout << img << "\n";  
+  cout << "    argc = " << argc << "if (argc>1) - save image in text file.\n";
+  if (argc>1) ImgAlgos::save2DArrayInFile<PSCalib::GeometryAccess::image_t>("cspad-img-test.txt", img, true);
+                   
+ //-----------------
   cout << "\n\nTest of get_pixel_areas(...):\n";
   const double* A;
   geometry.get_pixel_areas(A,size);
@@ -122,12 +166,16 @@ int main (int argc, char* argv[])
   cout << "Areas: "; for(unsigned i=190; i<200; ++i) cout << std::setw(10) << A[i] << ", "; cout << "...\n"; 
 
   //-----------------
-  cout << "\n\nTest of print_pixel_coords(...) for quad:\n";
-  geometry.print_pixel_coords("QUAD:V1", 1);
-  cout << "\n\nTest of print_pixel_coords(...) for CSPAD:\n";
-  geometry.print_pixel_coords();
-
-
+  cout << "\n\nTest of get_size_geo_array(...) for";
+  cout << "\nQuad : " << geometry.get_geo("QUAD:V1", 1)->get_size_geo_array();
+  cout << "\nCSPAD: " << geometry.get_top_geo()->get_size_geo_array();
+ 
+  //-----------------
+  cout << "\n\nTest of get_pixel_scale_size() for" << std::setprecision(2);
+  cout << "\nQuad     : " << geometry.get_geo("QUAD:V1", 1)->get_pixel_scale_size();
+  cout << "\nCSPAD    : " << geometry.get_top_geo()->get_pixel_scale_size();
+  cout << "\ngeometry : " << geometry.get_pixel_scale_size();
+ 
   //-----------------
   cout << "\n\nTest of get_dict_of_comments():\n";
   std::map<std::string, std::string>& dict = geometry.get_dict_of_comments();

@@ -11,6 +11,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+### Tag: V00-02-10
+2014-08-13 Mikhail S. Dubrovin
+- in PSCalib/ex_geometry_access add test of methods get_pixel_coord_indexes(...), img_from_pixel_arrays(...)
+- update doxy-doc inn GeometryAccess.h
+2014-08-12 Mikhail S. Dubrovin
+- in GeometryAccess.py add methods get_pixel_coord_indexes(...), img_from_pixel_arrays(...)
+2014-08-11 Mikhail S. Dubrovin
+- in GeometryObject and GeometryAccess add methods for get_pixel_scale_size(...) and complete implementation for pixel area
+
+	
 Tag: V00-02-09
 2014-08-08 Mikhail S. Dubrovin
 - move python modules from pyimgalgos to PSCalib for 

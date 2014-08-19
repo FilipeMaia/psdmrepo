@@ -59,6 +59,8 @@ namespace PSCalib {
  *
  *  @version $Id$
  *
+ *  @see GeometryObject, CalibFileFinder, PSCalib/test/ex_geometry_access.cpp
+ *
  *  @author Mikhail S. Dubrovin
  *
  *  @anchor interface
@@ -109,6 +111,7 @@ namespace PSCalib {
  *    unsigned    oindex = geo->get_geo_index();
  *    std::string pname  = geo->get_parent_name();
  *    unsigned    pindex = geo->get_parent_index();
+ *    double      pixsize= geo->get_pixel_scale_size();
  *  
  *    // Next methods are used in class GeometryAccess for building of hierarchial geometry structure.
  *    geo->set_parent(parent_geo);
@@ -226,6 +229,9 @@ public:
 
   /// Returns size of geometry object array - number of pixels
   unsigned get_size_geo_array();
+
+  /// Returns pixel scale size of geometry object
+  double get_pixel_scale_size();
 
 protected:
 

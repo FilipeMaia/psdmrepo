@@ -23,6 +23,7 @@
 #include <fstream>  // for ifstream 
 #include <sstream>  // for stringstream
 #include <iomanip>  // for setw, setfill
+//#include <algorithm>  // for fill_n
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -260,6 +261,16 @@ GeometryAccess::get_pixel_areas( const double*& A,
 
 //-------------------
 
+double
+GeometryAccess::get_pixel_scale_size( const std::string& oname, 
+                                      const unsigned& oindex)
+{
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  return geo -> get_pixel_scale_size();
+}
+
+//-------------------
+
 void GeometryAccess::print_list_of_geos()
 {
   std::stringstream ss; ss << "print_list_of_geos():";
@@ -324,6 +335,79 @@ GeometryAccess::print_pixel_coords( const std::string& oname,
 }
 
 //-------------------
+//-------------------
+
+void
+GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX, 
+                                         const unsigned *& iY, 
+				         unsigned& size,
+                                         const std::string& oname, 
+					 const unsigned& oindex, 
+                                         const double& pix_scale_size_um, 
+                                         const int* xy0_off_pix )
+{
+  const double* X;
+  const double* Y;
+  const double* Z;
+
+  get_pixel_coords(X,Y,Z,size,oname,oindex);
+  
+  double pix_size = (pix_scale_size_um) ? pix_scale_size_um : get_pixel_scale_size(oname, oindex);
+
+  p_iX = new unsigned[size];
+  p_iY = new unsigned[size];
+
+  if (xy0_off_pix) {
+    // Offset in pix -> um
+    double x_off_um = xy0_off_pix[0] * pix_size;
+    double y_off_um = xy0_off_pix[1] * pix_size;
+    // Protection against wrong offset bringing negative indexes
+    double x_min=0; for(unsigned i=0; i<size; ++i) { if (X[i] + x_off_um < x_min) x_min = X[i] + x_off_um; } x_off_um -= x_min - pix_size/2;
+    double y_min=0; for(unsigned i=0; i<size; ++i) { if (Y[i] + y_off_um < y_min) y_min = Y[i] + y_off_um; } y_off_um -= y_min - pix_size/2;
+
+    for(unsigned i=0; i<size; ++i) { 
+      p_iX[i] = (X[i] + x_off_um) / pix_size;
+      p_iY[i] = (Y[i] + y_off_um) / pix_size;
+    }
+  } 
+  else {
+    // Find coordinate min values
+    double x_min=X[0]; for(unsigned i=0; i<size; ++i) { if (X[i] < x_min) x_min = X[i]; } x_min -= pix_size/2;
+    double y_min=Y[0]; for(unsigned i=0; i<size; ++i) { if (Y[i] < y_min) y_min = Y[i]; } y_min -= pix_size/2;
+    for(unsigned i=0; i<size; ++i) { 
+      p_iX[i] = (X[i] - x_min) / pix_size;
+      p_iY[i] = (Y[i] - y_min) / pix_size;
+    }
+  }
+
+  iX = p_iX;
+  iY = p_iY;
+}
+
+//-------------------
+//-------------------
+//-- Static Methods--
+//-------------------
+//-------------------
+
+ndarray<GeometryAccess::image_t, 2>
+GeometryAccess::img_from_pixel_arrays( const unsigned*& iX, 
+                                       const unsigned*& iY, 
+                                       const double*    W,
+                                       const unsigned&  size)
+{
+    unsigned ix_max=iX[0]; for(unsigned i=0; i<size; ++i) { if (iX[i] > ix_max) ix_max = iX[i]; } ix_max++;
+    unsigned iy_max=iY[0]; for(unsigned i=0; i<size; ++i) { if (iY[i] > iy_max) iy_max = iY[i]; } iy_max++;
+
+    ndarray<GeometryAccess::image_t, 2> img = make_ndarray<GeometryAccess::image_t>(ix_max, iy_max);
+    // std::fill_n(img, int(img.size()), GeometryAccess::image_t(0));
+    for(ndarray<GeometryAccess::image_t, 2>::iterator it=img.begin(); it!=img.end(); it++) { *it = 0; }
+
+    if (W) for(unsigned i=0; i<size; ++i) img[iX[i]][iY[i]] = (GeometryAccess::image_t) W[i];
+    else   for(unsigned i=0; i<size; ++i) img[iX[i]][iY[i]] = 1;
+    return img;
+}
+
 //-------------------
 //-------------------
 

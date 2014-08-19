@@ -85,6 +85,8 @@ class GeometryObject :
 #------------------------------
 
     def print_geo(self) :
+        """ Print info about self geometry object
+        """
         print 'parent:%10s %2d   geo: %10s %2d' % (self.pname, self.pindex, self.oname, self.oindex) + \
               '  x0:%8.0f  y0:%8.0f  z0:%8.0f' % (self.x0, self.y0, self.z0) + \
               '  rot_z:%6.1f  rot_y:%6.1f  rot_x:%6.1f' % (self.rot_z, self.rot_y, self.rot_x) + \
@@ -93,6 +95,8 @@ class GeometryObject :
 #------------------------------
 
     def print_geo_children(self) :
+        """ Print info about children of self geometry object
+        """
         msg = 'parent:%10s %2d   geo: %10s %2d #children: %d:' % \
               (self.pname, self.pindex, self.oname, self.oindex, len(self.list_of_children))
         for geo in self.list_of_children :
@@ -102,27 +106,64 @@ class GeometryObject :
 #------------------------------
 
     def set_parent(self, parent) :
+        """ Set parent geometry object for self
+        """
         self.parent = parent
 
 #------------------------------
 
     def add_child(self, child) :
+        """ Add children geometry object to the list
+        """
         self.list_of_children.append(child)
 
 #------------------------------
 
     def get_parent(self) :
+        """ Returns parent geometry object
+        """
         return self.parent
 
 #------------------------------
 
     def get_list_of_children(self) :
+        """ Returns list of children geometry objects
+        """
         return self.list_of_children
 
 #------------------------------
 
-    def transform_geo_coord_arrays(self, X, Y, Z, do_tilt = True) :
+    def get_geo_name(self) :
+        """ Returns self geometry object name
+        """
+        return self.oname
 
+#------------------------------
+
+    def get_geo_index(self) :
+        """ Returns self geometry object index
+        """
+        return self.oindex
+
+#------------------------------
+
+    def get_parent_name(self) :
+        """ Returns parent geometry object name
+        """
+        return self.pname
+
+#------------------------------
+
+    def get_parent_index(self) :
+        """ Returns parent geometry object index
+        """
+        return self.pindex
+
+#------------------------------
+
+    def transform_geo_coord_arrays(self, X, Y, Z, do_tilt = True) :
+        """ Transform geometry object coordinates to the parent frame
+        """
         angle_z = self.rot_z + self.tilt_z if do_tilt else self.rot_z
         angle_y = self.rot_y + self.tilt_y if do_tilt else self.rot_y
         angle_x = self.rot_x + self.tilt_x if do_tilt else self.rot_x
@@ -140,13 +181,13 @@ class GeometryObject :
 #------------------------------
 
     def get_pixel_coords(self) :
-
-        #if self.oname == 'SENS2X1:V1' : 
+        """ Returns three numpy arrays with pixel X, Y, Z coordinates for self geometry object
+        """
         if self.algo is not None :
-            #xac, yac, zac = self.algo.get_xyz_maps_um()
             xac, yac, zac = self.algo.pixel_coord_array()
             return self.transform_geo_coord_arrays(xac, yac, zac)
 
+        xac, yac, zac = None, None, None
         for ind, child in enumerate(self.list_of_children) :
             if child.oindex != ind :
                 print 'WARNING! Geometry object %s:%d has non-consequtive index in calibration file, reconst index:%d' % \
@@ -175,8 +216,61 @@ class GeometryObject :
 
 #------------------------------
 
-    def transform_2d_geo_coord_arrays(self, X, Y, do_tilt = True) :
+    def get_pixel_areas(self) :
+        """ Returns numpy array with pixel areas for self geometry object
+        """
+        if self.algo is not None :
+            return self.algo.pixel_area_array()
 
+        aar = None
+        for ind, child in enumerate(self.list_of_children) :
+            if child.oindex != ind :
+                print 'WARNING! Geometry object %s:%d has non-consequtive index in calibration file, reconst index:%d' % \
+                      (child.oname, child.oindex, ind)
+
+            ach = child.get_pixel_areas()
+            aar = ach if ind==0 else np.vstack((aar, ach))
+
+        # define shape for output x,y,z arrays
+        shape_child = ach.shape
+        len_child = len(self.list_of_children)
+        geo_shape = np.hstack(([len_child], ach.shape))
+        #print 'geo_shape = ', geo_shape        
+        aar.shape = geo_shape
+        return aar
+
+#------------------------------
+
+    def get_size_geo_array(self) :
+        """ Returns size of  self geometry object
+        """
+        if self.algo is not None : return self.algo.size()
+
+        size_arr = 0
+        for child in self.list_of_children :
+            size_arr += child.get_size_geo_array()
+
+        return size_arr
+
+#------------------------------
+
+    def get_pixel_scale_size(self) :
+        """ Returns pixel scale size of the geometry object from the first found segment
+        """
+        if self.algo is not None : return self.algo.pixel_scale_size()
+
+        for child in self.list_of_children :
+            return child.get_pixel_scale_size()
+
+#------------------------------
+#------------------------------
+# Additional to interface 2-d methods
+#------------------------------
+#------------------------------
+
+    def transform_2d_geo_coord_arrays(self, X, Y, do_tilt = True) :
+        """ Simplified version of transform_geo_coord_arrays(...) for 2-d case
+        """
         angle_z = self.rot_z + self.tilt_z if do_tilt else self.rot_z
         X1, Y1 = rotation(X,  Y,  angle_z)
         Xt = X1 + self.x0
@@ -186,7 +280,8 @@ class GeometryObject :
 #------------------------------
 
     def get_2d_pixel_coords(self) :
-
+        """ Simplified version of get_pixel_coords() for 2-d case 
+        """
         #if self.oname == 'SENS2X1:V1' : 
         if self.algo is not None :
             #xac, yac, zac = self.algo.get_xyz_maps_um()

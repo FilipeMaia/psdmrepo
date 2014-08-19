@@ -22,11 +22,12 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSCalib/GeometryObject.h"
+
+#include "ndarray/ndarray.h" // for img_from_pixel_arrays(...)
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -50,7 +51,7 @@ namespace PSCalib {
  *
  *  @version $Id$
  *
- *  @see GeometryObject, PSCalib/CalibFileFinder, PSCalib/test/ex_geometry_access
+ *  @see GeometryObject, CalibFileFinder, PSCalib/test/ex_geometry_access.cpp
  *
  *  @anchor interface
  *  @par<interface> Interface Description
@@ -65,32 +66,56 @@ namespace PSCalib {
  *  Code below instateates GeometryAccess object using path to the calibration "geometry" file and verbosity control bit-word:
  *  @code
  *  std::string path = /reg/d/psdm/<INS>/<experiment>/calib/<calib-type>/<det-src>/geometry/0-end.data"
- *  unsigned print_bits = 0377;
+ *  unsigned print_bits = 0377; // or = 0 (by default) - to suppress printout from this object. 
  *  PSCalib::GeometryAccess geometry(path, print_bits);
  *  @endcode
+ *  To find path automatically use CalibFileFinder.
  *
  *  @li Access methods
  *  @code
  *    // Access and print coordinate arrays:
- *    const double* X;
- *    const double* Y;
- *    const double* Z;
- *    unsigned   size;
- *    geometry.get_pixel_coords(X,Y,Z,size);
- *    cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
- *    cout << "X: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << X[i] << ", "; cout << "...\n"; 
- *
- *    // or get coordinate arrays for specified geometry object:
- *    geometry.get_pixel_coords(X,Y,Z,size, "QUAD:V1", 1);
- * 
+ *        const double* X;
+ *        const double* Y;
+ *        const double* Z;
+ *        unsigned   size;
+ *        geometry.get_pixel_coords(X,Y,Z,size);
+ *        cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
+ *        cout << "X: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << X[i] << ", "; cout << "...\n"; 
+ *        // or get coordinate arrays for specified geometry object:
+ *        geometry.get_pixel_coords(X,Y,Z,size, "QUAD:V1", 1);
+ *        // then use X, Y, Z, size
+ *    
  *    // Access pixel areas:
- *    const double* A;
- *    unsigned   size;
- *    geometry.get_pixel_areas(A,size);
- *
+ *        const double* A;
+ *        unsigned   size;
+ *        geometry.get_pixel_areas(A,size);
+ * 
+ *    // Access pixel size:
+ *        double pix_scale_size = geometry.get_pixel_scale_size ();
+ *        // or for specified geo
+ *        double pix_scale_size = geometry.get_pixel_scale_size("QUAD:V1", 1);
+ *    
+ *    // Access pixel indexes for image:
+ *        const unsigned * iX;                                                                             
+ *        const unsigned * iY;                                                                             
+ *        unsigned   isize;                                                                                
+ *        // optional parameters for specified geometry  
+ *        const std::string ioname = "QUAD:V1";                                                            
+ *        const unsigned ioindex = 1;                                                                      
+ *        const double pix_scale_size_um = 109.92;                                                         
+ *        const int xy0_off_pix[] = {200,200};
+ *        geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix);
+ *        // or
+ *        geometry.get_pixel_coord_indexes(iX, iY, isize);
+ *        // then use iX, iY, isize, for example make image:
+ *    
+ *    // Make image from index, iX, iY, and intensity, W, arrays
+ *        ndarray<PSCalib::GeometryAccess::image_t, 2> img = 
+ *                PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, 0, isize);
+ *    
  *    // Access and print comments from the calibration "geometry" file:
- *    std::map<std::string, std::string>& dict = geometry.get_dict_of_comments();
- *    cout << "dict['HDR'] = " << dict["HDR"] << '\n';
+ *        std::map<std::string, std::string>& dict = geometry.get_dict_of_comments ();
+ *        cout << "dict['HDR'] = " << dict["HDR"] << '\n';
  *  @endcode
  * 
  *  @li Print methods
@@ -109,14 +134,16 @@ namespace PSCalib {
  *  @author Mikhail S. Dubrovin
  */
 
+
 class GeometryAccess  {
 
 //typedef boost::shared_ptr<GeometryObject> shpGO;
 /** Use the same declaration of the shared pointer to geometry object like in the class GeometryObject*/
 typedef PSCalib::GeometryObject::shpGO shpGO;
 
-
 public:
+
+  typedef double image_t;
 
   /**
    *  @brief Class constructor accepts path to the calibration "geometry" file and verbosity control bit-word 
@@ -169,6 +196,14 @@ public:
 			 const std::string& oname = std::string(), 
 			 const unsigned& oindex = 0);
 
+  /// Returns pixel scale size for specified geometry object through its children segment
+  /**
+   *  @param[in]  oname - object name
+   *  @param[in]  oindex - object index
+   */
+  double get_pixel_scale_size(const std::string& oname = std::string(), 
+                              const unsigned& oindex = 0);
+
   /// Returns dictionary of comments
   std::map<std::string, std::string>& get_dict_of_comments() {return m_dict_of_comments;}
 
@@ -185,6 +220,36 @@ public:
   void print_pixel_coords( const std::string& oname= std::string(), 
 			   const unsigned& oindex = 0);
 
+  /// Returns pixel coordinate index arrays iX, iY of size for specified geometry object 
+ /**
+   *  @param[out] iX - pointer to x pixel index coordinate array
+   *  @param[out] iY - pointer to y pixel index coordinate array
+   *  @param[out] size - size of the pixel coordinate array (number of pixels)
+   *  @param[in]  oname - object name (deafault - top object)
+   *  @param[in]  oindex - object index (default = 0)
+   *  @param[in]  pix_scale_size_um - ex.: 109.92 (default - search for the first segment pixel size)
+   *  @param[in]  xy0_off_pix - array containing X and Y coordinates of the offset (default - use xmin, ymin)
+   */
+  void get_pixel_coord_indexes( const unsigned *& iX, 
+                                const unsigned *& iY, 
+				unsigned& size,
+                                const std::string& oname = std::string(), 
+				const unsigned& oindex = 0, 
+                                const double& pix_scale_size_um = 0, 
+                                const int* xy0_off_pix = 0 );
+
+  /// Returns image as ndarray<image_t, 2> object
+ /**
+   *  @param[in] iX - pointer to x pixel index coordinate array
+   *  @param[in] iY - pointer to y pixel index coordinate array
+   *  @param[in]  W - pointer to the intensity (weights) array (default - set 1 for each pixel) 
+   *  @param[in] size - size of the pixel coordinate array (number of pixels)
+   */
+  static ndarray<image_t, 2>
+  img_from_pixel_arrays(const unsigned*& iX, 
+                        const unsigned*& iY, 
+                        const double* W = NULL,
+                        const unsigned& size = 0);
 
 protected:
 
@@ -196,6 +261,12 @@ private:
   /// print bits
   unsigned m_pbits;
 
+  /// pointer to x pixel coordinate index array
+  unsigned* p_iX;
+
+  /// pointer to x pixel coordinate index array
+  unsigned* p_iY;
+ 
   /// vector/list of shared pointers to geometry objects
   std::vector<shpGO> v_list_of_geos;
 
