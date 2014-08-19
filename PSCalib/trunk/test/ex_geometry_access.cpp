@@ -74,14 +74,14 @@ int main (int argc, char* argv[])
   //string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data";
   //string fname_data     = basedir + "cspad-ndarr-ave-cxii0114-r0227.dat";
 
-  //string basedir = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/";
-  //string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data";
-  //string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
+  string basedir = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/";
+  string fname_geometry = basedir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data";
+  string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
  
   // Temporary solution for Summer 2014 shutdown:
-  string basedir = "/home/pcds/LCLS/calib/geometry/";
-  string fname_geometry = basedir + "2-end.data";
-  string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
+  // string basedir = "/home/pcds/LCLS/calib/geometry/";
+  // string fname_geometry = basedir + "2-end.data";
+  // string fname_data     = basedir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt";
  
 
   unsigned print_bits = 0; // 0377;

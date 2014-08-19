@@ -430,17 +430,18 @@ if __name__ == "__main__" :
     #fname_data     = basedir + 'cspad-ndarr-ave-cxi83714-r0136.dat'
     #amp_range = (0,0.5)
 
-    #basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/'
-    #fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/'
+    fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    fname_data     = basedir + 'cspad-ndarr-ave-cxii0114-r0227.dat'
+    fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    amp_range = (0,500)
+
+    #basedir = '/home/pcds/LCLS/calib/geometry/'
+    #fname_geometry = basedir + '0-end.data'
+    #fname_geometry = basedir + '2-end.data'
     #fname_data     = basedir + 'cspad-ndarr-ave-cxii0114-r0227.dat'
     #fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     #amp_range = (0,500)
-
-    basedir = '/home/pcds/LCLS/calib/geometry/'
-    #fname_geometry = basedir + '0-end.data'
-    fname_geometry = basedir + '2-end.data'
-    fname_data     = basedir + 'cspad-ndarr-ave-cxii0114-r0227.dat'
-    amp_range = (0,500)
 
     #basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/'
     #fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data'
@@ -449,13 +450,13 @@ if __name__ == "__main__" :
 
     geometry = GeometryAccess(fname_geometry, 0377)
 
-    msg = 'Use command: sys.argv[0] <num>, wher num=[1,4]'
+    msg = 'Use command: sys.argv[0] <num>, wher num=[1,3]'
 
     if len(sys.argv)==1   : print 'App needs in input parameter.' + msg
     elif sys.argv[1]=='1' : test_access(geometry)
     elif sys.argv[1]=='2' : test_plot_quad(geometry)
     elif sys.argv[1]=='3' : test_plot_cspad(geometry, fname_data, amp_range)
-    elif sys.argv[1]=='4' : test_img_default()
+    #elif sys.argv[1]=='4' : test_img_default()
     else : print 'Wrong input parameter.' + msg
 
     sys.exit ('End of %s' % sys.argv[0])

@@ -57,7 +57,7 @@ class SegGeometry :
         print self.wmsg % 'cols()'
 
     def shape(self) :
-        """ Returns shape of the segment {rows, cols}
+        """ Returns shape of the segment [rows, cols]
         """
         print self.wmsg % 'shape()'
 
@@ -67,17 +67,17 @@ class SegGeometry :
         print self.wmsg % 'pixel_scale_size()'
 
     def pixel_area_array(self) :
-        """ Returns shape of the segment {rows, cols}
+        """ Returns array of pixel relative areas of shape=[rows, cols]
         """
         print self.wmsg % 'pixel_area_array()'
 
     def pixel_size_array(self, axis) :
-        """ Returns pointer to the array of pixel size in um for AXIS
+        """ Returns array of pixel size in um for AXIS
         """
         print self.wmsg % 'pixel_size_array(axis)'
 
     def pixel_coord_array(self, axis) :
-        """ Returns pointer to the array of segment pixel coordinates in um for AXIS
+        """ Returns array of segment pixel coordinates in um for AXIS
         """
         print self.wmsg % 'pixel_coord_array(axis)'
 
