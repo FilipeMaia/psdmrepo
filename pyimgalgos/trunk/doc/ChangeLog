@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 	
 =======
+Tag: V00-00-21
+2014-08-18 Mikhail S. Dubrovin
+- update src/TestImageGenerator.py
+	
 Tag: V00-00-20
 2014-08-08 Mikhail S. Dubrovin
 - move python modules from pyimgalgos to PSCalib for 

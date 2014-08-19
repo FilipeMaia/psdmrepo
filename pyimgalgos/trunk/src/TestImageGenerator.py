@@ -153,6 +153,16 @@ def cspad_nparr(n2x1=32, pbits=0377) :
     return arr
 
 #------------------------------
+
+def monotonicly_rising(shape=(10,10), dtype = np.float32) :
+    """Returns monotonicly rising image intensity along the diagonal
+    """
+    rows, cols = shape
+    arr = np.arange(rows*cols, dtype=dtype)
+    arr.shape = shape
+    return arr
+
+#------------------------------
 #------------------------------
 #------------------------------
 #------------------------------
