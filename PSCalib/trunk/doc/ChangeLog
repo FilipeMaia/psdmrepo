@@ -11,7 +11,7 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-### Tag: V00-02-10
+Tag: V00-02-10
 2014-08-13 Mikhail S. Dubrovin
 - in PSCalib/ex_geometry_access add test of methods get_pixel_coord_indexes(...), img_from_pixel_arrays(...)
 - update doxy-doc inn GeometryAccess.h
