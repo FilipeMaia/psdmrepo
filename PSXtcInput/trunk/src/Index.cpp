@@ -301,15 +301,28 @@ private:
     }
   }
 
-  // create a vector of unique times that the user can use to jump to events
+  // create a vector of unique times that the user can use to jump to events.
+  // also keep track of which times correspond to the beginning of a new
+  // calibcycle.
   void _fillTimes() {
     IndexEvent last(0,0,0);
+    _calibTimeIndex.clear();
+    std::vector<IndexCalib>::const_iterator caliter = _idxcalib.begin();
+    // check error conditions here
+    unsigned evtcount = 0;
     for (vector<IndexEvent>::iterator itev = _idx.begin(); itev != _idx.end(); ++ itev) {
       if (*itev!=last) {
         _times.push_back(psana::EventTime(itev->entry.time(),itev->entry.uFiducial));
         last = *itev;
+	if (itev->entry.time() > caliter->entry.time()) {
+	  _calibTimeIndex.push_back(evtcount);
+	  ++caliter;
+	}
+	++evtcount;
       }
     }
+    if (_calibTimeIndex.size() != _idxcalib.size())
+      MsgLog(logger, fatal, "Configure transition not found in first 2 datagrams");
   }
 
   // add a datagram with "event" data (versus nonEvent data, like epics)
@@ -535,7 +548,22 @@ public:
   ~IndexRun() {}
 
   // return vector of times that can be used for the "jump" method.
-  const vector<psana::EventTime>& times() const {return _times;}
+  void times(psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) const {
+    begin = _times.begin();
+    end = _times.end();
+  }
+
+  void times(unsigned step, psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) const {
+    if (step>=_calibTimeIndex.size()) MsgLog(logger, fatal, "Requested step " << step << " not in range.  Number of steps in this run: " << _idxcalib.size());
+    begin = _times.begin()+_calibTimeIndex[step];
+    if (step==_calibTimeIndex.size()-1) { // the last calibstep
+      end = _times.end();
+    } else {
+      end = _times.begin()+_calibTimeIndex[step+1]; // the software "excludes" the last event
+    }
+  }
+
+  unsigned nsteps() const {return _idxcalib.size();}
 
   void endrun() {
     Pds::Dgram* dg = new Pds::Dgram;
@@ -591,6 +619,7 @@ private:
   DgramPieces              _pieces;
   vector<psana::EventTime> _times;
   queue<DgramPieces>&      _queue;
+  vector<unsigned>         _calibTimeIndex;
 };
 
 // above is the "private" implementation (class IndexRun), below this is the
@@ -610,14 +639,22 @@ int Index::jump(psana::EventTime time) {
   return _idxrun->jump(time.time(),time.fiducial());
 }
 
-const vector<psana::EventTime>& Index::runtimes() {
-  return _idxrun->times();
+void Index::times(psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) {
+  _idxrun->times(begin,end);
+}
+
+void Index::times(unsigned step, psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) {
+  _idxrun->times(step, begin, end);
 }
 
 void Index::setrun(int run) {
   if (not _rmap->runFiles.count(run)) MsgLog(logger, fatal, "Run " << run << " not found");
   delete _idxrun;
   _idxrun = new IndexRun(_queue,_rmap->runFiles[run]);
+}
+
+unsigned Index::nsteps() {
+  return _idxrun->nsteps();
 }
 
 void Index::end() {

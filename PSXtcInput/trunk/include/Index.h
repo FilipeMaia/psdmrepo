@@ -32,8 +32,10 @@ public:
   ~Index();
   int jump(psana::EventTime t);
   void setrun(int run);
+  unsigned nsteps();
   void end();
-  const std::vector<psana::EventTime>& runtimes();
+  void times(psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end);
+  void times(unsigned nstep, psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end);
   const std::vector<unsigned>& runs();
 private:
   std::vector<std::string> _fileNames;
