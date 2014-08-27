@@ -105,7 +105,6 @@ void
 ImgPeakFinder::beginJob(Event& evt, Env& env)
 {
   m_time = new TimeInterval();
-
 }
 
 /// Method which is called at the beginning of the run
@@ -247,6 +246,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 
         m_ndarr = new ndarray<const double,2>(p_data, shape);
         m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
+
         return procImage(evt);
       }
   }
@@ -306,6 +306,7 @@ ImgPeakFinder::procImage(Event& evt)
                      setWindowRange();
                      saveImageInFile0(evt);
     if(m_sigma != 0) smearImage();        // convolution with Gaussian
+
     else             initImage();         // non-zero pixels only in window above the lower threshold
                      saveImageInFile1(evt);
 		     findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
@@ -455,7 +456,6 @@ ImgPeakFinder::checkIfPixIsPeak(size_t& r0, size_t& c0)
 
   // Save the peak info here ----------
   savePeakInfo(r0, c0, a0, sum_a, n_pix );
-  //if( m_print_bits & 8 ) printPeakInfo(r0, c0, a0, sum_a, n_pix );
 }
 
 //--------------------
@@ -479,7 +479,9 @@ ImgPeakFinder::printPeakInfo(Peak& p)
                                   << " y="      << p.y
                                   << " ampmax=" << p.ampmax
                                   << " amptot=" << p.amptot 
-                                  << " npix="   << p.npix );
+                                  << " npix="   << p.npix
+                                  << " m_Peaks.size()=" << m_Peaks.size()
+                                  << " capacity()=" << m_Peaks.capacity() );
 }
 
 //--------------------
@@ -487,6 +489,10 @@ ImgPeakFinder::printPeakInfo(Peak& p)
 void 
 ImgPeakFinder::savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
 {
+  if ( m_Peaks.size() == m_Peaks.capacity() ) {
+      m_Peaks.reserve( m_Peaks.capacity() + 100 );
+      if( m_print_bits & 8 ) MsgLog( name(), info, "Peaks vector capacity is increased to:" << m_Peaks.capacity() );
+  }
   Peak onePeak = { (double)col, (double)row, amp, amp_tot, npix };
   m_Peaks.push_back(onePeak);
   if( m_print_bits & 8 ) printPeakInfo( onePeak );
