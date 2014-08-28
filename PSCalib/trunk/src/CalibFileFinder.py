@@ -1,6 +1,20 @@
 #!/usr/bin/env python
 #------------------------------
-"""CalibFileFinder.py is a python version of CalibFileFinder.cpp
+""":py:class:`PSCalib.CalibFileFinder` is a python version of CalibFileFinder.cpp - finds calibration file
+
+Usage::
+
+    from PSCalib.CalibFileFinder improt CalibFileFinder
+
+    cdir  = '/reg/d/psdm/CXI/cxi83714/calib/'
+    group = 'CsPad::CalibV1'
+    src   = 'CxiDs1.0:Cspad.0'
+    type  = 'pedestals'
+    rnum  = 137
+
+    cff = CalibFileFinder(cdir, group, pbits=0377)
+    fname = cff.findCalibFile(src, type, rnum)
+
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -137,11 +151,10 @@ if __name__ == "__main__" :
     group = 'CsPad::CalibV1'
     src   = 'CxiDs1.0:Cspad.0'
     type  = 'pedestals'
-    rnum  = 23
     rnum  = 137
 
     cff = CalibFileFinder(cdir, group, 0377) # 0377)
-    cff.findCalibFile(src, type, rnum)
+    fname = cff.findCalibFile(src, type, rnum)
 
     sys.exit('End of %s' % sys.argv[0])
 

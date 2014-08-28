@@ -4,23 +4,17 @@
 #
 # Description:
 #  Module SegGeometryCspad2x1V1...
-#
 #------------------------------------------------------------------------
 
-"""
-This software was developed for the SIT project.  If you use all or 
-part of it, please give an appropriate acknowledgment.
+"""Class :py:class:`PSCalib.SegGeometryCspad2x1V1` describes the CSPAD 2x1 V1 sensor geometry.
 
-@see SegGeometry
-
-@version $Id: 2013-03-08$
-
-@author Mikhail S. Dubrovin
-
-Use matrix notations (like in data array)
-DIFFERENT from the detector map... rows<->cols:
-Assume that 2x1 has 195 rows and 388 columns
-The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,ymax)
+In this class we use natural matrix notations like in data array
+(that is different from the DAQ notations where rows and cols are swapped).
+\n We assume that
+\n * 2x1 has 195 rows and 388 columns,
+\n * X-Y coordinate system origin coinsides with sensor center,
+\n * (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,ymax), as shown below
+\n ::
 
                     ^ Y          (Xmax,Ymax)
    (0,0)            |            (0,387)
@@ -36,6 +30,41 @@ The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,y
    (184,0)          |           (184,387)
    (Xmin,Ymin)
 
+
+Usage of interface methods::
+
+    from SegGeometryCspad2x1V1 import cspad2x1_one as sg
+
+    sg.print_seg_info(0377)
+
+    size_arr = sg.size()
+    rows     = sg.rows()
+    cols     = sg.cols()
+    shape    = sg.shape()
+    pix_size = pixel_scale_size()
+
+    areaA = sg.pixel_area_array()
+    
+    sizeX = sg.pixel_size_array('X')
+    sizeX, sizeY, sizeZ = sg.pixel_size_array()
+
+    X     = sg.pixel_coord_array('X')
+    X,Y,Z = sg.pixel_coord_array()
+    print 'X.shape =', X.shape
+
+    xmin, ymin, zmin = sg.pixel_coord_min()
+    ymax = sg.pixel_coord_max('Y')
+    ...
+
+
+This software was developed for the SIT project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@see :py:class:`PSCalib.SegGeometry`
+
+@version $Id: 2013-03-08$
+
+@author Mikhail S. Dubrovin
 """
 
 #--------------------------------

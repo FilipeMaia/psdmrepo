@@ -8,13 +8,25 @@
 #------------------------------------------------------------------------
 
 """
-Factory class/methid to switch between different device-dependent
-segments/sensors to access their pixel geometry uling SegGeometry interface.
+:py:class:`PSCalib.SegGeometryStore` - is a factory class/method to switch between different device-dependent
+segments/sensors to access their pixel geometry uling :py:class:`PSCalib.SegGeometry` interface.
+
+Usage::
+
+    from PSCalib.SegGeometryStroe import sgs
+
+    sg = sgs.Create('SENS2X1:V1', pbits=0377)
+    sg.print_seg_info(pbits=0377)
+    size_arr = sg.size()
+    rows     = sg.rows()
+    ...
+
+
+@see other interface methods in :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`
+
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see SegGeometry
 
 @version $Id: 2013-03-08$
 

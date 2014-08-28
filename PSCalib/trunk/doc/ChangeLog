@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-12
+2014-08-27 Mikhail S. Dubrovin
+- in SegGeometry*.py, Geometry*.py, and CalibFileFinder.py add Sphinx documentation of interfaces
+	
 Tag: V00-02-11
 2014-08-19 Mikhail S. Dubrovin
 - in test/ex_geometry_access.cpp and GeometryAccess.py change test files location after summer shutdown

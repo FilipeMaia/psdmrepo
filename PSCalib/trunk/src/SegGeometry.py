@@ -1,10 +1,40 @@
 #!/usr/bin/env python
 #------------------------------
-""" SegGeometry - base class with interface description.
+""" SegGeometry - abstract class with interface description.
 
-Methods of this class should be re-implemented in derived classes SegGeometry<SensorVers> 
-for pixel geometry description of all sensors (ex.: 2x1) used in detectors (ex.: cspad).
+Methods of this class should be re-implemented in derived classes with name pattern SegGeometry<SensorVers> 
+for pixel geometry description of all sensors.
+For example, CSPAD 2x1 sensor is implemented in class :py:class:`PSCalib.SegGeometryCspad2x1V1`.
+Access to all implemented sensors is available through the factory method in class :py:class:`PSCalib.SegGeometry`.
 
+
+Usage of interface methods::
+
+    from SegGeometryCspad2x1V1 import cspad2x1_one as sg
+
+    sg.print_seg_info(pbits=0377)
+
+    size_arr = sg.size()
+    rows     = sg.rows()
+    cols     = sg.cols()
+    shape    = sg.shape()
+    pix_size = pixel_scale_size()
+
+    areaA = sg.pixel_area_array()
+    
+    sizeX = sg.pixel_size_array('X')
+    sizeX, sizeY, sizeZ = sg.pixel_size_array()
+
+    X     = sg.pixel_coord_array('X')
+    X,Y,Z = sg.pixel_coord_array()
+    print 'X.shape =', X.shape
+
+    xmin, ymin, zmin = sg.pixel_coord_min()
+    ymax = sg.pixel_coord_max('Y')
+    ...
+
+
+@see :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.

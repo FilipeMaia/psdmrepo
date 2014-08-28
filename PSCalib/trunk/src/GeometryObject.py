@@ -1,6 +1,22 @@
 #!/usr/bin/env python
 #------------------------------
-"""GeometryObject - building block for hierarchical geometry
+""":py:class:`PSCalib.GeometryObject` - building block for hierarchical geometry
+
+Usage::
+
+    from PSCalib.GeometryObject import GeometryObject
+    ...
+    d = <dictionary-of-input-parameters>
+    geo = GeometryObject(**d)
+    geo.print_geo()
+    geo.print_geo_children()
+    ...
+
+    Methods of this class are used internally in PSCalib.GeometryAccess
+    and are not supposed to be used directly...
+
+@see :py:class:`PSCalib.GeometryAccess`
+
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.

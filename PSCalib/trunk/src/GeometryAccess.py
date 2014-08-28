@@ -2,6 +2,26 @@
 #------------------------------
 """GeometryAccess - holds and access hierarchical geometry for generic pixel detector
 
+
+Usage::
+ 
+    from PSCalib.GeometryAccess import GeometryAccess, img_from_pixel_arrays
+
+    fname_geometry = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    geometry = GeometryAccess(fname_geometry, 0377)
+
+    # get index arrays for quad
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None)
+
+    # get index arrays for entire CSPAD with offset
+    iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=(1000,1000))
+
+    img = img_from_pixel_arrays(iX,iY,W=arr)
+
+    X, Y, Z = geometry.get_pixel_coords(oname=None, oindex=0)
+
+@see :py:class:`PSCalib.GeometryObject`, :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
+
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
@@ -431,9 +451,10 @@ if __name__ == "__main__" :
     #amp_range = (0,0.5)
 
     basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/'
-    fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     fname_data     = basedir + 'cspad-ndarr-ave-cxii0114-r0227.dat'
-    fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    #fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    #fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    fname_geometry = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     amp_range = (0,500)
 
     #basedir = '/home/pcds/LCLS/calib/geometry/'
