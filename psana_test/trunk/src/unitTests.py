@@ -153,9 +153,14 @@ class Psana( unittest.TestCase ) :
             if nevent>=4:
                 break
         myfile = os.path.join(OUTDIR,'savetimes.pkl')
-        pickle.dump( savetimes, open(myfile, "wb" ) )
+        f=open(myfile,'wb')
+        pickle.dump(savetimes, f)
+        f.close()
         # check that we get the right events back using the pickled EventTime objects
-        times = pickle.load( open(myfile, "rb" ) )
+        f=open(myfile,'rb')
+        times = pickle.load(f)
+        f.close()
+        os.remove(myfile)
         ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=15:idx')
         run = ds.runs().next()
         expectFid = [5366,11177,14060]
