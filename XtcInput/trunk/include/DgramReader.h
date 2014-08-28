@@ -60,12 +60,14 @@ public:
 
   typedef std::vector<std::string> FileList ;
 
-  // full constructor with parameters for handling control streams
+  // full constructor with parameters for handling control streams and optionally
+  // specifies file offsets before the second event (event after configure).
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
               double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec,
-              boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure)
+              boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure = 
+	                                          boost::shared_ptr<XtcFilesPosition>())
     : m_files(begin, end)
     , m_queue( queue )
     , m_mode( mode )
