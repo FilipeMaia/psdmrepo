@@ -16,6 +16,7 @@ import subprocess as sb
 from psana_test import epicsPvToStr
 import psana_test.psanaTestLib as ptl
 import psana
+import pickle
 
 DATADIR = ptl.getTestDataDir()
 OUTDIR = "data/psana_test"
@@ -137,6 +138,42 @@ class Psana( unittest.TestCase ) :
         os.unlink(outFile)
         self.runPsanaOnCfg(cmdLineOptions=cmdLine)
         self.assertTrue(os.path.exists(outFile), msg="Translation did not produce outfile: %s" % outFile)
+
+    def test_Index(self):
+        # test the pickling of EventTime objects
+        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=15')
+        savetimes = []
+        nevent=0
+        for evt in ds.events():
+            evtid = evt.get(psana.EventId)
+            evttime = evtid.idxtime()
+            if nevent != 1: #only save events 0,2,3
+                savetimes.append(evttime)
+            nevent+=1
+            if nevent>=4:
+                break
+        myfile = os.path.join(OUTDIR,'savetimes.pkl')
+        pickle.dump( savetimes, open(myfile, "wb" ) )
+        # check that we get the right events back using the pickled EventTime objects
+        times = pickle.load( open(myfile, "rb" ) )
+        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=15:idx')
+        run = ds.runs().next()
+        expectFid = [5366,11177,14060]
+        expectSec = [1339858956,1339858972,1339858980]
+        expectNsec = [671607864,816395836,826443448]
+        for i in range(len(times)):
+            id = run.event(times[i]).get(psana.EventId)
+            self.assertEqual(id.fiducials(), expectFid[i], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
+            self.assertEqual(id.time()[0], expectSec[i], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
+            self.assertEqual(id.time()[1], expectNsec[i], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
+        self.assertEqual(run.nsteps(), 500, msg="incorrect number of calibsteps from indexing. found %d, expect 500" % run.nsteps())
+        # test that the calibcycle interface can also get a correct event
+        calibtimes = run.times(2)
+        self.assertEqual(len(calibtimes), 1, msg="incorrect number of events in calibstep. found %d, expect 1" % len(calibtimes))
+        id = run.event(calibtimes[0]).get(psana.EventId)
+        self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
+        self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
+        self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
         
     def test_MoreRecentEpicsStored(self):
         '''When the same epics pv is recorded from several sources, or several times in the same source, 
