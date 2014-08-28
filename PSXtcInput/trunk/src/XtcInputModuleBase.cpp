@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcInputModuleBase...
+//     Class XtcInputModuleBase...
 //
 // Author List:
-//      Andrei Salnikov
+//     Andrei Salnikov
 //
 //------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@
 #include <vector>
 #include <boost/make_shared.hpp>
 #include <boost/foreach.hpp>
+#include <string>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -35,8 +36,6 @@
 #include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
 #include "PSXtcInput/XtcEventId.h"
-#include "XtcInput/DgramQueue.h"
-#include "XtcInput/DgramReader.h"
 #include "XtcInput/XtcFileName.h"
 #include "XtcInput/XtcIterator.h"
 #include "XtcInput/MergeMode.h"
@@ -93,9 +92,9 @@ namespace {
 
 
 
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
+//             ----------------------------------------
+//             -- Public Function Member Definitions --
+//             ----------------------------------------
 
 namespace PSXtcInput {
 
@@ -121,15 +120,15 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
 {
   std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
 
+  ConfigSvc::ConfigSvc cfg = configSvc();
+  m_firstControlStream = cfg.get("psana", "first_control_stream", m_firstControlStream);
   if (not noSkip) {
     // get number of events to process/skip from psana configuration
-    ConfigSvc::ConfigSvc cfg = configSvc();
     m_skipEvents = cfg.get("psana", "skip-events", 0UL);
     m_maxEvents = cfg.get("psana", "events", 0UL);
     m_skipEpics = cfg.get("psana", "skip-epics", true);
     m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
-    m_firstControlStream = cfg.get("psana", "first_control_stream", 80);
-  }
+  }  
 }
 
 //--------------
@@ -686,5 +685,6 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
   }
 
 }
+
 
 } // namespace PSXtcInput

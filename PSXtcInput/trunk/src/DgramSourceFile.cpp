@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class DgramSourceFile...
+//     Class DgramSourceFile...
 //
 // Author List:
-//      Andy Salnikov
+//     Andy Salnikov
 //
 //------------------------------------------------------------------------
 
@@ -28,6 +28,7 @@
 #include "XtcInput/DgramQueue.h"
 #include "XtcInput/DgramReader.h"
 #include "XtcInput/MergeMode.h"
+#include "XtcInput/XtcFilesPosition.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -35,9 +36,9 @@
 
 using namespace XtcInput;
 
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
+//             ----------------------------------------
+//             -- Public Function Member Definitions --
+//             ----------------------------------------
 
 namespace {
 
@@ -135,6 +136,17 @@ DgramSourceFile::init()
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
   m_firstControlStream = config("first_control_stream",80);
   m_maxStreamClockDiffSec = config("max_stream_clock_diff",85);
+
+  std::list<off64_t> emptyOffsets;
+  std::list<off64_t> offsets =  configList("second_event_jump_offsets",emptyOffsets);
+  std::list<std::string> emptyStrings;
+  std::list<std::string> filenames = configList("second_event_jump_filenames",emptyStrings);
+
+  boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure;
+  if ((offsets.size() > 0) or (filenames.size() > 0)) {
+    firstEventAfterConfigure = boost::make_shared<XtcFilesPosition>(filenames,
+                                                                    offsets);
+  }
   m_readerThread.reset( new boost::thread( DgramReader ( m_fileNames.begin(), 
                                                          m_fileNames.end(),
                                                          *m_dgQueue, 
@@ -142,7 +154,8 @@ DgramSourceFile::init()
                                                          liveTable, liveTimeout, 
                                                          l1offset, 
                                                          m_firstControlStream,
-                                                         m_maxStreamClockDiffSec) ) );
+                                                         m_maxStreamClockDiffSec,
+                                                         firstEventAfterConfigure) ) );
 }
 
 
