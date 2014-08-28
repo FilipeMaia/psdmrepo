@@ -179,7 +179,7 @@ class Psana( unittest.TestCase ) :
         self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from calibcycle-indexing. found %d, expect %d" % (id.fiducials(), expectFid[1]))
         self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from calibcycle-indexing. found %d, expect %d" % (id.time()[0],expectSec[1]))
         self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from calibcycle-indexing. found %d, expect %d" % (id.time()[1],expectNsec[1]))
-        
+
     def test_MoreRecentEpicsStored(self):
         '''When the same epics pv is recorded from several sources, or several times in the same source, 
         the most recent one should be stored. test_073 is a case where this occurs, and before the code
@@ -498,7 +498,70 @@ class Psana( unittest.TestCase ) :
         failMsg += cmd
         self.assertEqual(prev_md5, md5, msg=failMsg)
         os.unlink(dumpOutput)
+
+    def test_jmpToSecond(self):
+        '''tests the special options to jump to a event after the configure
+        '''
+        dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_002_xppd9714')
+        ds = psana.setConfigFile('')
+        ccOffsetsOption = '121184 121184 121184 121184 144524 121184'
+        ccBaseFilenames = ['e428-r0016-s00-c00.xtc',
+                           'e428-r0016-s01-c00.xtc',
+                           'e428-r0016-s02-c00.xtc',
+                           'e428-r0016-s03-c00.xtc',
+                           'e428-r0016-s04-c00.xtc',
+                           'e428-r0016-s05-c00.xtc']
+        ccFullFilenames = [os.path.join(dataSourceDir, fname) for fname in ccBaseFilenames]
+        ccFilenamesOption = ' '.join(ccFullFilenames)
+
+        class EventTime(object):
+            def __init__(self,sec,nsec,fid):
+                self.sec=sec
+                self.nsec=nsec
+                self.fid=fid
+
+            def __eq__(self, x):
+                '''only works for x = psana.EventId.
+                convenience function for tests below.
+                '''
+                tm = x.time()
+                if self.sec != tm[0]: return False
+                if self.nsec != tm[1]: return False
+                fid = x.fiducials()
+                if self.fid != fid: return False
+                return True
+
+            def __repr__(self):
+                return 'sec=%d nsec=%d fid=%d' % (self.sec, self.nsec, self.fid)
+    
+        def psanaEventIdToStr(eventId):
+            return 'sec=%d nsec=%d fid=%d' % (eventId.time()[0], eventId.time()[1], eventId.fiducials())
+
+        firstTime = EventTime(sec=1399774510, nsec=475171424, fid=8130)
+        eventTimes = []
+        eventTimes.append(EventTime(sec=1399774513, nsec=616326150, fid=9261))
+        eventTimes.append(EventTime(sec=1399774516, nsec=691053493, fid=10368))
+        eventTimes.append(EventTime(sec=1399774519, nsec=890170627, fid=11520))
+        eventTimes.append(EventTime(sec=1399774523, nsec=339827189, fid=12762))
+        eventTimes.append(EventTime(sec=1399774526, nsec=630896109, fid=13947))
         
+        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_offsets",ccOffsetsOption)
+        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_filenames",ccFilenamesOption)
+
+        dsString = 'exp=xppd9714:run=16:dir=%s' % dataSourceDir
+        ds = psana.DataSource(dsString)
+
+        events = ds.events()
+        for evt, evtTestTime in zip(events, eventTimes):
+            evtTime = evt.get(psana.EventId)
+            failMsg = "Fail: data=%s\n      test=%s\n     first=%s" % \
+                (psanaEventIdToStr(evtTime),evtTestTime, firstTime)
+            self.assertTrue(evtTestTime == evtTime, msg=failMsg)
+                
+        # psana remembers options. If another unit test function is run after this one
+        # the jump parameters will still be in effect. Set them to null.
+        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_offsets",'')
+        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_filenames",'')
         
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
