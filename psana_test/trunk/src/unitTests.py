@@ -141,7 +141,7 @@ class Psana( unittest.TestCase ) :
 
     def test_Index(self):
         # test the pickling of EventTime objects
-        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=15')
+        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=999')
         savetimes = []
         nevent=0
         for evt in ds.events():
@@ -161,7 +161,7 @@ class Psana( unittest.TestCase ) :
         times = pickle.load(f)
         f.close()
         os.remove(myfile)
-        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=15:idx')
+        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=999:idx')
         run = ds.runs().next()
         expectFid = [5366,11177,14060]
         expectSec = [1339858956,1339858972,1339858980]
@@ -171,7 +171,7 @@ class Psana( unittest.TestCase ) :
             self.assertEqual(id.fiducials(), expectFid[i], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
             self.assertEqual(id.time()[0], expectSec[i], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
             self.assertEqual(id.time()[1], expectNsec[i], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
-        self.assertEqual(run.nsteps(), 500, msg="incorrect number of calibsteps from indexing. found %d, expect 500" % run.nsteps())
+        self.assertEqual(run.nsteps(), 5, msg="incorrect number of calibsteps from indexing. found %d, expect 5" % run.nsteps())
         # test that the calibcycle interface can also get a correct event
         calibtimes = run.times(2)
         self.assertEqual(len(calibtimes), 1, msg="incorrect number of events in calibstep. found %d, expect 1" % len(calibtimes))
