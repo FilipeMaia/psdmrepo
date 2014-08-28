@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcStreamDgIter...
+//     Class XtcStreamDgIter...
 //
 // Author List:
 //      Andrei Salnikov
@@ -27,6 +27,7 @@
 #include "XtcInput/Exceptions.h"
 #include "XtcInput/XtcChunkDgIter.h"
 #include "pdsdata/xtc/Xtc.hh"
+#include "XtcInput/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -48,11 +49,29 @@ namespace {
 
     Pds::ClockTime m_clock;
   };
+
+  // function to compare xtc files
+  bool xtcFilesNotEqual(const XtcInput::XtcFileName &a, const XtcInput::XtcFileName &b) {
+    int chunkA = a.chunk();
+    int chunkB = b.chunk();
+    bool equalChunks = chunkA == chunkB;
+    bool notEqualPaths  = false;
+    if (a < b) {
+      notEqualPaths = true;
+    }
+    if (b < a) {
+      notEqualPaths = true;
+    }
+    if (equalChunks and notEqualPaths) {
+      MsgLog(logger,warning, "xtc files are not equal but chunks are: a=" << a << " b=" << b);
+    }
+    return notEqualPaths;
+  }
 }
 
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
+//             ----------------------------------------
+//             -- Public Function Member Definitions --
+//             ----------------------------------------
 
 namespace XtcInput {
 
@@ -63,13 +82,27 @@ XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkI
                                  bool clockSort)
   : m_chunkIter(chunkIter)
   , m_dgiter()
-  , m_count(0)
+  , m_chunkCount(0)
+  , m_streamCount(0)
   , m_headerQueue()
   , m_clockSort(clockSort)
 {
   m_headerQueue.reserve(::readAheadSize);
 }
 
+XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
+                                 const boost::shared_ptr<SecondDatagram> & secondDatagram,
+                                 bool clockSort)
+  : m_chunkIter(chunkIter)
+  , m_dgiter()
+  , m_chunkCount(0)
+  , m_streamCount(0)
+  , m_headerQueue()
+  , m_clockSort(clockSort)
+  , m_secondDatagram(secondDatagram)
+{
+  m_headerQueue.reserve(::readAheadSize);
+}
 //--------------
 // Destructor --
 //--------------
@@ -122,11 +155,44 @@ XtcStreamDgIter::readAhead()
       // open next xtc file if there is none open
       MsgLog(logger, trace, "processing file: " << file) ;
       m_dgiter = boost::make_shared<XtcChunkDgIter>(file, m_chunkIter->liveTimeout());
-      m_count = 0 ;
+      m_chunkCount = 0 ;
     }
 
-    // try to read next event from it
-    boost::shared_ptr<DgHeader> hptr = m_dgiter->next() ;
+    boost::shared_ptr<DgHeader> hptr; // next datagram header
+
+    // check for special parameters to jump for the second datagram 
+    if (m_streamCount == 1) {    // we are at the second datagram, streamCount is 0 based
+      if (m_secondDatagram) {
+        const XtcFileName & xtcFileForSecondDgram = m_secondDatagram->xtcFile;
+        off64_t offsetForSecondDgram = m_secondDatagram->offset;
+        MsgLog(logger,debug,"second datagram jump: will try to jump to offset=" 
+	       << offsetForSecondDgram << " in file=" << xtcFileForSecondDgram); 
+        // advance chunk file if need be
+        while (xtcFilesNotEqual(m_dgiter->path(), xtcFileForSecondDgram)) {
+          MsgLog(logger,debug,"second datagram jump, jmpFile != currentFile - "
+		 << xtcFileForSecondDgram << " != " << m_dgiter->path());
+          // get next file name
+          const XtcFileName& file = m_chunkIter->next();
+          
+          if (file.path().empty()) {
+	    // we went through all the files in the chunkIter
+            throw FileNotInStream(ERR_LOC, xtcFileForSecondDgram.path());
+          }
+          // open file
+          MsgLog(logger, trace, " looking for 2nd dgram - opening file: " << file) ;
+          m_dgiter = boost::make_shared<XtcChunkDgIter>(file, m_chunkIter->liveTimeout());
+          m_chunkCount = 0;
+        }
+        hptr = m_dgiter->nextAtOffset(offsetForSecondDgram);
+      } else {
+        // this is the second datagram (streamCount == 1), but no special jump to do
+        MsgLog(logger,debug,"second datagram, no jmp");
+        hptr = m_dgiter->next();
+      }
+    } else {
+      // typical case, streamCount != 1
+      hptr = m_dgiter->next();
+    }
 
     // if failed to read go to next file
     if (not hptr) {
@@ -134,7 +200,8 @@ XtcStreamDgIter::readAhead()
     } else {
       // read full datagram
       queueHeader(hptr);
-      ++ m_count ;
+      ++ m_chunkCount ;
+      ++ m_streamCount ;
     }
 
   }

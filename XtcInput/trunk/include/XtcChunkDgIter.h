@@ -3,10 +3,10 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcChunkDgIter.
+//     Class XtcChunkDgIter.
 //
 //------------------------------------------------------------------------
 
@@ -32,9 +32,9 @@
 #include "XtcInput/SharedFile.h"
 #include "XtcInput/XtcFileName.h"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//             ---------------------
+//             -- Class Interface --
+//             ---------------------
 
 namespace XtcInput {
 
@@ -93,6 +93,27 @@ public:
    *  @throw XTCExtentException Thrown if XTC header is corrupted and extend is below expected
    */
   boost::shared_ptr<DgHeader> next() ;
+
+  /**
+   *  @brief Returns next datagram header at offset, zero on EOF, throws exceptions for errors
+   *
+   *  Works the same as next() except reads datagram header from given offset. 
+   *  No check is made that a offset is correct and a datagram starts there.
+   *
+   *  @return Shared pointer to datagram header object
+   *
+   *  @throw XTCReadException Thrown for any read errors
+   *  @throw XTCLiveTimeout Thrown for timeout during live data reading
+   *  @throw XTCExtentException Thrown if XTC header is corrupted and extend is below expected
+   */
+  boost::shared_ptr<DgHeader> nextAtOffset(off64_t offset);
+
+  /**
+   *  @brief Returns XtcFileName for this chunk.
+   *
+   *  @return the xtc filename object for the chunk
+   */
+  const XtcFileName & path() const { return m_file.path(); }
 
 protected:
 

@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcStreamMerger...
+//     Class XtcStreamMerger...
 //
 // Author List:
-//      Andrei Salnikov
+//     Andrei Salnikov
 //
 //------------------------------------------------------------------------
 
@@ -20,8 +20,8 @@
 //-----------------
 #include <map>
 #include <iomanip>
+#include <sstream>
 #include <boost/make_shared.hpp>
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -36,6 +36,8 @@
 
 #define DBGMSG debug
 
+using namespace XtcInput;
+
 namespace {
 
 const char* logger = "XtcInput.XtcStreamMerger" ;
@@ -46,11 +48,30 @@ bool isDisable(const XtcInput::Dgram &dg) {
   return (nextService == Pds::TransitionId::Disable);
 }
 
-}
+boost::shared_ptr<XtcStreamDgIter::SecondDatagram> 
+checkForSecondDatagram(int stream, boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure) {
 
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
+  if (not firstEventAfterConfigure) {
+    MsgLog(logger, DBGMSG, "XtcStreamMerger: no second event position");
+    return boost::shared_ptr<XtcStreamDgIter::SecondDatagram>();
+  }
+  if (not firstEventAfterConfigure->hasStream(stream)) {
+    std::stringstream msg;
+    msg << stream;
+    throw StreamNotInPosition(ERR_LOC, msg.str());
+  }
+  std::pair<XtcFileName, off64_t> secondDatagramThisStream = firstEventAfterConfigure->getChunkFileOffset(stream);
+  boost::shared_ptr<XtcStreamDgIter::SecondDatagram> secondDgram = 
+    boost::make_shared<XtcStreamDgIter::SecondDatagram>(secondDatagramThisStream.first,
+                                                        secondDatagramThisStream.second);
+  return secondDgram;
+}
+  
+} // local namespace
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace XtcInput {
 
@@ -59,7 +80,8 @@ namespace XtcInput {
 //----------------
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
                                  double l1OffsetSec, int firstControlStream,
-                                 unsigned maxStreamClockDiffSec)
+                                 unsigned maxStreamClockDiffSec,
+                                 boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure) 
   : m_streams()
   , m_priorTransBlock()
   , m_processingDAQ(false)
@@ -67,6 +89,7 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_firstControlStream(firstControlStream)
   , m_streamDgramGreater(maxStreamClockDiffSec)
+  , m_firstEventAfterConfigure(firstEventAfterConfigure)
   , m_outputQueue(m_streamDgramGreater)
     
 {
@@ -81,9 +104,12 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
     bool controlStream = int(streamIter->stream()) >= m_firstControlStream;
     bool clockSort = not controlStream;
 
+    boost::shared_ptr<XtcStreamDgIter::SecondDatagram> secondDatagram = 
+      checkForSecondDatagram(streamIter->stream(), m_firstEventAfterConfigure);
+
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
-      boost::make_shared<XtcStreamDgIter>(chunkFileIter, clockSort) ;
+      boost::make_shared<XtcStreamDgIter>(chunkFileIter, secondDatagram, clockSort);
     if (controlStream) {
       StreamDgram dg(stream->next(), StreamDgram::controlUnderDAQ, 0, idxCtrl);
       StreamIndex streamIndex(StreamDgram::controlUnderDAQ, idxCtrl);

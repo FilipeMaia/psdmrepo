@@ -3,10 +3,10 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcMergeIterator.
+//     Class XtcMergeIterator.
 //
 //------------------------------------------------------------------------
 
@@ -27,14 +27,15 @@
 #include "XtcInput/RunFileIterI.h"
 #include "XtcInput/XtcStreamMerger.h"
 #include "XtcInput/XtcFileName.h"
+#include "XtcInput/XtcFilesPosition.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//             ---------------------
+//             -- Class Interface --
+//             ---------------------
 
 namespace XtcInput {
 
@@ -59,7 +60,8 @@ public:
   // Default constructor
   XtcMergeIterator(const boost::shared_ptr<RunFileIterI>& runIter, 
                    double l1OffsetSec, int firstControlStream,
-                   unsigned maxStreamClockDiffSec);
+                   unsigned maxStreamClockDiffSec,
+                   boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure);
 
 
   // Destructor
@@ -88,6 +90,8 @@ private:
   int m_firstControlStream;
   unsigned m_maxStreamClockDiffSec;
   boost::shared_ptr<XtcStreamMerger> m_dgiter ;  ///< Datagram iterator for current run
+  boost::shared_ptr<XtcFilesPosition> m_firstEventAfterConfigure;
+  bool m_firstRun;
 
 };
 

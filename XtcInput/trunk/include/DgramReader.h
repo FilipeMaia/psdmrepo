@@ -15,6 +15,8 @@
 //-----------------
 #include <string>
 #include <vector>
+#include "boost/shared_ptr.hpp"
+#include "boost/make_shared.hpp"
 
 //----------------------
 // Base Class Headers --
@@ -24,6 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/MergeMode.h"
+#include "XtcInput/XtcFilesPosition.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -61,7 +64,8 @@ public:
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
-              double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec)
+              double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec,
+              boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure)
     : m_files(begin, end)
     , m_queue( queue )
     , m_mode( mode )
@@ -71,6 +75,7 @@ public:
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(firstControlStream)
     , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
+    , m_firstEventAfterConfigure(firstEventAfterConfigure)
   {}
 
   // constructor with default parameters for parameters for handling control streams
@@ -110,6 +115,7 @@ private:
   double m_l1OffsetSec ;
   int m_firstControlStream;
   unsigned m_maxStreamClockDiffSec;
+  boost::shared_ptr<XtcFilesPosition> m_firstEventAfterConfigure;
 };
 
 } // namespace XtcInput

@@ -62,8 +62,13 @@ XtcChunkDgIter::~XtcChunkDgIter ()
 boost::shared_ptr<DgHeader>
 XtcChunkDgIter::next()
 {
-  // move to a correct position
-  if (m_file.seek(m_off, SEEK_SET) == (off_t)-1) {
+  return nextAtOffset(m_off);
+}
+
+boost::shared_ptr<DgHeader>
+XtcChunkDgIter::nextAtOffset(off64_t offset)
+{
+  if (m_file.seek(offset, SEEK_SET) == (off_t)-1) {
     throw XTCReadException(ERR_LOC, m_file.path().path());
   }
 
@@ -92,11 +97,11 @@ XtcChunkDgIter::next()
 
   // check header consistency
   if (header.xtc.extent < sizeof(Pds::Xtc)) {
-    throw XTCExtentException(ERR_LOC, m_file.path().path(), m_off, header.xtc.extent);
+    throw XTCExtentException(ERR_LOC, m_file.path().path(), offset, header.xtc.extent);
   }
 
   // make an object
-  hptr = boost::make_shared<DgHeader>(header, m_file, m_off);
+  hptr = boost::make_shared<DgHeader>(header, m_file, offset);
 
   // get position of the next datagram
   m_off = hptr->nextOffset();

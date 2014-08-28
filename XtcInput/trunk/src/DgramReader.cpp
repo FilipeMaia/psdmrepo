@@ -1,12 +1,12 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class DgramReader...
+//     Class DgramReader...
 //
 // Author List:
-//      Andrei Salnikov
+//     Andrei Salnikov
 //
 //------------------------------------------------------------------------
 
@@ -51,9 +51,9 @@ namespace {
 
 }
 
-//		----------------------------------------
-// 		-- Public Function Member Definitions --
-//		----------------------------------------
+//             ----------------------------------------
+//             -- Public Function Member Definitions --
+//             ----------------------------------------
 
 namespace XtcInput {
 
@@ -89,7 +89,7 @@ try {
     
     IData::Dataset ds(*it);
     
-    // make sure the stream number and range filters are not user together
+    // make sure the stream number and range filters are not used together
     if (ds.exists("one-stream") && ds.exists("stream")) throw DatasetSpecError(ERR_LOC, "cannot specify both 'one-stream' and 'stream'");
 
     if (ds.isFile()) {
@@ -270,7 +270,8 @@ try {
 
   if (runFileIter) {
 
-    XtcMergeIterator iter(runFileIter, m_l1OffsetSec, m_firstControlStream, m_maxStreamClockDiffSec);
+    XtcMergeIterator iter(runFileIter, m_l1OffsetSec, m_firstControlStream, 
+                          m_maxStreamClockDiffSec, m_firstEventAfterConfigure);
     Dgram dg;
     while ( not boost::this_thread::interruption_requested() ) {
 

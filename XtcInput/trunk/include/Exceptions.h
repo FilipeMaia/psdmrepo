@@ -59,6 +59,7 @@ public:
 
 };
 
+
 class ErrnoException : public Exception {
 public:
 
@@ -82,6 +83,28 @@ public:
 
   FileOpenException(const ErrSvc::Context& ctx, const std::string& fileName)
     : ErrnoException(ctx, "FileOpenException", "failed to open file "+fileName) {}
+
+};
+
+class FileNotInStream : public Exception {
+public:
+
+  FileNotInStream(const ErrSvc::Context& ctx, const std::string& fileName)
+    : Exception(ctx, "FileNotInStream", "ChunkFileIter does not contain file: " +fileName) {}
+
+};
+
+class StreamNotInPosition : public Exception {
+public:
+
+  StreamNotInPosition(const ErrSvc::Context& ctx, const std::string & stream)
+    : Exception(ctx, "StreamNotInPosition", "No file in Position for stream " + stream) {}
+};
+
+class JumpToDifferentRun : public Exception {
+public:
+
+  JumpToDifferentRun(const ErrSvc::Context& ctx) : Exception(ctx, "JumpToDifferentRun","") {}
 
 };
 

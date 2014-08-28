@@ -3,10 +3,10 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//     $Id$
 //
 // Description:
-//	Class XtcStreamMerger.
+//     Class XtcStreamMerger.
 //
 //------------------------------------------------------------------------
 
@@ -30,14 +30,15 @@
 #include "XtcInput/StreamFileIterI.h"
 #include "XtcInput/XtcStreamDgIter.h"
 #include "XtcInput/XtcFileName.h"
+#include "XtcInput/XtcFilesPosition.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//              ---------------------
+//              -- Class Interface --
+//              ---------------------
 
 namespace XtcInput {
 
@@ -70,10 +71,12 @@ public:
    *  @param[in]  firstControlStream starting stream number for fiducial merge
    *  @param[in]  maxStreamClockDiffSec maximum difference between stream clocks in seconds
    *              should be <= 85 seconds.
+   *  @param[in]  firstEventAfterConfigure if non-null, offsets for second event
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
                   double l1OffsetSec, int firstControlStream,
-                  unsigned maxStreamClockDiffSec) ;
+                  unsigned maxStreamClockDiffSec,
+                  boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure) ;
 
   // Destructor
   ~XtcStreamMerger () ;
@@ -141,6 +144,7 @@ private:
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   int m_firstControlStream ;                  ///< starting stream number for control streams
   StreamDgramGreater m_streamDgramGreater;    ///< for comparing two dgrams in the priority queue
+  boost::shared_ptr<XtcFilesPosition> m_firstEventAfterConfigure; ///< if non-null, offsets for second event
 
   typedef std::priority_queue<StreamDgram, std::vector<StreamDgram>, StreamDgramGreater> OutputQueue;
   OutputQueue m_outputQueue;                  ///< Output queue for datagrams
