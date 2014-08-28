@@ -171,9 +171,9 @@ class Psana( unittest.TestCase ) :
         calibtimes = run.times(2)
         self.assertEqual(len(calibtimes), 1, msg="incorrect number of events in calibstep. found %d, expect 1" % len(calibtimes))
         id = run.event(calibtimes[0]).get(psana.EventId)
-        self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from indexing. found %d, expect %d" % (id.fiducials(), expectFid[i]))
-        self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from indexing. found %d, expect %d" % (id.time()[0],expectSec[i]))
-        self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from indexing. found %d, expect %d" % (id.time()[1],expectNsec[i]))
+        self.assertEqual(id.fiducials(), expectFid[1], msg="incorrect fiducials from calibcycle-indexing. found %d, expect %d" % (id.fiducials(), expectFid[1]))
+        self.assertEqual(id.time()[0], expectSec[1], msg="incorrect seconds from calibcycle-indexing. found %d, expect %d" % (id.time()[0],expectSec[1]))
+        self.assertEqual(id.time()[1], expectNsec[1], msg="incorrect nanoseconds from calibcycle-indexing. found %d, expect %d" % (id.time()[1],expectNsec[1]))
         
     def test_MoreRecentEpicsStored(self):
         '''When the same epics pv is recorded from several sources, or several times in the same source, 
