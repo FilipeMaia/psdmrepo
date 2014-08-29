@@ -29,4 +29,4 @@ Import('*')
 #    NEED_QT - set to True to enable Qt support
 #
 #
-standardSConscript(PYEXTMOD="pypsalg_c",DOCGEN="doxy-all psana-doxy")
+standardSConscript(PYEXTMOD="pypsalg_c")
