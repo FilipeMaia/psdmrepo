@@ -93,6 +93,9 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
+
+private:
+
   void   printInputParameters();
   void   setWindowRange();
   void   printWindowRange();
@@ -114,9 +117,9 @@ protected:
   void   printPeakInfo(Peak& p);
   void   savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
   void   savePeaksInEvent(Event& evt);
+  void   savePeaksInEventAsNDArr(Event& evt);
   void   savePeaksInFile(Event& evt);
 
-private:
 
   enum{ MAX_IMG_SIZE=2000*2000 };
   enum{ MARGIN=10, MARGIN1=11 };
@@ -124,7 +127,8 @@ private:
   Pds::Src    m_src;
   Source      m_str_src;
   std::string m_key;
-  std::string m_peaksKey;
+  std::string m_key_peaks_vec;
+  std::string m_key_peaks_nda;
   double   m_thr_low;
   double   m_thr_high;
   double   m_sigma;    // smearing sigma in pixel size
@@ -156,7 +160,7 @@ private:
   double m_data_arr[MAX_IMG_SIZE];
   double m_work_arr[MAX_IMG_SIZE];
   TimeInterval *m_time;
-  std::vector<Peak> m_Peaks;
+  std::vector<Peak> v_peaks;
 };
 
 } // namespace ImgAlgos

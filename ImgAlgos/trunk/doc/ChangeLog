@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-58
+2014-08-29 Mikhail S. Dubrovin
+- in ImgPeakFinder add saving in the event store info about peaks as ndarray if m_key_peaks_nda is non-empty
+	
 Tag: V00-03-57
 2014-08-27 Mikhail S. Dubrovin
 - in ImgPeakFinder implicetly increase vector reserved capacity when it is exceeded

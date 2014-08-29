@@ -523,6 +523,19 @@ private:
   }
 
 //--------------------
+/// Save 1-D array in the calibStore for const T
+  template <typename T>
+  void save1DArrayInCalibStore(PSEnv::Env& env, const Pds::Src& src, const std::string& key, const ndarray<const T,1>& data)
+  {
+    boost::shared_ptr< ndarray<const T,1> > shp( new ndarray<const T,1>(data) );
+    env.calibStore().put(shp, src);
+    //env.calibStore().put(shp, src, key);
+  }
+
+//--------------------
+//--------------------
+//--------------------
+//--------------------
 /// Save 1-D array in event for const T
   template <typename T>
   void save1DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,1>& data)

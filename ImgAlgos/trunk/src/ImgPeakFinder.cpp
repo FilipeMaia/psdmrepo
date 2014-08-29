@@ -56,7 +56,8 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
-  , m_peaksKey()
+  , m_key_peaks_vec()
+  , m_key_peaks_nda()
   , m_thr_low()
   , m_thr_high()
   , m_sigma()
@@ -73,21 +74,22 @@ ImgPeakFinder::ImgPeakFinder (const std::string& name)
   , m_selected(0)
 {
   // get the values from configuration or use defaults
-  m_str_src    = configSrc("source",  "DetInfo()");
-  m_key        = configStr("key",              "");
-  m_peaksKey   = configStr("peaksKey",    "peaks");
-  m_thr_low    = config   ("threshold_low",    10);
-  m_thr_high   = config   ("threshold_high",  100);
-  m_sigma      = config   ("sigma",           1.5);
-  m_nsm        = config   ("smear_radius",      3);
-  m_npeak      = config   ("peak_radius",       3);
-  m_xmin       = config   ("xmin",              0);
-  m_xmax       = config   ("xmax",         100000);
-  m_ymin       = config   ("ymin",              0);
-  m_ymax       = config   ("ymax",         100000);
-  m_event      = config   ("testEvent",         0);
-  m_finderIsOn = config   ("finderIsOn",     true);
-  m_print_bits = config   ("print_bits",        0);
+  m_str_src       = configSrc("source",  "DetInfo()");
+  m_key           = configStr("key",              "");
+  m_key_peaks_vec = configStr("peaksKey",    "peaks");
+  m_key_peaks_nda = configStr("peaks_nda",        "");
+  m_thr_low       = config   ("threshold_low",    10);
+  m_thr_high      = config   ("threshold_high",  100);
+  m_sigma         = config   ("sigma",           1.5);
+  m_nsm           = config   ("smear_radius",      3);
+  m_npeak         = config   ("peak_radius",       3);
+  m_xmin          = config   ("xmin",              0);
+  m_xmax          = config   ("xmax",         100000);
+  m_ymin          = config   ("ymin",              0);
+  m_ymax          = config   ("ymax",         100000);
+  m_event         = config   ("testEvent",         0);
+  m_finderIsOn    = config   ("finderIsOn",     true);
+  m_print_bits    = config   ("print_bits",        0);
 
   std::fill_n(&m_data_arr[0], int(MAX_IMG_SIZE), double(0));
   std::fill_n(&m_work_arr[0], int(MAX_IMG_SIZE), double(0));
@@ -171,21 +173,22 @@ ImgPeakFinder::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n source     : "     << m_str_src
-	<< "\n key        : "     << m_key      
-	<< "\n peaksKey   : "     << m_peaksKey      
-	<< "\n thr_low    : "     << m_thr_low
-	<< "\n thr_high   : "     << m_thr_high
-	<< "\n sigma      : "     << m_sigma
-	<< "\n nsm        : "     << m_nsm
-	<< "\n npeak      : "     << m_npeak
-	<< "\n xmin       : "     << m_xmin     
-	<< "\n xmax       : "     << m_xmax     
-	<< "\n ymin       : "     << m_ymin     
-	<< "\n ymax       : "     << m_ymax     
-	<< "\n event      : "     << m_event     
-	<< "\n print_bits : "     << m_print_bits     
-	<< "\n finderIsOn : "     << m_finderIsOn;   
+        << "\n source        : " << m_str_src
+	<< "\n key           : " << m_key      
+	<< "\n key_peaks_vec : " << m_key_peaks_vec      
+	<< "\n key_peaks_nda : " << m_key_peaks_nda      
+	<< "\n thr_low       : " << m_thr_low
+	<< "\n thr_high      : " << m_thr_high
+	<< "\n sigma         : " << m_sigma
+	<< "\n nsm           : " << m_nsm
+	<< "\n npeak         : " << m_npeak
+	<< "\n xmin          : " << m_xmin     
+	<< "\n xmax          : " << m_xmax     
+	<< "\n ymin          : " << m_ymin     
+	<< "\n ymax          : " << m_ymax     
+	<< "\n event         : " << m_event     
+	<< "\n print_bits    : " << m_print_bits     
+	<< "\n finderIsOn    : " << m_finderIsOn;   
   }
 }
 
@@ -301,8 +304,8 @@ ImgPeakFinder::printWindowRange()
 bool
 ImgPeakFinder::procImage(Event& evt)
 {
-                     m_Peaks.clear();
-                     m_Peaks.reserve(100);
+                     v_peaks.clear();
+                     v_peaks.reserve(100);
                      setWindowRange();
                      saveImageInFile0(evt);
     if(m_sigma != 0) smearImage();        // convolution with Gaussian
@@ -311,6 +314,7 @@ ImgPeakFinder::procImage(Event& evt)
                      saveImageInFile1(evt);
 		     findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
 		     savePeaksInEvent(evt);
+		     savePeaksInEventAsNDArr(evt);
 		     savePeaksInFile(evt);
     return true;
 }
@@ -425,7 +429,7 @@ ImgPeakFinder::findPeaks(Event& evt)
   }
   if( m_print_bits & 4 ) MsgLog(name(), info, "Event:" << m_count 
                          << " Time:" << stringTimeStamp(evt) 
-			 << " Found number of peaks:" << (int)m_Peaks.size() ) ;
+			 << " Found number of peaks:" << (int)v_peaks.size() ) ;
 }
 
 //--------------------
@@ -480,8 +484,8 @@ ImgPeakFinder::printPeakInfo(Peak& p)
                                   << " ampmax=" << p.ampmax
                                   << " amptot=" << p.amptot 
                                   << " npix="   << p.npix
-                                  << " m_Peaks.size()=" << m_Peaks.size()
-                                  << " capacity()=" << m_Peaks.capacity() );
+                                  << " v_peaks.size()=" << v_peaks.size()
+                                  << " capacity()=" << v_peaks.capacity() );
 }
 
 //--------------------
@@ -489,12 +493,12 @@ ImgPeakFinder::printPeakInfo(Peak& p)
 void 
 ImgPeakFinder::savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
 {
-  if ( m_Peaks.size() == m_Peaks.capacity() ) {
-      m_Peaks.reserve( m_Peaks.capacity() + 100 );
-      if( m_print_bits & 8 ) MsgLog( name(), info, "Peaks vector capacity is increased to:" << m_Peaks.capacity() );
+  if ( v_peaks.size() == v_peaks.capacity() ) {
+      v_peaks.reserve( v_peaks.capacity() + 100 );
+      if( m_print_bits & 8 ) MsgLog( name(), info, "Peaks vector capacity is increased to:" << v_peaks.capacity() );
   }
   Peak onePeak = { (double)col, (double)row, amp, amp_tot, npix };
-  m_Peaks.push_back(onePeak);
+  v_peaks.push_back(onePeak);
   if( m_print_bits & 8 ) printPeakInfo( onePeak );
 }
 
@@ -503,8 +507,33 @@ ImgPeakFinder::savePeakInfo(size_t& row, size_t& col, double& amp, double& amp_t
 void 
 ImgPeakFinder::savePeaksInEvent(Event& evt)
 {
-  shared_ptr< std::vector<Peak> > sppeaks( new std::vector<Peak>(m_Peaks) );
-  if( m_Peaks.size() > 0 ) evt.put(sppeaks, m_src, m_peaksKey);
+  if(m_key_peaks_vec.empty()) return;
+
+  shared_ptr< std::vector<Peak> > sppeaks( new std::vector<Peak>(v_peaks) );
+  if( v_peaks.size() > 0 ) evt.put(sppeaks, m_src, m_key_peaks_vec);
+}
+
+//--------------------
+// Save peak vector in the event as ndarray
+void 
+ImgPeakFinder::savePeaksInEventAsNDArr(Event& evt)
+{
+  if(m_key_peaks_nda.empty()) return;
+
+  ndarray<float, 2> peaks_nda = make_ndarray<float>(int(v_peaks.size()), 5);
+
+  int i=-1;
+  for(vector<Peak>::const_iterator itv  = v_peaks.begin();
+                                   itv != v_peaks.end(); itv++) {
+    i++;
+    peaks_nda[i][0] = float(itv->x);
+    peaks_nda[i][1] = float(itv->y);
+    peaks_nda[i][2] = float(itv->ampmax);
+    peaks_nda[i][3] = float(itv->amptot);
+    peaks_nda[i][4] = float(itv->npix);
+  }
+
+  save2DArrayInEvent<float>(evt, m_src, m_key_peaks_nda, peaks_nda);
 }
 
 //--------------------
@@ -520,8 +549,8 @@ ImgPeakFinder::savePeaksInFile(Event& evt)
   ofstream file; 
   file.open(fname.c_str(),ios_base::out);
 
-  for( std::vector<Peak>::iterator itv  = m_Peaks.begin();
-                                   itv != m_Peaks.end(); itv++ ) {
+  for( std::vector<Peak>::iterator itv  = v_peaks.begin();
+                                   itv != v_peaks.end(); itv++ ) {
 
     if( m_print_bits & 16 ) printPeakInfo(*itv);
 
