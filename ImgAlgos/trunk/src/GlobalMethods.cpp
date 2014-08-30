@@ -317,6 +317,59 @@ std::string srcToString( const Pds::Src& src )
 }
 
 //--------------------
+
+DETECTOR_TYPE detectorTypeForStringSource(const std::string& str_src)
+{ 
+  if      ( str_src.find("Cspad.")     != std::string::npos ) return CSPAD; // from GlobalMethods.h
+  else if ( str_src.find("Cspad2x2.")  != std::string::npos ) return CSPAD2X2;
+  else if ( str_src.find("pnCCD.")     != std::string::npos ) return PNCCD;
+  else if ( str_src.find("Princeton.") != std::string::npos ) return PRINCETON;
+  else if ( str_src.find("Acqiris.")   != std::string::npos ) return ACQIRIS;
+  else if ( str_src.find("Tm6740.")    != std::string::npos ) return TM6740;
+  else if ( str_src.find("Opal1000.")  != std::string::npos ) return OPAL1000;
+  else if ( str_src.find("Opal2000.")  != std::string::npos ) return OPAL2000;
+  else if ( str_src.find("Opal4000.")  != std::string::npos ) return OPAL4000;
+  else if ( str_src.find("Opal8000.")  != std::string::npos ) return OPAL8000;
+  else if ( str_src.find(":Andor.")    != std::string::npos ) return ANDOR;
+  else if ( str_src.find(":OrcaFl40.") != std::string::npos ) return ORCAFL40;
+  else                                                        return OTHER;
+}
+
+//--------------------
+
+DETECTOR_TYPE detectorTypeForSource(PSEvt::Source& src)
+{ 
+  std::stringstream ss; ss << src;
+  return detectorTypeForStringSource(ss.str());
+}
+
+//--------------------
+
+std::string calibGroupForDetType(const DETECTOR_TYPE det_type)
+{ 
+  if      ( CSPAD     ) return "CsPad::CalibV1";
+  else if ( CSPAD2X2  ) return "CsPad2x2::CalibV1";
+  else if ( PNCCD     ) return "PNCCD::CalibV1";
+  else if ( PRINCETON ) return "Princeton::CalibV1";
+  else if ( ACQIRIS   ) return "Acqiris::CalibV1";
+  else if ( TM6740    ) return "Camera::CalibV1";
+  else if ( OPAL1000  ) return "Camera::CalibV1";
+  else if ( OPAL2000  ) return "Camera::CalibV1";
+  else if ( OPAL4000  ) return "Camera::CalibV1";
+  else if ( OPAL8000  ) return "Camera::CalibV1";
+  else if ( ANDOR     ) return "Andor::CalibV1";
+  else if ( ORCAFL40  ) return "Camera::CalibV1";
+  else                  return std::string(); 
+}
+
+//--------------------
+
+std::string calibGroupForSource(PSEvt::Source& src)
+{
+    DETECTOR_TYPE det_type = detectorTypeForSource(src);
+    return calibGroupForDetType(det_type);
+}
+
 //--------------------
 //--------------------
 //--------------------
