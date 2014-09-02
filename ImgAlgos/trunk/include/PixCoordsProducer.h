@@ -54,6 +54,8 @@ class PixCoordsProducer : public Module {
 public:
 
   typedef double coord_t;
+  typedef double area_t;
+  typedef unsigned coord_index_t;
 
   // Default constructor
   PixCoordsProducer (const std::string& name) ;
@@ -97,6 +99,9 @@ private:
   std::string m_key_out_x;        // Key for output pixel x-coordinate array
   std::string m_key_out_y;        // Key for output pixel y-coordinate array
   std::string m_key_out_z;        // Key for output pixel z-coordinate array
+  std::string m_key_out_a;        // Key for output pixel area array
+  std::string m_key_out_ix;       // Key for output pixel index x-coordinate array
+  std::string m_key_out_iy;       // Key for output pixel index y-coordinate array
   unsigned    m_print_bits;       // verbosity
 
   long m_count_run;
@@ -114,11 +119,19 @@ private:
   const coord_t* m_pixX;
   const coord_t* m_pixY;
   const coord_t* m_pixZ;
+  const area_t*  m_pixA;
+  const coord_index_t* m_pixIX;
+  const coord_index_t* m_pixIY;
   unsigned       m_size;
+  unsigned       m_size_a;
+  unsigned       m_size_ind;
 
-  ndarray<const coord_t,1> m_ndaX;
-  ndarray<const coord_t,1> m_ndaY;
-  ndarray<const coord_t,1> m_ndaZ;
+  ndarray<const coord_t,1>       m_ndaX;
+  ndarray<const coord_t,1>       m_ndaY;
+  ndarray<const coord_t,1>       m_ndaZ;
+  ndarray<const area_t,1>        m_ndaA;
+  ndarray<const coord_index_t,1> m_ndaIX;
+  ndarray<const coord_index_t,1> m_ndaIY;
 
   /// Regular check for available calibration parameters
   void checkCalibPars(Event& evt, Env& env);

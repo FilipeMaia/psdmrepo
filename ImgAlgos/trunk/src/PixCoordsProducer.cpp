@@ -58,6 +58,9 @@ PixCoordsProducer::PixCoordsProducer (const std::string& name)
   , m_key_out_x() 
   , m_key_out_y() 
   , m_key_out_z() 
+  , m_key_out_a() 
+  , m_key_out_ix() 
+  , m_key_out_iy() 
   , m_print_bits(0)
   , m_count_run(0)
   , m_count_event(0)
@@ -72,6 +75,9 @@ PixCoordsProducer::PixCoordsProducer (const std::string& name)
   m_key_out_x  = configStr("key_out_x", "x-pix-coords");
   m_key_out_y  = configStr("key_out_y", "y-pix-coords");
   m_key_out_z  = configStr("key_out_z", "z-pix-coords");
+  m_key_out_a  = configStr("key_out_area", "");
+  m_key_out_ix = configStr("key_out_ix",   "");
+  m_key_out_iy = configStr("key_out_iy",   "");
   m_print_bits = config   ("print_bits", 0);
 }
 
@@ -86,6 +92,9 @@ PixCoordsProducer::printInputParameters()
         << "\n key_out_x         : " << m_key_out_x
         << "\n key_out_y         : " << m_key_out_y
         << "\n key_out_z         : " << m_key_out_z
+        << "\n key_out_a         : " << m_key_out_a
+        << "\n key_out_ix        : " << m_key_out_ix
+        << "\n key_out_iy        : " << m_key_out_iy
         << "\n print_bits        : " << m_print_bits
         << "\n";     
 	 );
@@ -194,7 +203,7 @@ PixCoordsProducer::getConfigPars(Env& env)
   if ( getConfigParsForType<Psana::Epix::ConfigV1>(env) ) { m_config_vers = "Epix::ConfigV1"; return true; }
 
   m_count_warnings++;
-  if (m_count_warnings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-V5, Epix::ConfigV1 is not available in this event...")
+  if (m_count_warnings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-5, CsPad2x2::ConfigV1-2, Epix::ConfigV1 is not available in this event...")
   if (m_count_warnings ==20) MsgLog(name(), warning, "STOP PRINT WARNINGS !!!")
   return false;
 }
@@ -226,7 +235,14 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
   m_fname = fname;
 
   m_geometry = new PSCalib::GeometryAccess(fname, 0);
-  m_geometry -> get_pixel_coords(m_pixX, m_pixY, m_pixZ, m_size);
+  if(! m_key_out_x.empty()
+  or ! m_key_out_y.empty()
+  or ! m_key_out_z.empty())  m_geometry -> get_pixel_coords(m_pixX, m_pixY, m_pixZ, m_size);
+
+  if(! m_key_out_a .empty()) m_geometry -> get_pixel_areas(m_pixA, m_size_a);
+
+  if(! m_key_out_ix.empty()
+  or ! m_key_out_iy.empty()) m_geometry -> get_pixel_coord_indexes(m_pixIX, m_pixIY, m_size_ind);
 
   if( m_print_bits &  4 ) m_geometry -> print_list_of_geos();
   if( m_print_bits &  8 ) m_geometry -> print_list_of_geos_children();
@@ -235,9 +251,12 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
     cout << "X: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << m_pixX[i] << ", "; cout << "...\n"; 
   }
 
-  m_ndaX = make_ndarray(m_pixX, m_size);
-  m_ndaY = make_ndarray(m_pixY, m_size);
-  m_ndaZ = make_ndarray(m_pixZ, m_size);
+  if(! m_key_out_x .empty()) m_ndaX = make_ndarray(m_pixX,  m_size);
+  if(! m_key_out_y .empty()) m_ndaY = make_ndarray(m_pixY,  m_size);
+  if(! m_key_out_z .empty()) m_ndaZ = make_ndarray(m_pixZ,  m_size);
+  if(! m_key_out_a .empty()) m_ndaA = make_ndarray(m_pixA,  m_size_a); 
+  if(! m_key_out_ix.empty()) m_ndaIX= make_ndarray(m_pixIX, m_size_ind); 
+  if(! m_key_out_iy.empty()) m_ndaIY= make_ndarray(m_pixIY, m_size_ind); 
 
   return true;
 }
@@ -247,9 +266,12 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
 void 
 PixCoordsProducer::savePixCoordsInEvent(Event& evt)
 {
-  save1DArrayInEvent<PixCoordsProducer::coord_t>(evt, m_src, m_key_out_x, m_ndaX);
-  save1DArrayInEvent<PixCoordsProducer::coord_t>(evt, m_src, m_key_out_y, m_ndaY);
-  save1DArrayInEvent<PixCoordsProducer::coord_t>(evt, m_src, m_key_out_z, m_ndaZ);
+  if(! m_key_out_x.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_x,  m_ndaX);
+  if(! m_key_out_y.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_y,  m_ndaY);
+  if(! m_key_out_z.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_z,  m_ndaZ);
+  if(! m_key_out_a.empty())  save1DArrayInEvent<PixCoordsProducer::area_t>       (evt, m_src, m_key_out_a,  m_ndaA);
+  if(! m_key_out_ix.empty()) save1DArrayInEvent<PixCoordsProducer::coord_index_t>(evt, m_src, m_key_out_ix, m_ndaIX);
+  if(! m_key_out_iy.empty()) save1DArrayInEvent<PixCoordsProducer::coord_index_t>(evt, m_src, m_key_out_iy, m_ndaIY);
 }
 
 //--------------------
