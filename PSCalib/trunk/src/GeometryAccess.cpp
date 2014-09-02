@@ -366,8 +366,8 @@ GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX,
     double y_min=0; for(unsigned i=0; i<size; ++i) { if (Y[i] + y_off_um < y_min) y_min = Y[i] + y_off_um; } y_off_um -= y_min - pix_size/2;
 
     for(unsigned i=0; i<size; ++i) { 
-      p_iX[i] = (X[i] + x_off_um) / pix_size;
-      p_iY[i] = (Y[i] + y_off_um) / pix_size;
+      p_iX[i] = (unsigned)((X[i] + x_off_um) / pix_size);
+      p_iY[i] = (unsigned)((Y[i] + y_off_um) / pix_size);
     }
   } 
   else {
@@ -375,8 +375,8 @@ GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX,
     double x_min=X[0]; for(unsigned i=0; i<size; ++i) { if (X[i] < x_min) x_min = X[i]; } x_min -= pix_size/2;
     double y_min=Y[0]; for(unsigned i=0; i<size; ++i) { if (Y[i] < y_min) y_min = Y[i]; } y_min -= pix_size/2;
     for(unsigned i=0; i<size; ++i) { 
-      p_iX[i] = (X[i] - x_min) / pix_size;
-      p_iY[i] = (Y[i] - y_min) / pix_size;
+      p_iX[i] = (unsigned)((X[i] - x_min) / pix_size);
+      p_iY[i] = (unsigned)((Y[i] - y_min) / pix_size);
     }
   }
 

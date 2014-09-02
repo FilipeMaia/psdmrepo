@@ -248,8 +248,8 @@ public:
   static ndarray<image_t, 2>
   img_from_pixel_arrays(const unsigned*& iX, 
                         const unsigned*& iY, 
-                        const double* W = NULL,
-                        const unsigned& size = 0);
+                        const double*    W = 0,
+                        const unsigned&  size = 0);
 
 protected:
 
