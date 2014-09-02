@@ -11,7 +11,7 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-03-59
+Tag: V00-03-60
 2014-09-02 Mikhail S. Dubrovin
 - in PixCoordsProducer add new keyword-parameters which allows to get pixel area and index iX, iY arrays for image
 
