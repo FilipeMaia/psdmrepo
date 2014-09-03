@@ -308,21 +308,20 @@ private:
     IndexEvent last(0,0,0);
     _calibTimeIndex.clear();
     std::vector<IndexCalib>::const_iterator caliter = _idxcalib.begin();
-    // check error conditions here
-    unsigned evtcount = 0;
     for (vector<IndexEvent>::iterator itev = _idx.begin(); itev != _idx.end(); ++ itev) {
       if (*itev!=last) {
         _times.push_back(psana::EventTime(itev->entry.time(),itev->entry.uFiducial));
         last = *itev;
-	if (itev->entry.time() > caliter->entry.time()) {
-	  _calibTimeIndex.push_back(evtcount);
-	  ++caliter;
-	}
-	++evtcount;
+        if (caliter != _idxcalib.end()) {
+          if (itev->entry.time() > caliter->entry.time()) {
+            // put the array-offset of the first event in this
+            // calibcycle into the list.
+            _calibTimeIndex.push_back(_times.size()-1);
+            ++caliter;
+          }
+        }
       }
     }
-    if (_calibTimeIndex.size() != _idxcalib.size())
-      MsgLog(logger, fatal, "Configure transition not found in first 2 datagrams");
   }
 
   // add a datagram with "event" data (versus nonEvent data, like epics)
@@ -554,6 +553,8 @@ public:
   }
 
   void times(unsigned step, psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) const {
+    if (_calibTimeIndex.size() != _idxcalib.size())
+      MsgLog(logger, fatal, "Incorrect number of calibcycles: " << _calibTimeIndex.size() << " " << _idxcalib.size());
     if (step>=_calibTimeIndex.size()) MsgLog(logger, fatal, "Requested step " << step << " not in range.  Number of steps in this run: " << _idxcalib.size());
     begin = _times.begin()+_calibTimeIndex[step];
     if (step==_calibTimeIndex.size()-1) { // the last calibstep
