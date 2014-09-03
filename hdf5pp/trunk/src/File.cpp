@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -37,6 +38,18 @@ namespace {
       delete id ;
     }
   };
+
+  std::string CreateMode2str(hdf5pp::File::CreateMode mode) {
+    if (mode == hdf5pp::File::Truncate) return "Truncate";
+    if (mode == hdf5pp::File::Exclusive) return "Exclusive";
+    return "*unknown*";
+  }
+
+  std::string OpenMode2str(hdf5pp::File::OpenMode mode) {
+    if (mode == hdf5pp::File::Read) return "Read";
+    if (mode == hdf5pp::File::Update) return "Update";
+    return "*unknown*";
+  }
 
 }
 
@@ -79,7 +92,9 @@ File::create( const std::string& path,
   if ( mode == Truncate ) flags = H5F_ACC_TRUNC ;
   hid_t f_id = H5Fcreate ( path.c_str(), flags, plCreate.plist(), plAccess.plist() ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( ERR_LOC, "H5Fcreate") ;
+    std::stringstream callMsg;
+    callMsg << "H5Fcreate path=" << path <<" mode=" << CreateMode2str(mode);
+    throw Hdf5CallException( ERR_LOC, callMsg.str()) ;
   }
   return File(f_id) ;
 }
@@ -96,7 +111,9 @@ File::open( const std::string& path,
   if ( mode == Update ) flags = H5F_ACC_RDWR ;
   hid_t f_id = H5Fopen ( path.c_str(), flags, plAccess.plist() ) ;
   if ( f_id < 0 ) {
-    throw Hdf5CallException( ERR_LOC, "H5Fopen") ;
+    std::stringstream callMsg;
+    callMsg << "H5Fopen path=" << path <<" mode=" << OpenMode2str(mode);
+    throw Hdf5CallException( ERR_LOC, callMsg.str()) ;
   }
   return File(f_id) ;
 }

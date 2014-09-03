@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-08
+2014-09-03 David Schneider
+- more informative error message when fail to create or open a file
+
 Tag: V00-07-07
 2014-07-03 David Schneider
 - add File::id() to get hdf5 file id for object
