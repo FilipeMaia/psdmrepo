@@ -138,9 +138,9 @@ DgramSourceFile::init()
   m_maxStreamClockDiffSec = config("max_stream_clock_diff",85);
 
   std::list<off64_t> emptyOffsets;
-  std::list<off64_t> offsets =  configList("second_event_jump_offsets",emptyOffsets);
+  std::list<off64_t> offsets =  configList("third_event_jump_offsets",emptyOffsets);
   std::list<std::string> emptyStrings;
-  std::list<std::string> filenames = configList("second_event_jump_filenames",emptyStrings);
+  std::list<std::string> filenames = configList("third_event_jump_filenames",emptyStrings);
 
   boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure;
   if ((offsets.size() > 0) or (filenames.size() > 0)) {
