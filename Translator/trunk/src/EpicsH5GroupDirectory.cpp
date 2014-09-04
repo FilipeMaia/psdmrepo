@@ -258,7 +258,7 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
                                             boost::shared_ptr<PSEvt::EventId> eventId) 
 {
   if (not checkIfStoringEpics()) return;
-  if (m_splitScanMgr->noSplitOrJob0()) {
+  if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
     if (currentConfigGroup<0) MsgLog(logger(), fatal, "processBeginJob passed invalid group");
     m_configureGroup = currentConfigGroup;
   } 
@@ -268,7 +268,7 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
   }
   m_epicsStatus = hasEpics;
 
-  if (not m_splitScanMgr->noSplitOrJob0()) return;
+  if (not m_splitScanMgr->thisJobWritesMainOutputFile()) return;
   
   createEpicsTypeAndSrcGroups(m_configureGroup, "config",  
                               m_configEpicsTypeGroup, m_configEpicsSrcGroup);

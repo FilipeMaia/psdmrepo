@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2014-09-03 David Schneider
+- Introduce mpi based split scan. Adds dependency on openmpi.
+- Some cleanup/refactoring. Make some H5Output functionality public
+  so it can be accessed from H5MpiTranslateApp	
+
 Tag: V00-01-30
 2014-08-06 David Schneider
 - adjust unit tests to use $SIT_ROOT environment variable to 

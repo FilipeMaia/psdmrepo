@@ -114,6 +114,7 @@ class HdfWriterEpicsPv {
       hid_t fileTypeId = epicsWriteBuffer.getFileH5Type();
       hid_t memTypeId = epicsWriteBuffer.getMemH5Type();
       size_t dsetIdx = -1;
+      if (not eventId) MsgLog("Translator.HdfWriterEpicsPv.doDispatch",fatal,"null eventId: dispatchAction=" << dispatchAction);
       switch (dispatchAction) {
       case CreateWriteClose:
         dsetIdx = m_hdfWriterGeneric->createFixedSizeDataset(groupId, "data", 

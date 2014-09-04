@@ -35,13 +35,6 @@
 
 namespace Translator {
 
-class LessEventKey {
-public:
-  bool operator()(const PSEvt::EventKey & a, const PSEvt::EventKey & b ) const { 
-    return a < b; 
-  }
-};
-
 /**
  *  @ingroup Translator
  *
@@ -59,8 +52,6 @@ public:
  */
 class H5Output : public Module {
 public:
-  enum SplitMode { NoSplit, Family, SplitScan };
-
   H5Output(std::string);
   virtual ~H5Output();
  
@@ -72,17 +63,31 @@ public:
   virtual void endRun(Event& evt, Env& env);
   virtual void endJob(Event& evt, Env& env);
 
+  boost::shared_ptr<SplitScanMgr> splitScanMgr() { return m_splitScanMgr; }
+
+  hdf5pp::Group currentRunGroup() { return m_currentRunGroup; }
+
+  hdf5pp::Group currentConfigureGroup() { return m_currentConfigureGroup; }
+
+  /// name for the CalibStore in the hdf5 file
+  static const std::string calibStoreGroupName; 
+
   friend class Translator::ChunkManager;
 
 protected:  
+
   void init();
+  void createH5OutputFile();
   void readConfigParameters();
+
+  static const std::string & msgLoggerName();
+
   template <typename T>
     T configReportIfNotDefault(const std::string &param, const T &defaultValue) const
     {
       T configValue = config(param,defaultValue);
       if ((configValue != defaultValue) and (not m_quiet)) {
-        MsgLog(name(),info," param " << param << " = " << configValue << " (non-default value)");
+        MsgLog(msgLoggerName(),info," param " << param << " = " << configValue << " (non-default value)");
       }
       return configValue;
     }
@@ -90,40 +95,44 @@ protected:
                                                       const std::list<std::string> &defaultValue) const;
   void addCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
-  void createH5OutputFile();
-  void createNextConfigureGroup();
-  void setEventVariables(Event &evt, Env &env);
-  void addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
+  void createNextConfigureGroup(boost::shared_ptr<EventId> eventId);
+  void addConfigTypes(PSEvt::Event &evt,
+		      PSEnv::Env &env,
+		      TypeSrcKeyH5GroupDirectory &configGroupDirectory,
                       hdf5pp::Group & parentGroup);
-  void createNextRunGroup();
-  void createNextCalibCycleGroup();
+  void createNextRunGroup(boost::shared_ptr<EventId> eventId);
+  void createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId);
   void createNextCalibCycleExtLink(const char *linkName, hdf5pp::Group &runGroup);
-  void lookForAndStoreCalibData();
-  void eventImpl();
-  void setDamageMapFromEvent();
-  Pds::Damage getDamageForEventKey(const EventKey &eventKey);
+  void lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup);
+  void eventImpl(PSEvt::Event &evt, PSEnv::Env &env);
+  Pds::Damage getDamageForEventKey(const EventKey &eventKey, 
+				   boost::shared_ptr<PSEvt::DamageMap> damageMap);
 
-  boost::shared_ptr<HdfWriterFromEvent> checkTranslationFilters(const EventKey &eventKey, 
-                                                           bool checkForCalibratedKey);
-  std::list<PSEvt::EventKey> getUpdatedConfigKeys();
-  void setEventKeysToTranslate(std::list<EventKeyTranslation> & toTranslate,
+  boost::shared_ptr<HdfWriterFromEvent> checkTranslationFilters(PSEvt::Event &evt,
+								const EventKey &eventKey, 
+								bool checkForCalibratedKey);
+  std::list<PSEvt::EventKey> getUpdatedConfigKeys(PSEnv::Env &env);
+  void setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
+			       std::list<EventKeyTranslation> & toTranslate,
                                std::list<PSEvt::EventKey> &filtered);
   
-  void addToFilteredEventGroup(const std::list<EventKey> &eventKeys, const PSEvt::EventId &eventId);
+  void addToFilteredEventGroup(PSEvt::Event &evt, PSEnv::Env &env, const std::list<EventKey> &eventKeys, const PSEvt::EventId &eventId);
   void closeH5File();
 
   bool srcIsFiltered(const Pds::Src &);
   bool keyIsFiltered(const std::string &key);
 
   void filterHdfWriterMap();
-  void initializeSrcAndKeyFilters();
+  void initializeSrcAndKeyFilters(PSEnv::Env &env);
   std::string eventPosition();
 
   /// returns true if C++ type is an ndarray that the system can translate
   bool isNDArray(const type_info *typeInfoPtr);
 
-  void checkForNewWriters();
+  void checkForNewWriters(PSEvt::Event &evt);
   bool checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(const std::type_info *);
+
+  void reportRunTime();
 
 private:
   hdf5pp::File m_h5file;
@@ -134,6 +143,7 @@ private:
   size_t m_currentEventCounter; // reset when a CalibCycle begins
   size_t m_totalEventsProcessed;
   size_t m_totalCalibCyclesProcessed;
+  size_t m_minEventsPerMPIWorker;
   size_t m_filteredEventsThisCalibCycle;
   size_t m_maxSavedPreviousSplitEvents;
   hdf5pp::Group m_currentConfigureGroup;
@@ -150,17 +160,14 @@ private:
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<HdfWriterDamage> m_hdfWriterDamage;
 
-  boost::shared_ptr<PSEvt::DamageMap> m_damageMap;
-  Event *m_event;
-  Env *m_env;
   boost::shared_ptr<EventId> m_eventId;
 
   std::map<PSEvt::EventKey, long>  m_configStoreUpdates;
   long m_totalConfigStoreUpdates;
 
   struct BlankNonBlanks {
-    std::map<PSEvt::EventKey, long, LessEventKey> blanks;
-    std::set<PSEvt::EventKey, LessEventKey> nonblanks;
+    std::map<PSEvt::EventKey, long> blanks;
+    std::set<PSEvt::EventKey> nonblanks;
   };
   typedef std::map< boost::shared_ptr<PSEvt::EventId>,  
                     BlankNonBlanks, 
@@ -185,13 +192,13 @@ private:
 
   /////////////////////////////////
   // parameters read in from config:
-  // key parameters 
   std::string m_h5fileName;
-  SplitMode m_split;
-  int m_jobNumber, m_jobTotal;
-  hsize_t m_splitSize;
-
   bool m_overwrite;
+
+  SplitScanMgr::SplitMode m_split;
+  int m_jobNumber, m_jobTotal;
+  int m_mpiWorkerStartCalibCycle;
+  hsize_t m_splitSize;  
 
   // translation parameters
   std::map<std::string, bool> m_typeInclude;  // each type alias will be read in 
@@ -206,7 +213,7 @@ private:
   bool m_skip_calibrated;
   bool m_exclude_calibstore;
 
-  std::set<PSEvt::EventKey, LessEventKey> m_calibratedEventKeys;
+  std::set<PSEvt::EventKey> m_calibratedEventKeys;
 
   bool m_quiet;
 

@@ -52,6 +52,8 @@
 //  use_fortran_stride = false     # this creates arrays with a fortran stride
 //                                 # which is presently not supported in the Translator
 //  add_vlen_prefix = true         # will cause translate_vlen: to be added to the front of the keys
+//  skip_event = 0                 # set to positive event number and module will call skip()
+//                                 # use 1-up value for event
 //
 // The modules
 // TestModuleReadVlenNDArrayString
@@ -97,6 +99,8 @@ public:
     m_use_fortran_stride = config("use_fortran_stride", false);
     m_vlen_prefix = config("vlen_prefix",false);
     m_ndarrayKeyPrefix = m_vlen_prefix ? string("translate_vlen:") : string();
+    // option to skip one event (use 1-up event counter)
+    m_skipEvent = config("skip_event",0);
   }
 
   virtual void beginJob(Event& evt, Env& env) {
@@ -106,6 +110,7 @@ public:
   virtual void event(Event& evt, Env& env) {
     ++m_eventCounter;
     MsgLog(name(),debug,"Event number (1-up counter): " << m_eventCounter);
+    if (m_skipEvent == int(m_eventCounter)) skip();
     // put two strings in event queue
     ostringstream s1, s2;
     s1 << "This is event number: " << m_eventCounter;
@@ -209,7 +214,7 @@ private:
   bool m_use_fortran_stride, m_vary_array_sizes;
   bool m_vlen_prefix;
   string m_ndarrayKeyPrefix;
-  
+  int m_skipEvent;
 };
 
 PSANA_MODULE_FACTORY(TestModuleNDArrayString);

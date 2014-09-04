@@ -10,17 +10,20 @@
 #--------------------------------
 import sys
 import os
+import stat
 import tempfile
 import unittest
 import subprocess as sb
 import collections
 import math
 import numpy as np
-import psana
+import glob
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import psana
 import h5py
+import psana_test.psanaTestLib as ptl
 
 # -----------------------------
 # Test data
@@ -50,8 +53,144 @@ TESTDATA_CALIBDAMAGE = os.path.join(DATADIR, "test_080_cxi_cxi83714_e379-r0121-s
 TESTDATA_TIMETOOL = os.path.join(DATADIR, "test_081_xpp_xppi0214_e439-r0054-s00-c00.xtc")
 
 #------------------
-# Utility functions 
+# Utility functions / classes
 #------------------
+def makeTempMpiLaunch():
+    '''Makes a temporary executable (for user) file in data/Translator/mpilaunch_xxx 
+    File will start as
+    
+    #!/bin/bash
+
+    . sit_setup.sh
+
+    with a full path to sit_setup.sh, it will then run all following arguments.
+
+    returns the filename,  user must delete file when done
+    '''
+    sitsetupScript = 'sit_setup.sh'
+    sitSetupCmd = sb.check_output(['which',sitsetupScript]).strip()
+    assert sitSetupCmd.endswith(sitsetupScript), "no sit_setup.sh script found"
+    (mpilaunchHandle, mpilaunchFileName) = tempfile.mkstemp(prefix='mpilaunch_', dir=OUTDIR )
+    
+    os.write(mpilaunchHandle,'#!/bin/bash\n\n. %s\n\n$@' % sitSetupCmd)
+    os.close(mpilaunchHandle)
+    st=os.stat(mpilaunchFileName)
+    os.chmod(mpilaunchFileName,st.st_mode | stat.S_IEXEC)
+    return mpilaunchFileName
+
+def makeMpiTransCmd(min_events_per_calib_file, 
+                    num_events_check_done_calib_file,
+                    output_h5, dsString, downstreamModules=None, extraOptions=None, njobs=2):
+    '''Makes a command line that uses mpirun to launch h5-mpi-translate to produce
+    the given output file from the given input source. Defaults to use 2 jobs.
+
+    returns the cmd, and mpilaunch filename - that filename should be deleted when done
+    '''
+    mpilaunchFileName = makeTempMpiLaunch()
+
+    mpiRunCmd = sb.check_output(['which','mpirun']).strip()
+    assert mpiRunCmd.endswith('mpirun'), "no mpirun command found"
+
+    transCmd = '%s -n %d %s h5-mpi-translate' % (mpiRunCmd, njobs, mpilaunchFileName)
+
+    transCmd += ' -m '
+    if downstreamModules is not None:
+        assert len(downstreamModules)>0
+        transCmd += ','.join(downstreamModules)
+        transCmd += ','
+    transCmd += 'Translator.H5Output'
+    transCmd += ' -o Translator.H5Output.output_file=%s' % output_h5
+    transCmd += ' -o Translator.H5Output.overwrite=True'
+    transCmd += ' -o Translator.H5Output.min_events_per_calib_file=%d' % min_events_per_calib_file
+    transCmd += ' -o Translator.H5Output.num_events_check_done_calib_file=%d' % num_events_check_done_calib_file
+    if extraOptions is not None:
+        assert len(extraOptions)>0
+        for opt in extraOptions:
+            transCmd += ' -o %s' % opt
+    transCmd += ' %s' % dsString
+
+    return transCmd, mpilaunchFileName
+
+class MpiTestHelper(object):
+    '''Helper class that takes parameters for running mpi translate on input.
+    It then translates the input and runs psana_test.dump on original xtc and 
+    translated.
+
+    When the object is deleted, it removes files if required to. 
+    
+    After initializing, one can look at:
+    
+    self.output_h5    # name of translated master h5 file
+    self.xtc_dump     # dump of original xtc 
+    self.h5_dump      # dump of h5
+
+    self.cleanup()    # remove any of the expected output files, if they exist
+    '''
+    def __init__(self, testName, 
+                 min_events_per_calib_file,
+                 num_events_check_done_calib_file,
+                 dataSourceString = 'exp=xppd9714:run=16:dir=%s' % SPLITSCANDATADIR,
+                 njobs=2, transCmdTimeOut=3*60, cleanUp=True, verbose=False,
+                 doDump=True, downstreamModules=None, extraOptions=None):
+
+        global OUTDIR
+        self.output_h5 = os.path.join(OUTDIR,'unit-test-%s.h5' % testName)
+        if doDump:
+            self.xtc_dump = os.path.join(OUTDIR,'unit-test-%s.xtc.dump' % testName)
+            self.h5_dump = os.path.join(OUTDIR,'unit-test-%s.h5.dump' % testName)
+        self.doCleanUp = cleanUp
+        self.transCmd, self.mpilaunchFileName = \
+            makeMpiTransCmd(min_events_per_calib_file = min_events_per_calib_file,
+                            num_events_check_done_calib_file = num_events_check_done_calib_file,
+                            output_h5 = self.output_h5,
+                            dsString=dataSourceString,
+                            downstreamModules=downstreamModules,
+                            extraOptions=extraOptions,
+                            njobs=njobs)
+        if verbose:
+            print "------- trans cmd -------"
+            print self.transCmd
+        o,e = ptl.cmdTimeOut(self.transCmd, transCmdTimeOut)
+        if verbose:
+            print " ------- trans stdout ------"
+            print o
+            print " ------- trans stderr ------"
+            print e
+        eLns = e.split('\n')
+        eLns = [ln for ln in eLns if ptl.filterPsanaStderr(ln)]
+        eLns = [ln for ln in eLns if len(ln.strip())>0]
+        noWarningLns = []
+        for ln in eLns:
+            if ln[0:10].lower().find('warning')>=0:
+                continue
+            noWarningLns.append(ln)
+        assert len(noWarningLns)==0, "error running mpi translation. stderr=%s" % e
+
+        if doDump:
+            cmd,err = ptl.psanaDump(dataSourceString, self.xtc_dump, dumpBeginJobEvt=False, verbose=verbose)
+            assert err=='', "something wrong with cmd=%s\nerror:%s" % (cmd,err)
+
+            cmd, err = ptl.psanaDump(self.output_h5, self.h5_dump, verbose=verbose)
+            assert err=='', "something wrong with cmd=%s\nerror:%s" % (cmd,err)
+        
+    def __del__(self):
+        if self.doCleanUp:
+            self.cleanup()
+
+    def cleanup(self):
+        toDelete = [self.mpilaunchFileName, self.output_h5]
+        if hasattr(self,'xtc_dump'):
+            toDelete.append(self.xtc_dump)
+        if hasattr(self,'h5_dump'):
+            toDelete.append(self.h5_dump)
+        ccPattern = self.output_h5.replace('.h5','_cc*.h5')
+        toDelete.extend(glob.glob(ccPattern))
+ 
+        for fname in toDelete:
+            if os.path.exists(fname):
+                os.unlink(fname)
+
+        
 def makeH5OutputNameFromXtc(xtcfile):
     xtcbase = os.path.basename(xtcfile)
     h5out = os.path.join(OUTDIR, os.path.splitext(xtcbase)[0]) + '.h5'
@@ -1212,11 +1351,8 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
-#    @unittest.skip("disabled no data access")
     def test_calibstore(self):
         '''runs on xpptut data to see if calibration stuff gets written.
-        Note - this data is not in the translator test directory. It has to be on disk
-        for the test to succeed.
         '''
         input_file = "exp=xpptut13:run=71:dir=%s" % XPPTUTDATADIR
         output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
@@ -1488,6 +1624,76 @@ class H5Output( unittest.TestCase ) :
 
         if self.cleanUp:
             os.unlink(output_h5)
+
+    def test_observeSkipEvents(self):
+        '''if downstream module calls skips, does Translator see this and skip?
+        '''
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR,'unit_test_observeSkipEvents.h5')
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        cfgfile.file.write("[Translator.TestModuleNDArrayString]\n")
+        cfgfile.file.write("skip_event=1\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=self.printPsanaOutput)
+        f=h5py.File(output_h5,'r')
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data']
+        self.assertEqual(1,len(double3D),msg="downstream module skipped first event. Expected 1 translated event, but found %d" % len(double3D))
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_mpiSplitScan_oneCalibPerExternalFile(self):
+        '''test that mpi split scan works when running similar to how non-mpi split scan worked.
+        That is one calib cycle per external file"
+        '''
+        mpiTest = MpiTestHelper('mpiSplitScan_oneCalibPerCcFile',
+                                min_events_per_calib_file=1,
+                                num_events_check_done_calib_file=2,
+                                verbose=False,
+                                cleanUp = self.cleanUp)
+        
+        diff_cmd = 'diff %s %s' % (mpiTest.xtc_dump, mpiTest.h5_dump)
+        p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(o,'',msg='cmd: %s\nhas stdout=%s' % (diff_cmd, o))
+        self.assertEqual(e,'',msg='cmd: %s\nhas stderr=%s' % (diff_cmd, e))
+
+    def test_mpiSplitScan_twoCalibPerExternalFile(self):
+        '''two calib cycles per external file'''
+
+        mpiTest = MpiTestHelper('mpiSplitScan_twoCalibPerCcFile',
+                                min_events_per_calib_file=2,
+                                num_events_check_done_calib_file=2,
+                                cleanUp = self.cleanUp,
+                                verbose = False)
+        
+        diff_cmd = 'diff %s %s' % (mpiTest.xtc_dump, mpiTest.h5_dump)
+        p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(o,'',msg='cmd: %s\nhas stdout=%s' % (diff_cmd, o))
+        self.assertEqual(e,'',msg='cmd: %s\nhas stderr=%s' % (diff_cmd, e))
+
+    def test_mpiCalibStore(self):
+        '''test if the calibstore gets translated in mpi mode
+        '''
+        inputString= "exp=xpptut13:run=71:dir=%s" % XPPTUTDATADIR
+        mpiTest = MpiTestHelper('mpiSplitScan',
+                                min_events_per_calib_file=2,
+                                num_events_check_done_calib_file=2,
+                                dataSourceString = inputString,
+                                cleanUp = self.cleanUp,
+                                verbose = False,
+                                doDump = False,
+                                downstreamModules = ["cspad_mod.CsPadCalib"],
+                                extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])
+
+        f = h5py.File(mpiTest.output_h5,'r')
+        calibStore=f['/Configure:0000/CalibStore']
+        self.assertEqual(set(calibStore.keys()), 
+                         set([u'pdscalibdata::CsPad2x2PedestalsV1', 
+                              u'pdscalibdata::CsPad2x2PixelStatusV1',
+                              u'pdscalibdata::CsPadCommonModeSubV1',
+                              u'pdscalibdata::CsPad2x2PixelGainV1']),
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1, pdscalibdata::CsPad2x2PixelGainV1")
 
     def test_epics(self):
         '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.
