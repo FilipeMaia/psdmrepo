@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2014-09-03 David Schneider
+- add tests for mpi split scan translator.
+- change test for new config file options in PSXtcInput to 'third event'
+- add option to psana dump module to skip dump of beginJob events - to get
+  mpi translate dump to look like typical translate dump - see JIRA PSAS-26
+	
 Tag: V00-00-25
 2014-08-28 Christopher O'Grady
 - switch to analyzing a smaller version of run 15, given the

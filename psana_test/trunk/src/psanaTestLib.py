@@ -264,7 +264,7 @@ def get_md5sum(fname, verbose=False):
     assert flds[1] == fname, "output of md5 did not have filename in second field, flds[1]=%s, while filename=%s and flds[0]=%s" % (flds[1], fname, flds[0])
     return flds[0]
 
-def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False):
+def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDump=True, verbose=False, dumpBeginJobEvt=True):
     '''Runs the  psana_test.dump module on the inDataset and saves the output
     to outfile. Returns output to stderr from the run, filtered as per the
     filterPsanaStderr function
@@ -276,7 +276,10 @@ def psanaDump(inDataset, outfile, events=None, dumpEpicsAliases=False, regressDu
     if not dumpEpicsAliases:
         epicAliasStr = '-o psana_test.dump.aliases=False'
     regressDumpStr = '-o psana_test.dump.regress_dump=%r' % regressDump
-    cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, inDataset)
+    beginJobEvtStr = ''
+    if not dumpBeginJobEvt:
+        beginJobEvtStr = '-o psana_test.dump.dump_beginjob_evt=False'
+    cmd = 'psana  -c "" %s -m psana_test.dump %s %s %s %s' % (numEventsStr, epicAliasStr, regressDumpStr, beginJobEvtStr, inDataset)
     if verbose: print cmd
     p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
     out,err = p.communicate()

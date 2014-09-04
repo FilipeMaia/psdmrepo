@@ -11,6 +11,7 @@ class dump(object):
         self.aliasesParam  = self.configBool('aliases', True)
         self.followEpicsAliases = self.configBool('dump_aliases',False)
         self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
+        self.beginJobEvt = self.configBool('dump_beginjob_evt',True)
         # if outputFile is set, all output will be written to that file, if 
         # not in parallel mode, otherwise, that file + '.subproc_n' where n 
         # n is the subprocess number
@@ -61,7 +62,8 @@ class dump(object):
                 self.fout.write( "%s%s\n" % (indent, alias))
         self.dumpEpics(evt, env)
         self.dumpConfig(evt, env)
-        self.dumpEvent(evt, env)
+        if self.beginJobEvt:
+            self.dumpEvent(evt, env)
         self.fout.flush()
 
     def beginrun(self, evt, env):

@@ -499,8 +499,8 @@ class Psana( unittest.TestCase ) :
         self.assertEqual(prev_md5, md5, msg=failMsg)
         os.unlink(dumpOutput)
 
-    def test_jmpToSecond(self):
-        '''tests the special options to jump to a event after the configure
+    def test_jmpToThird(self):
+        '''tests the special options to set offset for the third event
         '''
         dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_002_xppd9714')
         ds = psana.setConfigFile('')
@@ -545,8 +545,8 @@ class Psana( unittest.TestCase ) :
         eventTimes.append(EventTime(sec=1399774523, nsec=339827189, fid=12762))
         eventTimes.append(EventTime(sec=1399774526, nsec=630896109, fid=13947))
         
-        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_offsets",ccOffsetsOption)
-        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_filenames",ccFilenamesOption)
+        psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_offsets",ccOffsetsOption)
+        psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_filenames",ccFilenamesOption)
 
         dsString = 'exp=xppd9714:run=16:dir=%s' % dataSourceDir
         ds = psana.DataSource(dsString)
@@ -560,8 +560,8 @@ class Psana( unittest.TestCase ) :
                 
         # psana remembers options. If another unit test function is run after this one
         # the jump parameters will still be in effect. Set them to null.
-        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_offsets",'')
-        psana.setOption("PSXtcInput.XtcInputModule.second_event_jump_filenames",'')
+        psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_offsets",'')
+        psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_filenames",'')
         
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
