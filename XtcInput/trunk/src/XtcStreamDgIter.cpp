@@ -91,7 +91,7 @@ XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkI
 }
 
 XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
-                                 const boost::shared_ptr<SecondDatagram> & secondDatagram,
+                                 const boost::shared_ptr<ThirdDatagram> & thirdDatagram,
                                  bool clockSort)
   : m_chunkIter(chunkIter)
   , m_dgiter()
@@ -99,7 +99,7 @@ XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkI
   , m_streamCount(0)
   , m_headerQueue()
   , m_clockSort(clockSort)
-  , m_secondDatagram(secondDatagram)
+  , m_thirdDatagram(thirdDatagram)
 {
   m_headerQueue.reserve(::readAheadSize);
 }
@@ -160,33 +160,33 @@ XtcStreamDgIter::readAhead()
 
     boost::shared_ptr<DgHeader> hptr; // next datagram header
 
-    // check for special parameters to jump for the second datagram 
-    if (m_streamCount == 1) {    // we are at the second datagram, streamCount is 0 based
-      if (m_secondDatagram) {
-        const XtcFileName & xtcFileForSecondDgram = m_secondDatagram->xtcFile;
-        off64_t offsetForSecondDgram = m_secondDatagram->offset;
-        MsgLog(logger,debug,"second datagram jump: will try to jump to offset=" 
-	       << offsetForSecondDgram << " in file=" << xtcFileForSecondDgram); 
+    // check for special parameters to jump for the third datagram 
+    if (m_streamCount == 2) {    // we are at the third datagram, streamCount is 0 based
+      if (m_thirdDatagram) {
+        const XtcFileName & xtcFileForThirdDgram = m_thirdDatagram->xtcFile;
+        off64_t offsetForThirdDgram = m_thirdDatagram->offset;
+        MsgLog(logger,debug,"third datagram jump: will try to jump to offset=" 
+	       << offsetForThirdDgram << " in file=" << xtcFileForThirdDgram); 
         // advance chunk file if need be
-        while (xtcFilesNotEqual(m_dgiter->path(), xtcFileForSecondDgram)) {
-          MsgLog(logger,debug,"second datagram jump, jmpFile != currentFile - "
-		 << xtcFileForSecondDgram << " != " << m_dgiter->path());
+        while (xtcFilesNotEqual(m_dgiter->path(), xtcFileForThirdDgram)) {
+          MsgLog(logger,debug,"third datagram jump, jmpFile != currentFile - "
+		 << xtcFileForThirdDgram << " != " << m_dgiter->path());
           // get next file name
           const XtcFileName& file = m_chunkIter->next();
           
           if (file.path().empty()) {
 	    // we went through all the files in the chunkIter
-            throw FileNotInStream(ERR_LOC, xtcFileForSecondDgram.path());
+            throw FileNotInStream(ERR_LOC, xtcFileForThirdDgram.path());
           }
           // open file
-          MsgLog(logger, trace, " looking for 2nd dgram - opening file: " << file) ;
+          MsgLog(logger, trace, " looking for third dgram - opening file: " << file) ;
           m_dgiter = boost::make_shared<XtcChunkDgIter>(file, m_chunkIter->liveTimeout());
           m_chunkCount = 0;
         }
-        hptr = m_dgiter->nextAtOffset(offsetForSecondDgram);
+        hptr = m_dgiter->nextAtOffset(offsetForThirdDgram);
       } else {
-        // this is the second datagram (streamCount == 1), but no special jump to do
-        MsgLog(logger,debug,"second datagram, no jmp");
+        // this is the third datagram (streamCount == 2), but no special jump to do
+        MsgLog(logger,debug,"third datagram, no jmp");
         hptr = m_dgiter->next();
       }
     } else {

@@ -48,12 +48,12 @@ namespace XtcInput {
 XtcMergeIterator::XtcMergeIterator (const boost::shared_ptr<RunFileIterI>& runIter, 
                                     double l1OffsetSec, int firstControlStream, 
                                     unsigned maxStreamClockDiffSec,
-				    boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure)
+				    boost::shared_ptr<XtcFilesPosition> thirdEvent)
   : m_runIter(runIter)
   , m_l1OffsetSec(l1OffsetSec)
   , m_firstControlStream(firstControlStream)
   , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
-  , m_firstEventAfterConfigure(firstEventAfterConfigure)
+  , m_thirdEvent(thirdEvent)
   , m_firstRun(true)
 
 {
@@ -81,14 +81,14 @@ XtcMergeIterator::next()
       boost::shared_ptr<XtcFilesPosition> xtcFilesPos;
       if (m_firstRun) {
 	m_firstRun = false;
-	if (m_firstEventAfterConfigure) {
-	  if (unsigned(m_firstEventAfterConfigure->run()) != m_runIter->run()) {
-	    MsgLog(logger, error, "run mismatch: firstEventAfterConfigure.run=" 
-		   << m_firstEventAfterConfigure->run()
+	if (m_thirdEvent) {
+	  if (unsigned(m_thirdEvent->run()) != m_runIter->run()) {
+	    MsgLog(logger, error, "run mismatch: thirdEvent.run=" 
+		   << m_thirdEvent->run()
 		   << " != runIter.run=" << m_runIter->run());
 	    throw JumpToDifferentRun(ERR_LOC);
 	  }
-	  xtcFilesPos = m_firstEventAfterConfigure;
+	  xtcFilesPos = m_thirdEvent;
 	}
       }
 

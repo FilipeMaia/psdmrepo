@@ -66,7 +66,7 @@ public:
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
               double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec,
-              boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure = 
+              boost::shared_ptr<XtcFilesPosition> thirdEvent = 
 	                                          boost::shared_ptr<XtcFilesPosition>())
     : m_files(begin, end)
     , m_queue( queue )
@@ -77,7 +77,7 @@ public:
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(firstControlStream)
     , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
-    , m_firstEventAfterConfigure(firstEventAfterConfigure)
+    , m_thirdEvent(thirdEvent)
   {}
 
   // constructor with default parameters for parameters for handling control streams
@@ -117,7 +117,7 @@ private:
   double m_l1OffsetSec ;
   int m_firstControlStream;
   unsigned m_maxStreamClockDiffSec;
-  boost::shared_ptr<XtcFilesPosition> m_firstEventAfterConfigure;
+  boost::shared_ptr<XtcFilesPosition> m_thirdEvent;
 };
 
 } // namespace XtcInput

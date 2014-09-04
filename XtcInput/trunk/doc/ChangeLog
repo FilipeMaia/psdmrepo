@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-07
+2014-09-02 David Schneider
+- change jump options from second event to third event. Allows psana to
+  process both beginRun and Configure before jump. Then user modules can
+  get a valid run number in beginRun
+
 Tag: V00-10-06
 2014-08-28 David Schneider
 - Give new DgramReader argument default value for backward compatibility.

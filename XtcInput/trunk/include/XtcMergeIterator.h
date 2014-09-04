@@ -61,7 +61,7 @@ public:
   XtcMergeIterator(const boost::shared_ptr<RunFileIterI>& runIter, 
                    double l1OffsetSec, int firstControlStream,
                    unsigned maxStreamClockDiffSec,
-                   boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure);
+                   boost::shared_ptr<XtcFilesPosition> thirdEvent);
 
 
   // Destructor
@@ -90,7 +90,7 @@ private:
   int m_firstControlStream;
   unsigned m_maxStreamClockDiffSec;
   boost::shared_ptr<XtcStreamMerger> m_dgiter ;  ///< Datagram iterator for current run
-  boost::shared_ptr<XtcFilesPosition> m_firstEventAfterConfigure;
+  boost::shared_ptr<XtcFilesPosition> m_thirdEvent;
   bool m_firstRun;
 
 };

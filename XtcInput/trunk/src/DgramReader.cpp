@@ -271,7 +271,7 @@ try {
   if (runFileIter) {
 
     XtcMergeIterator iter(runFileIter, m_l1OffsetSec, m_firstControlStream, 
-                          m_maxStreamClockDiffSec, m_firstEventAfterConfigure);
+                          m_maxStreamClockDiffSec, m_thirdEvent);
     Dgram dg;
     while ( not boost::this_thread::interruption_requested() ) {
 

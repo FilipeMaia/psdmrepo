@@ -77,12 +77,12 @@ public:
   XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
                   bool clockSort=true);
 
-  /// struct to take a filename and offset for the second datagram in the iteration
-  struct SecondDatagram {
+  /// struct to take a filename and offset for the third datagram in the iteration
+  struct ThirdDatagram {
     XtcFileName xtcFile;
     off64_t offset;
-    SecondDatagram() {}
-  SecondDatagram(const XtcFileName &_xtcFile, off64_t _offset) : 
+    ThirdDatagram() {}
+  ThirdDatagram(const XtcFileName &_xtcFile, off64_t _offset) : 
     xtcFile(_xtcFile), offset(_offset) {}
   };
 
@@ -90,19 +90,20 @@ public:
    *  @brief Make iterator instance that will jump to specified location for second datagram
    *
    *  In addition to taking an iterator object which iterators over chunks in a stream, this
-   *  constructor takes a SecondDatagram struct that gives a chunk file and offset for
-   *  the second datagram. After the first datagram in the stream is returned (this is
-   *  usually the configure transition) one can effectively jump to an arbitrary datagram in 
-   *  the stream - even in another chunk file, as long as the offset of that datagram is known.
+   *  constructor takes a ThirdDatagram struct that gives a chunk file and offset for
+   *  the third datagram. After the first and second datagrams in the stream are returned (this is
+   *  usually the configure and beginRun transitions) one can effectively jump to an arbitrary 
+   *  datagram in the stream - even in another chunk file, as long as the offset of that 
+   *  datagram is known.
    *
    *  @param[in] chunkIter as with first constuctor
-   *  @param[in] secondDatagram if non-null, the filename and offset are used for the
-   *             second datagram this stream iterator returns. The filename must
+   *  @param[in] thirdDatagram if non-null, the filename and offset are used for the
+   *             third datagram this stream iterator returns. The filename must
    *             exist in the chunkIter or an exception will be thrown from next
    *  @param[in] clockSort as with first constructor
    */
   XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter,
-                  const boost::shared_ptr<SecondDatagram> & secondDatagram,
+                  const boost::shared_ptr<ThirdDatagram> & thirdDatagram,
                   bool clockSort=true);
 
   // Destructor
@@ -140,7 +141,7 @@ private:
   uint64_t m_streamCount;                       ///< Datagram counter for stream
   HeaderQueue m_headerQueue;            ///< Queue for read-ahead headers
   bool m_clockSort;                     ///< sort datagrams in between non-L1Accept transitions by clock time
-  boost::shared_ptr<SecondDatagram> m_secondDatagram;
+  boost::shared_ptr<ThirdDatagram> m_thirdDatagram;
 };
 
 } // namespace XtcInput

@@ -48,23 +48,23 @@ bool isDisable(const XtcInput::Dgram &dg) {
   return (nextService == Pds::TransitionId::Disable);
 }
 
-boost::shared_ptr<XtcStreamDgIter::SecondDatagram> 
-checkForSecondDatagram(int stream, boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure) {
+boost::shared_ptr<XtcStreamDgIter::ThirdDatagram> 
+checkForThirdDatagram(int stream, boost::shared_ptr<XtcFilesPosition> thirdEvent) {
 
-  if (not firstEventAfterConfigure) {
-    MsgLog(logger, DBGMSG, "XtcStreamMerger: no second event position");
-    return boost::shared_ptr<XtcStreamDgIter::SecondDatagram>();
+  if (not thirdEvent) {
+    MsgLog(logger, DBGMSG, "XtcStreamMerger: no third event position");
+    return boost::shared_ptr<XtcStreamDgIter::ThirdDatagram>();
   }
-  if (not firstEventAfterConfigure->hasStream(stream)) {
+  if (not thirdEvent->hasStream(stream)) {
     std::stringstream msg;
     msg << stream;
     throw StreamNotInPosition(ERR_LOC, msg.str());
   }
-  std::pair<XtcFileName, off64_t> secondDatagramThisStream = firstEventAfterConfigure->getChunkFileOffset(stream);
-  boost::shared_ptr<XtcStreamDgIter::SecondDatagram> secondDgram = 
-    boost::make_shared<XtcStreamDgIter::SecondDatagram>(secondDatagramThisStream.first,
-                                                        secondDatagramThisStream.second);
-  return secondDgram;
+  std::pair<XtcFileName, off64_t> thirdDatagramThisStream = thirdEvent->getChunkFileOffset(stream);
+  boost::shared_ptr<XtcStreamDgIter::ThirdDatagram> thirdDgram = 
+    boost::make_shared<XtcStreamDgIter::ThirdDatagram>(thirdDatagramThisStream.first,
+                                                        thirdDatagramThisStream.second);
+  return thirdDgram;
 }
   
 } // local namespace
@@ -81,7 +81,7 @@ namespace XtcInput {
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
                                  double l1OffsetSec, int firstControlStream,
                                  unsigned maxStreamClockDiffSec,
-                                 boost::shared_ptr<XtcFilesPosition> firstEventAfterConfigure) 
+                                 boost::shared_ptr<XtcFilesPosition> thirdEvent) 
   : m_streams()
   , m_priorTransBlock()
   , m_processingDAQ(false)
@@ -89,7 +89,7 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_firstControlStream(firstControlStream)
   , m_streamDgramGreater(maxStreamClockDiffSec)
-  , m_firstEventAfterConfigure(firstEventAfterConfigure)
+  , m_thirdEvent(thirdEvent)
   , m_outputQueue(m_streamDgramGreater)
     
 {
@@ -104,12 +104,12 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
     bool controlStream = int(streamIter->stream()) >= m_firstControlStream;
     bool clockSort = not controlStream;
 
-    boost::shared_ptr<XtcStreamDgIter::SecondDatagram> secondDatagram = 
-      checkForSecondDatagram(streamIter->stream(), m_firstEventAfterConfigure);
+    boost::shared_ptr<XtcStreamDgIter::ThirdDatagram> thirdDatagram = 
+      checkForThirdDatagram(streamIter->stream(), m_thirdEvent);
 
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
-      boost::make_shared<XtcStreamDgIter>(chunkFileIter, secondDatagram, clockSort);
+      boost::make_shared<XtcStreamDgIter>(chunkFileIter, thirdDatagram, clockSort);
     if (controlStream) {
       StreamDgram dg(stream->next(), StreamDgram::controlUnderDAQ, 0, idxCtrl);
       StreamIndex streamIndex(StreamDgram::controlUnderDAQ, idxCtrl);
