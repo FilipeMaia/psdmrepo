@@ -17,6 +17,7 @@ from psana_test import epicsPvToStr
 import psana_test.psanaTestLib as ptl
 import psana
 import pickle
+import numpy as np
 
 DATADIR = ptl.getTestDataDir()
 OUTDIR = "data/psana_test"
@@ -562,6 +563,29 @@ class Psana( unittest.TestCase ) :
         # the jump parameters will still be in effect. Set them to null.
         psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_offsets",'')
         psana.setOption("PSXtcInput.XtcInputModule.third_event_jump_filenames",'')
-        
+
+    def test_storeGetPut(self):
+        '''Test configStore and calibStore get/put interfaces
+        '''
+        TEST_42 = os.path.join(DATADIR,'test_042_Translator_t1.xtc')
+        assert os.path.exists(TEST_42), "input file: %s does not exist, can't run test" % TEST_42
+        psana.setConfigFile('')
+        ds = psana.DataSource(TEST_42)
+        cfgStore = ds.env().configStore()
+        self.assertIsNotNone(cfgStore.get(psana.ControlData.ConfigV2))
+        self.assertIsNotNone(cfgStore.get(psana.ControlData.ConfigV2,psana.Source('ProcInfo()')))
+        self.assertIsNotNone(cfgStore.get(psana.Ipimb.ConfigV2,psana.Source("BldInfo(XppSb2_Ipm)")))
+        self.assertRaises(TypeError, cfgStore.get, None)
+        ar = np.zeros((2,2))
+        cfgStore.put(ar)
+        cfgStore.put(ar,psana.Source('ProcInfo()'))
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2))
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2, psana.Source('ProcInfo()')))
+        calibStore = ds.env().calibStore()
+        calibStore.put(ar)
+        calibStore.put(ar,psana.Source('ProcInfo()'))
+        self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2))
+        self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2, psana.Source('ProcInfo()')))
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

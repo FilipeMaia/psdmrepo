@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-27
+2014-09-05 David Schneider
+- add test for configStore calibStore get/put interface. To make sure
+  we don't brake anything when addressing JIRA PSAS-25
+	
 Tag: V00-00-26
 2014-09-03 David Schneider
 - add tests for mpi split scan translator.
