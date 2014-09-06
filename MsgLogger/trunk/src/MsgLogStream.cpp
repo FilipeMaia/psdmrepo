@@ -65,12 +65,12 @@ MsgLogStream::MsgLogStream ( const std::string& loggerName, MsgLogLevel sev, con
 // Destructor
 MsgLogStream::~MsgLogStream()
 {
-  emit() ;
+  emit_content() ;
 }
 
 // send my content to logger
 void
-MsgLogStream::emit()
+MsgLogStream::emit_content()
 {
   // check if we need to send it at all
   MsgLogger logger( _logger ) ;

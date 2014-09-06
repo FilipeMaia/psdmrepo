@@ -195,7 +195,7 @@ public:
   std::ostream& ostream_hack() { return *this ; }
 
   // send my content to logger
-  void emit() ;
+  void emit_content() ;
 
   // get the state of the stream
   bool ok() const { return _ok ; }

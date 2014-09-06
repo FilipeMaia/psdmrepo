@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2014-09-05 Mikhail Dubrovin
+- in MsgLogStream replace emit() for emit_content(); QT4 macro processor uses this name...
+
 Tag: V00-01-08
 2014-07-30 Igor Gaponenko
 - boost 1.55.0 migration
