@@ -221,8 +221,19 @@ class MultiPlotClient(object):
     def __init__(self, init, framegen, info, rate):
         self.fig_win = pg.GraphicsLayoutWidget()
         self.fig_win.setWindowTitle(init.title)
+        self.fig_win.resize(config.PYQT_LARGE_WIN_X, config.PYQT_LARGE_WIN_Y)
         self.fig_win.show()
-        self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
+        if init.ncols is None:
+            self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
+        else:
+            self.plots = []
+            for index, data_obj in enumerate(init.data_con):
+                if isinstance(init.ncols, int) and 0 < init.ncols <= init.size:
+                    if index > 0 and index % init.ncols == 0:
+                        self.fig_win.nextRow()
+                else:
+                    LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s', init.ncols, init.size)
+                self.plots.append(type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win))
         self.framegen = framegen
         self.rate_ms = rate * 1000
         self.info = info
