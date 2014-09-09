@@ -579,6 +579,12 @@ class Psana( unittest.TestCase ) :
         ar = np.zeros((2,2))
         cfgStore.put(ar)
         cfgStore.put(ar,psana.Source('ProcInfo()'))
+
+        # test that we can't replace a C++ visible object from python
+        ar2 = np.zeros((2,2))
+        self.assertRaises(ValueError,cfgStore.put,ar2)
+        self.assertRaises(ValueError,cfgStore.put, ar2,psana.Source('ProcInfo()'))
+        
         self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2))
         self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2, psana.Source('ProcInfo()')))
         calibStore = ds.env().calibStore()
@@ -586,6 +592,12 @@ class Psana( unittest.TestCase ) :
         calibStore.put(ar,psana.Source('ProcInfo()'))
         self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2))
         self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2, psana.Source('ProcInfo()')))
+
+        # test that we can't replace a C++ visible object from python
+        ar2 = np.zeros((2,2))
+        self.assertRaises(ValueError,calibStore.put,ar2)
+        self.assertRaises(ValueError,calibStore.put, ar2,psana.Source('ProcInfo()'))
+
 
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

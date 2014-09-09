@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+2014-09-09 David Schneider
+- extend configStore calibStore get/put test a bit.
+
 Tag: V00-00-27
 2014-09-05 David Schneider
 - add test for configStore calibStore get/put interface. To make sure
