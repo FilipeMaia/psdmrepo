@@ -1,0 +1,14 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSEnv
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+Package containing class to handle environment objects in psana.
