@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-14
+2014-09-09 Mikhail S. Dubrovin
+- in GeometryAccess.h - improve doxygen documentation
+
 Tag: V00-02-13
 2014-09-02 Mikhail S. Dubrovin
 - in src/GeometryAccess.cpp - explicit conversion from double to unsigned

@@ -59,6 +59,7 @@ namespace PSCalib {
  *  @li  Include
  *  @code
  *  #include "PSCalib/GeometryAccess.h"
+ *  #include "ndarray/ndarray.h" // need it if image is returned
  *  @endcode
  *
  *  @li Instatiation
@@ -90,9 +91,9 @@ namespace PSCalib {
  *        unsigned   size;
  *        geometry.get_pixel_areas(A,size);
  * 
- *    // Access pixel size:
+ *    // Access pixel size for entire detector:
  *        double pix_scale_size = geometry.get_pixel_scale_size ();
- *        // or for specified geo
+ *        // or for specified geometry object, for example one quad of CSPAD
  *        double pix_scale_size = geometry.get_pixel_scale_size("QUAD:V1", 1);
  *    
  *    // Access pixel indexes for image:
@@ -104,11 +105,14 @@ namespace PSCalib {
  *        const unsigned ioindex = 1;                                                                      
  *        const double pix_scale_size_um = 109.92;                                                         
  *        const int xy0_off_pix[] = {200,200};
+ *        
+ *        // this call returns index arrays iX, iY of size=isize for QUAD with offset 
  *        geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix);
- *        // or
+ *        
+ *        // this call returns index arrays for entire detector with auto generated minimal offset
  *        geometry.get_pixel_coord_indexes(iX, iY, isize);
- *        // then use iX, iY, isize, for example make image:
- *    
+ *        // then use iX, iY, isize, for example make image as follows.   
+ *
  *    // Make image from index, iX, iY, and intensity, W, arrays
  *        ndarray<PSCalib::GeometryAccess::image_t, 2> img = 
  *                PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, 0, isize);
