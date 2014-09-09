@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-07
+2014-09-09 David Schneider
+- Jira ticket PSAS-25 - extend EnvObjectStore to take a key string.
+
 Tag: V00-13-06
 2014-07-08 David Schneider
 - print warning when fictional pvnames are created

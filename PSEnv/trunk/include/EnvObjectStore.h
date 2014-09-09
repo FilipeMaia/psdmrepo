@@ -72,12 +72,13 @@ public:
     /// Convert the result of get() call to smart pointer to object
     template<typename T>
     operator boost::shared_ptr<T>() {
-      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, std::string(), m_foundSrc);
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key, m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
     
     boost::shared_ptr<PSEvt::ProxyDictI> m_dict;  ///< Proxy dictionary containing the data
     PSEvt::Source m_source;    ///< Data source address
+    std::string m_key;         ///< String key
     Pds::Src* m_foundSrc;      ///< Pointer to where to store the exact address of found object
   };
 
@@ -98,13 +99,14 @@ public:
    *  @param[in] source Source detector address.
    */
   template <typename T>
-  void putProxy(const boost::shared_ptr<PSEvt::Proxy<T> >& proxy, const Pds::Src& source)
+  void putProxy(const boost::shared_ptr<PSEvt::Proxy<T> >& proxy, const Pds::Src& source,
+		const std::string& key=std::string())
   {
-    PSEvt::EventKey key(&typeid(const T), source, std::string());
-    if ( m_dict->exists(key) ) {
-      m_dict->remove(key);
+    PSEvt::EventKey evKey(&typeid(const T), source, key);
+    if ( m_dict->exists(evKey) ) {
+      m_dict->remove(evKey);
     }
-    m_dict->put(boost::static_pointer_cast<PSEvt::ProxyI>(proxy), key);
+    m_dict->put(boost::static_pointer_cast<PSEvt::ProxyI>(proxy), evKey);
   }
 
   /**
@@ -117,14 +119,16 @@ public:
    *  @param[in] source Source detector address.
    */
   template <typename T>
-  void put(const boost::shared_ptr<T>& data, const Pds::Src& source) 
+  void put(const boost::shared_ptr<T>& data, const Pds::Src& source,
+           const std::string& key=std::string()) 
+
   {
     boost::shared_ptr<PSEvt::ProxyI> proxyPtr(new PSEvt::DataProxy<T>(data));
-    PSEvt::EventKey key(&typeid(const T), source, std::string());
-    if ( m_dict->exists(key) ) {
-      m_dict->remove(key);
+    PSEvt::EventKey evKey(&typeid(const T), source, key);
+    if ( m_dict->exists(evKey) ) {
+      m_dict->remove(evKey);
     }
-    m_dict->put(proxyPtr, key);
+    m_dict->put(proxyPtr, evKey);
   }
   
   /**
@@ -133,9 +137,9 @@ public:
    *  @param[in] source Source detector address.
    *  @return Shared pointer (or object convertible to it) which can be zero when object is not found.
    */
-  GetResultProxy get(const Pds::Src& source) 
+  GetResultProxy get(const Pds::Src& source, const std::string& key=std::string()) 
   {
-    GetResultProxy pxy = { m_dict, PSEvt::Source(source) };
+    GetResultProxy pxy = { m_dict, PSEvt::Source(source), key };
     return pxy;
   }
 
@@ -147,9 +151,9 @@ public:
    *                       with the exact source address of the returned object.
    *  @return Shared pointer (or object convertible to it) which can be zero when object is not found.
    */
-  GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=0) 
+  GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=0, const std::string& key=std::string()) 
   {
-    GetResultProxy pxy = { m_dict, source, foundSrc};
+    GetResultProxy pxy = { m_dict, source, key, foundSrc};
     return pxy;
   }
 
