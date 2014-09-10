@@ -1,0 +1,59 @@
+
+From Mikhail:
+
+MsgLogger V00-01-09 - replace name emit for emit_content; Qt4 
+pre-processor uses the name emit and does not like in in other packages...
+
+ImgAlgos V00-03-60 - in geometry modules add methods to access 
+pixel area, improve ImgPeakFinder
+
+PSCalib V00-02-14 - update/add doxygen/sphinx documentation
+
+**********************************************************************
+
+From David:
+
+psana_python:
+* unlock/restore Python GIL when calling C++ Psana modules. Allows a 
+Python script to start a thread that can run concurrently with the C++ 
+Psana Modules (Python Psana Modules still compete for the GIL).
+* Improve error message for event store.
+* added keystrings for the configstore and calib store - the
+  latest psana_python and PSEnv tags
+
+Translator:
+initial checkin of MPI based split scan Translator. Not ready for 
+production.
+
+PSXtcInput/XtcInput:
+add options to make it feasible to start psana at a new calib cycle. 
+Support for MPI Translator.
+
+hdf5pp:
+improve error message when fail to open file.
+
+psana:
+refactor to make it easier to write a C++ driver program
+
+psana_test:
+tests for MPI Translator, XtcInput/PSXtcInput to start at new calib 
+cycle, putting objects into the configStore from Python
+
+**********************************************************************
+
+From Chris:
+
+psana_python:
+ability to access all times within a calibcycle for random access.
+ability to pickle EventTime objects for later random access.
+fix configuration-fil parameter inheritance bug
+
+pyimgalgos:
+added module to correct for cspad per-pixel gain
+
+psana_test:
+add tests for indexing
+
+pdsdata:
+fix std::map<int,int> pragma pack bug in pdsdata/index/IndexList.hh
+(together with Tomy Tsai)
