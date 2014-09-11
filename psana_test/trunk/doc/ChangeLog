@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-30
+2014-09-11 David Schneider
+- Somehow the tags in the changLog are off by one with the tags. 
+  synching ChangeLog tag with svn tags.
+
 Tag: V00-00-29
 2014-09-11 David Schneider
 - test get/put with key strings for configStore/calibStore get/put test.
