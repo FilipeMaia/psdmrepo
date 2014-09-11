@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <stdint.h> // uint8_t, uint32_t, etc.
 
 //----------------------
 // Base Class Headers --
@@ -102,6 +103,7 @@ private:
   std::string m_key_out_a;        // Key for output pixel area array
   std::string m_key_out_ix;       // Key for output pixel index x-coordinate array
   std::string m_key_out_iy;       // Key for output pixel index y-coordinate array
+  std::string m_key_fname;        // Key for the name of geometry calibration file used in evaluation
   unsigned    m_print_bits;       // verbosity
 
   long m_count_run;
@@ -132,6 +134,7 @@ private:
   ndarray<const area_t,1>        m_ndaA;
   ndarray<const coord_index_t,1> m_ndaIX;
   ndarray<const coord_index_t,1> m_ndaIY;
+  ndarray<const uint8_t,1>       m_ndafn;
 
   /// Regular check for available calibration parameters
   void checkCalibPars(Event& evt, Env& env);

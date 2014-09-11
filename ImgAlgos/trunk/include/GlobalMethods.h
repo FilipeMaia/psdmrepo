@@ -534,8 +534,7 @@ private:
   void save1DArrayInCalibStore(PSEnv::Env& env, const Pds::Src& src, const std::string& key, const ndarray<const T,1>& data)
   {
     boost::shared_ptr< ndarray<const T,1> > shp( new ndarray<const T,1>(data) );
-    env.calibStore().put(shp, src);
-    //env.calibStore().put(shp, src, key);
+    env.calibStore().put(shp, src, key);
   }
 
 //--------------------

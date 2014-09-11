@@ -61,6 +61,7 @@ PixCoordsProducer::PixCoordsProducer (const std::string& name)
   , m_key_out_a() 
   , m_key_out_ix() 
   , m_key_out_iy() 
+  , m_key_fname() 
   , m_print_bits(0)
   , m_count_run(0)
   , m_count_event(0)
@@ -78,6 +79,7 @@ PixCoordsProducer::PixCoordsProducer (const std::string& name)
   m_key_out_a  = configStr("key_out_area", "");
   m_key_out_ix = configStr("key_out_ix",   "");
   m_key_out_iy = configStr("key_out_iy",   "");
+  m_key_fname  = configStr("key_fname",    "geometry-calib");
   m_print_bits = config   ("print_bits", 0);
 }
 
@@ -95,6 +97,7 @@ PixCoordsProducer::printInputParameters()
         << "\n key_out_a         : " << m_key_out_a
         << "\n key_out_ix        : " << m_key_out_ix
         << "\n key_out_iy        : " << m_key_out_iy
+        << "\n key_fname         : " << m_key_fname
         << "\n print_bits        : " << m_print_bits
         << "\n";     
 	 );
@@ -144,7 +147,8 @@ PixCoordsProducer::event(Event& evt, Env& env)
 
   checkCalibPars(evt, env);
 
-  if( m_count_clb ) savePixCoordsInEvent(evt);
+  //if( m_count_clb ) savePixCoordsInEvent(evt);
+  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -257,6 +261,7 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
   if(! m_key_out_a .empty()) m_ndaA = make_ndarray(m_pixA,  m_size_a); 
   if(! m_key_out_ix.empty()) m_ndaIX= make_ndarray(m_pixIX, m_size_ind); 
   if(! m_key_out_iy.empty()) m_ndaIY= make_ndarray(m_pixIY, m_size_ind); 
+  if(! m_key_fname .empty()) m_ndafn= make_ndarray(reinterpret_cast<const uint8_t*>(m_fname.c_str()), m_fname.size()); 
 
   return true;
 }
@@ -266,12 +271,13 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
 void 
 PixCoordsProducer::savePixCoordsInEvent(Event& evt)
 {
-  if(! m_key_out_x.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_x,  m_ndaX);
-  if(! m_key_out_y.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_y,  m_ndaY);
-  if(! m_key_out_z.empty())  save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_z,  m_ndaZ);
-  if(! m_key_out_a.empty())  save1DArrayInEvent<PixCoordsProducer::area_t>       (evt, m_src, m_key_out_a,  m_ndaA);
+  if(! m_key_out_x .empty()) save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_x,  m_ndaX);
+  if(! m_key_out_y .empty()) save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_y,  m_ndaY);
+  if(! m_key_out_z .empty()) save1DArrayInEvent<PixCoordsProducer::coord_t>      (evt, m_src, m_key_out_z,  m_ndaZ);
+  if(! m_key_out_a .empty()) save1DArrayInEvent<PixCoordsProducer::area_t>       (evt, m_src, m_key_out_a,  m_ndaA);
   if(! m_key_out_ix.empty()) save1DArrayInEvent<PixCoordsProducer::coord_index_t>(evt, m_src, m_key_out_ix, m_ndaIX);
   if(! m_key_out_iy.empty()) save1DArrayInEvent<PixCoordsProducer::coord_index_t>(evt, m_src, m_key_out_iy, m_ndaIY);
+  if(! m_key_fname .empty()) save1DArrayInEvent<uint8_t>                         (evt, m_src, m_key_fname,  m_ndafn);
 }
 
 //--------------------
@@ -282,9 +288,13 @@ PixCoordsProducer::savePixCoordsInCalibStore(Env& env)
   // For now there is no key parameter in evr.calibStore().put(...) method.
   // Data can be only distinguished by type. So, there is no chance to save 3 ndarray<double,1>... 
 
-  //save1DArrayInCalibStore<PixCoordsProducer::coord_t>(env, m_src, "x-pix-coords", m_ndaX);
-  //save1DArrayInCalibStore<PixCoordsProducer::coord_t>(env, m_src, "y-pix-coords", m_ndaY);
-  //save1DArrayInCalibStore<PixCoordsProducer::coord_t>(env, m_src, "z-pix-coords", m_ndaZ);
+  if(! m_key_out_x .empty()) save1DArrayInCalibStore<PixCoordsProducer::coord_t>      (env, m_src, "x-pix-coords", m_ndaX);
+  if(! m_key_out_y .empty()) save1DArrayInCalibStore<PixCoordsProducer::coord_t>      (env, m_src, "y-pix-coords", m_ndaY);
+  if(! m_key_out_z .empty()) save1DArrayInCalibStore<PixCoordsProducer::coord_t>      (env, m_src, "z-pix-coords", m_ndaZ);
+  if(! m_key_out_a .empty()) save1DArrayInCalibStore<PixCoordsProducer::area_t>       (env, m_src, m_key_out_a,  m_ndaA);
+  if(! m_key_out_ix.empty()) save1DArrayInCalibStore<PixCoordsProducer::coord_index_t>(env, m_src, m_key_out_ix, m_ndaIX);
+  if(! m_key_out_iy.empty()) save1DArrayInCalibStore<PixCoordsProducer::coord_index_t>(env, m_src, m_key_out_iy, m_ndaIY);
+  if(! m_key_fname .empty()) save1DArrayInCalibStore<uint8_t>                         (env, m_src, m_key_fname,  m_ndafn);
 }
 
 //--------------------

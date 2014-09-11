@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-61
+2014-09-11 Mikhail S. Dubrovin
+- in PixCoordsProducer save pixel coordinate and index arrays in env.calibStore() in stead of evt,
+	+ add key_fname and save path to "geometry" calibration file
+
 Tag: V00-03-60
 2014-09-02 Mikhail S. Dubrovin
 - in PixCoordsProducer add new keyword-parameters which allows to get pixel area and index iX, iY arrays for image
