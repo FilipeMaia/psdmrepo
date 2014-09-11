@@ -572,21 +572,36 @@ class Psana( unittest.TestCase ) :
         psana.setConfigFile('')
         ds = psana.DataSource(TEST_42)
         cfgStore = ds.env().configStore()
+        # these are in the test data
+
+        # config store get will match any if no source given
         self.assertIsNotNone(cfgStore.get(psana.ControlData.ConfigV2))
+
+        # these are in there
         self.assertIsNotNone(cfgStore.get(psana.ControlData.ConfigV2,psana.Source('ProcInfo()')))
         self.assertIsNotNone(cfgStore.get(psana.Ipimb.ConfigV2,psana.Source("BldInfo(XppSb2_Ipm)")))
+
+        # mismatches, 
+        self.assertIsNone(cfgStore.get(psana.ControlData.ConfigV2, psana.Source('DetInfo(NoDetector.0:Evr.1)')))
+        self.assertIsNone(cfgStore.get(psana.ControlData.ConfigV2,"mykey"))
+        self.assertIsNone(cfgStore.get(psana.Ipimb.ConfigV2,psana.Source('ProcInfo()')))
         self.assertRaises(TypeError, cfgStore.get, None)
+
+        # put an array in
         ar = np.zeros((2,2))
         cfgStore.put(ar)
         cfgStore.put(ar,psana.Source('ProcInfo()'))
+
+        # retrieve it
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2))
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2,psana.Source('ProcInfo()')))
 
         # test that we can't replace a C++ visible object from python
         ar2 = np.zeros((2,2))
         self.assertRaises(ValueError,cfgStore.put,ar2)
         self.assertRaises(ValueError,cfgStore.put, ar2,psana.Source('ProcInfo()'))
-        
-        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2))
-        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2, psana.Source('ProcInfo()')))
+
+        # test for calib store as well
         calibStore = ds.env().calibStore()
         calibStore.put(ar)
         calibStore.put(ar,psana.Source('ProcInfo()'))
@@ -598,6 +613,18 @@ class Psana( unittest.TestCase ) :
         self.assertRaises(ValueError,calibStore.put,ar2)
         self.assertRaises(ValueError,calibStore.put, ar2,psana.Source('ProcInfo()'))
 
+        # test key strings
+        cfgStore.put(ar,"mykey")
+        cfgStore.put(ar,psana.Source('ProcInfo()'),"mykey")
+        calibStore.put(ar,"mykey")
+        calibStore.put(ar,psana.Source('ProcInfo()'),"mykey")
 
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2,"mykey"))
+        self.assertIsNotNone(cfgStore.get(psana.ndarray_float64_2,psana.Source('ProcInfo()'),"mykey"))
+        self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2,"mykey"))
+        self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2,psana.Source('ProcInfo()'),"mykey"))
+
+        self.assertRaises(TypeError, cfgStore.get, psana.ndarray_float64_2,"mykey","anotherString")
+        
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
