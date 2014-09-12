@@ -117,6 +117,26 @@ std::string GeometryObject::string_geo()
 }
 
 //-------------------
+std::string GeometryObject::str_data()
+{
+  std::stringstream ss;
+  ss         << std::setw(10) << std::left << m_pname 
+     << "  " << std::setw(2)  << m_pindex
+     << "  " << std::setw(10) << m_oname 
+     << "  " << std::setw(2)  << m_oindex << std::right << std::fixed
+     << "  " << std::setw(8)  << std::setprecision(0) << m_x0    
+     << "  " << std::setw(8)  << std::setprecision(0) << m_y0    
+     << "  " << std::setw(8)  << std::setprecision(0) << m_z0    
+     << "  " << std::setw(6)  << std::setprecision(1) << m_rot_z 
+     << "  " << std::setw(6)  << std::setprecision(1) << m_rot_y 
+     << "  " << std::setw(6)  << std::setprecision(1) << m_rot_x 
+     << "  " << std::setw(8)  << std::setprecision(5) << m_tilt_z
+     << "  " << std::setw(8)  << std::setprecision(5) << m_tilt_y
+     << "  " << std::setw(8)  << std::setprecision(5) << m_tilt_x;
+  return ss.str();
+}
+
+//-------------------
 void GeometryObject::print_geo()
 {
   //std::cout << string_geo() << '\n';

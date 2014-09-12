@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-15
+2014-09-12 Mikhail S. Dubrovin
+- in GeometryAccess add methods save_pars_in_file(path), set_print_bits(pbits)
+- in GeometryObject add methods str_data()
+- update test/examples in GeometryAccess.py and test/ex_geometry_access.cpp
+	
 Tag: V00-02-14
 2014-09-09 Mikhail S. Dubrovin
 - in GeometryAccess.h - improve doxygen documentation

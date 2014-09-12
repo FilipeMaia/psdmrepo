@@ -110,6 +110,16 @@ class GeometryObject :
 
 #------------------------------
 
+    def str_data(self) :
+        """ Returns a string of data to save in file
+        """
+        return '%s %2d  %s %2d' % (self.pname.ljust(10), self.pindex, self.oname.ljust(10), self.oindex) + \
+               '  %8.0f  %8.0f  %8.0f' % (self.x0, self.y0, self.z0) + \
+               '  %6.1f  %6.1f  %6.1f' % (self.rot_z, self.rot_y, self.rot_x) + \
+               '  %8.5f  %8.5f  %8.5f' % (self.tilt_z, self.tilt_y, self.tilt_x)
+
+#------------------------------
+
     def print_geo_children(self) :
         """ Print info about children of self geometry object
         """

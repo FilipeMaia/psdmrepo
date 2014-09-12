@@ -64,10 +64,12 @@ GeometryAccess::~GeometryAccess ()
 }
 
 //-------------------
-void GeometryAccess::load_pars_from_file()
+void GeometryAccess::load_pars_from_file(const std::string& path)
 {
   m_dict_of_comments.clear();
   v_list_of_geos.clear();
+
+  if(! path.empty()) m_path = path;
 
   std::ifstream f(m_path.c_str());
 
@@ -88,6 +90,37 @@ void GeometryAccess::load_pars_from_file()
   f.close();
 
   set_relations();
+}
+
+//-------------------
+
+void GeometryAccess::save_pars_in_file(const std::string& path)
+{
+  if(m_pbits & 1) MsgLog(name(), info, "Save pars in file " << path.c_str());
+
+  std::stringstream ss;
+
+  // Save comments
+  std::map<std::string, std::string>::iterator iter;
+  for (iter = m_dict_of_comments.begin(); iter != m_dict_of_comments.end(); ++iter) {
+    ss << "# " << std::setw(10) << std::left << iter->first;
+    ss << "  " << iter->second << '\n';
+  }
+
+  ss << '\n';
+
+  // Save data
+  for(std::vector<GeometryAccess::shpGO>::iterator it  = v_list_of_geos.begin(); 
+                                                   it != v_list_of_geos.end(); ++it) {
+    if( (*it)->get_parent_name().empty() ) continue;
+    ss << (*it)->str_data() << '\n';
+  }
+
+  std::ofstream out(path.c_str()); 
+  out << ss.str();
+  out.close();
+
+  if(m_pbits & 64) std::cout << ss.str();
 }
 
 //-------------------

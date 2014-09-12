@@ -66,30 +66,60 @@ class GeometryAccess :
 
     #------------------------------
 
-    def load_pars_from_file(self) :
+    def load_pars_from_file(self, path=None) :
         """Reads input "geometry" file, discards empty lines and comments, fills the list of geometry objects for data lines
         """        
+        if path is not None : self.path = path
+            
         self.dict_of_comments = {}
         self.list_of_geos = []
+
+        if self.pbits & 32 : print 'Load file: %s' % self.path
 
         f=open(self.path,'r')
         for linef in f :
             line = linef.strip('\n')
             if not line : continue   # discard empty strings
             if line[0] == '#' :      # process line of comments
-                self.add_comment_to_dict(line)
+                self._add_comment_to_dict(line)
                 continue
             #print line
-            #geo=self.parse_line(line)
-            self.list_of_geos.append(self.parse_line(line))
+            #geo=self._parse_line(line)
+            self.list_of_geos.append(self._parse_line(line))
     
         f.close()
     
-        self.set_relations()
+        self._set_relations()
+    
+    #------------------------------
+
+    def save_pars_in_file(self, path) :
+        """Save "geometry" file with current content
+        """        
+
+        if self.pbits & 32 : print 'Save file: %s' % path
+
+        txt = ''
+        # save comments
+        for k in sorted(self.dict_of_comments) :
+            txt += '# %10s  %s\n' % (k.ljust(10), self.dict_of_comments[k])
+
+        txt += '\n'        
+
+        # save data
+        for geo in self.list_of_geos :
+            if geo.get_parent_name() is None : continue
+            txt += '%s\n' % (geo.str_data())
+
+        f=open(path,'w')
+        f.write(txt)
+        f.close()
+
+        if self.pbits & 64 : print txt
     
     #------------------------------
     
-    def add_comment_to_dict(self, line) :
+    def _add_comment_to_dict(self, line) :
         """Splits the line of comments for keyward and value and store it in the dictionary
         """
         beginline, endline = line.lstrip('# ').split(' ', 1)
@@ -99,7 +129,7 @@ class GeometryAccess :
 
     #------------------------------
     
-    def parse_line(self, line) :
+    def _parse_line(self, line) :
         """Gets the string line with data from input file,
            creates and returns the geometry object for this string.
         """
@@ -134,7 +164,7 @@ class GeometryAccess :
     
     #------------------------------
     
-    def find_parent(self, geobj) :
+    def _find_parent(self, geobj) :
         """Finds and returns parent for geobj geometry object
         """           
         for geo in self.list_of_geos :
@@ -154,19 +184,19 @@ class GeometryAccess :
        
     #------------------------------
 
-    def set_relations(self) :
+    def _set_relations(self) :
         """Set relations between geometry objects in the list_of_geos
         """
         for geo in self.list_of_geos :
             #geo.print_geo()
-            parent = self.find_parent(geo)        
+            parent = self._find_parent(geo)        
 
             if parent is None : continue
 
             geo.set_parent(parent)
             parent.add_child(geo)
 
-            print 'geo:%s:%d has parent:%s:%d' % (geo.oname, geo.oindex, parent.oname, parent.oindex)
+            if self.pbits & 16 : print 'geo:%s:%d has parent:%s:%d' % (geo.oname, geo.oindex, parent.oname, parent.oindex)
 
     #------------------------------
 
@@ -283,6 +313,12 @@ class GeometryAccess :
             iX, iY = np.array((X-xmin)/pix_size, dtype=np.uint), np.array((Y-ymin)/pix_size, dtype=np.uint)
             return iX, iY
 
+#------------------------------
+
+    def set_print_bits(self, pbits=0) :
+        """ Sets printout control bitword
+        """
+        self.pbits = pbits
 
 #------------------------------
 #------ Global Method(s) ------
@@ -432,12 +468,29 @@ def test_plot_cspad(geometry, fname_data, amp_range=(0,0.5)) :
 #------------------------------
 
 def test_img_default() :
-    """ The same test as previous, but use get_pixel_coord_indexes(...) method
+    """ Test default image
     """
     axim = gg.plotImageLarge( img_default() )
     gg.move(500,10)
     gg.show()
 
+#------------------------------
+
+def test_save_pars_in_file(geometry) :
+    """ Test default image
+    """
+    geometry.set_print_bits(32)
+    geometry.save_pars_in_file('./test.txt')
+
+#------------------------------
+
+def test_load_pars_from_file(geometry) :
+    """ Test default image
+    """
+    geometry.set_print_bits(32+64)
+    geometry.load_pars_from_file('./test.txt')
+    geometry.print_list_of_geos()
+    
 #------------------------------
 #------------------------------
 #------------------------------
@@ -469,15 +522,21 @@ if __name__ == "__main__" :
     #fname_data     = basedir + 'cspad-arr-cxid2714-r0023-lysozyme-rings.npy'
     #amp_range = (0,500)
 
-    geometry = GeometryAccess(fname_geometry, 0377)
+    geometry = GeometryAccess(fname_geometry, 0)
 
-    msg = 'Use command: sys.argv[0] <num>, wher num=[1,3]'
+    msg = 'Use command: sys.argv[0] <num>, wher num=1,2,3,...,7'
 
     if len(sys.argv)==1   : print 'App needs in input parameter.' + msg
     elif sys.argv[1]=='1' : test_access(geometry)
     elif sys.argv[1]=='2' : test_plot_quad(geometry)
     elif sys.argv[1]=='3' : test_plot_cspad(geometry, fname_data, amp_range)
-    #elif sys.argv[1]=='4' : test_img_default()
+    elif sys.argv[1]=='4' : test_img_default()
+    elif sys.argv[1]=='5' :
+        print 'Init GeometryAccess is silent? (see below)'
+        ga0 = GeometryAccess(fname_geometry, 0)
+    elif sys.argv[1]=='6' : ga0377 = GeometryAccess(fname_geometry, 0377)
+    elif sys.argv[1]=='7' : test_save_pars_in_file(geometry)
+    elif sys.argv[1]=='8' : test_load_pars_from_file(geometry)
     else : print 'Wrong input parameter.' + msg
 
     sys.exit ('End of %s' % sys.argv[0])

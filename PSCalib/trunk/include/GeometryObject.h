@@ -233,6 +233,9 @@ public:
   /// Returns pixel scale size of geometry object
   double get_pixel_scale_size();
 
+  /// Returns string of data for output file
+  std::string str_data();
+
 protected:
 
 private:

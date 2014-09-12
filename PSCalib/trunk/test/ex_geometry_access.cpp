@@ -33,18 +33,18 @@ using namespace std;
 int main (int argc, char* argv[])
 {
   std::string pname("SOME_PARENT");
-  unsigned    pindex=0;
+  unsigned    pindex=1;
   std::string oname("SENS2X1:V1");
-  unsigned    oindex=0;
-  double      x0=0;
-  double      y0=0;
-  double      z0=0;
-  double      rot_z=0;
-  double      rot_y=0;
-  double      rot_x=0;
-  double      tilt_z=0;
-  double      tilt_y=0;
-  double      tilt_x=0;
+  unsigned    oindex=2;
+  double      x0=3;
+  double      y0=4;
+  double      z0=5;
+  double      rot_z=6;
+  double      rot_y=7;
+  double      rot_x=8;
+  double      tilt_z=9;
+  double      tilt_y=10;
+  double      tilt_x=11;
 
   //-----------------
   cout << "Run " << argv[0] << '\n';     
@@ -180,6 +180,23 @@ int main (int argc, char* argv[])
   cout << "\n\nTest of get_dict_of_comments():\n";
   std::map<std::string, std::string>& dict = geometry.get_dict_of_comments();
   cout << "dict['HDR'] = " << dict["HDR"] << '\n';
+
+  //-----------------
+  cout << "\n\nTest of save_pars_in_file(path):\n";
+  geometry.save_pars_in_file("test.txt");
+
+  //-----------------
+  cout << "\n\nTest of save_pars_in_file(path):\n";
+
+  const std::string fname_test("test.txt");
+  geometry.set_print_bits(1+64);
+  geometry.save_pars_in_file(fname_test);
+
+  //-----------------
+  cout << "\n\nTest of load_pars_from_file(path):\n";
+  geometry.set_print_bits(1);
+  geometry.load_pars_from_file(fname_test);
+  geometry.print_list_of_geos();
 
   //-----------------
   cout << "End of " << argv[0] << '\n';

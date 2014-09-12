@@ -255,6 +255,25 @@ public:
                         const double*    W = 0,
                         const unsigned&  size = 0);
 
+  /// Loads calibration file
+ /**
+   *  @param[in] path - path to the file with calibration parameters of type "geometry"
+   */
+  void load_pars_from_file(const std::string& path = std::string());
+
+  /// Saves calibration file
+ /**
+   *  @param[in] path - path to the file with calibration parameters of type "geometry"
+   */
+  void save_pars_in_file(const std::string& path = std::string());
+
+  /// Sets the m_pbits - printout control bitword
+ /**
+   *  @param[in] pbits - printout control bitword
+   */
+  void set_print_bits(unsigned pbits=0) {m_pbits=pbits;}
+
+
 protected:
 
 private:
@@ -276,9 +295,6 @@ private:
 
   /// map/dictionary of comments from calibration "geometry" file 
   std::map<std::string, std::string> m_dict_of_comments;
-
-  /// Loads calibration file
-  void load_pars_from_file();
 
   /// Adds comment to the dictionary
   void add_comment_to_dict(const std::string& line);
