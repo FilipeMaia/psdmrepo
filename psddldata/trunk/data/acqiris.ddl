@@ -174,6 +174,9 @@
             unlike in pdsdata this already takes into account value of the indexFirstPoint so
             that client code does not need to correct for this offset. */
   int16_t _extraSpace[_extraSize-@self.indexFirstPoint()];
+
+  /* Contructor for valid sizeof estimate */
+  @init(indexFirstPoint -> _indexFirstPoint) [[inline]];
 }
 
 
