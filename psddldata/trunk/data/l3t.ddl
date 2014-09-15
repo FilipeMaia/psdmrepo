@@ -29,4 +29,33 @@
   @init()  [[auto, inline]];
 
 }
+
+//------------------ DataV2 ------------------
+@type DataV2
+  [[type_id(Id_L3TData, 2)]]
+  [[pack(4)]]
+{
+  @enum Result(uint8_t) {
+    Fail, 
+    Pass, 
+    None,
+  }
+
+  @enum Bias(uint8_t) {
+    Unbiased,
+    Biased
+  }
+
+  uint32_t _accept -> accept {
+    /*  Returns L3T Decision : None = insufficient information/resources */
+    Result   _bf_result:2 -> result;
+    /*  Returns L3T Bias : Unbiased = recorded independent of decision */
+    Bias     _bf_bias:1   -> bias;
+    uint32_t _z:29;
+  }
+
+  /* Constructor with values for each attribute */
+  @init()  [[auto, inline]];
+
+}
 } //- @package L3T

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-13
+2014-09-15 Matt Weaver
+- Added TimeTool config type, GenericPgp config type, and L3T::DataV2 type
+	
 Tag: V01-00-12
 2014-07-03 Jana Thayer
 - Support the 3 new fields in Ebeam BLD V6 in bldreader, cfgreader, xtcreader, and xtcMonClientExample.

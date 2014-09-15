@@ -1,3 +1,5 @@
+@include "psddldata/genericpgp.ddl";
+
 @package Epix  {
 
 
@@ -452,6 +454,7 @@
   [[pack(2)]]
   [[config(ConfigV1)]]
   [[config(Config10KV1)]]
+  [[config(GenericPgp.ConfigV1)]]
 {
   uint32_t _first {
     uint8_t _vc:2 -> vc;
