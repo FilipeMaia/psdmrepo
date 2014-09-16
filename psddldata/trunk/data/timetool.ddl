@@ -95,6 +95,18 @@
   /*  EPICS PV base name */
   char _base_name[@self.base_name_length()] -> base_name;
 
+  /*  Size of projections */
+  uint32_t signal_projection_size()
+  [[language("C++")]] @{ return (@self.write_projections() ? (@self.project_axis()==X ?
+  @self.sig_roi_hi().column()-@self.sig_roi_lo().column()+1 :
+  @self.sig_roi_hi().row   ()-@self.sig_roi_lo().row   ()+1) : 0); @}
+
+  uint32_t sideband_projection_size()
+  [[language("C++")]] @{ return ((@self.write_projections()&&@self.subtract_sideband()) ?
+  (@self.project_axis()==X ?
+     @self.sb_roi_hi().column()-@self.sb_roi_lo().column()+1 :
+     @self.sb_roi_hi().row   ()-@self.sb_roi_lo().row   ()+1) : 0); @}
+
   /* Constructor which takes values for every attribute */
   @init() [[auto]];
 
@@ -104,6 +116,56 @@
         number_of_weights -> _number_of_weights,
         calib_poly_dim    -> _calib_poly_dim,
         base_name_length  -> _base_name_length) [[inline]];
+}
+
+//------------------ DataV1 ------------------
+@type DataV1
+  [[type_id(Id_TimeToolData, 1)]]
+  [[config(ConfigV1)]]
+{
+  @enum EventType (uint32_t) {
+    Dark,           // No Laser
+    Reference,      // No Beam
+    Signal          // Laser and Beam
+  }
+
+  /*  Event designation */
+  EventType _event_type   -> event_type;
+  
+  uint32_t  _z;
+
+  /*  Amplitude of the edge */
+  double _amplitude      -> amplitude;
+
+  /*  Filtered pixel position of the edge */
+  double _position_pixel -> position_pixel;
+
+  /*  Filtered time position of the edge */
+  double _position_time  -> position_time;
+
+  /*  Full-width half maximum of filtered edge (in pixels) */
+  double _position_fwhm  -> position_fwhm;
+
+  /*  Amplitude of reference at the edge */
+  double _ref_amplitude  -> ref_amplitude;
+
+  /*  Amplitude of the next largest edge */
+  double _nxt_amplitude  -> nxt_amplitude;
+
+  /*  Projected signal */
+  int32_t _projected_signal   [@config.signal_projection_size()]   -> projected_signal;
+
+  /*  Projected reference */
+  int32_t _projected_sideband [@config.sideband_projection_size()] -> projected_sideband;
+
+  /* Constructor with values for each attributes */
+  @init(event_type     -> _event_type,
+        amplitude      -> _amplitude, 
+        position_pixel -> _position_pixel,
+        position_time  -> _position_time,
+        position_fwhm  -> _position_fwhm,
+        ref_amplitude  -> _ref_amplitude,
+        nxt_amplitude  -> _nxt_amplitude) [[inline]];
 }
 } //- @package TimeTool
 
