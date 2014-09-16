@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2014-09-16 David Schneider
+- Fix some bugs with mpi based split scan. Not production ready.
+- instrument code with macros for printing debug/trace messages.
+	
 Tag: V00-02-00
 2014-09-03 David Schneider
 - Introduce mpi based split scan. Adds dependency on openmpi.

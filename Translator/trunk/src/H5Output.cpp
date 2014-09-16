@@ -49,7 +49,8 @@
 using namespace Translator;
 using namespace std;
 
-#define DBGMSG debug
+#define DBGLVL debug
+#define TRACELVL trace
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -120,7 +121,7 @@ namespace {
     hdf5pp::Attribute<uint32_t> attr2 = group.createAttr<uint32_t> ( what+".nanoseconds" ) ;
     attr2.store ( clock.nsec() ) ;
 
-    MsgLog(logger,debug,"storeClock - stored " << what << ".seconds than .nanoseconds to group " << group);
+    MsgLog(logger,DBGLVL,"storeClock - stored " << what << ".seconds than .nanoseconds to group " << group);
   }
 
   void parseFilterConfigString(const string &configParamKey, 
@@ -153,7 +154,7 @@ namespace {
     } else {
       if (filter1 == all) {
         includeAll = true;
-        MsgLog(logger,debug, configParamKey << ": include all");
+        MsgLog(logger,DBGLVL, configParamKey << ": include all");
         return;
       }
     }
@@ -163,7 +164,7 @@ namespace {
       filterSet.insert(*pos);
       ++pos;
     }  
-    WithMsgLog(logger, debug, str) {
+    WithMsgLog(logger, DBGLVL, str) {
       str << configParamKey << ": is_exclude=" 
           << isExclude << " filterSet: ";
       copy(filterSet.begin(), filterSet.end(),
@@ -192,12 +193,12 @@ namespace {
       }
     }
     if (foundDaqAliasKey) {
-      MsgLog(logger, debug, "hack to deal with alias from both DAQ and control, found 0 ip address, putting in front");
+      MsgLog(logger, DBGLVL, "hack to deal with alias from both DAQ and control, found 0 ip address, putting in front");
       EventKey daqAlias = *iter;
       eventKeys.erase(iter);
       eventKeys.push_front(daqAlias);
     } else {
-      MsgLog(logger, debug, "hack to deal with alias from both DAQ and control, did not find 0 ip address");
+      MsgLog(logger, DBGLVL, "hack to deal with alias from both DAQ and control, did not find 0 ip address");
     }
   }
 
@@ -228,7 +229,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName,
                                         m_storeEpics(EpicsH5GroupDirectory::Unknown),
                                         m_printedNotFilteringWarning(false)
 {
-  MsgLog(logger,trace,name() << " constructor()");
+  MsgLog(logger,TRACELVL,name() << " constructor()");
 }
 
 void H5Output::init() {
@@ -237,7 +238,7 @@ void H5Output::init() {
                                                     m_split,
                                                     m_jobNumber,
                                                     m_jobTotal,
-						    m_mpiWorkerStartCalibCycle,
+                                                    m_mpiWorkerStartCalibCycle,
                                                     m_overwrite,
                                                     ::_fileSchemaVersion);
   m_hdfWriters.initialize();
@@ -282,7 +283,7 @@ list<string> H5Output::configListReportIfNotDefault(const string &param,
 }
 
 void H5Output::readConfigParameters() {
-  MsgLog(logger, trace, name() << "reading config parameters");
+  MsgLog(logger, TRACELVL, name() << "reading config parameters");
   m_quiet = config("quiet",false);
   m_h5fileName = configStr("output_file");
   if (not m_quiet) MsgLog(logger, info, "output file: " << m_h5fileName);
@@ -327,13 +328,16 @@ void H5Output::readConfigParameters() {
   m_jobTotal = configReportIfNotDefault("jobTotal",1);
   if (m_split == SplitScanMgr::MPIWorker) {
     m_mpiWorkerStartCalibCycle = config("first_calib_cycle_number");
+    if (m_mpiWorkerStartCalibCycle < 0) {
+      MsgLog(logger, fatal, "MPI Worker started with negative calib cycle: " << m_mpiWorkerStartCalibCycle);
+    }
   }
   if ((m_split != SplitScanMgr::NoSplit) and 
       (m_storeEpics == EpicsH5GroupDirectory::OnlyStoreEpicsUpdates)) {
     m_storeEpics = EpicsH5GroupDirectory::RepeatEpicsEachCalib;
     MsgLog(logger,warning,"epics storage set to 'calib_repeat' (was 'updates_only') since SplitScan mode in use");
   }
-  MsgLog(logger,trace, name() << "epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
+  MsgLog(logger,TRACELVL, name() << "epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
 
   m_overwrite = configReportIfNotDefault("overwrite",false);
 
@@ -451,7 +455,7 @@ void H5Output::initializeSrcAndKeyFilters(PSEnv::Env &env) {
     PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(env.aliasMap()));
     m_psevtSourceFilterList.push_back(srcMatch);
   }
-  MsgLog(logger,trace, name() << "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
+  MsgLog(logger,TRACELVL, name() << "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
   parseFilterConfigString("key_filter", m_key_filter, m_keyFilterIsExclude,   m_includeAllKey,   m_keyFilterSet, true);
   if (m_keyFilterSet.find(doNotTranslatePrefix()) != m_keyFilterSet.end()) {
     MsgLog(logger,warning, "key_filter contains special key string: " 
@@ -474,7 +478,7 @@ void H5Output::createH5OutputFile() {
   unsigned majnum, minnum, relnum;
   herr_t err = H5get_libversion(&majnum, &minnum, &relnum);
   if (err != 0) throw hdf5pp::Hdf5CallException(ERR_LOC,"failed to get Hdf5 library version number");
-  MsgLog(logger,trace,"Hdf Library version info: " << majnum << "." << minnum << "." << relnum);
+  MsgLog(logger,TRACELVL,"Hdf Library version info: " << majnum << "." << minnum << "." << relnum);
 
   hdf5pp::File::CreateMode mode = m_overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
 
@@ -485,7 +489,8 @@ void H5Output::createH5OutputFile() {
   
   // we want to create new file
   hdf5pp::PListFileAccess fapl ;
-  if (m_splitScanMgr->splitScanMode()) {
+  if (m_splitScanMgr->isNonMPISplitMaster() or 
+      m_splitScanMgr->isMPIMaster()) {
     // h5py and matlab should be able to read from the master file if we 
     // use CloseWeak. Using CloseWeak may pose some risk to integrity of master file.
     fapl.set_fclose_degree(hdf5pp::PListFileAccess::CloseWeak);
@@ -568,7 +573,7 @@ void H5Output::checkForNewWriters(PSEvt::Event &evt) {
       const std::type_info * newType = newWriter->typeInfoPtr();
       bool nameCollision = checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(newType);
       if (nameCollision) continue;
-      MsgLog(logger,trace,name()<<" new hdf5 writer found for type: "
+      MsgLog(logger,TRACELVL,name()<<" new hdf5 writer found for type: "
              << PSEvt::TypeInfoUtils::typeInfoRealName(newType)
              << " key: " << key);
       boost::shared_ptr<HdfWriterNewDataFromEvent> newWriterFromEvent = 
@@ -588,7 +593,7 @@ void H5Output::checkForNewWriters(PSEvt::Event &evt) {
 
 void H5Output::beginJob(Event& evt, Env& env) 
 {
-  MsgLog(logger,DBGMSG,"H5Output beginJob()");
+  MsgLog(logger,DBGLVL,"H5Output beginJob()");
   init();
   boost::shared_ptr<EventId> eventId = evt.get();
   initializeSrcAndKeyFilters(env);
@@ -610,6 +615,18 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_configureGroupDir.clearMaps();
   m_chunkManager.beginJob(env);
   
+  if (m_splitScanMgr->isMPIWorker()) {
+    // create a configure group in the external file for the configure data.
+    // Write the configure data there. This data is already in the master file.
+    // We do not need to do this for the user, however if we don't do it, then
+    // when we write updated config in the calibCycle group, we will repeat all the
+    // initial configure information, which is a source of bugs.
+    m_splitScanMgr->createCalibFileIfNeeded(m_currentCalibCycleCounter);
+    m_currentConfigureGroup = m_splitScanMgr->createConfigureGroupInExtCalibFile(m_currentCalibCycleCounter);
+    addConfigTypes(evt, env, m_configureGroupDir, m_currentConfigureGroup);
+    m_configureGroupDir.closeGroups();
+    m_currentConfigureGroup.close();
+  }
   if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
     // add config types to the Configure group
     addConfigTypes(evt, env, m_configureGroupDir, m_currentConfigureGroup);
@@ -622,11 +639,11 @@ void H5Output::beginJob(Event& evt, Env& env)
 
 void H5Output::beginRun(Event& evt, Env& env) 
 {
-  MsgLog(logger,DBGMSG, name() << ": beginRun()");
+  MsgLog(logger,DBGLVL, name() << ": beginRun()");
   boost::shared_ptr<EventId> eventId = evt.get();
   // the aliasMap can change from run to run, so reinitialize the src filter list with each run.
   initializeSrcAndKeyFilters(env);
-  if (m_splitScanMgr->isMPIWorker()) {
+  if (m_splitScanMgr->isMPIWorker()) {    
     m_currentCalibCycleCounter =  m_mpiWorkerStartCalibCycle;
   } else {
     m_currentCalibCycleCounter = 0;
@@ -644,7 +661,7 @@ void H5Output::beginRun(Event& evt, Env& env)
 
 void H5Output::beginCalibCycle(Event& evt, Env& env) 
 {
-  MsgLog(logger,DBGMSG,"beginCalibCycle() calib cycle " << m_currentCalibCycleCounter);
+  MsgLog(logger,DBGLVL,"beginCalibCycle() calib cycle " << m_currentCalibCycleCounter);
   boost::shared_ptr<EventId> eventId = evt.get();
   createNextCalibCycleGroup(eventId);
   m_calibCycleGroupDir.clearMaps();
@@ -653,9 +670,8 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   m_filteredEventsThisCalibCycle = 0;
   m_chunkManager.beginCalibCycle(env);
   if (m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
+    // find/add any updates to the config objects
     addConfigTypes(evt, env, m_calibCycleGroupDir, m_currentCalibCycleGroup);
-  }
-  if (m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
     m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
   }
 }
@@ -667,19 +683,20 @@ void H5Output::event(Event& evt, Env& env)
     ++m_totalEventsProcessed;
     if (not psanaSkipedEvent(evt)) {
       try {
-	eventImpl(evt, env);
+        eventImpl(evt, env);
       } catch (...) {
-	MsgLog(logger,error,name() << " event: error, closing file");
-	if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
-	  closeH5File();
-	} 
-	if (m_splitScanMgr->splitScanMode() and 
-	    m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
-        m_calibCycleGroupDir.closeGroups();
-        m_currentCalibCycleGroup.close();
-        m_splitScanMgr->closeCalibCycleFile(m_currentCalibCycleCounter);
-	}
-	throw;
+        MsgLog(logger,error,name() << " event: error, closing file. cc=" << m_currentCalibCycleCounter
+               << " evts (this cc)=" << m_currentEventCounter << " evts(total)=" << m_totalEventsProcessed);
+        if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
+          closeH5File();
+        } 
+        if (m_splitScanMgr->splitScanMode() and 
+            m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
+          m_calibCycleGroupDir.closeGroups();
+          m_currentCalibCycleGroup.close();
+          m_splitScanMgr->closeCalibCycleFile(m_currentCalibCycleCounter);
+        }
+        throw;
       }
     }
   }
@@ -725,10 +742,10 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
   boost::shared_ptr<HdfWriterFromEvent> nullHdfWriter;
   if (srcIsFiltered(src)) {
     if (key.size() == 0)  {
-      MsgLog(logger,debug,"Filtering " << eventKey << " due to src_filter");
+      MsgLog(logger,DBGLVL,"Filtering " << eventKey << " due to src_filter");
       return nullHdfWriter;
     } else {
-      MsgLog(logger,debug,"Although src_filter applies to " << eventKey << " it has a non-empty key string. NOT filtering");
+      MsgLog(logger,DBGLVL,"Although src_filter applies to " << eventKey << " it has a non-empty key string. NOT filtering");
     }
   }
   bool hasVlenPrefix = false;
@@ -736,7 +753,7 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
   if (key.size() != 0) {
     hasVlenPrefix = hasNDArrayVlenPrefix(key, &stripPrefixKey);
     if (keyIsFiltered(stripPrefixKey)) {
-      MsgLog(logger,debug,"key is filtered for " << eventKey << ", filtering.");
+      MsgLog(logger,DBGLVL,"key is filtered for " << eventKey << ", filtering.");
       return nullHdfWriter;
     }
   }
@@ -746,7 +763,7 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
              << " contains key with special prefix only for ndarrays, "
              << " but type is not a known ndarray");
     }
-    MsgLog(logger,debug,"skipping calibrated data: " << eventKey);
+    MsgLog(logger,DBGLVL,"skipping calibrated data: " << eventKey);
     return nullHdfWriter;
   }
 
@@ -761,14 +778,14 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
                << eventKey << " but the type is not a known ndarray");
       }
     }
-    MsgLog(logger,debug,"No hdfwriter found for " << eventKey);
+    MsgLog(logger,DBGLVL,"No hdfwriter found for " << eventKey);
     return nullHdfWriter;
   }
   if ((not m_skip_calibrated) and checkForCalibratedKey) {
     if (key.size()==0) {
       EventKey calibratedKey(typeInfoPtr,src, m_calibration_key);
       if (evt.proxyDict()->exists(calibratedKey)) {
-        MsgLog(logger, debug, "calibrated key exists for " << eventKey << " filtering");
+        MsgLog(logger, DBGLVL, "calibrated key exists for " << eventKey << " filtering");
         return nullHdfWriter;
       }
     }
@@ -806,7 +823,7 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
   filtered.clear();
   boost::shared_ptr<PSEvt::DamageMap> damageMap = evt.get();
   list<EventKey> eventKeysFromEvent = evt.keys();
-  WithMsgLog(logger, debug, str) {
+  WithMsgLog(logger, DBGLVL, str) {
     str << "setEventKeysToTranslate - eventKeysFromEvent:";
     for (list<EventKey>::iterator pos = eventKeysFromEvent.begin();
          pos != eventKeysFromEvent.end(); ++pos) {
@@ -814,7 +831,7 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
     }
   }
   list<EventKey> updatedConfigKeys = getUpdatedConfigKeys(env);
-  WithMsgLog(logger, debug, str) {
+  WithMsgLog(logger, DBGLVL, str) {
     str << "setEventKeysToTranslate updated config keys:";
     for (list<EventKey>::iterator pos = updatedConfigKeys.begin();
          pos != updatedConfigKeys.end(); ++pos) {
@@ -859,14 +876,14 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
   // event for translation to the CalibCycle group - the filtered list will contain any
   // data to go to the filtered group
   if (eventIsFiltered) {
-    WithMsgLog(logger,trace,str) {
+    WithMsgLog(logger,TRACELVL,str) {
       str << "setEventKeysToTranslate - event is filtered, filtered key list: ";
       list<PSEvt::EventKey>::iterator pos;
       for (pos = filtered.begin(); pos != filtered.end(); ++pos) {
         str << *pos << ", ";
       }
     }
-    WithMsgLog(logger,trace,str) {
+    WithMsgLog(logger,TRACELVL,str) {
       str << "setEventKeysToTranslate - EventKeyTranslation list: ";
       list<EventKeyTranslation>::iterator pos;
       for (pos = toTranslate.begin(); pos != toTranslate.end(); ++pos) {
@@ -896,7 +913,7 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
                                               EventKeyTranslation::Blank,
                                               inEvent));
   }
-  WithMsgLog(logger,trace,str) {
+  WithMsgLog(logger,TRACELVL,str) {
     str << " EventKeyTranslation list: ";
     list<EventKeyTranslation>::iterator pos;
     for (pos = toTranslate.begin(); pos != toTranslate.end(); ++pos) {
@@ -962,18 +979,18 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
   map<EventKey, long> previousBlanksForRepeatSplitEvent;
   set<EventKey> previousNonBlanksForRepeatSplitEvent;
   if (splitEvent) {
-    MsgLog(logger,trace,"split event " << eventPosition());
+    MsgLog(logger,TRACELVL,"split event " << eventPosition());
     BlankNonBlanksMap::iterator pos = m_previousSplitEvents.find(eventId);
     repeatEvent = pos != m_previousSplitEvents.end();
     if (repeatEvent) {
-      MsgLog(logger,trace,"split event AND repeat event");
+      MsgLog(logger,TRACELVL,"split event AND repeat event"); 
       previousBlanksForRepeatSplitEvent = pos->second.blanks;
       previousNonBlanksForRepeatSplitEvent = pos->second.nonblanks;
     }
   }
 
   m_calibCycleGroupDir.markAllSrcKeyGroupsNotWrittenForEvent();
-  MsgLog(logger, DBGMSG, name() << eventPosition() << " eventId: " << *eventId);
+  MsgLog(logger, DBGLVL, name() << eventPosition() << " eventId: " << *eventId);
   list<EventKeyTranslation>::iterator keyIter;
   for (keyIter = toTranslate.begin(); keyIter != toTranslate.end(); ++keyIter) {
     const EventKey eventKey = keyIter->eventKey;
@@ -982,30 +999,30 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
     Pds::Damage damage = keyIter->damage;
     boost::shared_ptr<HdfWriterFromEvent> hdfWriter = keyIter->hdfWriter;
     const Pds::Src & src = eventKey.src();
-    MsgLog(logger,debug,"eventKey=" << eventKey << "damage= " << damage.value() <<
+    MsgLog(logger,DBGLVL,"eventKey=" << eventKey << "damage= " << damage.value() <<
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
     const std::string  & key = eventKey.key();
     if (key == m_calibration_key) {
       m_calibratedEventKeys.insert(eventKey);
-      MsgLog(logger,debug, "eventKey is calibration key. Adding Pds::Src to calibratedSrc Src.");
+      MsgLog(logger,DBGLVL, "eventKey is calibration key. Adding Pds::Src to calibratedSrc Src.");
     }
     TypeMapContainer::iterator typePos = m_calibCycleGroupDir.findType(eventKey);
     if (typePos == m_calibCycleGroupDir.endType()) {
       m_calibCycleGroupDir.addTypeGroup(eventKey, m_currentCalibCycleGroup);
-      MsgLog(logger,trace, "eventKey: " << eventKey 
+      MsgLog(logger,TRACELVL, "eventKey: " << eventKey 
              << " with group name " << m_h5groupNames->nameForType(eventKey.typeinfo(), eventKey.key())
              << " not in calibCycleEventGroupDir.  Added type to groups");
     }
     SrcKeyMap::iterator srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
     if (srcKeyPos == m_calibCycleGroupDir.endSrcKey(eventKey)) {
-      MsgLog(logger,trace,
+      MsgLog(logger,TRACELVL,
              "src " << src << " not in type group.  Adding src to type group");
       SrcKeyGroup & srcKeyGroup = m_calibCycleGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
       if (writeBlank) {
-        MsgLog(logger,trace," initial event is blank.  Only creating time/damage datasets");
+        MsgLog(logger,TRACELVL," initial event is blank.  Only creating time/damage datasets");
         srcKeyGroup.make_timeDamageDatasets();
       } else {
-        MsgLog(logger,trace," initial event is nonblank.  Creating event datasets, and time/damage datasets");
+        MsgLog(logger,TRACELVL," initial event is nonblank.  Creating event datasets, and time/damage datasets");
         srcKeyGroup.make_datasets(dataTypeLoc, evt, env, m_defaultCreateDsetProp);
       }
       srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
@@ -1016,7 +1033,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
       map<PSEvt::EventKey, long>::iterator previousBlank;
       previousBlank = previousBlanksForRepeatSplitEvent.find(eventKey);
       if (previousBlank != previousBlanksForRepeatSplitEvent.end()) {
-        MsgLog(logger,trace,
+        MsgLog(logger,TRACELVL,
                "repeat event has blank entry for eventKey " << eventKey);
         size_t blankIndex = previousBlank->second;
         if (writeBlank) srcKeyGroup.overwriteDamage(blankIndex, eventKey, eventId, damage);
@@ -1024,7 +1041,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
         srcKeyGroup.written(true);
         needToAppend = false;
       } else {
-        MsgLog(logger,trace,
+        MsgLog(logger,TRACELVL,
                "repeat event has nonblank entry for eventKey " << eventKey);
         set<PSEvt::EventKey>::iterator previousNonBlank;
         previousNonBlank = previousNonBlanksForRepeatSplitEvent.find(eventKey);
@@ -1047,15 +1064,20 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
     }
     if (needToAppend) {
       if (writeBlank) {
-        MsgLog(logger,debug,"appending blank");
-        srcKeyGroup.appendBlankTimeAndDamage(eventKey, eventId, damage);
+        MsgLog(logger,DBGLVL,"appending blank");
+        try {
+          srcKeyGroup.appendBlankTimeAndDamage(eventKey, eventId, damage);
+        } catch (const std::runtime_error &exp) {
+          MsgLog(logger, error, "Failed to append blank - second case");
+          throw exp;
+        }
       }
       else {
         if (not srcKeyGroup.arrayTypeDatasetsCreated()) {
-          MsgLog(logger,trace, "appending nonblank and type dataset not created, making type datasets");
+          MsgLog(logger,TRACELVL, "appending nonblank and type dataset not created, making type datasets");
           srcKeyGroup.make_typeDatasets(dataTypeLoc, evt, env, m_defaultCreateDsetProp);
         } else {
-          MsgLog(logger,debug,"appending nonblank");
+          MsgLog(logger,DBGLVL,"appending nonblank");
         }
         srcKeyGroup.appendDataTimeAndDamage(eventKey, dataTypeLoc, evt, env, eventId, damage);
       }
@@ -1067,7 +1089,9 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
     // As a given source can have several types of data, there may be two or more 
     // droppedContributions from a given source.  That is there may be Src repeats in the 
     // droppedContribs list below.  If there is at least one dropped contribution from a
-    // source, we will append blanks to all the types from that source that were not already written.
+    // source, we will append blanks to all the types that are event based from that source 
+    // that were not already written. We qualify on event based in case config data from the
+    // calib cycle exists for the source as well.
     // The damage we use for these blanks will be from one of these droppedContrib entries with
     // that Src. We have no way to identify which damage will go with which type in this case.
     // This situtation will be rare, and when it happens, most likely all droppedContrib entries
@@ -1105,8 +1129,16 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
         SrcKeyMap::iterator srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
         SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
         Pds::Damage damage = src2damage[src];
-        long pos = srcKeyGroup.appendBlankTimeAndDamage(eventKey, eventId, damage);
-        blankNonBlanks.blanks[eventKey] = pos;
+        if (srcKeyGroup.arrayDatasetsCreated()) {
+          try {
+            long pos = srcKeyGroup.appendBlankTimeAndDamage(eventKey, eventId, damage);
+            blankNonBlanks.blanks[eventKey] = pos;
+          } catch (const std::runtime_error &exp) {
+            MsgLog(logger, error, exp.what());
+            MsgLog(logger, error, "Failed to append blank. notWritten loop. notWrittenIdx=" << notWrittenIdx);
+            throw exp;
+          }
+        }
       }
     }
     for (size_t writtenIdx = 0; writtenIdx < writtenKeys.size(); ++writtenIdx)  {
@@ -1147,7 +1179,7 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
     }
     for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
       EventKey &eventKey = *iter;
-      MsgLog(logger,debug,"addConfigureTypes eventKey: " << *iter << " loc: " << dataLoc);
+      MsgLog(logger,DBGLVL,"addConfigureTypes eventKey: " << *iter << " loc: " << dataLoc);
       boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, eventKey,checkForCalib);
       if (not hdfWriter) continue;
       const std::type_info * typeInfoPtr = eventKey.typeinfo();
@@ -1156,10 +1188,10 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
       if (typePos == configGroupDirectory.endType()) {
         ++newTypes;
         configGroupDirectory.addTypeGroup(eventKey, parentGroup);
-        MsgLog(logger,trace, "eventKey: " << eventKey
+        MsgLog(logger,TRACELVL, "eventKey: " << eventKey
                << " with group name " << m_h5groupNames->nameForType(eventKey.typeinfo(), eventKey.key())
                << " not in configGroupDir.  Added type to groups");
-        MsgLog(logger,trace, 
+        MsgLog(logger,TRACELVL, 
                PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) <<" not in groups.  Added type to groups");
       }
       SrcKeyMap::iterator srcKeyPos = configGroupDirectory.findSrcKey(eventKey);
@@ -1167,7 +1199,7 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
       if (srcKeyPos == configGroupDirectory.endSrcKey(eventKey)) {
         ++newSrcs;
         configGroupDirectory.addSrcKeyGroup(eventKey,hdfWriter);
-        MsgLog(logger, trace,
+        MsgLog(logger, TRACELVL,
                " src " << src << " not in type group.  Added src to type group");
         srcKeyPos = configGroupDirectory.findSrcKey(eventKey);
         alreadyExists = false;
@@ -1194,12 +1226,12 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
       ++newDatasets;
     }
   }
-  MsgLog(logger, trace, "created " << newTypes << " new types, " << newSrcs << " new srcs, and "
+  MsgLog(logger, TRACELVL, "created " << newTypes << " new types, " << newSrcs << " new srcs, and "
          << newDatasets << " newDatasets");
 }
 
 void H5Output::endCalibCycle(Event& evt, Env& env) {
-  MsgLog(logger,DBGMSG,"endCalibCycle()");
+  MsgLog(logger,DBGLVL,"endCalibCycle()");
   boost::shared_ptr<EventId> eventId = evt.get();
   if (m_filteredEventsThisCalibCycle > 0) {
     // filtered events messages are disabled in split mode, 
@@ -1220,7 +1252,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
   if (m_splitScanMgr->splitScanMode()) {
     if (m_splitScanMgr->isMPIWorker()) {
       if (m_totalEventsProcessed >= m_minEventsPerMPIWorker) {
-	stop();
+        stop();
       } 
     } else if (m_splitScanMgr->thisJobWritesThisCalib(m_currentCalibCycleCounter)) {
       // normal split scan mode - one calib cyle per file
@@ -1233,7 +1265,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
 
 void H5Output::endRun(Event& evt, Env& env) 
 {
-  MsgLog(logger,DBGMSG,"endRun()");
+  MsgLog(logger,DBGLVL,"endRun()");
   boost::shared_ptr<EventId> eventId = evt.get();
   if (m_splitScanMgr->splitScanMode() and 
       m_splitScanMgr->thisJobWritesMainOutputFile() and
@@ -1250,7 +1282,7 @@ void H5Output::endRun(Event& evt, Env& env)
 void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
   vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
   getHdfWritersForCalibStore(calibStoreWriters);
-  MsgLog(logger,trace,"Adding calibstore hdfwriters: got " 
+  MsgLog(logger,TRACELVL,"Adding calibstore hdfwriters: got " 
          << calibStoreWriters.size() << " writers");
   vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
   for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
@@ -1269,7 +1301,7 @@ void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
 void H5Output::removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
   vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
   getHdfWritersForCalibStore(calibStoreWriters);
-  MsgLog(logger,trace,"Removing calibstore hdfwriters: got " 
+  MsgLog(logger,TRACELVL,"Removing calibstore hdfwriters: got " 
          << calibStoreWriters.size() << " writers");
   vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
   for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
@@ -1294,15 +1326,15 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
     calibStoreTypesAlreadyWritten(LessSrcKeyPair(m_h5groupNames->calibratedKey()));
   map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair>::iterator alreadyWrittenIter;
   std::set<PSEvt::EventKey>::iterator calibEventKeyIter;
-  MsgLog(logger,debug, "going to go through " << m_calibratedEventKeys.size() << " calibrated event keys");
+  MsgLog(logger,DBGLVL, "going to go through " << m_calibratedEventKeys.size() << " calibrated event keys");
   for (calibEventKeyIter = m_calibratedEventKeys.begin(); 
        calibEventKeyIter != m_calibratedEventKeys.end(); ++calibEventKeyIter) {
     const PSEvt::EventKey &calibEventKey = *calibEventKeyIter;
-    MsgLog(logger,debug, "calib key: " << calibEventKey);
+    MsgLog(logger,DBGLVL, "calib key: " << calibEventKey);
     const type_info * calibEventType = calibEventKey.typeinfo();
     const Pds::Src &src = calibEventKey.src();
     vector<const type_info *> calibStoreTypes = type2calibTypeMap[calibEventType];
-    MsgLog(logger, debug, "going to go through " << calibStoreTypes.size() << " types for key");
+    MsgLog(logger, DBGLVL, "going to go through " << calibStoreTypes.size() << " types for key");
     for (unsigned idx = 0; idx < calibStoreTypes.size(); ++idx) {
       const type_info * calibStoreType = calibStoreTypes[idx];
       boost::shared_ptr<void> calibStoreData;
@@ -1317,19 +1349,19 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
         continue;
       }
       if (calibStoreData) {
-	MsgLog(logger, debug, " got calib store data for type " 
+	MsgLog(logger, DBGLVL, " got calib store data for type " 
 	       << TypeInfoUtils::typeInfoRealName(calibStoreType) 
 	       << " for " << calibEventKey);
         boost::shared_ptr<HdfWriterFromEvent> hdfWriter = m_hdfWriters.find(calibStoreType);
         if (not hdfWriter) {
-          MsgLog(logger,trace,"No HdfWriter found for calibStore type: " 
+          MsgLog(logger,TRACELVL,"No HdfWriter found for calibStore type: " 
                  << TypeInfoUtils::typeInfoRealName(calibStoreType));
           continue;
         }
         PSEvt::EventKey calibStoreEventKey(calibStoreType, src, "");
-        MsgLog(logger,trace,"calib data and hdfwriter obtained for " << calibStoreEventKey);
+        MsgLog(logger,TRACELVL,"calib data and hdfwriter obtained for " << calibStoreEventKey);
         if (not calibGroupCreated) {
-          MsgLog(logger,trace,"Creating CalibStore group");
+          MsgLog(logger,TRACELVL,"Creating CalibStore group");
 	  calibGroup = parentGroup.createGroup(calibStoreGroupName);
           calibGroupCreated = true;
         }
@@ -1350,7 +1382,7 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
           const set<const type_info *> & typesWritten = alreadyWrittenIter->second;
           if (typesWritten.find(calibStoreEventKey.typeinfo()) != typesWritten.end()) {
             alreadyStored = true;
-            MsgLog(logger,trace,"calibStore data for " << calibStoreEventKey
+            MsgLog(logger,TRACELVL,"calibStore data for " << calibStoreEventKey
                    << " already stored. No need to store again for eventKey: " 
                    << calibEventKey);
           }
@@ -1374,7 +1406,7 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
           }
         }
       } else {
-	MsgLog(logger, debug, " DID NOT get calib store data for type " 
+	MsgLog(logger, DBGLVL, " DID NOT get calib store data for type " 
 	       << TypeInfoUtils::typeInfoRealName(calibStoreType) 
 	       << " for " << calibEventKey);
       }
@@ -1389,7 +1421,7 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
 
 void H5Output::endJob(Event& evt, Env& env) 
 {
-  MsgLog(logger,DBGMSG,"H5Output endJob()");
+  MsgLog(logger,DBGLVL,"H5Output endJob()");
   boost::shared_ptr<EventId> eventId = evt.get();
   if (not m_exclude_calibstore) {
     hdf5pp::Group calibStoreParent;
@@ -1416,7 +1448,7 @@ void H5Output::endJob(Event& evt, Env& env)
   ++m_currentConfigureCounter;
 
   if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
-    MsgLog(logger, DBGMSG, "closing hdf5 file.");
+    MsgLog(logger, DBGLVL, "closing hdf5 file.");
     m_h5file.close();
   }
   if (m_splitScanMgr->isMPIWorker()) {
@@ -1453,7 +1485,7 @@ void H5Output::reportRunTime() {
 
 H5Output::~H5Output() 
 {
-  MsgLog(logger, trace, "desctructor");
+  MsgLog(logger, TRACELVL, "desctructor");
 }
 
 //////////////////////////////////////////////////////
@@ -1467,22 +1499,30 @@ void H5Output::createNextConfigureGroup(boost::shared_ptr<EventId> eventId) {
   if (eventId) {
     ::storeClock ( m_currentConfigureGroup, eventId->time(), "start" );
   } else {
-    MsgLog(logger,trace,name() << ": no eventId to store start.seconds, start.nanoseconds in configureGroup");
+    MsgLog(logger,TRACELVL,name() << ": no eventId to store start.seconds, start.nanoseconds in configureGroup");
   }
-  MsgLog(logger,trace,name() << ": createNextConfigureGroup: " << groupName);
+  MsgLog(logger,TRACELVL,name() << ": createNextConfigureGroup: " << groupName);
 }
 
 void H5Output::createNextRunGroup(boost::shared_ptr<EventId> eventId) {
   if (not m_splitScanMgr->thisJobWritesMainOutputFile()) return;
   char groupName[128];
   sprintf(groupName,"Run:%4.4lu", m_currentRunCounter);
+  if (m_currentConfigureGroup.hasChild(groupName)) {
+    ostringstream msg;
+    msg << "createNextRunGroup: config group " 
+        << m_currentConfigureGroup.name() 
+        << " already has child: " << groupName;
+    throw std::runtime_error(msg.str());
+  }
   m_currentRunGroup = m_currentConfigureGroup.createGroup(groupName);
+  MsgLog(logger,TRACELVL,"createNextRunGroup - created group");
   if (eventId) {
     ::storeClock ( m_currentRunGroup, eventId->time(), "start" ) ;
   } else {
-    MsgLog(logger,DBGMSG,name() << ": createNextRunGroup - no eventId to store start.seconds, start.nanoseconds");
+    MsgLog(logger,DBGLVL,name() << ": createNextRunGroup - no eventId to store start.seconds, start.nanoseconds");
   }
-  MsgLog(logger,DBGMSG,name() << ": createNextRunGroup: " << groupName);
+  MsgLog(logger,DBGLVL,name() << ": createNextRunGroup: " << groupName);
 }
 
 void H5Output::createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId) {
@@ -1512,9 +1552,9 @@ void H5Output::createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId) {
     if (eventId) {
       ::storeClock ( m_currentCalibCycleGroup, eventId->time(), "start" ) ;
     } else {
-      MsgLog(logger,DBGMSG,name() << ": createNextCalibCycleGroup: no valid eventId to create start.seconds, nanoseconds");
+      MsgLog(logger,DBGLVL,name() << ": createNextCalibCycleGroup: no valid eventId to create start.seconds, nanoseconds");
     }
-    MsgLog(logger,DBGMSG,name() << ": createNextCalibCycleGroup: " << groupName);
+    MsgLog(logger,DBGLVL,name() << ": createNextCalibCycleGroup: " << groupName);
   }
 }
 
@@ -1538,7 +1578,7 @@ namespace {
     if (isExclude) {
       bool inExcludeList = keyInFilterList;
       if (inExcludeList) {
-        MsgLog(logger,trace,"keyIsFiltered: key= " << key << " is in exclude list - no translation");
+        MsgLog(logger,TRACELVL,"keyIsFiltered: key= " << key << " is in exclude list - no translation");
         return true;
       } else {
         return false;
@@ -1547,7 +1587,7 @@ namespace {
     // it is an include set
     bool keyNotInIncludeSet = not keyInFilterList;
     if (keyNotInIncludeSet) {
-      MsgLog(logger,trace,"keyIsFiltered: key=" << key << " is not listed in include list - no translation");
+      MsgLog(logger,TRACELVL,"keyIsFiltered: key=" << key << " is not listed in include list - no translation");
       return true;
     }
     return false;
@@ -1573,7 +1613,7 @@ bool H5Output::srcIsFiltered(const Pds::Src &src) {
   if (m_srcFilterIsExclude) {
     bool inExcludeList = srcInList;
     if (inExcludeList) {
-      MsgLog(logger,trace,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
+      MsgLog(logger,TRACELVL,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
              << " name=" << m_h5groupNames->nameForSrc(src) 
              << " matches Source exclude list - no translation");
       return true;
@@ -1584,7 +1624,7 @@ bool H5Output::srcIsFiltered(const Pds::Src &src) {
   // it is an include set
   bool srcNotInIncludeSet = not srcInList;
   if (srcNotInIncludeSet) {
-    MsgLog(logger,trace,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
+    MsgLog(logger,TRACELVL,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
            << " name=" << m_h5groupNames->nameForSrc(src) 
            << " does not match any Source in include list - no translation");
     return true;

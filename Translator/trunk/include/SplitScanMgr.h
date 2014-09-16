@@ -167,11 +167,23 @@ namespace Translator {
      *  @brief create the given calib cycle group in the calib file for the group.
      *
      * Meant to be called from both MPIWorker and Split mode.
-      *
+     *
      *  @param[in]    calibCycle - calib cycle number
      *  @return hdf5pp::Group to CalibCycle:000x within the external file.
      */
     hdf5pp::Group createCalibCycleGroupInExtCalibFile(size_t calibCycle);
+
+    /**
+     *  @brief create a configure group in the external calib file.
+     *
+     *  Creates the group /config in the file. Throws if file has not been created.
+     *
+     *  Meant to be called from MPIWorker only.
+     *
+     *  @param[in]    calibCycle - calib cycle number
+     *  @return hdf5pp::Group to /Config within the external file.
+     */
+    hdf5pp::Group createConfigureGroupInExtCalibFile(size_t calibCycle);
 
     /**
      * creates h5 file based on given calibCycle.
@@ -186,8 +198,10 @@ namespace Translator {
      * and not create the file.
      *
      * In non MPI mode, with one calib cycle per file, this usually creates the file.
+     *
+     * @return true if created the file
      */
-    void createCalibFileIfNeeded(size_t calibCycle);
+    bool createCalibFileIfNeeded(size_t calibCycle);
 
     /// returns the group for the root entry in the external hdf5 file where this 
     /// calib cycle is being written to
@@ -255,6 +269,7 @@ namespace Translator {
 
     struct ExtCalib {
       hdf5pp::File file;
+      hdf5pp::Group configGroup;
       std::map<size_t, hdf5pp::Group> groups;
       LusiTime::Time startTime;
     };

@@ -31,7 +31,8 @@ import psana_test.psanaTestLib as ptl
 SIT_ROOT = os.path.expandvars('$SIT_ROOT')
 assert SIT_ROOT != '$SIT_ROOT', '$SIT_ROOT is not defined. run sit_setup'
 DATADIR = os.path.join(SIT_ROOT,"data_test/Translator")
-SPLITSCANDATADIR = os.path.join(SIT_ROOT,"data_test/multifile/test_002_xppd9714")
+SPLITSCANDATADIR    = os.path.join(SIT_ROOT,"data_test/multifile/test_002_xppd9714")
+SPLITSCANDATADIRBUG = os.path.join(SIT_ROOT,"data_test/multifile/test_006_xppd7114")
 XPPTUTDATADIR=os.path.join(SIT_ROOT,"data_test/multifile/test_003_xpptut13")
 CALIBDATADIR=os.path.join(SIT_ROOT,"data_test/calib")
 OUTDIR = "data/Translator"
@@ -61,7 +62,7 @@ def makeTempMpiLaunch():
     
     #!/bin/bash
 
-    . sit_setup.sh
+    . sit_setup.sh ana-current
 
     with a full path to sit_setup.sh, it will then run all following arguments.
 
@@ -72,7 +73,7 @@ def makeTempMpiLaunch():
     assert sitSetupCmd.endswith(sitsetupScript), "no sit_setup.sh script found"
     (mpilaunchHandle, mpilaunchFileName) = tempfile.mkstemp(prefix='mpilaunch_', dir=OUTDIR )
     
-    os.write(mpilaunchHandle,'#!/bin/bash\n\n. %s\n\n$@' % sitSetupCmd)
+    os.write(mpilaunchHandle,'#!/bin/bash\n\n. %s ana-current\n\n$@\n' % sitSetupCmd)
     os.close(mpilaunchHandle)
     st=os.stat(mpilaunchFileName)
     os.chmod(mpilaunchFileName,st.st_mode | stat.S_IEXEC)
@@ -1641,6 +1642,38 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_mpiSplitScan_droppedSrc(self):
+        '''This is a regression test for a bug that cropped up. The issue was due to moving where
+        the MPIworker's do their translation of the initial configure. Because it was initially moved
+        to beginCalibCycle - the ipimb config was added to the src group where the ipimb data was. 
+        Ordinarily that config object would be in /Configure:00000/srcA, not in 
+        /Configure:0000/Run:0000/CalibCycle:0000/srcA. Later in the xtc files, the ipimb data was 
+        damaged. The Translator sees damaged from srcA - but it doesn't know which of the
+        types - Ipimb::Config or Ipimb::Data that it should make a blank for. So it was trying to
+        write a blank for both. However Ipimb::Config is of a scalar type, you can't add to it, so
+        we crashed. There is enough information at hand to deduce that it is scalar and not write
+        to it.
+
+        This is also a good test because the ControlData is sent again during the BeginCalibCycle -
+        it forces the mpiworkers to translate config during beginJob where they should.
+        '''
+        mpiTest = MpiTestHelper('mpiSplitScan_bug',
+                                min_events_per_calib_file=1,
+                                num_events_check_done_calib_file=1,
+                                dataSourceString = 'exp=xppd7114:run=130:dir=%s' % SPLITSCANDATADIRBUG,
+                                njobs=6,
+                                verbose=True,
+                                cleanUp = False) # self.cleanUp
+# can't do calibration if doing dump - will compare calibrated to uncalibrated
+#                                downstreamModules = ["cspad_mod.CsPadCalib"],
+#                                extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])
+        
+        diff_cmd = 'diff %s %s' % (mpiTest.xtc_dump, mpiTest.h5_dump)
+        p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(o,'',msg='cmd: %s\nhas stdout=%s' % (diff_cmd, o))
+        self.assertEqual(e,'',msg='cmd: %s\nhas stderr=%s' % (diff_cmd, e))
+        
     def test_mpiSplitScan_oneCalibPerExternalFile(self):
         '''test that mpi split scan works when running similar to how non-mpi split scan worked.
         That is one calib cycle per external file"

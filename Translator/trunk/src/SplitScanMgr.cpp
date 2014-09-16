@@ -35,6 +35,8 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+#define TRACELVL trace
+
 namespace {
 
   LoggerNameWithMpiRank logger("SplitScanMgr");
@@ -93,13 +95,13 @@ bool SplitScanMgr::thisJobWritesThisCalib(size_t calibNumber) const {
   return false;
 }
 
-void SplitScanMgr::createCalibFileIfNeeded(size_t calibNumber) {
-  if (not thisJobWritesThisCalib(calibNumber)) return;
-  if ((m_splitScanMode != MPIWorker) and (m_splitScanMode != SplitScan)) return;
+bool SplitScanMgr::createCalibFileIfNeeded(size_t calibNumber) {
+  if (not thisJobWritesThisCalib(calibNumber)) return false;
+  if ((m_splitScanMode != MPIWorker) and (m_splitScanMode != SplitScan)) return false;
 
   size_t calibIndex = getExtCalibIndex(calibNumber);
 
-  MsgLog(logger, trace, "createCalibFileIfNeeded calibNumber=" 
+  MsgLog(logger, TRACELVL, "createCalibFileIfNeeded calibNumber=" 
 	 << calibNumber << " calibIndex=" << calibIndex);
 
   if (m_extCalib.find(calibIndex) == m_extCalib.end()) {
@@ -107,7 +109,9 @@ void SplitScanMgr::createCalibFileIfNeeded(size_t calibNumber) {
     extCalib.file = createCalibCycleFile(calibIndex);
     extCalib.startTime = LusiTime::Time::now();
     m_extCalib[calibIndex] = extCalib;
+    return true;
   }
+  return false;
 }
 
 void SplitScanMgr::closeCalibCycleFile(size_t calibCycle) {
@@ -121,6 +125,7 @@ void SplitScanMgr::closeCalibCycleFile(size_t calibCycle) {
     hdf5pp::Group &group = groupIter->second;
     if (group.valid()) group.close();
   }
+  if (extCalib.configGroup.valid()) extCalib.configGroup.close();
   if (extCalib.file.valid()) extCalib.file.close();
 }
 
@@ -141,7 +146,7 @@ hdf5pp::File SplitScanMgr::createCalibCycleFile(size_t calibCycle) {
     MsgLog(logger, error, "failure in SplitScanMgr::createCalibCycleFile");
     throw failMsg;
   }
-  MsgLog(logger, trace, "SplitScanMgr::createCalibCycleFile - created " << h5calibFilename);
+  MsgLog(logger, TRACELVL, "SplitScanMgr::createCalibCycleFile - created " << h5calibFilename);
 
   // store schema version for this file
   extCalibFile.createAttr<uint32_t>(":schema:version").store(fileSchemaVersion());
@@ -167,6 +172,14 @@ hdf5pp::File SplitScanMgr::createCalibCycleFile(size_t calibCycle) {
   return extCalibFile;
 }
 
+hdf5pp::Group SplitScanMgr::createConfigureGroupInExtCalibFile(size_t calibCycle) {
+  if (not isMPIWorker()) throw std::runtime_error("createConfigureCycleGroupInExtCalibFile but not MPIWorker");
+  ExtCalib &extCalib = getExtCalib(calibCycle);
+  if (not extCalib.file.valid()) throw std::runtime_error("createConfigureCycleGroupInExtCalibFile file not valid");
+  if (extCalib.configGroup.valid()) throw std::runtime_error("createConfigureCycleGroupInExtCalibFile config group already created");
+  extCalib.configGroup = extCalib.file.createGroup("config");
+  return extCalib.configGroup;
+}
 
 hdf5pp::Group SplitScanMgr::createCalibCycleGroupInExtCalibFile(size_t calibCycle) {
 
@@ -177,7 +190,6 @@ hdf5pp::Group SplitScanMgr::createCalibCycleGroupInExtCalibFile(size_t calibCycl
   
   char groupName[128];
   sprintf(groupName,"CalibCycle:%4.4lu", calibCycle);
-
   extCalib.groups[calibCycle] = extCalib.file.createGroup(groupName);
   return extCalib.groups[calibCycle];
 }
@@ -195,7 +207,7 @@ void SplitScanMgr::newExtLnkForMaster(const char *linkName,
     return;
   }
   m_masterLnksToWrite[calibCycle]=MasterLinkToWrite(linkName, linkGroupLoc);
-  MsgLog(logger, trace, "received notice of external link to add to master file, linkName="
+  MsgLog(logger, TRACELVL, "received notice of external link to add to master file, linkName="
          << linkName<< " calibCycle=" << calibCycle << " linkGroupLoc=" << linkGroupLoc);
 }
 
@@ -224,7 +236,14 @@ hdf5pp::Group SplitScanMgr::extCalibFileRootGroup(size_t calibCycle) {
   if (not extCalib.file.valid()) {
     MsgLog(logger, fatal, "cannot return root group, file is not valid");
   }
-  return extCalib.file.openGroup("/");
+  hdf5pp::Group rootGroup;
+  try {
+    rootGroup = extCalib.file.openGroup("/");
+  } catch (const hdf5pp::Hdf5CallException &callExcept) {
+    MsgLog(logger, error, "SplitScanMgr::extCalibFileRoot - hdf5 call exceptoin on opening file");
+    throw callExcept;
+  }
+  return rootGroup;
 }
 
 void SplitScanMgr::updateMasterLinks(enum UpdateExtLinksMode updateMode) {
@@ -245,7 +264,7 @@ void SplitScanMgr::updateMasterLinks(enum UpdateExtLinksMode updateMode) {
       calibsToErase.push_back(calibCycle);
     }
   }
-  MsgLog(logger, trace, "updateCalibCycleExtLinks updateMode=" << updateModeToStr(updateMode)
+  MsgLog(logger, TRACELVL, "updateCalibCycleExtLinks updateMode=" << updateModeToStr(updateMode)
          << " created " << calibsToErase.size() << " external links.");
 
   for (std::vector<size_t>::iterator ccIter = calibsToErase.begin();
@@ -291,7 +310,7 @@ bool SplitScanMgr::createExtLink(const char *linkName,
   err = H5Fflush(linkGroupLoc.id(), H5F_SCOPE_GLOBAL);
   if (err < 0) throw hdf5pp::Hdf5CallException(ERR_LOC, "H5Fflush");
 
-  MsgLog(logger,trace,"added external link to master file. targetFile=" 
+  MsgLog(logger,TRACELVL,"added external link to master file. targetFile=" 
          << extH5File << " targetName=" << targetName 
          << " linkGroupLoc=" << linkGroupLoc << " linkName=" << linkName);
   return true;

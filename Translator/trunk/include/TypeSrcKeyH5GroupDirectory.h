@@ -96,8 +96,10 @@ class SrcKeyGroup {
                        Pds::Damage damage);
   void close();
   boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter() { return m_hdfWriter; };
-  const PSEvt::EventKey & eventKey() { return m_eventKey; }
-  bool arrayTypeDatasetsCreated() { return m_datasetsCreated == ArrayForTypeTimeDamage; }
+  const PSEvt::EventKey & eventKey() const { return m_eventKey; }
+  bool arrayTypeDatasetsCreated() const { return m_datasetsCreated == ArrayForTypeTimeDamage; }
+  bool arrayDatasetsCreated() const { return m_datasetsCreated == ArrayForTypeTimeDamage or 
+      m_datasetsCreated == ArrayForOnlyTimeDamage; }
 
  private:
   PSEvt::EventKey m_eventKey;

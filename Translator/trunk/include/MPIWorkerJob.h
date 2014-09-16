@@ -61,7 +61,7 @@ class MPIWorkerJob {
   JobState_t state() const { return m_state; }
 
   /// returns true if this is a valid job.
-  bool valid() const { return m_startCalibNumber >= 0; }
+  bool valid() const;
 
   int startCalibNumber() const { return m_startCalibNumber; }
 
@@ -141,11 +141,11 @@ class MPIWorkerJob {
   /// returns MPI datatype for FilePos
   MPI_Datatype static filePosDtype();
 
+  typedef enum { noBlocking, waitForReceivedByWorkerState} WaitLevel_t ;
  protected:
 
   /// internal implementation for  testForFinished() or waitForReceiveAndTestForFinished()
   /// functions
-  typedef enum { noBlocking, waitForReceivedByWorkerState} WaitLevel_t ;
   bool waitTestFinishImpl(int workerToSendTo, WaitLevel_t waitLevel);
 
   /// A MPIWorkerJob has an internal buffer of FilePos. This function fills
@@ -175,6 +175,13 @@ class MPIWorkerJob {
 
 }; // class MPIWorkerJob
 
+std::ostream & operator<<(std::ostream &o, const MPIWorkerJob &mpiWorker);
+
+std::ostream & operator<<(std::ostream &o, MPIWorkerJob::JobState_t);
+
+std::ostream & operator<<(std::ostream &o, MPIWorkerJob::WaitLevel_t);
+
 }; // namespace Translator
+
 
 #endif // TRANSLATOR_MPIWORKERJOB_H

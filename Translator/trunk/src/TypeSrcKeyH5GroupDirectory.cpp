@@ -104,7 +104,11 @@ long SrcKeyGroup::appendBlankTimeAndDamage(const PSEvt::EventKey & eventKey,
                                            boost::shared_ptr<PSEvt::EventId> eventId,
                                            Pds::Damage damage) {
   if (m_datasetsCreated == None or m_datasetsCreated == ScalarForType) {
-    MsgLog(logger,fatal,"cannot append blank, datasetsCreated is " << datasetsCreatedStr());
+    ostringstream msg;
+    msg << "cannot append blank, datasetsCreated is " 
+        << datasetsCreatedStr() << " eventKey=" << eventKey
+        << " eventId=" << *eventId << " damage=" << std::hex << damage.value();
+    throw std::runtime_error(msg.str());
   }
   if (m_datasetsCreated == ArrayForTypeTimeDamage) {
     m_hdfWriter->addBlank(group());

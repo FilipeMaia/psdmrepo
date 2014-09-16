@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "Translator/MPIWorkerJob.h"
+#include "Translator/LoggerNameWithMpiRank.h"
 
 //-----------------
 // C/C++ Headers --
@@ -30,12 +31,14 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 namespace {
-  const char * logger = "MPIWorkerJob";
+  LoggerNameWithMpiRank logger("MPIWorkerJob");
 } // local namespace
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
+
+#define MSGLOGLVL info
 
 using namespace Translator;
 
@@ -79,6 +82,23 @@ MPIWorkerJob::~MPIWorkerJob()
     delete m_msgBuffer;
     m_msgBuffer = 0;
   }
+}
+
+  /// returns true if this is a valid job.
+bool MPIWorkerJob::valid() const { 
+  if (m_startCalibNumber < 0) {
+    if (m_state == invalidJob) return false;
+    else {
+      MsgLog(logger,error,"state is " << m_state << " but m_startCalibNumber is not < 0. It is " << m_startCalibNumber);
+      throw std::runtime_error("MPIWorkerJob internal state");
+    }
+  } 
+  // m_startCalibNumber >= 0
+  if (m_state == invalidJob) {
+    MsgLog(logger,error,"state is " << m_state << " but m_startCalibNumber is >=0. It is " << m_startCalibNumber);
+    throw std::runtime_error("MPIWorkerJob internal state");
+  }
+  return true;
 }
 
 // static function - the MPI data type for the start message buffer
@@ -150,7 +170,7 @@ void MPIWorkerJob::iSend(int workerToSendTo) {
     throw std::runtime_error("iSend: invalid workerToSendTo");
   }
   int bufferLen = int(m_startCalibPos.size());
-  MsgLog(logger,trace,"about to call iSend(from=" << m_worldRank
+  MsgLog(logger,MSGLOGLVL,"about to call iSend(from=" << m_worldRank
 	 << " to=" << workerToSendTo << ",tag=" << m_startCalibNumber << ")");
   MPI_Isend((void *)m_msgBuffer, 
 	    bufferLen,
@@ -161,7 +181,7 @@ void MPIWorkerJob::iSend(int workerToSendTo) {
 	    &m_requestStart);
   m_state = sentToWorker;
   m_workerSentTo = workerToSendTo;
-  MsgLog(logger,trace,"called iSend(from=" << m_worldRank
+  MsgLog(logger,MSGLOGLVL,"called iSend(from=" << m_worldRank
 	 << " to=" << workerToSendTo << ",tag=" << m_startCalibNumber << ")");
 }
 
@@ -183,44 +203,92 @@ bool MPIWorkerJob::waitTestFinishImpl(int worker, WaitLevel_t waitLevel) {
   }
   if (m_state == sentToWorker) {
     int processed;
-    MsgLog(logger,trace,"waitTestFinish: worker=" << worker << " state=sentToWorker about to call MPI_Test on start");
     if (waitLevel == noBlocking) {
+      MsgLog(logger,MSGLOGLVL,"waitTestFinish: worker=" << worker << " state=" << m_state << " about to call noBlocking MPI_Test");
       MPI_Test(&m_requestStart, &processed, MPI_STATUS_IGNORE);
     } else if (waitLevel == waitForReceivedByWorkerState) {
+      MsgLog(logger,MSGLOGLVL,"waitTestFinish: worker=" << worker << " state=" << m_state << " about to call blocking MPI_Wait");
       MPI_Wait(&m_requestStart, MPI_STATUS_IGNORE);
       processed = true;
     } else {
       throw std::runtime_error("waitTestFinish - waitLevel not understood");
     }
-    MsgLog(logger,trace,"waitTestFinish: worker=" << worker << " state=sentToWorker called MPI_Test on start: processed=" << processed);
+    MsgLog(logger,MSGLOGLVL,"waitTestFinish: worker=" << worker << " state=" << m_state << " waitLevel=" << waitLevel << " called MPI_Test or MPI_Wait. processed=" << processed);
     if (processed) {
       m_state = receivedByWorker;
     }
   }
   if (m_state == receivedByWorker) {
     if (m_requestFinish == MPI_REQUEST_NULL)  {
-      MsgLog(logger,trace,"waitTestFinish: about to call IRecv(from=" << m_worldRank
-	     << ", to=" << worker << ", tag=" << startCalibNumber() << ")");
+      MsgLog(logger,MSGLOGLVL,"waitTestFinish: about to call IRecv(from=" << m_worldRank
+             << ", to=" << worker << ", tag=" << startCalibNumber() << ")");
       MPI_Irecv(0, 0, MPI_INT, worker, startCalibNumber(), MPI_COMM_WORLD, &m_requestFinish);
-      MsgLog(logger,trace,"waitTestFinish: called IRecv(from=" << m_worldRank
-	     << ", to=" << worker << ", tag=" << startCalibNumber() << ")");
+      MsgLog(logger,MSGLOGLVL,"waitTestFinish: called IRecv(from=" << m_worldRank
+             << ", to=" << worker << ", tag=" << startCalibNumber() << ")");
     }
     int processed;
-    MsgLog(logger,trace,"waitTestFinish: worker=" << worker << "? state=receivedByWorker finish sent");
-    MsgLog(logger,trace,"waitTestFinish: about to call MPI_Test for finish from=" << m_worldRank
-	   << ", to=" << worker);
+    MsgLog(logger,MSGLOGLVL,"waitTestFinish: worker=" << worker << "? state=receivedByWorker finish sent");
+    MsgLog(logger,MSGLOGLVL,"waitTestFinish: about to call MPI_Test for finish from=" << m_worldRank
+           << ", to=" << worker);
     MPI_Test(&m_requestFinish, &processed, MPI_STATUS_IGNORE);
-    MsgLog(logger,trace,"waitTestFinish: called MPI_Test for finish from=" << m_worldRank
-	   << ", to=" << worker << " processed=" << processed);
+    MsgLog(logger,MSGLOGLVL,"waitTestFinish: called MPI_Test for finish from=" << m_worldRank
+           << ", to=" << worker << " processed=" << processed);
     if (processed) {
       m_state = finishedByWorker;
     }
   }
   bool retValue = m_state == finishedByWorker;
-  MsgLog(logger,trace,"waitTestFinish(" << worker <<") returning " << retValue);
+  MsgLog(logger,MSGLOGLVL,"waitTestFinish(" << worker <<") returning " << retValue);
   return retValue;
 }
 
 void MPIWorkerJob::setStateToFinished() {
+  if (m_state == invalidJob or m_startCalibNumber < 0) {
+    throw std::runtime_error("setStateToFinished called on invalid job");
+  }
   m_state = finishedByWorker;
+}
+
+std::ostream & Translator::operator<<(std::ostream &o, const MPIWorkerJob &mpiWorker) {
+  o << "mpiworker: state=" << mpiWorker.state() << " valid=" << mpiWorker.valid() 
+    << " startCalibNumber=" << mpiWorker.startCalibNumber();
+  return o;
+}
+
+std::ostream & Translator::operator<<(std::ostream &o, MPIWorkerJob::WaitLevel_t waitLevel) {
+  switch (waitLevel) {
+  case MPIWorkerJob::noBlocking:
+    o << "noBlocking";
+    break;
+  case MPIWorkerJob::waitForReceivedByWorkerState:
+    o << "waitForReceivedByWorkerState";
+    break;
+  default:
+    o << "*invalid";
+  }
+  return o;
+}
+
+std::ostream & Translator::operator<<(std::ostream &o, MPIWorkerJob::JobState_t state) {
+  switch (state) {
+  case MPIWorkerJob::invalidJob:
+    o << "invalidJob";
+    break;
+  case MPIWorkerJob::notStarted:
+    o << "notStarted";
+    break;
+  case MPIWorkerJob::sentToWorker:
+    o << "sentToWorker";
+    break;
+  case MPIWorkerJob::receivedByWorker:
+    o << "receivedByWorker";
+    break;
+  case MPIWorkerJob::finishedByWorker:
+    o << "finishedByWorker";
+    break;
+  default:
+    o << "*unknown*";
+    break;
+  }
+  return o;
 }

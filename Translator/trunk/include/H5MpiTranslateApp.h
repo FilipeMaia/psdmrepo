@@ -194,6 +194,8 @@ private:
   LusiTime::Time m_startTime, m_endTime;
   double m_eventTime;  // time iterating through events, as opposed to idle time when waiting for
                        // a message (workers) or waiting for a workers to finish (master)
+  int m_numCalibJobs; // for the master - the number of calib jobs farmed out,
+                      // for a worker - the number of calib jobs processed
   std::queue< boost::shared_ptr<MPIWorkerJob> > m_jobsToDo;
   std::vector< boost::shared_ptr<MPIWorkerJob> > m_workerJobInProgress;
 
