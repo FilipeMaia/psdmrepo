@@ -625,6 +625,30 @@ class Psana( unittest.TestCase ) :
         self.assertIsNotNone(calibStore.get(psana.ndarray_float64_2,psana.Source('ProcInfo()'),"mykey"))
 
         self.assertRaises(TypeError, cfgStore.get, psana.ndarray_float64_2,"mykey","anotherString")
-        
+
+    def test_eventStrGetPut(self):
+        '''Test that std::string is getting converted to Python str and vice versa
+        through the event store
+        '''
+        TEST_42 = os.path.join(DATADIR,'test_042_Translator_t1.xtc')
+        assert os.path.exists(TEST_42), "input file: %s does not exist, can't run test" % TEST_42
+        psana.setConfigFile('')
+        psana.setOption('modules','Translator.TestModuleNDArrayString psana_test.PsanaModulePutStr psana_test.PsanaModuleGetStr')
+        ds = psana.DataSource(TEST_42)
+        evt = ds.events().next()
+        # if we got this far, then the psana_test.PsanaModuleGetStr C++ module got the 
+        # string from the Python module psana_test.PsanaModulePutStr.
+        # So Python -> C++ is working.
+        # Now we test C++ -> Python. The C++ module Translator.TestModuleNDArrayString
+        # puts a few strings in the event:
+        str1 = evt.get(str,'my_string1')
+        self.assertIsNotNone(str1,msg="could not get str with key='my_string1' from event")
+        self.assertTrue(str1.startswith('This is event number'), msg="retrieved my_string1 but did not start with 'This is event number'")
+
+        # now we test that we can put things in from Python and get them back out
+        evt.put('testing string','testkey')
+        testStr = evt.get(str,'testkey')
+        self.assertEqual(testStr,'testing string', msg="testStr does not have expected value")
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
