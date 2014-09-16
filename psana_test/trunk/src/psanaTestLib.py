@@ -1206,10 +1206,111 @@ def updateTestData(xtc, newTypeVers, dgrams):
     bytesToCopy = max([el[1] for el in l1acceptFollowing.values()])
     copyBytes(xtc, bytesToCopy, newTestFilePath)
 
-def copyBytes(src, n, dest):
+def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibCycle, 
+                       destDir, fiducialList=None):
+    '''copies specified number of events/calib cycles from regular data to 
+    destination directory. Optionally copies datagrams matching the given fidicuals as well.
+    only copies the first occurence of any fiducial.
+    INPUT
+     experiment, run  - for example experiment=xppd7114 and run=130 means that the
+                        all streams and chunks of those xtc files in 
+                        /reg/g/psdm/data will be examined.
+    numberCalibCycles - how many calib cycles to copy events from
+    numberEventsPerCalibCycle - how many events per calib cycle to copy out
+    destDir  - the destination directory for the output
+    fiducialList - for example [34263, 34266, 35436, 36009, 44559, 54090, 54696, 54699]
+                   means that datagrams with those fiducials will be copies out as well
+                   (when they first occur) however if they occur past the last calib cycle
+                   they will not be copied
+    '''
+    def getEndOffset(lns, lnIdx, xtc):
+        '''helper function.
+        INPUT
+        lns   - list of lines from xtclinedump output
+        lnIdx - index of line in lns that we want end offset of
+        xtc   - name of xtc file for which this is a xtclinedump
+        OUTPUT
+        the offset in the xtc of the next byte after the datagram as lnIdx
+        '''
+        if lnIdx < len(lns)-1:
+            nextDg = XtcLine(lns[lnIdx+1])
+            if nextDg.contains == 'dg':
+                endOffset = nextDg.offset
+            else:
+                endOffset = os.stat(xtc).st_size
+        else:
+            endOffset = os.stat(xtc).st_size
+        return endOffset
+
+    dataDir = os.path.join('/','reg','d','psdm', experiment[0:3], experiment, 'xtc')
+    assert os.path.exists(dataDir), "data dir not found: %s" % dataDir
+    assert os.path.exists(destDir), "dest dir not found: %s" % destDir
+    xtcFiles = glob.glob(os.path.join(dataDir,'*-r%4.4d*.xtc'%run))
+    xtcFiles.sort()
+    chunk0 = [fname for fname in xtcFiles if fname.endswith('-c00.xtc')]
+    chunkn = xtcFiles[-len(chunk0):]
+    dgramQueue = ['Configure','BeginRun']
+    if fiducialList is None:
+        fiducialList = set()
+    else:
+        fiducialList = set(fiducialList)
+    for cc in range(numberCalibCycles):
+        dgramQueue.extend(['BeginCalibCycle','Enable'])
+        for evt in range(numberEventsPerCalibCycle):
+            dgramQueue.append('L1Accept')
+        dgramQueue.extend(['Disable','EndCalibCycle'])
+    dgramQueue.append('EndRun')
+        
+    for xtc0,xtcn in zip(chunk0,chunkn):
+        done = False
+        queueIdx = 0
+        outFile = os.path.join(destDir,os.path.basename(xtc0))
+        xtcs = [xtc0]
+        if xtcn != xtc0:
+            xtcs.append(xtcn)
+        for xtcIdx,xtc in enumerate(xtcs):
+            cmd = 'xtclinedump dg %s' % xtc
+            o,e = cmdTimeOut(cmd,10*60)
+            assert len(e)==0, "Failure running cmd%s\nError=%s" % (cmd,e)
+            bytesToCopy=[]
+            lns = o.split('\n')
+            numberEndCalibCyclesSeen = 0
+            for lnIdx,ln in enumerate(lns):
+                if len(ln.strip())==0: continue
+                dg = XtcLine(ln)
+                assert dg.contains == 'dg', 'xtclinedump dg line not dg: ln= %s' % ln
+                copiedDgram = False
+                startOffset = dg.offset
+                if queueIdx < len(dgramQueue) and dg.sv.strip() == dgramQueue[queueIdx]:
+                    if dgramQueue[queueIdx]=='EndCalibCycle':
+                        numberEndCalibCyclesSeen += 1
+                    queueIdx += 1
+                    endOffset = getEndOffset(lns, lnIdx, xtc)
+                    bytesToCopy.append((startOffset,endOffset))
+                    copiedDgram = True
+                if (dg.fid in fiducialList) and \
+                   (numberEndCalibCyclesSeen < numberCalibCycles) and (not copiedDgram):
+                    endOffset = getEndOffset(lns, lnIdx, xtc)
+                    bytesToCopy.append((startOffset, endOffset))
+                    fiducialList.discard(dg.fid)
+                if queueIdx == len(dgramQueue):
+                    done = True
+                    break
+            if xtcIdx == 0:
+                pass
+                copyBytes(xtc,bytesToCopy,outFile,'truncate')
+            else:
+                pass
+                copyBytes(xtc,bytesToCopy,outFile,'append')
+            if done:
+                break
+        
+def copyBytes(src, n, dest, mode='truncate'):
     '''copies the fist n bytes, or a set of invervals, the intervals are 
     treated as [a,b), i.e, copyBytes(fileA,[[10,13]],fileB) copies bytes
     10,11 and 12 from fileA to make fileB.
+
+    set mode to 'append' to append
     '''
     if isinstance(n,int):
         intervals = [[0,n]]
@@ -1222,7 +1323,12 @@ def copyBytes(src, n, dest):
             print " [%d,%d)" % (a,b),
         print " from src=%s to dest=%s" % (src, dest)
     inFile = io.open(src,'rb')
-    outFile = io.open(dest,'wb')
+    if mode == 'truncate':
+        outFile = io.open(dest,'wb')
+    elif mode == 'append':
+        outFile = io.open(dest,'ab')
+    else:
+        raise ValueError("Mode is neither 'append' nor 'truncate' it is %s" % mode)
     for interval in intervals:
         assert len(interval)==2
         a = interval[0]
