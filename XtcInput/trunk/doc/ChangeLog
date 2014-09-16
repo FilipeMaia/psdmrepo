@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-08
+2014-09-16 David Schneider
+- reduce debug verbosity
+
 Tag: V00-10-07
 2014-09-02 David Schneider
 - change jump options from second event to third event. Allows psana to

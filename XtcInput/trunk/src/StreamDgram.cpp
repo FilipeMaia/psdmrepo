@@ -186,9 +186,6 @@ bool StreamDgramGreater::doClockGreater(const StreamDgram &a, const StreamDgram 
   const Pds::ClockTime & clockA = a.dg()->seq.clock();
   const Pds::ClockTime & clockB = b.dg()->seq.clock();
   bool res = clockA > clockB;
-  MsgLog(logger, DBGMSG, "doClockGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
-         << "A: " << StreamDgram::dumpStr(a) << std::endl
-         << "B: " << StreamDgram::dumpStr(b));
   return res;
 }
 
@@ -202,10 +199,6 @@ bool StreamDgramGreater::doFidGreater(const StreamDgram &a, const StreamDgram &b
   if (blockResult > 0) return true;
   if (blockResult < 0) return false;
   bool res = m_fidCompare.fiducialsGreater(*a.dg(), *b.dg());
-  MsgLog(logger, DBGMSG, "doFidGreater: A > B is " << bool2str(res) << " dgrams: " << std::endl 
-         << "A: " << StreamDgram::dumpStr(a) << std::endl
-         << "B: " << StreamDgram::dumpStr(b));
-  
   return res;
 }
 
@@ -240,18 +233,10 @@ bool StreamDgramGreater::doBlockGreater(const StreamDgram &a, const StreamDgram 
 
   if ((transA == L1Accept) and (transB == otherTrans)) {
     bool res = a.L1Block() >= b.L1Block();
-    MsgLog(logger, DBGMSG, "doBlockGreater: same run. A > B = " << bool2str(res)
-           << " dgrams:" << std::endl
-           << "A: " << StreamDgram::dumpStr(a) << std::endl
-           << "B: " << StreamDgram::dumpStr(b));
     return res;
   } 
   // (transA == otherTrans) and (transB == L1Accept)
   bool res = a.L1Block() > b.L1Block();
-  MsgLog(logger, DBGMSG, "doBlockGreater: same run. A > B = " << bool2str(res)
-         << " dgrams:" << std::endl
-         << "A: " << StreamDgram::dumpStr(a) << std::endl
-         << "B: " << StreamDgram::dumpStr(b));
   return res;
 }
 
