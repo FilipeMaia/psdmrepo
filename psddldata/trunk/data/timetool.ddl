@@ -93,7 +93,7 @@
   double   _calib_poly[@self.calib_poly_dim()] -> calib_poly;
 
   /*  EPICS PV base name */
-  uint8_t _base_name[@self.base_name_length()] -> base_name;
+  char _base_name[@self.base_name_length()] -> base_name;
 
   /* Constructor which takes values for every attribute */
   @init() [[auto]];
