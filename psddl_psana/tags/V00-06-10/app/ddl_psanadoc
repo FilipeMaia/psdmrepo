@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -d psddldata/data/ ]; then
+    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
+    exit 1
+fi
+
+dir=${1:-psddl_psana/doc/html}
+mkdir -p "$dir"
+
+files=`ls -1 psddldata/data/*.ddl | grep -v xtc.ddl`
+
+psddlc -b psana-doc -I data -O "$dir" -t Psana \
+    -B psana-inc:psddl_psana $files
