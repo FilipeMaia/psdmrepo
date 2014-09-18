@@ -18,6 +18,7 @@
 #include "psddl_psana/evr.ddl.h"
 #include "psddl_psana/fccd.ddl.h"
 #include "psddl_psana/fli.ddl.h"
+#include "psddl_psana/genericpgp.ddl.h"
 #include "psddl_psana/gsc16ai.ddl.h"
 #include "psddl_psana/imp.ddl.h"
 #include "psddl_psana/ipimb.ddl.h"
@@ -34,6 +35,7 @@
 #include "psddl_psana/quartz.ddl.h"
 #include "psddl_psana/rayonix.ddl.h"
 #include "psddl_psana/timepix.ddl.h"
+#include "psddl_psana/timetool.ddl.h"
 #include "psddl_psana/usdusb.ddl.h"
 #include "ndarray/ndarray.h"
 
@@ -179,6 +181,10 @@ TypeAliases::TypeAliases() {
   GMD.insert( & typeid(Psana::Bld::BldDataGMDV2));
   m_alias2TypesMap["GMD"] = GMD;
 
+  TypeInfoSet GenericPgp;
+  GenericPgp.insert( & typeid(Psana::GenericPgp::ConfigV1));
+  m_alias2TypesMap["GenericPgp"] = GenericPgp;
+
   TypeInfoSet Gsc16ai;
   Gsc16ai.insert( & typeid(Psana::Gsc16ai::ConfigV1));
   Gsc16ai.insert( & typeid(Psana::Gsc16ai::DataV1));
@@ -205,6 +211,7 @@ TypeAliases::TypeAliases() {
   TypeInfoSet L3T;
   L3T.insert( & typeid(Psana::L3T::ConfigV1));
   L3T.insert( & typeid(Psana::L3T::DataV1));
+  L3T.insert( & typeid(Psana::L3T::DataV2));
   m_alias2TypesMap["L3T"] = L3T;
 
   TypeInfoSet OceanOptics;
@@ -283,6 +290,11 @@ TypeAliases::TypeAliases() {
   TM6740.insert( & typeid(Psana::Pulnix::TM6740ConfigV1));
   TM6740.insert( & typeid(Psana::Pulnix::TM6740ConfigV2));
   m_alias2TypesMap["TM6740"] = TM6740;
+
+  TypeInfoSet TimeTool;
+  TimeTool.insert( & typeid(Psana::TimeTool::ConfigV1));
+  TimeTool.insert( & typeid(Psana::TimeTool::DataV1));
+  m_alias2TypesMap["TimeTool"] = TimeTool;
 
   TypeInfoSet Timepix;
   Timepix.insert( & typeid(Psana::Timepix::ConfigV1));

@@ -25,6 +25,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/fccd.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
+#include "psddl_hdf2psana/genericpgp.ddl.h"
 #include "psddl_hdf2psana/gsc16ai.ddl.h"
 #include "psddl_hdf2psana/imp.ddl.h"
 #include "psddl_hdf2psana/ipimb.ddl.h"
@@ -41,6 +42,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/quartz.ddl.h"
 #include "psddl_hdf2psana/rayonix.ddl.h"
 #include "psddl_hdf2psana/timepix.ddl.h"
+#include "psddl_hdf2psana/timetool.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
 #include "Translator/HdfWriterNDArray.h"
 #include "Translator/HdfWriterStringFromEvent.h"
@@ -66,6 +68,7 @@ using namespace psddl_hdf2psana::EvrData;
 using namespace psddl_hdf2psana::Bld;
 using namespace psddl_hdf2psana::EpixSampler;
 using namespace psddl_hdf2psana::Arraychar;
+using namespace psddl_hdf2psana::TimeTool;
 using namespace psddl_hdf2psana::Quartz;
 using namespace psddl_hdf2psana::Timepix;
 using namespace psddl_hdf2psana::Encoder;
@@ -73,6 +76,7 @@ using namespace psddl_hdf2psana::CsPad;
 using namespace psddl_hdf2psana::Opal1k;
 using namespace psddl_hdf2psana::Pimax;
 using namespace psddl_hdf2psana::Princeton;
+using namespace psddl_hdf2psana::GenericPgp;
 using namespace psddl_hdf2psana::Partition;
 using namespace psddl_hdf2psana::ControlData;
 using namespace psddl_hdf2psana::FCCD;
@@ -212,6 +216,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::FCCD::FccdConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::FCCD::FccdConfigV2> >();
   m_mainMap[ & typeid(Psana::Fli::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Fli::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Fli::FrameV1) ] = boost::make_shared<HdfWriterPsana<Psana::Fli::FrameV1> >();
+  m_mainMap[ & typeid(Psana::GenericPgp::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::GenericPgp::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Gsc16ai::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Gsc16ai::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Gsc16ai::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::Gsc16ai::DataV1> >();
   m_mainMap[ & typeid(Psana::Imp::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Imp::ConfigV1> >();
@@ -222,6 +227,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Ipimb::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::Ipimb::DataV2> >();
   m_mainMap[ & typeid(Psana::L3T::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::L3T::ConfigV1> >();
   m_mainMap[ & typeid(Psana::L3T::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::L3T::DataV1> >();
+  m_mainMap[ & typeid(Psana::L3T::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::L3T::DataV2> >();
   m_mainMap[ & typeid(Psana::Lusi::DiodeFexConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Lusi::DiodeFexConfigV1> >();
   m_mainMap[ & typeid(Psana::Lusi::DiodeFexConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Lusi::DiodeFexConfigV2> >();
   m_mainMap[ & typeid(Psana::Lusi::DiodeFexV1) ] = boost::make_shared<HdfWriterPsana<Psana::Lusi::DiodeFexV1> >();
@@ -254,6 +260,8 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Quartz::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Quartz::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Rayonix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Rayonix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV2> >();
+  m_mainMap[ & typeid(Psana::TimeTool::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::ConfigV1> >();
+  m_mainMap[ & typeid(Psana::TimeTool::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::DataV1> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV2> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV3> >();
