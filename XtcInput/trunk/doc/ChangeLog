@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-09
+2014-09-18 David schneider
+- adjust debug printout
+
 Tag: V00-10-08
 2014-09-16 David Schneider
 - reduce debug verbosity

@@ -166,6 +166,8 @@ XtcStreamMerger::next()
     throw psana::Exception(ERR_LOC, "XtcStreamMerger::next() replacement stream index not found in m_priorTransBlock");
   }
 
+  MsgLog(logger,DBGMSG,"next() returning: " << StreamDgram::dumpStr(nextStreamDg));
+
   bool replaced = false;
   while (not replaced) {
     Dgram replaceDg = m_streams[replaceStreamIndex]->next();
