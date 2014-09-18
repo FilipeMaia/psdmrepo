@@ -57,8 +57,32 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::L3T::DataV1> >(Pds::TypeId::Id_L3TData));
 
   {
-    PyObject* unvlist = PyList_New(1);
+  scope outer = 
+  class_<Psana::L3T::DataV2, boost::shared_ptr<Psana::L3T::DataV2>, boost::noncopyable >("DataV2", no_init)
+    .def("accept", &Psana::L3T::DataV2::accept)
+    .def("result", &Psana::L3T::DataV2::result,"Returns L3T Decision : None = insufficient information/resources")
+    .def("bias", &Psana::L3T::DataV2::bias,"Returns L3T Bias : Unbiased = recorded independent of decision")
+  ;
+
+  enum_<Psana::L3T::DataV2::Result>("Result")
+    .value("Fail",Psana::L3T::DataV2::Fail)
+    .value("Pass",Psana::L3T::DataV2::Pass)
+    .value("None",Psana::L3T::DataV2::None)
+  ;
+
+  enum_<Psana::L3T::DataV2::Bias>("Bias")
+    .value("Unbiased",Psana::L3T::DataV2::Unbiased)
+    .value("Biased",Psana::L3T::DataV2::Biased)
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_L3TData);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::L3T::DataV2> >(Pds::TypeId::Id_L3TData));
+
+  {
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "DataV2"));
     PyObject_SetAttrString(submodule, "Data", unvlist);
     Py_CLEAR(unvlist);
   }
