@@ -11,6 +11,22 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2014-09-17 Mikhail S. Dubrovin
+A       app/geo.cpp
+A       include/GUIMain.h
+A       include/ThreadTimer.h
+A       include/GeoImage.h
+A       include/WdgFile.h
+A       include/WdgImage.h
+A       include/QGUtils.h
+A       src/ThreadTimer.cpp
+A       src/GeoImage.cpp
+A       src/WdgFile.cpp
+A       src/WdgImage.cpp
+A       src/QGUtils.cpp
+A       src/GUIMain.cpp
+
 Tag: V00-00-02
 2014-08-06 Mikhail S. Dubrovin
 - svn auto modifications in all file headers?...
