@@ -3129,6 +3129,133 @@ def Encoder_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def GenericPgp_CDimension_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'rows: %s' % uint32_to_str( obj.rows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'columns: %s' % uint32_to_str( obj.columns() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def GenericPgp_CRegister_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'address: %s' % uint32_to_str( obj.address() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'offset: %s' % uint32_to_str( obj.offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'mask: %s' % uint32_to_str( obj.mask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'datasize: %s' % uint32_to_str( obj.datasize() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'action:\n'
+    methodStr += enum_to_str(obj.action(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def GenericPgp_CStream_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pgp_channel: %s' % uint32_to_str( obj.pgp_channel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data_type: %s' % uint32_to_str( obj.data_type() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config_type: %s' % uint32_to_str( obj.config_type() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'config_offset: %s' % uint32_to_str( obj.config_offset() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def GenericPgp_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.GenericPgp.ConfigV1.TypeId
+    assert obj.Version == psana.GenericPgp.ConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'id: %s' % uint32_to_str( obj.id() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_registers: %s' % uint32_to_str( obj.number_of_registers() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_sequences: %s' % uint32_to_str( obj.number_of_sequences() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_streams: %s' % uint32_to_str( obj.number_of_streams() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payload_size: %s' % uint32_to_str( obj.payload_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'pixel_settings: %s' % ndarray_to_str( obj.pixel_settings() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sequence_length: %s' % ndarray_to_str( obj.sequence_length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'payload: %s' % ndarray_to_str( obj.payload() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfRows: %s' % uint32_to_str( obj.numberOfRows() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfColumns: %s' % uint32_to_str( obj.numberOfColumns() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'lastRowExclusions: %s' % uint32_to_str( obj.lastRowExclusions() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numberOfAsics: %s' % uint32_to_str( obj.numberOfAsics() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frame_dim:\n'
+    methodStr += GenericPgp_CDimension_to_str(obj.frame_dim(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'aux_dim:\n'
+    methodStr += GenericPgp_CDimension_to_str(obj.aux_dim(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'env_dim:\n'
+    methodStr += GenericPgp_CDimension_to_str(obj.env_dim(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.sequence() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'sequence[%d]:\n' % idx
+        subMethodStr += GenericPgp_CRegister_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.stream() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'stream[%d]:\n' % idx
+        subMethodStr += GenericPgp_CStream_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Epix_AsicConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
@@ -5023,6 +5150,26 @@ def L3T_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def L3T_DataV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.L3T.DataV2.TypeId
+    assert obj.Version == psana.L3T.DataV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'accept: %s' % uint32_to_str( obj.accept() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'result:\n'
+    methodStr += enum_to_str(obj.result(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'bias:\n'
+    methodStr += enum_to_str(obj.bias(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def OceanOptics_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.OceanOptics.ConfigV1.TypeId
     assert obj.Version == psana.OceanOptics.ConfigV1.Version
@@ -6695,6 +6842,151 @@ def Timepix_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def TimeTool_EventLogic_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'event_code: %s' % uint8_to_str( obj.event_code() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'logic_op:\n'
+    methodStr += enum_to_str(obj.logic_op(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def TimeTool_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.ConfigV1.TypeId
+    assert obj.Version == psana.TimeTool.ConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_beam_event_codes: %s' % uint16_to_str( obj.number_of_beam_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_laser_event_codes: %s' % uint16_to_str( obj.number_of_laser_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_cut: %s' % uint32_to_str( obj.signal_cut() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_convergence: %s' % double_to_str( obj.sb_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_convergence: %s' % double_to_str( obj.ref_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'weights: %s' % ndarray_to_str( obj.weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly: %s' % ndarray_to_str( obj.calib_poly() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name: %s' % str_to_str( obj.base_name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_image: %s' % uint8_to_str( obj.write_image() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_projections: %s' % uint8_to_str( obj.write_projections() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'subtract_sideband: %s' % uint8_to_str( obj.subtract_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_weights: %s' % uint16_to_str( obj.number_of_weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly_dim: %s' % uint8_to_str( obj.calib_poly_dim() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name_length: %s' % uint8_to_str( obj.base_name_length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_projection_size: %s' % uint32_to_str( obj.signal_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_projection_size: %s' % uint32_to_str( obj.sideband_projection_size() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'project_axis:\n'
+    methodStr += enum_to_str(obj.project_axis(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.beam_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'beam_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.laser_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'laser_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def TimeTool_DataV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.DataV1.TypeId
+    assert obj.Version == psana.TimeTool.DataV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'amplitude: %s' % double_to_str( obj.amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_pixel: %s' % double_to_str( obj.position_pixel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_time: %s' % double_to_str( obj.position_time() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_fwhm: %s' % double_to_str( obj.position_fwhm() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_amplitude: %s' % double_to_str( obj.ref_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nxt_amplitude: %s' % double_to_str( obj.nxt_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_signal: %s' % ndarray_to_str( obj.projected_signal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_sideband: %s' % ndarray_to_str( obj.projected_sideband() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'event_type:\n'
+    methodStr += enum_to_str(obj.event_type(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def UsdUsb_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.UsdUsb.ConfigV1.TypeId
     assert obj.Version == psana.UsdUsb.ConfigV1.Version
@@ -6819,6 +7111,7 @@ objFunctionTable = {
     (psana.FCCD.FccdConfigV2.TypeId,2) : FCCD_FccdConfigV2_to_str,
     (psana.Fli.ConfigV1.TypeId,1) : Fli_ConfigV1_to_str,
     (psana.Fli.FrameV1.TypeId,1) : Fli_FrameV1_to_str,
+    (psana.GenericPgp.ConfigV1.TypeId,1) : GenericPgp_ConfigV1_to_str,
     (psana.Gsc16ai.ConfigV1.TypeId,1) : Gsc16ai_ConfigV1_to_str,
     (psana.Gsc16ai.DataV1.TypeId,1) : Gsc16ai_DataV1_to_str,
     (psana.Imp.ConfigV1.TypeId,1) : Imp_ConfigV1_to_str,
@@ -6829,6 +7122,7 @@ objFunctionTable = {
     (psana.Ipimb.DataV2.TypeId,2) : Ipimb_DataV2_to_str,
     (psana.L3T.ConfigV1.TypeId,1) : L3T_ConfigV1_to_str,
     (psana.L3T.DataV1.TypeId,1) : L3T_DataV1_to_str,
+    (psana.L3T.DataV2.TypeId,2) : L3T_DataV2_to_str,
     (psana.Lusi.DiodeFexConfigV1.TypeId,1) : Lusi_DiodeFexConfigV1_to_str,
     (psana.Lusi.DiodeFexConfigV2.TypeId,2) : Lusi_DiodeFexConfigV2_to_str,
     (psana.Lusi.DiodeFexV1.TypeId,1) : Lusi_DiodeFexV1_to_str,
@@ -6861,6 +7155,8 @@ objFunctionTable = {
     (psana.Quartz.ConfigV1.TypeId,1) : Quartz_ConfigV1_to_str,
     (psana.Rayonix.ConfigV1.TypeId,1) : Rayonix_ConfigV1_to_str,
     (psana.Rayonix.ConfigV2.TypeId,2) : Rayonix_ConfigV2_to_str,
+    (psana.TimeTool.ConfigV1.TypeId,1) : TimeTool_ConfigV1_to_str,
+    (psana.TimeTool.DataV1.TypeId,1) : TimeTool_DataV1_to_str,
     (psana.Timepix.ConfigV1.TypeId,1) : Timepix_ConfigV1_to_str,
     (psana.Timepix.ConfigV2.TypeId,2) : Timepix_ConfigV2_to_str,
     (psana.Timepix.ConfigV3.TypeId,3) : Timepix_ConfigV3_to_str,

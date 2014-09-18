@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-34
+2014-09-18 David Schneider
+- regenerate dump module for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+
 Tag: V00-00-33
 2014-09-18 David Schneider
 - add unit tests for external packages. Test h5py, tables and pandas
