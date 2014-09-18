@@ -50,6 +50,19 @@ print "my mean of testarray",mymean
 print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
+#testarray2D = (np.random.rand(10,10)).astype(np.float32)
+#numpytest.printArray2D(testarray2D,10,20)
+
+#baseline_value = 0.0
+#outarray =  numpytest.find_edges(testarray.astype(np.double),
+#                                    baseline_value, 
+#                                    0.1,
+#                                    0.5,
+#                                    0.0,
+#                                    True)
+#print outarray
+#print baseline_value
+
 #print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 #print "DELETING OUTGOING NUMPY ARRAYS"
 #print "DELETING testval"
@@ -59,5 +72,17 @@ print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 #print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
+#waveform = np.random.rand(100)
+#print waveform
+#psalg = pypsalg_cpp.psalg()
+#edges = psalg.find_edges(waveform,
+#                         0.2,0.1,0.5,0.0,True)
+#print edges
 
+print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+#psalg_ankush = pypsalg_cpp.psalg_ankush()
+testarray = np.random.rand(10).astype(np.double)
+#psalg_ankush.find_edges(testarray, 0.0, 0.0, 0.0, 0.0, True)
+pypsalg_cpp.find_edges(testarray, 0.0, 0.0, 0.0, 0.0, True)
+print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 

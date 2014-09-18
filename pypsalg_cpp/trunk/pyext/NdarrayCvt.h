@@ -75,6 +75,10 @@ namespace {
     static const char* typeName() { return "float64"; }
     static int numpyType() { return NPY_FLOAT64; }
   };
+  template <> struct Traits<const double> {
+    static const char* typeName() { return "float64"; }
+    static int numpyType() { return NPY_FLOAT64; }
+  };
 
 
   // Returns true if strides correspond to C memmory layout
@@ -148,7 +152,7 @@ namespace {
 };
 
 // typedef myarray ndtype;
-typedef ndarray<float,1> ndtype;
+//typedef ndarray<float,1> ndtype;
 
 // NDArray to Numpy converter for BOOST
 template <typename T, unsigned Rank>
@@ -156,8 +160,13 @@ struct NDArrayToNumpy
 {
   static PyObject* convert(ndarray<T, Rank> const& array) {
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
-    std::cout << "Calling converter from ndarray<T, Rank> to python object" 
+    std::cout << "Calling converter from ndarray<"
+	      << Rank << "> to python object" 
 	      << std::endl;
+
+
+    //<T, Rank> to python object" 
+    //	      << std::endl;
 
     // item size
     const size_t itemsize = sizeof(T);
@@ -257,6 +266,8 @@ struct NDArrayToNumpy
 template <typename T, unsigned Rank>
 struct NumpyToNDArray
 {
+  //  typedef ndarray<T, Rank> Container;
+
 
   NumpyToNDArray& 
   from_python()
@@ -267,18 +278,19 @@ struct NumpyToNDArray
     boost::python::converter::registry::push_back(
       &NumpyToNDArray::convertible,
       &NumpyToNDArray::construct,
-      boost::python::type_id<ndarray<T, Rank> >() );
+      //  boost::python::type_id< Container >() );
+      boost::python::type_id< ndarray<T, Rank>  >() );
 
     // Now check converter was registered
-    // boost::python::type_info tinfo = boost::python::type_id<ndarray<T, Rank> >();
-    // boost::python::converter::registration const* reg = 
-    // boost::python::converter::registry::query(tinfo);
+    boost::python::type_info tinfo = boost::python::type_id<ndarray<T, Rank> >();
+    boost::python::converter::registration const* reg = 
+    boost::python::converter::registry::query(tinfo);
     
-/*     if (reg) { */
-/*       std::cout << "NDARRAY REGISTERED" << std::endl; */
-/*     } else { */
-/*       std::cout << "NDARRAY NOT REGISTERED" << std::endl; */
-/*     } */
+    if (reg) {
+      std::cout << "NDARRAY REGISTERED" << std::endl;
+    } else {
+      std::cout << "NDARRAY NOT REGISTERED" << std::endl;
+    }
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
     return *this;
   }

@@ -2,14 +2,16 @@
 #include <pyext/NdarrayCvt.h>
 #include <iostream>
 
+
+
 struct numpytest
 {
-  void printArray(ndtype array) {
+  void printArray(ndarray<float,1> array) {
     std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
     std::cout << "HELLO FROM PRINT ARRAY !!" << std::endl;
     std::cout << "Number of elements " << array.size() << std::endl;
     std::cout << "Address of underlying array " << array.data() << std::endl;
-    ndtype::iterator iter;
+    ndarray<float,1>::iterator iter;
     for (iter = array.begin(); iter != array.end(); iter++) {
       std::cout << *iter << " ";
     }
@@ -24,21 +26,21 @@ struct numpytest
     return;
   }
 
-  ndtype outArray() {
+  ndarray<float,1> outArray() {
     std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
     std::cout << "outArray called" << std::endl;
 
     //    float* data = new float[10];
-    ndtype::shape_t shape[1] = {10};
+    ndarray<float,1>::shape_t shape[1] = {10};
     // ==> TRY NDARRAY's INTERNAL MEMORY ALLOCATION
-    ndtype array(shape);
+    ndarray<float,1> array(shape);
 
     for (int i=0; i<10; i++) {
       //data[i] = i;
       array[i] = i;
     }
 
-    //    ndtype array(data,shape);
+    //    ndarray<float,1> array(data,shape);
     
     
     std::cout << "Contents of array" << std::endl;
@@ -54,14 +56,14 @@ struct numpytest
     return array;
   }
 
-  ndtype calcmean(ndtype array) {
+  ndarray<float,1> calcmean(ndarray<float,1> array) {
     std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
     std::cout << "My version of mean calculation" << std::endl;
     std::cout << "Sum up contents of array" << std::endl;
         
     float count = 0.0;
     float sum = 0.0;
-    ndtype::iterator iter;
+    ndarray<float,1>::iterator iter;
     for (iter = array.begin(); iter != array.end(); iter++) {
       sum += *iter;
       count++;
@@ -71,13 +73,13 @@ struct numpytest
     float mean = sum / count;
     std::cout << "Mean: " << mean << std::endl;
 
-    ndtype::shape_t shape[1] = {1};    
+    ndarray<float,1>::shape_t shape[1] = {1};    
     //    float* data = new float[1];
     //    data[0] = mean;
 
     // TRY NDARRAY'S INTERNAL MEMORY ALLOCATION
-    //    ndtype outarray(data, shape);
-    ndtype outarray(shape);            
+    //    ndarray<float,1> outarray(data, shape);
+    ndarray<float,1> outarray(shape);            
     outarray[0] = mean;
 
     //    std::cout << "DELETING ARRAY THAT HOLDS VALUE OF MEAN" << std::endl;
@@ -85,6 +87,65 @@ struct numpytest
     std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
     return outarray;
   }
+
+  void printArray2D(ndarray<float,2> array, double number1, float number2=100.0) {
+    std::cout << "Print 2D float array" << std::endl;
+    std::cout << array << std::endl;
+    std::cout << "Number1:" << number1 << std::endl;
+    std::cout << "Number2:" << number2 << std::endl;
+    return;
+  }
+
+  ndarray<double,2> find_edges(const ndarray<const double,1>& wf,
+			       double baseline_value,
+			       double threshold_value,
+			       double fraction,
+			       double deadtime,
+			       bool   leading_edge)  {
+
+    std::cout << "ANKUSH'S FIND EDGES CALLED!!" << std::endl;
+    //    baseline_value += 1.0;
+    std::cout << wf << std::endl;
+    std::cout << baseline_value << std::endl;
+    std::cout << threshold_value << std::endl;
+    std::cout << fraction << std::endl;
+    std::cout << deadtime << std::endl;
+    std::cout << leading_edge << std::endl;
+    
+    ndarray<double,2> outarray = make_ndarray<double>(2,2);
+    
+
+    std::cout << outarray << std::endl;
+    return outarray;
+  }
+
+
+};
+
+
+class psalg_ankush {
+ public:
+    static ndarray<double,2> find_edges(const ndarray<const double,1>& wf,
+					double baseline_value,
+					double threshold_value,
+					double fraction,
+					double deadtime,
+					bool   leading_edge)  {
+
+    std::cout << "PSALG_ANKUSH'S FIND EDGES CALLED!!" << std::endl;
+    std::cout << wf << std::endl;
+    std::cout << baseline_value << std::endl;
+    std::cout << threshold_value << std::endl;
+    std::cout << fraction << std::endl;
+    std::cout << deadtime << std::endl;
+    std::cout << leading_edge << std::endl;
+    
+    ndarray<double,2> outarray = make_ndarray<double>(2,2);
+    
+    std::cout << outarray << std::endl;
+    return outarray;
+  }
+
 
 
 };
