@@ -284,5 +284,151 @@ void store_at(const Psana::L3T::DataV1* obj, hdf5pp::Group group, long index, in
   store_DataV1(obj, group, index, version, true);
 }
 
+
+hdf5pp::Type ns_DataV2_v0_dataset_data_stored_type()
+{
+  typedef ns_DataV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("accept", offsetof(DsType, accept), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_result = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_result.insert("Fail", Psana::L3T::DataV2::Fail);
+  _enum_type_result.insert("Pass", Psana::L3T::DataV2::Pass);
+  _enum_type_result.insert("None", Psana::L3T::DataV2::None);
+  type.insert("result", offsetof(DsType, result), _enum_type_result);
+  hdf5pp::EnumType<uint8_t> _enum_type_bias = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_bias.insert("Unbiased", Psana::L3T::DataV2::Unbiased);
+  _enum_type_bias.insert("Biased", Psana::L3T::DataV2::Biased);
+  type.insert("bias", offsetof(DsType, bias), _enum_type_bias);
+  return type;
+}
+
+hdf5pp::Type ns_DataV2_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_DataV2_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_DataV2_v0_dataset_data_native_type()
+{
+  typedef ns_DataV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("accept", offsetof(DsType, accept), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_result = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_result.insert("Fail", Psana::L3T::DataV2::Fail);
+  _enum_type_result.insert("Pass", Psana::L3T::DataV2::Pass);
+  _enum_type_result.insert("None", Psana::L3T::DataV2::None);
+  type.insert("result", offsetof(DsType, result), _enum_type_result);
+  hdf5pp::EnumType<uint8_t> _enum_type_bias = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_bias.insert("Unbiased", Psana::L3T::DataV2::Unbiased);
+  _enum_type_bias.insert("Biased", Psana::L3T::DataV2::Biased);
+  type.insert("bias", offsetof(DsType, bias), _enum_type_bias);
+  return type;
+}
+
+hdf5pp::Type ns_DataV2_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_DataV2_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_DataV2_v0::dataset_data::dataset_data()
+{
+}
+
+ns_DataV2_v0::dataset_data::dataset_data(const Psana::L3T::DataV2& psanaobj)
+  : accept(psanaobj.accept())
+  , result(psanaobj.result())
+  , bias(psanaobj.bias())
+{
+}
+
+ns_DataV2_v0::dataset_data::~dataset_data()
+{
+}
+uint32_t DataV2_v0::accept() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->accept);
+}
+Psana::L3T::DataV2::Result DataV2_v0::result() const {
+  if (not m_ds_data) read_ds_data();
+  return Psana::L3T::DataV2::Result(m_ds_data->result);
+}
+Psana::L3T::DataV2::Bias DataV2_v0::bias() const {
+  if (not m_ds_data) read_ds_data();
+  return Psana::L3T::DataV2::Bias(m_ds_data->bias);
+}
+void DataV2_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<L3T::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
+}
+
+void make_datasets_DataV2_v0(const Psana::L3T::DataV2& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = L3T::ns_DataV2_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_DataV2_v0(const Psana::L3T::DataV2* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    L3T::ns_DataV2_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::L3T::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::L3T::DataV2> >(boost::make_shared<DataV2_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::L3T::DataV2> >(boost::shared_ptr<Psana::L3T::DataV2>());
+  }
+}
+
+void make_datasets(const Psana::L3T::DataV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_DataV2_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "L3T.DataV2", version);
+  }
+}
+
+void store_DataV2(const Psana::L3T::DataV2* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_DataV2_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "L3T.DataV2", version);
+  }
+}
+
+void store(const Psana::L3T::DataV2& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV2(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::L3T::DataV2* obj, hdf5pp::Group group, long index, int version)
+{
+  store_DataV2(obj, group, index, version, true);
+}
+
 } // namespace L3T
 } // namespace psddl_hdf2psana

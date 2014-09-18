@@ -33,10 +33,12 @@
 #include "psddl_hdf2psana/fli.ddl.h"
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
 #include "psddl_hdf2psana/partition.ddl.h"
+#include "psddl_hdf2psana/timetool.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/rayonix.ddl.h"
 #include "psddl_hdf2psana/epix.ddl.h"
+#include "psddl_hdf2psana/genericpgp.ddl.h"
 
 
 namespace {
@@ -108,6 +110,12 @@ try {
   case 512147955:
     // Lusi::DiodeFexConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexConfigV1(schema_version, group, idx), src);
+    break;
+  case 647095711:
+    // TimeTool::DataV1
+    if (boost::shared_ptr<Psana::TimeTool::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::TimeTool::make_DataV1(schema_version, group, idx, cfgPtr), src);
+    }
     break;
   case 670963505:
     // Quartz::ConfigV1
@@ -449,6 +457,8 @@ try {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::Epix::Config10KV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::GenericPgp::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
   case 2929134981:
@@ -567,6 +577,10 @@ try {
     // EvrData::SrcConfigV1
     cfgStore.putProxy(psddl_hdf2psana::EvrData::make_SrcConfigV1(schema_version, group, idx), src);
     break;
+  case 3538416190:
+    // GenericPgp::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::GenericPgp::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 3565044250:
     // Acqiris::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_ConfigV1(schema_version, group, idx), src);
@@ -603,6 +617,14 @@ try {
   case 3930091641:
     // L3T::DataV1
     evt.putProxy(psddl_hdf2psana::L3T::make_DataV1(schema_version, group, idx), src);
+    break;
+  case 3930091642:
+    // L3T::DataV2
+    evt.putProxy(psddl_hdf2psana::L3T::make_DataV2(schema_version, group, idx), src);
+    break;
+  case 3940776773:
+    // TimeTool::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::TimeTool::make_ConfigV1(schema_version, group, idx), src);
     break;
   case 3985960297:
     // Andor::FrameV1

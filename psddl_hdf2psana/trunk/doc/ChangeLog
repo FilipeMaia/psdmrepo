@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-13
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+- added schema's for TimeTool and GenerigPgp classes. In timetool-h5.ddl
+  Note use of [[vlen]] for basename string, and [[zero_len]] for TimeTool 
+  data where projection array can be zero len.
+	
 Tag: V00-09-12
 2014-07-03 David Schneider
 - regenerate for new pdsdata/psddldata with BldEBeamV6

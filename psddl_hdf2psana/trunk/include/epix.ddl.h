@@ -8,6 +8,7 @@
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
 #include "psddl_hdf2psana/ChunkPolicy.h"
+#include "psddl_hdf2psana/genericpgp.ddl.h"
 namespace psddl_hdf2psana {
 namespace Epix {
 
@@ -656,6 +657,7 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::ConfigV1>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::Config10KV1>& cfg);
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::GenericPgp::ConfigV1>& cfg);
 
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Epix::ElementV1& obj, hdf5pp::Group group, int version = -1);

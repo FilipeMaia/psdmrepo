@@ -115,6 +115,55 @@ void make_datasets(const Psana::L3T::DataV1& obj, hdf5pp::Group group, const Chu
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::L3T::DataV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+
+namespace ns_DataV2_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::L3T::DataV2& psanaobj);
+  ~dataset_data();
+
+  uint32_t accept;
+  uint8_t result;
+  uint8_t bias;
+
+
+};
+}
+
+
+class DataV2_v0 : public Psana::L3T::DataV2 {
+public:
+  typedef Psana::L3T::DataV2 PsanaType;
+  DataV2_v0() {}
+  DataV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  DataV2_v0(const boost::shared_ptr<L3T::ns_DataV2_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~DataV2_v0() {}
+  virtual uint32_t accept() const;
+  virtual Psana::L3T::DataV2::Result result() const;
+  virtual Psana::L3T::DataV2::Bias bias() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<L3T::ns_DataV2_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::L3T::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::L3T::DataV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::L3T::DataV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::L3T::DataV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 } // namespace L3T
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_L3T_DDL_H

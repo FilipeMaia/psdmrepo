@@ -8,7 +8,7 @@
   [[embedded]]
   [[default]]
 {
-}
+} 
 
 //------------------ Asic10kConfigV1 ------------------
 @h5schema Asic10kConfigV1

@@ -2128,6 +2128,7 @@ void ElementV1_v0<Config>::read_ds_temperatures() const {
 }
 template class ElementV1_v0<Psana::Epix::ConfigV1>;
 template class ElementV1_v0<Psana::Epix::Config10KV1>;
+template class ElementV1_v0<Psana::GenericPgp::ConfigV1>;
 
 void make_datasets_ElementV1_v0(const Psana::Epix::ElementV1& obj, 
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
@@ -2219,6 +2220,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV1> > make_ElementV1(int vers
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::Epix::Config10KV1> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV1> >(boost::shared_ptr<Psana::Epix::ElementV1>());
+  }
+}
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::GenericPgp::ConfigV1>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::GenericPgp::ConfigV1> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV1> >(boost::shared_ptr<Psana::Epix::ElementV1>());
   }
