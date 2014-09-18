@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-33
+2014-09-18 David Schneider
+- add unit tests for external packages. Test h5py, tables and pandas
+- test h5tools to excersice h5py vlen patch
+
 Tag: V00-00-32
 2014-09-16 David Schneider
 - add function for making small multifile test data with specific datagrams

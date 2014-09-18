@@ -853,6 +853,22 @@ def testShmCommand(args):
         if os.path.exists(fname):
             os.unlink(fname)
 
+def translate(inDataset, outfile, numEvents, testLabel, verbose):
+    numEventsStr = ''
+    if numEvents is not None and numEvents > 0:
+        numEventsStr = ' -n %d' % numEvents
+    cmd = 'psana %s -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
+    cmd %= (numEventsStr, outfile, inDataset)
+    if verbose: print cmd
+    o,e = cmdTimeOut(cmd,20*60)
+    e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
+    if len(e) > 0:
+        errMsg =  "**Failure** %s: Translator failure\n" % testLabel
+        errMsg += "cmd=%s\n" % cmd
+        errMsg += "\n%s" % e
+        raise Exception(errMsg)
+    if verbose: print "%s: translation finished, produced: %s" % (testLabel, outfile)
+
 def testCommand(args):
     # helper functions
     def checkForSameXtcFiles(testDataInfo, prevInfo, src, num, verbose):
@@ -912,22 +928,6 @@ def testCommand(args):
             msg += " They agree with previously recorded md5s"
             msg %= (src, num)
             print msg
-
-    def translate(inDataset, outfile, numEvents, testLabel, verbose):
-        numEventsStr = ''
-        if numEvents is not None and numEvents > 0:
-            numEventsStr = ' -n %d' % numEvents
-        cmd = 'psana %s -m Translator.H5Output -o Translator.H5Output.output_file=%s -o Translator.H5Output.overwrite=True %s'
-        cmd %= (numEventsStr, outfile, inDataset)
-        if verbose: print cmd
-        o,e = cmdTimeOut(cmd,20*60)
-        e = '\n'.join([ ln for ln in e.split('\n') if not filterPsanaStderr(ln)])
-        if len(e) > 0:
-            errMsg =  "**Failure** %s: Translator failure\n" % testLabel
-            errMsg += "cmd=%s\n" % cmd
-            errMsg += "\n%s" % e
-            raise Exception(errMsg)
-        if verbose: print "%s: translation finished, produced: %s" % (testLabel, outfile)
 
     def compareXtcH5Dump(currentXtcDumpPath, h5DumpPath, testLabel, verbose, expectedOutput=''):
         cmd = 'diff %s %s' % (currentXtcDumpPath, h5DumpPath)
