@@ -62,5 +62,39 @@ uint32_t DataV1::accept() const {
   return m_xtcObj->accept();
 }
 
+Psana::L3T::DataV2::Result pds_to_psana(Pds::L3T::DataV2::Result e)
+{
+  return Psana::L3T::DataV2::Result(e);
+}
+
+Psana::L3T::DataV2::Bias pds_to_psana(Pds::L3T::DataV2::Bias e)
+{
+  return Psana::L3T::DataV2::Bias(e);
+}
+
+DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::L3T::DataV2()
+  , m_xtcObj(xtcPtr)
+{
+}
+DataV2::~DataV2()
+{
+}
+
+
+uint32_t DataV2::accept() const {
+  return m_xtcObj->accept();
+}
+
+
+Psana::L3T::DataV2::Result DataV2::result() const {
+  return pds_to_psana(m_xtcObj->result());
+}
+
+
+Psana::L3T::DataV2::Bias DataV2::bias() const {
+  return pds_to_psana(m_xtcObj->bias());
+}
+
 } // namespace L3T
 } // namespace psddl_pds2psana

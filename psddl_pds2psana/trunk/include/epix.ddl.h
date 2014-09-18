@@ -7,6 +7,7 @@
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/epix.ddl.h"
 #include "pdsdata/psddl/epix.ddl.h"
+#include "psddl_pds2psana/genericpgp.ddl.h"
 namespace psddl_pds2psana {
 namespace Epix {
 

@@ -1225,5 +1225,6 @@ uint32_t ElementV1<Config>::lastWord() const {
 
 template class ElementV1<Pds::Epix::ConfigV1>;
 template class ElementV1<Pds::Epix::Config10KV1>;
+template class ElementV1<Pds::GenericPgp::ConfigV1>;
 } // namespace Epix
 } // namespace psddl_pds2psana

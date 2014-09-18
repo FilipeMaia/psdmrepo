@@ -40,6 +40,21 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+
+class DataV2 : public Psana::L3T::DataV2 {
+public:
+  typedef Pds::L3T::DataV2 XtcType;
+  typedef Psana::L3T::DataV2 PsanaType;
+  DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~DataV2();
+  virtual uint32_t accept() const;
+  virtual Psana::L3T::DataV2::Result result() const;
+  virtual Psana::L3T::DataV2::Bias bias() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace L3T
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_L3T_DDL_H

@@ -31,6 +31,7 @@
 #include "psddl_pds2psana/quartz.ddl.h"
 #include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/usdusb.ddl.h"
+#include "psddl_pds2psana/timetool.ddl.h"
 #include "psddl_pds2psana/alias.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
@@ -39,6 +40,7 @@
 #include "psddl_pds2psana/imp.ddl.h"
 #include "psddl_pds2psana/partition.ddl.h"
 #include "psddl_pds2psana/epixsampler.ddl.h"
+#include "psddl_pds2psana/genericpgp.ddl.h"
 #include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
 #include "psddl_pds2psana/TimepixDataV1ToV2.h"
@@ -776,6 +778,10 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::Epix::ConfigV1>, Pds::Epix::ElementV1, Pds::Epix::ConfigV1> ProxyType;
             if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<Pds::GenericPgp::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::GenericPgp::ConfigV1>, Pds::Epix::ElementV1, Pds::GenericPgp::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -788,6 +794,10 @@ try {
           } else if (boost::shared_ptr<Pds::Epix::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
             typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::Epix::ConfigV1>, Pds::Epix::ElementV1, Pds::Epix::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<Pds::GenericPgp::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::GenericPgp::ConfigV1>, Pds::Epix::ElementV1, Pds::GenericPgp::ConfigV1> ProxyType;
             if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
@@ -1127,6 +1137,22 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_GenericPgpConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::GenericPgp::ConfigV1> xptr(xtc, (Pds::GenericPgp::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::GenericPgp::ConfigV1> obj = boost::make_shared<psddl_pds2psana::GenericPgp::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_GMD:
     {
       switch (version) {
@@ -1393,11 +1419,25 @@ try {
           if (evt) evt->putProxy<Psana::L3T::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
+      case 2:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::L3T::DataV2, psddl_pds2psana::L3T::DataV2, Pds::L3T::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::L3T::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
       case 32769:
         {
           // store proxy
           typedef EvtProxy<Psana::L3T::DataV1, psddl_pds2psana::L3T::DataV1, Pds::L3T::DataV1> ProxyType;
           if (evt) evt->putProxy<Psana::L3T::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32770:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::L3T::DataV2, psddl_pds2psana::L3T::DataV2, Pds::L3T::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::L3T::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -2074,6 +2114,46 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_TimeToolConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::TimeTool::ConfigV1> xptr(xtc, (Pds::TimeTool::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::TimeTool::ConfigV1> obj = boost::make_shared<psddl_pds2psana::TimeTool::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_TimeToolData:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<Pds::TimeTool::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::TimeTool::DataV1, psddl_pds2psana::TimeTool::DataV1<Pds::TimeTool::ConfigV1>, Pds::TimeTool::DataV1, Pds::TimeTool::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::TimeTool::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<Pds::TimeTool::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::TimeTool::DataV1, psddl_pds2psana::TimeTool::DataV1<Pds::TimeTool::ConfigV1>, Pds::TimeTool::DataV1, Pds::TimeTool::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::TimeTool::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_TM6740Config:
     {
       switch (version) {
@@ -2572,6 +2652,13 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     } // end version switch
     break;
+  case Pds::TypeId::Id_GenericPgpConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::GenericPgp::ConfigV1) );
+      break;
+    } // end version switch
+    break;
   case Pds::TypeId::Id_GMD:
     switch(typeId.version()) {
     case 0:
@@ -2686,8 +2773,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::L3T::DataV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::L3T::DataV2) );
+      break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::L3T::DataV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::L3T::DataV2) );
       break;
     } // end version switch
     break;
@@ -2928,6 +3021,23 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     case 32770:
       typeIdPtrs.push_back( &typeid(Psana::Timepix::DataV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TimeToolConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TimeToolData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV1) );
       break;
     } // end version switch
     break;
