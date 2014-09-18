@@ -8,6 +8,7 @@
 #include <cstring>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/genericpgp.ddl.h"
 namespace Psana {
 namespace Epix {
 

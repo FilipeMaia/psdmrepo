@@ -50,6 +50,35 @@ public:
   /** Module trigger decision */
   virtual uint32_t accept() const = 0;
 };
+
+/** @class DataV2
+
+  
+*/
+
+
+class DataV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_L3TData /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  enum Result {
+    Fail,
+    Pass,
+    None,
+  };
+  enum Bias {
+    Unbiased,
+    Biased,
+  };
+  virtual ~DataV2();
+  virtual uint32_t accept() const = 0;
+  /** Returns L3T Decision : None = insufficient information/resources */
+  virtual L3T::DataV2::Result result() const = 0;
+  /** Returns L3T Bias : Unbiased = recorded independent of decision */
+  virtual L3T::DataV2::Bias bias() const = 0;
+};
+std::ostream& operator<<(std::ostream& str, L3T::DataV2::Result enval);
+std::ostream& operator<<(std::ostream& str, L3T::DataV2::Bias enval);
 } // namespace L3T
 } // namespace Psana
 #endif // PSANA_L3T_DDL_H

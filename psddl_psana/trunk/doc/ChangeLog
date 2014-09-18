@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-10
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+	
 Tag: V00-06-09
 2014-07-03 David Schneider
 - regenerate for new pdsdata/psddldata with BldEBeamV6
