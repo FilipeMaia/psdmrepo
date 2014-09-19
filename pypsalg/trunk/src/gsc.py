@@ -1,7 +1,9 @@
 import psana
 
 class gsc:
-    def __init__(self,dataSource,source):
+    # put the "run" in the interface, so that the user knows that a new
+    # object should be made for every run (to get the correct configuration)
+    def __init__(self,dataSource,run,source):
         self.source=source
         cstore = dataSource.env().configStore()
         cfg = cstore.get(psana.Gsc16ai.ConfigV1, source)

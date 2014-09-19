@@ -11,6 +11,11 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2014-09-19 Christopher O'Grady
+- Add "run" to gsc interface so user knows object must
+  be recreated every run
+
 Tag: V00-00-03
 2014-09-19 Christopher O'Grady
 - Add some code to convert Gsc16ai device output to voltages
