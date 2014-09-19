@@ -32,8 +32,12 @@ using namespace boost::python;
 namespace {
 
   // type traits for selected set of C++ types that we support as
-  // elements of ndarraysn
+  // elements of ndarrays
   template <typename T> struct Traits {};
+  
+  // ===> SHOULD BE ABLE TO REPLACE THIS WITH BOOST MACROS 
+  
+  // non-const data types
   template <> struct Traits<int8_t> {
     static const char* typeName() { return "int8"; }
     static int numpyType() { return NPY_INT8; }
@@ -50,7 +54,6 @@ namespace {
     static const char* typeName() { return "uint16"; }
     static int numpyType() { return NPY_UINT16; }
   };
-
   template <> struct Traits<int32_t> {
     static const char* typeName() { return "int32"; }
     static int numpyType() { return NPY_INT32; }
@@ -74,6 +77,45 @@ namespace {
   template <> struct Traits<double> {
     static const char* typeName() { return "float64"; }
     static int numpyType() { return NPY_FLOAT64; }
+  };
+
+
+  // const data types
+  template <> struct Traits<const int8_t> {
+    static const char* typeName() { return "int8"; }
+    static int numpyType() { return NPY_INT8; }
+  };
+  template <> struct Traits<const uint8_t> {
+    static const char* typeName() { return "uint8"; }
+    static int numpyType() { return NPY_UINT8; }
+  };
+  template <> struct Traits<const int16_t> {
+    static const char* typeName() { return "int16"; }
+    static int numpyType() { return NPY_INT16; }
+  };
+  template <> struct Traits<const uint16_t> {
+    static const char* typeName() { return "uint16"; }
+    static int numpyType() { return NPY_UINT16; }
+  };
+  template <> struct Traits<const int32_t> {
+    static const char* typeName() { return "int32"; }
+    static int numpyType() { return NPY_INT32; }
+  };
+  template <> struct Traits<const uint32_t> {
+    static const char* typeName() { return "uint32"; }
+    static int numpyType() { return NPY_UINT32; }
+  };
+  template <> struct Traits<const int64_t> {
+    static const char* typeName() { return "int64"; }
+    static int numpyType() { return NPY_INT64; }
+  };
+  template <> struct Traits<const uint64_t> {
+    static const char* typeName() { return "uint64"; }
+    static int numpyType() { return NPY_UINT64; }
+  };
+  template <> struct Traits<const float> {
+    static const char* typeName() { return "float32"; }
+    static int numpyType() { return NPY_FLOAT32; }
   };
   template <> struct Traits<const double> {
     static const char* typeName() { return "float64"; }
