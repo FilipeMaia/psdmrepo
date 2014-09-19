@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-35
+2014-09-19 David Schneider
+- add regression tests for test data 84-87. These are sample xtc files
+  Matt provides that have the new types. tests 85-87exercise TimeTool::DataV1 
+  with/without the projections.  We test all three to cover zero length arrays 
+  to make sure our hdf5 schema handles them correctly.
+
 Tag: V00-00-34
 2014-09-18 David Schneider
 - regenerate dump module for new pdsdata 8.1.3/psddldata with:

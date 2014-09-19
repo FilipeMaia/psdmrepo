@@ -23,7 +23,9 @@ usage = '''enter one of the commands:
 prev   updates psana_test/data/previousDump.txt.
        For each xtc in the testdata, write the md5 sum of the xtc, the dump of the full xtc,
        and if the xtc is included in the regressionTests.txt file, the specified dump (usually a
-       smaller number of events, without epics aliases in the dump).
+       smaller number of events, without epics aliases in the dump). Note: to include new test
+       data in the regression tests, edit psana_test/data/regressionTests.txt BEFORE running this.
+       Otherwise delete the line for that test file in previousDump.txt and re-run this command.
 
        This file is used by the test command to detect changes.
 

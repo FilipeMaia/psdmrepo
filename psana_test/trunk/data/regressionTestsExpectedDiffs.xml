@@ -165,6 +165,57 @@ From the dump, in the config:
     </comment>
   </regress>
 
+  <regress src="xtc" number="84">
+    <diff>
+<![CDATA[
+1756c1756
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1793c1793
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1838c1838
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1879c1879
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1920c1920
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1961c1961
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2002c2002
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2039c2039
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2080c2080
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2117c2117
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+]]>
+    </diff>
+    <comment>
+This is not a big deal, to have zero dimensional arrays show up as 0x384 in the xtc
+but 0x0 in the hdf5 translation.
+    </comment>
+  </regress>
+
   <regress src="xtc" number="99999">
     <diff>
 <![CDATA[
