@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2014-09-22 Mikhail S. Dubrovin
+- WdgImage - fix for RHEL6 ( #include <cstring> // for memcpy )
+
 Tag: V00-00-03
 2014-09-17 Mikhail S. Dubrovin
 A       app/geo.cpp

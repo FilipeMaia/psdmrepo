@@ -9,6 +9,7 @@
 #include <fstream>     // for std::ifstream(fname)
 //using namespace std; // for cout without std::
 //#include <math.h>  // atan2
+#include <cstring> // for memcpy
 
 namespace PSQt {
 
@@ -366,7 +367,7 @@ WdgImage::setColorBar( const unsigned& rows,
   uint32_t* ctable = ColorTable(cols, hue1, hue2);
   uint32_t dimg[rows][cols]; 
 
-  for(int r=0; r<rows; ++r) {
+  for(unsigned r=0; r<rows; ++r) {
     std::memcpy(&dimg[r][0], &ctable[0], cols*sizeof(uint32_t));
     //dimg[r][c] = ctable[c];
   }
@@ -388,6 +389,10 @@ WdgImage::setCameraImage()
 
   ndarray<uint32_t, 2> inda(dnda.shape());
 
+  //const unsigned ncolors = 1024;
+
+  //uint32_t* ctable = ColorTable(ncolors); // , hue1, hue2);
+
   // Define image_t to uint32_t conversion parameters
   image_t dmin=dnda[0][0];
   image_t dmax=dnda[0][0];
@@ -397,6 +402,7 @@ WdgImage::setCameraImage()
     if( *itd > dmax ) dmax = *itd;
   }
   image_t k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
+  //float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
 
   std::cout << "     dnda: " << dnda
             << "\n   dmin: " << dmin
@@ -408,6 +414,9 @@ WdgImage::setCameraImage()
   ndarray<uint32_t, 2>::iterator iti;
   for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
     *iti = uint32_t( (*itd-dmin)*k ) + 0xFF000000; // converts to 24bits adds alpha layer
+    //unsigned cind = unsigned((*itd-dmin)*k);
+    //cind = (cind<ncolors) ? cind : ncolors-1;
+    //*iti = ctable[cind]; // converts to 24bits adds alpha layer
   }
 
   QImage image((const uchar*) &inda[0][0], inda.shape()[1], inda.shape()[0], QImage::Format_ARGB32);
