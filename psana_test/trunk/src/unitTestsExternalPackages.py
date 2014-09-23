@@ -67,7 +67,7 @@ class ExtPkg( unittest.TestCase ) :
         '''
         infile = os.path.join(DATADIR,'test_042_Translator_t1.xtc')
         assert os.path.exists(infile), "infile not found"
-        outfile = os.path.join(DATADIR, 'test_h5py.h5')
+        outfile = os.path.join(OUTDIR, 'unit-test_h5py.h5')
         ptl.translate(infile, outfile,numEvents=0,testLabel='test_h5py',verbose=False)
         #### test that we can import h5py - however packages already imported can affect success
         successfulImport = False
@@ -212,7 +212,7 @@ rowIdx     timestampHigh, timestampLow, eventCode
             pressure  = tables.Float32Col()    # float  (single-precision)
             energy    = tables.Float64Col()    # double (double-precision)
 
-        outfile = os.path.join(OUTDIR,'test_pytables.h5')
+        outfile = os.path.join(OUTDIR,'unit-test_pytables.h5')
         h5file = tables.open_file(outfile, mode = "w", title = "Test file")
         group = h5file.create_group("/", 'detector', 'Detector information')
         table = h5file.create_table(group, 'readout', Particle, "Readout example")

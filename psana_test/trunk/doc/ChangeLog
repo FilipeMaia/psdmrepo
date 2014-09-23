@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-36
+2014-09-22 David Schneider
+- fix bug with unit tests for external packages. A test created an output
+  file in a directory where I had permission, but not psrel.
+
 Tag: V00-00-35
 2014-09-19 David Schneider
 - add regression tests for test data 84-87. These are sample xtc files
