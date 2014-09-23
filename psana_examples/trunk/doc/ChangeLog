@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-20
+2014-09-23 Mikhail Dubrovin
+- update DumpEpix.cpp for Epix::Config10KV1 and Epix::Asic10kConfigV1 
+	
 Tag: V00-04-19
 2014-08-08 David Schneider
 - update DumpDgram to work with offsets in XtcInput::DgramList
