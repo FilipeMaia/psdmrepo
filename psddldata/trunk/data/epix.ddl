@@ -695,6 +695,10 @@
   uint32_t numberOfRows()  [[inline]]
   [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.numberOfRowsPerAsic(); @}
 
+  /* Number of readable pixel rows in a readout unit */
+  uint32_t numberOfReadableRows()  [[inline]]
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.numberOfReadableRowsPerAsic(); @}
+
   /* Number of pixel columns in a readout unit */
   uint32_t numberOfColumns()  [[inline]]
   [[language("C++")]] @{ return  @self.numberOfAsicsPerRow()*@self.numberOfPixelsPerAsicRow(); @}
@@ -772,7 +776,7 @@
   uint32_t _z0;
   uint32_t _z1;
   uint32_t _z2;
-  uint16_t _frame[@config.numberOfRows()][@config.numberOfColumns()] -> frame;
+  uint16_t _frame[@config.numberOfReadableRows()][@config.numberOfColumns()] -> frame;
   uint16_t _calibrationRows[@config.numberOfCalibrationRows()][@config.numberOfColumns()] -> calibrationRows;
   uint16_t _environmentalRows[@config.numberOfEnvironmentalRows()][@config.numberOfColumns()] -> environmentalRows;
   uint16_t _temperatures[@config.numberOfAsics()] -> temperatures;
