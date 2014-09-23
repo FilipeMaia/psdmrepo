@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-21
+2014-09-23 Mikhail Dubrovin
+- DumpEpix.cpp - improve output format
+
 Tag: V00-04-20
 2014-09-23 Mikhail Dubrovin
 - update DumpEpix.cpp for Epix::Config10KV1 and Epix::Asic10kConfigV1 

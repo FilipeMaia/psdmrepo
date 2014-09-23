@@ -169,79 +169,70 @@ DumpEpix::beginRun(Event& evt, Env& env)
   if (config10k1) {
     WithMsgLog(name(), info, str) {
       str << "Psana::Epix::ConfigV1:";
-      str << "\n  version           = " << config10k1->version();
-      str << "\n  runTrigDelay      = " << config10k1->runTrigDelay();
-      str << "\n  daqTrigDelay      = " << config10k1->daqTrigDelay();
-      str << "\n  dacSetting        = " << config10k1->dacSetting();
-      str << "\n  asicGR            = " << int(config10k1->asicGR());
-      str << "\n  asicAcq           = " << int(config10k1->asicAcq());
-      str << "\n  asicR0            = " << int(config10k1->asicR0());
-      str << "\n  asicPpmat         = " << int(config10k1->asicPpmat());
-      str << "\n  asicPpbe          = " << int(config10k1->asicPpbe());
-      str << "\n  asicRoClk         = " << int(config10k1->asicRoClk());
-      str << "\n  asicGRControl     = " << int(config10k1->asicGRControl());
-      str << "\n  asicAcqControl    = " << int(config10k1->asicAcqControl());
-      str << "\n  asicR0Control     = " << int(config10k1->asicR0Control());
-      str << "\n  asicPpmatControl  = " << int(config10k1->asicPpmatControl());
-      str << "\n  asicPpbeControl   = " << int(config10k1->asicPpbeControl());
-      str << "\n  asicR0ClkControl  = " << int(config10k1->asicR0ClkControl());
-      str << "\n  prepulseR0En      = " << int(config10k1->prepulseR0En());
-      str << "\n  adcStreamMode     = " << config10k1->adcStreamMode();
-      str << "\n  testPatternEnable = " << int(config10k1->testPatternEnable());
-      /** new */
-      str << "\n  SyncMode          = " << int(config10k1->SyncMode());
-      /** new */
-      str << "\n  R0Mode            = " << int(config10k1->R0Mode());
-      /** new */
-      str << "\n  DoutPipelineDelay = " << int(config10k1->DoutPipelineDelay());
-      str << "\n  acqToAsicR0Delay  = " << int(config10k1->acqToAsicR0Delay());
-      str << "\n  asicR0ToAsicAcq   = " << int(config10k1->asicR0ToAsicAcq());
-      str << "\n  asicAcqWidth      = " << int(config10k1->asicAcqWidth());
-      str << "\n  asicAcqLToPPmatL  = " << int(config10k1->asicAcqLToPPmatL());
-      str << "\n  asicRoClkHalfT    = " << int(config10k1->asicRoClkHalfT());
-      str << "\n  adcReadsPerPixel  = " << int(config10k1->adcReadsPerPixel());
-      str << "\n  adcClkHalfT       = " << int(config10k1->adcClkHalfT());
-      str << "\n  asicR0Width       = " << int(config10k1->asicR0Width());
-      str << "\n  adcPipelineDelay  = " << int(config10k1->adcPipelineDelay());
-      /** new */
-      str << "\n  SyncWidth()       = " << int(config10k1->SyncWidth());
-      /** new */
-      str << "\n  SyncDelay()               = " << int(config10k1->SyncDelay());
-      str << "\n  prepulseR0Width           = " << config10k1->prepulseR0Width();
-      str << "\n  prepulseR0Delay           = " << config10k1->prepulseR0Delay();
-      str << "\n  digitalCardId0            = " << config10k1->digitalCardId0();
-      str << "\n  digitalCardId1            = " << config10k1->digitalCardId1();
-      str << "\n  analogCardId0             = " << config10k1->analogCardId0();
-      str << "\n  analogCardId1             = " << config10k1->analogCardId1();
-      str << "\n  lastRowExclusions         = " << config10k1->lastRowExclusions();
-      str << "\n  numberOfAsicsPerRow       = " << config10k1->numberOfAsicsPerRow();
-      str << "\n  numberOfAsicsPerColumn    = " << config10k1->numberOfAsicsPerColumn();
-      str << "\n  numberOfRowsPerAsic       = " << config10k1->numberOfRowsPerAsic();
-      /** for epix10k  176 */ 
-      str << "\n  numberOfPixelsPerAsicRow  = " << config10k1->numberOfPixelsPerAsicRow();
-      /** for epix10k 48*4 */
-      str << "\n  baseClockFrequency        = " << config10k1->baseClockFrequency();
-      str << "\n  asicMask                  = " << config10k1->asicMask();
-      str << "\n  scopeEnable               = " << int(config10k1->scopeEnable());
-      str << "\n  scopeTrigEdge             = " << int(config10k1->scopeTrigEdge());
-      str << "\n  scopeTrigChan             = " << int(config10k1->scopeTrigChan());
-      str << "\n  scopeArmMode              = " << int(config10k1->scopeArmMode());
-      str << "\n  scopeADCThreshold         = " << int(config10k1->scopeADCThreshold());
-      str << "\n  scopeTrigHoldoff          = " << int(config10k1->scopeTrigHoldoff());
-      str << "\n  scopeTrigOffset           = " << int(config10k1->scopeTrigOffset());
-      str << "\n  scopeTraceLength          = " << int(config10k1->scopeTraceLength());
-      str << "\n  scopeADCsameplesToSkip    = " << int(config10k1->scopeADCsameplesToSkip());
-      str << "\n  scopeChanAwaveformSelect  = " << int(config10k1->scopeChanAwaveformSelect());
-      str << "\n  scopeChanBwaveformSelect  = " << int(config10k1->scopeChanBwaveformSelect());
-
-      str << "\n  asicPixelConfigArray = " << config10k1->asicPixelConfigArray();
-
-      str << "\n  numberOfRows    = " << config10k1->numberOfRows();
-      str << "\n  numberOfColumns = " << config10k1->numberOfColumns();
-      str << "\n  numberOfAsics   = " << config10k1->numberOfAsics();
+      str << "\n  version                  = " << config10k1->version();
+      str << "\n  runTrigDelay             = " << config10k1->runTrigDelay();
+      str << "\n  daqTrigDelay             = " << config10k1->daqTrigDelay();
+      str << "\n  dacSetting               = " << config10k1->dacSetting();
+      str << "\n  asicGR                   = " << int(config10k1->asicGR());
+      str << "\n  asicAcq                  = " << int(config10k1->asicAcq());
+      str << "\n  asicR0                   = " << int(config10k1->asicR0());
+      str << "\n  asicPpmat                = " << int(config10k1->asicPpmat());
+      str << "\n  asicPpbe                 = " << int(config10k1->asicPpbe());
+      str << "\n  asicRoClk                = " << int(config10k1->asicRoClk());
+      str << "\n  asicGRControl            = " << int(config10k1->asicGRControl());
+      str << "\n  asicAcqControl           = " << int(config10k1->asicAcqControl());
+      str << "\n  asicR0Control            = " << int(config10k1->asicR0Control());
+      str << "\n  asicPpmatControl         = " << int(config10k1->asicPpmatControl());
+      str << "\n  asicPpbeControl          = " << int(config10k1->asicPpbeControl());
+      str << "\n  asicR0ClkControl         = " << int(config10k1->asicR0ClkControl());
+      str << "\n  prepulseR0En             = " << int(config10k1->prepulseR0En());
+      str << "\n  adcStreamMode            = " << config10k1->adcStreamMode();
+      str << "\n  testPatternEnable        = " << int(config10k1->testPatternEnable());
+      str << "\n  SyncMode                 = " << int(config10k1->SyncMode());
+      str << "\n  R0Mode                   = " << int(config10k1->R0Mode());
+      str << "\n  DoutPipelineDelay        = " << int(config10k1->DoutPipelineDelay());
+      str << "\n  acqToAsicR0Delay         = " << int(config10k1->acqToAsicR0Delay());
+      str << "\n  asicR0ToAsicAcq          = " << int(config10k1->asicR0ToAsicAcq());
+      str << "\n  asicAcqWidth             = " << int(config10k1->asicAcqWidth());
+      str << "\n  asicAcqLToPPmatL         = " << int(config10k1->asicAcqLToPPmatL());
+      str << "\n  asicRoClkHalfT           = " << int(config10k1->asicRoClkHalfT());
+      str << "\n  adcReadsPerPixel         = " << int(config10k1->adcReadsPerPixel());
+      str << "\n  adcClkHalfT              = " << int(config10k1->adcClkHalfT());
+      str << "\n  asicR0Width              = " << int(config10k1->asicR0Width());
+      str << "\n  adcPipelineDelay         = " << int(config10k1->adcPipelineDelay());
+      str << "\n  SyncWidth()              = " << int(config10k1->SyncWidth());
+      str << "\n  SyncDelay()              = " << int(config10k1->SyncDelay());
+      str << "\n  prepulseR0Width          = " << config10k1->prepulseR0Width();
+      str << "\n  prepulseR0Delay          = " << config10k1->prepulseR0Delay();
+      str << "\n  digitalCardId0           = " << config10k1->digitalCardId0();
+      str << "\n  digitalCardId1           = " << config10k1->digitalCardId1();
+      str << "\n  analogCardId0            = " << config10k1->analogCardId0();
+      str << "\n  analogCardId1            = " << config10k1->analogCardId1();
+      str << "\n  lastRowExclusions        = " << config10k1->lastRowExclusions();
+      str << "\n  numberOfAsicsPerRow      = " << config10k1->numberOfAsicsPerRow();
+      str << "\n  numberOfAsicsPerColumn   = " << config10k1->numberOfAsicsPerColumn();
+      str << "\n  numberOfRowsPerAsic      = " << config10k1->numberOfRowsPerAsic();
+      str << "\n  numberOfPixelsPerAsicRow = " << config10k1->numberOfPixelsPerAsicRow();
+      str << "\n  baseClockFrequency       = " << config10k1->baseClockFrequency();
+      str << "\n  asicMask                 = " << config10k1->asicMask();
+      str << "\n  scopeEnable              = " << int(config10k1->scopeEnable());
+      str << "\n  scopeTrigEdge            = " << int(config10k1->scopeTrigEdge());
+      str << "\n  scopeTrigChan            = " << int(config10k1->scopeTrigChan());
+      str << "\n  scopeArmMode             = " << int(config10k1->scopeArmMode());
+      str << "\n  scopeADCThreshold        = " << int(config10k1->scopeADCThreshold());
+      str << "\n  scopeTrigHoldoff         = " << int(config10k1->scopeTrigHoldoff());
+      str << "\n  scopeTrigOffset          = " << int(config10k1->scopeTrigOffset());
+      str << "\n  scopeTraceLength         = " << int(config10k1->scopeTraceLength());
+      str << "\n  scopeADCsameplesToSkip   = " << int(config10k1->scopeADCsameplesToSkip());
+      str << "\n  scopeChanAwaveformSelect = " << int(config10k1->scopeChanAwaveformSelect());
+      str << "\n  scopeChanBwaveformSelect = " << int(config10k1->scopeChanBwaveformSelect());
+      str << "\n  asicPixelConfigArray     = " << config10k1->asicPixelConfigArray();
+      str << "\n  numberOfRows             = " << config10k1->numberOfRows();
+      str << "\n  numberOfColumns          = " << config10k1->numberOfColumns();
+      str << "\n  numberOfAsics            = " << config10k1->numberOfAsics();
 
       //virtual std::vector<int> asics_shape() const = 0;
-      str << "\n  asics_shape() =";
+      str << "\n  asics_shape()            =";
       std::vector<int> v = config10k1->asics_shape();
       for(std::vector<int>::iterator it = v.begin(); it != v.end(); ++it) { str << " " << *it; }
 
