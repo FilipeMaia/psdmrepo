@@ -168,7 +168,7 @@ DumpEpix::beginRun(Event& evt, Env& env)
   shared_ptr<Psana::Epix::Config10KV1> config10k1 = env.configStore().get(m_src);
   if (config10k1) {
     WithMsgLog(name(), info, str) {
-      str << "Psana::Epix::ConfigV1:";
+      str << "Psana::Epix::Config10KV1:";
       str << "\n  version                  = " << config10k1->version();
       str << "\n  runTrigDelay             = " << config10k1->runTrigDelay();
       str << "\n  daqTrigDelay             = " << config10k1->daqTrigDelay();
