@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-62
+2014-09-23 Mikhail S. Dubrovin
+- add EpixNDArrProducer
+	
 Tag: V00-03-61
 2014-09-11 Mikhail S. Dubrovin
 - in PixCoordsProducer save pixel coordinate and index arrays in env.calibStore() in stead of evt,
