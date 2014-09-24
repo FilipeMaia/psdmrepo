@@ -144,14 +144,30 @@ Check::beginCalibCycle(Event& evt, Env& env)
 void 
 Check::event(Event& evt, Env& env)
 {
-  shared_ptr<double> ampl1 = evt.get(m_get_key1+std::string(":AMPL"));
-  shared_ptr<double> fltp1 = evt.get(m_get_key1+std::string(":FLTPOS"));
-  shared_ptr<double> fltw1 = evt.get(m_get_key1+std::string(":FLTPOSFWHM"));
-  shared_ptr<double> ramp1 = evt.get(m_get_key1+std::string(":REFAMPL"));
-  shared_ptr<double> namp1 = evt.get(m_get_key1+std::string(":AMPLNXT"));
+  double ampl1, fltp1, fltw1, ramp1, namp1;
 
-  if (ampl1.get()==0)
-    return;
+  shared_ptr<double> q = evt.get(m_get_key1+std::string(":AMPL"));
+  if (q.get()) {
+    ampl1 = *q;
+    fltp1 = *(q = evt.get(m_get_key1+std::string(":FLTPOS")));
+    fltw1 = *(q = evt.get(m_get_key1+std::string(":FLTPOSFWHM")));
+    ramp1 = *(q = evt.get(m_get_key1+std::string(":REFAMPL")));
+    namp1 = (q = evt.get(m_get_key1+std::string(":AMPLNXT"))) ? *q : 0;
+  }
+  else {
+    shared_ptr< ndarray<double,1> > p = 
+      evt.get(m_get_key1+std::string(":AMPL"));
+    if (p.get()) {
+      ampl1 = *p->data();
+      fltp1 = *(p = evt.get(m_get_key1+std::string(":FLTPOS")))->data();
+      fltw1 = *(p = evt.get(m_get_key1+std::string(":FLTPOSFWHM")))->data();
+      ramp1 = *(p = evt.get(m_get_key1+std::string(":REFAMPL")))->data();
+      namp1 = (p = evt.get(m_get_key1+std::string(":AMPLNXT"))) ? *p->data() : 0;
+    }
+    else
+      return;
+  }
+
 
   double angsh = 0;
 
@@ -163,21 +179,20 @@ Check::event(Event& evt, Env& env)
   } catch(PSEnv::Exception& e) {
   }
 
-  m_ampl->fill(*ampl1);
-  m_fltp->fill(*fltp1);
-  m_fltw->fill(*fltw1);
-  m_ampl_v_fltp->fill(*fltp1,*ampl1);
+  m_ampl->fill(ampl1);
+  m_fltp->fill(fltp1);
+  m_fltw->fill(fltw1);
+  m_ampl_v_fltp->fill(fltp1,ampl1);
   
-  double namp = namp1.get() ? *namp1 : 0;
-  m_namp->fill(namp);
-  m_namp2->fill(*ampl1,namp);
+  m_namp->fill(namp1);
+  m_namp2->fill(ampl1,namp1);
 
   boost::shared_ptr<Psana::Bld::BldDataPhaseCavity> phcav = 
     evt.get(Source("BldInfo(PhaseCavity)"));
   if (phcav.get()) {
     double  tt = 0;
     for(unsigned i=m_tt_calib.size(); i!=0; )
-      tt = tt*(*fltp1) + m_tt_calib[--i];
+      tt = tt*fltp1 + m_tt_calib[--i];
 
     bool lphcav1 = (phcav->fitTime1()>m_phcav1_limits[0] &&
                     phcav->fitTime1()<m_phcav1_limits[1]);
@@ -190,16 +205,16 @@ Check::event(Event& evt, Env& env)
     }
 
     if (lphcav1) {
-      m_pos_v_p1->fill(-phcav->fitTime1(),*fltp1);
+      m_pos_v_p1->fill(-phcav->fitTime1(),fltp1);
       m_tt_v_p1->fill(angsh-phcav->fitTime1(),tt);
       m_tt_m_p1->fill(tt-angsh+phcav->fitTime1());
     }
 
     if (lphcav2) {
-      m_pos_v_p2->fill(-phcav->fitTime2(),*fltp1);
+      m_pos_v_p2->fill(-phcav->fitTime2(),fltp1);
       m_tt_v_p2->fill(angsh-phcav->fitTime2(),tt);
       m_tt_m_p2->fill(tt-angsh+phcav->fitTime2());
-      m_tt_v_p2_2d->fill(angsh-phcav->fitTime2(),*fltp1);
+      m_tt_v_p2_2d->fill(angsh-phcav->fitTime2(),fltp1);
     }
   }
 
@@ -212,7 +227,7 @@ Check::event(Event& evt, Env& env)
     double ramp2 = epics.value(m_get_key2+std::string(":REFAMPL"));
     double namp2 = epics.value(m_get_key2+std::string(":AMPLNXT"));
     
-#define DEREF(p) (p.get() ? *p.get():0)
+#define DEREF(p) p
 
     MsgLog(name(), info, 
            name() << ": ttparms " << std::endl

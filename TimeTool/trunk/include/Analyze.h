@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "psddl_psana/timetool.ddl.h"
 #include <vector>
 
 //------------------------------------
@@ -93,22 +94,28 @@ private:
   Source      m_get_key;  // Key for retrieving camera image
   std::string m_put_key;  // Key for inserting results into Event
   bool        m_put_ndarrays; // put size 1 ndarray's into Event rather than doubles
-  bool m_use_online_config;   // use configuration parameters found in data
-
-  int m_eventcode_nobeam; // use this eventcode for detecting no beam
-  int m_eventcode_skip  ; // use this eventcode for skipping (no laser)
 
   std::string m_ipm_get_key;  // use this ipm threshold for detecting no beam
   double      m_ipm_beam_threshold;
 
-  std::vector<double> m_calib_poly; // polynomial coefficients converting to time
+  //
+  // The following parameters are optional.  They will default to
+  // whatever configuration is found in the run data.
+  //
+  ndarray<const Psana::TimeTool::EventLogic,1> m_beam_logic;
+  ndarray<const Psana::TimeTool::EventLogic,1> m_laser_logic;
 
-  bool     m_projectX ;  // project image onto X axis
-  int      m_proj_cut ;  // valid projection must be at least this large
+  ndarray<const double,1> m_calib_poly; // polynomial coefficients converting to time
 
-  unsigned m_sig_roi_lo[2];  // image sideband is projected within ROI
-  unsigned m_sig_roi_hi[2];  // image sideband is projected within ROI
+  bool        m_projectX_set;
+  bool        m_projectX ;  // project image onto X axis
+  int         m_proj_cut ;  // valid projection must be at least this large
 
+  bool     m_sig_roi_set;
+  unsigned m_sig_roi_lo[2];  // image signal is projected within ROI
+  unsigned m_sig_roi_hi[2];  // image signal is projected within ROI
+
+  bool     m_sb_roi_set;
   unsigned m_sb_roi_lo[2];  // image sideband is projected within ROI
   unsigned m_sb_roi_hi[2];  // image sideband is projected within ROI
 
@@ -117,10 +124,16 @@ private:
   double   m_sb_avg_fraction ; // rolling average fraction (1/N)
   double   m_ref_avg_fraction; // rolling average fraction (1/N)
 
-  ndarray<double,1> m_weights; // digital filter weights
+  ndarray<const double,1> m_weights; // digital filter weights
   ndarray<double,1> m_ref;     // accumulated reference
   ndarray<double,1> m_sb_avg;  // averaged sideband
 
+  bool     m_analyze_projections;
+
+  //
+  //  These parameters are for persisting the accumulated reference
+  //  and generating histograms
+  //
   std::string m_ref_store; // store reference to text file
 
   unsigned m_pedestal;
