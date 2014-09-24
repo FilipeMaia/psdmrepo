@@ -336,7 +336,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
 #-----------------------------
     
-        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Acqiris']
+        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Epix10k', 'Acqiris']
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
         self.list_of_data_types  = ['CsPad::DataV',
@@ -349,6 +349,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Camera::FrameV',
                                     'Camera::FrameV',
                                     'Camera::FrameV',
+                                    'Epix::ElementV',
+                                    'Epix::ElementV',
                                     'Acqiris::DataDesc']
         self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_data_types) )
         #self.print_dict_of_det_data_types()
@@ -363,6 +365,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Camera::CalibV1',
                                     'Camera::CalibV1',
                                     'Camera::CalibV1',
+                                    'Epix::CalibV1',
+                                    'Epix10k::CalibV1',
                                     'Acqiris::CalibV1']
         self.dict_of_det_calib_types = dict( zip(self.list_of_dets, self.list_of_calib_types) )
         #self.print_dict_of_det_calib_types()
@@ -370,6 +374,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
 
         det_cbx_states = [ (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
@@ -448,7 +454,15 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'common_mode'
             ]
 
-        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Acqiris', etc.
+        self.const_types_epix = [
+            'pedestals'
+           ,'pixel_status'
+           ,'pixel_gain'
+           ,'pixel_rms'
+           ,'common_mode'
+            ]
+
+        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Epix10k', 'Acqiris', etc.
         self.dict_of_det_const_types = dict( zip(self.list_of_dets, [ self.const_types_cspad 
                                                                      ,self.const_types_cspad2x2
                                                                      ,self.const_types_princeton
@@ -459,6 +473,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                      ,self.const_types_camera
                                                                      ,self.const_types_camera
                                                                      ,self.const_types_orcafl40
+                                                                     ,self.const_types_epix
+                                                                     ,self.const_types_epix
                                                                      ,['pedestals']
                                                                       ]) )
      
@@ -472,6 +488,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
             ]
         
         self.srcs_cspad2x2 = [ 
+            'CxiDg2.0:Cspad2x2.0'
+            'CxiDg2.0:Cspad2x2.1'
             'CxiSc1.0:Cspad2x2.0'
            ,'CxiSc2.0:Cspad2x2.0'
            ,'CxiSc2.0:Cspad2x2.1'
@@ -488,6 +506,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'MecTargetChamber.0:Cspad2x2.3'
            ,'MecTargetChamber.0:Cspad2x2.4'
            ,'MecTargetChamber.0:Cspad2x2.5'
+           ,'SxrBeamline.0:Cspad2x2.2'
+           ,'SxrBeamline.0:Cspad2x2.3'
            ,'XcsEndstation.0:Cspad2x2.0'
            ,'XcsEndstation.0:Cspad2x2.1'
            ,'XppGon.0:Cspad2x2.0'
@@ -586,6 +606,16 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'XppEndstation.0:OrcaFl40.0'
             ]
 
+        self.srcs_epix = [ 
+            'NoDetector.0:Epix.0'
+           ,'XcsEndstation.0:Epix.0'
+           ,'XcsEndstation.0:Epix.1'
+            ]
+
+        self.srcs_epix10k = [ 
+            'NoDetector.0:Epix10k.0'
+           ]
+
         self.srcs_acqiris = [ 
             'AmoETOF.0:Acqiris.0'
            ,'AmoITOF.0:Acqiris.0'
@@ -602,7 +632,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'XppLas.0:Acqiris.0'
             ]
 
-        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Acqiris', etc.
+        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Epix10k', 'Acqiris', etc.
         self.dict_of_det_sources = dict( zip(self.list_of_dets, [ self.srcs_cspad 
                                                                  ,self.srcs_cspad2x2
                                                                  ,self.srcs_princeton
@@ -613,12 +643,16 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                  ,self.srcs_opal4000
                                                                  ,self.srcs_opal8000
                                                                  ,self.srcs_orcafl40
+                                                                 ,self.srcs_epix
+                                                                 ,self.srcs_epix10k
                                                                  ,self.srcs_acqiris
                                                                   ]) )
 
 
         self.dict_of_metrology_scripts = dict( zip(self.list_of_dets, [ ['CSPADV1', 'CSPADV2']
                                                                        ,['CSPAD2X2']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
                                                                        ,['N/A']
                                                                        ,['N/A']
                                                                        ,['N/A']

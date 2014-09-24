@@ -291,6 +291,8 @@ if __name__ == "__main__" :
 
     #det_name = 'cspad'
     det_name = 'cspad2x2'
+    #det_name = 'epix'
+    #det_name = 'epix10k'
     #det_name = 'princeton'
     #det_name = 'pnccd'
     #det_name = 'tm6740'

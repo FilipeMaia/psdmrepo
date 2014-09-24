@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-09-23 Mikhail S. Dubrovin
+Tag: V00-00-60
+- ConfigParametersForApp, ConfigFileGenerator add support for Epix and Epix10k
+- add scripts/psana-module-peds-aver-camera.cfg with parameter ftype to save metatxt
+	
 2014-07-07 Mikhail S. Dubrovin
 Tag: V00-00-59
 - CommandLineCalib.py - fix default calibdir
