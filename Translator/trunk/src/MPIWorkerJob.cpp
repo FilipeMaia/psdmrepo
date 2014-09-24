@@ -38,7 +38,7 @@ namespace {
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
-#define MSGLOGLVL info
+#define MSGLOGLVL trace
 
 using namespace Translator;
 

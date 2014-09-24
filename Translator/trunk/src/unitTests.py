@@ -1662,8 +1662,8 @@ class H5Output( unittest.TestCase ) :
                                 num_events_check_done_calib_file=1,
                                 dataSourceString = 'exp=xppd7114:run=130:dir=%s' % SPLITSCANDATADIRBUG,
                                 njobs=6,
-                                verbose=True,
-                                cleanUp = False) # self.cleanUp
+                                verbose=False,
+                                cleanUp = self.cleanUp)
 # can't do calibration if doing dump - will compare calibrated to uncalibrated
 #                                downstreamModules = ["cspad_mod.CsPadCalib"],
 #                                extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])

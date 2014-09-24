@@ -84,13 +84,13 @@ void broadCastArgs(int argc, char * argv[], std::vector<std::string> &args) {
 // So we modify the APPUTILS_MAIN macro to initialize and finalize MPI before/after 
 // running the app.
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char *env[]) {
   MPI_Init(&argc, &argv);
   std::vector<std::string> args;
   broadCastArgs(argc, argv, args);
   int retValue = -1;
   try {
-    H5MpiTranslateApp app(argv[0]);
+    H5MpiTranslateApp app(argv[0], env);
     retValue = app.run(args);
   } catch (std::exception &e) {
     std::cerr << "Standard exceptoin caught: " << e.what() << std::endl;

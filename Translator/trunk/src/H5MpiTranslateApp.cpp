@@ -64,10 +64,14 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
   processorName = std::string(_processorName);
 }
 
-#define MSGLOGLVL trace
+  double timeDiffSeconds(const LusiTime::Time & endTime, const LusiTime::Time & startTime) {
+    double res = (endTime.sec() - startTime.sec()) + (endTime.nsec()-startTime.nsec())/1e9;
+    return res;
+  }
 
 }; // local namespace
 
+#define MSGLOGLVL trace
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -75,8 +79,8 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
 
 namespace Translator {
 
-H5MpiTranslateApp::H5MpiTranslateApp (const std::string& appName)
-  : psana::PSAnaApp( appName )
+H5MpiTranslateApp::H5MpiTranslateApp (const std::string& appName, char *env[])
+  : psana::PSAnaApp( appName ), m_env(env)
 {}
 
 H5MpiTranslateApp::~H5MpiTranslateApp ()
@@ -148,7 +152,7 @@ H5MpiTranslateApp::runApp ()
   if (abort) MPI_Abort(MPI_COMM_WORLD, 2);
   
   m_endTime = LusiTime::Time::now();
-  double totalTime = (m_endTime.sec()-m_startTime.sec()) + (m_endTime.nsec()-m_startTime.nsec())/1e9;
+  double totalTime = timeDiffSeconds(m_endTime,m_startTime);
   
   
   if (m_worldRank == m_masterRank) {
@@ -187,6 +191,20 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   m_numEventsToCheckForDoneWorkers = cfgSvc.get("Translator.H5Output",
                                                 "num_events_check_done_calib_file",
                                                 NUM_EVENTS_CHECK_DONE_CALIB_FILE_DEFAULT);
+
+  if (cfgSvc.get("Translator.H5Output","printenv",false)) {
+    WithMsgLog(loggerMaster, info, str) {
+      str << "------ Begin Environment -------" << std::endl;
+      char *envVar = *m_env;
+      int envIdx = 1;
+      while (envVar != NULL) {
+        str << envVar << std::endl;
+        envVar = m_env[envIdx];
+        envIdx += 1;
+      }
+      str << "------ End Environment ------" << std::endl;
+    }
+  }
   
   if (0 != fwk.modules().size()) {
     MsgLog(loggerMaster,error,"failed to clear psana modules");
@@ -232,6 +250,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
 
   MsgLog(loggerMaster,MSGLOGLVL, "starting event loop");
   LusiTime::Time eventStartTime = LusiTime::Time::now();
+  double messagingTimeDuringEventLoop = 0.0;
   bool doBeginJob = true;
   while (true) {
     // loop through runs
@@ -272,6 +291,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
         }
       }	// destroy the step event
       if (calibStartsNewJob) {
+        LusiTime::Time messagingTimeStart = LusiTime::Time::now();        
         XtcInput::XtcFilesPosition &pos = *beginStepPos;
         m_jobsToDo.push(boost::make_shared<MPIWorkerJob>(m_worldRank, m_numWorkers, stepIdx, pos));
         m_numCalibJobs += 1;
@@ -283,6 +303,8 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
         
         calibStartsNewJob = false;
         lastCalibEventStart = totalEvents;
+        LusiTime::Time messagingTimeEnd = LusiTime::Time::now();
+        messagingTimeDuringEventLoop += timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
       }
       EventIter eventIter = step.events();
       while (boost::shared_ptr<PSEvt::Event> evt = eventIter.next()) {
@@ -291,17 +313,21 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
           calibStartsNewJob = true;
         }
         if (totalEvents % m_numEventsToCheckForDoneWorkers == 0) {
+          LusiTime::Time messagingTimeStart = LusiTime::Time::now();
           StartWorkerRes_t startWorkerResult;
           do {
             startWorkerResult  = tryToStartWorker();
             checkOnLinksToWrite(h5OutputModule);
           } while (startWorkerResult == StartedWorker);
+          LusiTime::Time messagingTimeEnd = LusiTime::Time::now();
+          messagingTimeDuringEventLoop += timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
         }
       }
     } // finish steps in run
   } // finish runs
+  MsgLog(loggerMaster, info, "messaging time during event loop (sec): " << messagingTimeDuringEventLoop);
   LusiTime::Time eventEndTime = LusiTime::Time::now();
-  m_eventTime += (eventEndTime.sec()-eventStartTime.sec()) + (eventEndTime.nsec()-eventStartTime.nsec())/1e9;
+  m_eventTime += timeDiffSeconds(eventEndTime, eventStartTime);
   
   MsgLog(loggerMaster, MSGLOGLVL, "done with event loop");
   // done iterating through the data
@@ -568,7 +594,7 @@ int H5MpiTranslateApp::runAppWorker(std::string cfgFile, std::map<std::string, s
       throw;
     }
     LusiTime::Time eventEndTime =  LusiTime::Time::now();
-    m_eventTime += (eventEndTime.sec()-eventStartTime.sec()) + (eventEndTime.nsec()-eventStartTime.nsec())/1e9;
+    m_eventTime += timeDiffSeconds(eventEndTime, eventStartTime);
     
     // tell server we are done
     MsgLog(loggerWorker,MSGLOGLVL,"runAppWorker:  loop=" << loop << " worker " 

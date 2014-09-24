@@ -55,7 +55,7 @@ class H5MpiTranslateApp : public psana::PSAnaApp {
 public:
 
   // Constructor
-  explicit H5MpiTranslateApp(const std::string& appName = "h5-mpi-translate") ;
+  explicit H5MpiTranslateApp(const std::string& appName = "h5-mpi-translate", char *env[]=NULL) ;
 
   // destructor
   virtual ~H5MpiTranslateApp () ;
@@ -198,7 +198,7 @@ private:
                       // for a worker - the number of calib jobs processed
   std::queue< boost::shared_ptr<MPIWorkerJob> > m_jobsToDo;
   std::vector< boost::shared_ptr<MPIWorkerJob> > m_workerJobInProgress;
-
+  char **m_env;     // environment, from main
 };
 
 } // namespace Translator
