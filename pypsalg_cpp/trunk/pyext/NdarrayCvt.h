@@ -3,6 +3,7 @@
 
 #include <string>
 #include <iostream>
+#include <typeinfo>
 
 #include <boost/python.hpp>
 #include <boost/foreach.hpp>
@@ -203,7 +204,7 @@ struct NDArrayToNumpy
   static PyObject* convert(ndarray<T, Rank> const& array) {
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
     std::cout << "Calling converter from ndarray<"
-	      << Rank << "> to python object" 
+	      <<  typeid(T) << "," << Rank << "> to python object" 
 	      << std::endl;
 
 
@@ -229,7 +230,9 @@ struct NDArrayToNumpy
 
     // Grab underlying ndarry data pointer.
     // Have to cast to void* for numpy creation
-    void* data = reinterpret_cast<void*>(array.data());
+    // The const is needed incase we instatiate a const type ndarray
+    const void* data = array.data();
+
 
     // Set the numpy flags 
     int flags = 0;   //==> initialise to zero
@@ -249,12 +252,13 @@ struct NDArrayToNumpy
     }
     
     // Create the outgoing numpy array
+    // Note the const_cast, as the PyArray_New only accepts non-const
     PyObject* outgoing_numpy_array = PyArray_New(&PyArray_Type,
 						 Rank,
 						 dims,
 						 typenum,
 						 strides,
-						 data,
+						 const_cast<void*>(data),
 						 itemsize,
 						 flags,
 						 0);
@@ -316,11 +320,11 @@ struct NumpyToNDArray
   {
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
     std::cout << "registerting BOOST PYTHON converter for NUMPY to NDARRAY"
+	      << "<" << typeid(T) << "," << Rank << ">"
 	      << std::endl;
     boost::python::converter::registry::push_back(
       &NumpyToNDArray::convertible,
       &NumpyToNDArray::construct,
-      //  boost::python::type_id< Container >() );
       boost::python::type_id< ndarray<T, Rank>  >() );
 
     // Now check converter was registered
@@ -329,9 +333,9 @@ struct NumpyToNDArray
     boost::python::converter::registry::query(tinfo);
     
     if (reg) {
-      std::cout << "NDARRAY REGISTERED" << std::endl;
+      std::cout << "NDARRAY CONVERTER REGISTERED" << std::endl;
     } else {
-      std::cout << "NDARRAY NOT REGISTERED" << std::endl;
+      std::cout << "NDARRAY CONVERTER NOT REGISTERED" << std::endl;
     }
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
     return *this;

@@ -18,36 +18,36 @@ print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
 # Create instance of numpytest
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
-print "Creating instance of numpytest" 
-numpytest = pypsalg_cpp.numpytest()
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "Creating instance of numpytest" 
+#numpytest = pypsalg_cpp.numpytest()
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 # test C++ call to print array
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
-print "Calling C++ printarray(ndarray) function"
-numpytest.printArray(testarray)
-print "Input test array", testarray
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "Calling C++ printarray(ndarray) function"
+#numpytest.printArray(testarray)
+#print "Input test array", testarray
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
 # testing ndarray to numpy conversion
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
-print "Calling C++  ndarray outArray() function"
-testval = numpytest.outArray()
-print "contents of testval",testval
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "Calling C++  ndarray outArray() function"
+#testval = numpytest.outArray()
+#print "contents of testval",testval
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
-print "numpy mean of testarray",np.mean(testarray)
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "numpy mean of testarray",np.mean(testarray)
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
-print "Calling C++  ndarray calcmean(ndarray)"
-mymean = numpytest.calcmean(testarray)
-print "my mean of testarray",mymean
-print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
+#print "Calling C++  ndarray calcmean(ndarray)"
+#mymean = numpytest.calcmean(testarray)
+#print "my mean of testarray",mymean
+#print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
 #testarray2D = (np.random.rand(10,10)).astype(np.float32)
@@ -72,17 +72,15 @@ print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 #print "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP"
 
 
-#waveform = np.random.rand(100)
-#print waveform
+waveform = np.random.rand(100)
+print "waveform",waveform
 #psalg = pypsalg_cpp.psalg()
-#edges = psalg.find_edges(waveform,
-#                         0.2,0.1,0.5,0.0,True)
-#print edges
+edges = pypsalg_cpp.find_edges(waveform,
+                               0.2,0.1,0.5,0.0,True)
+print "edges",edges
 
-print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
-#psalg_ankush = pypsalg_cpp.psalg_ankush()
-testarray = np.random.rand(10).astype(np.double)
-#psalg_ankush.find_edges(testarray, 0.0, 0.0, 0.0, 0.0, True)
-pypsalg_cpp.find_edges(testarray, 0.0, 0.0, 0.0, 0.0, True)
-print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+#print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+#testarray = np.random.rand(10).astype(np.double)
+#pypsalg_cpp.find_edges(testarray, 0.0, 0.0, 0.0, 0.0, True)
+#print "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
