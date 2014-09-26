@@ -489,8 +489,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         
         self.srcs_cspad2x2 = [ 
             'CxiDg2.0:Cspad2x2.0'
-            'CxiDg2.0:Cspad2x2.1'
-            'CxiSc1.0:Cspad2x2.0'
+           ,'CxiDg2.0:Cspad2x2.1'
+           ,'CxiSc1.0:Cspad2x2.0'
            ,'CxiSc2.0:Cspad2x2.0'
            ,'CxiSc2.0:Cspad2x2.1'
            ,'CxiSc2.0:Cspad2x2.2'
@@ -650,18 +650,18 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
 
         self.dict_of_metrology_scripts = dict( zip(self.list_of_dets, [ ['CSPADV1', 'CSPADV2']
-                                                                       ,['CSPAD2X2']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
-                                                                       ,['N/A']
+                                                                       ,['CSPAD2X2V1']
+                                                                       ,['PRINCETONV1']
+                                                                       ,['PNCCDV1']
+                                                                       ,['TM6740V1']
+                                                                       ,['OPAL1000V1']
+                                                                       ,['OPAL2000V1']
+                                                                       ,['OPAL4000V1']
+                                                                       ,['OPAL8000V1']
+                                                                       ,['ORCAFL40V1']
+                                                                       ,['EPIXV1']
+                                                                       ,['EPIX10KV1']
+                                                                       ,['ACQIRISV1']
                                                                         ]) )
 
  

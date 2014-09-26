@@ -47,8 +47,11 @@ from GUIFileBrowser       import *
 from GUIRange             import *
 from FileDeployer         import fd
 import GlobalUtils        as     gu
-from xlsx_parser          import convert_xlsx_to_text
-from OpticAlignmentCspadV1 import *
+
+from xlsx_parser              import convert_xlsx_to_text
+from OpticAlignmentCspadV1    import OpticAlignmentCspadV1
+from OpticAlignmentCspadV2    import OpticAlignmentCspadV2
+from OpticAlignmentCspad2x2V1 import OpticAlignmentCspad2x2V1
 
 #---------------------
 #  Class definition --
@@ -500,12 +503,32 @@ class GUIMetrology ( QtGui.QWidget ) :
             logger.warning(msg, __name__)
             return
 
+        fname_metrology = fnm.path_metrology_text()
+
         #print 'list_of_metrology_scripts', list_of_metrology_scripts
-        #for CSPAD script CSPADV1
+        #for CSPAD script CSPADV1 CXI-like
         if det == cp.list_of_dets[0] and self.script == list_of_metrology_scripts[0] :            
             msg = 'Evaluate parameters for %s using script %s' % (det, self.script)
             logger.info(msg, __name__)
-            self.procCspadV1()
+            optal = OpticAlignmentCspadV1(fname_metrology, print_bits=0, plot_bits=0, \
+                                      exp=self.instr_name.value(), det=det)
+            self.procCspad(optal)
+
+        #for CSPAD script CSPADV2 XPP-like
+        elif det == cp.list_of_dets[0] and self.script == list_of_metrology_scripts[1] :            
+            msg = 'Evaluate parameters for %s using script %s' % (det, self.script)
+            logger.info(msg, __name__)
+            optal = OpticAlignmentCspadV2(fname_metrology, print_bits=0, plot_bits=0, \
+                                      exp=self.instr_name.value(), det=det)
+            self.procCspad(optal)
+
+        #for CSPAD2x2 script CSPAD2X2V1
+        elif det == cp.list_of_dets[1] and self.script == list_of_metrology_scripts[0] :            
+            msg = 'Evaluate parameters for %s using script %s' % (det, self.script)
+            logger.info(msg, __name__)
+            optal = OpticAlignmentCspad2x2V1(fname_metrology, print_bits=0, plot_bits=0, \
+                                      exp=self.instr_name.value(), det=det)
+            self.procCspad(optal)
 
         # for other detectors and scripts for now...
         else :            
@@ -514,16 +537,13 @@ class GUIMetrology ( QtGui.QWidget ) :
             return
         
  
-    def procCspadV1(self):
+    def procCspad(self, optal):
         """Create and save interim files for calibration types"""
         self.list_of_calib_types = ['center', 'tilt', 'geometry']
 
         fname_metrology = fnm.path_metrology_text()
-        msg = 'procCspadV1 for metrology data in file %s' % fname_metrology
+        msg = 'procCspad(V1,V2,2x2V1) for metrology data in file %s' % fname_metrology
         logger.info(msg, __name__)       
-
-        optal = OpticAlignmentCspadV1(fname_metrology, print_bits=0, plot_bits=0, \
-                                      exp=self.instr_name.value(), det=self.source_name)
 
         txt_qc_table_xy = optal.txt_qc_table_xy()
         txt_qc_table_z  = optal.txt_qc_table_z()

@@ -5,38 +5,34 @@
 #  $Id$
 #
 # Description:
-#  Module Template...
-#
 #------------------------------------------------------------------------
-"""
+""" Processing of optical measurements for CXI-CSPAD (moving quads geometry)
+
 @version $Id$
 
 @author Mikhail S. Dubrovin
 """
 
 #------------------------------
-#  Module's version from SVN --
-#------------------------------
 __version__ = "$Revision$"
 # $Source$
+#----------------------------------
+#import os
+#import sys
+#import numpy
+#import numpy as np
+#import math
+#from time import localtime, gmtime, strftime, clock, time, sleep
 
+#import matplotlib.pyplot as plt
+#import matplotlib.lines  as lines
+
+from CalibManager.OpticAlignmentCspadMethods import *
+#from OpticAlignmentCspadMethods import *
 
 #----------------------------------
-import os
-import sys
-import numpy
-import numpy as np
-import math
-from time import localtime, gmtime, strftime, clock, time, sleep
 
-#from PyQt4 import QtGui, QtCore
-
-import matplotlib.pyplot as plt
-import matplotlib.lines  as lines
-
-#----------------------------------
-
-class OpticAlignmentCspadV1 :
+class OpticAlignmentCspadV1 (OpticAlignmentCspadMethods) :
     """OpticAlignmentCspadV1"""
 
     sensor_rotation = [0,0,270,270,180,180,270,270]
@@ -49,9 +45,11 @@ class OpticAlignmentCspadV1 :
     #        0  1   2  3   4   5   6   7
     ibase = [5, 1, 13, 9, 17, 21, 29, 25] 
 
+    quad_n90_in_det = [0,0,0,0]
+
     pixelSize = 109.92
 
-    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=0377, plot_bits=0377, exp='', det=''):
+    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=0377, plot_bits=0377, exp='Any', det='CSPAD-CXI'):
         """Constructor."""
         if print_bits &  1 : print 'Start OpticAlignmentCspadV1'
 
@@ -80,6 +78,7 @@ class OpticAlignmentCspadV1 :
         self.read_optical_alignment_file()
         self.evaluate_deviation_from_flatness()
         self.evaluate_center_coordinates()
+        #self.evaluate_length_width_angle_v0()
         self.evaluate_length_width_angle()
 
         self.present_results()
@@ -116,34 +115,34 @@ class OpticAlignmentCspadV1 :
 
 
     def read_optical_alignment_file(self): 
-        if self.print_bits & 1 : print 'read_optical_alignment_file()'
+        if self.print_bits & 256 : print 'read_optical_alignment_file()'
 
                                  # quad 0:3
                                    # point 1:32
                                       # record: point, X, Y, Z 0:3
-        self.arr = numpy.zeros( (4,33,4), dtype=numpy.int32 )
+        self.arr = numpy.zeros( (self.nquads, self.npoints+1, 4), dtype=numpy.int32 )
 
         file = open(self.fname, 'r')
         # Print out 7th entry in each line.
         for line in file:
 
             if len(line) == 1 : continue # ignore empty lines
-            if self.print_bits & 1 : print len(line),  ' Line: ', line
+            if self.print_bits & 256 : print len(line),  ' Line: ', line
 
             list_of_fields = line.split()
 
             if list_of_fields[0] == 'Quad' : # Treat quad header lines
                 self.quad = int(list_of_fields[1])
-                if self.print_bits & 1 : print 'Stuff for quad', self.quad  
+                if self.print_bits & 256 : print 'Stuff for quad', self.quad  
                 continue
 
             if list_of_fields[0] == 'Sensor' or list_of_fields[0] == 'Point' : # Treat the title lines
-                if self.print_bits & 1 : print 'Comment line:', line  
+                if self.print_bits & 256 : print 'Comment line:', line  
                 continue
             
             if len(list_of_fields) != 4 : # Ignore lines with non-expected number of fields
-                if self.print_bits & 1 : print 'len(list_of_fields) =', len(list_of_fields),
-                if self.print_bits & 1 : print 'RECORD IS IGNORED due to unexpected format of the line:',line
+                if self.print_bits & 256 : print 'len(list_of_fields) =', len(list_of_fields),
+                if self.print_bits & 256 : print 'RECORD IS IGNORED due to unexpected format of the line:',line
                 continue              
 
             point = int(list_of_fields[0])
@@ -160,7 +159,7 @@ class OpticAlignmentCspadV1 :
             ##Title = list_of_fields[4]
             
             #record = [point, X, Y, Z, Title]
-            if self.print_bits & 1 : print 'ACCEPT RECORD:', point, X, Y, Z #, Title
+            if self.print_bits & 256 : print 'ACCEPT RECORD:', point, X, Y, Z #, Title
 
             self.arr[self.quad,point,0] = point
             self.arr[self.quad,point,1] = X
@@ -170,156 +169,11 @@ class OpticAlignmentCspadV1 :
         file.close()
 
 
-    def evaluate_deviation_from_flatness(self) :
-
-        ix = 1
-        iy = 2
-        iz = 3
-
-        self.arr_dev_um = numpy.zeros( (4,8), dtype=numpy.double )
-
-        for quad in range(4) :
-           for segm in range(8) :
-
-               icor1 = self.ibase[segm]   
-               icor2 = self.ibase[segm] + 1
-               icor3 = self.ibase[segm] + 2
-               icor4 = self.ibase[segm] + 3
-
-               v21 = ( self.arr[quad,icor2,ix] - self.arr[quad,icor1,ix],
-                       self.arr[quad,icor2,iy] - self.arr[quad,icor1,iy],
-                       self.arr[quad,icor2,iz] - self.arr[quad,icor1,iz] )
-
-               v31 = ( self.arr[quad,icor3,ix] - self.arr[quad,icor1,ix],
-                       self.arr[quad,icor3,iy] - self.arr[quad,icor1,iy],
-                       self.arr[quad,icor3,iz] - self.arr[quad,icor1,iz] )
-
-               v41 = ( self.arr[quad,icor4,ix] - self.arr[quad,icor1,ix],
-                       self.arr[quad,icor4,iy] - self.arr[quad,icor1,iy],
-                       self.arr[quad,icor4,iz] - self.arr[quad,icor1,iz] )
-
-               #print v21, v31, v41, 
-
-               vort = np.array(np.cross(v21, v41), dtype=np.double) # vort = [v21 x v41]        - vector product
-               norm = math.sqrt(np.sum(vort*vort))                  # norm = |vort|             - length of the vector vort
-               vort_norm = vort / norm                              # vort_norm = vort / |vort| - normalized vector orthogonal to the plane
-               dev = np.sum(v31*vort_norm)                          # dev = (v31 * vort_norm)   - scalar product
-
-               self.arr_dev_um[quad,segm] = dev
-
-               #print '  vort_norm=', vort_norm, '  norm =', norm, '  dev =', dev
-               #print '  vort_norm=', vort_norm, '  norm =', norm, '  dev =', dev
-               #print 'quad:%1d, segm:%2d,  dz3[um]: %8.3f\n' % (quad, segm, self.arr_dev_um[quad,segm])
-
-
-    def txt_deviation_from_flatness(self) :
-        txt = 'Deviation from flatness [um] for segments:\n'
-        for quad in range(4) :
-           for segm in range(8) :
-               txt += 'quad:%1d, segm:%2d,  dz3[um]: %8.3f\n' % (quad, segm, self.arr_dev_um[quad,segm])
-        txt += 'Mean and Standard deviation for dz3[um]: %8.3f +- %8.3f\n' % (np.mean(self.arr_dev_um), np.std(self.arr_dev_um))
-        return txt
-
-
-    def evaluate_center_coordinates(self) :
-
-        self.arrXmu = numpy.zeros( (4,8), dtype=numpy.int32 )
-        self.arrYmu = numpy.zeros( (4,8), dtype=numpy.int32 )
-        self.arrZmu = numpy.zeros( (4,8), dtype=numpy.int32 )
-        self.arrX   = numpy.zeros( (4,8), dtype=numpy.float )
-        self.arrY   = numpy.zeros( (4,8), dtype=numpy.float )
-        self.arrZ   = numpy.zeros( (4,8), dtype=numpy.float )
-
-        ix = 1
-        iy = 2
-        iz = 3
-
-        for quad in range(4) :
-            for segm in range(8) :
-
-                icor1 = self.ibase[segm]   
-                icor2 = self.ibase[segm] + 1
-                icor3 = self.ibase[segm] + 2
-                icor4 = self.ibase[segm] + 3
-
-                X = 0.25 * ( self.arr[quad,icor1,ix]
-                           + self.arr[quad,icor2,ix]
-                           + self.arr[quad,icor3,ix]
-                           + self.arr[quad,icor4,ix] )
-
-                Y = 0.25 * ( self.arr[quad,icor1,iy]
-                           + self.arr[quad,icor2,iy]
-                           + self.arr[quad,icor3,iy]
-                           + self.arr[quad,icor4,iy] ) 
-
-                Z = 0.25 * ( self.arr[quad,icor1,iz]
-                           + self.arr[quad,icor2,iz]
-                           + self.arr[quad,icor3,iz]
-                           + self.arr[quad,icor4,iz] ) 
-
-                Xmy, Ymy, Zmy = X, Y, Z
-
-                #print 'quad:%1d, segm:%2d,  X:%7d  Y:%7d, Z:%3d' % (quad, segm, Xmy, Ymy, Zmy)
-
-                self.arrXmu[quad][segm] = Xmy
-                self.arrYmu[quad][segm] = Ymy
-                self.arrZmu[quad][segm] = Zmy
-
-                self.arrX[quad][segm] = float(Xmy) / self.pixelSize
-                self.arrY[quad][segm] = float(Ymy) / self.pixelSize
-                self.arrZ[quad][segm] = float(Zmy) / self.pixelSize
-
 #----------------------------------
 
-    def txt_center_um_formatted_array(self, format='%6i  ') :
-        return self.get_formatted_array(self.arrXmu, format=format)+'\n' \
-             + self.get_formatted_array(self.arrYmu, format=format)+'\n' \
-             + self.get_formatted_array(self.arrZmu, format=format)
-
-#----------------------------------
-
-    def txt_center_pix_formatted_array(self, format='%7.2f  ') :
-        return self.get_formatted_array(self.arrX, format=format)+'\n' \
-             + self.get_formatted_array(self.arrY, format=format)+'\n' \
-             + self.get_formatted_array(self.arrZ, format=format)
-
-#----------------------------------
-
-    def txt_tilt_formatted_array(self, format='%8.5f  ') :
-        return self.get_formatted_array(self.tiltXYDegree, format)
-
-#----------------------------------
-
-    def get_formatted_array(self, arr, format='%7.2f,') :
-        txt = ''
-        for row in range(4) :
-            for col in range(8) :
-                txt += format % (arr[row][col])
-            txt += '\n'
-        return txt
-
-#----------------------------------
-
-    def create_directory(self, dir) : 
-        if os.path.exists(dir) :
-            if self.print_bits & 1 : print 'Directory exists:' + dir
-        else :
-            os.makedirs(dir)
-            if self.print_bits & 1 : print 'Directory created:' + dir 
-
-#----------------------------------
-
-    def save_text_file(self, fname, text) :
-        if self.print_bits & 256 : print 'Save text file: ' + fname
-        f=open(fname,'w')
-        f.write( text )
-        f.close() 
-
-#----------------------------------
-
-    def evaluate_length_width_angle(self) :
-
-        rad_to_deg = 180/3.1415927
+    def evaluate_length_width_angle_v0(self) :
+        """ DEPRICATED in favor of OpticAlignmentCspadMethods.evaluate_length_width_angle()
+        """
 
         self.S1  = numpy.zeros( (4,8), dtype=numpy.int32 )
         self.S2  = numpy.zeros( (4,8), dtype=numpy.int32 )
@@ -456,99 +310,10 @@ class OpticAlignmentCspadV1 :
                 tiltXZ = float(self.dZX[quad][segm]) / self.XSize[quad][segm] if self.XSize[quad][segm] != 0 else 0
                 tiltYZ = float(self.dZY[quad][segm]) / self.YSize[quad][segm] if self.YSize[quad][segm] != 0 else 0
 
-                self.tiltXYDegree[quad][segm] = rad_to_deg * tiltXY
-                self.tiltXZDegree[quad][segm] = rad_to_deg * tiltXZ
-                self.tiltYZDegree[quad][segm] = rad_to_deg * tiltYZ
+                self.tiltXYDegree[quad][segm] = self.rad_to_deg * tiltXY
+                self.tiltXZDegree[quad][segm] = self.rad_to_deg * tiltXZ
+                self.tiltYZDegree[quad][segm] = self.rad_to_deg * tiltYZ
 
-
-#----------------------------------
-
-    def evaluateSLAverage(self,quad,segm) :
-        self.dZSA[quad][segm] = 0.5 * (self.dZS1[quad][segm] + self.dZS2[quad][segm])
-        self.dZLA[quad][segm] = 0.5 * (self.dZL1[quad][segm] + self.dZL2[quad][segm])
-        self.SA[quad][segm]   = 0.5 * (self.S1[quad][segm]   + self.S2[quad][segm])
-        self.LA[quad][segm]   = 0.5 * (self.L1[quad][segm]   + self.L2[quad][segm])
-        self.dSA[quad][segm]  = 0.5 * (self.dS1[quad][segm]  + self.dS2[quad][segm])
-        self.dLA[quad][segm]  = 0.5 * (self.dL1[quad][segm]  + self.dL2[quad][segm])
-
-#----------------------------------
-
-    def txt_qc_table_xy(self) :
-        txt = 'segm:        S1      S2     dS1     dS2        L1      L2     dL1     dL2    angle(deg)   D1      D2      dD   d(dS)   d(dL)'
-        for quad in range(4) :
-            txt += '\nQuad  %d\n' % quad
-            for segm in range(8) :
-                txt += 'segm: %1d  %6d  %6d  %6d  %6d    %6d  %6d  %6d  %6d   %8.5f  %6d  %6d  %6d  %6d  %6d\n' % \
-                    (segm, self.S1[quad][segm], self.S2[quad][segm], self.dS1[quad][segm], self.dS2[quad][segm], \
-                           self.L1[quad][segm], self.L2[quad][segm], self.dL1[quad][segm], self.dL2[quad][segm], \
-                           self.tiltXYDegree[quad][segm], \
-                           self.D1[quad][segm], self.D2[quad][segm], self.dD[quad][segm], self.ddS[quad][segm], self.ddL[quad][segm] )
-        return txt
-
-#----------------------------------
-
-    def txt_qc_table_z(self) :
-        txt = 'segm:        SA      LA   XSize   YSize    dZS1  dZS2  dZL1  dZL2    dZSA  dZLA  ddZS  ddZL     dZX   dZY   angXZ(deg) angYZ(deg) dz3(um)'
-        for quad in range(4) :
-            txt += '\nQuad  %d\n' % quad
-            for segm in range(8) :
-                txt += 'segm: %1d  %6d  %6d  %6d  %6d   %5d %5d %5d %5d   %5d %5d %5d %5d   %5d %5d  %8.5f   %8.5f   %8.3f\n' % \
-                    (segm, self.SA[quad][segm],   self.LA[quad][segm],   self.XSize[quad][segm], self.YSize[quad][segm], \
-                           self.dZS1[quad][segm], self.dZS2[quad][segm], self.dZL1[quad][segm],  self.dZL2[quad][segm], \
-                           self.dZSA[quad][segm], self.dZLA[quad][segm], self.ddZS[quad][segm],  self.ddZL[quad][segm], \
-                           self.dZX[quad][segm],  self.dZY[quad][segm],  self.tiltXZDegree[quad][segm], self.tiltYZDegree[quad][segm], \
-                           self.arr_dev_um[quad,segm])
-        return txt #+'\n' 
-
-#----------------------------------
- 
-    def txt_geometry_header(self) :
-        txt = '# TITLE      Geometry parameters of CSPAD with moving quads' \
-            + '\n# DATE_TIME  %s' % strftime('%Y-%m-%d %H:%M:%S %Z', localtime()) \
-            + '\n# AUTHOR     %s' % os.environ['LOGNAME'] \
-            + '\n# EXPERIMENT %s' % self.exp \
-            + '\n# DETECTOR   %s' % self.det \
-            + '\n# CALIB_TYPE geometry' \
-            + '\n# COMMENT  Table contains the list of geometry parameters for alignment of 2x1 sensors in quads and quads in CSPAD' \
-            + '\n# PARAM:01 PARENT     - name and version of the parent object; all translation and rotation pars are defined w.r.t. parent Cartesian frame' \
-            + '\n# PARAM:02 PARENT_IND - index of the parent object' \
-            + '\n# PARAM:03 OBJECT     - name and version of the new object' \
-            + '\n# PARAM:04 OBJECT_IND - index of the new object' \
-            + '\n# PARAM:05 X0         - x-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAM:06 Y0         - y-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAM:07 Z0         - z-coordinate [um] of the new object origin in the parent frame' \
-            + '\n# PARAM:08 ROT_Z      - new object design rotation angle [deg] around Z axis of the parent frame' \
-            + '\n# PARAM:09 ROT_Y      - new object design rotation angle [deg] around Y axis of the parent frame' \
-            + '\n# PARAM:10 ROT_X      - new object design rotation angle [deg] around X axis of the parent frame' \
-            + '\n# PARAM:11 TILT_Z     - new object tilt angle [deg] around Z axis of the parent frame' \
-            + '\n# PARAM:12 TILT_Y     - new object tilt angle [deg] around Y axis of the parent frame' \
-            + '\n# PARAM:13 TILT_X     - new object tilt angle [deg] around X axis of the parent frame' \
-            + '\n\n# HDR PARENT IND    OBJECT IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
-
-        return txt + '\n\n'
-
-#----------------------------------
- 
-    def txt_geometry_segments(self) :
-        txt = ''        
-        name_segm   = 'SENS2X1:V1'
-        name_parent = 'QUAD:V1'
-        rotXZ, rotYZ = 0,0
-        for quad in range(4) :
-            for segm in range(8) :
-                txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
-                       (name_parent.ljust(10), quad, name_segm.ljust(10), segm, \
-                       self.arrXmu[quad][segm], \
-                       self.arrYmu[quad][segm], \
-                       self.arrZmu[quad][segm], \
-                       self.sensor_rotation[segm], \
-                       rotXZ, \
-                       rotYZ, \
-                       self.tiltXYDegree[quad][segm], \
-                       self.tiltXZDegree[quad][segm], \
-                       self.tiltYZDegree[quad][segm])
-            txt += '\n' 
-        return txt
 
 #----------------------------------
  
@@ -560,9 +325,10 @@ class OpticAlignmentCspadV1 :
         q_rot = [90,0,270,180]
         q_x0  = [-4500,-4500, 4500, 4500]
         q_y0  = [-4500, 4500, 4500,-4500]
-        for quad in range(4) :
+        for quad in range(self.nquads) :
             txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
-                (name_parent.ljust(10), num_parent, name_segm.ljust(10), quad, q_x0[quad], q_y0[quad], z0, q_rot[quad], rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+                (name_parent.ljust(12), num_parent, name_segm.ljust(12), quad, \
+                 q_x0[quad], q_y0[quad], z0, q_rot[quad], rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
         return txt + '\n' 
 
 #----------------------------------
@@ -571,84 +337,6 @@ class OpticAlignmentCspadV1 :
         return self.txt_geometry_header() + \
                self.txt_geometry_segments() + \
                self.txt_geometry_quads()
-
-#----------------------------------
-
-    def drawOpticalAlignmentFile(self): 
-        print 'drawOpticalAlignmentFile()'
-
-        sizex, sizey = shape = (100,100)
-        #arr   = np.arange(sizex*sizey)
-        #arr.shape = shape
-        #arr   = np.zeros(shape)
-        fig   = plt.figure(figsize=(10,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-        axes  = fig.add_subplot(111)        
-        axes.set_xlim((-50,1750))
-        axes.set_ylim((-50,1750))
-        #axes1 = plt.imshow(arr, origin='lower', interpolation='nearest',extent=ax_range) 
-
-        for quad in range(4) :
-            #print '\nQuad:', quad
-            self.drawOneQuad(quad,axes)
-
-        plt.show()
-        fig.savefig(self.fname_plot_det)
-        print 'Image saved in file:', self.fname_plot_det
-
-
-    def drawOneQuad(self,quad,axes):
-        print 'drawOneQuad(' + str(quad) + ')'
-
-        line_point = 0
-        self.xlp = [0,0,0,0,0]
-        self.ylp = [0,0,0,0,0]
-        for point in range(1,33) :
-            N = self.arr[quad,point,0]
-            X = self.arr[quad,point,1]
-            Y = self.arr[quad,point,2]
-            Z = self.arr[quad,point,3]                
-            #print 'N,X,Y =', N,X,Y
-
-            x = self.xlp[line_point] = X / self.pixelSize
-            y = self.ylp[line_point] = Y / self.pixelSize
-            plt.text(x, y, str(N), fontsize=7, color='k', ha='left', rotation=45)
-
-            if N==1 :
-                x, y = self.xlp[0] + 100, self.ylp[0] + 100
-                plt.text(x, y, 'Quad:'+str(quad), fontsize=12, color='k', ha='left', rotation=0)
-
-            if line_point == 3 :
-                #print 'Add new line:'
-                #print 'x=',self.xlp                   
-                #print 'y=',self.ylp
-                self.xlp[4] = self.xlp[0]
-                self.ylp[4] = self.ylp[0]
-                line = lines.Line2D(self.xlp, self.ylp, linewidth=1, color='r')        
-                axes.add_artist(line)
-                line_point = -1
-                self.xlp = [0,0,0,0,0]
-                self.ylp = [0,0,0,0,0]
-            line_point += 1
-
-#----------------------------------
-
-    def drawQuadsSeparately(self): 
-        print 'drawQuadsSeparately()'
-
-        sizex, sizey = shape = (100,100)
-        fig   = plt.figure(figsize=(10,10), dpi=100, facecolor='w',edgecolor='w',frameon=True)
-
-        quadlims = (-50,870)
-        
-        for quad in range(4) :
-            axes = fig.add_subplot(221+quad)
-            axes.set_xlim(quadlims)
-            axes.set_ylim(quadlims)
-            self.drawOneQuad(quad,axes)
-
-        plt.show()
-        fig.savefig(self.fname_plot_quads)
-        print 'Image saved in file:', self.fname_plot_quads
 
 #----------------------------------
 

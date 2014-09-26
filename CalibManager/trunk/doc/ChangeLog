@@ -12,6 +12,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-09-26 Mikhail S. Dubrovin
+Tag: V00-00-61
+- add OpticAlignmentCspadV2.py, OpticAlignmentCspad2x2V1.py
+- add OpticAlignmentCspadMethods.py to collect common methods for cspad alignment in superclass
+- GUIMetrology.py - integrate CspadV2(xpp) and Cspad2x2V1 in calibman
+
 2014-09-23 Mikhail S. Dubrovin
 Tag: V00-00-60
 - ConfigParametersForApp, ConfigFileGenerator add support for Epix and Epix10k
