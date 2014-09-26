@@ -229,6 +229,23 @@ def files2migrate(instr=None,host=None,filetype=None):
                                       "WHERE e.id=%d AND e.instr_id=i.id" % f['exper_id'])
     return files
 
+# -------------------------------------
+# Find index files that failed transfer
+# -------------------------------------
+
+
+def failed_idx_files(age=0):
+    
+    select = ""
+    if age > 0:
+        select = "AND start_time > %d" % age
+        
+    query = "SELECT exper_id,file,start_time FROM data_migration " \
+        "WHERE file_type = 'xtc.idx' and status = 'FAIL' %s " % select
+
+    files = __do_select_many(query)                             
+
+    return files
 
 # ------------------------------------
 #  Get info for all experiments
