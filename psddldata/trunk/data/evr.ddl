@@ -585,4 +585,48 @@
   @init(conn -> _conn [[method(conn)]], nchannels -> _nchannels)  [[inline]];
 
 }
+
+//------------------ IOChannelV2 ------------------
+@type IOChannelV2
+  [[value_type]]
+{
+  @const int32_t NameLength = 64;
+  @const int32_t MaxInfos = 16;
+
+  /*  Output connector */
+  OutputMapV2 _output           -> output;
+
+  /*  Name of channel */
+  char        _name[NameLength] -> name;
+
+  /*  Number of Detectors connected */
+  uint32_t _ninfo -> ninfo;
+
+  /*  List of Detectors connected */
+  Pds.DetInfo _info[MaxInfos] -> infos;
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto, inline]];
+
+}
+
+
+//------------------ IOConfigV2 ------------------
+@type IOConfigV2
+  [[type_id(Id_EvrIOConfig, 2)]]
+  [[config_type]]
+  [[pack(4)]]
+{
+  /* Number of Configured output channels */
+  uint32_t    _nchannels -> nchannels;
+
+  /* List of Configured output channels */
+  IOChannelV2 _channels[@self._nchannels] -> channels;
+
+  /* Standard constructor */
+  @init(nchannels -> _nchannels)  [[inline]];
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto]];
+}
 } //- @package EvrData
