@@ -115,6 +115,7 @@ PixCoordsProducer::~PixCoordsProducer ()
 void 
 PixCoordsProducer::beginJob(Event& evt, Env& env)
 {
+  //cout << "beginJob(...)\n";
   if( m_print_bits & 1 ) printInputParameters();
 }
 
@@ -123,10 +124,12 @@ void
 PixCoordsProducer::beginRun(Event& evt, Env& env)
 {
   ++ m_count_run;
-  //cout << "m_count_run: " << m_count_run << "\n";
+  //cout << "beginRun(...): m_count_run: " << m_count_run << "\n";
 
   m_count_clb = 0;
+
   checkCalibPars(evt, env);
+  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -134,7 +137,8 @@ void
 PixCoordsProducer::beginCalibCycle(Event& evt, Env& env)
 {
   ++ m_count_calibcycle;
-  //cout << "m_count_calibcycle: " << m_count_calibcycle << "\n";
+  checkCalibPars(evt, env);
+  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
 
 /// Method which is called with event data, this is the only required 
@@ -143,10 +147,9 @@ void
 PixCoordsProducer::event(Event& evt, Env& env)
 {
   ++ m_count_event;
-  cout << "m_count_event: " << m_count_event << "\n";
+  //cout << "event(...): m_count_event: " << m_count_event << "\n";
 
   checkCalibPars(evt, env);
-
   //if( m_count_clb ) savePixCoordsInEvent(evt);
   if( m_count_clb ) savePixCoordsInCalibStore(env);
 }

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-63
+2014-09-27 Mikhail S. Dubrovin
+- in PixCoordsProducer - check and savePixCoordsInCalibStore(env) in all callbacks
+
 Tag: V00-03-62
 2014-09-23 Mikhail S. Dubrovin
 - add EpixNDArrProducer
