@@ -1,0 +1,30 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ChangeLog 8463 2014-06-24 01:53:04Z cpo@SLAC.STANFORD.EDU $
+#
+# Description:
+#  ChangeLog file for package psmon
+#------------------------------------------------------------------------
+
+Package author: Dan Damiani
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-02
+2014-09-29 Christopher O'Grady
+- Add Anton Lindahl's simple multiplot example
+
+Tag: V00-01-01
+2014-09-29 Christopher O'Grady
+- Add support for MultiPlots, Histograms and matplotlib-style
+  strings to set symbol types in overlay plots.
+
+Tag: V00-01-00
+2014-07-23 Christopher O'Grady
+- Many improvements to the interface and functionality.  This
+  feels like the first real official version.
+
+Tag: V00-00-01
+2014-06-25 Christopher O'Grady
+- First tag of Dan's psmon
