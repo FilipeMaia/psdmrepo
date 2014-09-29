@@ -1,23 +1,36 @@
-#!/bin/sh
+#!/bin/bash
+#
+# Create *experiment-db.dat* file with a list of the LCLS experiments
+#
+# Runs as a cronjob and crontab will send a mail to psrel if new 
+# experiments were found (because of echo to stdout). The email 
+# is forwarded to the address in ~psrel/.forward (afs home). 
+#
 
 db=/reg/g/psdm/data/ExpNameDb/experiment-db.dat
-tmpdb=$db.tmp
+tmpdb=${db}.tmp
 rpmsrc=/reg/g/psdm/sw/dist/rpms/SOURCES
 
 q="select e.id, i.name, e.name from experiment e, instrument i where e.instr_id = i.id and INSTR(e.name, ' ') = 0 order by e.id;"
 
-echo "$q" | mysql -N -hpsdb -uregdb_reader regdb > $tmpdb
-if diff -q $tmpdb $db > /dev/null ; then
-	rm $tmpdb
+echo "${q}" | mysql -N -hpsdb -uregdb_reader regdb > ${tmpdb}
+if diff -q ${tmpdb} ${db} > /dev/null ; then
+	rm ${tmpdb}
 else
-	mv $tmpdb $db
-	echo "$db has been updated"
+    # some simple checks: new file is not empty and there are at least 10 lines.  
+    if [[ ! -s ${tmpdb} ]] || [[ $(wc -l ${tmpdb} | awk '{print $1}') -lt 10 ]] ; then
+        echo "new experiment-db.dat looks wrong, no update"
+	    rm ${tmpdb}
+        exit 
+    fi
+    
+    mv ${tmpdb} ${db}
+    echo "${db} has been updated"
 	
-	# make a tarball
-	cd /reg/g/psdm
-	ts=$(date +%Y%m%d)
-	tar czf /tmp/psdm-data-$ts.tar.gz data
-	mv /tmp/psdm-data-$ts.tar.gz $rpmsrc/
-	echo "Created tarball $rpmsrc/psdm-data-$ts.tar.gz"
-
+    # make a tarball
+    cd /reg/g/psdm
+    ts=$(date +%Y%m%d)
+    tar czf /tmp/psdm-data-${ts}.tar.gz data
+    mv /tmp/psdm-data-${ts}.tar.gz ${rpmsrc}/
+    echo "Created tarball ${rpmsrc}/psdm-data-${ts}.tar.gz"
 fi
