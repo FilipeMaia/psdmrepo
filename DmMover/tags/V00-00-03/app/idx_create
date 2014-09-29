@@ -1,0 +1,75 @@
+#!/bin/bash 
+#
+# Create a index files from an xtc file. 
+#
+# Usage:
+#   create_idx <xtc-file> 
+#
+# The index file is created in a tmp directory and move to the proper name 
+# only after the program ran successfully
+#
+
+msg() {
+    echo $(date '+%Y%m%d %H:%M:%S') $*
+}
+
+debug() {
+    [[ ${VERBOSE} -eq 1 ]] && echo $(date '+%Y%m%d %H:%M:%S') $*
+}
+
+
+VERBOSE=1
+while getopts :q OPT; do
+    case $OPT in
+        q|+q) VERBOSE=0 ;;
+        *) sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+set -u 
+xtcfile=${1:?}
+
+[[ ! -e ${xtcfile} ]] && echo "No xtc file ${xtcfile}" && exit 4
+
+fnxtc=$(basename ${xtcfile})
+index_dir=$(dirname ${xtcfile})/index
+index_file=${index_dir}/${fnxtc}.idx
+
+[[ -e ${index_file} ]] && echo "index exists ${xtcfile}" && exit 4 
+
+tmp_dir=${index_dir}/idx_${fnxtc%.xtc}_$(uuidgen)
+tmp_index_file=${tmp_dir}/${fnxtc}.idx
+
+debug "index dir: ${index_dir}"
+debug "index file:  ${index_file}"
+debug "tmp dir: ${tmp_dir}"
+debug "tmp file: ${tmp_index_file}"
+
+# create tmp dir and create proper permissions
+mkdir ${tmp_dir} || (echo "Error creating ${tmp_dir}" && exit 5) 
+chmod u+wx ${tmp_dir} || (echo "Error permissions ${tmp_dir}" && exit 5) 
+
+cmd="xtcindex -f ${xtcfile} -o ${tmp_index_file}"
+
+msg $cmd
+start_time=$(date +%s)
+$cmd > /dev/null
+rcidx=$?
+elap=$(( $(date +%s) - ${start_time} ))
+fsize=$(stat --format %s ${xtcfile}) 
+
+rc=${rcidx}
+if [[ ${rcidx} -eq 0 ]] ; then
+    [[ ! -e ${tmp_index_file} ]] && echo "tmp index files missing ${tmp_index_file}" && exit 5
+    debug ${tmp_index_file} ${index_file}
+    mv ${tmp_index_file} ${index_file}
+    rc=$?
+fi
+
+[[ -e ${tmp_dir} ]] && rmdir ${tmp_dir}
+
+msg "Idx elap=${elap} size=${fsize} rcidx=${rcidx} rcall=${rc} ${xtcfile}" 
+exit $rc
