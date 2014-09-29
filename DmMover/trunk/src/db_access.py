@@ -49,7 +49,7 @@ def select_db(conn_file):
 
     __host = key_value['Server']
     __user = key_value['Uid']
-    __passwd = key_value['Pwd'] 
+    __passwd = key_value.get('Pwd', "") 
     __db = key_value['Database']
     
 

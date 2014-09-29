@@ -16,15 +16,15 @@ import FileMgr.file_status as file_status
 import DmMover.db_access as db 
 
 
-_ws_conn = "/reg/g/psdm/psdatmgr/datamigr/.filemgr-ws"
+_ws_conn    = "/reg/g/psdm/psdatmgr/datamigr/.filemgr-ws"
+_regdb_conn = "/reg/g/psdm/psdatmgr/regdb/.regdb-reader-conn"
 _no_experiment_   = -2
 _all_experiments_ = -1
 
 _print_header="""
-  ----------+-----------+---------------------------+-----------------------+---------+---------
-   exper_id | file type | file name                 | IN MIGRATION DATABASE | ON DISK | ON HPSS
-  ----------+-----------+---------------------------+-----------------------+---------+---------"""
-
+  ----------+-----------+---------------------------+-----------------------+---------+---------+--------------
+   exper_id | file type | file name                 | IN MIGRATION DATABASE | ON DISK | ON HPSS | size (check)
+  ----------+-----------+---------------------------+-----------------------+---------+---------+--------------"""
 
 def ws_conn_para(fname):
     line = open(fname).readline().rstrip()
@@ -37,7 +37,7 @@ class XtcCleanLocal:
     dictExp = { "amo":1, "sxr":1, "xpp":1, "cxi":1, "xcs":1, "mec":1 }
     iConnectTimeOut = 3
     
-    def __init__(self, sExpType, sExpName, iExpId, iCleanType, verbose):
+    def __init__(self, sExpType, sExpName, iExpId, iCleanType, verbose, src_type='ffb'):
         self.sExpType   = sExpType.lower()    
         self.sExpName   = sExpName.lower()    
         self.iExpId     = iExpId
@@ -47,11 +47,19 @@ class XtcCleanLocal:
         self.ignore_disk_status = False
         self.retry = False 
         
-
         self.minage = 4  # hours
         self.nlastkeep = 10 
 
         self.ftoDelete = {}   # path : [f1, ...., fn]
+        if src_type == 'ffb':
+            self.scan_path = "/reg/d/ffb/%s/%s/xtc" % (self.sExpType, self.sExpName)
+            self.scan_path_all = "/reg/d/ffb/%s" % self.sExpType 
+        elif src_type == 'dss':
+            self.scan_path = "/u2/pcds/pds/%s/e%d" % (self.sExpType, self.iExpId)
+            self.scan_path_all = "/u2/pcds/pds/%s" % (self.sExpType)
+        else:
+            raise VauleError("Unknown src_type %s", src_type)
+            
 
     def no_check_ana_disk(self):
         self.ignore_disk_status = True
@@ -69,19 +77,11 @@ class XtcCleanLocal:
             print "Searching for xtc files..."
 
         if self.iExpId == _all_experiments_:
-            path = "/reg/d/ffb/%s" % self.sExpType 
-            self.run_path_wild(path)
+            self.run_path_wild(self.scan_path_all)
         else:
-            path = "/reg/d/ffb/%s/%s/xtc" % (self.sExpType, self.sExpName)
-            self.run_path(path, self.iExpId)
-                
-        # sort date
-        #fl = self.dateSorted()
-        #for entry in fl:
-        #    print entry 
-        #rmFilesPath(self, path, lDelFiles)
-        
+            self.run_path(self.scan_path, self.iExpId)
 
+                
     def dateSorted(self):
         """ Sort all files that can be deleted by access time """
 
@@ -95,9 +95,13 @@ class XtcCleanLocal:
         return sorted_files
 
     def sort_by_run(self, fl, keeplast=5, ageh=6.0):
-        """ Sort file list by run and as sorted list except the last
-        <keeplast> runs and a run has to be older than ageh [hours]
+        """ Return a file list that is sorted by run-nr
+        Runs that are more recent than *ageh* (in hours) are removed.
+        *keeplast=N* selects the first N runs or all but the last N runs:
+          N>=0  all runs except the last N will be included in the list
+          N<0   the list will contain the first N runs
         """
+
         now = time.time()
         runs = {}
         runs_ignore = set()
@@ -128,12 +132,19 @@ class XtcCleanLocal:
             if not run in runs_ignore:
                 newDelList.extend(runs[run])
         return newDelList
-
+        
     def filter_fileStatus(self, triplet,status):  
         """ Filter function called to decide if a file can be removed """
 
-        #print triplet,  status.size_bytes()
-        if  ( file_status.IN_MIGRATION_DATABASE in status.flags() ) and \
+        #print triplet, status.size_bytes(), self.expected_size.get(triplet[2], -1)        
+        if self.expected_size:
+            size_match = status.size_bytes() == self.expected_size.get(triplet[2], -1)
+            check_size = True
+        else:
+            size_match = True
+            check_size = False
+
+        if  size_match and ( file_status.IN_MIGRATION_DATABASE in status.flags() ) and \
                 ( file_status.DISK in status.flags() or self.ignore_disk_status) and \
                 ( file_status.HPSS in status.flags() ):                
             return True
@@ -143,12 +154,11 @@ class XtcCleanLocal:
             print _print_header
             self.print_stat = True
 
-        print "   %8d | %9s | %25s |         %5s         |  %5s  |  %5s" % \
+        print "   %8d | %9s | %25s |         %5s         |  %5s  |  %5s  | %s (%s)" % \
             ( int(triplet[0]),triplet[1],triplet[2],
               str(file_status.IN_MIGRATION_DATABASE in status.flags()),
               str(file_status.DISK in status.flags()),
-              str(file_status.HPSS in status.flags())\
-                  )
+              str(file_status.HPSS in status.flags()), size_match, check_size)
         return False
     
     def run_path_wild(self, path):
@@ -171,7 +181,8 @@ class XtcCleanLocal:
             self.run_path(sPath, _all_experiments_)
 
         return True
-  
+
+    # ----------------------------------------------------------------------  
     def run_path(self, path, expid):
         """ Find all xtc files in path and remove the ones that are eligible """
         try:
@@ -192,14 +203,14 @@ class XtcCleanLocal:
             print "   Last File: " + lFiles[-1] + "\n"
     
         lXtcStatusQuery = []
+        size_dict = {}
         for sFile in lFiles:
-            # ignore gluster specific files (permissions = 01000)
-            #if os.stat(sFile).st_mode & 01000 > 0:
-            #    continue
             if expid == _all_experiments_:
                 expid = int(sFile[1:].split('-')[0])
             if expid != 0: 
-                lXtcStatusQuery.append( (expid, 'xtc', sFile) )      
+                lXtcStatusQuery.append((expid, 'xtc', sFile))      
+            size_dict[sFile] = os.path.getsize(sFile)
+        self.expected_size = size_dict
 
         self.print_stat = False
         url,user,pswd = ws_conn_para(_ws_conn)
@@ -215,18 +226,20 @@ class XtcCleanLocal:
         self.ftoDelete[path] = lDelFiles
         
         newDelFiles = self.sort_by_run(lDelFiles, self.nlastkeep, self.minage)
-        print "Found", len(lDelFiles), "To rm", len(newDelFiles),  "N keep", self.nlastkeep, "age [h]", self.minage
-
-        #self.rmFilesPath(path, lDelFiles)
+        print "Found %d eligible files. Attempt to rm %d files. Check file size entries=%d (true if >0)" % (
+            len(lDelFiles), len(newDelFiles), len(self.expected_size))
+        print "   Keep %d last files and age must be > %d hours" % (self.nlastkeep, self.minage) 
+        
         self.rmFilesPath(path, newDelFiles)
 
-
+    # ----------------------------------------------------------------------
     def doCleanup(self):
         
         for path, files in self.ftoDelete.iteritems:
             if files:
                 self.rmFilesPath(path, files)
 
+    # ----------------------------------------------------------------------
     def rmFilesPath(self, path, lDelFiles):
         """ Clean up all files that are in ftoDelete
         
@@ -450,6 +463,7 @@ def main():
                         help="don't retry file remove by moving a file temporarily")
     parser.add_argument("--minageh", default=240, type=int, help="min age [hours] of a file")
     parser.add_argument("--keep", default=5, type=int, help="keep last N runs")
+    parser.add_argument("--src", default="ffb", help="src type ffb or dss (default: %(default)s)")
 
     try:
         args = parser.parse_args()
@@ -476,7 +490,9 @@ def main():
     elif args.exp:
         exp_id = args.exp
     else:
-        db.select_db("/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn")
+        #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn")
+        #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.regdb-reader-conn")
+        db.select_db(_regdb_conn)
         exp_tmp = db.name2id(args.name)
         if exp_tmp == None:
             print "Error getting exper-id from name"
@@ -486,9 +502,11 @@ def main():
 
     # exp_id = _all_experiments_ if args.all else args.exp
 
-    print "instr: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.instr, args.name, exp_id, clean_mode, args.verbose)
+    print "instr: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.instr, args.name, exp_id, 
+                                                                    clean_mode, args.verbose)
     
-    xtcCleanLocal = XtcCleanLocal(args.instr, args.name, exp_id, clean_mode, args.verbose)
+    xtcCleanLocal = XtcCleanLocal(args.instr, args.name, exp_id, clean_mode, args.verbose, 
+                                  args.src)
     if args.nodiskcheck:
         xtcCleanLocal.no_check_ana_disk()
 
