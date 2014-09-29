@@ -1,0 +1,79 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script TestFileMgrRegister...
+#
+#------------------------------------------------------------------------
+
+"""Test application for FileMgrRegister class.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@version $Id$ 
+
+@author Andy Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from InterfaceCtlr.FileMgrRegister import FileMgrRegister
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class TestFileMgrRegister ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, 
+                usage = "usage: %prog [options] input-file instrument experiment type" )
+
+
+    #
+    #  Run the whole thing after parsing the command arguments and
+    #  installing logger. See AppBase class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if len(self._args) != 4 :
+            self._parser.error("four arguments required")
+            return 2
+
+        reg = FileMgrRegister()
+        reg.register(*self._args)
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = TestFileMgrRegister()
+    rc = app.run()
+    sys.exit(rc)
