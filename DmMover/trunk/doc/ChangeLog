@@ -11,10 +11,13 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag:
-- for check_all_destpath add argument for directories to create
-- Various improvements to dm_create_folders. Create only certain dirs if
-  allexp option is used. Allow to select experiments. 
+Tag: V00-00-03
+2014-09-29
+- In function *check_all_destpath* added argument to select directories that should be created.
+- Various improvements to *dm_create_folders*. Create only certain dirs if
+  *allexp* option is used. Allow to select experiments. 
+- Extended *ffbxtcclean* to remove files from a dss node (using *--src* option).
+  Check that the file size agrees with the one in irods.
 	
 Tag: V00-00-02
 2014-07-14
