@@ -1,4 +1,5 @@
 import psana
+import numpy as np
 
 class gsc:
     # put the "run" in the interface, so that the user knows that a new
@@ -24,7 +25,7 @@ class gsc:
     def voltages(self, evt):
         data = evt.get(psana.Gsc16ai.DataV1, self.source)
         if self.format == self.format.DataFormat_TwosComplement:
-            return self.voltsPerCount * data.channelValue();
+            return self.voltsPerCount * data.channelValue().astype(np.int16);
         elif self.format == self.format.DataFormat_OffsetBinary:
             return self.voltsMin + self.voltsPerCount * data.channelValue();
         else:
