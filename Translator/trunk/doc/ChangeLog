@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2014-09-29 David Schneider
+- minor adjustment to default.cfg
+	
 Tag: V00-02-03
 2014-09-24 David Schneider
 - add option Translator.H5Output.printenv for h5-mpi-translate to print environment
