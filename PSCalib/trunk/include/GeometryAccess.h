@@ -91,6 +91,12 @@ namespace PSCalib {
  *        unsigned   size;
  *        geometry.get_pixel_areas(A,size);
  * 
+ *    // Access pixel mask:
+ *        const int* mask;
+ *        unsigned   size;
+ *        unsigned   mbits=0377; // 1-edges; 2-wide central cols; 4-non-bound; 8-non-bound neighbours
+ *        geometry.get_pixel_mask(A, size, std::string(), 0, mbits);
+ * 
  *    // Access pixel size for entire detector:
  *        double pix_scale_size = geometry.get_pixel_scale_size ();
  *        // or for specified geometry object, for example one quad of CSPAD
@@ -133,6 +139,14 @@ namespace PSCalib {
  *    // or print info about specified geometry objects (see class GeometryObject):
  *    geometry.get_geo("QUAD:V1", 1)->print_geo();
  *    geometry.get_top_geo()->print_geo_children();
+ *  @endcode
+ * 
+ *  @li Modify and save new geometry file methods
+ *  @code
+ *    geometry.set_geo_pars("QUAD:V1", x0, y0, z0, rot_z,...<entire-list-of-9-parameters>);
+ *    geometry.move_geo("QUAD:V1", 1, 10, 20, 0);
+ *    geometry.tilt_geo("QUAD:V1", 1, 0.01, 0, 0);
+ *    geometry.save_pars_in_file("new-file-name.txt");
  *  @endcode
  *
  *  @author Mikhail S. Dubrovin
@@ -199,6 +213,24 @@ public:
                          unsigned& size,
 			 const std::string& oname = std::string(), 
 			 const unsigned& oindex = 0);
+
+  /// Returns pixel mask array of size for specified geometry object 
+  /**
+   *  @param[out] mask - pointer to pixel mask array
+   *  @param[out] size - size of the pixel array (number of pixels)
+   *  @param[in]  oname - object name
+   *  @param[in]  oindex - object index
+   *  @param[in]  mbits - mask control bits; 
+   *              +1-mask edges, 
+   *              +2-two wide central columns, 
+   *              +4-non-bounded, 
+   *              +8-non-bounded neighbours.
+   */
+  void  get_pixel_mask (const int*& mask, 
+                        unsigned& size,
+		        const std::string& oname = std::string(),
+ 		        const unsigned& oindex = 0,
+		        const unsigned& mbits = 0377);
 
   /// Returns pixel scale size for specified geometry object through its children segment
   /**
@@ -273,6 +305,35 @@ public:
    */
   void set_print_bits(unsigned pbits=0) {m_pbits=pbits;}
 
+  /// Sets self object geometry parameters
+  void set_geo_pars( const std::string& oname = std::string(), 
+		     const unsigned& oindex = 0,
+                     const double& x0 = 0,
+                     const double& y0 = 0,
+                     const double& z0 = 0,
+                     const double& rot_z = 0,
+                     const double& rot_y = 0,
+                     const double& rot_x = 0,                  
+                     const double& tilt_z = 0,
+                     const double& tilt_y = 0,
+                     const double& tilt_x = 0 
+		     );
+
+  /// Adds offset for origin of the self object w.r.t. current position
+  void move_geo( const std::string& oname = std::string(), 
+		 const unsigned& oindex = 0,
+                 const double& dx = 0,
+                 const double& dy = 0,
+                 const double& dz = 0
+		 );
+
+  /// Adds tilts to the self object w.r.t. current orientation
+  void tilt_geo( const std::string& oname = std::string(), 
+		 const unsigned& oindex = 0,
+                 const double& dt_x = 0,
+                 const double& dt_y = 0,
+                 const double& dt_z = 0 
+		 );
 
 protected:
 

@@ -20,6 +20,24 @@ Usage::
 
     X, Y, Z = geometry.get_pixel_coords(oname=None, oindex=0)
 
+    A = geometry.get_pixel_areas(oname=None, oindex=0)
+
+    #mbits = +1-edges, +2-wide pixels, +4-non-bounded pixels, +8-neighbours of non-bounded
+    mask = geometry.get_pixel_mask(oname=None, oindex=0, mbits=0377)
+
+    # modify currect geometry objects' parameters
+    geometry.set_geo_pars('QUAD:V1', x0, y0, z0, rot_z,...<entire-list-of-9-parameters>);
+    geometry.move_geo('QUAD:V1', 1, 10, 20, 0);
+    geometry.tilt_geo('QUAD:V1', 1, 0.01, 0, 0);
+
+    # save current geometry parameters in file
+    geometry.save_pars_in_file(fname_geometry_new)
+
+    # Return geometry parameters in the tuple psf[32][3][3] - format for TJ:
+    psf = geometry.get_psf()
+    geometry.print_psf()
+
+
 @see :py:class:`PSCalib.GeometryObject`, :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
 
 This software was developed for the SIT project.  If you use all or 
@@ -238,18 +256,54 @@ class GeometryAccess :
 
     #------------------------------
 
+    def get_pixel_mask(self, oname=None, oindex=0, mbits=0377) :
+        """Returns pixel mask array for top or specified geometry object.
+           mbits =+1 - mask edges
+                  +2 - two wide-pixel central columns
+                  +4 - non-bounded pixels
+                  +8 - neighbours of non-bounded pixels
+        """
+        geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)
+        return geo.get_pixel_mask(mbits)
+
+    #------------------------------
+
     def get_pixel_scale_size(self, oname=None, oindex=0) :
         """Returns pixel scale size for top or specified geometry object 
         """
         geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)        
         return geo.get_pixel_scale_size()
 
-      #------------------------------
+    #------------------------------
     
     def get_dict_of_comments(self) :
         """Returns dictionary of comments
         """
         return self.dict_of_comments
+
+    #------------------------------
+
+    def set_geo_pars(self, oname=None, oindex=0, x0=0, y0=0, z0=0, rot_z=0, rot_y=0, rot_x=0, tilt_z=0, tilt_y=0, tilt_x=0) :
+        """Sets geometry parameters for specified or top geometry object
+        """
+        geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)
+        return geo.set_geo_pars(x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x)
+
+    #------------------------------
+
+    def move_geo(self, oname=None, oindex=0, dx=0, dy=0, dz=0) :
+        """Moves specified or top geometry object by dx, dy, dz
+        """
+        geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)
+        return geo.move_geo(dx, dy, dz)
+
+    #------------------------------
+
+    def tilt_geo(self, oname=None, oindex=0, dt_x=0, dt_y=0, dt_z=0) :
+        """Tilts specified or top geometry object by dt_x, dt_y, dt_z
+        """
+        geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)
+        return geo.tilt_geo(dt_x, dt_y, dt_z)
 
     #------------------------------
     
@@ -313,12 +367,53 @@ class GeometryAccess :
             iX, iY = np.array((X-xmin)/pix_size, dtype=np.uint), np.array((Y-ymin)/pix_size, dtype=np.uint)
             return iX, iY
 
-#------------------------------
+    #------------------------------
 
     def set_print_bits(self, pbits=0) :
         """ Sets printout control bitword
         """
         self.pbits = pbits
+
+    #------------------------------
+
+    def get_psf(self) :
+        """Returns array of vectors in TJ format (psf stands for position-slow-fast vectors)
+        """
+        X, Y, Z = self.get_pixel_coords() # pixel positions for top level object
+        if X.size != 32*185*388 : return None
+        # For now it works for CSPAD only
+        shape_cspad = (32,185,388)
+        X.shape, Y.shape, Z.shape,  = shape_cspad, shape_cspad, shape_cspad
+
+        psf = []
+
+        for s in range(32) :
+            vp = (X[s,0,0], Y[s,0,0], Z[s,0,0])
+
+            vs = (X[s,1,0]-X[s,0,0], \
+                  Y[s,1,0]-Y[s,0,0], \
+                  Z[s,1,0]-Z[s,0,0])
+
+            vf = (X[s,0,1]-X[s,0,0], \
+                  Y[s,0,1]-Y[s,0,0], \
+                  Z[s,0,1]-Z[s,0,0])
+
+            psf.append((vp,vs,vf))
+
+        return psf
+
+
+    #------------------------------
+
+    def print_psf(self) :
+        """ Gets and prints psf array for test purpose
+        """
+        psf = np.array( geometry.get_psf() )
+        print 'print_psf(): psf.shape: %s \npsf vectors:' % (str(psf.shape)) 
+        for (px,py,pz), (sx,xy,xz), (fx,fy,fz) in psf:
+            print '    p=(%12.2f, %12.2f, %12.2f),    s=(%8.2f, %8.2f, %8.2f)   f=(%8.2f, %8.2f, %8.2f)' \
+                  % (px,py,pz,  sx,xy,xz,  fx,fy,fz)
+
 
 #------------------------------
 #------ Global Method(s) ------
@@ -333,7 +428,7 @@ def img_default(shape=(10,10), dtype = np.float32) :
 
 #------------------------------
 
-def img_from_pixel_arrays(iX, iY, W=None, dtype=np.float32) :
+def img_from_pixel_arrays(iX, iY, W=None, dtype=np.float32, vbase=0) :
     """Returns image from iX, iY coordinate index arrays and associated weights W.
     """
     if iX.size != iY.size \
@@ -347,7 +442,7 @@ def img_from_pixel_arrays(iX, iY, W=None, dtype=np.float32) :
     ysize = iY.max()+1
     if W==None : weight = np.ones_like(iX)
     else       : weight = W
-    img = np.zeros((xsize,ysize), dtype=dtype)
+    img = vbase*np.ones((xsize,ysize), dtype=dtype)
     img[iX,iY] = weight # Fill image array with data 
     return img
 
@@ -378,6 +473,7 @@ def test_access(geometry) :
 
     print '\nINTERMEDIATE GEO (QUAD):'
     geo = geometry.get_geo('QUAD:V1', 0) 
+    #geo = geometry.get_top_geo() 
     geo.print_geo_children()
 
     t0_sec = time()
@@ -430,6 +526,26 @@ def test_plot_quad(geometry) :
  
     print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape 
     img = img_from_pixel_arrays(iX,iY,W=arr)
+
+    gg.plotImageLarge(img,amp_range=amp_range)
+    gg.move(500,10)
+    gg.show()
+
+#------------------------------
+
+def test_mask_quad(geometry) :
+    """ Tests geometry acess methods of the class GeometryAccess object for CSPAD quad
+    """
+    ## get index arrays
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None)
+
+    # get intensity array
+    arr = geometry.get_pixel_mask('QUAD:V1', 1, 1+2+4+8)
+    arr.shape = (8,185,388)
+    amp_range = (-1,2)
+ 
+    print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape 
+    img = img_from_pixel_arrays(iX, iY, W=arr, vbase=0.5)
 
     gg.plotImageLarge(img,amp_range=amp_range)
     gg.move(500,10)
@@ -494,6 +610,7 @@ def test_load_pars_from_file(geometry) :
 #------------------------------
 #------------------------------
 #------------------------------
+#------------------------------
 
 if __name__ == "__main__" :
 
@@ -524,7 +641,7 @@ if __name__ == "__main__" :
 
     geometry = GeometryAccess(fname_geometry, 0)
 
-    msg = 'Use command: sys.argv[0] <num>, wher num=1,2,3,...,7'
+    msg = 'Use command: sys.argv[0] <num>, wher num=1,2,3,...,10'
 
     if len(sys.argv)==1   : print 'App needs in input parameter.' + msg
     elif sys.argv[1]=='1' : test_access(geometry)
@@ -537,6 +654,8 @@ if __name__ == "__main__" :
     elif sys.argv[1]=='6' : ga0377 = GeometryAccess(fname_geometry, 0377)
     elif sys.argv[1]=='7' : test_save_pars_in_file(geometry)
     elif sys.argv[1]=='8' : test_load_pars_from_file(geometry)
+    elif sys.argv[1]=='9' : test_mask_quad(geometry)
+    elif sys.argv[1]=='10': geometry.print_psf()
     else : print 'Wrong input parameter.' + msg
 
     sys.exit ('End of %s' % sys.argv[0])

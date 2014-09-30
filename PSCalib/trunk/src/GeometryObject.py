@@ -4,16 +4,50 @@
 
 Usage::
 
-    from PSCalib.GeometryObject import GeometryObject
-    ...
-    d = <dictionary-of-input-parameters>
-    geo = GeometryObject(**d)
-    geo.print_geo()
-    geo.print_geo_children()
-    ...
-
     Methods of this class are used internally in PSCalib.GeometryAccess
     and are not supposed to be used directly...
+
+    from PSCalib.GeometryObject import GeometryObject
+    ...
+
+    # Instatiation of the geometry object
+    d = <dictionary-of-input-parameters>
+    geo = GeometryObject(**d)
+
+    # test print methods:
+    geo.print_geo()
+    geo.print_geo_children()
+
+    # modification methods:
+    geo.set_geo_pars(self, x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x)
+    geo.move_geo(dx, dy, dz)
+    geo.tilt_geo(dt_x, dt_y, dt_z)
+
+    # access methods:
+    s      = geo.str_data()
+    parent = geo.get_parent()
+    list_of_children = geo.get_list_of_children()
+    oname  = geo.get_geo_name()
+    oindex = geo.get_geo_index()
+    pname  = geo.get_parent_name()
+    pindex = geo.get_parent_index()
+    X,Y,Z  = geo.get_pixel_coords()
+    X,Y    = geo.get_2d_pixel_coords()
+    area   = geo.get_pixel_area()
+    #mbits = +1-edges, +2-wide pixels, +4-non-bounded pixels, +8-neighbours of non-bounded
+    mask   = geo.get_pixel_mask(mbits=0377)
+    npixels= geo.get_size_geo_array()
+    pixsize= geo.get_pixel_scale_size(self)
+    
+    # private methods for internal consumption:
+    geo.set_parent(parent)
+    geo.add_child(child)
+    Xt, Yt, Zt = geo.transform_geo_coord_arrays(X, Y, Z, do_tilt = True)
+    Xt, Yt     = geo.transform_2d_geo_coord_arrays(X, Y, do_tilt = True)
+
+    # global methods:
+    Xrot, Yrot = rotation_cs(X, Y, C, S)
+    Xrot, Yrot = rotation(X, Y, angle_deg)
 
 @see :py:class:`PSCalib.GeometryAccess`
 
@@ -73,17 +107,7 @@ class GeometryObject :
         self.oname  = oname
         self.oindex = oindex
 
-        self.x0 = x0
-        self.y0 = y0
-        self.z0 = z0
-
-        self.rot_z  = rot_z  
-        self.rot_y  = rot_y 
-        self.rot_x  = rot_x 
-                            
-        self.tilt_z = tilt_z
-        self.tilt_y = tilt_y
-        self.tilt_x = tilt_x
+        self.set_geo_pars(x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x)
 
         #if   self.oname == 'SENS2X1:V1' : self.algo = cspad2x1_one # PixCoords2x1(use_wide_pix_center=False)
         #elif self.oname == 'SENS2X1:V2' : self.algo = None
@@ -98,6 +122,44 @@ class GeometryObject :
         self.parent = None
         self.list_of_children = []
         
+#------------------------------
+        
+    def set_geo_pars(self, \
+                     x0=0, y0=0, z0=0, \
+                     rot_z=0, rot_y=0, rot_x=0, \
+                     tilt_z=0, tilt_y=0, tilt_x=0) : 
+        """ Sets self object geometry parameters
+        """
+        self.x0 = x0
+        self.y0 = y0
+        self.z0 = z0
+
+        self.rot_z  = rot_z  
+        self.rot_y  = rot_y 
+        self.rot_x  = rot_x 
+                            
+        self.tilt_z = tilt_z
+        self.tilt_y = tilt_y
+        self.tilt_x = tilt_x
+
+#------------------------------
+        
+    def move_geo(self, dx=0, dy=0, dz=0) :
+        """ Adds offset for origin of the self object w.r.t. current position
+        """
+        self.x0 += dx
+        self.y0 += dy
+        self.z0 += dz
+
+#------------------------------
+        
+    def tilt_geo(self, dt_x=0, dt_y=0, dt_z=0) :
+        """ Tilts the self object w.r.t. current orientation
+        """
+        self.tilt_z += dt_z
+        self.tilt_y += dt_y
+        self.tilt_x += dt_x
+
 #------------------------------
 
     def print_geo(self) :
@@ -264,6 +326,37 @@ class GeometryObject :
         #print 'geo_shape = ', geo_shape        
         aar.shape = geo_shape
         return aar
+
+#------------------------------
+
+    def get_pixel_mask(self, mbits=0377) :
+        """ Returns numpy array with pixel mask for self geometry object.
+
+        mbits =+1 - mask edges
+               +2 - two wide-pixel central columns
+               +4 - non-bounded pixels
+               +8 - neighbours of non-bounded pixels
+        """
+
+        if self.algo is not None :
+            return self.algo.pixel_mask_array(mbits)
+
+        oar = None
+        for ind, child in enumerate(self.list_of_children) :
+            if child.oindex != ind :
+                print 'WARNING! Geometry object %s:%d has non-consequtive index in calibration file, reconst index:%d' % \
+                      (child.oname, child.oindex, ind)
+
+            car = child.get_pixel_mask(mbits)
+            oar = car if ind==0 else np.vstack((oar, car))
+
+        # define shape for output x,y,z arrays
+        shape_child = car.shape
+        len_child = len(self.list_of_children)
+        geo_shape = np.hstack(([len_child], car.shape))
+        #print 'geo_shape = ', geo_shape        
+        oar.shape = geo_shape
+        return oar
 
 #------------------------------
 

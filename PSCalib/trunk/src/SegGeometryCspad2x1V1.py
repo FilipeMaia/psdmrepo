@@ -11,12 +11,12 @@
 In this class we use natural matrix notations like in data array
 (that is different from the DAQ notations where rows and cols are swapped).
 \n We assume that
-\n * 2x1 has 195 rows and 388 columns,
-\n * X-Y coordinate system origin coinsides with sensor center,
-\n * (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,ymax), as shown below
+\n * 2x1 has 185 rows and 388 columns,
+\n * X-Y coordinate system origin is in the sensor center,
+\n * pixel (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,ymax), as shown below
 \n ::
 
-                    ^ Y          (Xmax,Ymax)
+   (Xmin,Ymax)      ^ Y          (Xmax,Ymax)
    (0,0)            |            (0,387)
       ------------------------------
       |             |              |
@@ -28,7 +28,7 @@ In this class we use natural matrix notations like in data array
       |             |              |
       ------------------------------
    (184,0)          |           (184,387)
-   (Xmin,Ymin)
+   (Xmin,Ymin)                  (Xmax,Ymin)
 
 
 Usage of interface methods::
@@ -43,8 +43,10 @@ Usage of interface methods::
     shape    = sg.shape()
     pix_size = pixel_scale_size()
 
-    areaA = sg.pixel_area_array()
-    
+    area  = sg.pixel_area_array()
+    mask = sg.pixel_mask_array(mbits=0377)
+    # where mbits = +1-edges, +2-wide pixels, +4-non-bounded pixels, +8-neighbours of non-bounded
+
     sizeX = sg.pixel_size_array('X')
     sizeX, sizeY, sizeZ = sg.pixel_size_array()
 
@@ -54,6 +56,9 @@ Usage of interface methods::
 
     xmin, ymin, zmin = sg.pixel_coord_min()
     ymax = sg.pixel_coord_max('Y')
+
+    # global method for numpy arrays:
+    Xrot, Yrot = rotation(X, Y, C, S)
     ...
 
 
@@ -341,7 +346,53 @@ class SegGeometryCspad2x1V1(SegGeometry) :
         """ Returns maximal value in the array of segment pixel coordinates in um for AXIS
         """
         return sp.return_switch(sp.get_xyz_max_um, axis)
-        
+
+
+    def pixel_mask_array(sp, mbits=0377) :
+        """ Returns numpy array of pixel mask: 1/0 = ok/masked,
+            mbits=1 - mask edges
+                 =2 - mask two central columns 
+                 =4 - mask non-bounded pixels
+                 =8 - mask nearest neighbours of nonbonded pixels
+        """
+        zero_col = np.zeros(sp._rows,dtype=np.int)
+        zero_row = np.zeros(sp._cols,dtype=np.int)
+        mask2x1  = np.ones((sp._rows,sp._cols),dtype=np.int)
+
+        if mbits & 1 : 
+        # mask edges
+            mask2x1[0, :] = zero_row # mask top    edge
+            mask2x1[-1,:] = zero_row # mask bottom edge
+            mask2x1[:, 0] = zero_col # mask left   edge
+            mask2x1[:,-1] = zero_col # mask right  edge
+
+        if mbits & 2 : 
+        # mask two central columns
+            mask2x1[:,sp.colsh-1] = zero_col # mask central-left  column
+            mask2x1[:,sp.colsh]   = zero_col # mask central-right column
+
+        if mbits & 4 : 
+        # mask non-bounded pixels
+            for p in range(0, sp._rows, 10):
+                h = sp.colsh
+                mask2x1[p,p] = 0
+                mask2x1[p,p+h] = 0
+                
+                if mbits & 8 :
+                # mask nearest neighbours of nonbonded pixels
+                    if p==0 :
+                        mask2x1[1,0] = 0
+                        mask2x1[0,1] = 0
+                        mask2x1[1,0+h] = 0
+                        mask2x1[0,1+h] = 0
+                    else :
+                        mask2x1[p-1:p+2,p] = 0
+                        mask2x1[p,p-1:p+2] = 0                        
+                        mask2x1[p-1:p+2,p+h] = 0
+                        mask2x1[p,p+h-1:p+h+2] = 0                        
+
+        return mask2x1
+
   
 #------------------------------
 #------------------------------
@@ -443,15 +494,27 @@ def test_pix_sizes() :
     print 'size_arr.shape :',           size_arr.shape
 
 #------------------------------
+
+def test_2x1_mask(mbits=0377) :
+    pc2x1 = SegGeometryCspad2x1V1(use_wide_pix_center=False)
+    X, Y = pc2x1.get_cspad2x1_xy_maps_pix_with_offset()
+    mask = pc2x1.pixel_mask_array(mbits)
+    iX, iY = (X+0.25).astype(int), (Y+0.25).astype(int)
+    img = gg.getImageFromIndexArrays(iX,iY,mask)
+    gg.plotImageLarge(img, amp_range=(-1, 2), figsize=(8,10))
+    gg.show()
+
+#------------------------------
  
 if __name__ == "__main__" :
 
-    if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=1-3>'
+    if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=0-5>'
     elif sys.argv[1]=='0' : test_xyz_min_max()
     elif sys.argv[1]=='1' : test_xyz_maps()
     elif sys.argv[1]=='2' : test_2x1_img()
     elif sys.argv[1]=='3' : test_2x1_img_easy()
     elif sys.argv[1]=='4' : test_pix_sizes()
+    elif sys.argv[1]=='5' : test_2x1_mask(mbits=1+2+4+8)
     else : print 'Non-expected arguments: sys.argv=', sys.argv
 
     sys.exit( 'End of test.' )

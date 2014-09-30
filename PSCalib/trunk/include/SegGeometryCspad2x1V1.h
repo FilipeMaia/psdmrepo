@@ -40,7 +40,7 @@ namespace PSCalib {
 /**
  *  @ingroup PSCalib
  *
- *  @brief SegGeometryCspad2x1V1 class defines the cspad 2x1 sensor pixel coordinates in its local frame. V1 stands for the first version of cspad2x1 segment.
+ *  @brief Class SegGeometryCspad2x1V1 defines the cspad 2x1 V1 sensor pixel coordinates in its local frame.
  *
  *
  *  2x1 sensor coordinate frame:
@@ -48,7 +48,7 @@ namespace PSCalib {
  *  @code
  *    (Xmin,Ymax)      ^ Y          (Xmax,Ymax)
  *    (0,0)            |            (0,387)
- *       ------------------------------
+ *       +----------------------------+
  *       |             |              |
  *       |             |              |
  *       |             |              |
@@ -56,12 +56,12 @@ namespace PSCalib {
  *       |             |              |
  *       |             |              |
  *       |             |              |
- *       ------------------------------
+ *       +----------------------------+
  *    (184,0)          |           (184,387)
  *    (Xmin,Ymin)                  (Xmax,Ymin)
  *  @endcode
  *
- *  The (r,c)=(0,0) is in the top left corner of the matrix which has coordinates (Xmin,Ymax)
+ *  Pixel (r,c)=(0,0) is in the top left corner of the matrix which has coordinates (Xmin,Ymax)
  *  Here we assume that 2x1 has 185 rows and 388 columns.
  *  This assumption differs from the DAQ map, where rows and cols are interchanged:
  *  /reg/g/psdm/sw/external/lusi-xtc/2.12.0a/x86_64-rhel5-gcc41-opt/pdsdata/cspad/ElementIterator.hh,
@@ -105,6 +105,9 @@ namespace PSCalib {
  *        const pixel_area_t*  p_pixel_area      = seg_geom_2x1 -> pixel_area_array(); // array of 1-for regular or 2.5-for long pixels
  *        const pixel_coord_t* p_pixel_size_arr  = seg_geom_2x1 -> pixel_size_array(SG2X1::AXIS_X);
  *        const pixel_coord_t* p_pixel_coord_arr = seg_geom_2x1 -> pixel_coord_array(SG2X1::AXIS_Y);
+ *
+ *        unsigned mbits=0377; // 1-edges; 2-wide central cols; 4-non-bound; 8-non-bound neighbours
+ *        const pixel_mask_t*  p_mask_arr = seg_geom_2x1 -> pixel_mask_array(mbits);
  *  @endcode
  *  
  *  This software was developed for the LCLS project.  If you use all or 
@@ -183,7 +186,7 @@ public:
   /// Returns pixel size in um for indexing
   virtual const pixel_coord_t pixel_scale_size() { return PIX_SCALE_SIZE; }
 
-  /// Returns shape of the segment {rows, cols}
+  /// Returns pointer to the array of pixel areas
   virtual const pixel_area_t* pixel_area_array();
 
   /**  
@@ -201,6 +204,15 @@ public:
   /// Returns maximal value in the array of segment pixel coordinates in um for AXIS
   virtual const pixel_coord_t pixel_coord_max(AXIS axis);
 
+  /**  
+   *  @brief Returns pointer to the array of pixel mask: 1/0 = ok/masked
+   *  @param[in] mbits - mask control bits;
+   *             + 1 - mask edges,
+   *             + 2 - mask two central columns, 
+   *             + 4 - mask non-bounded pixels,
+   *             + 8 - mask nearest neighbours of nonbonded pixels. 
+   */  
+  virtual const pixel_mask_t* pixel_mask_array(const unsigned& mbits = 0377);
 
 private:
 
@@ -244,9 +256,11 @@ private:
   pixel_coord_t  m_y_pix_size_um [ROWS2X1][COLS2X1];  
   pixel_coord_t  m_z_pix_size_um [ROWS2X1][COLS2X1];
 
-  /// 2-d pixel size arrays
+  /// 2-d pixel area arrays
   pixel_area_t  m_pix_area_arr [ROWS2X1][COLS2X1];  
 
+  /// 2-d pixel mask arrays
+  pixel_mask_t  m_pix_mask_arr [ROWS2X1][COLS2X1];  
 
   // Copy constructor and assignment are disabled by default
   SegGeometryCspad2x1V1 ( const SegGeometryCspad2x1V1& ) ;

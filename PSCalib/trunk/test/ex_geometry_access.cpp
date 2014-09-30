@@ -165,6 +165,16 @@ int main (int argc, char* argv[])
   cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
   cout << "Areas: "; for(unsigned i=190; i<200; ++i) cout << std::setw(10) << A[i] << ", "; cout << "...\n"; 
 
+ //-----------------
+  cout << "\n\nTest of get_pixel_mask(...):\n";
+  const int* mask;
+  unsigned mbits = 077;
+  geometry.get_pixel_mask(mask, size, std::string(), 0, mbits);
+
+  cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
+  cout << "Mask[row=0]: "; for(unsigned i=190; i<200; ++i) cout << std::setw(10) << mask[i]     << ", "; cout << "...\n"; 
+  cout << "Mask[row=1]: "; for(unsigned i=190; i<200; ++i) cout << std::setw(10) << mask[i+388] << ", "; cout << "...\n"; 
+
   //-----------------
   cout << "\n\nTest of get_size_geo_array(...) for";
   cout << "\nQuad : " << geometry.get_geo("QUAD:V1", 1)->get_size_geo_array();

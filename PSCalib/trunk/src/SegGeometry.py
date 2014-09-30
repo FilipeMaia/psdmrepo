@@ -20,7 +20,9 @@ Usage of interface methods::
     shape    = sg.shape()
     pix_size = pixel_scale_size()
 
-    areaA = sg.pixel_area_array()
+    area  = sg.pixel_area_array()
+
+    mask  = sg.pixel_mask(mbits=0377)
     
     sizeX = sg.pixel_size_array('X')
     sizeX, sizeY, sizeZ = sg.pixel_size_array()
@@ -120,6 +122,12 @@ class SegGeometry :
         """ Returns maximal value in the array of segment pixel coordinates in um for AXIS
         """
         print self.wmsg % 'pixel_coord_max(axis)'
+
+    def pixel_mask_array(self, mbits) :
+        """ Returns array of masked pixels which content depends on bontrol bitword mbits
+        """
+        print self.wmsg % 'pixel_mask_array(mask_bits)'
+
   
 #------------------------------
 

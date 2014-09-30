@@ -294,12 +294,79 @@ GeometryAccess::get_pixel_areas( const double*& A,
 
 //-------------------
 
+void
+GeometryAccess::get_pixel_mask( const int*& mask, 
+				unsigned& size,
+                                const std::string& oname, 
+                                const unsigned& oindex,
+                                const unsigned& mbits)
+{
+  //cout << "GeometryAccess::get_pixel_mask(): mbits =" << mbits << '\n';   
+
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  if(m_pbits & 32) {
+    std::string msg = "get_pixel_areas(...) for geo:\n" + geo -> string_geo_children();
+    MsgLog(name(), info, msg);
+  }
+  geo -> get_pixel_mask(mask, size, mbits);
+}
+
+//-------------------
+
 double
 GeometryAccess::get_pixel_scale_size( const std::string& oname, 
                                       const unsigned& oindex)
 {
   GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
   return geo -> get_pixel_scale_size();
+}
+
+//-------------------
+
+void
+GeometryAccess::set_geo_pars( const std::string& oname, 
+		              const unsigned& oindex,
+                              const double& x0,
+                              const double& y0,
+                              const double& z0,
+                              const double& rot_z,
+                              const double& rot_y,
+                              const double& rot_x,                  
+                              const double& tilt_z,
+                              const double& tilt_y,
+                              const double& tilt_x 
+		              )
+{
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  geo -> set_geo_pars(x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x);
+}
+
+//-------------------
+
+void
+GeometryAccess::move_geo( const std::string& oname, 
+		          const unsigned& oindex,
+                          const double& dx,
+                          const double& dy,
+                          const double& dz
+			  )
+{
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  geo -> move_geo(dx, dy, dz);
+}
+
+//-------------------
+
+void
+GeometryAccess::tilt_geo( const std::string& oname, 
+		          const unsigned& oindex,
+                          const double& dt_x,
+                          const double& dt_y,
+                          const double& dt_z
+			  )
+{
+  GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
+  geo -> tilt_geo(dt_x, dt_y, dt_z);
 }
 
 //-------------------

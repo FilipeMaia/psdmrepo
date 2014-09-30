@@ -104,6 +104,12 @@ namespace PSCalib {
  *    unsigned   size;
  *    geo->get_pixel_areas(A, size);
  *
+ *    // get pixel mask
+ *    const int* mask;
+ *    unsigned   size;
+ *    unsigned   mbits = 377; // 1-edges; 2-wide central cols; 4-non-bound; 8-non-bound neighbours
+ *    geo->get_pixel_mask(mask, size, mbits);
+ *
  *    shpGO parobj = geo->get_parent();
  *    std::vector<shpGO> lst = geo->get_list_of_children();
  *
@@ -116,6 +122,13 @@ namespace PSCalib {
  *    // Next methods are used in class GeometryAccess for building of hierarchial geometry structure.
  *    geo->set_parent(parent_geo);
  *    geo->add_child(child_geo);
+ *  @endcode
+ *
+ *  @li Modification methods
+ *  @code
+ *    geo->set_geo_pars( 10, 11, 12, 90, 0, 0, 0, 0, 0)
+ *    geo->move_geo(10, 11, 12);
+ *    geo->tilt_geo(0, 0, 0.15);
  *  @endcode
  *  
  *  @li Print methods
@@ -222,10 +235,22 @@ public:
 
   /**
    *  @brief Returns pointers to pixel areas array
-   *  @param[out] A - pointer to pixel areas array
-   *  @param[out] size - size of the pixel coordinate array (number of pixels)
+   *  @param[out] areas - pointer to pixel areas array
+   *  @param[out] size - size of the pixel areas array (number of pixels)
    */
-  void get_pixel_areas(const double*& A, unsigned& size);
+  void get_pixel_areas(const double*& areas, unsigned& size);
+
+  /**
+   *  @brief Returns pointers to pixel mask array
+   *  @param[out] mask - pointer to pixel mask array
+   *  @param[out] size - size of the pixel mask array (number of pixels)
+   *  @param[in]  mbits - mask control bits; 
+   *              + 1 - mask edges,
+   *              + 2 - mask two central columns, 
+   *              + 4 - mask non-bounded pixels,
+   *              + 8 - mask nearest neighbours of nonbonded pixels.
+   */
+  void get_pixel_mask(const int*& mask, unsigned& size, const unsigned& mbits = 0377);
 
   /// Returns size of geometry object array - number of pixels
   unsigned get_size_geo_array();
@@ -235,6 +260,30 @@ public:
 
   /// Returns string of data for output file
   std::string str_data();
+
+  /// Sets self object geometry parameters
+  void set_geo_pars( const double& x0 = 0,
+                     const double& y0 = 0,
+                     const double& z0 = 0,
+                     const double& rot_z = 0,
+                     const double& rot_y = 0,
+                     const double& rot_x = 0,                  
+                     const double& tilt_z = 0,
+                     const double& tilt_y = 0,
+                     const double& tilt_x = 0 
+		     );
+
+  /// Adds offset for origin of the self object w.r.t. current position
+  void move_geo( const double& dx = 0,
+                 const double& dy = 0,
+                 const double& dz = 0
+		 );
+
+  /// Adds tilts to the self object w.r.t. current orientation
+  void tilt_geo( const double& dt_x = 0,
+                 const double& dt_y = 0,
+                 const double& dt_z = 0 
+		 );
 
 protected:
 
@@ -262,6 +311,8 @@ private:
   shpGO m_parent;
   std::vector<shpGO> v_list_of_children;
 
+  unsigned m_mbits; // mask control bits
+
   //ALGO_TYPE m_algo;
   //PC2X1* m_pix_coords_2x1;
   SG* m_seggeom;
@@ -270,7 +321,8 @@ private:
   double*  p_xarr;
   double*  p_yarr;
   double*  p_zarr;
-  double*  p_aarr;
+  double*  p_aarr; // pixel area array
+  int*     p_marr; // pixel mask array
 
   //  NDA  m_X;
   //  NDA  m_Y;

@@ -65,6 +65,7 @@ public:
  
   typedef double pixel_coord_t;
   typedef double pixel_area_t;
+  typedef int    pixel_mask_t;
   //typedef int    pixel_index_t;
 
   // Destructor
@@ -102,6 +103,9 @@ public:
 
   /// Returns maximal value in the array of segment pixel coordinates in um for AXIS
   virtual const pixel_coord_t pixel_coord_max(AXIS axis) = 0;
+
+  /// Returns pointer to the array of pixel mask
+  virtual const pixel_mask_t* pixel_mask_array(const unsigned& mbits = 0377) = 0;
 };
 
 const static double DEG_TO_RAD = 3.141592653589793238463 / 180; 

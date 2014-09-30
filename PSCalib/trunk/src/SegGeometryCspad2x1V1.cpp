@@ -245,6 +245,72 @@ const SegGeometry::pixel_coord_t SegGeometryCspad2x1V1::pixel_coord_max (AXIS ax
 }
 
 //--------------
+
+const SegGeometry::pixel_mask_t* SegGeometryCspad2x1V1::pixel_mask_array(const unsigned& mbits)
+{
+
+  //cout << "SegGeometryCspad2x1V1::pixel_mask_array(): mbits =" << mbits << '\n';   
+
+  std::fill_n(&m_pix_mask_arr[0][0], int(SIZE2X1), SegGeometry::pixel_mask_t(1));
+
+  size_t h = COLS2X1HALF;
+
+  if(mbits & 1) {
+    // mask edges
+    for (size_t r=0; r<ROWS2X1; r++) {
+      m_pix_mask_arr[r][0]         = 0;
+      m_pix_mask_arr[r][COLS2X1-1] = 0;
+    }
+
+    for (size_t c=0; c<COLS2X1; c++) {
+      m_pix_mask_arr[0][c]         = 0;
+      m_pix_mask_arr[ROWS2X1-1][0] = 0;
+    }
+  } 
+
+  if(mbits & 2) {
+    // mask two central columns
+    for (size_t r=0; r<ROWS2X1; r++) {
+      m_pix_mask_arr[r][h-1] = 0;
+      m_pix_mask_arr[r][h]   = 0;
+    }
+  }
+
+  if(mbits & 4) {
+    // mask non-bounded pixels
+    for (size_t p=0; p<ROWS2X1; p+=10) {
+      
+      m_pix_mask_arr[p][p]   = 0;
+      m_pix_mask_arr[p][p+h] = 0;
+
+      if(mbits & 8) {
+        // mask nearest neighbours of nonbonded pixels
+	if(p==0) {
+          m_pix_mask_arr[1][0]   = 0;
+          m_pix_mask_arr[0][1]   = 0;
+          m_pix_mask_arr[1][0+h] = 0;
+          m_pix_mask_arr[0][1+h] = 0;
+	}
+	else {
+          m_pix_mask_arr[p-1][p] = 0;
+          m_pix_mask_arr[p+1][p] = 0;
+          m_pix_mask_arr[p][p-1] = 0;
+          m_pix_mask_arr[p][p+1] = 0;
+
+          m_pix_mask_arr[p-1][p+h] = 0;
+          m_pix_mask_arr[p+1][p+h] = 0;
+          m_pix_mask_arr[p][p+h-1] = 0;
+          m_pix_mask_arr[p][p+h+1] = 0;
+	}
+      }
+    }
+  }
+
+  return &m_pix_mask_arr[0][0];
+}
+
+
+//--------------
 //--------------
 //--------------
 //--------------

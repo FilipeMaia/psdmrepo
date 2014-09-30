@@ -86,7 +86,9 @@ namespace PSCalib {
   p_yarr = 0;
   p_zarr = 0;
   p_aarr = 0;
+  p_marr = 0;
   m_size = 0;
+  m_mbits = 0377;
 }
 
 //--------------
@@ -223,10 +225,14 @@ double GeometryObject::get_pixel_scale_size()
 {
   if(m_seggeom) return m_seggeom -> pixel_scale_size();
 
+  double pixel_scale_size=1;
+
   for(std::vector<shpGO>::iterator it  = v_list_of_children.begin(); 
                                    it != v_list_of_children.end(); ++it) {
-    return (*it)->get_pixel_scale_size();
+    pixel_scale_size = (*it)->get_pixel_scale_size();
+    break;
   }    
+  return pixel_scale_size;
 }
 
 //-------------------
@@ -240,10 +246,18 @@ void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const 
 }
 
 //-------------------
-void GeometryObject::get_pixel_areas(const double*& A, unsigned& size)
+void GeometryObject::get_pixel_areas(const double*& areas, unsigned& size)
 {
   if(p_aarr==0) evaluate_pixel_coords();
-  A    = p_aarr;
+  areas = p_aarr;
+  size  = m_size;
+}
+
+//-------------------
+void GeometryObject::get_pixel_mask(const int*& mask, unsigned& size, const unsigned& mbits)
+{
+  if(mbits != m_mbits or p_marr==0) { m_mbits = mbits; evaluate_pixel_coords(); }
+  mask = p_marr;
   size = m_size;
 }
 
@@ -258,6 +272,7 @@ void GeometryObject::evaluate_pixel_coords()
   p_zarr = new double [m_size];
 
   p_aarr = new double [m_size];
+  p_marr = new int    [m_size];
 
   //  if(m_algo == SENS2X1V1) {
   //       const double* x_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM);
@@ -274,9 +289,11 @@ void GeometryObject::evaluate_pixel_coords()
        const double* y_arr = m_seggeom -> pixel_coord_array (SG::AXIS_Y);
        const double* z_arr = m_seggeom -> pixel_coord_array (SG::AXIS_Z);
        const double* a_arr = m_seggeom -> pixel_area_array();
+       const int*    m_arr = m_seggeom -> pixel_mask_array(m_mbits);
 
        transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr);
        std::memcpy(&p_aarr[0], a_arr, m_size*sizeof(double));
+       std::memcpy(&p_marr[0], m_arr, m_size*sizeof(int));
        return;
   }
 
@@ -297,6 +314,7 @@ void GeometryObject::evaluate_pixel_coords()
     const double* pYch;
     const double* pZch; 
     const double* pAch; 
+    const int*    pMch; 
     unsigned      sizech;
 
     (*it)->get_pixel_coords(pXch, pYch, pZch, sizech);       
@@ -305,8 +323,59 @@ void GeometryObject::evaluate_pixel_coords()
     (*it)->get_pixel_areas(pAch, sizech);
     std::memcpy(&p_aarr[ibase], pAch, sizech*sizeof(double));
 
+    (*it)->get_pixel_mask(pMch, sizech, m_mbits);
+    std::memcpy(&p_marr[ibase], pMch, sizech*sizeof(int));
+
     ibase += sizech;
   }
+}
+
+//-------------------
+
+void GeometryObject::set_geo_pars( const double& x0,
+                                   const double& y0,
+                                   const double& z0,
+                                   const double& rot_z,
+                                   const double& rot_y,
+                                   const double& rot_x,                  
+                                   const double& tilt_z,
+                                   const double& tilt_y,
+                                   const double& tilt_x 
+				  )
+{
+  m_x0     = x0;    
+  m_y0     = y0;    
+  m_z0     = z0;  
+  m_rot_z  = rot_z; 
+  m_rot_y  = rot_y;
+  m_rot_x  = rot_x; 
+  m_tilt_z = tilt_z;
+  m_tilt_y = tilt_y;
+  m_tilt_x = tilt_x; 
+}
+
+//-------------------
+
+void GeometryObject::move_geo( const double& dx,
+                               const double& dy,
+                               const double& dz
+			      )
+{
+  m_x0 += dx;    
+  m_y0 += dy;    
+  m_z0 += dz;  
+}
+
+//-------------------
+
+void GeometryObject::tilt_geo( const double& dt_x,
+                               const double& dt_y,
+                               const double& dt_z 
+			      )
+{
+  m_tilt_z += dt_z;
+  m_tilt_y += dt_y;
+  m_tilt_x += dt_x; 
 }
 
 //-------------------
