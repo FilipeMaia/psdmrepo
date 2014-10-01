@@ -57,10 +57,10 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
     ibase = [1, 5] 
 
     #Segment origin index
-    iorgn = [2, 6]
+    iorgn = [4, 8]
 
-    #sensor_rotation = [0,0,270,270,180,180,270,270]
-    sensor_n90_in_quad = [0,0]
+    #sensor_rotation = [180,180]
+    sensor_n90_in_quad = [2,2]
 
     quad_n90_in_det = [0]
 

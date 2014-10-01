@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-10-01 Mikhail S. Dubrovin
+Tag: V00-00-62
+- OpticAlignmentCspad2x2V1.py - fix segment rotation angles 0 -> 180
+
 2014-09-26 Mikhail S. Dubrovin
 Tag: V00-00-61
 - add OpticAlignmentCspadV2.py, OpticAlignmentCspad2x2V1.py
