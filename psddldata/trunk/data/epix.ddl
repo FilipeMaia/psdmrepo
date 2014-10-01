@@ -604,11 +604,6 @@
   [[config_type]]
   [[pack(4)]]
 {
-  @enum FixedValues (uint32_t) {
-    CalibrationRowCountPerASIC = 2,
-    EnvironmentalRowCountPerASIC = 1,
-    }
-
   uint32_t _version -> version;
   uint32_t _runTrigDelay -> runTrigDelay;
   uint32_t _daqTrigDelay -> daqTrigDelay;
@@ -662,6 +657,8 @@
   // for epix100a  352
   uint32_t _numberOfPixelsPerAsicRow -> numberOfPixelsPerAsicRow;
   // for epix100a 96*4 = 384
+  uint32_t _calibrationRowCountPerASIC -> calibrationRowCountPerASIC;
+  uint32_t _environmentalRowCountPerASIC -> environmentalRowCountPerASIC;
   uint32_t _baseClockFrequency -> baseClockFrequency;
   uint32_t _asicMask -> asicMask;
   uint32_t _Scope {
@@ -688,7 +685,7 @@
   Asic100aConfigV1 _asics[@self.numberOfAsicsPerRow()*@self.numberOfAsicsPerColumn()] -> asics;
   uint16_t _asicPixelConfigArray[ @self.numberOfRows()][ @self.numberOfColumns()] -> asicPixelConfigArray;
   
-  /* Calibration row config map is one row for every two rows */
+  /* Calibration row config map is one row for every two calib rows */
   uint8_t  _calibPixelConfigArray[ @self.numberOfCalibrationRows()  / 2 ][ @self.numberOfPixelsPerAsicRow()*@self.numberOfAsicsPerRow()] -> calibPixelConfigArray;
 
   /* Number of pixel rows in a readout unit */
@@ -705,11 +702,11 @@
 
   /* Number of calibration rows in a readout unit */
   uint32_t numberOfCalibrationRows()  [[inline]]
-  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*CalibrationRowCountPerASIC; @}
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.calibrationRowCountPerASIC(); @}
 
   /* Number of rows in a readout unit */
   uint32_t numberOfEnvironmentalRows()  [[inline]]
-  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*EnvironmentalRowCountPerASIC; @}
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.environmentalRowCountPerASIC(); @}
 
   /* Number of columns in a readout unit */
   uint32_t numberOfAsics()  [[inline]]
@@ -720,7 +717,8 @@
 
   /* Constructor which takes values necessary for size calculations */
   @init(numberOfAsicsPerRow -> _numberOfAsicsPerRow, numberOfAsicsPerColumn -> _numberOfAsicsPerColumn, 
-      numberOfRowsPerAsic -> _numberOfRowsPerAsic, numberOfPixelsPerAsicRow -> _numberOfPixelsPerAsicRow)  [[inline]];
+      numberOfRowsPerAsic -> _numberOfRowsPerAsic, numberOfPixelsPerAsicRow -> _numberOfPixelsPerAsicRow,
+      calibrationRowCountPerASIC -> _calibrationRowCountPerASIC)  [[inline]];
 
 }
 
