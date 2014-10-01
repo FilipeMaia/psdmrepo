@@ -1,0 +1,42 @@
+psana:
+- updated to handle new DAQ types: TimeTool::ConfigV1, TimeTool::DataV1, GenericPgp::ConfigV1, L3T::DataV2
+- add C++ std::string to Python str conversion to Psana Event/Config/Calib store. Copy by value conversion.
+- add new blob finder from TJ Lane and put Gsc16ai voltage calculation in pypsalg.
+- give indexing users the ability to specify when they are done jumping to different events by calling DataSource.end() (triggers endjob calls for modules)
+- psana::EventKeys add flag-pars to print in event() info about env.configStore().keys() and env.calibStore().keys()
+
+psana_examples:
+- update DumpEpix.cpp for Epix::Config10KV1 and Epix::Asic10kConfigV1.
+
+In ImgAlgos::PixCoordsProducer:
+- save pixel coordinate and index arrays in env.calibStore() in stead of evt.
+- Add key_fname and save path to "geometry" calibration file.
+- Add EpixNDArrProducer.
+
+PSCalib:
+- SegGeometry.(py,h), SegGeometryCspad2x1V1.(py,h,cpp) add method pixel_mask_array(mbits=0377), update example in *.py
+- In GeometryObject, GeometryAccess.(py,h,cpp) add methods get_pixel_mask(...), set_geo_pars(...), move_geo(...), tilt_geo(...)
+- GeometryAccess.py add method get_psf()
+- GeometryAccess add methods save_pars_in_file(path), set_print_bits(pbits) + methods str_data() in GeometryObject.
+- Update test/examples in GeometryAccess.py and test/ex_geometry_access.cpp
+
+CalibManager:
+- add support for Epix and Epix10k for dark processing
+- add OpticAlignmentCspadV2.py, OpticAlignmentCspad2x2V1.py,  OpticAlignmentCspadMethods.py
+- in GUIMetrology.py - integrate metrology processing for CspadV2(xpp) and Cspad2x2V1 in calibman
+
+realtime-plotting package psmon:
+- add support for pyqtgraph MultiPlots, Histograms, and matplotlib-style strings for specifying symbols.
+
+psalg (external):
+- minor bug fix for timing tool - Change parab_fit function to return FWHM estimate
+from fit parameters rather than data extrapolation.
+
+pdsdata (external):
+ update to 8.1.2 with new DAQ types mentioned above
+
+h5py:
+- now built against hdf5 version 1.8.13
+
+tables:
+- now built against hdf5 version 1.8.13
