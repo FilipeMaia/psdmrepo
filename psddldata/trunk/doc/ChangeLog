@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-15
+2014-10-01 Matt Weaver
+- Added EvrIOConfigv2 for detector-trigger mapping
+
 Tag V01-00-14
 2014-09-16 Matt Weaver
 - Added TimeTool data type
