@@ -1,0 +1,38 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DmMover
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2014-09-29
+- In function *check_all_destpath* added argument to select directories that should be created.
+- Various improvements to *dm_create_folders*. Create only certain dirs if
+  *allexp* option is used. Allow to select experiments. 
+- Use redirect to a logfile when creating active experiments missing folders only if requested.  
+- Extended *ffbxtcclean* to remove files from a dss node (using *--src* option).
+  Check that the file size agrees with the one in irods.
+	
+Tag: V00-00-02
+2014-07-14
+- added tool to create missing experiment directories for active experiemnts
+  or all experiments obtained from regdb. (dm_create_folders)
+- daemon script that checks and creates missing folders for active experiments.
+  (dm_active_exp_folders)
+	
+	
+Tag: V00-00-01
+2014-05-22 Wilko Kroeger
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
