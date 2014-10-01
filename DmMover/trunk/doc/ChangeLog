@@ -16,6 +16,7 @@ Tag: V00-00-03
 - In function *check_all_destpath* added argument to select directories that should be created.
 - Various improvements to *dm_create_folders*. Create only certain dirs if
   *allexp* option is used. Allow to select experiments. 
+- Use redirect to a logfile when creating active experiments missing folders only if requested.  
 - Extended *ffbxtcclean* to remove files from a dss node (using *--src* option).
   Check that the file size agrees with the one in irods.
 	
