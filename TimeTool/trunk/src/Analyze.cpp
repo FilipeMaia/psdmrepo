@@ -666,6 +666,20 @@ Analyze::event(Event& evt, Env& env)
         evt.put(boost_double_as_ndarray(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
         evt.put(boost_double_as_ndarray(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
       }
+                
+      double nxtAmpl=0;
+      if (nfits>1) {
+        ndarray<double,1> pFit1 = 
+          psalg::parab_fit(qwf,*(++peaks.begin()),0.8);
+        if (pFit1[2]>0)
+          nxtAmpl = pFit1[0];
+          if (not m_put_ndarrays) {
+            evt.put(boost_double(nxtAmpl), m_put_key+std::string(":AMPLNXT"));
+          } else {
+            evt.put(boost_double_as_ndarray(nxtAmpl), m_put_key+std::string(":AMPLNXT"));
+          }
+      }
+
       // put 
       boost::shared_ptr<Psana::TimeTool::DataV1> timeToolEvtData = 
         boost::make_shared<TimeToolData>(Psana::TimeTool::DataV1::Signal,
@@ -674,21 +688,10 @@ Analyze::event(Event& evt, Env& env)
                                          xfltc,
                                          pFit0[2],
                                          m_ref[ix],
-                                         0.0, // nxt_amp
+                                         nxtAmpl,
                                          ndarray<const int32_t,1>(),
                                          ndarray<const int32_t,1>());
       evt.put(timeToolEvtData,m_put_key);
-                
-      if (nfits>1) {
-        ndarray<double,1> pFit1 = 
-          psalg::parab_fit(qwf,*(++peaks.begin()),0.8);
-        if (pFit1[2]>0)
-          if (not m_put_ndarrays) {
-            evt.put(boost_double(pFit1[0]), m_put_key+std::string(":AMPLNXT"));
-          } else {
-            evt.put(boost_double_as_ndarray(pFit1[0]), m_put_key+std::string(":AMPLNXT"));
-          }
-      }
       
 #undef boost_double
     }
