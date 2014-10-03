@@ -348,16 +348,22 @@ def main():
     #fname = '2011-08-DD-Run4-DSD-Metrology.txt'
     #fname = '2012-01-10-Run5-DSD-Metrology.txt'
     #fname = '2012-01-12-Run5-DSD-Metrology-corrected.txt'
-    #fname = '2012-02-26-CSPAD-XPP-Metrology.txt'
     #fname = '2012-11-08-Run6-DSD-Metrology-standard.txt'
-    #fname = '2013-01-24-CSPAD-XPP-Metrology-standard.txt'
     #fname = 'metrology_renumerated.txt'
-    fname = 'metrology_standard.txt'
+    #fname = 'metrology_standard.txt'
+    # New life
+    #fname = '2013-12-12-CSPAD-CXI-DSD-Metrology.txt'
+    #fname = '2013-12-20-CSPAD-CXI-DS1-Metrology-corr.txt'
+    #fname = '2014-03-19-CSPAD-CXI-DS1-Metrology-corr.txt'
+    fname = '2014-05-15-CSPAD-CXI-DS1-Metrology-corr.txt'
+    #fname = '2014-05-15-CSPAD-CXI-DS2-Metrology.txt'
 
     base_dir = '/reg/neh/home1/dubrovin/LCLS/CSPadMetrologyProc/'
-    path_metrol = os.path.join(base_dir,fname)
 
-    OpticAlignmentCspadV1(path_metrol, print_bits=0777, plot_bits=0377)
+    (opts, args) = input_option_parser(base_dir, fname)
+    path_metrol = os.path.join(opts.dir, opts.fname)
+
+    OpticAlignmentCspadV1(path_metrol, print_bits=opts.pbits, plot_bits=opts.gbits)
     sys.exit()
 
 if __name__ == '__main__':

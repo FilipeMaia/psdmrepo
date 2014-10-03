@@ -33,17 +33,6 @@ from CalibManager.OpticAlignmentCspadMethods import *
 #from OpticAlignmentCspadMethods import *
 
 #----------------------------------
-#  Numeration of quads in the metrology file should be consistent with numeration in DAQ.
-#  Orientation of CSPAD for
-#
-#  n90=0,          n90=1, etc.
-#  ^               ^           
-#  | Q0  Q1        | Q1  Q2    
-#  |               |           
-#  | Q3  Q2        | Q0  Q3    
-#  +-------->      +-------->  
-#
-#----------------------------------
 
 class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
     """OpticAlignmentCspad2x2V1"""
@@ -65,7 +54,7 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
     quad_n90_in_det = [0]
 
 
-    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=07777, plot_bits=0377, exp='Any', det='CSPAD2X1', n90=0):
+    def __init__(self, fname=None, path='calib-tmp', save_calib_files=True, print_bits=07777, plot_bits=0377, exp='Any', det='CSPAD2X2', n90=0):
         """Constructor."""
 
         if print_bits &  1 : print 'Start OpticAlignmentCspad2x2V1'
@@ -209,12 +198,20 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
 
 def main():
 
+    #fname = 'CSPad2x2-1.txt'
+    #fname = 'CSPad2x2-2.txt'
+    #fname = 'CSPad2x2-3.txt'
+    #fname = 'CSPad2x2-4.txt'
+    #fname = 'CSPad2x2-5.txt'
+    #fname = 'CSPad2x2-6.txt'
     fname = '2014-04-25-CSPAD2X2-3-MEC-Metrology.txt'
 
     base_dir = '/reg/neh/home1/dubrovin/LCLS/CSPad2x2Metrology/CSPad2x2'
-    path_metrol = os.path.join(base_dir,fname)
 
-    OpticAlignmentCspad2x2V1(path_metrol, print_bits=0777, plot_bits=0377)
+    (opts, args) = input_option_parser(base_dir, fname)
+    path_metrol = os.path.join(opts.dir, opts.fname)
+
+    OpticAlignmentCspad2x2V1(path_metrol, print_bits=opts.pbits, plot_bits=opts.gbits)
     sys.exit()
 
 if __name__ == '__main__':

@@ -29,6 +29,8 @@ from time import localtime, gmtime, strftime, clock, time, sleep
 import matplotlib.pyplot as plt
 import matplotlib.lines  as lines
 
+from optparse import OptionParser
+
 #----------------------------------
 
 class OpticAlignmentCspadMethods :
@@ -528,6 +530,7 @@ class OpticAlignmentCspadMethods :
     def txt_geometry_header(self) :
         txt = '# TITLE      Geometry parameters of %s' % self.det \
             + '\n# DATE_TIME  %s' % strftime('%Y-%m-%d %H:%M:%S %Z', localtime()) \
+            + '\n# METROLOGY  %s' % self.fname \
             + '\n# AUTHOR     %s' % os.environ['LOGNAME'] \
             + '\n# EXPERIMENT %s' % self.exp \
             + '\n# DETECTOR   %s' % self.det \
@@ -574,6 +577,22 @@ class OpticAlignmentCspadMethods :
 
  
 #----------------------------------
- 
+def input_option_parser(dir_def, fname_def) :
+
+    parser = OptionParser(description='Optional input parameters.', usage ='usage: %prog [options] args')
+    parser.add_option('-d', '--dir',   dest='dir',    default=dir_def,   action='store', type='string', help='directory for metrology files')
+    parser.add_option('-f', '--fnm',   dest='fname',  default=fname_def, action='store', type='string', help='metrology file name')
+    parser.add_option('-p', '--pbits', dest='pbits',  default=0377,      action='store', type='int',    help='print control bitword')
+    parser.add_option('-g', '--gbits', dest='gbits',  default=0377,      action='store', type='int',    help='graphics control bitword')
+    #parser.add_option('-v', '--verbose',      dest='verb',    default=True, action='store_true',           help='allows print on console')
+    #parser.add_option('-q', '--quiet',        dest='verb',                  action='store_false',          help='supress print on console')
+
+    (opts, args) = parser.parse_args()
+
+    print 'opts:\n', opts
+    print 'args:\n', args
+
+    return (opts, args)
+
 #----------------------------------
  

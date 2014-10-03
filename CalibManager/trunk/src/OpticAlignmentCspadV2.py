@@ -76,7 +76,11 @@ class OpticAlignmentCspadV2 (OpticAlignmentCspadMethods) :
         self.exp              = exp
         self.det              = det
 
+        self.fname_center_um  = os.path.join(self.path, 'center_global_um-0-end.data')
+        self.fname_center     = os.path.join(self.path, 'center_global-0-end.data')
+        self.fname_tilt       = os.path.join(self.path, 'tilt-0-end.data')
         self.fname_geometry   = os.path.join(self.path, 'geometry-0-end.data')
+
         self.fname_plot_det   = os.path.join(self.path, 'metrology_standard_det.png')
 
         self.readOpticalAlignmentFile()
@@ -96,11 +100,21 @@ class OpticAlignmentCspadV2 (OpticAlignmentCspadMethods) :
         if self.print_bits & 4 : print '\nQuality check in XY plane:\n', self.txt_qc_table_xy() 
         if self.print_bits & 8 : print '\nQuality check in Z:\n', self.txt_qc_table_z()
 
+        center_txt_um  = self.txt_center_um_formatted_array (format='%6i  ')
+        center_txt_pix = self.txt_center_pix_formatted_array(format='%7.2f  ')
+        tilt_txt       = self.txt_tilt_formatted_array(format='%8.5f  ')
         geometry_txt   = self.txt_geometry()
+
+        if self.print_bits &  16 : print 'X, Y, and Z coordinates of the 2x1 center_global (um):\n' + center_txt_um
+        if self.print_bits &  32 : print '\nCalibration type "center_global" in pixels:\n' + center_txt_pix
+        if self.print_bits &  64 : print '\nCalibration type "tilt" - degree:\n' + tilt_txt
         if self.print_bits & 128 : print '\nCalibration type "geometry"\n%s' % geometry_txt
 
         if self.save_calib_files :
             self.create_directory(self.path)
+            self.save_text_file(self.fname_center_um, center_txt_um)
+            self.save_text_file(self.fname_center, center_txt_pix)
+            self.save_text_file(self.fname_tilt, tilt_txt)
             self.save_text_file(self.fname_geometry, geometry_txt)
 
         if self.plot_bits & 1 :
@@ -248,12 +262,16 @@ def main():
 
     #fname = '2012-02-26-CSPAD-XPP-Metrology.txt'
     #fname = '2013-01-24-CSPAD-XPP-Metrology.txt'
-    fname = '2013-01-29-CSPAD-XPP-Metrology.txt'
+    #fname = '2013-01-29-CSPAD-XPP-Metrology.txt'      wrong numeration of quads
+    #fname = '2013-01-29-CSPAD-XPP-Metrology-corr.txt' wrong numeration of quads
+    fname = '2013-10-09-CSPAD-XPP-Metrology.txt'
 
     base_dir = '/reg/neh/home1/dubrovin/LCLS/CSPadMetrologyProc/'
-    path_metrol = os.path.join(base_dir,fname)
 
-    OpticAlignmentCspadV2(path_metrol, print_bits=0777, plot_bits=0377, n90=0)
+    (opts, args) = input_option_parser(base_dir, fname)
+    path_metrol = os.path.join(opts.dir, opts.fname)
+
+    OpticAlignmentCspadV2(path_metrol, print_bits=opts.pbits, plot_bits=opts.gbits, n90=0)
     sys.exit()
 
 if __name__ == '__main__':
