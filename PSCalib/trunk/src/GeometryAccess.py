@@ -97,11 +97,11 @@ class GeometryAccess :
         f=open(self.path,'r')
         for linef in f :
             line = linef.strip('\n')
+            if self.pbits & 128 : print line
             if not line : continue   # discard empty strings
             if line[0] == '#' :      # process line of comments
                 self._add_comment_to_dict(line)
                 continue
-            #print line
             #geo=self._parse_line(line)
             self.list_of_geos.append(self._parse_line(line))
     
@@ -244,7 +244,7 @@ class GeometryAccess :
             print 'get_pixel_coords(...) for geo:',
             geo.print_geo_children();
         
-        return geo.get_pixel_coords()
+        return geo.get_pixel_coords() 
 
     #------------------------------
 
@@ -414,7 +414,6 @@ class GeometryAccess :
             print '    p=(%12.2f, %12.2f, %12.2f),    s=(%8.2f, %8.2f, %8.2f)   f=(%8.2f, %8.2f, %8.2f)' \
                   % (px,py,pz,  sx,xy,xz,  fx,fy,fz)
 
-
 #------------------------------
 #------ Global Method(s) ------
 #------------------------------
@@ -570,8 +569,10 @@ def test_plot_cspad(geometry, fname_data, amp_range=(0,0.5)) :
     arr = np.load(fname_data) if ext == '.npy' else np.loadtxt(fname_data, dtype=np.float) 
     arr.shape= (4,8,185,388)
 
-    print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape 
-    img = img_from_pixel_arrays(iX,iY,W=arr)
+    print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape
+
+    arr.shape = iX.shape
+    img = img_from_pixel_arrays(iX, iY, W=arr)
 
     xyc_ring = (yc, xc)
     axim = gg.plotImageLarge(img,amp_range=amp_range)
@@ -606,7 +607,42 @@ def test_load_pars_from_file(geometry) :
     geometry.set_print_bits(32+64)
     geometry.load_pars_from_file('./test.txt')
     geometry.print_list_of_geos()
-    
+
+#------------------------------
+
+def test_cspad2x2() :
+    """ Test cspad2x2 geometry table
+    """
+    ## MecTargetChamber.0:Cspad2x2.1 
+    basedir = '/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-01-2013-02-13/'    
+    fname_geometry = basedir + 'calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/geometry/0-end.data'
+    fname_data     = basedir + 'cspad2x2.1-ndarr-ave-meca6113-r0028.dat'    
+
+    ## MecTargetChamber.0:Cspad2x2.2 
+    #basedir = '/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-02-2013-02-13/'    
+    #fname_geometry = basedir + 'calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.2/geometry/0-end.data'
+    #fname_data     = basedir + 'cspad2x2.2-ndarr-ave-meca6113-r0028.dat'    
+
+    geometry = GeometryAccess(fname_geometry, 0377)
+    amp_range = (0,15000)
+
+    # get pixel coordinate index arrays:
+    #xyc = xc, yc = 1000, 1000
+    #iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=xyc)
+
+    iX, iY = geometry.get_pixel_coord_indexes()
+
+    root, ext = os.path.splitext(fname_data)
+    arr = np.load(fname_data) if ext == '.npy' else np.loadtxt(fname_data, dtype=np.float) 
+    arr.shape= (185,388,2)
+
+    print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape 
+    img = img_from_pixel_arrays(iX,iY,W=arr)
+
+    axim = gg.plotImageLarge(img,amp_range=amp_range)
+    gg.move(500,10)
+    gg.show()
+
 #------------------------------
 #------------------------------
 #------------------------------
@@ -620,12 +656,20 @@ if __name__ == "__main__" :
     #fname_data     = basedir + 'cspad-ndarr-ave-cxi83714-r0136.dat'
     #amp_range = (0,0.5)
 
+    # CXI
     basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/'
     fname_data     = basedir + 'cspad-ndarr-ave-cxii0114-r0227.dat'
     #fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     #fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     fname_geometry = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     amp_range = (0,500)
+
+    ## XPP
+    #basedir = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29/'
+    #fname_data     = basedir + 'cspad-xpptut13-r1437-nda.dat'
+    #fname_geometry = basedir + 'calib/CsPad::CalibV1/XppGon.0:Cspad.0/geometry/0-end.data'
+    #amp_range = (1500,2500)
+
 
     #basedir = '/home/pcds/LCLS/calib/geometry/'
     #fname_geometry = basedir + '0-end.data'
@@ -656,6 +700,7 @@ if __name__ == "__main__" :
     elif sys.argv[1]=='8' : test_load_pars_from_file(geometry)
     elif sys.argv[1]=='9' : test_mask_quad(geometry)
     elif sys.argv[1]=='10': geometry.print_psf()
+    elif sys.argv[1]=='11': test_cspad2x2()
     else : print 'Wrong input parameter.' + msg
 
     sys.exit ('End of %s' % sys.argv[0])

@@ -28,6 +28,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "PSCalib/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -327,6 +328,15 @@ void GeometryObject::evaluate_pixel_coords()
     std::memcpy(&p_marr[ibase], pMch, sizech*sizeof(int));
 
     ibase += sizech;
+  }
+
+  if(ibase == PSCalib::SIZE2X2) { 
+    // shuffle pixels for cspad2x2, PSCalib::SIZE2X2 = 2*185*388 = 143560 
+    two2x1ToData2x2<double>(p_xarr);
+    two2x1ToData2x2<double>(p_yarr);
+    two2x1ToData2x2<double>(p_zarr);
+    two2x1ToData2x2<double>(p_aarr);
+    two2x1ToData2x2<int>   (p_marr);
   }
 }
 

@@ -376,6 +376,7 @@ private:
   GeometryAccess ( const GeometryAccess& ) ;
   GeometryAccess& operator = ( const GeometryAccess& ) ;
 
+//-----------------------------
 };
 
 } // namespace PSCalib

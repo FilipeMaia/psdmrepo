@@ -18,7 +18,8 @@
 #include "PSCalib/GeometryAccess.h"
 
 #include "ImgAlgos/GlobalMethods.h" // for test ONLY
-
+#include "pdscalibdata/NDArrIOV1.h"
+ 
 #include <string>
 #include <iostream>
 #include <iomanip>  // for setw, setfill
@@ -27,9 +28,45 @@
 //using std::endl;
 
 using namespace std;
+//using namespace PSCalib;
 
-//using namespace PSTime;
+//-----------------
+//-----------------
+ 
+void test_cspad2x2 (int argc, char* argv[])
+{
+  //MecTargetChamber.0:Cspad2x2.1 
+    string basedir = "/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-01-2013-02-13/";  
+    string fname_geometry = basedir + "calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/geometry/0-end.data";
+    string fname_data     = basedir + "cspad2x2.1-ndarr-ave-meca6113-r0028.dat";
 
+    typedef pdscalibdata::NDArrIOV1<double,3> NDAIO;
+    unsigned shape[] = {185,388,2};
+    NDAIO* arrio = new NDAIO(fname_data, shape, 0, 0); // 0377
+    //arrio->print_ndarray();
+    
+    PSCalib::GeometryAccess geometry(fname_geometry, 0); // 0177777 - prints more details for debugging
+    geometry.print_list_of_geos_children();
+
+    cout << "\n\ntest_cspad2x2(...):\n";
+
+    const unsigned * iX;
+    const unsigned * iY;
+    unsigned   isize;
+    geometry.get_pixel_coord_indexes(iX, iY, isize);
+
+    ndarray<PSCalib::GeometryAccess::image_t, 2> img = 
+      PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, arrio->get_ndarray().data(), isize);
+    cout << img << "\n";  
+
+    string fname_img("cspad2x2-img-test.txt");
+    cout << "    argc=" << argc << ", if (argc>1) - save image in text file " << fname_img << '\n';
+    if (argc>1) ImgAlgos::save2DArrayInFile<PSCalib::GeometryAccess::image_t>(fname_img.c_str(), img, true);
+}
+
+//-----------------
+//-----------------
+ 
 int main (int argc, char* argv[])
 {
   std::string pname("SOME_PARENT");
@@ -154,7 +191,7 @@ int main (int argc, char* argv[])
   ndarray<PSCalib::GeometryAccess::image_t, 2> img = 
           PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, 0, isize);
   cout << img << "\n";  
-  cout << "    argc = " << argc << "if (argc>1) - save image in text file.\n";
+  cout << "    argc=" << argc << ", if (argc>1) - save image in text file.\n";
   if (argc>1) ImgAlgos::save2DArrayInFile<PSCalib::GeometryAccess::image_t>("cspad-img-test.txt", img, true);
                    
  //-----------------
@@ -207,6 +244,11 @@ int main (int argc, char* argv[])
   geometry.set_print_bits(1);
   geometry.load_pars_from_file(fname_test);
   geometry.print_list_of_geos();
+
+
+  //-----------------
+  cout << "\n\nTest cspad2x2:\n";
+  test_cspad2x2(argc, argv);
 
   //-----------------
   cout << "End of " << argv[0] << '\n';

@@ -11,9 +11,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 	
+Tag: V00-02-17
+2014-10-02 Mikhail S. Dubrovin
+- In GeometryObject - add global methods det_shape(arr), data2x2ToTwo2x1(arr2x2), two2x1ToData2x2(arrTwo2x1)
+	- now methods return ndarrays through det_shape(arr), which shaffles pixels for cspad2x2
+	- add test plot of cspad2x2 in ex_geometry_access.cpp and GeometryAccess.py
+- add GlobalMethods.h
+	
 Tag: V00-02-16
 2014-09-30 Mikhail S. Dubrovin
-- In SegGeometry.(py,h), SegGeometryCspad2x1V1.(py,h,cpp) add method pixel_mask(mbits=0377), update example in *.py 
+- In SegGeometry.(py,h), SegGeometryCspad2x1V1.(py,h,cpp) add method pixel_mask_array(mbits=0377), update example in *.py 
 - In GeometryObject, GeometryAccess.(py,h,cpp) add methods get_pixel_mask(...), set_geo_pars(...), move_geo(...), tilt_geo(...) 
 - GeometryAccess.py add method get_psf()
 - update examples in test/ex_geometry_access.cpp and GeometryAccess.py

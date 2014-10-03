@@ -68,6 +68,7 @@ void GeometryAccess::load_pars_from_file(const std::string& path)
 {
   m_dict_of_comments.clear();
   v_list_of_geos.clear();
+  v_list_of_geos.reserve(100);
 
   if(! path.empty()) m_path = path;
 
@@ -78,7 +79,8 @@ void GeometryAccess::load_pars_from_file(const std::string& path)
 
   std::string line;
   while (std::getline(f, line)) {    
-    if(line.empty()) continue;    // discard empty lines
+    if(m_pbits & 256) std::cout << line << '\n'; // << " length = " << line.size() << '\n';
+    if(line.empty())    continue;    // discard empty lines
     if(line[0] == '#') {          // process line of comments 
        add_comment_to_dict(line); 
        continue;
@@ -175,12 +177,13 @@ GeometryAccess::shpGO GeometryAccess::parse_line(const std::string& line)
                               		     tilt_y,
                               		     tilt_x 
 		                             ));
+      if(m_pbits & 256) shp->print_geo();
       return shp;
   }
   else {
       std::string msg = "parse_line(...) can't parse line: " + line;
       //std::cout << msg;
-      MsgLog(name(), info, msg);
+      MsgLog(name(), error, msg);
       return GeometryAccess::shpGO();
   }
 }
@@ -201,15 +204,24 @@ GeometryAccess::shpGO GeometryAccess::find_parent(const GeometryAccess::shpGO& g
   //The name of parent object is not found among geos in the v_list_of_geos
   // add top parent object to the list
 
+  if(m_pbits & 256) std::cout << "  GeometryAccess::find_parent(...): parent is not found..."
+                              << geobj->get_parent_name() << " idx:" << geobj->get_parent_index() << '\n';
+
   if( ! geobj->get_parent_name().empty() ) { // skip top parent itself
+
+    if(m_pbits & 256) std::cout << "  create one with name:" << geobj->get_parent_name() 
+                                << " idx:" << geobj->get_parent_index() << '\n';
+
     GeometryAccess::shpGO shp_top_parent( new GeometryObject::GeometryObject (std::string(),
                             		                      0,
                             		                      geobj->get_parent_name(),
                             		                      geobj->get_parent_index()));
+
     v_list_of_geos.push_back( shp_top_parent );
     return shp_top_parent;		  
   }
 
+  if(m_pbits & 256) std::cout << "  return empty shpGO() for the very top parent\n";
   return GeometryAccess::shpGO(); // for top parent itself
 }
 
@@ -217,9 +229,9 @@ GeometryAccess::shpGO GeometryAccess::find_parent(const GeometryAccess::shpGO& g
 
 void GeometryAccess::set_relations()
 {
-  std::stringstream ss; ss << "set_relations():";
+  if(m_pbits & 16) MsgLog(name(), info, "Begin set_relations(): size of the list:" << v_list_of_geos.size());
   for(std::vector<GeometryAccess::shpGO>::iterator it  = v_list_of_geos.begin(); 
-                                   it != v_list_of_geos.end(); ++it) {
+                                                   it != v_list_of_geos.end(); ++it) {
 
     GeometryAccess::shpGO shp_parent = find_parent(*it);
     //std::cout << "set_relations(): found parent name:" << shp_parent->get_parent_name()<<'\n';
@@ -230,12 +242,12 @@ void GeometryAccess::set_relations()
     shp_parent->add_child(*it);
 
     if(m_pbits & 16) 
-      ss << "\n  geo:"     << std::setw(10) << (*it) -> get_geo_name()
-         << " : "                           << (*it) -> get_geo_index()
-         << " has parent:" << std::setw(10) << shp_parent -> get_geo_name()
-         << " : "                           << shp_parent -> get_geo_index();
+      std::cout << "\n  geo:"     << std::setw(10) << (*it) -> get_geo_name()
+                << " : "                           << (*it) -> get_geo_index()
+                << " has parent:" << std::setw(10) << shp_parent -> get_geo_name()
+                << " : "                           << shp_parent -> get_geo_index()
+                << '\n';
   }
-  if(m_pbits & 16) MsgLog(name(), info, ss.str());
 }
 
 //-------------------

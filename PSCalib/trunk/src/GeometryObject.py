@@ -300,7 +300,8 @@ class GeometryObject :
         xac.shape = geo_shape
         yac.shape = geo_shape
         zac.shape = geo_shape
-        return self.transform_geo_coord_arrays(xac, yac, zac)
+        X, Y, Z = self.transform_geo_coord_arrays(xac, yac, zac)
+        return det_shape(X), det_shape(Y), det_shape(Z) 
 
 #------------------------------
 
@@ -325,7 +326,7 @@ class GeometryObject :
         geo_shape = np.hstack(([len_child], ach.shape))
         #print 'geo_shape = ', geo_shape        
         aar.shape = geo_shape
-        return aar
+        return det_shape(aar)
 
 #------------------------------
 
@@ -356,7 +357,7 @@ class GeometryObject :
         geo_shape = np.hstack(([len_child], car.shape))
         #print 'geo_shape = ', geo_shape        
         oar.shape = geo_shape
-        return oar
+        return det_shape(oar)
 
 #------------------------------
 
@@ -412,8 +413,42 @@ class GeometryObject :
             xch, ych = child.get_2d_pixel_coords()
             xac += list(xch.flatten())
             yac += list(ych.flatten())
-        return self.transform_2d_geo_coord_arrays(np.array(xac), np.array(yac))
+        X, Y = self.transform_2d_geo_coord_arrays(np.array(xac), np.array(yac))
+        return det_shape(X), det_shape(Y) 
 
+    #------------------------------
+
+#------------------------------
+#------ Global Method(s) ------
+#------------------------------
+
+def det_shape(arr) :
+    """ Check detector dependency and re-shape array if necessary
+    """
+    if arr.size == 143560 : # 2*185*388 :
+        # shaffle array for cspad2x2
+        return two2x1ToData2x2(arr)
+    return arr
+
+#------------------------------
+
+def data2x2ToTwo2x1(arr2x2) :
+    """Converts array shaped as CSPAD2x2 data (185,388,2)
+    to two 2x1 arrays with shape=(2,185,388)
+    """
+    return np.array([arr2x2[:,:,0], arr2x2[:,:,1]])
+
+#------------------------------
+
+def two2x1ToData2x2(arrTwo2x1) :
+    """Converts array shaped as two 2x1 arrays (2,185,388)
+    to CSPAD2x2 data shape=(185,388,2)
+    """
+    arr2x2 = np.array(zip(arrTwo2x1[0].flatten(), arrTwo2x1[1].flatten()))
+    arr2x2.shape = (185,388,2)
+    return arr2x2
+
+#------------------------------
 #------------------------------
 #------------------------------
 #------------------------------
