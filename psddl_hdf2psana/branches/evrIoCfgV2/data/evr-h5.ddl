@@ -190,4 +190,20 @@
   [[external("psddl_hdf2psana/evr.h")]]
 {
 }
+
+//------------------ IOChannelV2 ------------------
+@h5schema IOChannelV2
+  [[version(0)]]
+  [[embedded]]
+  [[external("psddl_hdf2psana/evr.h")]]
+{
+}
+
+//------------------ IOConfigV2 ------------------
+@h5schema IOConfigV2
+  [[version(0)]]
+  [[external("psddl_hdf2psana/evr.h")]]
+{
+}
+
 } //- @package EvrData

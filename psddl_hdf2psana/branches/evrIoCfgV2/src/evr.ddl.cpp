@@ -2936,5 +2936,51 @@ void store_at(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long i
   store_IOConfigV1(obj, group, index, version, true);
 }
 
+boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV2> > make_IOConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::IOConfigV2> >(boost::make_shared<IOConfigV2_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::IOConfigV2> >(boost::shared_ptr<Psana::EvrData::IOConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::IOConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_IOConfigV2_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.IOConfigV2", version);
+  }
+}
+
+void store_IOConfigV2(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_IOConfigV2_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.IOConfigV2", version);
+  }
+}
+
+void store(const Psana::EvrData::IOConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_IOConfigV2(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index, int version)
+{
+  store_IOConfigV2(obj, group, index, version, true);
+}
+
 } // namespace EvrData
 } // namespace psddl_hdf2psana
