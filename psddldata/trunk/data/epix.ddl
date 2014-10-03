@@ -449,7 +449,6 @@
 
 }
 
-<<<<<<< .mine
 //------------------ Asic100aConfigV1 ------------------
 @type Asic100aConfigV1
   [[pack(4)]]
@@ -598,7 +597,6 @@
 
 }
 
-
 //------------------ Config100aV1 ------------------
 @type Config100aV1
   [[type_id(Id_Epix100aConfig, 1)]]
@@ -724,8 +722,7 @@
 
 }
 
-=======
->>>>>>> .r9006
+
 //------------------ ElementV1 ------------------
 @type ElementV1
   [[type_id(Id_EpixElement, 1)]]
