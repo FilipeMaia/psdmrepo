@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2014-10-03 Igor Gaponenko
+- bug fix in method RegDBFile::data_migration_file
+- migration of the HDF5 translation services
+- allowing group management authorizations for special POSIX groups ps-<instr>-elog
+- updating Storage Policy manager to include recent and comming months
+- a new Web service for allocating run numbers (JIRA ticket PSWA-4)
+
 Tag: V00-02-01
 2014-05-16 Igor Gaponenko
 - added method RegDBInstrument::experiments() to select experiments in a scope of an instrument

@@ -44,6 +44,10 @@ class RegDBFile {
     public function open_time () {
         return LusiTime::from64( $this->attr['open'] ); }
 
+    public function base_name () {
+        return  $filename = sprintf("e%d-r%04d-s%02d-c%02d", $this->experiment->id(), $this->run(), $this->stream(), $this->chunk());
+    }
+
     /**
      * Find the migration status of the file if this information is available.
      * Otherwise return null.
@@ -56,7 +60,7 @@ class RegDBFile {
     public function data_migration_file() {
         $table    = "{$this->connection->database}.data_migration";
         $filetype = 'xtc';
-        $filename = sprintf("e%d-r%03d-s%02d-c%02d.%s", $this->experiment->id(), $this->run(), $this->stream(), $this-chunk(), $filetype);
+        $filename = sprintf("e%d-r%04d-s%02d-c%02d.%s", $this->experiment->id(), $this->run(), $this->stream(), $this->chunk(), $filetype);
         $result = $this->connection->query(
             "SELECT * FROM {$table} WHERE exper_id={$this->experiment()->id()} AND file='{$filename}' AND file_type='{$filetype}'" );
 

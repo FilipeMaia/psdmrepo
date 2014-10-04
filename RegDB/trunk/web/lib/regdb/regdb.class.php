@@ -643,6 +643,7 @@ HERE;
         if( is_null( $instr ) || ( $instr == 'AMO' )) {
             $groups['ps-amo'] = True;
             $groups['ps-amo-sci'] = True;
+            $groups['ps-amo-elog'] = True;
             $groups['amoopr'] = True;
         }
 
@@ -654,6 +655,7 @@ HERE;
             $groups['sxrlje10'] = True;
             $groups['ps-sxr'] = True;
             $groups['ps-sxr-sci'] = True;
+            $groups['ps-sxr-elog'] = True;
             $groups['sxropr'] = True;
         }
 
@@ -667,6 +669,7 @@ HERE;
             $groups['xpp80610'] = True;
             $groups['ps-xpp'] = True;
             $groups['ps-xpp-sci'] = True;
+            $groups['ps-xpp-elog'] = True;
             $groups['xppopr'] = True;
             $groups['xppcom12'] = True;
             $groups['xppcom13'] = True;
@@ -677,6 +680,7 @@ HERE;
         if( is_null( $instr ) || ( $instr == 'CXI' )) {
             $groups['ps-cxi'] = True;
             $groups['ps-cxi-sci'] = True;
+            $groups['ps-cxi-elog'] = True;
             $groups['cxiopr'] = True;
         }
         /* MEC commissionning, in-house, etc. experiments for the year of 2010.
@@ -684,6 +688,7 @@ HERE;
         if( is_null( $instr ) || ( $instr == 'MEC' )) {
             $groups['ps-mec'] = True;
             $groups['ps-mec-sci'] = True;
+            $groups['ps-mec-elog'] = True;
             $groups['mecopr'] = True;
         }
 
@@ -692,6 +697,7 @@ HERE;
         if( is_null( $instr ) || ( $instr == 'XCS' )) {
             $groups['ps-xcs'] = True;
             $groups['ps-xcs-sci'] = True;
+            $groups['ps-xcs-elog'] = True;
             $groups['xcsopr'] = True;
             $groups['xcscom12'] = True;
         }

@@ -1,68 +1,90 @@
 
 <?php
-require_once( 'logbook/logbook.inc.php' );
-require_once( 'regdb/regdb.inc.php' );
 
-use LogBook\LogBook;
-use LogBook\LogBookAuth;
-use LogBook\LogBookException;
+require_once 'filemgr/filemgr.inc.php' ;
+require_once 'logbook/logbook.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
 
-use RegDB\RegDB;
-use RegDB\RegDBAuth;
-use RegDB\RegDBException;
+use FileMgr\IfaceCtrlDb ;
 
-$tables_html = '';
-$experiments2load = '';
+use LogBook\LogBook ;
+use LogBook\LogBookAuth ;
+
+use RegDB\RegDB ;
+use RegDB\RegDBAuth ;
+
+$tables_html      = '' ;
+$experiments2load = '' ;
 
 try {
-    $logbook = LogBook::instance();
-    $logbook->begin();
+    
+    $ifacectrl = IfaceCtrlDb::instance() ;
+    $ifacectrl->begin() ;
 
-    $regdb = RegDB::instance();
-    $regdb->begin();
+    $logbook = LogBook::instance() ;
+    $logbook->begin() ;
 
-    $can_modify = RegDBAuth::instance()->canEdit();
+    $regdb = RegDB::instance() ;
+    $regdb->begin() ;
 
-    foreach( $logbook->instruments() as $instrument ) {
+    $can_modify = RegDBAuth::instance()->canEdit() ;
 
-        if( $instrument->is_location()) continue;
+    foreach ($logbook->instruments() as $instrument) {
+
+        if ($instrument->is_location()) continue ;
 
         $tables_html .= <<<HERE
 <table><tbody>
   <tr>
-    <td class="table_hdr">Instrument</td>
-    <td class="table_hdr">Experiment</td>
+    <td class="table_hdr">Instr</td>
+    <td class="table_hdr">Exper</td>
     <td class="table_hdr">Id</td>
     <td class="table_hdr">#runs</td>
-    <td class="table_hdr">#translated</td>
-    <td class="table_hdr">Auto-Translate</td>
-    <td class="table_hdr">Auto-Translate (FFB)</td>
+    <td class="table_hdr">#trans</td>
+    <td class="table_hdr">Auto</td>
+    <td class="table_hdr">FFB</td>
+    <td class="table_hdr">release</td>
+    <td class="table_hdr">config</td>
     <td class="table_hdr">Actions</td>
     <td class="table_hdr">Comments</td>
   </tr>
 HERE;
 
-        foreach( $logbook->experiments_for_instrument( $instrument->name()) as $experiment ) {
+        foreach ($logbook->experiments_for_instrument($instrument->name()) as $experiment) {
 
-            if( $experiment->is_facility()) continue;
+            if ($experiment->is_facility()) continue ;
 
-            $is_authorized = $can_modify || LogBookAuth::instance()->canPostNewMessages( $experiment->id());
+            $is_authorized = $can_modify || LogBookAuth::instance()->canPostNewMessages($experiment->id()) ;
 
-            $num_runs = $experiment->num_runs();
-            $num_runs_str = '';
-            $loading_comment = '';
-            if($num_runs) {
-                $num_runs_str = $num_runs;
-                $loading_comment = 'Loading...';
-                if($experiments2load == '')
-                    $experiments2load = "var experiments2load=[{$experiment->id()}";
+            $num_runs = $experiment->num_runs() ;
+            $num_runs_str = '' ;
+            $loading_comment = '' ;
+            if ($num_runs) {
+                $num_runs_str = $num_runs ;
+                $loading_comment = 'Loading...' ;
+                if ($experiments2load == '')
+                    $experiments2load = "var experiments2load=[{$experiment->id()}" ;
                 else
-                    $experiments2load .= ",{$experiment->id()}";
+                    $experiments2load .= ",{$experiment->id()}" ;
             }
-            $autotranslate2hdf5 = $experiment->regdb_experiment()->find_param_by_name( 'AUTO_TRANSLATE_HDF5' );
-            $autotranslate2hdf5_str = $autotranslate2hdf5 ? 'checked="checked"' : '';
-            $ffb_autotranslate2hdf5 = $experiment->regdb_experiment()->find_param_by_name( 'FFB_AUTO_TRANSLATE_HDF5' );
-            $ffb_autotranslate2hdf5_str = $ffb_autotranslate2hdf5 ? 'checked="checked"' : '';
+            $auto    = $experiment->regdb_experiment()->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5) ? true : false ;
+            $dataset = $ifacectrl->get_config_param_val_r('live-mode', 'dataset', $instrument->name(), $experiment->name()) ;
+            if (is_null($dataset)) {
+                print "ERROR: Interface Controller database has invalid content" ;
+                exit (1) ;
+            }
+            $ffb = $dataset === IfaceCtrlDb::$DATASET_FFB ? true : false ;
+
+            $release_dir = $ifacectrl->get_config_param_val_r('', 'release', $instrument->name(), $experiment->name()) ;
+            if (is_null($release_dir)) {
+                print "ERROR: Interface Controller database has invalid content" ;
+                exit (1) ;
+            }
+            $config_file = $ifacectrl->get_config_param_val_r('', 'config', $instrument->name(), $experiment->name()) ;
+            if (is_null($config_file)) {
+                print "ERROR: Interface Controller database has invalid content" ;
+                exit (1) ;
+            }
 
             $tables_html .= <<<HERE
   <tr>
@@ -72,17 +94,26 @@ HERE;
     <td class="table_cell">{$num_runs_str}</td>
     <td class="table_cell"><span id="num_translated_{$experiment->id()}"}>{$loading_comment}</td>
 HERE;
-            if( $is_authorized ) {
+            if ($is_authorized) {
+                $auto_str = $auto ? 'checked="checked"' : '' ;
+                $ffb_str  = $ffb  ? 'checked="checked"' : '' ;
                 $tables_html .= <<<HERE
-    <td class="table_cell"><input type="checkbox" class="autotranslate2hdf5" name="{$experiment->id()}" value=1 {$autotranslate2hdf5_str} /></td>
-    <td class="table_cell"><input type="checkbox" class="ffb_autotranslate2hdf5" name="{$experiment->id()}" value=1 {$ffb_autotranslate2hdf5_str} /></td>
+    <td class="table_cell"><input type="checkbox" class="params auto"        name="{$experiment->id()}" value=1 {$auto_str} /></td>
+    <td class="table_cell"><input type="checkbox" class="params ffb"         name="{$experiment->id()}" value=1 {$ffb_str}  /></td>
+    <td class="table_cell"><input type="text"     class="params release_dir" name="{$experiment->id()}" value="{$release_dir}" size="42" /></td></td>
+    <td class="table_cell"><input type="text"     class="params config_file" name="{$experiment->id()}" value="{$config_file}" size="36" /></td></td>
+    <td class="table_cell">{$config}</td>
     <td class="table_cell"><button id="{$experiment->id()}" disabled="disabled">Save</button></td>
     <td class="table_cell table_cell_right"><span id="comment_{$experiment->id()}"}></span></td>
 HERE;
             } else {
+                $auto_str = '<div style="height:8px; width:8px; '.($auto ? 'background-color:red;' : '').'" >&nbsp;</div>' ;
+                $ffb_str  = '<div style="height:8px; width:8px; '.($ffb  ? 'background-color:red;' : '').'" >&nbsp;</div>' ;
                 $tables_html .= <<<HERE
-    <td class="table_cell"><input type="checkbox" class="autotranslate2hdf5" name="{$experiment->id()}" value=1 disabled="disabled" {$autotranslate2hdf5_str} /></td>
-    <td class="table_cell"><input type="checkbox" class="ffb_autotranslate2hdf5" name="{$experiment->id()}" value=1 disabled="disabled" {$ffb_autotranslate2hdf5_str} /></td>
+    <td class="table_cell">{$auto_str}</td>
+    <td class="table_cell">{$ffb_str}</td>
+    <td class="table_cell">{$release_dir}</td>
+    <td class="table_cell">{$config_file}</td>
     <td class="table_cell">&nbsp;</td>
     <td class="table_cell table_cell_right">&nbsp;</td>
 HERE;
@@ -95,22 +126,17 @@ HERE;
 </tbody><table>
 HERE;
     }
-    if($experiments2load == '')
-        $experiments2load = "var experiments2load=[];\n";
-    else
-        $experiments2load .= "];\n";
+    if ($experiments2load == '') $experiments2load = "var experiments2load=[];\n" ;
+    else                         $experiments2load .= "];\n" ;
 
-    $regdb->commit();
-    $logbook->commit();
+} catch (Exception $e) { print '<pre>'.print_r($e, true).'</pre>' ; }
 
-} catch( LogBookException $e ) { print $e->toHtml(); }
-  catch( RegDBException   $e ) { print $e->toHtml(); }
 ?>
 
 <!-- The script for reporting and optionally modifying the auto-translation
      option for HDF5 files of experiments. -->
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -126,60 +152,76 @@ HERE;
 <style type="text/css">
 
 td.table_hdr {
-  background-color:#d0d0d0;
-  padding: 2px 8px 2px 8px;
-  border: solid 1px #000000;
-  border-top: none;
-  border-left: none;
-  font-family: Arial, sans-serif;
-  font-weight: bold;
-  font-size: 75%;
+    background-color: #d0d0d0;
+    padding:            2px 8px 2px 8px;
+    border:             solid 1px #000000;
+    border-top:         none;
+    border-left:        none;
+    font-family:        Arial, sans-serif;
+    font-weight:        bold;
+    font-size:          75%;
 }
 td.table_cell {
-  border:solid 1px #d0d0d0;
-  border-top: none;
-  border-left: none;
-  padding: 2px 8px 2px 8px;
-  font-family: Arial, sans-serif;
-  font-size: 75%;
+    border:             solid 1px #d0d0d0;
+    border-top:         none;
+    border-left:        none;
+    padding:            2px 8px 2px 8px;
+    font-family:        Arial, sans-serif;
+    font-size:          75%;
 }
 td.table_cell_left {
-  font-weight: bold;
+    font-weight:        bold;
 }
 td.table_cell_right {
-  border-right: none;
+    border-right:       none;
 }
 td.table_cell_bottom {
-  border-bottom: none;
+    border-bottom:      none;
 }
 td.table_cell_within_group {
-  border-bottom: none;
+    border-bottom:      none;
 }
 
-input.autotranslate2hdf5 {
-  padding-left: 2px;
-  padding-right: 2px;
+input.auto {
+    padding-left:       2px;
+    padding-right:      2px;
 }
-input.ffb_autotranslate2hdf5 {
-  padding-left: 2px;
-  padding-right: 2px;
+input.ffb {
+    padding-left:       2px;
+    padding-right:      2px;
 }
+
+#descr {
+    max-width:          640px;
+}
+#descr table {
+    margin-top:         10px;
+    margin-left:        10px;
+}
+#descr table td.key {
+    font-weight:        bold;
+    padding-right:      10px;
+}
+
 </style>
 
 <script type="text/javascript">
 
-<?php echo $experiments2load; ?>
+<?php echo $experiments2load ; ?>
 
-function load_hdf5_files(exper_id) {
-    $.ajax({
-        type: 'GET',
-        url: '../portal/ws/SearchFiles.php',
+function load_hdf5_files (exper_id) {
+    $.ajax ({
+        type: 'GET' ,
+        url: '../portal/ws/SearchFiles.php' ,
         data: {
-            exper_id: exper_id,
+            exper_id: exper_id ,
             types: 'hdf5'
-        },
-        success: function(data) {
-            if( data.Status != 'success' ) { alert(data.Message); return; }
+        } ,
+        success: function (data) {
+            if (data.Status != 'success') {
+                alert(data.Message) ;
+                return ;
+            }
             var num_files = 0;
             for( var i in data.runs ) {
                 num_files += data.runs[i].files.length;
@@ -188,83 +230,124 @@ function load_hdf5_files(exper_id) {
         },
         error: function() { alert('The request can not go through due a failure to contact the server.'); },
         dataType: 'json'
-    });
+    }) ;
 }
 
-$(function() {
+function load_translation_config (exper_id) {
+    $.ajax ({
+        type: 'GET' ,
+        url: '../portal/ws/hdf5_config_get.php' ,
+        data: {
+            exper_id: exper_id
+        } ,
+        success: function (data) {
+            if (data.status != 'success') {
+                alert(data.message) ;
+                return ;
+            }
 
-    $('button').button().click(function() {
+            $('#num_translated_'+exper_id).html(num_files?num_files:'');
+        },
+        error: function() { alert('The request can not go through due a failure to contact the server.'); },
+        dataType: 'json'
+    }) ;
+}
+$(function () {
 
-        var exper_id = this.id;
-        var is_checked = $('input.autotranslate2hdf5[name="'+exper_id+'"]').is(':checked');
-        var ffb_is_checked = $('input.ffb_autotranslate2hdf5[name="'+exper_id+'"]').is(':checked');
+    $('button').button().click(function () {
 
-        $('button#'+exper_id).button('disable');
-        $('#comment_'+exper_id).text('saving...');
+        var exper_id    = this.id ;
+        var auto        = $('input.auto[name="'+exper_id+'"]').is(':checked') ;
+        var ffb         = $('input.ffb[name="'+exper_id+'"]').is(':checked') ;
+        var release_dir = $('input.release_dir[name="'+exper_id+'"]').val() ;
+        var config_file = $('input.config_file[name="'+exper_id+'"]').val() ;
 
-        $.ajax({
-            type: 'POST',
-            url: '../regdb/ws/SetAutoTranslate2HDF5.php',
-            data: {
-                exper_id: exper_id,
-                autotranslate2hdf5: is_checked ? 1 : 0,
-                ffb_autotranslate2hdf5: ffb_is_checked ? 1 : 0
-            },
-            success: function(data) {
-                if( data.Status != 'success' ) {
-                    $('#comment_'+exper_id).text(data.Message);
-                    return;
+        $('button#'+exper_id).button('disable') ;
+        $('#comment_'+exper_id).text('saving...') ;
+
+        $.ajax ({
+            type : 'POST' ,
+            url  : '../portal/ws/hdf5_config_set.php' ,
+            data : {
+                exper_id:    exper_id ,
+                auto:        auto ? 1 : 0 ,
+                ffb:         ffb  ? 1 : 0 ,
+                release_dir: release_dir ,
+                config_file: config_file
+            } ,
+            success: function (data) {
+                if (data.Status != 'success') {
+                    $('#comment_'+exper_id).text(data.Message) ;
+                    return ;
                 }
-                $('#comment_'+exper_id).text('saved');
-            },
-            error: function() {
-                $('button#'+exper_id).button('enable');
-                $('#comment_'+exper_id).text('failed to submit the request');
-            },
+                $('#comment_'+exper_id).text('saved') ;
+            } ,
+            error: function () {
+                $('button#'+exper_id).button('enable') ;
+                $('#comment_'+exper_id).text('failed to submit the request') ;
+            } ,
             dataType: 'json'
-        });
+        }) ;
 
-    });
-    $('input.autotranslate2hdf5, input.ffb_autotranslate2hdf5').change(function() {
-        var name = this.name;
-        $('button#'+name).button('enable');
-    });
+    }) ;
+    $('input.params').change(function () {
+        var name = this.name ;
+        $('button#'+name).button('enable') ;
+    }) ;
 
     // Begin asynchronious loading of the number of HDF5 files for each
     // experiment which had at least one run taken.
     //
-    for(var i in experiments2load) {
-       var exper_id = experiments2load[i];
-       load_hdf5_files(exper_id);
+    for (var i in experiments2load) {
+       var exper_id = experiments2load[i] ;
+       load_hdf5_files        (exper_id) ;
+       load_translation_config(exper_id) ;
     }
-});
+}) ;
 
 </script>
 
 </head>
-  <body>
-    <div style="padding-left:20px; padding-right:20px;">
+    <body>
+        <div style="padding-left:20px; padding-right:20px;">
 
-      <h2>View/Modify Auto-Translation Options for HDF5</h2>
-      This tool is mean to view and (if your account has sufficient privileges) to modify
-      values of the following parameters of experiments:
-      <div style="max-width:720px;">
-        <div style="padding:10px;">
-          <span style="font-weight:bold;">AUTO_TRANSLATE_HDF5</span> - automatically translate regular XTC streams of an experiment as they're
-          produced by the DAQ system and migrated to OFFLINE
+            <h2>View/Modify HDF5 translation options across all experiments</h2>
+
+            <div id="descr" >
+
+                This tool is mean to view and (if your account has sufficient privileges) to modify
+                values of the following parameters of experiments:
+
+                <table>
+                    <tbody>
+                        <tr><td class="key" valign="top" >Auto</td>
+                            <td class="val" >
+                                automatically translate regular XTC streams of an experiment as they're
+                                produced by the DAQ system and migrated to FFB or OFFLINE storage
+                            </td>
+                        </tr>
+                        <tr><td class="key" valign="top" >FFB</td>
+                            <td class="val" >
+                                read XTC files as they show up at the FFB storage <b>/reg/d/ffb/</b> instead of
+                                from the OFFLINE storage <b>/reg/d/psdm/</b>.
+                            </td>
+                        </tr>
+                        <tr><td class="key" valign="top" >release</td>
+                            <td class="val" >
+                                an absolute path to an analysis software release from which to run
+                                the Translator.
+                           </td>
+                        </tr>
+                        <tr><td class="key" valign="top" >config</td>
+                            <td class="val" >
+                                a relative path to a <b>psana</b> configuration file for the Translator
+                                application. Note that the path is relative to the release directory.
+                           </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top:20px; padding-left:10px;"><?php echo $tables_html; ?></div>
         </div>
-        <div style="padding:10px;">
-          <span style="font-weight:bold;">FFB_AUTO_TRANSLATE_HDF5</span> - automatically translate partial XTC files of an experiment as they
-          show up at the special ffb/ directory of the experiment.
-        </div>
-        <div style="margin-top:10px;">
-          The parameters can be also set when registering an experiment in the
-          <a target="_blank" href="../regdb/">Experiment Registry Database</a>.
-          The 'HDF5' tab of Web Portal of each experiment also allows to view or modify values of the parameters
-          for the corresponding experiment.
-        </div>
-      </div>
-      <div style="margin-top:20px; padding-left:10px;"><?php echo $tables_html; ?></div>
-    </div>
-  </body>
+    </body>
 </html>
