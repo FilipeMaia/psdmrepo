@@ -211,6 +211,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::EvrData::ConfigV7) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV7> >();
   m_mainMap[ & typeid(Psana::EvrData::DataV3) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::DataV3> >();
   m_mainMap[ & typeid(Psana::EvrData::IOConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::IOConfigV1> >();
+  m_mainMap[ & typeid(Psana::EvrData::IOConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::IOConfigV2> >();
   m_mainMap[ & typeid(Psana::EvrData::SrcConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::SrcConfigV1> >();
   m_mainMap[ & typeid(Psana::FCCD::FccdConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::FCCD::FccdConfigV1> >();
   m_mainMap[ & typeid(Psana::FCCD::FccdConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::FCCD::FccdConfigV2> >();

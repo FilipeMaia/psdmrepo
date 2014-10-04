@@ -142,6 +142,7 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet EvrIO;
   EvrIO.insert( & typeid(Psana::EvrData::IOConfigV1));
+  EvrIO.insert( & typeid(Psana::EvrData::IOConfigV2));
   m_alias2TypesMap["EvrIO"] = EvrIO;
 
   TypeInfoSet Evs;
