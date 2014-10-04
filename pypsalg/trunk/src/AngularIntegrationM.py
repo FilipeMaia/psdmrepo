@@ -60,8 +60,8 @@ class AngularIntegratorM :
         self.xsize   = columns
         self.ysize   = rows
 
-        self.xc    = xsize/2                            if xc    is None else xc
-        self.yc    = ysize/2                            if yc    is None else yc
+        self.xc    = self.xsize/2                            if xc    is None else xc
+        self.yc    = self.ysize/2                            if yc    is None else yc
         self.rmin  = 0                                  if rmin  is None else rmin
         self.rmax  = math.sqrt(self.xc**2 + self.yc**2) if rmax  is None else rmax
         self.nbins = int((self.rmax - self.rmin)/2)     if nbins is None else nbins
