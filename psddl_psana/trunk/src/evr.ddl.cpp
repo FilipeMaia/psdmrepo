@@ -264,5 +264,15 @@ IOChannel::name_shape() const {
 
 IOConfigV1::~IOConfigV1() {}
 
+std::vector<int>
+IOChannelV2::name_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(NameLength);
+  return shape;
+}
+
+IOConfigV2::~IOConfigV2() {}
+
 } // namespace EvrData
 } // namespace Psana

@@ -671,6 +671,61 @@ public:
   virtual ndarray<const EvrData::IOChannel, 1> channels() const = 0;
   virtual EvrData::OutputMap::Conn conn() const = 0;
 };
+
+/** @class IOChannelV2
+
+  
+*/
+
+
+class IOChannelV2 {
+public:
+  enum { NameLength = 64 };
+  enum { MaxInfos = 16 };
+  IOChannelV2(const EvrData::OutputMapV2& arg__output, const char* arg__name, uint32_t arg__ninfo, const Pds::DetInfo* arg__info)
+    : _output(arg__output), _ninfo(arg__ninfo)
+  {
+    if (arg__name) std::copy(arg__name, arg__name+(64), &_name[0]);
+    if (arg__info) std::copy(arg__info, arg__info+(16), &_info[0]);
+  }
+  IOChannelV2() {}
+  /** Output connector */
+  const EvrData::OutputMapV2& output() const { return _output; }
+  /** Name of channel */
+  const char* name() const { return _name; }
+  /** Number of Detectors connected */
+  uint32_t ninfo() const { return _ninfo; }
+  /** List of Detectors connected
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
+  ndarray<const Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
+  static uint32_t _sizeof() { return (((((((0+(EvrData::OutputMapV2::_sizeof()))+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
+  /** Method which returns the shape (dimensions) of the data returned by name() method. */
+  std::vector<int> name_shape() const;
+private:
+  EvrData::OutputMapV2	_output;	/**< Output connector */
+  char	_name[NameLength];	/**< Name of channel */
+  uint32_t	_ninfo;	/**< Number of Detectors connected */
+  Pds::DetInfo	_info[MaxInfos];	/**< List of Detectors connected */
+};
+
+/** @class IOConfigV2
+
+  
+*/
+
+
+class IOConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~IOConfigV2();
+  /** Number of Configured output channels */
+  virtual uint32_t nchannels() const = 0;
+  /** List of Configured output channels */
+  virtual ndarray<const EvrData::IOChannelV2, 1> channels() const = 0;
+};
 } // namespace EvrData
 } // namespace Psana
 #endif // PSANA_EVR_DDL_H
