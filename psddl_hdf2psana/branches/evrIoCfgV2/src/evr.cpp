@@ -230,6 +230,7 @@ ns_IOChannel_v0::dataset_data::~dataset_data()
 ns_IOChannel_v0::dataset_data::operator Psana::EvrData::IOChannel() const
 {
   Pds::DetInfo dinfos[MaxInfos];
+  memset(dinfos,0,MaxInfos*sizeof(Pds::DetInfo));
   std::copy(infos, infos+ninfo, dinfos);
   return Psana::EvrData::IOChannel(name, ninfo, dinfos);
 }
@@ -392,7 +393,7 @@ hdf5pp::Type ns_IOChannelV2_v0_dataset_data_native_type()
   type.insert("output", offsetof(DsType, output), hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::native_type());
   type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("ninfo", offsetof(DsType, ninfo), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hsize_t _array_type_infos_shape[] = { 16 };
+  hsize_t _array_type_infos_shape[] = { ns_IOChannelV2_v0::dataset_data::MaxInfos };
   hdf5pp::ArrayType _array_type_infos = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Pds::ns_DetInfo_v0::dataset_data>::native_type(), 1, _array_type_infos_shape);
   type.insert("infos", offsetof(DsType, infos), _array_type_infos);
   return type;
@@ -405,18 +406,20 @@ hdf5pp::Type ns_IOChannelV2_v0::dataset_data::native_type()
 }
 
 ns_IOChannelV2_v0::dataset_data::dataset_data()
+  : ninfo(0)
+  , name(NULL)
 {
 }
 
 ns_IOChannelV2_v0::dataset_data::dataset_data(const Psana::EvrData::IOChannelV2& psanaobj)
   : output(psanaobj.output())
-  , name(0)
+  , name(NULL)
   , ninfo(psanaobj.ninfo())
 {
   name = strdup(psanaobj.name());
   {
     const __typeof__(psanaobj.infos())& arr = psanaobj.infos();
-    std::copy(arr.begin(), arr.begin()+16, infos);
+    std::copy(arr.begin(), arr.begin()+MaxInfos, infos);
   }
 }
 

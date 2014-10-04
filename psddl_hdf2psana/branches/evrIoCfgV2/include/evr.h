@@ -166,6 +166,11 @@ void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group gr
 
 namespace ns_IOChannelV2_v0 {
 struct dataset_data {
+
+
+  enum {NameLength = Psana::EvrData::IOChannelV2::NameLength};
+  enum {MaxInfos = Psana::EvrData::IOChannelV2::MaxInfos};
+
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
@@ -176,7 +181,7 @@ struct dataset_data {
   EvrData::ns_OutputMapV2_v0::dataset_data output;
   char* name;
   uint32_t ninfo;
-  Pds::ns_DetInfo_v0::dataset_data infos[16];
+  Pds::ns_DetInfo_v0::dataset_data infos[MaxInfos];
 
   operator Psana::EvrData::IOChannelV2() const;
 
@@ -221,6 +226,7 @@ private:
 
 void make_datasets_IOConfigV2_v0(const Psana::EvrData::IOConfigV2& obj,
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
+
 void store_IOConfigV2_v0(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index, bool append);
 
 
