@@ -423,6 +423,31 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::IOConfigV1> >(Pds::TypeId::Id_EvrIOConfig));
 
   {
+  scope outer = 
+  class_<Psana::EvrData::IOChannelV2 >("IOChannelV2", no_init)
+    .def("output", &Psana::EvrData::IOChannelV2::output, return_value_policy<copy_const_reference>(),"Output connector")
+    .def("name", &Psana::EvrData::IOChannelV2::name,"Name of channel")
+    .def("ninfo", &Psana::EvrData::IOChannelV2::ninfo,"Number of Detectors connected")
+    .def("infos", &Psana::EvrData::IOChannelV2::infos,"List of Detectors connected")
+    .def("name_shape", &method_shape<Psana::EvrData::IOChannelV2, &Psana::EvrData::IOChannelV2::name_shape>)
+  ;
+  scope().attr("NameLength")=64;
+  scope().attr("MaxInfos")=16;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::IOChannelV2> >(-1));
+
+  {
+  scope outer = 
+  class_<Psana::EvrData::IOConfigV2, boost::shared_ptr<Psana::EvrData::IOConfigV2>, boost::noncopyable >("IOConfigV2", no_init)
+    .def("nchannels", &Psana::EvrData::IOConfigV2::nchannels,"Number of Configured output channels")
+    .def("channels", &Psana::EvrData::IOConfigV2::channels,"List of Configured output channels")
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrIOConfig);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::IOConfigV2> >(Pds::TypeId::Id_EvrIOConfig));
+
+  {
     PyObject* unvlist = PyList_New(1);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "SrcConfigV1"));
     PyObject_SetAttrString(submodule, "SrcConfig", unvlist);
@@ -441,8 +466,9 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(1);
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "IOConfigV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "IOConfigV2"));
     PyObject_SetAttrString(submodule, "IOConfig", unvlist);
     Py_CLEAR(unvlist);
   }
@@ -458,6 +484,7 @@ void createWrappers(PyObject* module) {
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::IOChannel>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::EventCodeV4>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::EventCodeV5>();
+  detail::register_ndarray_to_list_cvt<const Psana::EvrData::IOChannelV2>();
   detail::register_ndarray_to_list_cvt<const Pds::DetInfo>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::FIFOEvent>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::PulseConfig>();
