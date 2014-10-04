@@ -353,6 +353,10 @@ try {
     // Epics::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Epics::make_ConfigV1(schema_version, group, idx), src);
     break;
+  case 1869558588:
+    // EvrData::IOConfigV2
+    cfgStore.putProxy(psddl_hdf2psana::EvrData::make_IOConfigV2(schema_version, group, idx), src);
+    break;
   case 1869558591:
     // EvrData::IOConfigV1
     cfgStore.putProxy(psddl_hdf2psana::EvrData::make_IOConfigV1(schema_version, group, idx), src);

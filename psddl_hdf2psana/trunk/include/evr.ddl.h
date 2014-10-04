@@ -814,6 +814,18 @@ void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, c
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV2> > make_IOConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::EvrData::IOConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::EvrData::IOConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 } // namespace EvrData
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_EVR_DDL_H

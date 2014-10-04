@@ -162,6 +162,74 @@ void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, bool append);
 
+
+
+namespace ns_IOChannelV2_v0 {
+struct dataset_data {
+
+
+  enum {NameLength = Psana::EvrData::IOChannelV2::NameLength};
+  enum {MaxInfos = Psana::EvrData::IOChannelV2::MaxInfos};
+
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::EvrData::IOChannelV2& psanaobj);
+  ~dataset_data();
+
+  EvrData::ns_OutputMapV2_v0::dataset_data output;
+  char* name;
+  uint32_t ninfo;
+  Pds::ns_DetInfo_v0::dataset_data infos[MaxInfos];
+
+  operator Psana::EvrData::IOChannelV2() const;
+
+};
+}
+
+
+namespace ns_IOConfigV2_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::EvrData::IOConfigV2& psanaobj);
+  ~dataset_config();
+
+  uint32_t nchannels;
+
+
+};
+}
+
+
+class IOConfigV2_v0 : public Psana::EvrData::IOConfigV2 {
+public:
+  typedef Psana::EvrData::IOConfigV2 PsanaType;
+  IOConfigV2_v0() {}
+  IOConfigV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~IOConfigV2_v0() {}
+  virtual uint32_t nchannels() const;
+  virtual ndarray<const Psana::EvrData::IOChannelV2, 1> channels() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<EvrData::ns_IOConfigV2_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable ndarray<const Psana::EvrData::IOChannelV2, 1> m_ds_channels;
+  void read_ds_channels() const;
+};
+
+
+void make_datasets_IOConfigV2_v0(const Psana::EvrData::IOConfigV2& obj,
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
+
+void store_IOConfigV2_v0(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index, bool append);
+
+
 } // namespace EvrData
 } // namespace psddl_hdf2psana
 

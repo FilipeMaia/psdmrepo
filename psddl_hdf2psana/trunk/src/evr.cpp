@@ -230,6 +230,7 @@ ns_IOChannel_v0::dataset_data::~dataset_data()
 ns_IOChannel_v0::dataset_data::operator Psana::EvrData::IOChannel() const
 {
   Pds::DetInfo dinfos[MaxInfos];
+  memset(dinfos,0,MaxInfos*sizeof(Pds::DetInfo));
   std::copy(infos, infos+ninfo, dinfos);
   return Psana::EvrData::IOChannel(name, ninfo, dinfos);
 }
@@ -364,6 +365,180 @@ void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group gr
 
 }
 
+
+
+hdf5pp::Type ns_IOChannelV2_v0_dataset_data_stored_type()
+{
+  typedef ns_IOChannelV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("output", offsetof(DsType, output), hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::stored_type());
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type());
+  type.insert("ninfo", offsetof(DsType, ninfo), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hsize_t _array_type_infos_shape[] = { 16 };
+  hdf5pp::ArrayType _array_type_infos = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Pds::ns_DetInfo_v0::dataset_data>::stored_type(), 1, _array_type_infos_shape);
+  type.insert("infos", offsetof(DsType, infos), _array_type_infos);
+  return type;
+}
+
+hdf5pp::Type ns_IOChannelV2_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_IOChannelV2_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_IOChannelV2_v0_dataset_data_native_type()
+{
+  typedef ns_IOChannelV2_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("output", offsetof(DsType, output), hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::native_type());
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type());
+  type.insert("ninfo", offsetof(DsType, ninfo), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hsize_t _array_type_infos_shape[] = { ns_IOChannelV2_v0::dataset_data::MaxInfos };
+  hdf5pp::ArrayType _array_type_infos = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Pds::ns_DetInfo_v0::dataset_data>::native_type(), 1, _array_type_infos_shape);
+  type.insert("infos", offsetof(DsType, infos), _array_type_infos);
+  return type;
+}
+
+hdf5pp::Type ns_IOChannelV2_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_IOChannelV2_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_IOChannelV2_v0::dataset_data::dataset_data()
+  : ninfo(0)
+  , name(NULL)
+{
+}
+
+ns_IOChannelV2_v0::dataset_data::dataset_data(const Psana::EvrData::IOChannelV2& psanaobj)
+  : output(psanaobj.output())
+  , name(NULL)
+  , ninfo(psanaobj.ninfo())
+{
+  name = strdup(psanaobj.name());
+  {
+    const __typeof__(psanaobj.infos())& arr = psanaobj.infos();
+    std::copy(arr.begin(), arr.begin()+MaxInfos, infos);
+  }
+}
+
+ns_IOChannelV2_v0::dataset_data::~dataset_data()
+{
+}
+
+ns_IOChannelV2_v0::dataset_data::operator Psana::EvrData::IOChannelV2() const
+{
+  Pds::DetInfo dinfos[Psana::EvrData::IOChannelV2::MaxInfos];
+  std::copy(infos, infos+ninfo, dinfos);
+  return Psana::EvrData::IOChannelV2(Psana::EvrData::OutputMapV2(output), name, ninfo, dinfos);
+}
+
+
+hdf5pp::Type ns_IOConfigV2_v0_dataset_config_stored_type()
+{
+  typedef ns_IOConfigV2_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("nchannels", offsetof(DsType, nchannels), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_IOConfigV2_v0::dataset_config::stored_type()
+{
+  static hdf5pp::Type type = ns_IOConfigV2_v0_dataset_config_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_IOConfigV2_v0_dataset_config_native_type()
+{
+  typedef ns_IOConfigV2_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("nchannels", offsetof(DsType, nchannels), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_IOConfigV2_v0::dataset_config::native_type()
+{
+  static hdf5pp::Type type = ns_IOConfigV2_v0_dataset_config_native_type();
+  return type;
+}
+
+ns_IOConfigV2_v0::dataset_config::dataset_config()
+{
+}
+
+ns_IOConfigV2_v0::dataset_config::dataset_config(const Psana::EvrData::IOConfigV2& psanaobj)
+  : nchannels(psanaobj.nchannels())
+{
+}
+
+ns_IOConfigV2_v0::dataset_config::~dataset_config()
+{
+}
+uint32_t IOConfigV2_v0::nchannels() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->nchannels);
+}
+ndarray<const Psana::EvrData::IOChannelV2, 1> IOConfigV2_v0::channels() const {
+  if (m_ds_channels.empty()) read_ds_channels();
+  return m_ds_channels;
+}
+void IOConfigV2_v0::read_ds_config() const {
+  m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_IOConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+}
+void IOConfigV2_v0::read_ds_channels() const {
+  ndarray<EvrData::ns_IOChannelV2_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<EvrData::ns_IOChannelV2_v0::dataset_data, 1>(m_group, "channels", m_idx);
+  ndarray<Psana::EvrData::IOChannelV2, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_channels = tmp;
+}
+
+void make_datasets_IOConfigV2_v0(const Psana::EvrData::IOConfigV2& obj,
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_IOConfigV2_v0::dataset_config::stored_type();
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
+  }
+  {
+    typedef __typeof__(obj.channels()) PsanaArray;
+    const PsanaArray& psana_array = obj.channels();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_IOChannelV2_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "channels", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
+  }
+}
+
+void store_IOConfigV2_v0(const Psana::EvrData::IOConfigV2* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    EvrData::ns_IOConfigV2_v0::dataset_config ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
+  }
+  if (obj) {
+    typedef __typeof__(obj->channels()) PsanaArray;
+    typedef ndarray<EvrData::ns_IOChannelV2_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj->channels();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_IOChannelV2_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "channels", hdf_array, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "channels", hdf_array);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "channels", index < 0 ? index : index + 1);
+  }
+
+}
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana
