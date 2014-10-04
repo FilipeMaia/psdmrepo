@@ -4814,6 +4814,52 @@ def EvrData_IOConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def EvrData_IOChannelV2_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'name: %s' % str_to_str( obj.name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ninfo: %s' % uint32_to_str( obj.ninfo() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output:\n'
+    methodStr += EvrData_OutputMapV2_to_str(obj.output(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.infos() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'infos[%d]:\n' % idx
+        subMethodStr += Pds_DetInfo_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def EvrData_IOConfigV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.EvrData.IOConfigV2.TypeId
+    assert obj.Version == psana.EvrData.IOConfigV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nchannels: %s' % uint32_to_str( obj.nchannels() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.channels() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'channels[%d]:\n' % idx
+        subMethodStr += EvrData_IOChannelV2_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def FCCD_FccdConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.FCCD.FccdConfigV1.TypeId
     assert obj.Version == psana.FCCD.FccdConfigV1.Version
@@ -7106,6 +7152,7 @@ objFunctionTable = {
     (psana.EvrData.ConfigV7.TypeId,7) : EvrData_ConfigV7_to_str,
     (psana.EvrData.DataV3.TypeId,3) : EvrData_DataV3_to_str,
     (psana.EvrData.IOConfigV1.TypeId,1) : EvrData_IOConfigV1_to_str,
+    (psana.EvrData.IOConfigV2.TypeId,2) : EvrData_IOConfigV2_to_str,
     (psana.EvrData.SrcConfigV1.TypeId,1) : EvrData_SrcConfigV1_to_str,
     (psana.FCCD.FccdConfigV1.TypeId,1) : FCCD_FccdConfigV1_to_str,
     (psana.FCCD.FccdConfigV2.TypeId,2) : FCCD_FccdConfigV2_to_str,

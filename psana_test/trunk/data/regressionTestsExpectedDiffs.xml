@@ -216,9 +216,53 @@ but 0x0 in the hdf5 translation.
     </comment>
   </regress>
 
-  <regress src="xtc" number="99999">
+  <regress src="xtc" number="88">
     <diff>
 <![CDATA[
+99c99
+<       ProcInfo(0.0.0.0, pid=8130032)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+101c101
+<       ProcInfo(0.0.0.0, pid=8130040)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+103c103
+<       ProcInfo(0.0.0.0, pid=8130040)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+105c105
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+107c107
+<       ProcInfo(0.0.0.0, pid=49)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+109c109
+<       ProcInfo(0.0.0.0, pid=7990560)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+111c111
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+113c113
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+115c115
+<       ProcInfo(0.0.0.0, pid=7679904)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+117c117
+<       ProcInfo(0.0.0.0, pid=48)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+119c119
+<       ProcInfo(0.0.0.0, pid=129)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
 ]]>
     </diff>
     <comment>

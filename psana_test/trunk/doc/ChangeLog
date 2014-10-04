@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-37
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with: Evr::IOConfigV2. 
+  Track JIRA issue PSAS-41. 
+- Add test_088 to regression - file evrio.xtc from Matt with new type.
+
+
 Tag: V00-00-36
 2014-09-22 David Schneider
 - fix bug with unit tests for external packages. A test created an output

@@ -93,3 +93,4 @@ xtc_md5sum=ecb7af39e4967057d8c8fb0a0b3a4df9   dump_md5sum=384eb9924cb597afdc0345
 xtc_md5sum=a1bebc54b7cc19c6b41428cd9dba2ad1   dump_md5sum=c8add0a4d16cae2581f2091a41eebba5   regress_md5sum=0f678a837f7d0e27a07d0a138de4e50b   xtc=test_085_timetool_no_proj.xtc
 xtc_md5sum=5f8b6e6a636b6d44c7733e0a655edd5a   dump_md5sum=0967696a5c6eb6f7a33afa1014db1466   regress_md5sum=7ab0f8d2cc39c937a786a5d398782967   xtc=test_086_timetool_one_proj.xtc
 xtc_md5sum=38c755b1ef27d15ab22f96209e2b17db   dump_md5sum=8034b8b2b80fc7bd646bcaf642a13e81   regress_md5sum=2b94c5ea3d1963c0d4690da2a175812b   xtc=test_087_timetool_two_proj.xtc
+xtc_md5sum=9d7b772177b48108de81f08d93f1e043   dump_md5sum=2b89a0d858ca71a11731a972c8565513   regress_md5sum=7b61822f33ef757cdfa267e4f0f07d94   xtc=test_088_evrio.xtc

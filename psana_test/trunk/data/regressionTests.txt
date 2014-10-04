@@ -50,6 +50,7 @@ test=084  events=010 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translato
 test=085  events=010 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_085_timetool_no_proj.xtc
 test=086  events=010 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_086_timetool_one_proj.xtc
 test=087  events=010 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_087_timetool_two_proj.xtc
+test=088  events=003 doNotDumpEpicsAliases=1 xtc=/reg/g/psdm/data_test/Translator/test_088_evrio.xtc
 
 # define regression tests for multi file datasets. 
 test=000  events=000 doNotDumpEpicsAliases=1 multi=/reg/g/psdm/data_test/multifile/test_000_amo01509
