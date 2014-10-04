@@ -406,8 +406,8 @@ hdf5pp::Type ns_IOChannelV2_v0::dataset_data::native_type()
 }
 
 ns_IOChannelV2_v0::dataset_data::dataset_data()
-  : ninfo(0)
-  , name(NULL)
+  : name(NULL)
+  , ninfo(0)
 {
 }
 

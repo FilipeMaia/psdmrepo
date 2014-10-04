@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-14
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with:
+  Evr::IOConfigV2. Track JIRA issue PSAS-41
+
 Tag: V00-09-13
 2014-09-18 David Schneider
 - regenerate for new pdsdata 8.1.3/psddldata with:
