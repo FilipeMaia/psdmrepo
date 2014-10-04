@@ -254,6 +254,23 @@ private:
   ndarray<Psana::EvrData::IOChannel, 1> _channels_ndarray_storage_;
 };
 
+Psana::EvrData::IOChannelV2 pds_to_psana(Pds::EvrData::IOChannelV2 pds);
+
+
+class IOConfigV2 : public Psana::EvrData::IOConfigV2 {
+public:
+  typedef Pds::EvrData::IOConfigV2 XtcType;
+  typedef Psana::EvrData::IOConfigV2 PsanaType;
+  IOConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~IOConfigV2();
+  virtual uint32_t nchannels() const;
+  virtual ndarray<const Psana::EvrData::IOChannelV2, 1> channels() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  ndarray<Psana::EvrData::IOChannelV2, 1> _channels_ndarray_storage_;
+};
+
 } // namespace EvrData
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_EVR_DDL_H

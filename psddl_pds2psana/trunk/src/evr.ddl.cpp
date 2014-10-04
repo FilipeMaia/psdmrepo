@@ -644,5 +644,35 @@ Psana::EvrData::OutputMap::Conn IOConfigV1::conn() const {
   return pds_to_psana(m_xtcObj->conn());
 }
 
+Psana::EvrData::IOChannelV2 pds_to_psana(Pds::EvrData::IOChannelV2 pds)
+{
+  return Psana::EvrData::IOChannelV2(pds_to_psana(pds.output()), pds.name(), pds.ninfo(), pds.infos().data());
+}
+
+IOConfigV2::IOConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::EvrData::IOConfigV2()
+  , m_xtcObj(xtcPtr)
+{
+  {
+    typedef ndarray<Psana::EvrData::IOChannelV2, 1> NDArray;
+    typedef ndarray<const Pds::EvrData::IOChannelV2, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->channels();
+    _channels_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _channels_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::EvrData::pds_to_psana(*it);
+    }
+  }
+}
+IOConfigV2::~IOConfigV2()
+{
+}
+
+
+uint32_t IOConfigV2::nchannels() const {
+  return m_xtcObj->nchannels();
+}
+
+ndarray<const Psana::EvrData::IOChannelV2, 1> IOConfigV2::channels() const { return _channels_ndarray_storage_; }
 } // namespace EvrData
 } // namespace psddl_pds2psana
