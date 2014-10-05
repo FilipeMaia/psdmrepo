@@ -752,4 +752,34 @@
   uint16_t _temperatures[@config.numberOfAsics()] -> temperatures;
   uint32_t _lastWord -> lastWord;
 }
+
+//------------------ ElementV2 ------------------
+@type ElementV2
+  [[type_id(Id_EpixElement, 2)]]
+  [[pack(2)]]
+  [[config(Config100aV1)]]
+{
+  uint32_t _first {
+    uint8_t _vc:2 -> vc;
+    uint8_t _z:4;
+    uint8_t _lane:2 -> lane;
+    uint32_t _tid:24;
+  }
+  uint32_t _second {
+    uint16_t _acqCount:16 -> acqCount;
+    uint16_t _z:16;
+  }
+  uint32_t _frameNumber -> frameNumber;
+  uint32_t _ticks -> ticks;
+  uint32_t _fiducials -> fiducials;
+  uint32_t _z0;
+  uint32_t _z1;
+  uint32_t _z2;
+  uint16_t _frame[@config.numberOfReadableRows()][@config.numberOfColumns()] -> frame;
+  uint16_t _calibrationRows[@config.numberOfCalibrationRows()][@config.numberOfColumns()] -> calibrationRows;
+  uint16_t _environmentalRows[@config.numberOfEnvironmentalRows()][@config.numberOfColumns()] -> environmentalRows;
+  uint16_t _temperatures[@config.numberOfAsics()] -> temperatures;
+  uint32_t _lastWord -> lastWord;
+}
+
 } //- @package Epix
