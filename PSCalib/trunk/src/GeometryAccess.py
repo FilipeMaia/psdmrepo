@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 #------------------------------
-"""GeometryAccess - holds and access hierarchical geometry for generic pixel detector
-
+""":py:class:`GeometryAccess` - holds and access hierarchical geometry for generic pixel detector
 
 Usage::
  
@@ -10,33 +9,36 @@ Usage::
     fname_geometry = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     geometry = GeometryAccess(fname_geometry, 0377)
 
-    # get index arrays for quad
-    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None)
-
-    # get index arrays for entire CSPAD with offset
-    iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=(1000,1000))
-
-    img = img_from_pixel_arrays(iX,iY,W=arr)
-
+    # get pixel coordinate [um] arrays
     X, Y, Z = geometry.get_pixel_coords(oname=None, oindex=0)
 
-    A = geometry.get_pixel_areas(oname=None, oindex=0)
+    # get pixel area array; A=1 for regular pixels, =2.5 for wide.
+    area = geometry.get_pixel_areas(oname=None, oindex=0)
 
-    #mbits = +1-edges, +2-wide pixels, +4-non-bounded pixels, +8-neighbours of non-bounded
+    # get pixel mask array;
+    # mbits = +1-mask edges, +2-wide pixels, +4-non-bounded pixels, +8-non-bounded pixel neighbours
     mask = geometry.get_pixel_mask(oname=None, oindex=0, mbits=0377)
 
+    # get index arrays for entire CSPAD
+    iX, iY = geometry.get_pixel_coord_indexes()
+
+    # get index arrays for specified quad with offset
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=(1000,1000))
+
+    # get 2-d image from index arrays
+    img = img_from_pixel_arrays(iX,iY,W=arr)
+
     # modify currect geometry objects' parameters
-    geometry.set_geo_pars('QUAD:V1', x0, y0, z0, rot_z,...<entire-list-of-9-parameters>);
+    geometry.set_geo_pars('QUAD:V1', 1, x0, y0, z0, rot_z,...<entire-list-of-9-parameters>);
     geometry.move_geo('QUAD:V1', 1, 10, 20, 0);
     geometry.tilt_geo('QUAD:V1', 1, 0.01, 0, 0);
 
     # save current geometry parameters in file
     geometry.save_pars_in_file(fname_geometry_new)
 
-    # Return geometry parameters in the tuple psf[32][3][3] - format for TJ:
+    # return geometry parameters in "psf" format for TJ as a tuple psf[32][3][3]
     psf = geometry.get_psf()
     geometry.print_psf()
-
 
 @see :py:class:`PSCalib.GeometryObject`, :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
 
