@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-64
+2014-09-28 Mikhail S. Dubrovin
+- PixCoordsProducer
+  - save geometry file name as a string (as ndarray<char,1> - is depricated but still available)
+  - add saving mask for edge and unbound pixels
+  - add x,y origin offsets for indexing 
+	
 Tag: V00-03-63
 2014-09-27 Mikhail S. Dubrovin
 - in PixCoordsProducer - check and savePixCoordsInCalibStore(env) in all callbacks

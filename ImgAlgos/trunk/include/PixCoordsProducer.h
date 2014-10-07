@@ -56,6 +56,7 @@ public:
 
   typedef double coord_t;
   typedef double area_t;
+  typedef int mask_t;
   typedef unsigned coord_index_t;
 
   // Default constructor
@@ -101,9 +102,14 @@ private:
   std::string m_key_out_y;        // Key for output pixel y-coordinate array
   std::string m_key_out_z;        // Key for output pixel z-coordinate array
   std::string m_key_out_a;        // Key for output pixel area array
+  std::string m_key_out_m;        // Key for output pixel mask array
   std::string m_key_out_ix;       // Key for output pixel index x-coordinate array
   std::string m_key_out_iy;       // Key for output pixel index y-coordinate array
-  std::string m_key_fname;        // Key for the name of geometry calibration file used in evaluation
+  std::string m_key_fname;        // Key for the name of geometry calibration file used in evaluation transmitted as ndarray<char,1>
+  std::string m_key_gfname;       // Key for the name of geometry calibration file used in evaluation transmitted as string
+  int         m_x0_off_pix;       // x0 origin offset in number of pixels before evaluation of indexes
+  int         m_y0_off_pix;       // y0 origin offset in number of pixels before evaluation of indexes
+  unsigned    m_mask_bits;        // mask control bits
   unsigned    m_print_bits;       // verbosity
 
   long m_count_run;
@@ -122,16 +128,19 @@ private:
   const coord_t* m_pixY;
   const coord_t* m_pixZ;
   const area_t*  m_pixA;
+  const mask_t*  m_pixM;
   const coord_index_t* m_pixIX;
   const coord_index_t* m_pixIY;
   unsigned       m_size;
   unsigned       m_size_a;
+  unsigned       m_size_m;
   unsigned       m_size_ind;
 
   ndarray<const coord_t,1>       m_ndaX;
   ndarray<const coord_t,1>       m_ndaY;
   ndarray<const coord_t,1>       m_ndaZ;
   ndarray<const area_t,1>        m_ndaA;
+  ndarray<const mask_t,1>        m_ndaM;
   ndarray<const coord_index_t,1> m_ndaIX;
   ndarray<const coord_index_t,1> m_ndaIY;
   ndarray<const uint8_t,1>       m_ndafn;
