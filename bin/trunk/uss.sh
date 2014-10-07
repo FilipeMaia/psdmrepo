@@ -50,14 +50,27 @@ fi
 # =============================
 #   Few common shell functions
 # =============================
-_remove_from_path ()
-{ 
-  # 1. split original path at : into separate lines
-  # 2. filter out matching lines and empty lines
-  # 3. replace newlines with :
-  # 4. strip trailing :
-  #
-  echo "$1" | tr ':' '\n'| sed -e "\\:^$2\$:d" -e '/^ *$/d' | tr '\n' ':' | sed -e 's/\(.*\):/\1/'
+_remove_from_path () { 
+    # 1. split original path at : into separate lines
+    # 2. filter out matching lines and empty lines
+    # 3. replace newlines with :
+    # 4. strip trailing :
+
+    echo "$1" | tr ':' '\n' | \
+      awk -v pat="^$2\$" ' \
+          $1 ~ pat  {
+              if ( substr(pat,2,1) != "/" ) {
+                  where = match($1,/.*\/arch/, arr)
+                  cmd="test -e " arr[0]"/../.sit_release"
+                  rc = system(cmd)
+                  if ( rc != 0 )
+                      print $1
+              }
+              next
+          } 
+          /^ *$/ {next}
+          {print $1}' \
+      | tr '\n'  ':' | sed -e 's/\(.*\):/\1/'
 }
 
 
