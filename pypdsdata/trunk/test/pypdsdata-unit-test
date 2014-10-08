@@ -678,7 +678,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.XcsUsrIpm02, 50 )
         self.assertEqual ( BldInfo.Type.XcsUsrIpm03, 51 )
         self.assertEqual ( BldInfo.Type.XcsUsrIpm04, 52 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 53 )
+
+# we no longer maintain pypdsdata, so the numberOf will get out of date
+#        self.assertEqual ( BldInfo.Type.NumberOf, 53 )
 
         o1 = BldInfo(0,0)
         
@@ -715,7 +717,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         # out of range, parameters
         self.assertRaises( TypeError, lambda : BldInfo() )
         self.assertRaises( TypeError, lambda : BldInfo(1,1,1) )
-        self.assertRaises( ValueError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
+
+# we no longer maintain pypdsdata, so NumberOf will get out of date
+#        self.assertRaises( ValueError, lambda : BldInfo(1,BldInfo.Type.NumberOf) )
 
         # can use for keys
         d = {}

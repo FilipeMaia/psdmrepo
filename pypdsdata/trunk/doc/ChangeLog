@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-21
+2014-10-07 David Schneider
+- Disabling test of NumberOf for Bld sources. pypdsdata is out of data
+  with pdsdata 8.1.5
+
 Tag: V01-01-20
 2014-07-14 Christopher O'Grady
 - Add support for ebeam bld V6 for pyana
