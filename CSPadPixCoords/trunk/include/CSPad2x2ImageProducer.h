@@ -110,6 +110,7 @@ protected:
 
   void printInputParameters();
   void getConfigPars(Env& env);
+  bool getGeometryPars(const std::string& calib_dir, const int runnum, const unsigned prbits);
   void getCalibPars(Event& evt, Env& env);
   void cspad_image_init();
   void processEvent(Event& evt, Env& env);
@@ -145,9 +146,9 @@ private:
   PSCalib::CSPad2x2CalibPars  *m_cspad2x2_calibpars;
   PC2X2                       *m_pix_coords_cspad2x2;
 
-  uint32_t   m_cspad_ind;
-  double    *m_coor_x_pix;
-  double    *m_coor_y_pix;
+  //uint32_t   m_cspad_ind;
+  //double    *m_coor_x_pix;
+  //double    *m_coor_y_pix;
   uint32_t  *m_coor_x_int;
   uint32_t  *m_coor_y_int;
 
@@ -219,8 +220,12 @@ public:
         for (unsigned r=0; r<PC2X2::ROWS2X1; ++r) {
         for (unsigned c=0; c<PC2X2::COLS2X1; ++c) {
   
-          int ix = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_X, sect, r, c) * PC2X2::UM_TO_PIX);
-          int iy = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_Y, sect, r, c) * PC2X2::UM_TO_PIX);
+          //int ix = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_X, sect, r, c) * PC2X2::UM_TO_PIX);
+          //int iy = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_Y, sect, r, c) * PC2X2::UM_TO_PIX);
+
+	  unsigned ind = r*PC2X2::COLS2X1*PC2X2::N2X1_IN_DET + c*PC2X2::N2X1_IN_DET + sect;
+          int ix = m_coor_x_int[ind];
+          int iy = m_coor_y_int[ind];
   
           if(ix <  0)           continue;
           if(iy <  0)           continue;

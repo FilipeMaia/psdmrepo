@@ -26,6 +26,9 @@
 //-------------------------------
 #include "psddl_psana/cspad2x2.ddl.h"
 #include "PSEvt/EventId.h"
+#include "PSCalib/CalibFileFinder.h"
+#include "PSCalib/GeometryAccess.h"
+#include "PSCalib/SegGeometryCspad2x1V1.h"
 
 #include "CSPadPixCoords/Image2D.h"
 
@@ -70,7 +73,7 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   m_source           = configSrc("source",        "DetInfo(:Cspad2x2.1)");
   m_inkey            = configStr("inkey",         "");
   m_outimgkey        = configStr("outimgkey",     "image");
-  m_outtype          = configStr("outtype",       "int16");
+  m_outtype          = configStr("outtype",       "asdata");
   m_tiltIsApplied    = config   ("tiltIsApplied",    true);
   m_useWidePixCenter = config   ("useWidePixCenter",false);
   m_print_bits       = config   ("print_bits",          0);
@@ -150,9 +153,9 @@ CSPad2x2ImageProducer::event(Event& evt, Env& env)
   if( m_print_bits & 4 ) printTimeStamp(evt, m_count);
 
   if ( m_count_cfg==0 ) {
-    getConfigPars(env);           // get m_src here
+    getConfigPars(env);           // get m_src
     if ( m_count_cfg==0 ) return; // skip event processing if configuration is missing
-    getCalibPars(evt, env);       // use m_src here
+    getCalibPars(evt, env);       // use m_src
   }
 
   processEvent(evt, env);
@@ -196,15 +199,69 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
   //terminate();
 }
 
+
+//--------------------
+
+bool
+CSPad2x2ImageProducer::getGeometryPars(const std::string& calib_dir, const int runnum, const unsigned prbits)
+{
+  PSCalib::CalibFileFinder calibfinder(calib_dir, m_typeGroupName, prbits);
+  std::string fname = calibfinder.findCalibFile(m_src, "geometry", runnum);
+
+  if( fname.empty() ) return false;
+  if( m_print_bits & 2 ) MsgLog(name(), info, "Use \"geometry\" constants for run: " << runnum << " from file:\n" << fname);
+
+  PSCalib::GeometryAccess geometry(fname, prbits);
+  if( m_print_bits & 2 ) geometry.print_pixel_coords();
+
+  const unsigned * iX;
+  const unsigned * iY;
+  unsigned       size;
+  geometry.get_pixel_coord_indexes(iX, iY, size);
+
+  m_coor_x_int = new uint32_t[size];
+  m_coor_y_int = new uint32_t[size];
+
+  for(unsigned i=0; i<size; ++i) {
+    m_coor_x_int[i] = iX[i]; 
+    m_coor_y_int[i] = iY[i];
+  }
+
+  return true;
+  //return false;
+}
+
 //--------------------
 
 void 
 CSPad2x2ImageProducer::getCalibPars(Event& evt, Env& env)
 {
   std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
-  m_cspad2x2_calibpars = new PSCalib::CSPad2x2CalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt));
+  int runnum = getRunNumber(evt);
+  unsigned prbits = (m_print_bits & 64) ? 0377 : 0;
 
+  // if "geometry" file exists - that's it!
+  if( getGeometryPars(calib_dir, runnum, prbits) ) return; 
+
+  m_cspad2x2_calibpars = new PSCalib::CSPad2x2CalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt));
   m_pix_coords_cspad2x2 = new PC2X2 (m_cspad2x2_calibpars, m_tiltIsApplied, m_useWidePixCenter);
+
+  // Make pixel coordinate index arrays shaped as data
+  unsigned size = PC2X2::ROWS2X1 * PC2X2::COLS2X1 * PC2X2::N2X1_IN_DET;
+  m_coor_x_int  = new uint32_t[size];
+  m_coor_y_int  = new uint32_t[size];
+
+  unsigned ind=0;
+  for (unsigned r=0; r<PC2X2::ROWS2X1; r++){
+  for (unsigned c=0; c<PC2X2::COLS2X1; c++){
+  for (unsigned s=0; s<PC2X2::N2X1_IN_DET; s++){
+  
+    m_coor_x_int[ind] = int (m_pix_coords_cspad2x2 -> getPixCoor_pix(PC2X2::AXIS_X, s, r, c) + 0.1);
+    m_coor_y_int[ind] = int (m_pix_coords_cspad2x2 -> getPixCoor_pix(PC2X2::AXIS_Y, s, r, c) + 0.1);
+    ind++;
+  }
+  }
+  }
 
   if( m_print_bits & 2 ) {
     m_cspad2x2_calibpars  -> printInputPars();
@@ -242,11 +299,11 @@ void
 CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 {
   // Save image in the event for one of the supported data types
-  if      ( m_outtype == "float"   ) save2DArrayInEventForType<float>   (evt); 
-  else if ( m_outtype == "double"  ) save2DArrayInEventForType<double>  (evt); 
-  else if ( m_outtype == "int"     ) save2DArrayInEventForType<int>     (evt); 
-  else if ( m_outtype == "int16"   ) save2DArrayInEventForType<int16_t> (evt); 
-  else if ( m_outtype == "int16_t" ) save2DArrayInEventForType<int16_t> (evt); 
+  if      ( m_dtype == ASDATA ) save2DArrayInEventForType<int16_t> (evt); 
+  else if ( m_dtype == INT16  ) save2DArrayInEventForType<int16_t> (evt); 
+  else if ( m_dtype == FLOAT  ) save2DArrayInEventForType<float>   (evt); 
+  else if ( m_dtype == DOUBLE ) save2DArrayInEventForType<double>  (evt); 
+  else if ( m_dtype == INT    ) save2DArrayInEventForType<int>     (evt); 
 }
 
 //--------------------
@@ -254,11 +311,11 @@ CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 void 
 CSPad2x2ImageProducer::checkTypeImplementation()
 {  
-  if ( m_outtype == "float"   ) { m_dtype = FLOAT;  return; }
-  if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 
-  if ( m_outtype == "int"     ) { m_dtype = INT;    return; } 
-  if ( m_outtype == "int16"   ) { m_dtype = INT16;  return; } 
-  if ( m_outtype == "int16_t" ) { m_dtype = INT16;  return; } 
+  if ( m_outtype == "asdata" ) { m_dtype = ASDATA; return; } 
+  if ( m_outtype == "int16"  ) { m_dtype = INT16;  return; } 
+  if ( m_outtype == "float"  ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double" ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"    ) { m_dtype = INT;    return; } 
 
   const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
   MsgLog(name(), warning, msg );
