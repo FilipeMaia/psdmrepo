@@ -1,0 +1,235 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script psddlc...
+#
+#------------------------------------------------------------------------
+
+"""Compiler from psddl into other formats.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from psddl.DdlPds2Psana import DdlPds2Psana
+from psddl.DdlPds2PsanaDispatch import DdlPds2PsanaDispatch
+from psddl.DdlPsanaDoc import DdlPsanaDoc
+from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
+from psddl.DdlPythonInterfaces import DdlPythonInterfaces
+from psddl.DdlPdsdata import DdlPdsdata
+from psddl.DdlHdf5Data import DdlHdf5Data
+from psddl.DdlHdf5DataDispatch import DdlHdf5DataDispatch
+from psddl.DdlHdf5Translator import DdlHdf5Translator
+from psddl.DdlDumpHddl import DdlDumpHddl
+from psddl.XmlReader import XmlReader
+from psddl.HddlReader import HddlReader
+from psddl.DdlPsanaTest import DdlPsanaTest
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class psddlc ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, 
+                           usage = "usage: %prog [options] input-file ...",
+                           logfmt = '%(levelname)-6s %(message)s' )
+        
+        self._parser.set_defaults(backend = "psana",
+                                  header = None,
+                                  output = None,
+                                  header_dir = None,
+                                  output_dir = None,
+                                  gen_incdir = "",
+                                  include_dir = [],
+                                  top_package = None,
+                                  backend_options = [],
+                                  input_xml = False,
+                                  list_backends = False,
+                                  parse_devel = False)
+        
+        self._parser.add_option("-b", "--backend", metavar="NAME", 
+                                help="use specified backend (pdsdata, psana, etc.), use -l option to produce list of know backends")
+        self._parser.add_option("-I", "--include-dir",  action="append",
+                                help="directory to search for included files, can be specified multiple times", metavar="PATH")
+        self._parser.add_option("-e", "--header",
+                                help="output file name for header/declarations, default is to use name of the first input file and extension .h", 
+                                metavar="PATH")
+        self._parser.add_option("-E", "--header-dir",
+                                help="output directory for header/declarations, default is current working directory", metavar="PATH")
+        self._parser.add_option("-o", "--output",
+                                help="output file name for source, default is to use name of the first input file and extension .cpp", 
+                                metavar="PATH")
+        self._parser.add_option("-O", "--output-dir",
+                                help="output directory for source, default is current working directory", metavar="PATH")
+        self._parser.add_option("-i", "--gen-incdir",
+                                help="include directory for headers in generated code", metavar="PATH")
+        self._parser.add_option("-t", "--top-package",
+                                help="top-level package/namespace for generated code, default is not to use top-level namespace", metavar="NAME")
+        self._parser.add_option("-B", "--backend-options", action="append",
+                                help="options for backend, form key:value or key, can be specified multiple times, say -B help for list of supported backend options",
+                                metavar="OPTION")
+        self._parser.add_option("-x", "--input-xml", action="store_true", help="use old unsupported XML parser")
+        self._parser.add_option("-l", "--list-backends", action="store_true",
+                                help="print list of available backends and exit")
+        self._parser.add_option("-D", "--parse-devel", action="store_true",
+                                help="parse types tagged with [[devel]]")
+
+        # map backend name to class 
+        self.backends = {
+            "pdsdata": DdlPdsdata,
+            "psana": DdlPsanaInterfaces,
+            "python": DdlPythonInterfaces,
+            "psana-doc": DdlPsanaDoc,
+            "pds2psana": DdlPds2Psana,
+            "pds2psana-dispatch": DdlPds2PsanaDispatch,
+            "hdf5": DdlHdf5Data,
+            "hdf5-dispatch": DdlHdf5DataDispatch,
+            "hdf5Translator": DdlHdf5Translator,
+            "psana_test":DdlPsanaTest,
+            "dump-hddl": DdlDumpHddl,
+        }
+        
+
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See AppBase class for details.
+    #
+    def _run ( self ) :
+
+        if self._options.list_backends:
+            print "Available backends: " + " ".join(sorted(self.backends.keys()))
+            return 0
+
+        # build dict with backend options
+        backend_options = dict()
+        for opt in self._options.backend_options:
+            words = opt.split(':',1) + [None]
+            backend_options[words[0]] = words[1]
+        
+        # maybe all we need is a help with backend options
+        if 'help' in backend_options:
+            print 'Options defined by backends, if backend name is not in the list then it does not have options:'
+            for be in sorted(self.backends.keys()):
+                factory = self.backends[be]
+                be_options = factory.backendOptions()
+                if be_options:
+                    print "\n  '{0}' backend:".format(be)
+                    lenopt = max([len(option) for option, typ, descr in be_options])
+                    lentyp = max([len(typ) for option, typ, descr in be_options])
+                    fmt = "    {{0:{0}s}}  {{1:{1}s}}  {{2}}".format(lenopt, lentyp)
+                    for option, typ, descr in be_options:
+                        print fmt.format(option, typ, descr)
+            return 0
+
+        # rest of the code needs an input data
+        if not self._args:
+            self._parser.error("one or more arguments required")
+            return 2
+
+        header, source = self._getHeaderAndSource()
+        
+        # add few standard options
+        backend_options['global:header'] = header
+        backend_options['global:source'] = source
+        backend_options['global:header-dir'] = self._options.header_dir
+        backend_options['global:output-dir'] = self._options.output_dir
+        backend_options['global:top-package'] = self._options.top_package
+        backend_options['global:gen-incdir'] = self._options.gen_incdir
+        
+        # get backend factory
+        try:
+            factory = self.backends[self._options.backend]
+        except:
+            print >>sys.stderr, "incorrect back-end name:", self._options.backend
+            return 2
+        generator = factory(backend_options, self)
+        
+        try :
+            if self._options.input_xml:
+                reader = XmlReader(self._args, self._options.include_dir)
+            else:
+                reader = HddlReader(self._args, self._options.include_dir, self._options.parse_devel)
+            model = reader.read()
+        except EOFError, ex:
+            # if parser throws this error means it has already printed as much 
+            # info as possible and we should just stop with error
+            return 2
+        except Exception, ex:
+            print >>sys.stderr, "parsing failed for file", self._args
+            print >>sys.stderr, ex
+            raise
+            return 2
+
+        try :
+            generator.parseTree(model)
+        except Exception, ex:
+            print >>sys.stderr, "generation failed for file", self._args
+            print >>sys.stderr, "reason:", ex
+            raise
+            return 2
+
+        return 0
+
+    def _getHeaderAndSource(self):
+        base = os.path.basename(self._args[0])
+
+        header = self._options.header
+        source = self._options.output
+
+        # to keep our old convention when we transformed 'file.ddl.xml' into 'file.ddl.cpp'
+        # with the new DDL naming we want to transform 'file.ddl' into 'file.ddl.cpp'
+        # (or more generally 'file.ext' into 'file.ddl.cpp')
+        base = os.path.splitext(base)[0]
+        if not base.endswith('.ddl'): base += '.ddl'
+        if not header : header = base + '.h'
+        if not source : source = base + '.cpp'
+        if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+        if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+
+        return (header, source)
+    
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = psddlc()
+    rc = app.run()
+    sys.exit(rc)
