@@ -80,7 +80,8 @@ class psddlc ( AppBase ) :
                                   top_package = None,
                                   backend_options = [],
                                   input_xml = False,
-                                  list_backends = False)
+                                  list_backends = False,
+                                  parse_devel = False)
         
         self._parser.add_option("-b", "--backend", metavar="NAME", 
                                 help="use specified backend (pdsdata, psana, etc.), use -l option to produce list of know backends")
@@ -106,6 +107,8 @@ class psddlc ( AppBase ) :
         self._parser.add_option("-x", "--input-xml", action="store_true", help="use old unsupported XML parser")
         self._parser.add_option("-l", "--list-backends", action="store_true",
                                 help="print list of available backends and exit")
+        self._parser.add_option("-D", "--parse-devel", action="store_true",
+                                help="parse types tagged with [[devel]]")
 
         # map backend name to class 
         self.backends = {
@@ -182,7 +185,7 @@ class psddlc ( AppBase ) :
             if self._options.input_xml:
                 reader = XmlReader(self._args, self._options.include_dir)
             else:
-                reader = HddlReader(self._args, self._options.include_dir)
+                reader = HddlReader(self._args, self._options.include_dir, self._options.parse_devel)
             model = reader.read()
         except EOFError, ex:
             # if parser throws this error means it has already printed as much 

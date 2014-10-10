@@ -95,7 +95,7 @@ class HddlYacc ( object ) :
         lexer.lexer.lineno = 1
         tree = self.parser.parse(input=input, lexer=lexer.lexer, debug=0, tracking=1)
         
-        # now tri to attach comments collected by lexer to the declarations
+        # now try to attach comments collected by lexer to the declarations
         self._commentFixup(tree, lexer.comments, input, name)
         
         return tree

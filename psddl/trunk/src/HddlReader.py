@@ -164,6 +164,12 @@ def _access(decl):
         if tagname in ['public', 'protected', 'private']: return tagname
     return 'public'
 
+def _hasDevelTag(decl):
+    for tag in decl['tags']:
+        if tag['name'] == 'devel': 
+            return True
+    return False
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -176,11 +182,11 @@ class HddlReader ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, ddlfiles, inc_dir ) :
-        
+    def __init__ ( self, ddlfiles, inc_dir, parseDevel=False ) :
         self.files = ddlfiles
         self.inc_dir = inc_dir
-        
+        self.parseDevelTypes = parseDevel
+
         # list of all files already processed (or being processed)
         # each item is a tuple (name, data)
         self.processed = []
@@ -226,7 +232,7 @@ class HddlReader ( object ) :
         
           @param file     name of the file to read
           @param model    model instance (global namespace)
-          @parm included  if true then we are processing included file
+          @param included  if true then we are processing included file
         """
 
         # opne file and read its data
@@ -368,8 +374,8 @@ class HddlReader ( object ) :
     def _parseType(self, typedict, pkg, included):
 
         # check tag names
-        self._checktags(typedict, ['value_type', 'config_type', 'config', 'pack', 'no_sizeof', 'external', 'type_id', 'cpp_name', 'doc'])
-
+        self._checktags(typedict, ['value_type', 'devel', 'config_type', 'config', 'pack', 'no_sizeof', 'external', 'type_id', 'cpp_name', 'doc'])
+        if _hasDevelTag(typedict) and not self.parseDevelTypes: return
         # every type must have a name
         typename = typedict['name']
         
