@@ -86,32 +86,32 @@ class FileMgrIfaceCtrlWs {
          *
          *   [run][id]
          */
-		$run2id2request = array();
-		foreach( $info as $req ) {
-			$run2id2request[$req->run][$req->id] = $req;
-		}
+        $run2id2request = array();
+        foreach( $info as $req ) {
+            $run2id2request[$req->run][$req->id] = $req;
+        }
 
-		function latest_timestamp( $req ) {
-			if( $req->stopped != '' ) return $req->stopped;
-			if( $req->started != '' ) return $req->started;
-			return $req->created;
-		}
-		$out = array();
+        function latest_timestamp( $req ) {
+            if( $req->stopped != '' ) return $req->stopped;
+            if( $req->started != '' ) return $req->started;
+            return $req->created;
+        }
+        $out = array();
 
-		$runs = array_keys( $run2id2request );
-		sort( $runs );
-		foreach( $runs as $run ) {
-			$latest = null;
-			$id = null;
-			foreach( $run2id2request[$run] as $req ) {
-				$time = latest_timestamp( $req );
-				if( is_null( $latest ) || ( $time > $latest )) {
-					$latest = $time;
-					$id = $req->id;
-				}
-			}
-			array_push( $out, $run2id2request[$run][$id] );
-		}
+        $runs = array_keys( $run2id2request );
+        sort( $runs );
+        foreach( $runs as $run ) {
+            $latest = null;
+            $id = null;
+            foreach( $run2id2request[$run] as $req ) {
+                $time = latest_timestamp( $req );
+                if( is_null( $latest ) || ( $time > $latest )) {
+                    $latest = $time;
+                    $id = $req->id;
+                }
+            }
+            array_push( $out, $run2id2request[$run][$id] );
+        }
         return $out;
     }
 
