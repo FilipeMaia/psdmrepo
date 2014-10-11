@@ -328,6 +328,68 @@ class SysMon extends DbConnection {
 
         return $list2array ;
     }
+    
+    /**
+     * Return an object representing the specified psanamon plot (if any).
+     *
+     * @param integer $exper_id
+     * @param string $name
+     * @return \SysMon\SysMonPsanaMonPlot|null
+     * @throws SysMonException
+     */
+    public function find_psanamon_plot ($exper_id, $name) {
+
+        if (!$exper_id) throw new SysMonException (
+            __class__.'::'.__METHOD__ ,
+            'experiment ID passed into the method is not valid') ;
+
+        if (is_null($name) || $name === '') throw new SysMonException (
+            __class__.'::'.__METHOD__ ,
+            'plot name passed into the method is not valid') ;
+
+        $name_esc = $this->escape_string(strtolower(trim($name))) ;
+
+        return $this->find_psanamon_plot_by_("exper_id={$exper_id} and name='{$name_esc}'") ;
+    }
+
+    /**
+     * Return an object representing the specified psanamon plot (if any).
+     * 
+     * @param integer $id
+     * @return \SysMon\SysMonPsanaMonPlot|null
+     * @throws SysMonException
+     */
+    public function find_psanamon_plot_by_id ($id) {
+        if (!$id) throw new SysMonException (
+            __class__.'::'.__METHOD__ ,
+            'plot ID passed into the method is not valid') ;
+        return $this->find_psanamon_plot_by_("id={$id}") ;
+    }
+
+    /**
+     * Return an object representing the specified psanamon plot (if any).
+     * 
+     * @param string $cond
+     * @return \SysMon\SysMonPsanaMonPlot|null
+     * @throws SysMonException
+     */
+    private function find_psanamon_plot_by_ ($cond) {
+
+        $result = $this->query (
+            "SELECT id, exper_id, name, type, descr, LENGTH(data) AS data_size, update_time, update_uid" .
+            " FROM {$this->database}.psanamon_plot_m" .
+            " WHERE {$cond}") ;
+
+        $nrows = mysql_numrows($result) ;
+        if ($nrows == 0) return null ;
+        if ($nrows != 1) throw new SysMonException (
+            __class__.'::'.__METHOD__ ,
+            'inconsistent result returned from the database. Wrong schema?') ;
+
+        return new SysMonPsanaMonPlot (
+            $this ,
+            mysql_fetch_array ($result, MYSQL_ASSOC)) ;
+    }
 }
 
 ?>
