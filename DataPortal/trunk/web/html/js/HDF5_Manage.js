@@ -70,7 +70,6 @@ function (
         this._body_ctrl = null ;
         this._reverse_order = false ;
         this._hide_xtc = null ;
-        this._auto = null ;
         this._viewer = null ;
 
         this._last_request = [] ;
@@ -129,7 +128,6 @@ function (
 '    <div>' +
 '      <button class="control-button" name="translate" >TRANSLATE SELECTED RUNS</button>' +
 '      <button class="control-button" name="stop"      >STOP TRANSLATION OF SELECTED RUNS</button>' +
-'      <span class="label">enable auto-translation</span><input type="checkbox" name="auto" />' +
 '    </div>' +
 '  </div>' +
 '  <div id="viewer"></div>' +
@@ -173,11 +171,6 @@ function (
                         break ;
                 }
             }) ;
-            this._auto = this._body_ctrl.find('input[name="auto"]') ;
-            this._auto.change(function () {
-                var on = $(this).attr('checked') ? true : false ;
-                _that._auto_translation(on) ;
-            }) ;
             this._hide_xtc = this._body_ctrl.find('input[name="hide"]') ;
             this._hide_xtc.change(function () {
                 _that._display() ;
@@ -186,7 +179,6 @@ function (
             if (!this.access_list.hdf5.manage) {
                 this._body_ctrl.find('button.control-button[name="translate"]').button('disable') ;
                 this._body_ctrl.find('button.control-button[name="stop"]').button('disable') ;
-                this._auto.attr('disabled', 'disabled') ;
             }        
 
             this._viewer = body.find('#viewer') ;
@@ -236,7 +228,6 @@ function (
         } ;
         this._display = function () {
             var hide_xtc = this._hide_xtc.attr('checked') ? true : false ;
-            if (this._last_request.autotranslate2hdf5) this._auto.attr('checked', 'checked') ;
             var html =
 '<table class="requests" border="0" cellspacing="0" cellpadding="0" >' +
 '  <thead>' +
@@ -503,32 +494,6 @@ function (
                     Fwk.report_error(msg) ;
                 }
             );
-        } ;
-        this._auto_translation = function(on) {
-            Fwk.ask_yes_no (
-                'Confirmn HDF5 Translation Request' ,
-                on ? 'You are about to request automatic HDF5 translaton of all (past and future) runs of the experiment. ' +
-                     'This may take substantial resources (CPU and disk storage). Are you sure you want to proceed with this operation?'
-                   : 'You are about to stop automatic HDF5 translaton of all (past and future) runs of the experiment. ' +
-                     'Note that this may potentially affect all members of the experiment. Are you sure you want to proceed with this operation?' ,
-                function () {
-                    Fwk.web_service_POST (
-                        '../regdb/ws/SetAutoTranslate2HDF5.php' ,
-                        {   exper_id: this.experiment.id ,
-                            autotranslate2hdf5: on ? 1 : 0 } ,
-                        function ()     {} ,
-                        function (msg)  {
-                            _that._revert_auto_translation(on) ;
-                            Fwk.report_error(msg) ;
-                        }
-                    ) ;
-                } ,
-                function () { _that._revert_auto_translation(on) ; }
-            ) ;
-        } ;
-        this._revert_auto_translation = function (on) {
-            if (on) this._auto.removeAttr('checked') ;
-            else    this._auto.attr('checked', 'checked') ;
         } ;
     }
     Class.define_class (HDF5_Manage, FwkApplication, {}, {}) ;

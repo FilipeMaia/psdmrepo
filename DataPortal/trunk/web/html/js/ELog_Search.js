@@ -1,11 +1,9 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'webfwk/CSSLoader',          'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
     'portal/ELog_MessageViewer', 'portal/ELog_Utils'] ,
 
 function (
-    cssloader ,
-    Class, FwkApplication, Fwk ,
+    cssloader,          Class, FwkApplication, Fwk ,
     ELog_MessageViewer, ELog_Utils) {
 
     cssloader.load('../portal/css/ELog_Search.css') ;

@@ -84,7 +84,7 @@ class Translator {
                 $actions = '<button class="control-button translate not4print" name="translate" value="'.$run_logbook->num().'">Translate</button>';
                 $ready4translation = true;
             } elseif( $xtc_files_found && $hdf5_files_found &&
-                in_array( $status, array('FINISHED' ))) {
+                in_array( $status, array('FINISHED', 'FAILED' ))) {
                 $actions = '<button class="control-button translate retranslate not4print" name="translate" value="'.$run_logbook->num().'">Re-translate</button>';
                 $ready4translation = true;
             }
@@ -132,8 +132,12 @@ class Translator {
              * record (if present) says something else, we just do not all any actions
              * on that file.
              */
-            if( $hdf5_files_found && !is_null( $run_icws ) && ( $status == 'FAILED' )) {
+//            if( $hdf5_files_found && !is_null( $run_icws ) && ( $status == 'FAILED' )) {
+            if( $hdf5_files_found && !is_null( $run_icws ) && ( $status == 'DONE' )) {
                 $status = 'FINISHED';
+            }
+            if( $hdf5_files_found && !is_null( $run_icws ) && ( $status == 'FAILED' )) {
+                $comments .= ($comments == '' ? '' : '; ')."The HDF file from the previous successful translation<br>is still available.";
             }
             if( !$hdf5_files_found && ( $status == 'FINISHED' )) {
                 $comments .= ($comments == '' ? '' : '; ')."If the translation just finished then HDF files<br>will appear shortly after they'll be archived to tape.";

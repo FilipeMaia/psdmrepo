@@ -54,7 +54,8 @@ $known_apps = array (
         'name'             => 'HDF5 Translation' ,
         'context1_default' => 'Manage' ,
         'context1'         => array (
-            'manage'           => 'Manage' )) ,
+            'manage'           => 'Manage' ,
+            'config'           => 'Configuration' )) ,
 
     'shiftmgr' => array (
         'name'             => 'Hutch Manager' ,
@@ -146,21 +147,27 @@ try {
     $elog_can_delete_messages = LogBookAuth::instance()->canDeleteMessages ($logbook_experiment->id()) ;
     $elog_can_manage_shifts   = LogBookAuth::instance()->canManageShifts   ($logbook_experiment->id()) ;
 
+    $is_member_of_instr_group = !$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower($instrument->name()), AuthDb::instance()->authName()) ;
+    $is_member_of_data_group  = RegDB::instance()->is_member_of_posix_group('ps-data', AuthDb::instance()->authName()) ;
+
     $calibrations_can_edit = 
         $elog_can_post_messages ||
-        RegDB::instance()->is_member_of_posix_group('ps-data', AuthDb::instance()->authName()) ||
-        (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower($instrument->name()), AuthDb::instance()->authName())) ;
+        $is_member_of_data_group ||
+        $is_member_of_instr_group ;
 
     $experiment_can_read_data =
         $experiment_can_manage_group ||
         $elog_can_read_messages || $elog_can_post_messages || $elog_can_edit_messages || $elog_can_delete_messages || $elog_can_manage_shifts ||
         $calibrations_can_edit ||
-        RegDB::instance()->is_member_of_posix_group('ps-data', AuthDb::instance()->authName()) ||
+        $is_member_of_data_group ||
         RegDB::instance()->is_member_of_posix_group($logbook_experiment->POSIX_gid(), AuthDb::instance()->authName()) ||
-        (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower( $instrument->name()), AuthDb::instance()->authName())) ;
+        $is_member_of_instr_group ;
     
     $hdf5_can_retranslate =
-        $is_data_administrator || (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower( $instrument->name()), AuthDb::instance()->authName())) ;
+        $is_data_administrator ||
+        $is_member_of_data_group ||
+        $is_member_of_instr_group ||
+        $elog_can_post_messages ;
 
     $shiftmgr_can_edit = AuthDb::instance()->hasRole (
         AuthDb::instance()->authName() ,
@@ -181,18 +188,7 @@ try {
 
 <link rel="icon" href="../webfwk/img/Portal_favicon.ico"/>
 
-<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
-<link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
-
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
-
-<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-timepicker-addon.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
 
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
@@ -292,31 +288,6 @@ var app_config = {
 ?>
     }
 } ;
-
-// Redirections in the global scope which may be required by the legacy
-// code generatet by Web services.
-
-function show_email (user, addr) { Fwk.show_email(user, addr) ; }
-
-function global_elog_search_message_by_text (text2search) {
-    var application = Fwk.activate('e-Log', 'Search') ;
-    if (application) application.search_message_by_text(text2search) ;
-    else console.log('global_elog_search_message_by_text(): not implemented') ;
-} 
-
-function global_elog_search_message_by_id (id, show_in_vicinity) {
-    var application = Fwk.activate('e-Log', 'Search') ;
-    if (application) application.search_message_by_id(id, show_in_vicinity) ;
-    else console.log('global_elog_search_message_by_id(): not implemented') ;
-} 
-
-function global_elog_search_run_by_num (num, show_in_vicinity) {
-    var application = Fwk.activate('e-Log', 'Search') ;
-    if (application) application.search_run_by_num (num, show_in_vicinity) ;
-    else console.log('global_elog_search_run_by_num(): not implemented') ;
-}
-
-function display_path(filepath) { Fwk.show_path(filepath) ; }
 
 </script>
 

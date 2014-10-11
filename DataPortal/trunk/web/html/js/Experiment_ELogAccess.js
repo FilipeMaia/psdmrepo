@@ -1,10 +1,10 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
+    'webfwk/Class', 'webfwk/RadioBox', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk) {
+    Class, RadioBox, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/Experiment_ELogAccess.css') ;
 

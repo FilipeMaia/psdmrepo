@@ -1,11 +1,9 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk' ,
     'portal/ELog_MessageViewer'] ,
 
 function (
-    cssloader ,
-    Class, FwkApplication, Fwk ,
+    cssloader, Class, FwkApplication, Fwk ,
     ELog_MessageViewer) {
 
     cssloader.load('../portal/css/ELog_Live.css') ;
@@ -88,7 +86,7 @@ function (
             this.container.html('<div id="elog-live"></div>') ;
             this._wa = this.container.find('div#elog-live') ;
 
-            if (!this.access_list.elog.post_messages) {
+            if (!this.access_list.elog.read_messages) {
                 this._wa.html(this.access_list.no_page_access_html) ;
                 return ;
             }

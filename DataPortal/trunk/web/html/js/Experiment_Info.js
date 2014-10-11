@@ -89,7 +89,7 @@ function (
 '  <tr><td class="table_cell table_cell_left"                                 >Last run</td>' +
 '      <td class="table_cell table_cell_right" id="last_run"                  >Loading...</td></tr>' ;
          html +=
-'  <tr><td class="table_cell table_cell_left"                                 >Description</td>' +
+'  <tr><td class="table_cell table_cell_left"                    valign="top" >Description</td>' +
 '      <td class="table_cell table_cell_right" id="description"               ><div class="exp-info-descr">Loading...</div></td></tr>' +
 '  <tr><td class="table_cell table_cell_left"                                 >Contact person(s)</td>' +
 '      <td class="table_cell table_cell_right" id="contact"                   >Loading...</td></tr>' +
@@ -152,8 +152,8 @@ function (
                 this.wa.find('#first_run'  ).html(data.first_run.num ? data.first_run.begin_time+' (<b>run '+data.first_run.num+'</b>)' : 'n/a') ;
                 this.wa.find('#last_run'   ).html(data.last_run.num  ? data.last_run.begin_time +' (<b>run '+data.last_run.num +'</b>)' : 'n/a') ;
             }
-            this.wa.find('#description').html(data.description) ;
-            this.wa.find('#contact'    ).html(data.contact_info_decorated) ;
+            this.wa.find('#description').children('.exp-info-descr').html(data.description) ;
+            this.wa.find('#contact'    )                            .html(data.contact_info_decorated) ;
             var html =
 '<table><tbody>' +
 '  <tr><td class="table_cell table_cell_left"  ></td>' +

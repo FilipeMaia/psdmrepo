@@ -118,6 +118,7 @@ function (
 '    <input type="hidden" name="num_tags" value="'+ELog_Utils.max_num_tags+'" />' +
 '    <input type="hidden" name="onsuccess" value="" />' +
 '    <input type="hidden" name="relevance_time" value="" />' +
+'    <input type="hidden" name="post2instrument" value="" />' +
 '    <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;" title="The first line of the message body will be used as its subject"></textarea>' +
 '    <div style="margin-top: 10px;">' +
 '      <div style="float:left;">' +
@@ -142,8 +143,14 @@ function (
 '  </form>' +
 '</div>' +
 '<div style="float:left; margin-left:20px; padding-top:30px;">' +
-'  <button class="control-button" name="submit" >Post</button>' +
-'  <button class="control-button" name="reset" style="margin-left:5px;">Reset form</button>' +
+'  <div id="buttons" >' +
+'    <button class="control-button" name="submit" >Post</button>' +
+'    <button class="control-button" name="reset" style="margin-left:5px;">Reset form</button>' +
+'  </div>' +
+'  <div id="extra_options" >' +
+'    <input name="post2instrument" type="checkbox" title="also post a copy of the message to the instrument e-log" />' +
+'    <span>Post a copy to the instrument e-Log</span>' +
+'  </div>' +
 '</div>' +
 '<div style="clear:both;"></div>' ;
             this.wa.html(html) ;
@@ -152,11 +159,12 @@ function (
                 this.runnum = this.wa.find('input#runnum') ;
                 this.shift  = this.wa.find('select#shift') ;
             }
-            this.form   = this.wa.find('form#form') ;
+            this.form = this.wa.find('form#form') ;
 
             this.form_scope          = this.form.find('input[name="scope"]') ;
             this.form_run_num        = this.form.find('input[name="run_num"]') ;
             this.form_shift_id       = this.form.find('input[name="shift_id"]') ;
+            this.post2instrument     = this.form.find('input[name="post2instrument"]') ;
             this.form_message_text   = this.form.find('textarea[name="message_text"]') ;
             this.form_author_account = this.form.find('input[name="uthor_account"]') ;
             this.form_tags           = this.form.find('#tags') ;
@@ -208,6 +216,7 @@ function (
                         return ;
                     }
                 }
+                that.post2instrument.val(that.wa.find('#extra_options').children('input[name="post2instrument"]').attr('checked') ? 1 : 0) ;
 
                 /* Submit the new message using the JQuery AJAX POST plug-in,
                  * which also allow uploading files w/o reloading the current page.
@@ -262,6 +271,7 @@ function (
                 this.runnum.val('') ;
                 this.shift.val(0) ;
             }
+            this.post2instrument.val(0) ;
             this.form_scope.val('') ;
             this.form_message_text.val('') ;
             this.form_run_num.val('') ;
@@ -274,6 +284,7 @@ function (
 '</div>'
             ) ;
             this.form_attachments.find('input:file[name="file2attach_0"]').change(function () { that.post_add_attachment() ; }) ;
+            this.wa.find('#extra_options').children('input[name="post2instrument"]').removeAttr('checked') ;
         } ;
 
         this.post_add_attachment = function () {

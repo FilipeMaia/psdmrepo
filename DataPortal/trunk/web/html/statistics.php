@@ -26,18 +26,18 @@ use FileMgr\FileMgrException;
  * been conducted. Produce a report in a desired format (HTML or JSON).
  */
 function report_error( $msg ) {
-	if( isset( $_GET['json'] )) {
-	    $status_encoded = json_encode( "error" );
-    	$msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
-    	print <<< HERE
+    if( isset( $_GET['json'] )) {
+        $status_encoded = json_encode( "error" );
+        $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
+        print <<< HERE
 {
   "status": {$status_encoded},
   "message": {$msg_encoded}
 }
 HERE;
-	} else {
-		print '<span style="color:red;">Error: </span>'.$msg;
-	}
+    } else {
+        print '<span style="color:red;">Error: </span>'.$msg;
+    }
     exit;
 }
 
@@ -59,12 +59,12 @@ function as_int    ( $num, $width=6, $bold=false ) { return $num == 0 ? '&nbsp;'
 function as_float  ( $num, $width=6, $bold=false ) { return $num == 0 ? '&nbsp;' : pre( sprintf( "%{$width}.1f", $num ), $bold ? 'font-weight:bold;' : '' ); }
 function as_text   ( $str          , $bold=false ) { return pre( $str, $bold ? 'font-weight:bold;' : '' ); }
 function as_percent( $fraction, $total           ) {
-	$percent = 0.0;
-	if( $total > 0 ) {
-		if( $fraction >= $total ) $percent = 100.0;
-		else                      $percent = floor(( $fraction / $total ) * 100.0 );
-	}
-	return pre( sprintf( "%3.0f%%", $percent ), ( $percent >= 100.0 ? '' : 'color:red;' ));
+    $percent = 0.0;
+    if( $total > 0 ) {
+        if( $fraction >= $total ) $percent = 100.0;
+        else                      $percent = floor(( $fraction / $total ) * 100.0 );
+    }
+    return pre( sprintf( "%3.0f%%", $percent ), ( $percent >= 100.0 ? '' : 'color:red;' ));
 }
 try {
 
@@ -91,119 +91,119 @@ try {
 //
 // if( $counter++ == 10 ) break;
 
-    	if( $experiment->is_facility()) continue;
+        if( $experiment->is_facility()) continue;
 
-    	// Ignore experiments which haven't taken (yet) any data
-    	//
-    	$first_run = $experiment->find_first_run(); if( is_null($first_run)) continue;
-    	$last_run  = $experiment->find_last_run (); if( is_null($last_run))  continue;
+        // Ignore experiments which haven't taken (yet) any data
+        //
+        $first_run = $experiment->find_first_run(); if( is_null($first_run)) continue;
+        $last_run  = $experiment->find_last_run (); if( is_null($last_run))  continue;
 
-   		// Find all runs and files per run. Narrow the search to HPSS archived files
-   		// only because files from older experiments may be missing on the local disk.
-   		//
-   		$range_of_runs  = $first_run->num().'-'.$last_run->num();
-   		$num_runs       = 0;
-   		$num_files      = array( 'xtc' => 0, 'hdf5' => 0 );
-   		$num_files_disk = array( 'xtc' => 0, 'hdf5' => 0 );
-   		$size_gb        = array( 'xtc' => 0, 'hdf5' => 0 );
-   		$size_gb_disk   = array( 'xtc' => 0, 'hdf5' => 0 );
+        // Find all runs and files per run. Narrow the search to HPSS archived files
+           // only because files from older experiments may be missing on the local disk.
+        //
+        $range_of_runs  = $first_run->num().'-'.$last_run->num();
+        $num_runs       = 0;
+        $num_files      = array( 'xtc' => 0, 'hdf5' => 0 );
+        $num_files_disk = array( 'xtc' => 0, 'hdf5' => 0 );
+        $size_gb        = array( 'xtc' => 0, 'hdf5' => 0 );
+        $size_gb_disk   = array( 'xtc' => 0, 'hdf5' => 0 );
 
-   		foreach( array( 'xtc', 'hdf5' ) as $type ) {
-        	$runs = null;
-                if ($use_ws) {
-                    FileMgrIrodsWs::runs( $runs, $experiment->instrument()->name(), $experiment->name(), $type, $range_of_runs );
-                    if( is_null($runs)) continue;
-                } else {
-                    $runs = FileMgrIrodsDb::instance()->runs ($experiment->instrument()->name(), $experiment->name(), $type, $first_run->num(), $last_run->num());
+        foreach( array( 'xtc', 'hdf5' ) as $type ) {
+            $runs = null;
+            if ($use_ws) {
+                FileMgrIrodsWs::runs( $runs, $experiment->instrument()->name(), $experiment->name(), $type, $range_of_runs );
+                if( is_null($runs)) continue;
+            } else {
+                $runs = FileMgrIrodsDb::instance()->runs ($experiment->instrument()->name(), $experiment->name(), $type, $first_run->num(), $last_run->num());
+            }
+            foreach( $runs as $irods_run ) {
+                $num_runs++;
+                $this_run_files   = 0;
+                $this_run_files_disk = 0;
+                $this_run_size_gb = 0;
+                $this_run_size_gb_disk = 0;
+                foreach( $irods_run->files as $file ) {
+                    if( $file->resource == 'hpss-resc') {
+                        $num_files[$type] ++;
+                        $size_gb  [$type] += $file->size / BYTES_IN_GB;
+                        $this_run_files   ++;
+                        $this_run_size_gb += $file->size / BYTES_IN_GB;
+                    } else if( $file->resource == 'lustre-resc') {
+                        $num_files_disk[$type] ++;
+                        $size_gb_disk  [$type] += $file->size / BYTES_IN_GB;
+                        $this_run_files_disk   ++;
+                        $this_run_size_gb_disk += $file->size / BYTES_IN_GB;
+                    }
                 }
-        	foreach( $runs as $irods_run ) {
-        		$num_runs++;
-        		$this_run_files   = 0;
-        		$this_run_files_disk = 0;
-        		$this_run_size_gb = 0;
-        		$this_run_size_gb_disk = 0;
-        		foreach( $irods_run->files as $file ) {
-            		if( $file->resource == 'hpss-resc') {
-            			$num_files[$type] ++;
-            			$size_gb  [$type] += $file->size / BYTES_IN_GB;
-            			$this_run_files   ++;
-            			$this_run_size_gb += $file->size / BYTES_IN_GB;
-            		} else if( $file->resource == 'lustre-resc') {
-            			$num_files_disk[$type] ++;
-            			$size_gb_disk  [$type] += $file->size / BYTES_IN_GB;
-            			$this_run_files_disk   ++;
-            			$this_run_size_gb_disk += $file->size / BYTES_IN_GB;
-            		}
-            	}
-            	$logbook_run = $experiment->find_run_by_num( $irods_run->run );
-            	if( !is_null($logbook_run)) {
-			    	$year  = $logbook_run->begin_time()->year();
-			    	$month = $logbook_run->begin_time()->month();
-			    	if( !array_key_exists( $year, $years )) $years[$year] = array();
-		    		if( !array_key_exists( $month, $years[$year] )) $years[$year][$month] = array(
-		    			'num_runs'            => 0,
-		    			'num_files_xtc'       => 0,
-		    			'num_files_xtc_disk'  => 0,
-		    			'num_files_hdf5'      => 0,
-		    			'num_files_hdf5_disk' => 0,
-		    			'size_tb_xtc'         => 0,
-		    			'size_tb_xtc_disk'    => 0,
-		    			'size_tb_hdf5'        => 0,
-		    			'size_tb_hdf5_disk'   => 0
-		    		);
-					$years[$year][$month]['num_runs'                ] ++;
-		    		$years[$year][$month]['num_files_'.$type        ] += $this_run_files;
-		    		$years[$year][$month]['num_files_'.$type.'_disk'] += $this_run_files_disk;
-		    		$years[$year][$month]['size_tb_'.$type          ] += $this_run_size_gb / 1000;
-		    		$years[$year][$month]['size_tb_'.$type.'_disk'  ] += $this_run_size_gb_disk / 1000;
-            	}
-        	}
-    	}
-    	if( !$num_runs ) continue;
+                $logbook_run = $experiment->find_run_by_num( $irods_run->run );
+                if( !is_null($logbook_run)) {
+                    $year  = $logbook_run->begin_time()->year();
+                    $month = $logbook_run->begin_time()->month();
+                    if( !array_key_exists( $year, $years )) $years[$year] = array();
+                    if( !array_key_exists( $month, $years[$year] )) $years[$year][$month] = array(
+                        'num_runs'            => 0,
+                        'num_files_xtc'       => 0,
+                        'num_files_xtc_disk'  => 0,
+                        'num_files_hdf5'      => 0,
+                        'num_files_hdf5_disk' => 0,
+                        'size_tb_xtc'         => 0,
+                        'size_tb_xtc_disk'    => 0,
+                        'size_tb_hdf5'        => 0,
+                        'size_tb_hdf5_disk'   => 0
+                    );
+                    $years[$year][$month]['num_runs'                ] ++;
+                    $years[$year][$month]['num_files_'.$type        ] += $this_run_files;
+                    $years[$year][$month]['num_files_'.$type.'_disk'] += $this_run_files_disk;
+                    $years[$year][$month]['size_tb_'.$type          ] += $this_run_size_gb / 1000;
+                    $years[$year][$month]['size_tb_'.$type.'_disk'  ] += $this_run_size_gb_disk / 1000;
+                }
+            }
+        }
+        if( !$num_runs ) continue;
 
-    	$path = $experiment->regdb_experiment()->find_param_by_name( 'DATA_PATH' );
-    	$experiments[$last_run->begin_time()->to64()] = array (
-   			'instr_name'      => $experiment->instrument()->name(),
-    		'exper_name'      => $experiment->name(),
-    		'exper_id'        => $experiment->id(),
-    	    'first_run_begin' => $first_run->begin_time()->toStringDay(),
-    	    'last_run_begin'  => $last_run->begin_time()->toStringDay(),
-    		'first_run_num'   => $first_run->num(),
-   			'last_run_num'    => $last_run->num(),
-    		'num_runs'        => $num_runs,
-    		'num_files_xtc'       => $num_files     ['xtc' ],
-    		'num_files_xtc_disk'  => $num_files_disk['xtc' ],
-    		'num_files_hdf5'      => $num_files     ['hdf5'],
-    		'num_files_hdf5_disk' => $num_files_disk['hdf5'],
-    		'size_tb_xtc'         => $size_gb     ['xtc' ] / 1000,
-    		'size_tb_xtc_disk'    => $size_gb_disk['xtc' ] / 1000,
-    		'size_tb_hdf5'        => $size_gb     ['hdf5'] / 1000,
-    		'size_tb_hdf5_disk'   => $size_gb_disk['hdf5'] / 1000,
-    		'DATA_PATH'       => (is_null( $path ) ? null : $path->value())
-    	);
-    	if( array_key_exists( $experiment->instrument()->name(), $instruments )) {
-			$instruments[$experiment->instrument()->name()]['num_runs'           ] += $num_runs;
-    		$instruments[$experiment->instrument()->name()]['num_files_xtc'      ] += $num_files     ['xtc'];
-    		$instruments[$experiment->instrument()->name()]['num_files_xtc_disk' ] += $num_files_disk['xtc'];
-    		$instruments[$experiment->instrument()->name()]['num_files_hdf5'     ] += $num_files     ['hdf5'];
-    		$instruments[$experiment->instrument()->name()]['num_files_hdf5_disk'] += $num_files_disk['hdf5'];
-    		$instruments[$experiment->instrument()->name()]['size_tb_xtc'        ] += $size_gb       ['xtc' ] / 1000;
-    		$instruments[$experiment->instrument()->name()]['size_tb_xtc_disk'   ] += $size_gb_disk  ['xtc' ] / 1000;
-    		$instruments[$experiment->instrument()->name()]['size_tb_hdf5'       ] += $size_gb       ['hdf5'] / 1000;
-    		$instruments[$experiment->instrument()->name()]['size_tb_hdf5_disk'  ] += $size_gb_disk  ['hdf5'] / 1000;
-    	} else {
-    		$instruments[$experiment->instrument()->name()] = array (
-    			'num_runs'            => $num_runs,
-    			'num_files_xtc'       => $num_files     ['xtc' ],
-    			'num_files_xtc_disk'  => $num_files_disk['xtc' ],
-    			'num_files_hdf5'      => $num_files     ['hdf5'],
-    			'num_files_hdf5_disk' => $num_files_disk['hdf5'],
-    			'size_tb_xtc'         => $size_gb       ['xtc' ] / 1000,
-    			'size_tb_xtc_disk'    => $size_gb_disk  ['xtc' ] / 1000,
-    			'size_tb_hdf5'        => $size_gb       ['hdf5'] / 1000,
-    			'size_tb_hdf5_disk'   => $size_gb_disk  ['hdf5'] / 1000
-    		);
-    	}
+        $path = $experiment->regdb_experiment()->find_param_by_name( 'DATA_PATH' );
+        $experiments[$last_run->begin_time()->to64()] = array (
+            'instr_name'          => $experiment->instrument()->name(),
+            'exper_name'          => $experiment->name(),
+            'exper_id'            => $experiment->id(),
+            'first_run_begin'     => $first_run->begin_time()->toStringDay(),
+            'last_run_begin'      => $last_run->begin_time()->toStringDay(),
+            'first_run_num'       => $first_run->num(),
+            'last_run_num'        => $last_run->num(),
+            'num_runs'            => $num_runs,
+            'num_files_xtc'       => $num_files     ['xtc' ],
+            'num_files_xtc_disk'  => $num_files_disk['xtc' ],
+            'num_files_hdf5'      => $num_files     ['hdf5'],
+            'num_files_hdf5_disk' => $num_files_disk['hdf5'],
+            'size_tb_xtc'         => $size_gb     ['xtc' ] / 1000,
+            'size_tb_xtc_disk'    => $size_gb_disk['xtc' ] / 1000,
+            'size_tb_hdf5'        => $size_gb     ['hdf5'] / 1000,
+            'size_tb_hdf5_disk'   => $size_gb_disk['hdf5'] / 1000,
+            'DATA_PATH'           => (is_null( $path ) ? null : $path->value())
+        );
+        if( array_key_exists( $experiment->instrument()->name(), $instruments )) {
+            $instruments[$experiment->instrument()->name()]['num_runs'           ] += $num_runs;
+            $instruments[$experiment->instrument()->name()]['num_files_xtc'      ] += $num_files     ['xtc'];
+            $instruments[$experiment->instrument()->name()]['num_files_xtc_disk' ] += $num_files_disk['xtc'];
+            $instruments[$experiment->instrument()->name()]['num_files_hdf5'     ] += $num_files     ['hdf5'];
+            $instruments[$experiment->instrument()->name()]['num_files_hdf5_disk'] += $num_files_disk['hdf5'];
+            $instruments[$experiment->instrument()->name()]['size_tb_xtc'        ] += $size_gb       ['xtc' ] / 1000;
+            $instruments[$experiment->instrument()->name()]['size_tb_xtc_disk'   ] += $size_gb_disk  ['xtc' ] / 1000;
+            $instruments[$experiment->instrument()->name()]['size_tb_hdf5'       ] += $size_gb       ['hdf5'] / 1000;
+            $instruments[$experiment->instrument()->name()]['size_tb_hdf5_disk'  ] += $size_gb_disk  ['hdf5'] / 1000;
+        } else {
+            $instruments[$experiment->instrument()->name()] = array (
+                'num_runs'            => $num_runs,
+                'num_files_xtc'       => $num_files     ['xtc' ],
+                'num_files_xtc_disk'  => $num_files_disk['xtc' ],
+                'num_files_hdf5'      => $num_files     ['hdf5'],
+                'num_files_hdf5_disk' => $num_files_disk['hdf5'],
+                'size_tb_xtc'         => $size_gb       ['xtc' ] / 1000,
+                'size_tb_xtc_disk'    => $size_gb_disk  ['xtc' ] / 1000,
+                'size_tb_hdf5'        => $size_gb       ['hdf5'] / 1000,
+                'size_tb_hdf5_disk'   => $size_gb_disk  ['hdf5'] / 1000
+            );
+        }
     }
     $experiment_keys = array_keys( $experiments );
     rsort( $experiment_keys, SORT_NUMERIC );
@@ -219,96 +219,96 @@ try {
     $total_size_tb_hdf5_disk = 0;
     
     foreach( array_keys( $instruments ) as $instr_name ) {
-    	$i = $instruments[$instr_name];
-    	$total_runs              += $i['num_runs'           ];
-		$total_files_xtc         += $i['num_files_xtc'      ];
-		$total_files_xtc_disk    += $i['num_files_xtc_disk' ];
-		$total_files_hdf5        += $i['num_files_hdf5'     ];
-		$total_files_hdf5_disk   += $i['num_files_hdf5_disk'];
-		$total_size_tb_xtc       += $i['size_tb_xtc'        ];
-		$total_size_tb_xtc_disk  += $i['size_tb_xtc_disk'   ];
-		$total_size_tb_hdf5      += $i['size_tb_hdf5'       ];
-		$total_size_tb_hdf5_disk += $i['size_tb_hdf5_disk'  ];
+        $i = $instruments[$instr_name];
+        $total_runs              += $i['num_runs'           ];
+        $total_files_xtc         += $i['num_files_xtc'      ];
+        $total_files_xtc_disk    += $i['num_files_xtc_disk' ];
+        $total_files_hdf5        += $i['num_files_hdf5'     ];
+        $total_files_hdf5_disk   += $i['num_files_hdf5_disk'];
+        $total_size_tb_xtc       += $i['size_tb_xtc'        ];
+        $total_size_tb_xtc_disk  += $i['size_tb_xtc_disk'   ];
+        $total_size_tb_hdf5      += $i['size_tb_hdf5'       ];
+        $total_size_tb_hdf5_disk += $i['size_tb_hdf5_disk'  ];
     }
 
-	$total_files        = $total_files_xtc        + $total_files_hdf5;
-	$total_files_disk   = $total_files_xtc_disk   + $total_files_hdf5_disk;
-	$total_size_tb      = $total_size_tb_xtc      + $total_size_tb_hdf5;
-	$total_size_tb_disk = $total_size_tb_xtc_disk + $total_size_tb_hdf5_disk;
-	
+    $total_files        = $total_files_xtc        + $total_files_hdf5;
+    $total_files_disk   = $total_files_xtc_disk   + $total_files_hdf5_disk;
+    $total_size_tb      = $total_size_tb_xtc      + $total_size_tb_hdf5;
+    $total_size_tb_disk = $total_size_tb_xtc_disk + $total_size_tb_hdf5_disk;
+    
     $instrument_keys = array_keys( $instruments );
-   	sort( $instrument_keys );
+    sort( $instrument_keys );
 
-   	// Fill in gaps in the sequence of years and months
-   	//
-	$now       = LusiTime::now();
-	$now_year  = $now->year();
-	$now_month = $now->month();
+    // Fill in gaps in the sequence of years and months
+    //
+    $now       = LusiTime::now();
+    $now_year  = $now->year();
+    $now_month = $now->month();
 
-	for( $year = 2009; $year <= 2050; $year++ ) {
-		if( !array_key_exists( $year, $years )) $years[$year] = array();
-   		for( $month = 1; $month <= 12; $month++ ) {
-   			if(( $year == 2009 ) && ( $month < 10 )) break;  // noting to report before LCLS experiments began taking data
-    		if( !array_key_exists( $month, $years[$year] )) $years[$year][$month] = array(
-    			'num_runs'            => 0,
-    			'num_files_xtc'       => 0,
-    			'num_files_xtc_disk'  => 0,
-    			'num_files_hdf5'      => 0,
-    			'num_files_hdf5_disk' => 0,
-    			'size_tb_xtc'         => 0,
-    			'size_tb_xtc_disk'    => 0,
-    			'size_tb_hdf5'        => 0,
-    			'size_tb_hdf5_disk'   => 0
-    		);
-			if(( $now_year == $year ) && ( $now_month == $month )) break;	// nothing to be expected next month
-    	}
-		if( $now_year == $year ) break;	// noting to be expected next year
-	}
-   	$year_keys = array_keys( $years );
+    for( $year = 2009; $year <= 2050; $year++ ) {
+        if( !array_key_exists( $year, $years )) $years[$year] = array();
+           for( $month = 1; $month <= 12; $month++ ) {
+                if(( $year == 2009 ) && ( $month < 10 )) break;  // noting to report before LCLS experiments began taking data
+                if( !array_key_exists( $month, $years[$year] )) $years[$year][$month] = array(
+                    'num_runs'            => 0,
+                    'num_files_xtc'       => 0,
+                    'num_files_xtc_disk'  => 0,
+                    'num_files_hdf5'      => 0,
+                    'num_files_hdf5_disk' => 0,
+                    'size_tb_xtc'         => 0,
+                    'size_tb_xtc_disk'    => 0,
+                    'size_tb_hdf5'        => 0,
+                    'size_tb_hdf5_disk'   => 0
+                );
+                if(( $now_year == $year ) && ( $now_month == $month )) break;    // nothing to be expected next month
+        }
+        if( $now_year == $year ) break;    // noting to be expected next year
+    }
+    $year_keys = array_keys( $years );
     rsort( $year_keys, SORT_NUMERIC );
 
     $data_path = array();
     foreach( $experiments as $e ) {
-    	$path = $e['DATA_PATH'];
-    	if( is_null( $path )) continue;
-    	if( !array_key_exists( $path, $data_path )) {
-    		$data_path[$path] = array(
-				'num_runs'            => 0,
-				'num_files_xtc'       => 0,
-				'num_files_xtc_disk'  => 0,
-    			'num_files_hdf5'      => 0,
-    			'num_files_hdf5_disk' => 0,
-    			'size_tb_xtc'         => 0,
-    			'size_tb_xtc_disk'    => 0,
-    			'size_tb_hdf5'        => 0,
-    			'size_tb_hdf5_disk'   => 0
-    		);
-    	}
-   		$data_path[$path]['num_runs'           ] += $e['num_runs'           ];
-   		$data_path[$path]['num_files_xtc'      ] += $e['num_files_xtc'      ];
-   		$data_path[$path]['num_files_xtc_disk' ] += $e['num_files_xtc_disk' ];
-   		$data_path[$path]['num_files_hdf5'     ] += $e['num_files_hdf5'     ];
-   		$data_path[$path]['num_files_hdf5_disk'] += $e['num_files_hdf5_disk'];
-   		$data_path[$path]['size_tb_xtc'        ] += $e['size_tb_xtc'        ];
-   		$data_path[$path]['size_tb_xtc_disk'   ] += $e['size_tb_xtc_disk'   ];
-   		$data_path[$path]['size_tb_hdf5'       ] += $e['size_tb_hdf5'       ];
-   		$data_path[$path]['size_tb_hdf5_disk'  ] += $e['size_tb_hdf5_disk'  ];
+        $path = $e['DATA_PATH'];
+        if( is_null( $path )) continue;
+        if( !array_key_exists( $path, $data_path )) {
+            $data_path[$path] = array(
+                'num_runs'            => 0,
+                'num_files_xtc'       => 0,
+                'num_files_xtc_disk'  => 0,
+                'num_files_hdf5'      => 0,
+                'num_files_hdf5_disk' => 0,
+                'size_tb_xtc'         => 0,
+                'size_tb_xtc_disk'    => 0,
+                'size_tb_hdf5'        => 0,
+                'size_tb_hdf5_disk'   => 0
+            );
+        }
+        $data_path[$path]['num_runs'           ] += $e['num_runs'           ];
+        $data_path[$path]['num_files_xtc'      ] += $e['num_files_xtc'      ];
+        $data_path[$path]['num_files_xtc_disk' ] += $e['num_files_xtc_disk' ];
+        $data_path[$path]['num_files_hdf5'     ] += $e['num_files_hdf5'     ];
+        $data_path[$path]['num_files_hdf5_disk'] += $e['num_files_hdf5_disk'];
+        $data_path[$path]['size_tb_xtc'        ] += $e['size_tb_xtc'        ];
+        $data_path[$path]['size_tb_xtc_disk'   ] += $e['size_tb_xtc_disk'   ];
+        $data_path[$path]['size_tb_hdf5'       ] += $e['size_tb_hdf5'       ];
+        $data_path[$path]['size_tb_hdf5_disk'  ] += $e['size_tb_hdf5_disk'  ];
     }
     $data_path_keys = array_keys( $data_path );
-   	sort( $data_path_keys );
+    sort( $data_path_keys );
 
 
-   	/* ========================================
-   	 *   REPORT RESULTS IN THE REQUESTED FORM
-   	 * ========================================
-   	 */
-   	if( $json ) {
+    /* ========================================
+     *   REPORT RESULTS IN THE REQUESTED FORM
+     * ========================================
+     */
+    if( $json ) {
 
-    	header( 'Content-type: application/json' );
-    	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
-    	
-   		print '
+        header( 'Content-type: application/json' );
+        header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+        header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+        
+        print '
 { status:  '.json_encode("success").                        ',
   updated: '.json_encode( LusiTime::now()->toStringShort()).',
   total: {
@@ -320,10 +320,10 @@ try {
   },
   filesystem: [';
 
-		$first = true;
-    	foreach( $data_path_keys as $path ) {
-       		$t = $data_path[$path];
-			print ( $first ? '' : ',' ).'
+        $first = true;
+        foreach( $data_path_keys as $path ) {
+            $t = $data_path[$path];
+            print ( $first ? '' : ',' ).'
     { name: '.json_encode($path).',
       runs: '.$t['num_runs'].',
       files:       { xtc : '.                 $t['num_files_xtc'     ]  .', hdf5 : '.                 $t['num_files_hdf5'     ]  .' },
@@ -331,16 +331,16 @@ try {
       size_tb:     { xtc : '.sprintf( "%.1f", $t['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $t['size_tb_hdf5'       ] ).' },
       size_tb_disk:{ xtc : '.sprintf( "%.1f", $t['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $t['size_tb_hdf5_disk'  ] ).' }
     }';
-			$first = false;
-		}
-		print '
+            $first = false;
+        }
+        print '
   ],
   instruments: [';
 
-		$first = true;
-    	foreach( $instrument_keys as $instr_name ) {
-       		$i = $instruments[$instr_name];
-			print ( $first ? '' : ',' ).'
+        $first = true;
+        foreach( $instrument_keys as $instr_name ) {
+            $i = $instruments[$instr_name];
+            print ( $first ? '' : ',' ).'
     { name: '.json_encode($instr_name).',
       runs: '.$i['num_runs'].',
       files:       { xtc : '.                 $i['num_files_xtc'     ]  .', hdf5 : '.                 $i['num_files_hdf5'     ]  .' },
@@ -348,16 +348,16 @@ try {
       size_tb:     { xtc : '.sprintf( "%.1f", $i['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $i['size_tb_hdf5'       ] ).' },
       size_tb_disk:{ xtc : '.sprintf( "%.1f", $i['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $i['size_tb_hdf5_disk'  ] ).' }
     }';
-			$first = false;
-    	}
-		print '
+            $first = false;
+        }
+        print '
   ],
   experiments: [';
 
-		$first = true;
-		foreach( $experiment_keys as $k ) {
-			$e = $experiments[$k];
-			print ( $first ? '' : ',' ).'
+        $first = true;
+        foreach( $experiment_keys as $k ) {
+            $e = $experiments[$k];
+            print ( $first ? '' : ',' ).'
     { instr_name      : '.json_encode($e['instr_name']).',
       exper_name      : '.json_encode($e['exper_name']).',
       exper_id        : '.$e['exper_id'  ].',
@@ -369,19 +369,19 @@ try {
       size_tb         : { xtc : '.sprintf( "%.1f", $e['size_tb_xtc'       ] ).', hdf5 : '.sprintf( "%.1f", $e['size_tb_hdf5'       ] ).' },
       size_tb_disk    : { xtc : '.sprintf( "%.1f", $e['size_tb_xtc_disk'  ] ).', hdf5 : '.sprintf( "%.1f", $e['size_tb_hdf5_disk'  ] ).' }
     }';
-			$first = false;
-		}
-		print '
+            $first = false;
+        }
+        print '
   ]
 }';
 
     } else {
 
-    	header( 'Content-type: text/html' );
-    	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-    	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+        header( 'Content-type: text/html' );
+        header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+        header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-    	print <<<HERE
+        print <<<HERE
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
@@ -409,7 +409,7 @@ try {
        from <a href="?json" target="_blank">here</a>.</p>
   </div>
 HERE;
-		print <<<HERE
+        print <<<HERE
 
   <div id="total">
     <h2>Total</h2>
@@ -431,7 +431,7 @@ HERE;
             <td class="table_hdr" >On Disk</td>
             </tr>
 HERE;
-    	print
+        print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.as_int    ( $total_runs ).'</td>
@@ -446,7 +446,7 @@ HERE;
           </tr>
 ';
 
-		print <<<HERE
+        print <<<HERE
 
         </tr>
       </tbody></table>
@@ -475,18 +475,18 @@ HERE;
           </tr>
 
 HERE;
-		$max_size = 0.0;
-    	foreach( $data_path_keys as $path ) {
-    		$t = $data_path[$path];
-    		$size = $t['size_tb_xtc'] + $t['size_tb_hdf5'];
-    		if( $size > $max_size ) $max_size = $size;
-    	}
-    	$max_width = 120;
-		foreach( $data_path_keys as $path ) {
-       		$t = $data_path[$path];
-    		$size = $t['size_tb_xtc'] + $t['size_tb_hdf5'];
-    		$width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
-       		print
+        $max_size = 0.0;
+        foreach( $data_path_keys as $path ) {
+            $t = $data_path[$path];
+            $size = $t['size_tb_xtc'] + $t['size_tb_hdf5'];
+            if( $size > $max_size ) $max_size = $size;
+        }
+        $max_width = 120;
+        foreach( $data_path_keys as $path ) {
+            $t = $data_path[$path];
+            $size = $t['size_tb_xtc'] + $t['size_tb_hdf5'];
+            $width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
+            print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.as_text   ( $path ).'</td>
@@ -495,18 +495,18 @@ HERE;
             <td class="table_cell table_bottom                  ">'.as_int    ( $t['num_files_hdf5'] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_int    ( $t['num_files_xtc' ] + $t['num_files_hdf5' ], 6, true ).'</td>
             <td class="table_cell table_bottom                  ">'.as_percent( $t['num_files_xtc_disk'] + $t['num_files_hdf5_disk'],
-			                                                                    $t['num_files_xtc'     ] + $t['num_files_hdf5'     ] ).'</td>
+                                                                                $t['num_files_xtc'     ] + $t['num_files_hdf5'     ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $t['size_tb_xtc'   ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $t['size_tb_hdf5'  ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $t['size_tb_xtc'   ] + $t['size_tb_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  "><div style="float:left; width: '.$width.'px; background-color: #000000;">&nbsp;</div><div style="float:left; width: '.($max_width-$width).'px;">&nbsp;</div><div style="clear:both;"></div></td>
             <td class="table_cell table_bottom table_cell_right ">'.as_percent( $t['size_tb_xtc_disk'] + $t['size_tb_hdf5_disk'],
-			                                                                    $t['size_tb_xtc'     ] + $t['size_tb_hdf5'     ] ).'</td>
+                                                                                $t['size_tb_xtc'     ] + $t['size_tb_hdf5'     ] ).'</td>
           </tr>
 ';
-		}
+        }
 
-		print <<<HERE
+        print <<<HERE
 
         </tr>
       </tbody></table>
@@ -536,18 +536,18 @@ HERE;
 
 HERE;
 
-		$max_size = 0.0;
-    	foreach( $instrument_keys as $instr_name ) {
-       		$i = $instruments[$instr_name];
-    		$size = $i['size_tb_xtc'] + $i['size_tb_hdf5'];
-    		if( $size > $max_size ) $max_size = $size;
-    	}
-    	$max_width = 120;
-		foreach( $instrument_keys as $instr_name ) {
-       		$i = $instruments[$instr_name];
-    		$size = $i['size_tb_xtc'] + $i['size_tb_hdf5'];
-    		$width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
-       		print
+        $max_size = 0.0;
+        foreach( $instrument_keys as $instr_name ) {
+            $i = $instruments[$instr_name];
+            $size = $i['size_tb_xtc'] + $i['size_tb_hdf5'];
+            if( $size > $max_size ) $max_size = $size;
+        }
+        $max_width = 120;
+        foreach( $instrument_keys as $instr_name ) {
+            $i = $instruments[$instr_name];
+            $size = $i['size_tb_xtc'] + $i['size_tb_hdf5'];
+            $width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
+            print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.as_text   ( $instr_name ).'</td>
@@ -556,17 +556,17 @@ HERE;
             <td class="table_cell table_bottom                  ">'.as_int    ( $i['num_files_hdf5'] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_int    ( $i['num_files_xtc' ] + $i['num_files_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  ">'.as_percent( $i['num_files_xtc_disk'] + $i['num_files_hdf5_disk'],
-			                                                                    $i['num_files_xtc'     ] + $i['num_files_hdf5'     ] ).'</td>
+                                                                                $i['num_files_xtc'     ] + $i['num_files_hdf5'     ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $i['size_tb_xtc'   ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $i['size_tb_hdf5'  ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $i['size_tb_xtc'   ] + $i['size_tb_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  "><div style="float:left; width: '.$width.'px; background-color: #000000;">&nbsp;</div><div style="float:left; width: '.($max_width-$width).'px;">&nbsp;</div><div style="clear:both;"></div></td>
             <td class="table_cell table_bottom table_cell_right ">'.as_percent( $i['size_tb_xtc_disk'] + $i['size_tb_hdf5_disk'],
-			                                                                    $i['size_tb_xtc'     ] + $i['size_tb_hdf5'     ] ).'</td>
+                                                                                $i['size_tb_xtc'     ] + $i['size_tb_hdf5'     ] ).'</td>
           </tr>
 ';
-		}
-		print <<<HERE
+        }
+        print <<<HERE
 
         </tr>
       </tbody></table>
@@ -600,19 +600,19 @@ HERE;
     
 HERE;
 
-		$max_size = 0.0;
-		foreach( $experiment_keys as $k ) {
-			$e = $experiments[$k];
-			$size = $e['size_tb_xtc'] + $e['size_tb_hdf5'];
-    		if( $size > $max_size ) $max_size = $size;
-    	}
-    	$max_width = 120;
-		foreach( $experiment_keys as $k ) {
-			$e = $experiments[$k];
-    		$size = $e['size_tb_xtc'] + $e['size_tb_hdf5'];
-    		$width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
-			$e_url = '<a href="../portal?exper_id='.$e['exper_id'].'" target="_blank">'.$e['exper_name'].'</a>';
-			print
+        $max_size = 0.0;
+        foreach( $experiment_keys as $k ) {
+            $e = $experiments[$k];
+            $size = $e['size_tb_xtc'] + $e['size_tb_hdf5'];
+            if( $size > $max_size ) $max_size = $size;
+        }
+        $max_width = 120;
+        foreach( $experiment_keys as $k ) {
+            $e = $experiments[$k];
+            $size = $e['size_tb_xtc'] + $e['size_tb_hdf5'];
+            $width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
+            $e_url = '<a href="../portal?exper_id='.$e['exper_id'].'" target="_blank">'.$e['exper_name'].'</a>';
+            print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.$e_url.'</td>
@@ -624,18 +624,18 @@ HERE;
             <td class="table_cell table_bottom                  ">'.as_int    ( $e['num_files_hdf5' ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_int    ( $e['num_files_xtc'  ] + $e['num_files_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  ">'.as_percent( $e['num_files_xtc_disk'] + $e['num_files_hdf5_disk'],
-			                                                                    $e['num_files_xtc'     ] + $e['num_files_hdf5'     ] ).'</td>
+                                                                                $e['num_files_xtc'     ] + $e['num_files_hdf5'     ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $e['size_tb_xtc'    ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $e['size_tb_hdf5'   ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $e['size_tb_xtc'    ] + $e['size_tb_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  "><div style="float:left; width: '.$width.'px; background-color: #000000;">&nbsp;</div><div style="float:left; width: '.($max_width-$width).'px;">&nbsp;</div><div style="clear:both;"></div></td>
             <td class="table_cell table_bottom                  ">'.as_percent( $e['size_tb_xtc_disk'] + $e['size_tb_hdf5_disk'],
-			                                                                    $e['size_tb_xtc'     ] + $e['size_tb_hdf5'     ] ).'</td>
+                                                                                $e['size_tb_xtc'     ] + $e['size_tb_hdf5'     ] ).'</td>
             <td class="table_cell table_bottom table_cell_right ">'.as_text   ( $e['DATA_PATH'      ], true ).'</td>
           </tr>
 ';
-		}
-		print <<<HERE
+        }
+        print <<<HERE
 
         </tr>
       </tbody></table>
@@ -665,27 +665,27 @@ HERE;
 
 HERE;
 
-		$max_size = 0.0;
-		foreach( $year_keys as $year ) {
+        $max_size = 0.0;
+        foreach( $year_keys as $year ) {
 
-    		$month_keys = array_keys( $years[$year] );
-			rsort( $month_keys, SORT_NUMERIC );
+            $month_keys = array_keys( $years[$year] );
+            rsort( $month_keys, SORT_NUMERIC );
 
-			foreach( $month_keys as $month ) {
-				$size = $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
-    			if( $size > $max_size ) $max_size = $size;
-			}
-		}
-    	$max_width = 120;
-		foreach( $year_keys as $year ) {
+            foreach( $month_keys as $month ) {
+                $size = $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
+                if( $size > $max_size ) $max_size = $size;
+            }
+        }
+        $max_width = 120;
+        foreach( $year_keys as $year ) {
 
-    		$month_keys = array_keys( $years[$year] );
-			rsort( $month_keys, SORT_NUMERIC );
+            $month_keys = array_keys( $years[$year] );
+            rsort( $month_keys, SORT_NUMERIC );
 
-			foreach( $month_keys as $month ) {
-				$size = $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
-				$width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
-				print
+            foreach( $month_keys as $month ) {
+                $size = $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
+                $width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
+                print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.pre       ( sprintf( "%4d - %02d", $year, $month )).'</td>
@@ -694,19 +694,19 @@ HERE;
             <td class="table_cell table_bottom                  ">'.as_int    ( $years[$year][$month]['num_files_hdf5'] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_int    ( $years[$year][$month]['num_files_xtc' ] + $years[$year][$month]['num_files_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  ">'.as_percent( $years[$year][$month]['num_files_xtc_disk'] + $years[$year][$month]['num_files_hdf5_disk'],
-				                                                                $years[$year][$month]['num_files_xtc'     ] + $years[$year][$month]['num_files_hdf5'     ] ).'</td>
+                                                                                $years[$year][$month]['num_files_xtc'     ] + $years[$year][$month]['num_files_hdf5'     ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $years[$year][$month]['size_tb_xtc'   ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $years[$year][$month]['size_tb_hdf5'  ] ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $years[$year][$month]['size_tb_xtc'   ] + $years[$year][$month]['size_tb_hdf5'], 6, true ).'</td>
             <td class="table_cell table_bottom                  "><div style="float:left; width: '.$width.'px; background-color: #000000;">&nbsp;</div><div style="float:left; width: '.($max_width-$width).'px;">&nbsp;</div><div style="clear:both;"></div></td>
             <td class="table_cell table_bottom table_cell_right ">'.as_percent( $years[$year][$month]['size_tb_xtc_disk'] + $years[$year][$month]['size_tb_hdf5_disk'],
-				                                                                $years[$year][$month]['size_tb_xtc'     ] + $years[$year][$month]['size_tb_hdf5'     ] ).'</td>
+                                                                                $years[$year][$month]['size_tb_xtc'     ] + $years[$year][$month]['size_tb_hdf5'     ] ).'</td>
           </tr>
-';	
-			}
-		}
+';    
+            }
+        }
 
-		print <<<HERE
+        print <<<HERE
 
         </tr>
       </tbody></table>
@@ -735,48 +735,48 @@ HERE;
           </tr>
 
 HERE;
-		$max_size = 0.0;
-		for( $year = 2009; $year <= 2050; $year++ ) {
-			if( !array_key_exists( $year, $years )) continue;
-    		for( $month = 1; $month <= 12; $month++ ) {
-    			if( array_key_exists( $year, $years ) && array_key_exists( $month, $years[$year] )) {
-					$max_size += $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
-    			}
-				if(( $now_year == $year ) && ( $now_month == $month )) break;	// nothing to be expected next month
-    		}
-			if( $now_year == $year ) break;	// noting to be expected next year
-		}
-		
-		$accumulated_num_runs            = 0;
-		$accumulated_num_files_xtc       = 0;
-		$accumulated_num_files_xtc_disk  = 0;
-		$accumulated_num_files_hdf5      = 0;
-		$accumulated_num_files_hdf5_disk = 0;
-		$accumulated_size_tb_xtc         = 0;
-		$accumulated_size_tb_xtc_disk    = 0;
-		$accumulated_size_tb_hdf5        = 0;
-		$accumulated_size_tb_hdf5_disk   = 0;
-		
-    	$max_width = 120;
-		for( $year = 2009; $year <= 2050; $year++ ) {
-			if( !array_key_exists( $year, $years )) continue;
-    		for( $month = 1; $month <= 12; $month++ ) {
+        $max_size = 0.0;
+        for( $year = 2009; $year <= 2050; $year++ ) {
+            if( !array_key_exists( $year, $years )) continue;
+            for( $month = 1; $month <= 12; $month++ ) {
+                if( array_key_exists( $year, $years ) && array_key_exists( $month, $years[$year] )) {
+                    $max_size += $years[$year][$month]['size_tb_xtc'] + $years[$year][$month]['size_tb_hdf5'];
+                }
+                if(( $now_year == $year ) && ( $now_month == $month )) break;    // nothing to be expected next month
+            }
+            if( $now_year == $year ) break;    // noting to be expected next year
+        }
+        
+        $accumulated_num_runs            = 0;
+        $accumulated_num_files_xtc       = 0;
+        $accumulated_num_files_xtc_disk  = 0;
+        $accumulated_num_files_hdf5      = 0;
+        $accumulated_num_files_hdf5_disk = 0;
+        $accumulated_size_tb_xtc         = 0;
+        $accumulated_size_tb_xtc_disk    = 0;
+        $accumulated_size_tb_hdf5        = 0;
+        $accumulated_size_tb_hdf5_disk   = 0;
+        
+        $max_width = 120;
+        for( $year = 2009; $year <= 2050; $year++ ) {
+            if( !array_key_exists( $year, $years )) continue;
+            for( $month = 1; $month <= 12; $month++ ) {
 
-    			if( array_key_exists( $year, $years ) && array_key_exists( $month, $years[$year] )) {
-    				$accumulated_num_runs            += $years[$year][$month]['num_runs'           ];
-					$accumulated_num_files_xtc       += $years[$year][$month]['num_files_xtc'      ];
-					$accumulated_num_files_xtc_disk  += $years[$year][$month]['num_files_xtc_disk' ];
-					$accumulated_num_files_hdf5      += $years[$year][$month]['num_files_hdf5'     ];
-					$accumulated_num_files_hdf5_disk += $years[$year][$month]['num_files_hdf5_disk'];
-					$accumulated_size_tb_xtc         += $years[$year][$month]['size_tb_xtc'        ];
-					$accumulated_size_tb_xtc_disk    += $years[$year][$month]['size_tb_xtc_disk'   ];
-					$accumulated_size_tb_hdf5        += $years[$year][$month]['size_tb_hdf5'       ];
-					$accumulated_size_tb_hdf5_disk   += $years[$year][$month]['size_tb_hdf5_disk'  ];
-    			}
-    			if( $accumulated_num_runs == 0 ) continue;
-				$size = $accumulated_size_tb_xtc + $accumulated_size_tb_hdf5;
-				$width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
-    			print
+                if( array_key_exists( $year, $years ) && array_key_exists( $month, $years[$year] )) {
+                    $accumulated_num_runs            += $years[$year][$month]['num_runs'           ];
+                    $accumulated_num_files_xtc       += $years[$year][$month]['num_files_xtc'      ];
+                    $accumulated_num_files_xtc_disk  += $years[$year][$month]['num_files_xtc_disk' ];
+                    $accumulated_num_files_hdf5      += $years[$year][$month]['num_files_hdf5'     ];
+                    $accumulated_num_files_hdf5_disk += $years[$year][$month]['num_files_hdf5_disk'];
+                    $accumulated_size_tb_xtc         += $years[$year][$month]['size_tb_xtc'        ];
+                    $accumulated_size_tb_xtc_disk    += $years[$year][$month]['size_tb_xtc_disk'   ];
+                    $accumulated_size_tb_hdf5        += $years[$year][$month]['size_tb_hdf5'       ];
+                    $accumulated_size_tb_hdf5_disk   += $years[$year][$month]['size_tb_hdf5_disk'  ];
+                }
+                if( $accumulated_num_runs == 0 ) continue;
+                $size = $accumulated_size_tb_xtc + $accumulated_size_tb_hdf5;
+                $width = $max_size > 0.0 ? sprintf( "%.0f", ceil( $max_width * $size / $max_size )): '1';
+                print
 '
           <tr>
             <td class="table_cell table_bottom table_cell_left  ">'.pre       ( sprintf( "%4d - %02d", $year, $month )).'</td>
@@ -785,20 +785,20 @@ HERE;
             <td class="table_cell table_bottom                  ">'.as_int    ( $accumulated_num_files_hdf5 ).'</td>
             <td class="table_cell table_bottom                  ">'.as_int    ( $accumulated_num_files_xtc + $accumulated_num_files_hdf5, 6, true ).'</td>
             <td class="table_cell table_bottom                  ">'.as_percent( $accumulated_num_files_xtc_disk + $accumulated_num_files_hdf5_disk,
-				                                                                $accumulated_num_files_xtc      + $accumulated_num_files_hdf5 ).'</td>
+                                                                                $accumulated_num_files_xtc      + $accumulated_num_files_hdf5 ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $accumulated_size_tb_xtc ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $accumulated_size_tb_hdf5 ).'</td>
             <td class="table_cell table_bottom                  ">'.as_float  ( $accumulated_size_tb_xtc + $accumulated_size_tb_hdf5, 6, true ).'</td>
             <td class="table_cell table_bottom                  "><div style="float:left; width: '.$width.'px; background-color: #000000;">&nbsp;</div><div style="float:left; width: '.($max_width-$width).'px;">&nbsp;</div><div style="clear:both;"></div></td>
             <td class="table_cell table_bottom table_cell_right ">'.as_percent( $accumulated_size_tb_xtc_disk + $accumulated_size_tb_hdf5_disk,
-				                                                                $accumulated_size_tb_xtc      + $accumulated_size_tb_hdf5 ).'</td>
+                                                                                $accumulated_size_tb_xtc      + $accumulated_size_tb_hdf5 ).'</td>
           </tr>
 ';
-				if(( $now_year == $year ) && ( $now_month == $month )) break;	// nothing to be expected next month
-    		}
-			if( $now_year == $year ) break;	// noting to be expected next year
-		}
-		print <<<HERE
+                if(( $now_year == $year ) && ( $now_month == $month )) break;    // nothing to be expected next month
+            }
+            if( $now_year == $year ) break;    // noting to be expected next year
+        }
+        print <<<HERE
 
         </tr>
       </tbody></table>

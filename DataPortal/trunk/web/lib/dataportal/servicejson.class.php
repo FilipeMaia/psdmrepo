@@ -42,6 +42,7 @@ class ServiceJSON {
     private $exptimemon  = null ;
     private $sysmon      = null ;
     private $shiftmgr    = null ;
+    private $ifacectrldb = null ;
 
     public function __construct ($method, $options=array()) {
         $this->method = strtoupper(trim($method)) ;
@@ -414,7 +415,15 @@ class ServiceJSON {
         }
         return $this->shiftmgr ;
     }
-
+    public function ifacectrldb () {
+        if (is_null($this->ifacectrldb)) {
+            require_once 'filemgr/filemgr.inc.php' ;
+            $this->ifacectrldb = \FileMgr\IfaceCtrlDb::instance() ;
+            $this->ifacectrldb->begin() ;
+        }
+        return $this->ifacectrldb ;
+    }
+        
     // -----------------------
     //  Convenience functions
     // -----------------------
@@ -437,18 +446,19 @@ class ServiceJSON {
     }
     public function finish ($parameters) {
         if (!$parameters) $parameters = array() ;
-        if (!is_null($this->authdb     )) $this->authdb    ->commit() ;
-        if (!is_null($this->regdb      )) $this->regdb     ->commit() ;
+        if (!is_null($this->authdb     )) $this->authdb     ->commit() ;
+        if (!is_null($this->regdb      )) $this->regdb      ->commit() ;
         if (!is_null($this->regdbauth)) ;
-        if (!is_null($this->logbook    )) $this->logbook   ->commit() ;
+        if (!is_null($this->logbook    )) $this->logbook    ->commit() ;
         if (!is_null($this->logbookauth)) ;
-        if (!is_null($this->configdb   )) $this->configdb  ->commit() ;
-        if (!is_null($this->irodsdb    )) $this->irodsdb   ->commit() ;
-        if (!is_null($this->neocaptar  )) $this->neocaptar ->commit() ;
-        if (!is_null($this->irep       )) $this->irep      ->commit() ;
-        if (!is_null($this->exptimemon )) $this->exptimemon->commit() ;
-        if (!is_null($this->sysmon     )) $this->sysmon    ->commit() ;
-        if (!is_null($this->shiftmgr   )) $this->shiftmgr  ->commit() ;
+        if (!is_null($this->configdb   )) $this->configdb   ->commit() ;
+        if (!is_null($this->irodsdb    )) $this->irodsdb    ->commit() ;
+        if (!is_null($this->neocaptar  )) $this->neocaptar  ->commit() ;
+        if (!is_null($this->irep       )) $this->irep       ->commit() ;
+        if (!is_null($this->exptimemon )) $this->exptimemon ->commit() ;
+        if (!is_null($this->sysmon     )) $this->sysmon     ->commit() ;
+        if (!is_null($this->shiftmgr   )) $this->shiftmgr   ->commit() ;
+        if (!is_null($this->ifacectrldb)) $this->ifacectrldb->commit() ;
         ServiceJSON::report_success ($parameters, $this->options) ;
     }
 

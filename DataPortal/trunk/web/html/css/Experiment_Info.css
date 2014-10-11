@@ -2,9 +2,8 @@
   padding: 20px;
 }
 .exp-info-descr {
-  max-width: 640px;
-  max-height: 240px;
-  overflow: auto;
+  width: 480px;
+  white-space: normal;
 }
 
 #exp-info #group-members {

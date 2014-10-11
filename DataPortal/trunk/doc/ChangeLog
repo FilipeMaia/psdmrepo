@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-08-02
+2014-10-10 Igor Gaponenko
+- continued migration to RequireJS
+- a bug fix in the HDF5 Translator UI and Web service preventing retranslation
+if the previous request failed
+- added an new application for configuring the custom HDF5 translation based
+on the new psana-based Translator
+- minor code cleanup in some files
+
 Tag: V00-08-01
 2014-05-21 Igor Gaponenko
 - nearly completed migration to the component model using RequireJS

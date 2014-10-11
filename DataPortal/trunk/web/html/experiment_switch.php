@@ -85,48 +85,14 @@ HERE;
 
 <link rel="icon" href="../webfwk/img/Portal_favicon.ico"/>
 
-<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
-<link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
-
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
-
-<style>
-
-span.toggler {
-  background-color: #ffffff;
-  border: 1px solid #c0c0c0;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  cursor: pointer;
-}
-
-button.control-button,
-label.control-label {
-  font-size: 10px;
-  color: black;
-}
-
-button {
-  background: rgba(240, 248, 255, 0.39) !important;
-  border-radius: 2px !important;
-}
-
-</style>
-
-<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-timepicker-addon.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
 
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <script type="text/javascript">
 
 // Application configuration needs to be passed to the Fwk initialization
-// procedure run upon loading RequireJS.
+// procedure run after loading RequireJS.
 
 var app_config = {
 
@@ -139,15 +105,7 @@ var app_config = {
     instruments : <?=json_encode($instruments)?>
 } ;
 
-// Redirections which may be required by the legacy code generated
-// by Web services.
-
-function show_email (user, addr) { Fwk.show_email(user, addr) ; }
-
 </script>
-
-<!-- Finally, when all JavaScript structures have been initialized
-     loading RequireJS -->
 
 <script data-main="../portal/js/experiment_switch_main.js" src="/require/require.js"></script>
 

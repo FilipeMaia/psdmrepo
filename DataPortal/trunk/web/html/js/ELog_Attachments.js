@@ -1,10 +1,8 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
+    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
 
 function (
-    cssloader ,
-    Class, FwkApplication, Fwk) {
+    cssloader, Class, FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/ELog_Attachments.css') ;
 

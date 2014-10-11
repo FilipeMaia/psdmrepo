@@ -312,38 +312,77 @@ function ELog_MessageBody (parent, message) {
         //////////////////// CONTROL BUTTONS ////////////////
         
         html +=
-'  <div class="ctrl view">' +
-'    <div class="url-cont">'+this.message_url()+'</div>' ;
+  '<div class="ctrl view" >' +
+    '<div class="url-cont" >'+this.message_url()+'</div>' ;
         if (this.parent.deleted) {
             ;
         } else {
             if (this.message.deleted) html +=
-'    <div class="button-cont"><button class="control-button" name="undelete"    title="undelete this message to allow othe operations" >undelete</button></div>' ;
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="undelete" ' +
+              'title="undelete this message to allow othe operations" >undelete</button>' +
+    '</div>' ;
             else {
                 html +=
-'    <div class="button-cont"><button class="control-button" name="print"        title="print this message and all its children if any">P</button></div>' +
-'    <div class="button-cont"><button class="control-button" name="delete"       title="delete this message and all its children if any" style="color:red;">X</button></div>' ;
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="email" ' +
+              'title="forward this message by e-mail to specified recipients" ><b>@</b></button>' +
+    '</div>' +
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+        'name="print" ' +
+        'title="print this message and all its children if any" >P</button> ' +
+    '</div>' +
+    '<div class="button-cont" >' +
+    '  <button class="control-button control-button-important" ' +
+              'name="delete" ' +
+              'title="delete this message and all its children if any" >X</button>' +
+    '</div>' ;
                 if (!this.message.parent_id) html +=
-'    <div class="button-cont"><button class="control-button" name="tags"         title="add more tags to the message">+ tags</button></div>' ;
-             html +=
-'    <div class="button-cont"><button class="control-button" name="attachments"  title="add more attachments to the message">+ attach</button></div>' ;
-             if (this.access_list.elog.edit_messages) {
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="tags" ' +
+              'title="add more tags to the message" >+ tags</button>' +
+    '</div>' ;
+                html +=
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="attachments" ' +
+              'title="add more attachments to the message" >+ attach</button>' +
+    '</div>' ;
+                if (this.access_list.elog.edit_messages) {
                     if (!this.message.parent_id) {
                         if (this.message.run_id) html +=
-'    <div class="button-cont"><button class="control-button" name="dettach"     title="attach this message to a run" >- run</button></div>' ;
+    '<div class="button-cont" > ' +
+      '<button class="control-button" ' +
+              'name="dettach" ' +
+              'title="attach this message to a run" >- run</button>' +
+    '</div>' ;
                         else html +=
-'    <div class="button-cont"><button class="control-button" name="attach"      title="dettach this message from the run" >+ run</button></div>' ;
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="attach" ' +
+              'title="dettach this message from the run" >+ run</button>' +
+    '</div>' ;
                     }
                     html +=
-'    <div class="button-cont"><button class="control-button" name="edit"        title="edit the message text" >E</button></div>' ;
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="edit"        title="edit the message text" >E</button></div>' ;
                 }
                 html +=
-'    <div class="button-cont"><button class="control-button" name="reply"        title="reply to the message"><b>&crarr;</b></button></div>' ;
+    '<div class="button-cont" >' +
+      '<button class="control-button" ' +
+              'name="reply" ' +
+              'title="reply to the message" ><b>&crarr;</b></button>' +
+    '</div>' ;
             }
         }
         html +=
-'    <div class="button-cont-last"></div>' +
-'  </div>' ;
+    '<div class="button-cont-last"></div>' +
+  '</div>' ;
 
 
         //////////////////// MESSAGE TEXT ////////////////
@@ -422,6 +461,7 @@ function ELog_MessageBody (parent, message) {
                 case 'dettach':     that.edit_run(op) ; break ;
                 case 'delete':
                 case 'undelete':    that.delete_message(op) ; break ;
+                case 'email':       that.email_message() ; break ;
                 default:
                     console.log('ELog_MessageBody.render(): this operation is not supported: '+op) ; break ;
             }
@@ -912,6 +952,38 @@ function ELog_MessageBody (parent, message) {
 '</div>'
         ) ;
         this.form_attachments_cont.find('input:file[name="file2attach_'+num+'"]').change(function () { that.add_attachment() ; }) ;
+    } ;
+    
+    this.email_message = function () {
+        console.log('ELog_MessageBody.email_message(): this operation is not fully implemented') ;
+        Fwk.form_dialog (
+            'Forwarding message via e-Mail' ,
+            '<div>Recipient 1 : <input type="text" size=24 val=""/></div>' +
+            '<div>Recipient 2 : <input type="text" size=24 val=""/></div>' +
+            '<div>Recipient 3 : <input type="text" size=24 val=""/></div>' ,
+            function (form) {
+                console.log('ELog_MessageBody.email_message() input:', $.makeArray(form.find('input'))) ;
+                var params = {
+                    id: that.message.id ,
+                    recipients: _.reduce($.makeArray(form.find('input')), function (recipients, input) {
+                        console.log('ELog_MessageBody.email_message() input:', input) ;
+                        //var email = input.val() ;
+                        //if (email) recipients.push(email) ;
+                        return recipients ;
+                    }, [])
+                } ;
+                if (!params.recipients.length) {
+                    Fwk.report_error('Please, provide at least one e-mail address or cancel the operation.' ) ;
+
+                    // keep the dialog open
+                    return false ;
+                }
+                console.log('ELog_MessageBody.email_message() recipients:', params.recipients) ;
+
+                // close the dialog
+                return true ;
+            }
+        ) ;
     } ;
 }
 Class.define_class (ELog_MessageBody, StackOfRows.StackRowBody, {}, {}) ;
