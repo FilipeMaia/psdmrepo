@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2014-10-10 Igor Gaponenko
+- started major refactoring of the application based on webfwk and RequireJS
+the new version is available via new.php instead of index.php.
+
 Tag: V00-01-02
 2014-04-30 Igor Gaponenko
 - minor refactoring to depend on webfwk/

@@ -28,10 +28,6 @@ try {
 
 ?>
 
-
-<!-- Document Begins Here -->
-
-
 <!DOCTYPE html>
 <html>
 
@@ -64,117 +60,6 @@ try {
 
 <script type="text/javascript" src="../webfwk/js/config.js"></script>
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
-
-<!-- Window layout styles and support actions -->
-
-<style type="text/css">
-
-#equipment-inventory-controls {
-  margin-bottom: 8px;
-  padding-left: 10px;
-}
-#equipment-inventory-controls-left {
-  margin-right: 20px;
-}
-
-#equipment-inventory-info {
-  color: maroon;
-}
-
-.form-elem {
-  width:100%;
-}
-
-div.equipment-grid-cell {
-  margin-right: 20px;
-  margin-bottom: 20px;
-
-  background-color: #f4f4f4;
-  /*
-  background-color: #f0f0d0;
-  */
-  border: 1px solid #c8c8c8;
-
-  border-radius: 6px;
-  -moz-border-radius: 6px;
-  /*
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  -moz-border-radius-bottomleft: 0;
-  -moz-border-radius-bottomright: 0;
-  */
-}
-div.equipment-grid-cell div.header {
-  padding: 2px;
-  background-color: #c0c0c0;
-}
-
-div.equipment-grid-cell div.body {
-}
-div.equipment-grid-cell div.footer {
-  background-color: #c0c0c0;
-}
-
-div.equipment-grid-cell pre {
-  margin: 0px;
-}
-td.equipment-edit-cell {
-  border: 0;
-  padding-right: 20px;
-}
-div.equipment-tag-hdr {
-  margin-left: 5px;
-  margin-right: 5px;
-  font-weight: bold;
-}
-div.equipment-tag {
-  margin-right: 5px;
-  font-style: italic;
-}
-div.equipment-attachment-edit-entry {
-  padding: 10px;
-}
-div.equipment-attachment-new-edit-entry {
-  padding: 10px;
-}
-div.equipment-tag-edit-entry {
-  padding: 10px;
-}
-div.equipment-tag-new-edit-entry {
-  padding: 10px;
-}
-div.equipment-edit-entry-modified {
-  background-color: #ffdcdc;
-}
-span.toggler {
-  background-color: #ffffff;
-  border: 1px solid #c0c0c0;
-  border-radius: 4px;
-  -moz-border-radius: 4px;
-  cursor: pointer;
-}
-
-div.visible {
-  display: block;
-}
-
-div.hidden {
-  display: none;
-}
-
-button.visible {
-  display: block;
-}
-
-button.hidden {
-  display: none;
-}
-
-span.form_element_info {
-  color: maroon;
-}
-</style>
-
 
 <script type="text/javascript">
 
