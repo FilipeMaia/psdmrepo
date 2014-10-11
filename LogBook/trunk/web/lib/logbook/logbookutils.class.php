@@ -1035,6 +1035,25 @@ class LogBookUtils {
         ),
 
         'XPP' => array(
+            array(
+
+                'SECTION' => 'scan',
+                'TITLE'   => 'Scan Info',
+                'PARAMS'  => array(
+                    array( 'descr' => 'Run_is_scan',              'name' => 'XPP:SCAN:ISSCAN' ),
+                    array( 'descr' => 'Scanmotor_0',              'name' => 'XPP:SCAN:SCANVAR00' ),
+                    array( 'descr' => 'Scanmotor_1',              'name' => 'XPP:SCAN:SCANVAR01' ),
+                    array( 'descr' => 'Scanmotor_2',              'name' => 'XPP:SCAN:SCANVAR02' ),
+                    array( 'descr' => 'Scanmotor_0_position_min', 'name' => 'XPP:SCAN:MIN00' ),
+                    array( 'descr' => 'Scanmotor_0_position_max', 'name' => 'XPP:SCAN:MAX00' ),
+                    array( 'descr' => 'Scanmotor_1_position_min', 'name' => 'XPP:SCAN:MIN01' ),
+                    array( 'descr' => 'Scanmotor_1_position_max', 'name' => 'XPP:SCAN:MAX01' ),
+                    array( 'descr' => 'Scanmotor_2_position_min', 'name' => 'XPP:SCAN:MIN02' ),
+                    array( 'descr' => 'Scanmotor_2_position_max', 'name' => 'XPP:SCAN:MAX02' ),
+                    array( 'descr' => 'Scan_Number_of_steps',     'name' => 'XPP:SCAN:NSTEPS' ),
+                    array( 'descr' => 'Scan_shots_pre_step',      'name' => 'XPP:SCAN:NSHOTS' )
+                )
+            )
         ),
 
         'CXI' => array(

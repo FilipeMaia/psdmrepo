@@ -362,7 +362,7 @@ HERE;
      *
      * @return LogBookRun - new run object
      */
-    public function create_run ( $num, $begin_time, $end_time=null ) {
+    public function create_run ( $num, $type, $begin_time, $end_time=null ) {
 
         /* Verify parameters
          */
@@ -391,7 +391,8 @@ HERE;
         $this->logbook->query(
             "INSERT INTO {$this->logbook->database}.run VALUES(NULL,".( $num > 0 ? $num : $this->allocate_run( $num ))
             .",".$this->attr['id']
-            .",".LusiTime::to64from( $begin_time )
+            .",'".$this->logbook->escape_string( $type )
+            ."',".LusiTime::to64from( $begin_time )
             .",".( is_null( $end_time ) ? 'NULL' : LusiTime::to64from( $end_time )).")" );
 
         return $this->find_run_by_id('(SELECT LAST_INSERT_ID())');
@@ -1173,38 +1174,76 @@ HERE;
         return $list;
     }
 
-    public function notify_subscribers( $entry, $new_vs_modified=true ) {
+    /**
+     * 
+     * @param {LogBookFFEntry} $entry
+     * @param {bool} $new_vs_modified
+     * @return undefined
+     */
+    public function notify_subscribers ($entry, $new_vs_modified=true) {
 
-        $subscriptions = $this->subscriptions();
-        if( count( $subscriptions ) <= 0 ) return;
+        $subscriptions = $this->subscriptions() ;
+        if (count($subscriptions) <= 0) return ;
 
-        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/index.php?action=select_message&id='.$entry->id();
-        $author  = $entry->author();
-        $time    = $entry->insert_time()->toStringShort();
-        $logbook = $this->instrument()->name().'/'.$this->name(); 
-        $subject = strtr( substr( $entry->content(), 0, 72 ), array( "'" => '"', "\n" => " " ));
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/index.php?action=select_message&id='.$entry->id() ;
+        $author  = $entry->author() ;
+        $time    = $entry->insert_time()->toStringShort() ;
+        $logbook = $this->instrument()->name().'/'.$this->name() ;
+        $subject = strtr(substr($entry->content(), 0, 72), array("'" => '"', "\n" => " ")) ;
+        $time_str = $new_vs_modified ? 'Posted  ' : 'Modified' ;
 
-        // Notify each subscriber.
-        //
-        $time_str = $new_vs_modified ? 'Posted:   ' : 'Modified: ';
-        foreach( $subscriptions as $s ) {
+        $entry_str = '' ;
+        foreach (explode("\n", $entry->content()) as $line) {
+            $entry_str .= "  {$line}\n" ;
+        }
+
+        $attachments_base_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/attachments' ;
+        $attachments_str = '' ;
+        foreach ($entry->attachments() as $a) {
+            $attachments_str .= "  {$attachments_base_url}/{$a->id()}/{$a->description()}\n" ;
+        }
+        
+        $tags_str = '  ' ;
+        foreach ($entry->tags() as $t) {
+            $tags_str .= "{$t->tag()} " ;
+        }
+
+        foreach ($subscriptions as $s) {
            
             $body =<<<HERE
-Message:  {$url}
-Author:   {$author}
-{$time_str}: {$time}
-LogBook:  {$logbook}
+_______
+SUMMARY
 
-** ATTENTION **
-The message was sent by the automated notification system because this e-mail
-was registered to recieve updates on new content posted in the Electornic LogBook
-of the experiment. The registration was made by user '{$s->subscriber()}'
-on {$s->subscribed_time()->toStringShort()} from {$s->subscribed_host()}. To unsubscribe
-from this service, please follow the above shown URL and select 'Subscribe' at
-the top top-level menu of the LogBook application. In case if you won't be able
-to log onto the LogBook get in touch with the experiment management personnel.
+  Message:    {$url}
+  Author:     {$author}
+  {$time_str}:   {$time}
+  Experiment: {$logbook}
+____________
+MESSAGE TEXT
+
+{$entry_str}
+___________
+ATTACHMENTS
+
+{$attachments_str}
+____
+TAGS
+
+{$tags_str}
+______________________
+YOUR SUBSCRIPTION INFO
+
+  The message was sent by the automated  notification system because your
+  SLAC e-mail address was registered to  recieve updates on  new  content
+  posted in the Electornic LogBook of  the  experiment. The  registration
+  was made by user '{$s->subscriber()}' on {$s->subscribed_time()->toStringShort()} from host {$s->subscribed_host()}.
+  To unsubscribe from this service, please follow the above shown URL and
+  Unsubscribe yourself at the 'Subscribe' menu of the LogBook application.
+  In case if you won't be able to log onto the LogBook get in touch  with
+  the experiment management personnel.
+_________________________________________________________________________
 HERE;
-            $this->do_notify( $s->address(), $logbook, $subject, $body );
+            $this->do_notify ($s->address(), $logbook, $subject, $body) ;
         }
     }
 

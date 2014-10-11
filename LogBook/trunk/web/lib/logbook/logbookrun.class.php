@@ -26,18 +26,48 @@ class LogBookRun {
 
     /* Accessors
      */
-    public function parent     () { return $this->experiment; }
-    public function id         () { return $this->attr['id']; }
-    public function num        () { return $this->attr['num']; }
-    public function exper_id   () { return $this->attr['exper_id']; }
-    public function begin_time () { return LusiTime::from64( $this->attr['begin_time'] ); }
-    public function end_time   () { return is_null( $this->attr['end_time'] ) ? null : LusiTime::from64( $this->attr['end_time'] ); }
+    public function parent     () { return                  $this->experiment; }
+    public function id         () { return           intval($this->attr['id']); }
+    public function num        () { return           intval($this->attr['num']); }
+    public function exper_id   () { return           intval($this->attr['exper_id']); }
+    public function begin_time () { return LusiTime::from64($this->attr['begin_time']); }
+    public function end_time   () { return          is_null($this->attr['end_time']) ? null : LusiTime::from64($this->attr['end_time']); }
  
     public function in_interval( $time ) {
         return LusiTime::in_interval (
             $time,
             $this->begin_time(),
-            $this->end_time() ); }
+            $this->end_time() );
+    }
+
+    /**
+     * Return a portable array representation which can be translated into JSON
+     *
+     * @return array()
+     */
+    public function to_array () {
+
+        $begin_time = $this->begin_time() ;
+        $end_time   = $this->end_time() ;
+
+        return array (
+            'exper_id' => $this->exper_id() ,
+            'id'       => $this->id() ,
+            'num'      => $this->num() ,
+            'begin_time'  => array (
+                'as_str'  => $begin_time->toStringShort() ,
+                'as_sec'  => $begin_time->sec ,
+                'as_nsec' => $begin_time->nsec ,
+                'as_64'   => $begin_time->to64()
+            ) ,
+            'end_time'    => array (
+                'as_str'  => $end_time ? $end_time->toStringShort() : '' ,
+                'as_sec'  => $end_time ? $end_time->sec             : 0 ,
+                'as_nsec' => $end_time ? $end_time->nsec            : 0 ,
+                'as_64'   => $end_time ? $end_time->to64()          : 0
+            )
+        ) ;
+    }
 
     /*
      * =============================

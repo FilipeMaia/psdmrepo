@@ -36,10 +36,10 @@ function handler ($SVC) {
         default :
             $SVC->assert (false, "invalid scope: '{$scope}'") ;
     }
-
-    $relevance_time = $SVC->optional_time('relevance_time', LusiTime::now()) ;
-    $files          = $SVC->optional_files() ;
-    $tags           = $SVC->optional_tags() ;
+    $post2instrument = $SVC->optional_int('post2instrument', 0) ;
+    $relevance_time  = $SVC->optional_time('relevance_time', LusiTime::now()) ;
+    $files           = $SVC->optional_files() ;
+    $tags            = $SVC->optional_tags() ;
 
     // If set this will tell the script to return the updated parent object
     // instead of the new one (the reply).
@@ -80,12 +80,35 @@ function handler ($SVC) {
     } else {
         $entry = $experiment->create_entry($author, $content_type, $message, $shift_id, $run_id, $relevance_time) ;        
         foreach($tags as $t)
-            $tag = $entry->add_tag($t['tag'], $t['value']) ;
+            $entry->add_tag($t['tag'], $t['value']) ;
     }
     foreach ($files as $f)
-        $attachment = $entry->attach_document($f['contents'], $f['type'], $f['description']) ;
+        $entry->attach_document($f['contents'], $f['type'], $f['description']) ;
 
     $experiment->notify_subscribers($entry) ;
+
+    // Post the message into the corresponding instrument e-Log if requested
+    // and if the one exists for the experiment.
+
+    if ($post2instrument && $experiment->regdb_experiment()->instrument()->is_standard()) {
+
+        $instr_experiment  = $SVC->logbook()->find_experiment('NEH', "{$experiment->instrument()->name()} Instrument") ;
+        if ($instr_experiment) {
+
+            $instr_entry = $instr_experiment->create_entry($author, $content_type, $message, null, null, $relevance_time) ;
+
+            $instr_entry->add_tag($experiment->name(), '') ;
+            foreach($tags as $t)
+                $instr_entry->add_tag($t['tag'], $t['value']) ;
+
+            foreach ($files as $f)
+                $instr_entry->attach_document($f['contents'], $f['type'], $f['description']) ;
+
+            $instr_experiment->notify_subscribers($instr_entry) ;
+        }
+    }
+
+    // Only return the message posted for the target experiment
 
     return array (
         'Entry' =>

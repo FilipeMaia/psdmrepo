@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-01
+2014-10-10 Igor Gaponenko
+- added Web services run_begin and run_end as per JIRA ticket PSWA-5
+- made required modificatons to the PHP classes
+- extended Web service message_new to support posting a copy of a message into
+an instrument e-log if requested by a client.The feature is now enabled in the
+Web UI
+
 Tag: V01-00-00
 2014-04-30 Igor Gaponenko
 - major package cleanup: removed the old LogBook Web application
