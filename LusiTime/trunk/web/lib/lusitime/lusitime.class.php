@@ -77,6 +77,8 @@ class LusiTime {
      *   2009-05-19
      *   2009-05-19 17:59:49
      *   2009-05-19 12:18:49.123456789
+     *   2009-05-19T17:59:49
+     *   2009-05-19T12:18:49.123456789
      *
      * The last example illustrates how to specify nanoseconds. The number
      * of nanoseconds (if not empty) must be in the range of 0..999999999.
@@ -86,7 +88,7 @@ class LusiTime {
      */
     public static function parse($str) {
 
-        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2})(\s+(\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?)?/';
+        $expr = '/(\d{4})-(\d{1,2})-(\d{1,2})([ T]+(\d{1,2}):(\d{1,2}):(\d{1,2})(\.(\d{1,9}))?)?/';
         if( !preg_match( $expr, $str, $matches2 )) return null;
 
         // Begin with interpreting result as a time w/ optonal nanoseconds
@@ -149,6 +151,15 @@ class LusiTime {
      */
     public function toStringShort() {
         return date("Y-m-d H:i:s", $this->sec); }
+
+    /* Return a human-readable ISO representation
+     * of date and time (no nanoseconds) and UTC timezone:
+     * 
+     * 2014-06-03T13:47:30+00:00
+     * 
+     */
+    public function toStringShortISO() {
+        return date("Y-m-d", $this->sec).'T'.date("H:i:s", $this->sec).date("P", $this->sec); }
 
     /* Unlike the previous methods this one would return just a day
      * (yer-month-day) part of the timestamp in the human-readable
