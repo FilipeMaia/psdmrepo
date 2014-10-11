@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2014-10-10 Igor Gaponenko
+- implemented a simple Web service named 'ping' to be used for testing
+access to the Web services
+
 Tag: V00-02-02
 2014-10-03 Igor Gaponenko
 - bug fix in method RegDBFile::data_migration_file
