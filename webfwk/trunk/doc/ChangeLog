@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2014-10-10 Igor Gaponenko
+- code cleanup
+- smart table widget
+- continued RequireJS migration
+- minor extention to the Fwk API
+
 Tag: V00-01-00
 2014-05-21 Igor Gaponenko
 - imajor refactoring to migrate to the component model based on RequireJS (AMD)

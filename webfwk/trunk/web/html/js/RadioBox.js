@@ -1,14 +1,10 @@
 define ([
-    'underscore' ,
-    'webfwk/CSSLoader' ,
-    'webfwk/Class' ,
-    'webfwk/Widget'] ,
+    'webfwk/CSSLoader', 'webfwk/Class','webfwk/Widget' ,
+
+    'underscore'] ,
 
 function (
-    _ ,
-    cssloader ,
-    Class ,
-    Widget) {
+    cssloader, Class, Widget) {
 
     cssloader.load('../webfwk/css/RadioBox.css') ;
 

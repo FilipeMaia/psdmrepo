@@ -154,6 +154,10 @@ function (
                 return this.application ;
             return null ;
         } ;
+        this.get_application_for = function (context1_name) {
+            var context1 = this.name_to_context1(context1_name) ;
+            return context1 === undefined ? undefined : this.context[context1].application ;
+        } ;
         this.init = function () {
             if (this.is_initialized) return ;
             this.is_initialized = true ;
@@ -267,6 +271,12 @@ function (
         } ;
     }
 
+    function _SAFE_ASSIGN (a) {
+        if (a instanceof FwkApplication) return a ;
+        console.log('Fwk::_safe_assign_application() not a subclass of FwkApplication:', a) ;
+        return a ;
+    }
+
     /**
      * Utility class for creating tab-based applications.
      *
@@ -339,7 +349,7 @@ function (
                                     wa_id: null
                                 } ;
                                 app_proxy.context[''+j].context[''+k] = descr3 ;
-                                if (menu3.application)    descr3.application = menu3.application ;
+                                if (menu3.application)    descr3.application = _SAFE_ASSIGN (menu3.application) ;
                                 if (menu3.html_container) descr3.html        = $('#'+menu3.html_container).html() ;
                                 if (menu3.html)           descr3.html        = menu3.html ;
                                 if (menu3.load_html)      descr3.load_html   = {
@@ -348,7 +358,7 @@ function (
                                 first_menu3 = false ;
                             }
                         } else {
-                            if (menu2.application)    descr2.application = menu2.application ;
+                            if (menu2.application)    descr2.application = _SAFE_ASSIGN (menu2.application) ;
                             if (menu2.html_container) descr2.html        = $('#'+menu2.html_container).html() ;
                             if (menu2.html)           descr2.html        = menu2.html ;
                             if (menu2.load_html)      descr2.load_html   = {
@@ -358,7 +368,7 @@ function (
                         first_menu2 = false ;
                     }
                 } else {
-                    if (menu1.application)    app_proxy.application = menu1.application ;
+                    if (menu1.application)    app_proxy.application = _SAFE_ASSIGN (menu1.application) ;
                     if (menu1.html_container) app_proxy.html        = $('#'+menu1.html_container).html() ;
                     if (menu1.html)           app_proxy.html        = menu1.html ;
                     if (menu1.load_html)      app_proxy.load_html   = {
@@ -989,6 +999,21 @@ function (
             }
         } ;
 
+        this.get_application = function (application_name, context1_name) {
+            if (!this.is_built) {
+                console.log('Fwk.get_application(\''+application_name+'\',\''+context1_name+'\'): framework isn\'t built yet. Come back later.') ;
+                return ;
+            }
+           for (var id in this.app_proxies) {
+                var app_proxy = this.app_proxies[id] ;
+                if (app_proxy.full_name === application_name)
+                    if (context1_name)
+                        return app_proxy.get_application_for(context1_name) ;
+            }
+            console.log('Fwk.get_application(): implementation error, code: 1') ;
+            return undefined ;
+        } ;
+
         /* ------------------------------------------------------------
          *   POPULATE HTML ACCORDING TO THE APPLICATION CONFIGURATION
          * ------------------------------------------------------------
@@ -1195,7 +1220,7 @@ function (
      * or DOM modifications will be taken until it's finally built and activated.
      * 
      * Also register the instance in the global scope. Note that this may
-     * be reconsidered in teh future.
+     * be reconsidered in the future.
      */
     if (!window.Fwk) window.Fwk = new FwkCreator() ;
 

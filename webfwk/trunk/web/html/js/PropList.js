@@ -1,12 +1,10 @@
 define ([
-    'underscore' ,
-    'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/Widget'] ,
+    //'underscore' ,
+    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/Widget'] ,
 
 function (
-    _ ,
-    cssloader ,
-    Class, Widget) {
+    //_ ,
+    cssloader, Class, Widget) {
 
     cssloader.load('../webfwk/css/PropList.css') ;
 
@@ -43,6 +41,17 @@ function (
         function get_prop_string (propdef, prop, default_val) {
             return get_prop(propdef, prop, default_val, _.isString) ;
         }
+        function get_prop_bool (propdef, prop, default_val) {
+            return get_prop(propdef, prop, default_val, _.isBoolean) ;
+        }
+        function get_prop_int (propdef, prop, default_val) {
+            return get_prop(propdef, prop, default_val, _.isNumber) ;
+        }
+        function get_prop_enum (propdef, prop, allowed_values) {
+            var val = get_prop_string (propdef, prop, allowed_values[0]) ;
+            _ASSERT(_.find(allowed_values, function (v) {return v === val ; }) !== undefined) ;
+            return val ;
+        }
 
         // Digest property definitions
 
@@ -62,12 +71,18 @@ function (
 
             _that._propnames.push(name) ;
             _that._propdefs[name]  = {
-                text:  _.escape(get_prop_string(propdef, 'text', name)) ,   // -- use the name if no text is provide
-                value: get_prop_string(propdef, 'value', '') ,
-                type:  get_prop_string(propdef, 'type',  'text') ,
-                class: get_prop_string(propdef, 'class', '') ,
-                style: get_prop_string(propdef, 'style', '')
+                text:      _.escape(get_prop_string(propdef, 'text', name)) ,   // -- use the name if no text is provide
+                value:     get_prop_string(propdef, 'value', '') ,
+                type:      get_prop_string(propdef, 'type',  'text') ,
+                class:     get_prop_string(propdef, 'class', '') ,
+                style:     get_prop_string(propdef, 'style', '') ,
+                edit_mode: get_prop_bool  (propdef, 'edit_mode', false) ,
+                editing:   false
             } ;
+            if (_that._propdefs[name].edit_mode) {
+                _that._propdefs[name].edit_size = get_prop_int (propdef, 'edit_size', 4) ;
+                _that._propdefs[name].editor    = get_prop_enum(propdef, 'editor', ['text', 'checkbox']) ;
+            }
         }) ;
 
         // Rendering is done only once
@@ -93,7 +108,7 @@ function (
                 html +=
 '      <tr name="'+name+'">' +
 '        <td class="prop-list-name" >'+propdef.text+'</td>' +
-'        <td class="prop-list-value" '+propdef.class+'" style="'+propdef.style+'"></td>' +
+'        <td class="prop-list-value '+propdef.class+'" style="'+propdef.style+'"></td>' +
 '      </tr>' ;
                 return html ;
             }, '') +
@@ -111,6 +126,29 @@ function (
         } ;
 
         /**
+         * Return the current value of the property.
+         * 
+         * Note, that if the property value is being edited then the current state
+         * of the properting value would be returned.
+         * @param {type} name
+         * @returns {_L5.PropList._propdefs.value}
+         */
+        this.get_value = function (name) {
+
+            var propdef = this._propdefs[name] ;
+
+            _ASSERT(propdef) ;
+
+            if (!this._is_rendered || !(propdef.edit_mode && propdef.editing)) return propdef.value ;
+
+            switch (propdef.editor) {
+                case 'text':     return propdef.value_elem.children('input').val() ;
+                case 'checkbox': return propdef.value_elem.children('input').attr('checked') ? 1 : 0 ;
+            }
+            _ASSERT() ;
+        } ;
+
+        /**
          * @brief Set the value of the specified property
          * 
          * The function will also find and cache a JQuery object corresponding to the HTML
@@ -121,19 +159,139 @@ function (
          * @returns {undefined}
          */
         this.set_value = function (name, value) {
+
             var propdef = this._propdefs[name] ;
+
             _ASSERT(propdef) ;
+
             propdef.value = value ;
+
             if (this._is_rendered) {
+
                 var value_elem = propdef.value_elem ;
                 if (!value_elem) {
                     value_elem = this.container.find('tr[name="'+name+'"]').children('td.prop-list-value') ;
                     propdef.value_elem = value_elem ;
                 }
-                switch (propdef.type) {
-                    case 'html' : value_elem.html(value) ; break ;
-                    default     : value_elem.text(value) ; break ;
+                if (propdef.edit_mode && propdef.editing) {
+                    switch (propdef.editor) {
+                        case 'text':
+                            value_elem.children('input').val(value) ;
+                            break ;
+                        case 'checkbox':
+                            if (value) value_elem.children('input').attr      ('checked', 'checked') ;
+                            else       value_elem.children('input').removeAttr('checked') ;
+                            break ;
+                        default:
+                            _ASSERT() ;
+                    }
+                } else {
+                    switch (propdef.type) {
+                        case 'html' :
+                            value_elem.html('&nbsp;'+value) ;
+                            break ;
+                        default :
+                            if (propdef.edit_mode && propdef.editor === 'checkbox') {
+                                if (value) value_elem.html('<div style="width:8px; height:8px; background-color:red;">&nbsp;</div>') ;
+                                else       value_elem.html('&nbsp;') ;
+                            } else {
+                                if (value === '') value_elem.html('&nbsp;') ;
+                                else              value_elem.text(value) ;
+                            }
+                            break ;
+                    }
                 }
+            }
+        } ;
+
+        /**
+         * Turn the property value's cell into the editing mode (if permitted)
+         *
+         * @param {String} name
+         * @returns {undefined}
+         */
+        this.edit_value = function (name) {
+
+            var propdef = this._propdefs[name] ;
+
+            _ASSERT(propdef) ;
+            _ASSERT(propdef.edit_mode) ;
+
+            if (this._is_rendered) {
+
+                if (propdef.editing) return ;
+
+                var value_elem = propdef.value_elem ;
+                if (!value_elem) {
+                    value_elem = this.container.find('tr[name="'+name+'"]').children('td.prop-list-value') ;
+                    propdef.value_elem = value_elem ;
+                }
+                value_elem.addClass('prop-list-value-editing') ;
+                switch (propdef.editor) {
+                    case 'text':
+                        value_elem.html('<input type="text" size="'+propdef.edit_size+'" />') ;
+                        value_elem.children('input').val(propdef.value) ;
+                        break ;
+                    case 'checkbox':
+                        value_elem.html('<input type="checkbox" />') ;
+                        if (propdef.value) value_elem.children('input').attr('checked', 'checked') ;
+                        break ;
+                    default:
+                        _ASSERT() ;
+                }
+                propdef.editing = true ;
+            }
+        } ;
+
+        /**
+         * Extract the presently edited value of the property from its cell and turn
+         * the cell into the viewing mode.
+         *
+         * @param {String} name
+         * @returns {undefined}
+         */
+        this.view_value = function (name) {
+
+            var propdef = this._propdefs[name] ;
+
+            _ASSERT(propdef) ;
+            _ASSERT(propdef.edit_mode) ;
+
+            if (this._is_rendered) {
+
+                if (!propdef.editing) return ;
+
+                var value_elem = propdef.value_elem ;
+                if (!value_elem) {
+                    value_elem = this.container.find('tr[name="'+name+'"]').children('td.prop-list-value') ;
+                    propdef.value_elem = value_elem ;
+                }
+                value_elem.removeClass('prop-list-value-editing') ;
+                switch (propdef.editor) {
+                    case 'text':
+                        propdef.value = value_elem.children('input').val() ;
+                        break ;
+                    case 'checkbox':
+                        propdef.value = value_elem.children('input').attr('checked') ? 1 : 0 ;
+                        break ;
+                    default:
+                        _ASSERT() ;
+                }
+                switch (propdef.type) {
+                    case 'html' :
+                        value_elem.html('&nbsp;'+propdef.value) ;
+                        break ;
+                    default :
+                        if (propdef.editor === 'checkbox') {
+                            if (propdef.value) value_elem.html('<div style="width:8px; height:8px; background-color:red;">&nbsp;</div>') ;
+                            else               value_elem.html('&nbsp;') ;
+                        } else {
+                            if (propdef.value === '') value_elem.html('&nbsp;') ;
+                            else                      value_elem.text(propdef.value) ;
+                        }
+                        break ;
+                }
+                propdef.editing = false ;
             }
         } ;
 

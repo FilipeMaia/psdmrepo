@@ -1,10 +1,8 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/Widget'] ,
+    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/Widget'] ,
 
 function (
-    cssloader ,
-    Class, Widget) {
+    cssloader, Class, Widget) {
 
     cssloader.load('../webfwk/css/SmartTable.css') ;
 

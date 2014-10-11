@@ -360,6 +360,10 @@ define_class( Table, null, {
  * Methods *
  ***********/
 
+    get_container: function() {
+        return this.container;
+    },
+
     cols: function() {
         return this.header.size.cols;
     },

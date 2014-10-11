@@ -1,40 +1,43 @@
-<!--
-This is an example of the Stack widget.
--->
 <!DOCTYPE html>
 <html>
 <head>
+
 <title>An example of the StackOfRows widget</title>
+
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 
-<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
-
-<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
-
 <style>
-    body {
-        margin: 0;
-        padding: 0;
-    }
-    .ctrl {
-        padding-left: 10px;
-        font-size: 10px;
-    }
-    .ctrl input {
-        padding: 1px;
-    }
-    .ctrl button {
-        position: relative;
-        top: -3px;
-    }
-    .test {
-        padding: 0px 20px 20px 20px;
-    }
-    .stack {
-        padding-left: 10px;
-    }
+body {
+    margin: 0;
+    padding: 0;
+}
+.ctrl {
+    padding-left: 10px;
+    font-size: 10px;
+}
+.ctrl input {
+    padding: 1px;
+}
+.ctrl button {
+    position: relative;
+    top: -3px;
+}
+.test {
+    padding: 0px 20px 20px 20px;
+}
+.stack {
+    margin-top: 5px;
+    padding-left: 10px;
+}
+button {
+    background: rgba(240, 248, 255, 0.39) !important;
+    border-radius: 2px !important;
+}
+button > span {
+    color: black;
+    font-size: 10px;
+}
 </style>
 
 <script data-main="../webfwk/js/test_stackofrows1_main.js" src="/require/require.js"></script>
@@ -47,14 +50,14 @@ This is an example of the Stack widget.
         <div class="ctrl" id="ctrl" >
             <input type="text" size="1" name="row"  value="0" />:
             <input type="text" name="body" value="new body of the row"/>
-            <button name="update"   style="margin-left: 10px;" >Update body</button>
-            <button name="expand"   >Expand</button>
-            <button name="collapse" >Collapse</button>
-            <button name="test"     >Test if expanded</button>
-            <button name="front"    >Insert new in front</button>
-            <button name="back"     >Append in the end</button>
-            <button name="delete"   >Delete</button>
-            <button name="focus"    >Expand and focus</button>
+            <button name="update"   style="margin-left: 10px;" >UPDATE BODY</button>
+            <button name="expand"   >EXPAND</button>
+            <button name="collapse" >COLLAPSE</button>
+            <button name="test"     >TEST IF EXPANDED</button>
+            <button name="front"    >INSERT NEW IN FRONT</button>
+            <button name="back"     >APPEND IN THE END</button>
+            <button name="delete"   >DELETE</button>
+            <button name="focus"    >EXPAND AND FOCUS</button>
         </div>
         <div id="stack1" class="stack" ></div>
     </div>

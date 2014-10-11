@@ -1,16 +1,36 @@
 require.config ({
     baseUrl: '..' ,
     paths: {
-        underscore: '/underscore/underscore-min' ,
-        webfwk: 'webfwk/js'
+        'jquery'     : '/jquery/js/jquery-1.8.2' ,
+        'jquery-ui'  : '/jquery/js/jquery-ui-1.9.1.custom.min' ,
+        'underscore' : '/underscore/underscore-min' ,
+        'webfwk'     : 'webfwk/js'
+    } ,
+    shim : {
+        'jquery' : {
+            exports : '$'
+        } ,
+        'jquery-ui' : {
+            exports : '$' ,
+            deps : ['jquery']
+        } ,
+        'underscore' : {
+            exports  : '_'
+        }
     }
 }) ;
 
 require ([
-    'webfwk/RadioBox'
-] ,
+    'webfwk/CSSLoader', 'webfwk/RadioBox' ,
 
-function (RadioBox) {
+    // Make sure the core libraries are preloaded so that the applications
+    // won't borther with loading them individually
+
+    'jquery', 'jquery-ui', 'underscore'] ,
+
+function (cssloader, RadioBox) {
+
+    cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
 
     $(function () {
         var rb = new RadioBox (

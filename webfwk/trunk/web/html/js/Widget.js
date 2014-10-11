@@ -1,6 +1,5 @@
 define ([
-    'webfwk/Class'
-] ,
+    'webfwk/Class'] ,
 
 function (Class) {
 

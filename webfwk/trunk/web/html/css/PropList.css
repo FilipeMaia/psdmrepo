@@ -18,3 +18,18 @@
 .prop-list > table > tbody > tr:last-child > td {
   border-bottom: 0;
 }
+.prop-list > table > tbody > tr > td.prop-list-value-editing {
+  padding: 3px 6px;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing:hover {
+  cursor: pointer;
+  background: aliceblue !important;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing > input {
+  border: solid 1px #ffffff;
+  /*width: 100%;*/
+  padding: 2px;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing > input:hover {
+  border: solid 1px #a0a0a0;
+}

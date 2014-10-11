@@ -1,20 +1,49 @@
 require.config ({
     baseUrl: '..' ,
     paths: {
-        webfwk: 'webfwk/js'
+        'jquery'        : '/jquery/js/jquery-1.8.2' ,
+        'jquery-ui'     : '/jquery/js/jquery-ui-1.9.1.custom.min' ,
+        'jquery.resize' : '/jquery/js/jquery.resize' ,
+        'underscore'    : '/underscore/underscore-min' ,
+        'webfwk'        : 'webfwk/js'
+    } ,
+    shim : {
+        'jquery' : {
+            exports : '$'
+        } ,
+        'jquery-ui' : {
+            exports : '$' ,
+            deps : ['jquery']
+        } ,
+        'jquery.resize' :  {
+            deps : ['jquery']
+        } ,
+        'underscore' : {
+            exports  : '_'
+        }
     }
 }) ;
-require ([
-    'webfwk/SmartTable'
-] ,
 
-function (SmartTable) {
+require ([
+    'webfwk/CSSLoader', 'webfwk/SmartTable' ,
+
+    // Make sure the core libraries are preloaded so that the applications
+    // won't borther with loading them individually
+
+    'jquery', 'jquery-ui', 'jquery.resize', 'underscore'] ,
+
+function (
+    cssloader, SmartTable) {
+
+    cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
 
     $(function () {
-        var num_rows = 100 ;
-        var num_hdr_rows = 2 ;
-        var max_hdr_rows = 4 ;
-        var num_cols = 20 ;
+
+        var num_rows     = 100 ;
+        var num_hdr_rows =   2 ;
+        var max_hdr_rows =   4 ;
+        var num_cols     =  20 ;
+
         var rows = [] ;
         for (var i=0; i < num_rows; i++) {
             var row = ['<b>'+(num_rows-i)+'</b>'] ;
