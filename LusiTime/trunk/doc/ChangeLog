@@ -11,7 +11,7 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-01-04
+Tag: V00-01-05
 2014-10-10 Igor Gaponenko
 - extended LusiTime parser to support symbol 'T' as date/time separator as
 per the true ISO format specification.
