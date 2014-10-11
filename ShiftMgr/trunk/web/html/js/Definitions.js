@@ -2,11 +2,7 @@ define ([] ,
 
 function () {
 
-    /* 
-     * To change this template, choose Tools | Templates
-     * and open the template in the editor.
-     */
-    var Definitions = {
+    return {
 
         AreaNames : [
 
@@ -68,6 +64,4 @@ function () {
 
         ShiftsUpdateInterval_Sec : 30       /* how frequently to update shift information */
     } ;
-
-    return Definitions ;
 }) ;

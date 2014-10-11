@@ -903,8 +903,8 @@ function (
     /**
      * The main class representing instrument-level reports.
      *
-     * @param string instr_name
-     * @param boolean can_edit
+     * @param {string} instr_name
+     * @param {boolean} can_edit
      * @returns {Reports}
      */
     function Reports (instr_name, can_edit) {

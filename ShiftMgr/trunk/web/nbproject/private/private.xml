@@ -2,16 +2,7 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/History.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/index.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Reports4all.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Reports.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Access.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Rules.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/index_main.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Notifications.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/ShiftMgr/web/html/js/Definitions.js</file>
-        </group>
+        <group name="PCDS Web App"/>
+        <group name="PCDS Web Apps"/>
     </open-files>
 </project-private>
