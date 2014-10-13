@@ -5,7 +5,7 @@
 #
 
 # release directory
-release=/reg/g/psdm/sw/releases/current
+release=/reg/g/psdm/sw/releases/dm-current
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
 
