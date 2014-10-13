@@ -6,7 +6,7 @@
 #
 
 # release directory
-release=/reg/g/psdm/sw/releases/current
+release=/reg/g/psdm/sw/releases/dm-current
 #release=/reg/neh/home/salnikov/ws/0.2.2
 
 # database options
