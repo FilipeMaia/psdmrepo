@@ -480,4 +480,69 @@
   @init()  [[auto, inline]];
 
 }
+
+
+//------------------ BldDataSpectrometerV1 ------------------
+/* Structure which contains image projections and fit parameters for spectrometers. 
+	Changes from V0 include extending size of hproj, removal of vproj,
+	 and addition of fit parameters. */
+@type BldDataSpectrometerV1
+  [[type_id(Id_Spectrometer, 1)]]
+  [[pack(4)]]
+{
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto]];
+
+  /* Construct from dimensions only.  Allow data to be appended externally. */
+  @init(width -> _width, nPeaks -> _nPeaks)  [[inline]];
+
+  /* Width of camera frame and thus size of hproj array 
+     PV TBD */
+  uint32_t _width -> width; 
+
+  /* First row of pixels used in projection ROI  
+     PV TBD */
+  uint32_t _hproj_y1 -> hproj_y1;
+
+  /* Last row of pixels used in projection ROI
+    PV: TBD */
+  uint32_t _hproj_y2 -> hproj_y2;
+
+  /* Raw center of mass, no baseline subtraction 
+     PV: TBD */
+  double _fComRaw -> comRaw;
+
+  /* Baseline level for calculated values 
+     PV: TBD */
+  double _fBaseline -> baseline;
+
+  /* Baseline-subtracted center of mass 
+     PV: TBD */
+  double _fCom -> com;
+
+  /* Integrated area under spectrum (no baseline subtraction) 
+     PV: TBD */
+  double _fIntegral -> integral;
+
+  /* Number of peak fits performed
+    PV: TBD */ 
+  uint32_t _nPeaks -> nPeaks;
+
+  /* Projection of spectrum onto energy axis 
+     PV TBD */
+  uint32_t _hproj[@self._width] -> hproj; 
+
+  /* Peak position array, length given by nPeaks
+     PV: TBD */
+  double _peakPos[@self._nPeaks] -> peakPos;
+
+  /* Peak height array, length given by nPeaks
+     PV: TBD */
+  double _peakHeight[@self._nPeaks] -> peakHeight;
+
+  /* Peak FWHM array, length given by nPeaks
+     PV: TBD */
+  double _Fwhm[@self._nPeaks] -> FWHM;
+
+}
 } //- @package Bld
