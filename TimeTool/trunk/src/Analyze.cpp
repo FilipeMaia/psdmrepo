@@ -61,8 +61,9 @@ namespace {
   calculate_logic(const ndarray<const Psana::TimeTool::EventLogic,1>& cfg,
                   const ndarray<const Psana::EvrData::FIFOEvent,1>& event)
   {
-    bool v = (cfg[0].logic_op() == Psana::TimeTool::EventLogic::L_AND ||
-              cfg[0].logic_op() == Psana::TimeTool::EventLogic::L_AND_NOT);
+    bool v = (cfg.size()==0) ||
+      (cfg[0].logic_op() == Psana::TimeTool::EventLogic::L_AND ||
+       cfg[0].logic_op() == Psana::TimeTool::EventLogic::L_AND_NOT);
     for(unsigned i=0; i<cfg.size(); i++) {
 
       bool p=false;
@@ -386,6 +387,13 @@ Analyze::beginJob(Event& evt, Env& env)
         m_sb_roi_hi[1] == config.sb_roi_hi().column();
     }
   }
+
+  if (m_beam_logic.size()==0)
+    MsgLog(name(), info, 
+           name() << ": no beam_logic configuration given.  Assume beam is always T");
+  if (m_laser_logic.size()==0)
+    MsgLog(name(), info, 
+           name() << ": no laser_logic configuration given.  Assume laser is always T");
 
   {
     shared_ptr<Psana::Camera::FrameFexConfigV1> config = 
