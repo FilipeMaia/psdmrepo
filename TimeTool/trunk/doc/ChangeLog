@@ -11,6 +11,13 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2014-10-15 David Schneider
+- includes Matt's fix for JIRA PSAS-47 (crash when no laser logic given, i.e, 
+  laser always on or off).
+- additional fix to local TimeToolData constructor in Analyze.cpp which sets
+  EventType parameter
+	
 Tag: V00-00-03
 2014-07-31 David Schneider
 - added config file option put_ndarrays to TimeTool.Analyze to put Event

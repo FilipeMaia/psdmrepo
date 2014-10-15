@@ -98,7 +98,8 @@ namespace {
                  double nxt_amplitude_arg,
                  ndarray<const int32_t, 1> projected_signal_arg,
                  ndarray<const int32_t, 1> projected_sideband)
-      : m_amplitude(amplitude_arg),
+      : m_event_type(event_type_arg),
+        m_amplitude(amplitude_arg),
         m_position_pixel(position_pixel_arg),
       m_position_time(position_time_arg),
       m_position_fwhm(position_fwhm_arg),
