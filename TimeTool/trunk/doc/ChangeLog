@@ -11,12 +11,18 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-04
+Tag: V00-01-01
 2014-10-15 David Schneider
 - includes Matt's fix for JIRA PSAS-47 (crash when no laser logic given, i.e, 
   laser always on or off).
 - additional fix to local TimeToolData constructor in Analyze.cpp which sets
   EventType parameter
+- note: there was no ChangeLog entry for Tag V00-01-00. This Tag includes 
+  those change as well - from svn message:
+  Fix to fill AMPLNXT r9005
+  Changed Analyze module to use TimeTool::ConfigV1 for defaults and TimeTool::DataV1 
+  when appropriate r8964
+
 	
 Tag: V00-00-03
 2014-07-31 David Schneider
