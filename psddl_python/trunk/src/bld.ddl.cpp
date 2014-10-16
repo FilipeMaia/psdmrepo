@@ -437,8 +437,30 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataSpectrometerV0> >(Pds::TypeId::Id_Spectrometer));
 
   {
-    PyObject* unvlist = PyList_New(1);
+  scope outer = 
+  class_<Psana::Bld::BldDataSpectrometerV1, boost::shared_ptr<Psana::Bld::BldDataSpectrometerV1>, boost::noncopyable >("BldDataSpectrometerV1", "Structure which contains image projections and fit parameters for spectrometers. \n	Changes from V0 include extending size of hproj, removal of vproj,\n	 and addition of fit parameters.", no_init)
+    .def("width", &Psana::Bld::BldDataSpectrometerV1::width,"Width of camera frame and thus size of hproj array \n     PV TBD")
+    .def("hproj_y1", &Psana::Bld::BldDataSpectrometerV1::hproj_y1,"First row of pixels used in projection ROI  \n     PV TBD")
+    .def("hproj_y2", &Psana::Bld::BldDataSpectrometerV1::hproj_y2,"Last row of pixels used in projection ROI\n    PV: TBD")
+    .def("comRaw", &Psana::Bld::BldDataSpectrometerV1::comRaw,"Raw center of mass, no baseline subtraction \n     PV: TBD")
+    .def("baseline", &Psana::Bld::BldDataSpectrometerV1::baseline,"Baseline level for calculated values \n     PV: TBD")
+    .def("com", &Psana::Bld::BldDataSpectrometerV1::com,"Baseline-subtracted center of mass \n     PV: TBD")
+    .def("integral", &Psana::Bld::BldDataSpectrometerV1::integral,"Integrated area under spectrum (no baseline subtraction) \n     PV: TBD")
+    .def("nPeaks", &Psana::Bld::BldDataSpectrometerV1::nPeaks,"Number of peak fits performed\n    PV: TBD")
+    .def("hproj", &Psana::Bld::BldDataSpectrometerV1::hproj,"Projection of spectrum onto energy axis \n     PV TBD")
+    .def("peakPos", &Psana::Bld::BldDataSpectrometerV1::peakPos,"Peak position array, length given by nPeaks\n     PV: TBD")
+    .def("peakHeight", &Psana::Bld::BldDataSpectrometerV1::peakHeight,"Peak height array, length given by nPeaks\n     PV: TBD")
+    .def("FWHM", &Psana::Bld::BldDataSpectrometerV1::FWHM,"Peak FWHM array, length given by nPeaks\n     PV: TBD")
+  ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Spectrometer);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataSpectrometerV1> >(Pds::TypeId::Id_Spectrometer));
+
+  {
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataSpectrometerV0"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataSpectrometerV1"));
     PyObject_SetAttrString(submodule, "BldDataSpectrometer", unvlist);
     Py_CLEAR(unvlist);
   }
@@ -482,6 +504,7 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
+  detail::register_ndarray_to_numpy_cvt<const double, 1>();
 
 } // createWrappers()
 } // namespace Bld
