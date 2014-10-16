@@ -147,7 +147,8 @@ class ConfigFileGenerator :
                 self.ind += 1 
                 #print self.ind, self.source, self.fname_ave, self.fname_rms
 
-                #list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Acqiris']
+                #list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', \
+                #                  'OrcaFl40', 'Epix', 'Epix10k', 'Fccd960', 'Acqiris']
                 #if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPadPedestals')
                 #elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPad2x2Pedestals')
                 if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPadNDArrProducer')
@@ -163,8 +164,9 @@ class ConfigFileGenerator :
                 elif det_name == cp.list_of_dets[9] : self.add_cfg_module_peds_aver_camera()
                 elif det_name == cp.list_of_dets[10]: self.add_cfg_module_peds_aver_epix()
                 elif det_name == cp.list_of_dets[11]: self.add_cfg_module_peds_aver_epix()
-                elif det_name == cp.list_of_dets[12]: self.add_cfg_module_peds_aver_acqiris()
-                elif det_name == cp.list_of_dets[13]: self.print_warning()
+                elif det_name == cp.list_of_dets[12]: self.add_cfg_module_peds_aver_camera()
+                elif det_name == cp.list_of_dets[13]: self.add_cfg_module_peds_aver_acqiris()
+                elif det_name == cp.list_of_dets[14]: self.print_warning()
                 else : logger.warning('UNKNOWN DETECTOR: %s' % det_name, __name__)
 
         if self.ind > 0 : return True

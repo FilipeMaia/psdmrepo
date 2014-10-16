@@ -326,9 +326,29 @@ class OpticAlignmentCspadV1 (OpticAlignmentCspadMethods) :
         q_x0  = [-4500,-4500, 4500, 4500]
         q_y0  = [-4500, 4500, 4500,-4500]
         for quad in range(self.nquads) :
-            txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
+            txt += self.str_fmt() % \
                 (name_parent.ljust(12), num_parent, name_segm.ljust(12), quad, \
                  q_x0[quad], q_y0[quad], z0, q_rot[quad], rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+        return txt + '\n' 
+
+#----------------------------------
+ 
+    def txt_geometry_det_ip(self) :
+        txt = ''
+        name_object = 'CSPAD:V1'
+        name_parent = 'RAIL'
+        num_parent, num_object, x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ = 0,0,0,0,1e6,0,0,0,0,0,0
+        txt += self.str_fmt() % \
+            (name_parent.ljust(12), num_parent, name_object.ljust(12), num_object, \
+            x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+
+        name_object = 'RAIL'
+        name_parent = 'IP'
+        z0          = 0
+        txt += self.str_fmt() % \
+            (name_parent.ljust(12), num_parent, name_object.ljust(12), num_object, \
+            x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+
         return txt + '\n' 
 
 #----------------------------------
@@ -336,7 +356,8 @@ class OpticAlignmentCspadV1 (OpticAlignmentCspadMethods) :
     def txt_geometry(self) :
         return self.txt_geometry_header() + \
                self.txt_geometry_segments() + \
-               self.txt_geometry_quads()
+               self.txt_geometry_quads() + \
+               self.txt_geometry_det_ip()
 
 #----------------------------------
 

@@ -106,7 +106,7 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
 #----------------------------------
 
     def readOpticalAlignmentFile(self): 
-        """Reads the metrology.txt file with original optical measurements for a single CSPAD2x1
+        """Reads the metrology.txt file with original optical measurements for a single CSPAD2x2
         """
         if self.print_bits & 1 : print 'readOpticalAlignmentFile()'
 
@@ -164,7 +164,7 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
 #        txt = ''        
 #        name_segm   = 'SENS2X1:V1'
 #        segm_index  = -1
-#        name_parent = 'CSPAD2X1:V1'
+#        name_parent = 'CSPAD2X2:V1'
 #        name_index  = 0
 #        rotXZ, rotYZ = 0,0
 #        for quad in range(self.nquads) :
@@ -185,11 +185,25 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
 #        return txt
 
 #----------------------------------
+#----------------------------------
+ 
+    def txt_geometry_det_ip(self) :
+        txt = ''
+        name_object = 'CSPAD2X2:V1'
+        name_parent = 'IP'
+        num_parent, num_object, x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ = 0,0,0,0,1e6,0,0,0,0,0,0
+        txt += self.str_fmt() % \
+            (name_parent.ljust(12), num_parent, name_object.ljust(12), num_object, \
+            x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+
+        return txt + '\n' 
+
+#----------------------------------
  
     def txt_geometry(self) :
         return self.txt_geometry_header() + \
-               self.txt_geometry_segments(name_segm='SENS2X1:V1', name_parent='CSPAD2X1:V1')
-               #self.txt_geometry_quads()
+               self.txt_geometry_segments(name_segm='SENS2X1:V1', name_parent='CSPAD2X2:V1') + \
+               self.txt_geometry_det_ip()
 
 #----------------------------------
 #----------------------------------

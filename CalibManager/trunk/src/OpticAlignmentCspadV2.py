@@ -232,7 +232,7 @@ class OpticAlignmentCspadV2 (OpticAlignmentCspadMethods) :
         for quad in range(self.nquads) :
             for segm in range(self.nsegms) :
                 segm_index += 1 
-                txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
+                txt += self.str_fmt() % \
                        (name_parent.ljust(12), name_index, name_segm.ljust(12), segm_index, \
                        self.arrXmu[quad][segm], \
                        self.arrYmu[quad][segm], \
@@ -248,10 +248,24 @@ class OpticAlignmentCspadV2 (OpticAlignmentCspadMethods) :
 
 #----------------------------------
  
+    def txt_geometry_det_ip(self) :
+        txt = ''
+        name_object = 'CSPAD:V2'
+        name_parent = 'IP'
+        num_parent, num_object, x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ = 0,0,0,0,1e6,0,0,0,0,0,0
+        txt += self.str_fmt() % \
+            (name_parent.ljust(12), num_parent, name_object.ljust(12), num_object, \
+            x0, y0, z0, rotXY, rotXZ, rotYZ, tiltXY, tiltXZ, tiltYZ)
+
+        return txt + '\n' 
+
+
+#----------------------------------
+ 
     def txt_geometry(self) :
         return self.txt_geometry_header() + \
-               self.txt_geometry_segments()
-               #self.txt_geometry_quads()
+               self.txt_geometry_segments() + \
+               self.txt_geometry_det_ip()
 
 #----------------------------------
 #----------------------------------

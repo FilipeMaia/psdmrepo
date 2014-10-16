@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-10-16 Mikhail S. Dubrovin
+Tag: V00-00-64
+- OpticAlignmentCspad* - add in all output geometry files the line with detector position relative to IP
+- ConfigParametersForApp, ConfigFileGenerator add support for Fccd960
+	
 2014-10-03 Mikhail S. Dubrovin
 Tag: V00-00-63
 - in OpticAlignmentCspad*.py - add option parser for manual processing of metrology files

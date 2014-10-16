@@ -550,9 +550,14 @@ class OpticAlignmentCspadMethods :
             + '\n# PARAM:11 TILT_Z     - object tilt angle [deg] around Z axis of the parent frame' \
             + '\n# PARAM:12 TILT_Y     - object tilt angle [deg] around Y axis of the parent frame' \
             + '\n# PARAM:13 TILT_X     - object tilt angle [deg] around X axis of the parent frame' \
-            + '\n\n# HDR PARENT IND        OBJECT IND    X0[um]  Y0[um]  Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
+            + '\n\n# HDR PARENT IND        OBJECT IND     X0[um]   Y0[um]   Z0[um]   ROT-Z ROT-Y ROT-X     TILT-Z   TILT-Y   TILT-X'
 
         return txt + '\n\n'
+
+#----------------------------------
+
+    def str_fmt(self) :
+        return '%s %3d  %s %3d   %8d %8d %8d   %5d %5d %5d   %8.5f %8.5f %8.5f \n'
 
 #----------------------------------
 
@@ -561,7 +566,7 @@ class OpticAlignmentCspadMethods :
         rotXZ, rotYZ = 0,0
         for quad in range(self.nquads) :
             for segm in range(self.nsegms) :
-                txt += '%s %3d  %s %3d   %7d %7d %7d   %5d %5d %5d   %8.5f %8.5f %8.5f \n' % \
+                txt += self.str_fmt() % \
                        (name_parent.ljust(12), quad, name_segm.ljust(12), segm, \
                        self.arrXmu[quad][segm], \
                        self.arrYmu[quad][segm], \

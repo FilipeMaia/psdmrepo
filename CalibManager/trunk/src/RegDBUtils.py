@@ -301,6 +301,7 @@ if __name__ == "__main__" :
     #det_name = 'opal4000'
     #det_name = 'opal8000'
     #det_name = 'orcafl40'
+    #det_name = 'fccd960'
     #det_name = 'Acqiris'
     print "\n\nTest : list_of_sources_for_det ('%s')" % det_name
     print_list_of_sources_for_det (det_name)
