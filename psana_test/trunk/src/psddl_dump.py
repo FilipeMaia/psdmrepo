@@ -1644,6 +1644,50 @@ def Bld_BldDataSpectrometerV0_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataSpectrometerV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataSpectrometerV1.TypeId
+    assert obj.Version == psana.Bld.BldDataSpectrometerV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'width: %s' % uint32_to_str( obj.width() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hproj_y1: %s' % uint32_to_str( obj.hproj_y1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hproj_y2: %s' % uint32_to_str( obj.hproj_y2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'comRaw: %s' % double_to_str( obj.comRaw() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'baseline: %s' % double_to_str( obj.baseline() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'com: %s' % double_to_str( obj.com() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'integral: %s' % double_to_str( obj.integral() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nPeaks: %s' % uint32_to_str( obj.nPeaks() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'hproj: %s' % ndarray_to_str( obj.hproj() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'peakPos: %s' % ndarray_to_str( obj.peakPos() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'peakHeight: %s' % ndarray_to_str( obj.peakHeight() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'FWHM: %s' % ndarray_to_str( obj.FWHM() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def ControlData_PVControl_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
@@ -7117,6 +7161,7 @@ objFunctionTable = {
     (psana.Bld.BldDataPhaseCavity.TypeId,0) : Bld_BldDataPhaseCavity_to_str,
     (psana.Bld.BldDataPimV1.TypeId,1) : Bld_BldDataPimV1_to_str,
     (psana.Bld.BldDataSpectrometerV0.TypeId,0) : Bld_BldDataSpectrometerV0_to_str,
+    (psana.Bld.BldDataSpectrometerV1.TypeId,1) : Bld_BldDataSpectrometerV1_to_str,
     (psana.Camera.FrameFccdConfigV1.TypeId,1) : Camera_FrameFccdConfigV1_to_str,
     (psana.Camera.FrameFexConfigV1.TypeId,1) : Camera_FrameFexConfigV1_to_str,
     (psana.Camera.FrameV1.TypeId,1) : Camera_FrameV1_to_str,

@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-38
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+
 Tag: V00-00-37
 2014-10-03 David Schneider
 - regenerate for new pdsdata 8.1.4/psddldata with: Evr::IOConfigV2. 
