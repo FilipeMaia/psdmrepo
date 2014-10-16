@@ -285,6 +285,7 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet Spectrometer;
   Spectrometer.insert( & typeid(Psana::Bld::BldDataSpectrometerV0));
+  Spectrometer.insert( & typeid(Psana::Bld::BldDataSpectrometerV1));
   m_alias2TypesMap["Spectrometer"] = Spectrometer;
 
   TypeInfoSet TM6740;

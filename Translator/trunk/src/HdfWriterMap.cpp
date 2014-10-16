@@ -175,6 +175,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Bld::BldDataPhaseCavity) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataPhaseCavity> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataPimV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataPimV1> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataSpectrometerV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataSpectrometerV0> >();
+  m_mainMap[ & typeid(Psana::Bld::BldDataSpectrometerV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataSpectrometerV1> >();
   m_mainMap[ & typeid(Psana::Camera::FrameFccdConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Camera::FrameFccdConfigV1> >();
   m_mainMap[ & typeid(Psana::Camera::FrameFexConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Camera::FrameFexConfigV1> >();
   m_mainMap[ & typeid(Psana::Camera::FrameV1) ] = boost::make_shared<HdfWriterPsana<Psana::Camera::FrameV1> >();
