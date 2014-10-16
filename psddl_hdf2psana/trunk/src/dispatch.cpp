@@ -125,6 +125,10 @@ try {
     // Bld::BldDataSpectrometerV0
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataSpectrometerV0(schema_version, group, idx), src);
     break;
+  case 738044565:
+    // Bld::BldDataSpectrometerV1
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataSpectrometerV1(schema_version, group, idx), src);
+    break;
   case 756401870:
     // Lusi::IpmFexV1
     evt.putProxy(psddl_hdf2psana::Lusi::make_IpmFexV1(schema_version, group, idx), src);

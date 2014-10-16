@@ -916,6 +916,76 @@ void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group g
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+
+namespace ns_BldDataSpectrometerV1_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataSpectrometerV1& psanaobj);
+  ~dataset_data();
+
+  uint32_t width;
+  uint32_t hproj_y1;
+  uint32_t hproj_y2;
+  double comRaw;
+  double baseline;
+  double com;
+  double integral;
+  uint32_t nPeaks;
+
+
+};
+}
+
+
+class BldDataSpectrometerV1_v0 : public Psana::Bld::BldDataSpectrometerV1 {
+public:
+  typedef Psana::Bld::BldDataSpectrometerV1 PsanaType;
+  BldDataSpectrometerV1_v0() {}
+  BldDataSpectrometerV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~BldDataSpectrometerV1_v0() {}
+  virtual uint32_t width() const;
+  virtual uint32_t hproj_y1() const;
+  virtual uint32_t hproj_y2() const;
+  virtual double comRaw() const;
+  virtual double baseline() const;
+  virtual double com() const;
+  virtual double integral() const;
+  virtual uint32_t nPeaks() const;
+  virtual ndarray<const uint32_t, 1> hproj() const;
+  virtual ndarray<const double, 1> peakPos() const;
+  virtual ndarray<const double, 1> peakHeight() const;
+  virtual ndarray<const double, 1> FWHM() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Bld::ns_BldDataSpectrometerV1_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const uint32_t, 1> m_ds_hproj;
+  void read_ds_hproj() const;
+  mutable ndarray<const double, 1> m_ds_peakPos;
+  void read_ds_peakPos() const;
+  mutable ndarray<const double, 1> m_ds_peakHeight;
+  void read_ds_peakHeight() const;
+  mutable ndarray<const double, 1> m_ds_FWHM;
+  void read_ds_FWHM() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataSpectrometerV1> > make_BldDataSpectrometerV1(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataSpectrometerV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataSpectrometerV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 } // namespace Bld
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_BLD_DDL_H

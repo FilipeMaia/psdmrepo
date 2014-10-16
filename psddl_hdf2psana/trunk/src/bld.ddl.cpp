@@ -2531,5 +2531,264 @@ void store_at(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group,
   store_BldDataSpectrometerV0(obj, group, index, version, true);
 }
 
+
+hdf5pp::Type ns_BldDataSpectrometerV1_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataSpectrometerV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("hproj_y1", offsetof(DsType, hproj_y1), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("hproj_y2", offsetof(DsType, hproj_y2), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("comRaw", offsetof(DsType, comRaw), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("baseline", offsetof(DsType, baseline), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("com", offsetof(DsType, com), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("integral", offsetof(DsType, integral), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("nPeaks", offsetof(DsType, nPeaks), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV1_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataSpectrometerV1_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV1_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataSpectrometerV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("hproj_y1", offsetof(DsType, hproj_y1), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("hproj_y2", offsetof(DsType, hproj_y2), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("comRaw", offsetof(DsType, comRaw), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("baseline", offsetof(DsType, baseline), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("com", offsetof(DsType, com), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("integral", offsetof(DsType, integral), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("nPeaks", offsetof(DsType, nPeaks), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV1_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataSpectrometerV1_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataSpectrometerV1_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataSpectrometerV1_v0::dataset_data::dataset_data(const Psana::Bld::BldDataSpectrometerV1& psanaobj)
+  : width(psanaobj.width())
+  , hproj_y1(psanaobj.hproj_y1())
+  , hproj_y2(psanaobj.hproj_y2())
+  , comRaw(psanaobj.comRaw())
+  , baseline(psanaobj.baseline())
+  , com(psanaobj.com())
+  , integral(psanaobj.integral())
+  , nPeaks(psanaobj.nPeaks())
+{
+}
+
+ns_BldDataSpectrometerV1_v0::dataset_data::~dataset_data()
+{
+}
+uint32_t BldDataSpectrometerV1_v0::width() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->width);
+}
+uint32_t BldDataSpectrometerV1_v0::hproj_y1() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->hproj_y1);
+}
+uint32_t BldDataSpectrometerV1_v0::hproj_y2() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->hproj_y2);
+}
+double BldDataSpectrometerV1_v0::comRaw() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->comRaw);
+}
+double BldDataSpectrometerV1_v0::baseline() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->baseline);
+}
+double BldDataSpectrometerV1_v0::com() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->com);
+}
+double BldDataSpectrometerV1_v0::integral() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->integral);
+}
+uint32_t BldDataSpectrometerV1_v0::nPeaks() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->nPeaks);
+}
+ndarray<const uint32_t, 1> BldDataSpectrometerV1_v0::hproj() const {
+  if (m_ds_hproj.empty()) read_ds_hproj();
+  return m_ds_hproj;
+}
+ndarray<const double, 1> BldDataSpectrometerV1_v0::peakPos() const {
+  if (m_ds_peakPos.empty()) read_ds_peakPos();
+  return m_ds_peakPos;
+}
+ndarray<const double, 1> BldDataSpectrometerV1_v0::peakHeight() const {
+  if (m_ds_peakHeight.empty()) read_ds_peakHeight();
+  return m_ds_peakHeight;
+}
+ndarray<const double, 1> BldDataSpectrometerV1_v0::FWHM() const {
+  if (m_ds_FWHM.empty()) read_ds_FWHM();
+  return m_ds_FWHM;
+}
+void BldDataSpectrometerV1_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataSpectrometerV1_v0::dataset_data>(m_group, "data", m_idx);
+}
+void BldDataSpectrometerV1_v0::read_ds_hproj() const {
+  m_ds_hproj = hdf5pp::Utils::readNdarray<uint32_t, 1>(m_group, "hproj", m_idx);
+}
+void BldDataSpectrometerV1_v0::read_ds_peakPos() const {
+  m_ds_peakPos = hdf5pp::Utils::readNdarray<double, 1>(m_group, "peakPos", m_idx);
+}
+void BldDataSpectrometerV1_v0::read_ds_peakHeight() const {
+  m_ds_peakHeight = hdf5pp::Utils::readNdarray<double, 1>(m_group, "peakHeight", m_idx);
+}
+void BldDataSpectrometerV1_v0::read_ds_FWHM() const {
+  m_ds_FWHM = hdf5pp::Utils::readNdarray<double, 1>(m_group, "FWHM", m_idx);
+}
+
+void make_datasets_BldDataSpectrometerV1_v0(const Psana::Bld::BldDataSpectrometerV1& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataSpectrometerV1_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.hproj()) PsanaArray;
+    const PsanaArray& psana_array = obj.hproj();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "hproj", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.peakPos()) PsanaArray;
+    const PsanaArray& psana_array = obj.peakPos();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<double>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "peakPos", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.peakHeight()) PsanaArray;
+    const PsanaArray& psana_array = obj.peakHeight();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<double>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "peakHeight", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.FWHM()) PsanaArray;
+    const PsanaArray& psana_array = obj.FWHM();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<double>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "FWHM", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_BldDataSpectrometerV1_v0(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Bld::ns_BldDataSpectrometerV1_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "hproj", obj->hproj(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "hproj", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "hproj", obj->hproj());
+  }
+
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "peakPos", obj->peakPos(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "peakPos", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "peakPos", obj->peakPos());
+  }
+
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "peakHeight", obj->peakHeight(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "peakHeight", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "peakHeight", obj->peakHeight());
+  }
+
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "FWHM", obj->FWHM(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "FWHM", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "FWHM", obj->FWHM());
+  }
+
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataSpectrometerV1> > make_BldDataSpectrometerV1(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataSpectrometerV1> >(boost::make_shared<BldDataSpectrometerV1_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataSpectrometerV1> >(boost::shared_ptr<Psana::Bld::BldDataSpectrometerV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataSpectrometerV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_BldDataSpectrometerV1_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataSpectrometerV1", version);
+  }
+}
+
+void store_BldDataSpectrometerV1(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_BldDataSpectrometerV1_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataSpectrometerV1", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataSpectrometerV1& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataSpectrometerV1(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group, long index, int version)
+{
+  store_BldDataSpectrometerV1(obj, group, index, version, true);
+}
+
 } // namespace Bld
 } // namespace psddl_hdf2psana

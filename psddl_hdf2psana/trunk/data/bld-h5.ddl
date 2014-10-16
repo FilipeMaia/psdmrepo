@@ -273,4 +273,24 @@
     @attribute vproj;
   }
 }
+
+//------------------ BldDataSpectrometerV1 ------------------
+@h5schema BldDataSpectrometerV1
+  [[version(0)]]
+{
+  @dataset data {
+    @attribute width;
+    @attribute hproj_y1;
+    @attribute hproj_y2;
+    @attribute comRaw;
+    @attribute baseline;
+    @attribute com;
+    @attribute integral;
+    @attribute nPeaks;
+  }
+  @dataset hproj;
+  @dataset peakPos;
+  @dataset peakHeight;
+  @dataset FWHM;
+}
 } //- @package Bld
