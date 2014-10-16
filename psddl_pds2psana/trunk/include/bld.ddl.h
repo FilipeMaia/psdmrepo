@@ -182,6 +182,30 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+
+class BldDataSpectrometerV1 : public Psana::Bld::BldDataSpectrometerV1 {
+public:
+  typedef Pds::Bld::BldDataSpectrometerV1 XtcType;
+  typedef Psana::Bld::BldDataSpectrometerV1 PsanaType;
+  BldDataSpectrometerV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataSpectrometerV1();
+  virtual uint32_t width() const;
+  virtual uint32_t hproj_y1() const;
+  virtual uint32_t hproj_y2() const;
+  virtual double comRaw() const;
+  virtual double baseline() const;
+  virtual double com() const;
+  virtual double integral() const;
+  virtual uint32_t nPeaks() const;
+  virtual ndarray<const uint32_t, 1> hproj() const;
+  virtual ndarray<const double, 1> peakPos() const;
+  virtual ndarray<const double, 1> peakHeight() const;
+  virtual ndarray<const double, 1> FWHM() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Bld
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_BLD_DDL_H

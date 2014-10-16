@@ -2044,11 +2044,25 @@ try {
           if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
+      case 1:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataSpectrometerV1, psddl_pds2psana::Bld::BldDataSpectrometerV1, Pds::Bld::BldDataSpectrometerV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
       case 32768:
         {
           // store proxy
           typedef EvtProxy<Psana::Bld::BldDataSpectrometerV0, psddl_pds2psana::Bld::BldDataSpectrometerV0, Pds::Bld::BldDataSpectrometerV0> ProxyType;
           if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataSpectrometerV1, psddl_pds2psana::Bld::BldDataSpectrometerV1, Pds::Bld::BldDataSpectrometerV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -3003,8 +3017,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 0:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV0) );
       break;
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV1) );
+      break;
     case 32768:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV0) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV1) );
       break;
     } // end version switch
     break;

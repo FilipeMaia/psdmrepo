@@ -334,5 +334,74 @@ ndarray<const uint32_t, 1> BldDataSpectrometerV0::vproj() const {
   return m_xtcObj->vproj(m_xtcObj);
 }
 
+BldDataSpectrometerV1::BldDataSpectrometerV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataSpectrometerV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataSpectrometerV1::~BldDataSpectrometerV1()
+{
+}
+
+
+uint32_t BldDataSpectrometerV1::width() const {
+  return m_xtcObj->width();
+}
+
+
+uint32_t BldDataSpectrometerV1::hproj_y1() const {
+  return m_xtcObj->hproj_y1();
+}
+
+
+uint32_t BldDataSpectrometerV1::hproj_y2() const {
+  return m_xtcObj->hproj_y2();
+}
+
+
+double BldDataSpectrometerV1::comRaw() const {
+  return m_xtcObj->comRaw();
+}
+
+
+double BldDataSpectrometerV1::baseline() const {
+  return m_xtcObj->baseline();
+}
+
+
+double BldDataSpectrometerV1::com() const {
+  return m_xtcObj->com();
+}
+
+
+double BldDataSpectrometerV1::integral() const {
+  return m_xtcObj->integral();
+}
+
+
+uint32_t BldDataSpectrometerV1::nPeaks() const {
+  return m_xtcObj->nPeaks();
+}
+
+
+ndarray<const uint32_t, 1> BldDataSpectrometerV1::hproj() const {
+  return m_xtcObj->hproj(m_xtcObj);
+}
+
+
+ndarray<const double, 1> BldDataSpectrometerV1::peakPos() const {
+  return m_xtcObj->peakPos(m_xtcObj);
+}
+
+
+ndarray<const double, 1> BldDataSpectrometerV1::peakHeight() const {
+  return m_xtcObj->peakHeight(m_xtcObj);
+}
+
+
+ndarray<const double, 1> BldDataSpectrometerV1::FWHM() const {
+  return m_xtcObj->FWHM(m_xtcObj);
+}
+
 } // namespace Bld
 } // namespace psddl_pds2psana
