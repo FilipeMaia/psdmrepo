@@ -1,0 +1,45 @@
+Psana:
+- Updated to handle new DAQ types: Evr::IOConfigV2 and Bld::BldDataSpectrometerV1
+
+GeometryObject:
+- add support for cspad2x2-shaffling of pixel arrays, both in C++ and Python
+
+CalibManager :
+- PlotImgSpeWidget.py - print image intensity along with coursor coordinates in coursor motion
+- OpticAlignmentCspad*.py - add option parser for manual processing of metrology files
+- OpticAlignmentCspad* - add in all output geometry files the line with detector position relative to IP;  
+- ConfigParametersForApp, ConfigFileGenerator add support for Fccd960
+ 
+PixCoordsProducer:
+- save geometry file name as a string (as ndarray<char,1> - is depricated but still available)
+- add saving mask for edge and unbound pixels 
+- add x,y origin offsets for indexing
+
+CSPadPixCoords::CSPad2x2ImageProducer:
+- use the "geometry" calibration file if available
+
+TimeTool:
+- the TimeTool.Analyze module now uses TimeTool::ConfigV1 for defaults and outputs
+  TimeTool::DataV1 when appropriate. The TimeTool::ConfigV1 data will be written when
+  upcoming experiments use the online DAQ TimingTool. If the experiment did not use
+  the DAQ timing tool, this data is not written. The TimeTool::DataV1 object will be
+  more convenient to work with from Python and C++ than the ndarrays that one could 
+  output before.
+
+DDL system (of interest to internal developers, not general users):
+- new tag for types: [[devel]] means by default do not generate code, it is
+  in development (like skip)
+- Generating code for [[devel]] tagged types is enabled by adding -D switch to
+  psddlc or GENDEVEL=1 when running make to build the 'gen' target in pdsdata
+
+External Packages:
+- pdsdata update to 8.1.5 with new DAQ type mentioned above, and new Bld Ipimb sources.
+
+Bugs fixed:
+- CalibManager: in OpticAlignmentCspad2x2V1.py fix segment rotation angles 0 -> 180
+- pypsalg: Fix bug in AngularIntegrationM where centers were not set correctly
+
+Known Issues:
+- Pyana does not support the new Bld Ipimb sources in pdsdata 8.1.5
+- Python applications using h5py with parallel HDF5 would hang when exiting. Apparently,
+  there is a deadlock caused by either mpi4py or h5py implementations.
