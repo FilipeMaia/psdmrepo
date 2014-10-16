@@ -505,7 +505,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #xmin, xmax = axes.get_xlim()
         #ymin, ymax = axes.get_ylim()
         x, y = event.xdata, event.ydata
-        s = '%d, %d' % (event.xdata, event.ydata)
+        #print 'self.arr.shape', self.arr.shape
+        v = self.arr[y,x]
+        s = '%d, %d\nv=%d' % (x, y, v)
         try : self.curstext.remove()
         except : pass
         self.curstext = axes.text(x, y, s, fontsize=10) #, ha='center')

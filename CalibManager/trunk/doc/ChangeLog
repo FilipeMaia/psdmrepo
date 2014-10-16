@@ -13,6 +13,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2014-10-16 Mikhail S. Dubrovin
+Tag: V00-00-65
+- PlotImgSpeWidget.py - print image intensity along with coursor coordinates in coursor motion
+
+2014-10-16 Mikhail S. Dubrovin
 Tag: V00-00-64
 - OpticAlignmentCspad* - add in all output geometry files the line with detector position relative to IP
 - ConfigParametersForApp, ConfigFileGenerator add support for Fccd960
