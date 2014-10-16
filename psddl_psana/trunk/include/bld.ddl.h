@@ -810,6 +810,57 @@ public:
   virtual ndarray<const uint32_t, 1> hproj() const = 0;
   virtual ndarray<const uint32_t, 1> vproj() const = 0;
 };
+
+/** @class BldDataSpectrometerV1
+
+  Structure which contains image projections and fit parameters for spectrometers. 
+	Changes from V0 include extending size of hproj, removal of vproj,
+	 and addition of fit parameters.
+*/
+
+
+class BldDataSpectrometerV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_Spectrometer /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~BldDataSpectrometerV1();
+  /** Width of camera frame and thus size of hproj array 
+     PV TBD */
+  virtual uint32_t width() const = 0;
+  /** First row of pixels used in projection ROI  
+     PV TBD */
+  virtual uint32_t hproj_y1() const = 0;
+  /** Last row of pixels used in projection ROI
+    PV: TBD */
+  virtual uint32_t hproj_y2() const = 0;
+  /** Raw center of mass, no baseline subtraction 
+     PV: TBD */
+  virtual double comRaw() const = 0;
+  /** Baseline level for calculated values 
+     PV: TBD */
+  virtual double baseline() const = 0;
+  /** Baseline-subtracted center of mass 
+     PV: TBD */
+  virtual double com() const = 0;
+  /** Integrated area under spectrum (no baseline subtraction) 
+     PV: TBD */
+  virtual double integral() const = 0;
+  /** Number of peak fits performed
+    PV: TBD */
+  virtual uint32_t nPeaks() const = 0;
+  /** Projection of spectrum onto energy axis 
+     PV TBD */
+  virtual ndarray<const uint32_t, 1> hproj() const = 0;
+  /** Peak position array, length given by nPeaks
+     PV: TBD */
+  virtual ndarray<const double, 1> peakPos() const = 0;
+  /** Peak height array, length given by nPeaks
+     PV: TBD */
+  virtual ndarray<const double, 1> peakHeight() const = 0;
+  /** Peak FWHM array, length given by nPeaks
+     PV: TBD */
+  virtual ndarray<const double, 1> FWHM() const = 0;
+};
 } // namespace Bld
 } // namespace Psana
 #endif // PSANA_BLD_DDL_H
