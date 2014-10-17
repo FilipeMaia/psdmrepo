@@ -11,8 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-65
+2014-10-17 Mikhail S. Dubrovin
+- add NDArrImageProducer
+- GlobalMethods - add support for FCCD960, fix bug in calibGroupForDetType()
+	
 Tag: V00-03-64
-2014-09-28 Mikhail S. Dubrovin
+2014-10-07 Mikhail S. Dubrovin
 - PixCoordsProducer
   - save geometry file name as a string (as ndarray<char,1> - is depricated but still available)
   - add saving mask for edge and unbound pixels

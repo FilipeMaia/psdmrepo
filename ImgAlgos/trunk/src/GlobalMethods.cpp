@@ -330,8 +330,9 @@ DETECTOR_TYPE detectorTypeForStringSource(const std::string& str_src)
   else if ( str_src.find("Opal2000.")  != std::string::npos ) return OPAL2000;
   else if ( str_src.find("Opal4000.")  != std::string::npos ) return OPAL4000;
   else if ( str_src.find("Opal8000.")  != std::string::npos ) return OPAL8000;
-  else if ( str_src.find(":Andor.")    != std::string::npos ) return ANDOR;
-  else if ( str_src.find(":OrcaFl40.") != std::string::npos ) return ORCAFL40;
+  else if ( str_src.find("Andor.")     != std::string::npos ) return ANDOR;
+  else if ( str_src.find("OrcaFl40.")  != std::string::npos ) return ORCAFL40;
+  else if ( str_src.find("Fccd960.")   != std::string::npos ) return FCCD960;
   else                                                        return OTHER;
 }
 
@@ -347,19 +348,20 @@ DETECTOR_TYPE detectorTypeForSource(PSEvt::Source& src)
 
 std::string calibGroupForDetType(const DETECTOR_TYPE det_type)
 { 
-  if      ( CSPAD     ) return "CsPad::CalibV1";
-  else if ( CSPAD2X2  ) return "CsPad2x2::CalibV1";
-  else if ( PNCCD     ) return "PNCCD::CalibV1";
-  else if ( PRINCETON ) return "Princeton::CalibV1";
-  else if ( ACQIRIS   ) return "Acqiris::CalibV1";
-  else if ( TM6740    ) return "Camera::CalibV1";
-  else if ( OPAL1000  ) return "Camera::CalibV1";
-  else if ( OPAL2000  ) return "Camera::CalibV1";
-  else if ( OPAL4000  ) return "Camera::CalibV1";
-  else if ( OPAL8000  ) return "Camera::CalibV1";
-  else if ( ANDOR     ) return "Andor::CalibV1";
-  else if ( ORCAFL40  ) return "Camera::CalibV1";
-  else                  return std::string(); 
+  if      ( det_type == CSPAD     ) return "CsPad::CalibV1";
+  else if ( det_type == CSPAD2X2  ) return "CsPad2x2::CalibV1";
+  else if ( det_type == PNCCD     ) return "PNCCD::CalibV1";
+  else if ( det_type == PRINCETON ) return "Princeton::CalibV1";
+  else if ( det_type == ACQIRIS   ) return "Acqiris::CalibV1";
+  else if ( det_type == TM6740    ) return "Camera::CalibV1";
+  else if ( det_type == OPAL1000  ) return "Camera::CalibV1";
+  else if ( det_type == OPAL2000  ) return "Camera::CalibV1";
+  else if ( det_type == OPAL4000  ) return "Camera::CalibV1";
+  else if ( det_type == OPAL8000  ) return "Camera::CalibV1";
+  else if ( det_type == ANDOR     ) return "Andor::CalibV1";
+  else if ( det_type == ORCAFL40  ) return "Camera::CalibV1";
+  else if ( det_type == FCCD960   ) return "Camera::CalibV1";
+  else                              return std::string(); 
 }
 
 //--------------------

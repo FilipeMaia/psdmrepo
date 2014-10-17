@@ -125,13 +125,13 @@ using namespace std;
 //typedef image<gray_double_pixel_t,false> gray_double_image_t;
 //typedef gray_double_image_t::view_t      gray_double_view_t; 
 
- enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+ enum DATA_TYPE {ASDATA, ASINP, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
  enum FILE_MODE {BINARY, TEXT, TIFF, PNG, METADTEXT};
 
  enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2, PNCCD, PRINCETON, ACQIRIS, TM6740, 
                      OPAL1000, OPAL2000, OPAL4000, OPAL8000,
-                     ANDOR, ORCAFL40};
+                     ANDOR, ORCAFL40, FCCD960};
 
 const static int UnknownCM = -10000; 
 
