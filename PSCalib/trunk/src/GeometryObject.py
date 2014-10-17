@@ -49,6 +49,10 @@ Usage::
     Xrot, Yrot = rotation_cs(X, Y, C, S)
     Xrot, Yrot = rotation(X, Y, angle_deg)
 
+    # global methods only for CSPAD2x2 array conversion between (2,185,388) and (185,388,2):
+    arrTwo2x1 = data2x2ToTwo2x1(asData2x2)
+    asData2x2 = two2x1ToData2x2(arrTwo2x1)
+
 @see :py:class:`PSCalib.GeometryAccess`
 
 
@@ -108,13 +112,6 @@ class GeometryObject :
         self.oindex = oindex
 
         self.set_geo_pars(x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x)
-
-        #if   self.oname == 'SENS2X1:V1' : self.algo = cspad2x1_one # PixCoords2x1(use_wide_pix_center=False)
-        #elif self.oname == 'SENS2X1:V2' : self.algo = None
-        #elif self.oname == 'SENS2X1:V3' : self.algo = None
-        #elif self.oname == 'SENS2X1:V4' : self.algo = None
-        #elif self.oname == 'SENS2X1:V5' : self.algo = None
-        #else                            : self.algo = None
 
         self.algo = sgs.Create(self.oname, pbits=0) # ex.: SegGeometryCspad2x1V1(...)
 
@@ -301,7 +298,7 @@ class GeometryObject :
         yac.shape = geo_shape
         zac.shape = geo_shape
         X, Y, Z = self.transform_geo_coord_arrays(xac, yac, zac)
-        return det_shape(X), det_shape(Y), det_shape(Z) 
+        return self.det_shape(X), self.det_shape(Y), self.det_shape(Z) 
 
 #------------------------------
 
@@ -326,7 +323,7 @@ class GeometryObject :
         geo_shape = np.hstack(([len_child], ach.shape))
         #print 'geo_shape = ', geo_shape        
         aar.shape = geo_shape
-        return det_shape(aar)
+        return self.det_shape(aar)
 
 #------------------------------
 
@@ -357,7 +354,7 @@ class GeometryObject :
         geo_shape = np.hstack(([len_child], car.shape))
         #print 'geo_shape = ', geo_shape        
         oar.shape = geo_shape
-        return det_shape(oar)
+        return self.det_shape(oar)
 
 #------------------------------
 
@@ -414,22 +411,23 @@ class GeometryObject :
             xac += list(xch.flatten())
             yac += list(ych.flatten())
         X, Y = self.transform_2d_geo_coord_arrays(np.array(xac), np.array(yac))
-        return det_shape(X), det_shape(Y) 
+        return self.det_shape(X), self.det_shape(Y) 
 
-    #------------------------------
+
+#------------------------------
+#------------------------------
+
+    def det_shape(self, arr) :
+        """ Check detector dependency and re-shape array if necessary
+        """
+        if arr.size == 143560 and self.oname == 'CSPAD2X2:V1' : # Shuffle pixels once for 2*185*388 and CSPAD2X2:V1 ONLY:
+            # shaffle array for cspad2x2
+            return two2x1ToData2x2(arr)
+        return arr
+
 
 #------------------------------
 #------ Global Method(s) ------
-#------------------------------
-
-def det_shape(arr) :
-    """ Check detector dependency and re-shape array if necessary
-    """
-    if arr.size == 143560 : # 2*185*388 :
-        # shaffle array for cspad2x2
-        return two2x1ToData2x2(arr)
-    return arr
-
 #------------------------------
 
 def data2x2ToTwo2x1(arr2x2) :

@@ -10,7 +10,11 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-	
+
+Tag: V00-02-19
+2014-10-17 Mikhail S. Dubrovin	
+- GeometryObject - shuffle cspad2x2 pixel only if size==2*185*388 and oname=="CSPAD2X2V1"
+
 Tag: V00-02-18
 2014-10-07 Mikhail S. Dubrovin
 - GeometryAccess.py - improve documentation for Sphinx 

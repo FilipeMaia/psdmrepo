@@ -330,8 +330,10 @@ void GeometryObject::evaluate_pixel_coords()
     ibase += sizech;
   }
 
-  if(ibase == PSCalib::SIZE2X2) { 
+  if(ibase == PSCalib::SIZE2X2 && m_oname == "CSPAD2X2:V1") { 
     // shuffle pixels for cspad2x2, PSCalib::SIZE2X2 = 2*185*388 = 143560 
+    // shuffle pixels only once for "CSPAD2X2:V1" only!
+
     two2x1ToData2x2<double>(p_xarr);
     two2x1ToData2x2<double>(p_yarr);
     two2x1ToData2x2<double>(p_zarr);
