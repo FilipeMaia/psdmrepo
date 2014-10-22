@@ -626,7 +626,7 @@ private:
 // above is the "private" implementation (class IndexRun), below this is the
 // "public" implementation (class Index)
 
-Index::Index(const std::string& name, std::queue<DgramPieces>& queue) : Configurable(name), _queue(queue),_idxrun(0) {
+Index::Index(const std::string& name, std::queue<DgramPieces>& queue) : Configurable(name), _queue(queue),_idxrun(0),_run(-1) {
   _fileNames = configList("files");
   if ( _fileNames.empty() ) MsgLog(logger, fatal, "Empty file list");
   _rmap = new RunMap(_fileNames);
@@ -649,6 +649,11 @@ void Index::times(unsigned step, psana::Index::EventTimeIter& begin, psana::Inde
 }
 
 void Index::setrun(int run) {
+  // we can be called twice for the same run, because
+  // at beginJob we "prefetch" the first configure transition
+  // and then we will get another setrun from the run iterator
+  if (run==_run) return;
+  _run=run;
   if (not _rmap->runFiles.count(run)) MsgLog(logger, fatal, "Run " << run << " not found");
   delete _idxrun;
   _idxrun = new IndexRun(_queue,_rmap->runFiles[run]);

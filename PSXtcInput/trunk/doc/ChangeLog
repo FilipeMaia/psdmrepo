@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-05
+2014-10-21 Christopher O'Grady
+- Change behavior of indexing to provide access to first
+  run's configure transition at module beginJob time.
+	
 Tag: V00-15-04
 2014-09-02 David Schneider
 - Change options from second event to third event to allow modules to process

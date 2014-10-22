@@ -56,6 +56,9 @@ public:
   /// Constructor takes the name of the module.
   XtcIndexInputModule (const std::string& name) ;
 
+  /// Method which is called once at the beginning of the job
+  virtual void beginJob(Event& evt, Env& env);
+
   psana::Index& index() {return _idx;}
 
   // Destructor

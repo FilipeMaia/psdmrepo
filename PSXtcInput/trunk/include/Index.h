@@ -42,6 +42,7 @@ private:
   std::queue<DgramPieces>& _queue;
   IndexRun*                _idxrun;
   RunMap*                  _rmap;
+  int                      _run;
 };
 
 }

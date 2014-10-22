@@ -60,4 +60,20 @@ XtcIndexInputModule::~XtcIndexInputModule ()
 {
 }
 
+void 
+XtcIndexInputModule::beginJob(Event& evt, Env& env)
+{
+  // to match the behavior of non-indexing mode, so that
+  // configuration information is available at beginJob.
+  // it feels somewhat awkward that we have run-specific
+  // information available at that time, but we already
+  // have this idea in the sequential-access mode -cpo
+
+  int runbegin = _idx.runs()[0];
+  _idx.setrun(runbegin);
+
+  // now that indexing is set up, do the base class beginJob
+  XtcInputModuleBase::beginJob(evt, env);
+}
+
 } // namespace PSXtcInput
