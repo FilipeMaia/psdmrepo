@@ -117,7 +117,7 @@ def parse_fmt_xyplot(fmt_str, color_index=0):
     fmt_dict['pen'] = line
 
     # only pass add these entries if they are non-null
-    if marker is not None:
+    if marker is not None or line is not None:
         fmt_dict['symbol'] = marker
     if color is not None:
         fmt_dict['symbolBrush'] = color
