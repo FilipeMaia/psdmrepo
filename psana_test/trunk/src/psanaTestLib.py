@@ -115,6 +115,9 @@ def expandSitRoot():
     assert sit_root != sit_root_envvar, "%s not expanded. run sit_setup" % sit_root_envvar
     return sit_root
 
+def instrDataDir():
+    return '/reg/d/psdm'
+
 def getTestDataDir():
     testDataDir = os.path.join(expandSitRoot(), 'data_test/Translator')
     assert os.path.exists(testDataDir), "test data dir does not exist." + \
@@ -1389,7 +1392,7 @@ def getCurrentXtcDirList():
     instrumentDirectories = ['amo','cxi','dia','mec','mob','sxr','usr','xcs','xpp']
     currentXtcDirList = []
     for instDir in instrumentDirectories:
-        instPath = os.path.join(expandSitRoot(), instDir)
+        instPath = os.path.join(instrDataDir(), instDir)
         expPaths = glob.glob(os.path.join(instPath, '*'))
         for expPath in expPaths:
             xtcPath = os.path.join(expPath, 'xtc')
