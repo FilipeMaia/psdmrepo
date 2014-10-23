@@ -11,6 +11,11 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02 
+2014-10-23 David Schneider
+- change config files to use eventcode_nobeam rather than eventcode_bykik (fix bug
+  in config files)
+	
 Tag: V00-01-01
 2014-10-15 David Schneider
 - includes Matt's fix for JIRA PSAS-47 (crash when no laser logic given, i.e, 
