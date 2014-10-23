@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-19
+2014-10-23 Matt Weaver
+- Removed devel tag fro Epix100a definitions	
+
 Tag V01-00-18
 2014-10-13 Daniel Flath
 - bld.ddl::BldDataSpectrometerV1

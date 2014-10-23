@@ -451,7 +451,6 @@
 
 //------------------ Asic100aConfigV1 ------------------
 @type Asic100aConfigV1
-  [[devel]]
   [[pack(4)]]
 {
   uint32_t _reg1 {
@@ -600,7 +599,6 @@
 
 //------------------ Config100aV1 ------------------
 @type Config100aV1
-  [[devel]]
   [[type_id(Id_Epix100aConfig, 1)]]
   [[config_type]]
   [[pack(4)]]
@@ -757,7 +755,6 @@
 
 //------------------ ElementV2 ------------------
 @type ElementV2
-  [[devel]]
   [[type_id(Id_EpixElement, 2)]]
   [[pack(2)]]
   [[config(Config100aV1)]]
