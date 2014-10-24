@@ -19,7 +19,16 @@ Asic10kConfigV1::~Asic10kConfigV1() {}
 Config10KV1::~Config10KV1() {}
 
 
+Asic100aConfigV1::~Asic100aConfigV1() {}
+
+
+Config100aV1::~Config100aV1() {}
+
+
 ElementV1::~ElementV1() {}
+
+
+ElementV2::~ElementV2() {}
 
 } // namespace Epix
 } // namespace Psana
