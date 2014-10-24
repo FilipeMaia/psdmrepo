@@ -1,0 +1,24 @@
+psana:
+- support for new Epix::ElementV2 and Epix::Config100aV1 types in pdsdata 8.1.8
+
+ImgAlgos:
+- add NDArrImageProducer
+- in GlobalMethods: add support for FCCD960
+
+PSCalib:
+- in GeometryObject: shuffle cspad2x2 pixel only if size==2*185*388 and oname=="CSPAD2X2V1"
+
+External Packages:
+- update to pdsdata 8.1.8 with new types Epix::ElementV2 and Epix::Config100aV1
+
+Bugs fixed:
+
+- PSXtcInput: change behavior of indexing to provide access to first run's configure
+  transition at module beginJob time.
+
+- psmon: support making plots without symbols (only lines). Add histogram support.
+
+- TimeTool package config files: remove parameter eventcode_bykik and replace with
+  eventcode_nobeam. This is the correct parameter for the TimeTool.
+
+- ImgAlgos: add NDArrImageProducer, in GlobalMethods fix a bug in calibGroupForDetType()
