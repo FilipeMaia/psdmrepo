@@ -198,9 +198,11 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Encoder::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV1> >();
   m_mainMap[ & typeid(Psana::Encoder::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV2> >();
   m_mainMap[ & typeid(Psana::Epics::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epics::ConfigV1> >();
+  m_mainMap[ & typeid(Psana::Epix::Config100aV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::Config100aV1> >();
   m_mainMap[ & typeid(Psana::Epix::Config10KV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::Config10KV1> >();
   m_mainMap[ & typeid(Psana::Epix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Epix::ElementV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::ElementV1> >();
+  m_mainMap[ & typeid(Psana::Epix::ElementV2) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::ElementV2> >();
   m_mainMap[ & typeid(Psana::EpixSampler::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ConfigV1> >();
   m_mainMap[ & typeid(Psana::EpixSampler::ElementV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ElementV1> >();
   m_mainMap[ & typeid(Psana::EvrData::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV1> >();

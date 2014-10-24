@@ -118,7 +118,12 @@ TypeAliases::TypeAliases() {
   TypeInfoSet Epix;
   Epix.insert( & typeid(Psana::Epix::ConfigV1));
   Epix.insert( & typeid(Psana::Epix::ElementV1));
+  Epix.insert( & typeid(Psana::Epix::ElementV2));
   m_alias2TypesMap["Epix"] = Epix;
+
+  TypeInfoSet Epix100a;
+  Epix100a.insert( & typeid(Psana::Epix::Config100aV1));
+  m_alias2TypesMap["Epix100a"] = Epix100a;
 
   TypeInfoSet Epix10k;
   Epix10k.insert( & typeid(Psana::Epix::Config10KV1));
