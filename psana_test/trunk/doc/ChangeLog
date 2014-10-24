@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-40
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
 Tag: V00-00-39
 2014-10-23 David Schneider
 - fix bug with identifying data files on disk - minor feature not used in build or testing
