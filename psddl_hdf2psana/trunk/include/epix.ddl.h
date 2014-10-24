@@ -601,6 +601,339 @@ void make_datasets(const Psana::Epix::Config10KV1& obj, hdf5pp::Group group, con
 void store_at(const Psana::Epix::Config10KV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
+namespace ns_Asic100aConfigV1_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Epix::Asic100aConfigV1& psanaobj);
+  ~dataset_data();
+
+  uint8_t pulserVsPixelOnDelay;
+  uint8_t pulserSync;
+  uint8_t dummyTest;
+  uint8_t dummyMask;
+  uint16_t testPulserLevel;
+  uint8_t pulserCounterDirection;
+  uint8_t automaticTestModeEnable;
+  uint8_t testMode;
+  uint8_t testModeWithDarkFrame;
+  uint8_t highResolutionModeTest;
+  uint8_t pulserReset;
+  uint8_t digitalMonitorMux1;
+  uint8_t digitalMonitorMux2;
+  uint8_t testPulserCurrent;
+  uint8_t testPointSystemOutputDynamicRange;
+  uint8_t digitalMonitor1Enable;
+  uint8_t digitalMonitor2Enable;
+  uint8_t LVDS_ImpedenceMatchingEnable;
+  uint8_t VRefBaselineDac;
+  uint8_t extraRowsLowReferenceValue;
+  uint8_t testPointSystemTemperatureCompensationEnable;
+  uint8_t testPointSytemInputSelect;
+  uint8_t programmableReadoutDelay;
+  uint8_t outputDriverOutputDynamicRange0;
+  uint8_t outputDriverOutputDynamicRange1;
+  uint8_t balconyEnable;
+  uint8_t balconyDriverCurrent;
+  uint8_t fastPowerPulsingSpeed;
+  uint8_t fastPowerPulsingEnable;
+  uint8_t preamplifierCurrent;
+  uint8_t pixelOutputBufferCurrent;
+  uint8_t pixelBufferAndPreamplifierDrivingCapabilities;
+  uint8_t outputDriverTemperatureCompensationEnable;
+  uint8_t pixelFilterLevel;
+  uint8_t bandGapReferenceTemperatureCompensationBits;
+  uint8_t outputDriverDrivingCapabilitiesAndStability;
+  uint8_t outputDriverDacReferenceBias;
+  uint8_t testPointSystemTemperatureCompensationGain;
+  uint8_t testPointSystemInputCommonMode;
+  uint8_t outputDriverTemperatureCompensationGain0;
+  uint8_t outputDriverInputCommonMode0;
+  uint8_t testBackEnd;
+  uint8_t interleavedReadOutEnable;
+  uint8_t EXEC_DelayEnable;
+  uint8_t CCK_RegDelayEnable;
+  uint8_t syncPinEnable;
+  uint16_t RowStartAddr;
+  uint16_t RowStopAddr;
+  uint8_t ColumnStartAddr;
+  uint8_t ColumnStopAddr;
+  uint16_t chipID;
+  uint8_t outputDriverOutputDynamicRange2;
+  uint8_t outputDriverOutputDynamicRange3;
+  uint8_t outputDriverTemperatureCompensationGain1;
+  uint8_t outputDriverInputCommonMode1;
+  uint8_t outputDriverTemperatureCompensationGain2;
+  uint8_t outputDriverInputCommonMode2;
+  uint8_t outputDriverTemperatureCompensationGain3;
+  uint8_t outputDriverInputCommonMode3;
+
+
+};
+}
+
+
+class Asic100aConfigV1_v0 : public Psana::Epix::Asic100aConfigV1 {
+public:
+  typedef Psana::Epix::Asic100aConfigV1 PsanaType;
+  Asic100aConfigV1_v0() {}
+  Asic100aConfigV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  Asic100aConfigV1_v0(const boost::shared_ptr<Epix::ns_Asic100aConfigV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~Asic100aConfigV1_v0() {}
+  virtual uint8_t pulserVsPixelOnDelay() const;
+  virtual uint8_t pulserSync() const;
+  virtual uint8_t dummyTest() const;
+  virtual uint8_t dummyMask() const;
+  virtual uint16_t testPulserLevel() const;
+  virtual uint8_t pulserCounterDirection() const;
+  virtual uint8_t automaticTestModeEnable() const;
+  virtual uint8_t testMode() const;
+  virtual uint8_t testModeWithDarkFrame() const;
+  virtual uint8_t highResolutionModeTest() const;
+  virtual uint8_t pulserReset() const;
+  virtual uint8_t digitalMonitorMux1() const;
+  virtual uint8_t digitalMonitorMux2() const;
+  virtual uint8_t testPulserCurrent() const;
+  virtual uint8_t testPointSystemOutputDynamicRange() const;
+  virtual uint8_t digitalMonitor1Enable() const;
+  virtual uint8_t digitalMonitor2Enable() const;
+  virtual uint8_t LVDS_ImpedenceMatchingEnable() const;
+  virtual uint8_t VRefBaselineDac() const;
+  virtual uint8_t extraRowsLowReferenceValue() const;
+  virtual uint8_t testPointSystemTemperatureCompensationEnable() const;
+  virtual uint8_t testPointSytemInputSelect() const;
+  virtual uint8_t programmableReadoutDelay() const;
+  virtual uint8_t outputDriverOutputDynamicRange0() const;
+  virtual uint8_t outputDriverOutputDynamicRange1() const;
+  virtual uint8_t balconyEnable() const;
+  virtual uint8_t balconyDriverCurrent() const;
+  virtual uint8_t fastPowerPulsingSpeed() const;
+  virtual uint8_t fastPowerPulsingEnable() const;
+  virtual uint8_t preamplifierCurrent() const;
+  virtual uint8_t pixelOutputBufferCurrent() const;
+  virtual uint8_t pixelBufferAndPreamplifierDrivingCapabilities() const;
+  virtual uint8_t outputDriverTemperatureCompensationEnable() const;
+  virtual uint8_t pixelFilterLevel() const;
+  virtual uint8_t bandGapReferenceTemperatureCompensationBits() const;
+  virtual uint8_t outputDriverDrivingCapabilitiesAndStability() const;
+  virtual uint8_t outputDriverDacReferenceBias() const;
+  virtual uint8_t testPointSystemTemperatureCompensationGain() const;
+  virtual uint8_t testPointSystemInputCommonMode() const;
+  virtual uint8_t outputDriverTemperatureCompensationGain0() const;
+  virtual uint8_t outputDriverInputCommonMode0() const;
+  virtual uint8_t testBackEnd() const;
+  virtual uint8_t interleavedReadOutEnable() const;
+  virtual uint8_t EXEC_DelayEnable() const;
+  virtual uint8_t CCK_RegDelayEnable() const;
+  virtual uint8_t syncPinEnable() const;
+  virtual uint16_t RowStartAddr() const;
+  virtual uint16_t RowStopAddr() const;
+  virtual uint8_t ColumnStartAddr() const;
+  virtual uint8_t ColumnStopAddr() const;
+  virtual uint16_t chipID() const;
+  virtual uint8_t outputDriverOutputDynamicRange2() const;
+  virtual uint8_t outputDriverOutputDynamicRange3() const;
+  virtual uint8_t outputDriverTemperatureCompensationGain1() const;
+  virtual uint8_t outputDriverInputCommonMode1() const;
+  virtual uint8_t outputDriverTemperatureCompensationGain2() const;
+  virtual uint8_t outputDriverInputCommonMode2() const;
+  virtual uint8_t outputDriverTemperatureCompensationGain3() const;
+  virtual uint8_t outputDriverInputCommonMode3() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Epix::ns_Asic100aConfigV1_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+};
+
+
+namespace ns_Config100aV1_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::Epix::Config100aV1& psanaobj);
+  ~dataset_config();
+
+  uint32_t version;
+  uint32_t runTrigDelay;
+  uint32_t daqTrigDelay;
+  uint32_t dacSetting;
+  uint8_t asicGR;
+  uint8_t asicAcq;
+  uint8_t asicR0;
+  uint8_t asicPpmat;
+  uint8_t asicPpbe;
+  uint8_t asicRoClk;
+  uint8_t asicGRControl;
+  uint8_t asicAcqControl;
+  uint8_t asicR0Control;
+  uint8_t asicPpmatControl;
+  uint8_t asicPpbeControl;
+  uint8_t asicR0ClkControl;
+  uint8_t prepulseR0En;
+  uint32_t adcStreamMode;
+  uint8_t testPatternEnable;
+  uint8_t SyncMode;
+  uint8_t R0Mode;
+  uint32_t acqToAsicR0Delay;
+  uint32_t asicR0ToAsicAcq;
+  uint32_t asicAcqWidth;
+  uint32_t asicAcqLToPPmatL;
+  uint32_t asicPPmatToReadout;
+  uint32_t asicRoClkHalfT;
+  uint32_t adcReadsPerPixel;
+  uint32_t adcClkHalfT;
+  uint32_t asicR0Width;
+  uint32_t adcPipelineDelay;
+  uint16_t SyncWidth;
+  uint16_t SyncDelay;
+  uint32_t prepulseR0Width;
+  uint32_t prepulseR0Delay;
+  uint32_t digitalCardId0;
+  uint32_t digitalCardId1;
+  uint32_t analogCardId0;
+  uint32_t analogCardId1;
+  uint32_t numberOfAsicsPerRow;
+  uint32_t numberOfAsicsPerColumn;
+  uint32_t numberOfRowsPerAsic;
+  uint32_t numberOfReadableRowsPerAsic;
+  uint32_t numberOfPixelsPerAsicRow;
+  uint32_t calibrationRowCountPerASIC;
+  uint32_t environmentalRowCountPerASIC;
+  uint32_t baseClockFrequency;
+  uint32_t asicMask;
+  uint8_t scopeEnable;
+  uint8_t scopeTrigEdge;
+  uint8_t scopeTrigChan;
+  uint8_t scopeArmMode;
+  uint16_t scopeADCThreshold;
+  uint16_t scopeTrigHoldoff;
+  uint16_t scopeTrigOffset;
+  uint16_t scopeTraceLength;
+  uint16_t scopeADCsameplesToSkip;
+  uint8_t scopeChanAwaveformSelect;
+  uint8_t scopeChanBwaveformSelect;
+  uint32_t numberOfRows;
+  uint32_t numberOfReadableRows;
+  uint32_t numberOfColumns;
+  uint32_t numberOfCalibrationRows;
+  uint32_t numberOfEnvironmentalRows;
+  uint32_t numberOfAsics;
+
+
+};
+}
+
+
+class Config100aV1_v0 : public Psana::Epix::Config100aV1 {
+public:
+  typedef Psana::Epix::Config100aV1 PsanaType;
+  Config100aV1_v0() {}
+  Config100aV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~Config100aV1_v0() {}
+  virtual uint32_t version() const;
+  virtual uint32_t runTrigDelay() const;
+  virtual uint32_t daqTrigDelay() const;
+  virtual uint32_t dacSetting() const;
+  virtual uint8_t asicGR() const;
+  virtual uint8_t asicAcq() const;
+  virtual uint8_t asicR0() const;
+  virtual uint8_t asicPpmat() const;
+  virtual uint8_t asicPpbe() const;
+  virtual uint8_t asicRoClk() const;
+  virtual uint8_t asicGRControl() const;
+  virtual uint8_t asicAcqControl() const;
+  virtual uint8_t asicR0Control() const;
+  virtual uint8_t asicPpmatControl() const;
+  virtual uint8_t asicPpbeControl() const;
+  virtual uint8_t asicR0ClkControl() const;
+  virtual uint8_t prepulseR0En() const;
+  virtual uint32_t adcStreamMode() const;
+  virtual uint8_t testPatternEnable() const;
+  virtual uint8_t SyncMode() const;
+  virtual uint8_t R0Mode() const;
+  virtual uint32_t acqToAsicR0Delay() const;
+  virtual uint32_t asicR0ToAsicAcq() const;
+  virtual uint32_t asicAcqWidth() const;
+  virtual uint32_t asicAcqLToPPmatL() const;
+  virtual uint32_t asicPPmatToReadout() const;
+  virtual uint32_t asicRoClkHalfT() const;
+  virtual uint32_t adcReadsPerPixel() const;
+  virtual uint32_t adcClkHalfT() const;
+  virtual uint32_t asicR0Width() const;
+  virtual uint32_t adcPipelineDelay() const;
+  virtual uint16_t SyncWidth() const;
+  virtual uint16_t SyncDelay() const;
+  virtual uint32_t prepulseR0Width() const;
+  virtual uint32_t prepulseR0Delay() const;
+  virtual uint32_t digitalCardId0() const;
+  virtual uint32_t digitalCardId1() const;
+  virtual uint32_t analogCardId0() const;
+  virtual uint32_t analogCardId1() const;
+  virtual uint32_t numberOfAsicsPerRow() const;
+  virtual uint32_t numberOfAsicsPerColumn() const;
+  virtual uint32_t numberOfRowsPerAsic() const;
+  virtual uint32_t numberOfReadableRowsPerAsic() const;
+  virtual uint32_t numberOfPixelsPerAsicRow() const;
+  virtual uint32_t calibrationRowCountPerASIC() const;
+  virtual uint32_t environmentalRowCountPerASIC() const;
+  virtual uint32_t baseClockFrequency() const;
+  virtual uint32_t asicMask() const;
+  virtual uint8_t scopeEnable() const;
+  virtual uint8_t scopeTrigEdge() const;
+  virtual uint8_t scopeTrigChan() const;
+  virtual uint8_t scopeArmMode() const;
+  virtual uint16_t scopeADCThreshold() const;
+  virtual uint16_t scopeTrigHoldoff() const;
+  virtual uint16_t scopeTrigOffset() const;
+  virtual uint16_t scopeTraceLength() const;
+  virtual uint16_t scopeADCsameplesToSkip() const;
+  virtual uint8_t scopeChanAwaveformSelect() const;
+  virtual uint8_t scopeChanBwaveformSelect() const;
+  virtual const Psana::Epix::Asic100aConfigV1& asics(uint32_t i0) const;
+  virtual ndarray<const uint16_t, 2> asicPixelConfigArray() const;
+  virtual ndarray<const uint8_t, 2> calibPixelConfigArray() const;
+  virtual uint32_t numberOfRows() const;
+  virtual uint32_t numberOfReadableRows() const;
+  virtual uint32_t numberOfColumns() const;
+  virtual uint32_t numberOfCalibrationRows() const;
+  virtual uint32_t numberOfEnvironmentalRows() const;
+  virtual uint32_t numberOfAsics() const;
+  /** Method which returns the shape (dimensions) of the data returned by asics() method. */
+  std::vector<int> asics_shape() const;
+
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Epix::ns_Config100aV1_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable ndarray<const Asic100aConfigV1_v0, 1> m_ds_asics;
+  void read_ds_asics() const;
+  mutable ndarray<const uint16_t, 2> m_ds_asicPixelConfigArray;
+  void read_ds_asicPixelConfigArray() const;
+  mutable ndarray<const uint8_t, 2> m_ds_calibPixelConfigArray;
+  void read_ds_calibPixelConfigArray() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::Config100aV1> > make_Config100aV1(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Epix::Config100aV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Epix::Config100aV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Epix::Config100aV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
 namespace ns_ElementV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
@@ -668,6 +1001,76 @@ void make_datasets(const Psana::Epix::ElementV1& obj, hdf5pp::Group group, const
 /// negative index means append to the end of dataset. If pointer to object is zero then
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::Epix::ElementV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
+namespace ns_ElementV2_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Epix::ElementV2& psanaobj);
+  ~dataset_data();
+
+  uint8_t vc;
+  uint8_t lane;
+  uint16_t acqCount;
+  uint32_t frameNumber;
+  uint32_t ticks;
+  uint32_t fiducials;
+  uint32_t lastWord;
+
+
+};
+}
+
+
+template <typename Config>
+class ElementV2_v0 : public Psana::Epix::ElementV2 {
+public:
+  typedef Psana::Epix::ElementV2 PsanaType;
+  ElementV2_v0() {}
+  ElementV2_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
+    : m_group(group), m_idx(idx), m_cfg(cfg) {}
+  virtual ~ElementV2_v0() {}
+  virtual uint8_t vc() const;
+  virtual uint8_t lane() const;
+  virtual uint16_t acqCount() const;
+  virtual uint32_t frameNumber() const;
+  virtual uint32_t ticks() const;
+  virtual uint32_t fiducials() const;
+  virtual ndarray<const uint16_t, 2> frame() const;
+  virtual ndarray<const uint16_t, 2> calibrationRows() const;
+  virtual ndarray<const uint16_t, 2> environmentalRows() const;
+  virtual ndarray<const uint16_t, 1> temperatures() const;
+  virtual uint32_t lastWord() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<Config> m_cfg;
+  mutable boost::shared_ptr<Epix::ns_ElementV2_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const uint16_t, 2> m_ds_frame;
+  void read_ds_frame() const;
+  mutable ndarray<const uint16_t, 2> m_ds_calibrationRows;
+  void read_ds_calibrationRows() const;
+  mutable ndarray<const uint16_t, 2> m_ds_environmentalRows;
+  void read_ds_environmentalRows() const;
+  mutable ndarray<const uint16_t, 1> m_ds_temperatures;
+  void read_ds_temperatures() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::Config100aV1>& cfg);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Epix::ElementV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Epix::ElementV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Epix::ElementV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Epix
 } // namespace psddl_hdf2psana

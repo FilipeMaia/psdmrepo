@@ -165,6 +165,10 @@ try {
     // Bld::BldDataFEEGasDetEnergy
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergy(schema_version, group, idx), src);
     break;
+  case 1054612892:
+    // Epix::Config100aV1
+    cfgStore.putProxy(psddl_hdf2psana::Epix::make_Config100aV1(schema_version, group, idx), src);
+    break;
   case 1078464760:
     // Bld::BldDataEBeamV5
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV5(schema_version, group, idx), src);
@@ -467,6 +471,12 @@ try {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::GenericPgp::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    }
+    break;
+  case 2914045211:
+    // Epix::ElementV2
+    if (boost::shared_ptr<Psana::Epix::Config100aV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Epix::make_ElementV2(schema_version, group, idx, cfgPtr), src);
     }
     break;
   case 2929134981:
