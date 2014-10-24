@@ -733,6 +733,22 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_Epix100aConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Epix::Config100aV1> xptr(xtc, (Pds::Epix::Config100aV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Epix::Config100aV1> obj = boost::make_shared<psddl_pds2psana::Epix::Config100aV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_Epix10kConfig:
     {
       switch (version) {
@@ -785,6 +801,15 @@ try {
           }
         }
         break;
+      case 2:
+        {
+          if (boost::shared_ptr<Pds::Epix::Config100aV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV2, psddl_pds2psana::Epix::ElementV2<Pds::Epix::Config100aV1>, Pds::Epix::ElementV2, Pds::Epix::Config100aV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
       case 32769:
         {
           if (boost::shared_ptr<Pds::Epix::Config10KV1> cfgPtr = cfgStore.get(xtc->src)) {
@@ -799,6 +824,15 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::GenericPgp::ConfigV1>, Pds::Epix::ElementV1, Pds::GenericPgp::ConfigV1> ProxyType;
             if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32770:
+        {
+          if (boost::shared_ptr<Pds::Epix::Config100aV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV2, psddl_pds2psana::Epix::ElementV2<Pds::Epix::Config100aV1>, Pds::Epix::ElementV2, Pds::Epix::Config100aV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -2519,6 +2553,13 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     } // end version switch
     break;
+  case Pds::TypeId::Id_Epix100aConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::Config100aV1) );
+      break;
+    } // end version switch
+    break;
   case Pds::TypeId::Id_Epix10kConfig:
     switch(typeId.version()) {
     case 1:
@@ -2538,8 +2579,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV2) );
+      break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV2) );
       break;
     } // end version switch
     break;
