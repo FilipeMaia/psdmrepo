@@ -11,6 +11,7 @@ from __future__ import print_function
 import os
 import time 
 import argparse
+import logging
 import datetime
 
 import DmMover.experiment as experiment
@@ -80,12 +81,18 @@ def main():
     parser.add_argument('--agereg', type=int, default=90, 
                         help="Select only experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
     parser.add_argument('sel_exper', nargs='*', help="list of experiments to check") 
-
+    parser.add_argument("--verbose", "-v", action='count', default=0)
 
     try:
         args = parser.parse_args()
     except SystemExit:
         return 0
+
+    log_levels = [logging.INFO, logging.DEBUG]
+    args.verbose = min(args.verbose, len(log_levels)-1)
+    logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
+                        datefmt="%Y%m%d %H:%M:%S")
+
 
     if args.allexp:
         gen = all_experiments(args.agereg)
@@ -97,9 +104,10 @@ def main():
 
     nexp, nmissing, nset = 0,0,0
     for expname, instr in gen:
+        logging.debug("Exp %s %s", expname, instr)
         nexp += 1
         if len(expname) != 8:
-            print("Wrong detector name", expname, instr)
+            logging.warning("Wrong detector name %s %s", expname, instr)
             continue
 
         # select experiment
@@ -124,8 +132,8 @@ def main():
     
         
     date = datetime.datetime.now()
-    print("Experiments found:", nexp, "with missing dirs:", nmissing, "nset:", nset, 
-          "date", date.strftime("%Y%m%d %H:%M:%S")) 
+    logging.info("Experiments found: %d with missing dirs: %d nset: %d date %s", 
+                 nexp, nmissing, nset, date.strftime("%Y%m%d %H:%M:%S")) 
 
 
 if __name__ == "__main__":

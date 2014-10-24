@@ -8,7 +8,8 @@
 #    -o            : run cmd only one time
 #
 # Simple wrapper to run active_exper_status
-set -e
+
+# set -e
 set -u
 
 function run_cmd() {
