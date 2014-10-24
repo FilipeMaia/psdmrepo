@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-10-24 Mikhail S. Dubrovin
+Tag: V00-00-66
+- ConfigParametersForApp.py, GUIDarkListItem.py - switch back to usage of unicode chars for shrinc/expand buttons
+	
 2014-10-16 Mikhail S. Dubrovin
 Tag: V00-00-65
 - PlotImgSpeWidget.py - print image intensity along with coursor coordinates in coursor motion

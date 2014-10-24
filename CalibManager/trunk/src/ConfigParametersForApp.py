@@ -46,10 +46,13 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_pars = []
 
-    char_expand    = ' *' # down-head triangle
-    char_shrink    = ' ^' # down-head triangle
-    #char_expand    = u' \u25BC' # down-head triangle
- 
+    #char_expand    = ' *' # down-head triangle
+    #char_shrink    = ' ^' # down-head triangle
+    char_expand    = u' \u25BC' # down-head triangle
+    char_shrink    = u' \u25B2' # solid up-head triangle
+    #char_shrink    = u'\u25B6' # solid right-head triangle
+    #char_shrink    = u'\u25B7' # open right-head triangle 
+
     list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['in range', 'dark', 'all']
