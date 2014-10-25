@@ -1,5 +1,10 @@
 require.config ({
+
     baseUrl: '..' ,
+
+    waitSeconds : 15,
+    urlArgs     : "bust="+new Date().getTime() ,
+
     paths: {
         'jquery'                : '/jquery/js/jquery-1.8.2' ,
         'jquery-ui'             : '/jquery/js/jquery-ui-1.9.1.custom.min' ,

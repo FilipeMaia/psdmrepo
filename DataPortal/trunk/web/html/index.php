@@ -291,7 +291,7 @@ var app_config = {
 
 </script>
 
-<script data-main="../portal/js/index_main.js" src="/require/require.js"></script>
+<script data-main="../portal/js/index_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
 
 </head>
 <body></body>
