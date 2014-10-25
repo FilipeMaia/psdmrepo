@@ -13,7 +13,7 @@ reverse time order.
 
 Tag: V00-02-01
 2014-10-24 Igor Gaponenko
-- continuted major refactoring of the application
+- continuted major refactoring of the application as per JIRA ticket PSWA-10
 
 Tag: V00-02-00
 2014-10-10 Igor Gaponenko
