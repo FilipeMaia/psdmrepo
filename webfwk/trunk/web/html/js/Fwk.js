@@ -349,29 +349,38 @@ function (
                                     wa_id: null
                                 } ;
                                 app_proxy.context[''+j].context[''+k] = descr3 ;
-                                if (menu3.application)    descr3.application = _SAFE_ASSIGN (menu3.application) ;
-                                if (menu3.html_container) descr3.html        = $('#'+menu3.html_container).html() ;
-                                if (menu3.html)           descr3.html        = menu3.html ;
-                                if (menu3.load_html)      descr3.load_html   = {
+                                if (menu3.application) {
+                                    descr3.application = _SAFE_ASSIGN (menu3.application) ;
+                                    descr3.application.set_path(menu1.name, menu2.name, menu3.name) ;
+                                }
+                                if (menu3.html_container) descr3.html      = $('#'+menu3.html_container).html() ;
+                                if (menu3.html)           descr3.html      = menu3.html ;
+                                if (menu3.load_html)      descr3.load_html = {
                                     url:    menu3.load_html.url ,
                                     params: menu3.load_html.params ? menu3.load_html.params : {}} ;
                                 first_menu3 = false ;
                             }
                         } else {
-                            if (menu2.application)    descr2.application = _SAFE_ASSIGN (menu2.application) ;
-                            if (menu2.html_container) descr2.html        = $('#'+menu2.html_container).html() ;
-                            if (menu2.html)           descr2.html        = menu2.html ;
-                            if (menu2.load_html)      descr2.load_html   = {
+                            if (menu2.application) {
+                                descr2.application = _SAFE_ASSIGN (menu2.application) ;
+                                descr2.application.set_path(menu1.name, menu2.name, '') ;
+                            }
+                            if (menu2.html_container) descr2.html      = $('#'+menu2.html_container).html() ;
+                            if (menu2.html)           descr2.html      = menu2.html ;
+                            if (menu2.load_html)      descr2.load_html = {
                                 url:    menu2.load_html.url ,
                                 params: menu2.load_html.params ? menu2.load_html.params : {}} ;
                         }
                         first_menu2 = false ;
                     }
                 } else {
-                    if (menu1.application)    app_proxy.application = _SAFE_ASSIGN (menu1.application) ;
-                    if (menu1.html_container) app_proxy.html        = $('#'+menu1.html_container).html() ;
-                    if (menu1.html)           app_proxy.html        = menu1.html ;
-                    if (menu1.load_html)      app_proxy.load_html   = {
+                    if (menu1.application) {
+                        app_proxy.application = _SAFE_ASSIGN (menu1.application) ;
+                        app_proxy.application.set_path(menu1.name, '', '') ;
+                    }
+                    if (menu1.html_container) app_proxy.html      = $('#'+menu1.html_container).html() ;
+                    if (menu1.html)           app_proxy.html      = menu1.html ;
+                    if (menu1.load_html)      app_proxy.load_html = {
                         url:    menu1.load_html.url ,
                         params: menu1.load_html.params ? menu1.load_html.params : {}} ;
                 }

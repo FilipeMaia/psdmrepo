@@ -10,9 +10,20 @@ function () {
     function FwkApplication () {
 
         this.container = null ;
-        this.active = false ;
+        this.set_container = function (container) {
+            if (this.container === null) this.container = container ;
+        } ;
 
-        this.set_container = function (container) { if (!this.container) this.container = container ; }
+        this.application_name = "" ;
+        this.context1_name    = "" ;
+        this.context2_name    = "" ;
+        this.set_path = function (application_name, context1_name, context2_name) {
+            this.application_name = application_name ;
+            this.context1_name    = context1_name ;
+            this.context2_name    = context2_name ;
+        } ;
+
+        this.active = false ;
         this.activate = function (container) {
             this.set_container(container) ;
             this.active = true ;
