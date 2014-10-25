@@ -2,6 +2,9 @@ require.config ({
 
     baseUrl : '..' ,
 
+    waitSeconds : 15,
+    urlArgs     : "bust="+new Date().getTime() ,
+
     paths : {
         'jquery'                : '/jquery/js/jquery-1.8.2' ,
         'jquery-ui'             : '/jquery/js/jquery-ui-1.9.1.custom.min' ,
@@ -72,19 +75,19 @@ function (
 
         var menus = [{
             name: 'Equipment',      menu: [{
-                name: 'Inventory',              application: new Equipment_Inventory(app_config)} , {
-                name: 'Add New Equipment',      application: new Equipment_Add(app_config)}]} , {
+                name: 'Inventory',              application: new Equipment_Inventory  (app_config)} , {
+                name: 'Add New Equipment',      application: new Equipment_Add        (app_config)}]} , {
             name: 'Issues',         menu: [{
-                name: 'Search',                 application: new Issue_Search(app_config)} , {
-                name: 'Reports',                application: new Issue_Report(app_config)}]} , {
+                name: 'Search',                 application: new Issue_Search         (app_config)} , {
+                name: 'Reports',                application: new Issue_Report         (app_config)}]} , {
             name: 'Dictionary',     menu: [{
-                name: 'Equipment',              application: new Dictionary_Equipment(app_config)} , {
-                name: 'Locations',              application: new Dictionary_Location(app_config)} , {
-                name: 'Statuses',               application: new Dictionary_Status(app_config)}]} , {
+                name: 'Equipment',              application: new Dictionary_Equipment (app_config)} , {
+                name: 'Locations',              application: new Dictionary_Location  (app_config)} , {
+                name: 'Statuses',               application: new Dictionary_Status    (app_config)}]} , {
             name: 'Admin',          menu: [{
-                name: 'Access Control',         application: new Admin_Access(app_config)} , {
-                name: 'E-mail Notifications',   application: new Admin_Notify(app_config)} , {
-                name: 'SLACid Numbers',         application: new Admin_SLACid(app_config)} ]}] ;
+                name: 'Access Control',         application: new Admin_Access         (app_config)} , {
+                name: 'E-mail Notifications',   application: new Admin_Notify         (app_config)} , {
+                name: 'SLACid Numbers',         application: new Admin_SLACid         (app_config)} ]}] ;
 
         Fwk.build (
 

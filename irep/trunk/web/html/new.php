@@ -88,10 +88,7 @@ try {
 
 <link rel="icon" href="../webfwk/img/Portal_favicon.ico"/>
 
-<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
-
 <script type="text/javascript" src="../webfwk/js/config.js"></script>
-<script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <script type="text/javascript">
 
@@ -149,7 +146,7 @@ var app_config = {
  
 </script>
 
-<script data-main="../irep/js/new_main.js" src="/require/require.js"></script>
+<script data-main="../irep/js/new_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
 
 </head>
 

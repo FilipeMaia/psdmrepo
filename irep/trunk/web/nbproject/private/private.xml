@@ -9,10 +9,7 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/irep/web/html/js/Admin_Access.js</file>
         </group>
         <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/irep/web/html/js/Admin_SLACid.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/irep/web/html/js/dictionary.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/irep/web/html/js/Dictionary_Status.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/irep/web/html/css/Admin_SLACid.css</file>
+            <file>file:/F:/lcls/releases/pswww-apps-dev/irep/web/html/js/Equipment_Add.js</file>
         </group>
     </open-files>
 </project-private>

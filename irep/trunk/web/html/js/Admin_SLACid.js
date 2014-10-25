@@ -1,10 +1,10 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk', 'webfwk/SimpleTable'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk) {
+    Class, FwkApplication, Fwk, SimpleTable) {
 
     cssloader.load('../irep/css/Admin_SLACid.css') ;
 
@@ -37,8 +37,8 @@ function (
 
         // Automatically refresh the page at specified interval only
 
-        this._update_ival_sec = 1000 ;
-        this._prev_update_sec = Fwk.now().sec ;
+        this._update_ival_sec = 10 ;
+        this._prev_update_sec = 0 ;
 
         this.on_update = function () {
             if (this.active) {
@@ -164,15 +164,15 @@ function (
                                 var id = this.name ;
                                 global_search_equipment_by_slacid_range(id) ;
                             }) ; }}} ,
-                    {   name: 'first',       align: 'right'} ,
-                    {   name: 'last',        align: 'right'} ,
-                    {   name: '# total',     align: 'right'} ,
-                    {   name: '# available', align: 'right'} ,
-                    {   name: 'description', sorted: false, hideable: true} ,
+                    {   name: 'first',       align: 'right', type: SimpleTable.Types.Number} ,
+                    {   name: 'last',        align: 'right', type: SimpleTable.Types.Number} ,
+                    {   name: '# total',     align: 'right', type: SimpleTable.Types.Number} ,
+                    {   name: '# available', align: 'right', type: SimpleTable.Types.Number} ,
+                    {   name: 'description', sorted: false,  hideable: true} ,
                     {   name: 'in use',      sorted: false}
                 ] ;
                 var rows = [] ;
-                this._table_obj = new Table (
+                this._table_obj = new SimpleTable.constructor (
                     this._table_elem ,
                     hdr ,
                     rows ,
@@ -301,17 +301,17 @@ function (
                 if (this._range_edit_mode() && this._can_manage())
                     rows.push ([
                         '' ,
-                        TextInput_HTML({classes: 'first', name: ''+range.id, value: range.first, size: 6}) ,
-                        TextInput_HTML({classes: 'last',  name: ''+range.id, value: range.last,  size: 6}) ,
+                        SimpleTable.html.TextInput ({classes: 'first', name: ''+range.id, value: range.first, size: 6}) ,
+                        SimpleTable.html.TextInput ({classes: 'last',  name: ''+range.id, value: range.last,  size: 6}) ,
                         '' ,
                         '' ,
-                        TextArea_HTML ({classes: 'description', name: ''+range.id }, 4, 36) ,
+                        SimpleTable.html.TextArea ({classes: 'description', name: ''+range.id }, 4, 36) ,
                         ''
                     ]) ;
                 else
                     rows.push([
                         this._can_manage() ?
-                            Button_HTML('X', {
+                            SimpleTable.html.Button ('X', {
                                 name:    range.id ,
                                 classes: 'control-button control-button-small control-button-important range-delete' ,
                                 title:   'delete this range' }) : ' ' ,
@@ -320,7 +320,7 @@ function (
                         range.last - range.first + 1 ,
                         count_elements_in_array(range.available) ,
                         '<div class="description" ><pre>'+range.description+'</pre></div>' ,
-                        Button_HTML('SEARCH', {
+                        SimpleTable.html.Button ('SEARCH', {
                                 name:    range.id ,
                                 classes: 'control-button control-button-small range-search' ,
                                 title:   'search all equipment associated with this range' })
@@ -329,11 +329,11 @@ function (
             if (this._range_edit_mode() && this._can_manage())
                 rows.push ([
                     '' ,
-                    TextInput_HTML({classes: 'first', name: '0', value: '0', size: 6}) ,
-                    TextInput_HTML({classes: 'last',  name: '0', value: '0', size: 6}) ,
+                    SimpleTable.html.TextInput ({classes: 'first', name: '0', value: '0', size: 6}) ,
+                    SimpleTable.html.TextInput ({classes: 'last',  name: '0', value: '0', size: 6}) ,
                     '' ,
                     '' ,
-                    TextArea_HTML ({classes: 'description', name: '0'}, 4, 36) ,
+                    SimpleTable.html.TextArea ({classes: 'description', name: '0'}, 4, 36) ,
                     ''
                 ]) ;
             this._table().load(rows) ;
@@ -350,7 +350,8 @@ function (
                         '../irep/ws/slacid_range_delete.php' ,
                         {range_id: id}
                     ) ;
-            }) ;
+                }
+            ) ;
         } ;
     }
     Class.define_class (Admin_SLACid, FwkApplication, {}, {}) ;

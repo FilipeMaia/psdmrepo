@@ -1,10 +1,10 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk', 'webfwk/SimpleTable'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk) {
+    Class, FwkApplication, Fwk, SimpleTable) {
 
     cssloader.load('../irep/css/Admin_Notify.css') ;
 
@@ -35,9 +35,19 @@ function (
             this._init() ;
         } ;
 
+        // Automatically refresh the page at specified interval only
+
+        this._update_ival_sec = 10 ;
+        this._prev_update_sec = 0 ;
+
         this.on_update = function () {
             if (this.active) {
-                this._init() ;
+                var now_sec = Fwk.now().sec ;
+                if (now_sec - this._prev_update_sec > this._update_ival_sec) {
+                    this._prev_update_sec = now_sec ;
+                    this._init() ;
+                    this._load() ;
+                }
             }
         } ;
 
@@ -167,23 +177,20 @@ function (
       '</div>' +
     '</div>' +
   '</div>' +
-'</div>'
+'</div>' ;
                 this.container.html(html) ;
                 this._wa_elem = this.container.children('#admin-notifications') ;
             }
             return this._wa_elem ;
         } ;
-       
         this._set_info = function (html) {
             if (!this._info_elem) this._info_elem = this._wa().children('#info') ;
             this._info_elem.html(html) ;
         } ;
-        
         this._set_updated = function (html) {
             if (!this._updated_elem) this._updated_elem = this._wa().children('#updated') ;
             this._updated_elem.html(html) ;
         } ;
-
         this._init = function () {
 
             if (this._is_initialized) return ;
@@ -209,9 +216,9 @@ function (
             this._action(
                 'Loading...' ,
                 '../irep/ws/notify_get.php' ,
-                {}) ;
+                {}
+            ) ;
         } ;
-
         this._save = function (recipient, uid, event_name, enabled) {
             this._action (
                 'Saving...' ,
@@ -220,36 +227,36 @@ function (
                     uid:        uid ,
                     event_name: event_name ,
                     enabled:    enabled ? 1 : 0
-                }) ;
+                }
+            ) ;
         } ;
-
         this._schedule_save = function (recipient, policy) {
             this._action(
                 'Saving...' ,
                 '../irep/ws/notify_save.php' ,
                 {   recipient:  recipient ,
                     policy:     policy
-                }) ;
+                }
+            ) ;
         } ;
-
         this._pending_submit = function (idx) {
             var params = {action: 'submit'} ;
             if (idx !== undefined) params.id = this._pending[idx].id ;
             this._action (
                 'Submitting...' ,
                 '../irep/ws/notify_queue.php' ,
-                params) ;
+                params
+            ) ;
         } ;
-
         this._pending_delete = function (idx) {
             var params = {action: 'delete'} ;
             if (idx !== undefined) params.id = this._pending[idx].id ;
             this._action (
                 'Deleting...' ,
                 '../irep/ws/notify_queue.php' ,
-                params) ;
+                params
+            ) ;
         } ;
-
         this._action = function (name, url, params) {
             this._set_updated(name) ;
             Fwk.web_service_GET(url, params, function (data) {
@@ -262,14 +269,12 @@ function (
                 _that._display() ;
             }) ;
         } ;
-
         this._display = function () {
             this._display_editor() ;
             this._display_administrator() ;
             this._display_other() ;
             this._display_pending() ;
         } ;
-
         this._display_editor = function () {
             var role = 'EDITOR' ;
             if( !this.app_config.current_user.can_edit_inventory) {
@@ -303,7 +308,7 @@ function (
                             checked: notify[event.name] == true } ;
                         rows.push([
                             event.description,
-                            Checkbox_HTML(attr) ]) ;
+                            SimpleTable.html.Checkbox(attr) ]) ;
                     }
                     break ;
 
@@ -326,13 +331,13 @@ function (
                                 checked: notify[event.name] == true } ;
                             if( !( this._can_manage() || ( this.app_config.current_user.uid == user.uid)))
                                 attr.disabled = 'disabled' ;
-                            row.push( Checkbox_HTML(attr)) ;
+                            row.push(SimpleTable.html.Checkbox(attr)) ;
                         }
                         rows.push(row) ;
                     }
                     break ;
             }
-            var table = new Table('admin-notifications-'+role, hdr, rows) ;
+            var table = new SimpleTable.constructor('admin-notifications-'+role, hdr, rows) ;
             table.display() ;
 
             var policy = this._wa().find('select[name="policy4'+role+'"]') ;
@@ -361,7 +366,7 @@ function (
                 var entry = this._pending[i] ;
                 var find_button = '' ;
                 if(( entry.scope == 'EQUIPMENT') && ( entry.event_type_name != 'on_equipment_delete')) {
-                    find_button = Button_HTML('find equipment', {
+                    find_button = SimpleTable.html.Button('find equipment', {
                             name:    'find_'+i,
                             classes: 'admin-notifications-pending-tools',
                             onclick: "global_search_requipment_by_id('"+entry.equipment_id+"')",
@@ -375,13 +380,13 @@ function (
                     entry.recipient_uid,
                     entry.recipient_role,
                     this.can_manage_access() ?
-                        Button_HTML('submit', {
+                        SimpleTable.html.Button('submit', {
                             name:    'submit_'+i,
                             classes: 'admin-notifications-pending-tools',
                             onclick: "Fwk.get_application('Admin', 'E-mail Notifications')._pending_submit('"+i+"')",
                             title:   'submit this event for the instant delivery'
                         })+' '+
-                        Button_HTML('delete', {
+                        SimpleTable.html.Button('delete', {
                             name:    'delete_'+i,
                             classes: 'admin-notifications-pending-tools',
                             onclick: "Fwk.get_application('Admin', 'E-mail Notifications')._pending_delete('"+i+"')",
@@ -390,7 +395,7 @@ function (
                         find_button : ''
                     ]) ;
             }
-            var table = new Table('admin-notifications-pending', hdr, rows) ;
+            var table = new SimpleTable.constructor('admin-notifications-pending', hdr, rows) ;
             table.display() ;
 
             this._wa().find('.admin-notifications-pending-tools').button() ;

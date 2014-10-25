@@ -1,10 +1,10 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk'] ,
+    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk', 'webfwk/SimpleTable'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk) {
+    Class, FwkApplication, Fwk, SimpleTable) {
 
     cssloader.load('../irep/css/Admin_Access.css') ;
 
@@ -14,6 +14,12 @@ function (
      * @returns {Admin_Access}
      */
     function Admin_Access (app_config) {
+
+        var roles = {
+            'ADMINISTRATOR': { is_administrator: true,  can_edit_inventory: true } ,
+            'EDITOR'       : { is_administrator: false, can_edit_inventory: true } ,
+            'OTHER'        : { is_administrator: false, can_edit_inventory: false}
+        } ;
 
         var _that = this ;
 
@@ -35,9 +41,19 @@ function (
             this._init() ;
         } ;
 
+        // Automatically refresh the page at specified interval only
+
+        this._update_ival_sec = 10 ;
+        this._prev_update_sec = 0 ;
+
         this.on_update = function () {
             if (this.active) {
-                this._init() ;
+                var now_sec = Fwk.now().sec ;
+                if (now_sec - this._prev_update_sec > this._update_ival_sec) {
+                    this._prev_update_sec = now_sec ;
+                    this._init() ;
+                    this._load() ;
+                }
             }
         } ;
 
@@ -95,7 +111,7 @@ function (
         '<div style="float:left;" >        ' +
         '  <input type="text"              ' +
         '         size="8"                 ' +
-        '         name="administrator2add" ' +
+        '         name="ADMINISTRATOR" ' +
         '         title="fill in a UNIX account of a user, press RETURN to save" />' +
         '</div>' +
         '<div style="float:left"  class="hint" > &larr; add new user here</div>' +
@@ -114,7 +130,7 @@ function (
         '<div style="float:left;" > ' +
           '<input type="text"       ' +
           '       size="8"          ' +
-          '       name="editor2add" ' +
+          '       name="EDITOR" ' +
           '       title="fill in a UNIX account of a user, press RETURN to save" />' +
         '</div>' +
         '<div style="float:left;" class="hint" > &larr; add new user here</div>' +
@@ -132,7 +148,7 @@ function (
         '<div style="float:left;" >' +
         '  <input type="text"      ' +
         '         size="8"         ' +
-        '         name="other2add" ' +
+        '         name="OTHER" ' +
         '         title="fill in a UNIX account of a user, press RETURN to save" />' +
         '</div>' +
         '<div style="float:left;" class="hint" > &larr; add new user here</div>' +
@@ -147,17 +163,48 @@ function (
             }
             return this._wa_elem ;
         } ;
-       
+        this._table = function (role) {
+            var id = 'admin-access-' + role ;
+            if (!this._table_obj) this._table_obj = {} ;
+            if (!this._table_obj[role]) {
+                var rows = [] ;
+                var elem = this._wa().find('#'+id) ;
+                var hdr = [] ;
+                if (this._can_manage()) hdr.push (
+                    {   name: 'DELETE', sorted: false , hideable: true ,
+                        type: { after_sort: function () {
+                            elem.find('button[name="delete"]').button() ;
+                        }}
+                    }
+                ) ;
+                hdr.push (
+                    {   name: 'UID'} ,
+                    {   name: 'user'}
+                ) ;
+                if (roles[role].can_edit_inventory && !roles[role].is_administrator) hdr.push (
+                    {   name: 'dictionary privilege', sorted: false ,
+                        type: { after_sort: function () {
+                            elem.find('button[name="dict_priv"]').button() ;
+                        }}
+                    }
+                ) ;
+                hdr.push (
+                    {   name: 'added'} ,
+                    {   name: 'last active'}
+                ) ;
+                this._table_obj[role] = new SimpleTable.constructor (id, hdr, rows) ;
+                this._table_obj[role].display() ;
+            }
+            return this._table_obj[role] ;
+        } ;
         this._set_info = function (html) {
             if (!this._info_elem) this._info_elem = this._wa().children('#info') ;
             this._info_elem.html(html) ;
         } ;
-        
         this._set_updated = function (html) {
             if (!this._updated_elem) this._updated_elem = this._wa().children('#updated') ;
             this._updated_elem.html(html) ;
         } ;
-
         this._init = function () {
 
             if (this._is_initialized) return ;
@@ -175,84 +222,79 @@ function (
 
             if (this._can_manage())
                 inputs.keyup(function (e) {
-                    var name = this.name ;
-                    var uid = $(this).val() ;
-                    if (uid && e.keyCode == 13)
-                        switch (this.name) {
-                            case 'administrator2add' : _that._create_administrator(uid) ; break ;
-                            case 'editor2add'        : _that._create_editor       (uid) ; break ;
-                            case 'other2add'         : _that._create_other        (uid) ; break ;
-                        }}) ;
+                    var role = this.name ;
+                    var uid  = $(this).val() ;
+                    if (uid && e.keyCode == 13) {
+                        _that._action (
+                            'Creating User...' ,
+                            '../irep/ws/access_new.php' ,
+                            {uid: uid, role: role}
+                        ) ;
+                    }
+                }) ;
             else
                 inputs.attr('disabled', 'disabled') ;
 
             this._load() ;
         } ;
-
-        this._create_administrator = function (uid) { this._create_user(uid, 'ADMINISTRATOR') ; } ;
-        this._create_editor        = function (uid) { this._create_user(uid, 'EDITOR') ; } ;
-        this._create_other         = function (uid) { this._create_user(uid, 'OTHER') ; } ;
-
         this._load = function () {
             this._action (
                 'Loading...' ,
                 '../irep/ws/access_get.php' ,
-                {}) ;
+                {}
+            ) ;
         } ;
-
-        this._create_user = function (uid, role) {
-            this._action (
-                'Creating User...' ,
-                '../irep/ws/access_new.php' ,
-                {uid: uid, role: role}) ;
-        } ;
-
         this._delete_user = function (uid) {
-            this._action (
-                'Deleting...' ,
-                '../irep/ws/access_delete.php' ,
-                {uid: uid}) ;
+            Fwk.ask_yes_no (
+                'Removing a user' ,
+                'Are you sure you want to remove user <b>'+uid+'</b> from the list?' ,
+                function () {
+                    _that._action (
+                        'Deleting...' ,
+                        '../irep/ws/access_delete.php' ,
+                        {uid: uid}
+                    ) ;
+                }
+            ) ;
         } ;
-
         this._toggle_priv = function (uid, name) {
             this._action (
                 'Changing Dictionary Privilege...' ,
                 '../irep/ws/access_toggle_priv.php' ,
-                {uid: uid, name: name}) ;
+                {uid: uid, name: name}
+            ) ;
         } ;
-
         this._action = function (name, url, params) {
             this._set_updated(name) ;
             Fwk.web_service_GET (url, params, function (data) {
                 _that._access = data.access ;
                 _that._display() ;
                 _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
-                //_that.notify_load() ;
             }) ;
         } ;
-
         this._display = function () {
-            this._display_users('admin-access-ADMINISTRATOR', this._access.ADMINISTRATOR, true, true) ;
-            this._display_users('admin-access-EDITOR',        this._access.EDITOR,        false, true) ;
-            this._display_users('admin-access-OTHER',         this._access.OTHER,         false, false) ;
+            this._display_users('ADMINISTRATOR') ;
+            this._display_users('EDITOR') ;
+            this._display_users('OTHER') ;
         } ;
-
-        this._display_users = function (id, users, is_administrator, can_edit_inventory) {
+        this._display_users = function (role) {
             var rows = [] ;
+            var users = this._access[role] ;
             for (var i in users) {
                 var a = users[i] ;
                 var row = [] ;
                 if (this._can_manage()) row.push (
-                    Button_HTML('X', {
+                    SimpleTable.html.Button ('X', {
                         name:    'delete' ,
+                        classes: 'control-button control-button-small control-button-important' ,
                         onclick: "Fwk.get_application('Admin', 'Access Control')._delete_user('"+a.uid+"')" ,
                         title:   'delete this user from the list'})) ;
                 row.push (
                     a.uid ,
                     a.name) ;
-                if (can_edit_inventory && !is_administrator) row.push (
+                if (roles[role].can_edit_inventory && !roles[role].is_administrator) row.push (
                     this._can_manage()
-                        ? Checkbox_HTML ({
+                        ? SimpleTable.html.Checkbox ({
                             name:    'dict_priv' ,
                             onclick: "Fwk.get_application('Admin', 'Access Control')._toggle_priv('"+a.uid+"','dict_priv')" ,
                             title:   'togle the dictionary privilege' ,
@@ -264,19 +306,7 @@ function (
 
                 rows.push(row) ;
             }
-            var hdr = [] ;
-            if (this._can_manage()) hdr.push(                      {name: 'DELETE',               sorted: false, hideable: true}) ;
-            hdr.push (                                             {name: 'UID',                  sorted: false} ,
-                                                                   {name: 'user',                 sorted: false}) ;
-            if (can_edit_inventory && !is_administrator) hdr.push ({name: 'dictionary privilege', sorted: false}) ;
-            hdr.push (                                             {name: 'added',                sorted: false} ,
-                                                                   {name: 'last active',          sorted: false}) ;
-            var elem = this._wa().find('#'+id) ;
-
-            var table = new Table(id, hdr, rows) ;
-            table.display() ;
-
-            elem.find('button[name="delete"]').button() ;
+            this._table(role).load(rows) ;
         } ;
     }
     Class.define_class (Admin_Access, FwkApplication, {}, {}) ;
