@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2014-10-24 Igor Gaponenko
+- modified a configuration of the module loader (RequireJS) as per JIRA ticket
+PSWA-14 to prevent pages from staying in browser caches forever.
+
 Tag: V00-02-01
 2014-10-10 Igor Gaponenko
 - minor code cleanup

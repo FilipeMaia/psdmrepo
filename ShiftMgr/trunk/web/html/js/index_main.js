@@ -1,5 +1,10 @@
 require.config ({
+
     baseUrl: '..' ,
+
+    waitSeconds : 15,
+    urlArgs     : "bust="+new Date().getTime() ,
+
     paths: {
         underscore: '/underscore/underscore-min' ,
         webfwk:     'webfwk/js' ,
