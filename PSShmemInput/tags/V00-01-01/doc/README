@@ -1,0 +1,16 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSShmemInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+This package contains few classes which together implement an input module
+for psana reading XTC data from shared memory in DAQ system.
+ 
