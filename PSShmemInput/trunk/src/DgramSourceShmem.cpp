@@ -46,7 +46,7 @@ namespace PSShmemInput {
 DgramSourceShmem::DgramSourceShmem (const std::string& name)
   : PSXtcInput::IDatagramSource()
   , psana::Configurable(name)
-  , m_dgQueue(new XtcInput::DgramQueue(32))
+  , m_dgQueue(new XtcInput::DgramQueue(3))
   , m_readerThread()
 {
 }

@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2014-10-27 Christopher O'Grady
+- Reduce queue depth in DgramSourceShmem from 32 to 3.
+  This is because applications that run from shmem
+  want minimal latency, which requires minimal buffering.
+
 Tag: V00-01-00
 2014-02-26 Andy
 - refactoring for multi-process psana
