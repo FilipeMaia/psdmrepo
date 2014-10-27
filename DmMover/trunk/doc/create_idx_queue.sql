@@ -1,6 +1,7 @@
 --
 -- Create tables for Index file (Idx) creation tools
 -- This is a sqlite3 database
+-- sqlite3  /u1/psdm/srv_idx/db < DmMover/doc/create_idx_queue.sql
 --
 
 PRAGMA foreign_keys = on;
@@ -16,7 +17,7 @@ INSERT INTO StatusEnum (statusName) VALUES ('FAIL');
 INSERT INTO StatusEnum (statusName) VALUES ('DONE');
 
 create table idx( 
-    fn TEXT PRIMARY KEY,
+    xtcfn TEXT PRIMARY KEY,
     fpath TEXT NOT NULL,
     date_added INTEGER,
     date_status INTEGER,

@@ -7,8 +7,12 @@ import time
 import logging
 import argparse
 
-import DmMover.db_access as db
+import DmMover.db_access as regdb
 from DmMover.xtcidx import CreateIdx
+from DmMover.xtcidxjob import IdxSrvClient
+
+pjoin = os.path.join
+
 
 # ========================================================================
 
@@ -16,7 +20,8 @@ db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
 test_db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
 
 usage="""
-Find index files that were not transfered by the data movers and create them.
+Find index files that were not transfered by the data movers and add them to 
+the idx creation queue.
 """
 help_epilog=""" """
 
@@ -50,11 +55,10 @@ def main():
     parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser.add_argument("--hours", type=int, default=24, help="")
-    parser.add_argument("--nmax", type=int, default=-1, help="Max number of index files to create (-1: infinity)")
+    parser.add_argument("--hours", type=int, default=24, help="max age of failed idx entries in RegDB")
+    parser.add_argument("--nmax", type=int, default=-1, help="Max number of index files to process (-1: all found)")
     parser.add_argument("--wait", type=int, default=-1, help="run continously, wait %(metavar)s min") 
     parser.add_argument("--instr", help="select only index files from a specific instr")
-    #parser.add_argument("--exp", metavar='EXP-ID', type=int, help="experiment ID")
     parser.add_argument("--listonly", action='store_true', default=False)
     parser.add_argument("--verbose", "-v", action='count', default=0)
 
@@ -67,22 +71,19 @@ def main():
     args.verbose = min(args.verbose, len(log_levels)-1)
     logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
                         datefmt="%Y%m%d %H:%M:%S")
-    db.select_db(db_conn)
+    regdb.select_db(db_conn)
     logging.warning("use production db")
 
-    exp_info = ExperInfo(db)
-    cridx = CreateIdx(listonly=args.listonly)
+    exp_info = ExperInfo(regdb)
+    queue = IdxSrvClient("/u1/psdm/srv_idx/db")
 
-
-    while True:
+    while True:        
+        age_ns = long(1E9 * (time.time() - args.hours*3600))
+        idx_files = regdb.failed_idx_files(age=age_ns)
         
-        age = long(1E9 * (time.time() - args.hours*3600))
-        idx_files = db.failed_idx_files(age=age)
-
         logging.info("Found %d files", len(idx_files))
     
         ndone, nexists = 0, 0 
-        
         for idx in idx_files:
             if args.nmax >= 0 and ndone >= args.nmax:
                 logging.warning("exit loop limit")
@@ -94,15 +95,23 @@ def main():
             if args.instr and args.instr != instr.lower():
                 continue
 
-            xtc_path = os.path.join("/reg/d/psdm", instr.lower(), name, 'xtc')
-            exp_file = ExpFile(name, instr, xtc_path, idx['file'])
+            xtc_path = pjoin("/reg/d/psdm", instr.lower(), name, 'xtc')
+            ind = idx['file'].find(".xtc")
+            xtc_name = idx['file'][:ind+4]
+            idx_file = pjoin(xtc_path, 'index', idx['file'])
+            
+            if os.path.exists(idx_file):
+                logging.debug("Exists %s", idx_file)
+                continue
+            if not os.path.exists(pjoin(xtc_path, xtc_name)):
+                logging.debug("Xtc file is missing %s %s", xtc_name, xtc_path)
+                continue
 
-            stat = cridx.add_request(exp_file)
+            rc = queue.add_request(xtc_name,xtc_path) if not args.listonly else 999
+            logging.info("Added %s %s %d", xtc_name, xtc_path, rc)            
 
-            if stat == -1 : nexists += 1
-
-            if stat >= 0:
-                ndone += 1
+            if rc == -1: nexists += 1
+            if rc >= 0:  ndone += 1
         
         if args.wait <= 0:
             break
