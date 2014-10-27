@@ -72,6 +72,26 @@ ColorTable(const unsigned& NColors, const float& H1, const float& H2) // H1, H2=
 
 //--------------------------
 
+void 
+setPixmapForLabel(const QImage& image, QPixmap*& pixmap, QLabel*& label)
+{
+  if(pixmap) delete pixmap;
+  pixmap = new QPixmap(QPixmap::fromImage(image));
+  //else pixmap -> loadFromData ( (const uchar*) &dimg[0], unsigned(rows*cols) );
+
+  label->setPixmap(pixmap->scaled(label->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+  //label->setPixmap(*pixmap);
+}
+
+//--------------------------
+
+int string_to_int(const std::string& str)
+{
+  return atoi( str.c_str() );
+}
+
+//--------------------------
+
 } // namespace PSQt
 
 //--------------------------

@@ -1,10 +1,16 @@
 #ifndef QGUTILS_H
 #define QGUTILS_H
 
+#include <string> 
+#include <sstream> // for stringstream
 #include <stdint.h> // uint8_t, uint32_t, etc.
 //#include "PSQt/GeoImage.h"
 //#include <QPainter>
 //#include <QPen>
+
+#include <QLabel>
+#include <QPainter>
+#include <QPixmap>
 
 namespace PSQt {
 //--------------------------
@@ -33,7 +39,29 @@ uint32_t HSV2RGBA(const float H, const float S, const float V);
 uint32_t*
   ColorTable(const unsigned& NColors=1024, const float& H1=-120, const float& H2=-360);
 
+/**
+ * Sets image as a pixmap for label
+ */ 
+void 
+  setPixmapForLabel(const QImage& image, QPixmap*& pixmap, QLabel*& label);
+
 //--------------------------
+
+ int string_to_int(const std::string& str);
+
+//--------------------------
+//--------------------------
+
+template<typename T>
+  std::string val_to_string(const T& v)
+  {
+    std::stringstream ss; ss << v;
+    return ss.str();
+  }
+
+
+//--------------------------
+
 } // namespace PSQt
 
 #endif // QGUTILS_H
