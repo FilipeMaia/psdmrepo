@@ -46,6 +46,10 @@ class ZMQPublisher(object):
             LOG.debug('Publisher is already initialized - Nothing to do')
             return
 
+        # set the hwm for the socket to the specified buffersize
+        LOG.debug('Publisher data socket buffer size set to %d', bufsize)
+        self.data_socket.set_hwm(bufsize)
+
         offset = 0
         while offset < config.APP_BIND_ATTEMPT and not self.initialized:
             port_try = port + offset
