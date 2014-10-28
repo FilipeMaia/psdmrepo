@@ -11,8 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-29
+2014-10-27 Mikhail S. Dubrovin
+- add CSPad2x2NDArrReshape, JIRA issue PSAS-45
+
 Tag: V00-03-28
-2014-08-09 Mikhail S. Dubrovin
+2014-10-09 Mikhail S. Dubrovin
 - in CSPad2x2ImageProducer - use the "geometry" calibration file if available
 	
 Tag: V00-03-27

@@ -155,6 +155,15 @@ private:
   }
 
 //--------------------
+// Save 3-D array in environment
+  template <typename T>
+  void save3DArrayInEnv(PSEnv::Env& env, const Pds::Src& src, const std::string& key, const ndarray<const T,3>& ndarr)
+  {
+    boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(ndarr) );
+    env.calibStore().put(shp, src, key);
+  }
+
+//--------------------
 // Save 2-D array in event
   template <typename T>
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,2>& ndarr)
