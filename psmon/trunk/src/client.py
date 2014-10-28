@@ -1,7 +1,5 @@
 #!/usr/bin/env python
-import os
 import sys
-import time
 import logging
 import argparse
 import multiprocessing as mp
@@ -9,7 +7,7 @@ import multiprocessing as mp
 from psmon import app, config, log_level_parse
 
 
-LOG = logging.getLogger(os.path.splitext(os.path.basename(__file__))[0])
+LOG = logging.getLogger(config.LOG_BASE_NAME)
 
 
 def parse_cmdline():
@@ -134,6 +132,14 @@ def parse_cmdline():
     )
 
     parser.add_argument(
+        '--recv-limit',
+        metavar='RECV_LIMIT',
+        type=int,
+        default=config.APP_RECV_LIMIT,
+        help='the maximum number of messages to discard from the recieve buffer per time'
+    )
+
+    parser.add_argument(
         '--log',
         metavar='LOG',
         default=config.LOG_LEVEL,
@@ -169,7 +175,7 @@ def main():
 
         proc_list = []
         for topic in args.topics:
-            client_info = app.ClientInfo(args.server, args.port, args.buffer, args.rate, topic)
+            client_info = app.ClientInfo(args.server, args.port, args.buffer, args.rate, args.recv_limit, topic)
             proc = mp.Process(name='%s-client'%topic, target=mpl_client, args=(args.client, client_info, plot_info))
             proc.daemon = True
             LOG.info('Starting client for topic: %s', topic)

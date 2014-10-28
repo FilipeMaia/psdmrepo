@@ -13,11 +13,12 @@ LOG = logging.getLogger(__name__)
 
 
 class ClientInfo(object):
-    def __init__(self, server, port, buffer, rate, topic):
+    def __init__(self, server, port, buffer, rate, recvlimit, topic):
         self.server = server
         self.port = port
         self.buffer = buffer
         self.rate = rate
+        self.recvlimit = recvlimit
         self.topic = topic
 
 
@@ -118,19 +119,30 @@ class ZMQSubscriber(object):
     def sock_init(self, sock, server, port):
         sock.connect('tcp://%s:%d' % (server, port))
 
-    def data_recv(self):
-        topic = self.data_socket.recv()
-        return self.data_socket.recv_pyobj()
+    def data_recv(self, flags=0):
+        topic = self.data_socket.recv(flags)
+        return self.data_socket.recv_pyobj(flags)
 
     def get_socket_gen(self):
-        poller = zmq.Poller()
-        poller.register(self.data_socket, zmq.POLLIN)
         while True:
-            socks = dict(poller.poll(25))
-            if socks.get(self.data_socket) == zmq.POLLIN:
-                yield self.data_recv()
-            else:
-                yield
+            count = 0
+            data = None
+            while count < self.client_info.recvlimit:
+                try:
+                    data = self.data_recv(flags=zmq.NOBLOCK)
+                    count += 1
+                except zmq.ZMQError as e:
+                    if e.errno == zmq.EAGAIN:
+                        if LOG.isEnabledFor(logging.DEBUG):
+                            LOG.debug('Number of queued messages discarded: %d', count)
+                        break
+                    else:
+                        raise
+
+            if count >= self.client_info.recvlimit and LOG.isEnabledFor(logging.WARN):
+                LOG.warn('Number of queued messages exceeds the discard limit: %d', self.client_info.recvlimit)
+
+            yield data
 
 
 class ZMQListener(object):

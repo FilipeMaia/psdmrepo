@@ -5,6 +5,7 @@ RESET_REQ_STR = 'reset signal - %s'
 RESET_REP_STR = 'reset signal recieved from %s'
 ZMQ_TOPIC_DELIM_CHAR = '\0'
 ### CONFIG KEYS FOR LOGGING ###
+LOG_BASE_NAME = __package__
 LOG_LEVEL = 'INFO'
 LOG_LEVEL_ROOT = logging.WARN
 LOG_FORMAT = '[%(levelname)-8s] %(message)s' #'%(asctime)s:%(levelname)s:%(message)s'
@@ -18,6 +19,7 @@ APP_CLIENT = 'pyqt'
 APP_RUN_DEFAULT = '12'
 APP_EXP_DEFAULT = 'xppb0114'
 APP_BIND_ATTEMPT = 32
+APP_RECV_LIMIT = 25
 ### PYQT DEFAULT APPEARANCE CONFIG ###
 PYQT_LARGE_WIN_X = 1024
 PYQT_LARGE_WIN_Y = 768
