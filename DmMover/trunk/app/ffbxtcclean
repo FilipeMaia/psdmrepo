@@ -248,7 +248,7 @@ class XtcCleanLocal:
         
         # already changed to xtc directory
 
-        print "workdir", os.getcwd()
+        print "workdir", os.getcwd(), path 
         if self.verbose or self.iCleanType != 0:      
             print "Found/selected %d Files to be deleted in %s" % (len(lDelFiles), path)
             if len(lDelFiles):
@@ -273,11 +273,13 @@ class XtcCleanLocal:
 
       
         # Keep record of files deleted in: deletedlistNN.txt
-        rm_log_path = os.path.join(path, 'rmlog')
+        log_path = "/reg/g/psdm/psdatmgr/logs/mvr/%s/%s" % (self.sExpType, self.sExpName)
+        
+        rm_log_path = os.path.join(log_path, 'rmlog')
         if not os.path.exists(rm_log_path):
-            os.mkdir(rm_log_path)
+            os.makedirs(rm_log_path)
         iDelNo = self.getDelNo(rm_log_path)
-        sFnDelList = "rmlog/deletedlist%02d.txt" % (iDelNo)
+        sFnDelList = os.path.join(rm_log_path, "deletedlist%02d.txt" % (iDelNo))
         print "Generating Delete List %s" % (sFnDelList)
 
         iNumXtcFilesDeleted = 0
@@ -487,8 +489,12 @@ def main():
     
     if args.all:
         exp_id = _all_experiments_
+        print "--all currently not supported"
+        return 0
     elif args.exp:
         exp_id = args.exp
+        print "--exp (exp_id) currently not supported"
+        return 0
     else:
         #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn")
         #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.regdb-reader-conn")
