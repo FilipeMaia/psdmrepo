@@ -1,0 +1,40 @@
+#admin-slacid {
+    padding:        20px;
+}
+#admin-slacid .notes {
+    max-width:      680px;
+    font-size:      12px;
+}
+#admin-slacid > #tabs {
+    font-size:      12px;
+}
+#admin-slacid > #tabs .tab-body {
+    padding:        10px;
+    padding-left:   20px;
+    padding-bottom: 20px;
+    border:         solid 1px #b0b0b0;
+    font-size:      11px;
+}
+#admin-slacid > #tabs .tab-body .table-ctrl .buttons {
+    padding-top:    10px;
+}
+#admin-slacid > #tabs #ranges #table {
+    margin-top:     10px;
+    padding-left:   10px;
+    overflow:       auto;
+}
+#admin-slacid > #tabs #ranges #table div.description {
+    max-width:      256px;
+    overflow:       auto;
+}
+#admin-slacid > #tabs #ranges #table div.description > pre { 
+    margin:         0px;
+    padding:        2px;
+}
+#admin-slacid .hint {
+    padding-top:    4px;
+    color:          maroon;
+}
+#admin-slacid .info {
+    color:          maroon;
+}

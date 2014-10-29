@@ -1,0 +1,25 @@
+#admin-access {
+    padding: 20px;
+}
+#admin-access .notes {
+    max-width:      680px;
+    font-size:      12px;
+}
+#admin-access > #tabs {
+    font-size:      12px;
+}
+#admin-access > #tabs .tab-body {
+    padding:        10px;
+    padding-left:   20px;
+    padding-bottom: 20px;
+    border:         solid 1px #b0b0b0;
+    font-size:      11px ;
+}
+#admin-access .hint {
+    padding-top:    4px;
+    color:          maroon;
+}
+
+#admin-access .info {
+    color:          maroon;
+}
