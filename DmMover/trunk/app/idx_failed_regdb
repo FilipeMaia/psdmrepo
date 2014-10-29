@@ -8,7 +8,6 @@ import logging
 import argparse
 
 import DmMover.db_access as regdb
-from DmMover.xtcidx import CreateIdx
 from DmMover.xtcidxjob import IdxSrvClient
 
 pjoin = os.path.join
