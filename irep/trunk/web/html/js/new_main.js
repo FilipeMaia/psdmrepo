@@ -54,9 +54,9 @@ require ([
     // Make sure the core libraries are preloaded so that the applications
     // won't borther with loading them individually
 
-    'jquery-ui',    'jquery-ui',   'jquery-ui-timepicker' ,
-    'jquery.form',  'jquery.json', 'jquery.printElement' ,
-    'jquery.resize'] ,
+    'jquery-ui',     'jquery-ui',   'jquery-ui-timepicker' ,
+    'jquery.form',   'jquery.json', 'jquery.printElement' ,
+    'jquery.resize', 'underscore'] ,
 
 function (
     cssloader, Fwk ,
@@ -100,10 +100,23 @@ function (
                 Fwk.activate('Equipment', 'Inventory').quick_search(text2search) ;
             } ,
             function () {
+                
+                // Display the staring application
+
                 Fwk.activate(app_config.select_app, app_config.select_app_context1) ;
+        
+                // preload dictionaries as they may be needed by some applications
+
+                Fwk.get_application('Dictionary', 'Equipment').init() ;
+                Fwk.get_application('Dictionary', 'Locations').init() ;
+                Fwk.get_application('Dictionary', 'Statuses') .init() ;
             }
         ) ;
     }) ;
+
+    // Global entries for applications
+
+    window.global_equipment_inventory = function () { return Fwk.get_application('Equipment', 'Inventory') ; }
 
     // Redirections which may be required by the legacy code generated
     // by Web services.
@@ -160,5 +173,9 @@ function (
     window.global_equipment_sorter_by_model        = function (a,b) { return sort_as_text(a.model,        b.model) ; } ;
     window.global_equipment_sorter_by_location     = function (a,b) { return sort_as_text(a.location,     b.location) ; } ;
     window.global_equipment_sorter_by_modified     = function (a,b) { return a.modified.time_64 - b.modified.time_64 ; } ;
+
+    window.global_dict_find_model_by_id = function (id)                  { return Fwk.get_application('Dictionary', 'Equipment').find_model_by_id(id) ; } ;
+    window.global_dict_find_model       = function (manufacturer, model) { return Fwk.get_application('Dictionary', 'Equipment').find_model      (manufacturer, model) ; } ;
+
 }) ;
 

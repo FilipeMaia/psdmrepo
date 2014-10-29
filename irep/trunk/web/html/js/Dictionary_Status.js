@@ -57,6 +57,15 @@ function (
 
         this._app_config = app_config ;
 
+        /**
+         * Preload the dictionary w/o displaying it
+         *
+         * @returns {undefined}
+         */
+        this.init = function () {
+            this._preload() ;
+        } ;
+
         // --------------------
         // Own data and methods
         // --------------------
@@ -243,6 +252,15 @@ function (
                 {}
             ) ;
         } ;
+        this._preload = function () {
+            var dont_display = true ;
+            this._status_action (
+                'Loading...' ,
+                '../irep/ws/status_get.php' ,
+                {} ,
+                dont_display
+            ) ;
+        } ;
         this._status_display = function () {
             var rows = [] ;
             for (var i in this._status) {
@@ -348,13 +366,19 @@ function (
                 {status: this._table_status().selected_object(), status2: name}
             ) ;
         } ;
-        this._status_action = function (name, url, params) {
-            this._set_updated(name) ;
-            Fwk.web_service_GET (url, params, function (data) {
-                _that._status = data.cable_status ;
-                _that._status_display() ;
-                _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
-            }) ;
+        this._status_action = function (name, url, params, dont_display) {
+            if (dont_display) {
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._status = data.cable_status ;
+                }) ;
+            } else {
+                this._set_updated(name) ;
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._status = data.cable_status ;
+                    _that._status_display() ;
+                    _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                }) ;
+            }
         } ;
         this._status2_action = function (name, url, params) {
             this._set_updated(name) ;

@@ -22,5 +22,21 @@
 }
 #equipment-inventory > #tabs .tab-cont {
     border:         solid 1px #b0b0b0;
-    padding:        20px;
+    padding:        15px;
+}
+#equipment-inventory > #tabs > #results #controls {
+    margin-bottom:  5px;
+}
+#equipment-inventory > #tabs .tab-cont.history > .table {
+    margin-right:   20px;
+}
+#equipment-inventory > #tabs .tab-cont.history .events {
+    margin-top:     10px;
+    margin-left:    10px;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > .view-visible {
+    display:        block;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > .view-hidden {
+    display:        none;
 }

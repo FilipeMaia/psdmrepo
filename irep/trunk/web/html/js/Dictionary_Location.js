@@ -58,6 +58,15 @@ function (
 
         this._app_config = app_config ;
 
+        /**
+         * Preload the dictionary w/o displaying it
+         *
+         * @returns {undefined}
+         */
+        this.init = function () {
+            this._preload() ;
+        } ;
+
         // --------------------
         // Own data and methods
         // --------------------
@@ -243,6 +252,15 @@ function (
                 {}
             ) ;
         } ;
+        this._preload = function () {
+            var dont_display = true ;
+            this._location_action (
+                'Loading...' ,
+                '../irep/ws/location_get.php' ,
+                {} ,
+                dont_display
+            ) ;
+        } ;
         this._location_display = function () {
             var rows = [] ;
             for (var i in this._location) {
@@ -347,13 +365,19 @@ function (
                 {location_name: this._table_location().selected_object(), room_name: name}
             ) ;
         } ;
-        this._location_action = function (name, url, params) {
-            this._set_updated(name) ;
-            Fwk.web_service_GET (url, params, function (data) {
-                _that._location = data.location ;
-                _that._location_display() ;
-                _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
-            }) ;
+        this._location_action = function (name, url, params, dont_display) {
+            if (dont_display) {
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._location = data.location ;
+                }) ;
+            } else {
+                this._set_updated(name) ;
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._location = data.location ;
+                    _that._location_display() ;
+                    _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                }) ;
+            }
         } ;
         this._room_action = function (name, url, params) {
             this._set_updated(name) ;

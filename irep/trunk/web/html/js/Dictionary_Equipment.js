@@ -57,6 +57,80 @@ function (
 
         this._app_config = app_config ;
 
+        // ----------------
+        // Public interface
+        // ----------------
+
+        /**
+         * Preload the dictionary w/o displaying it
+         *
+         * @returns {undefined}
+         */
+        this.init = function () {
+            this._preload() ;
+        } ;
+
+        this.manufacturers = function () {
+            return this._manufacturer ;
+        } ;
+
+        /**
+         * Return a dictionary with a manufacturer and a model if available.
+         * 
+         * NOTE: the function must be called after loading the dictionary.
+         *
+         * @param {number} id
+         * @returns {object}
+         */
+        this.find_model_by_id = function (id) {
+            if (this._manufacturer) {
+                for (var i in this._manufacturer) {
+                    var manufacturer = this._manufacturer[i] ;
+                    for (var j in manufacturer.model) {
+                        var model = manufacturer.model[j] ;
+                        if (id == model.id) {
+                            return {
+                                manufacturer: manufacturer ,
+                                model:        model
+                            } ;
+                            break ;
+                        }
+                    }
+                }
+            }
+            return null ;
+        } ;
+
+        /**
+         * Return a dictionary with a manufacturer and a model if available.
+         * 
+         * NOTE: the function must be called after loading the dictionary.
+         *
+         * @param {string} manuf_name
+         * @param {string} model_name
+         * @returns {string}
+         */
+        this.find_model = function (manuf_name, model_name) {
+            if (this._manufacturer) {
+                for (var i in this._manufacturer) {
+                    var manufacturer = this._manufacturer[i] ;
+                    if (manufacturer.name == manuf_name) {
+                        for (var j in manufacturer.model) {
+                            var model = manufacturer.model[j] ;
+                            if (model.name == model_name) {
+                                return {
+                                    manufacturer: manufacturer ,
+                                    model:        model
+                                } ;
+                                break ;
+                            }
+                        }
+                    }
+                }
+            }
+            return null ;
+        } ;
+
         // --------------------
         // Own data and methods
         // --------------------
@@ -64,10 +138,6 @@ function (
         this._is_initialized = false ;
 
         this._manufacturer = null ;
-
-        this.manufacturers = function () {
-            return this._manufacturer ;
-        } ;
 
         this._can_manage = function () { return this._app_config.current_user.is_administrator ; } ;
 
@@ -281,6 +351,15 @@ function (
                 'Loading...' ,
                 '../irep/ws/manufacturer_get.php' ,
                 {}
+            ) ;
+        } ;
+        this._preload = function () {
+            var dont_display = true ;
+            this._manufacturer_action (
+                'Loading...' ,
+                '../irep/ws/manufacturer_get.php' ,
+                {} ,
+                dont_display
             ) ;
         } ;
         this._manufacturer_display = function () {
@@ -504,13 +583,20 @@ function (
                 {id: attachment_id}
             ) ;
         } ;
-        this._manufacturer_action = function (name, url, params) {
-            this._set_updated(name) ;
-            Fwk.web_service_GET (url, params, function (data) {
-                _that._manufacturer = data.manufacturer ;
-                _that._manufacturer_display() ;
-                _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
-            }) ;
+        this._manufacturer_action = function (name, url, params, dont_display) {
+            if (dont_display) {
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._manufacturer = data.manufacturer ;
+                }) ;
+            } else {
+                this._set_updated(name) ;
+                Fwk.web_service_GET (url, params, function (data) {
+                    _that._manufacturer = data.manufacturer ;
+                    _that._manufacturer_display() ;
+                    _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                }) ;
+            }
+        } ;
         this._manufacturer_action_POST = function (name, url, params) {
             this._set_updated(name) ;
             Fwk.web_service_POST(url, params, function (data) {
@@ -536,7 +622,6 @@ function (
             }) ;
         } ;
     } ;
-    }
     Class.define_class (Dictionary_Equipment, FwkApplication, {}, {}) ;
     
     return Dictionary_Equipment ;
