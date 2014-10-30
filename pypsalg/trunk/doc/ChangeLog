@@ -11,6 +11,11 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2014-10-29 Christopher O'Grady
+- Throttle warning messages in find_blobs.py.  Fix missing imports
+  and add 2D histogram in Histogram.py
+
 Tag: V00-00-06
 2014-10-03 Christopher O'Grady
 - Fix bug in AngularIntegrationM where centers were not set correctly

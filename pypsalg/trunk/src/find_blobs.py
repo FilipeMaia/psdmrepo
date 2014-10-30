@@ -18,6 +18,7 @@ from scipy import ndimage
 
 import psana
 
+firsttime=True
 
 def find_blobs(image, sigma_threshold=5.0, discard_border=1):
     """
@@ -88,9 +89,13 @@ def find_blobs(image, sigma_threshold=5.0, discard_border=1):
         zy = np.where( np.abs(c_slice - np.roll(c_slice, 1)) == i+1 )[0]
         
         
+        global firstTime
         if not (len(zx) == 2) or not (len(zy) == 2):
-            print "WARNING: Peak algorithm confused about width of peak at", c
-            print "         Setting default peak width (5,5)"
+            if firstTime:
+                print "WARNING: Peak algorithm confused about width of peak at", c
+                print "         Setting default peak width (5,5)"
+                print "         This warning will not be repeated"
+                firstTime=False
             widths.append( (5.0, 5.0) )
         else:
             x_width = zx[1] - zx[0]
