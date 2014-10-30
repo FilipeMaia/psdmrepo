@@ -62,7 +62,7 @@ add_to_queue() {
 
         sqlite3 ${DB} <<EOF
 .timeout ${DB_TIMEOUT}
-INSERT INTO idx (fn,fpath,date_added) VALUES ('${bn}','${dn}',${sec});
+INSERT INTO idx (xtcfn,fpath,date_added) VALUES ('${bn}','${dn}',${sec});
 EOF
     done
 }
