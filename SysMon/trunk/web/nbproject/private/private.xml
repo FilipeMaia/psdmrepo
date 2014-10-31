@@ -2,11 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/psanamon_plot_info.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/SysMon/web/lib/sysmon/sysmonpsanamonplot.class.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/SysMon/web/html/view_psanamon_plots.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/SysMon/web/lib/sysmon/sysmon.class.php</file>
-        </group>
+        <group name="PCDS Web Apps"/>
     </open-files>
 </project-private>

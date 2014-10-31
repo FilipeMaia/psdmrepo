@@ -10,6 +10,12 @@ Package author: Igor Gaponenko
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-01-09
+2014-10-31 Igor Gaponenko
+- added schema for data movers performance monitoring as per JIRA
+tickets: PSDH-12 and PSDH-14
+
 Tag: V00-01-08
 2014-10-10 Igor Gaponenko
 - new development: a prototype for the distributed plotting service
