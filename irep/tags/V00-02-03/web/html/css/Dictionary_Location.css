@@ -1,0 +1,19 @@
+#dictionary-location {
+    padding:        20px;
+}
+#dictionary-location > #updated-info {
+    margin-top:     20px;
+}
+#dictionary-location > #tables {
+    margin-top:     10px;
+}
+#dictionary-location > #tables > .table-cont {
+    margin-right:   20px;
+}
+#dictionary-location > #tables > .table-cont > .table {
+    margin-top:     10px;
+}
+#dictionary-location .info {
+    color:          maroon;
+}
+
