@@ -14,7 +14,11 @@
  *
  *      <equipment_id> || <slacid> || || <slacid_range_id> || <pc> || <status_id> || <status2_id>
  *
- *   Partial search parameters:
+ *   Full text search (logical OR in relevant properties)
+ * 
+ *      <text2search>
+ *
+ *   Partial search parameters (logical AND for all):
  *
  *      [<status> [<status2>]]
  *      [<manufacturer> || <manufacturer_id>]
@@ -72,6 +76,15 @@ require_once 'irep/irep.inc.php' ;
     if (!is_null($status2_id)) {
         $SVC->finish (\Irep\IrepUtils::equipment2array (
             $SVC->irep()->find_equipment_by_status2_id($status2_id))) ;
+    }
+
+    // Check for a presence of the full text search parameter and trigger the search if
+    // the one is found.
+
+    $text2search = $SVC->optional_str('text2search', '') ;
+    if ($text2search != '') {
+        $SVC->finish (\Irep\IrepUtils::equipment2array (
+            $SVC->irep()->find_equipment_by_any($text2search))) ;
     }
 
     // Harvest optional parameters of the partial search. Note that for some of

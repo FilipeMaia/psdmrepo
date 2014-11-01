@@ -710,7 +710,40 @@ HERE
                 __METHOD__, "no sub-status exists for ID: {$id}") ;
         return $this->find_equipment_many_by_("(status='{$status2->status()->name()}' AND status2='{$status2->name()}')") ;
     }
-    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag_name, $description, $notes) {
+    public function search_equipment_by_many ($criteria) {
+        $status       = array_key_exists('status',       $criteria) ? $criteria['status']       : '' ;
+        $status2      = array_key_exists('status2',      $criteria) ? $criteria['status2']      : '' ;
+        $manufacturer = array_key_exists('manufacturer', $criteria) ? $criteria['manufacturer'] : '' ;
+        $model        = array_key_exists('model',        $criteria) ? $criteria['model']        : '' ;
+        $serial       = array_key_exists('serial',       $criteria) ? $criteria['serial']       : '' ;
+        $location     = array_key_exists('location',     $criteria) ? $criteria['location']     : '' ;
+        $custodian    = array_key_exists('custodian',    $criteria) ? $criteria['custodian']    : '' ;
+        $tag_name     = array_key_exists('tag_name',     $criteria) ? $criteria['tag_name']     : '' ;
+        $description  = array_key_exists('description',  $criteria) ? $criteria['description']  : '' ;
+        $notes        = array_key_exists('notes',        $criteria) ? $criteria['notes']        : '' ;
+        return $this->search_equipment (
+            $status ,
+            $status2 ,
+            $manufacturer ,
+            $model ,
+            $serial ,
+            $location ,
+            $custodian ,
+            $tag_name ,
+            $description ,
+            $notes) ;
+    }
+    public function search_equipment (
+        $status ,
+        $status2 ,
+        $manufacturer ,
+        $model ,
+        $serial ,
+        $location ,
+        $custodian ,
+        $tag_name ,
+        $description ,
+        $notes) {
 
         // First search based on the properties of an equipment.
 
@@ -870,6 +903,33 @@ HERE
         return $this->find_equipment_many_by_($conditions_opt) ;
     }
 
+    public function find_equipment_by_any ($text2search) {
+        $text2search_escaped = $this->escape_string(trim($text2search)) ;
+        if ($text2search_escaped == '')
+            throw new IrepException (
+                __METHOD__, "the <text2search> parameter can't be empty") ;
+
+        // Make two separate searches and merge results into a single list
+        // which won't have any duplicates (based on equipment identifiers).
+
+        $result = array() ;
+
+        $partial_result = array (
+            $this->search_equipment_by_many(array('description' => $text2search)) ,
+            $this->search_equipment_by_many(array('notes'       => $text2search))
+        ) ;
+        
+        $ids = array() ;
+        for ($i = 0; $i < count($partial_result); $i++) {
+            foreach ($partial_result[$i] as $e) {
+                if (array_key_exists($e->id(), $ids)) continue ;
+                $ids[$id] = $id ;
+                array_push ($result, $e) ;
+            }
+        }
+        return $result ;
+    }
+    
     private function find_equipment_by_ ($conditions_opt='') {
         $result = $this->query("SELECT * FROM {$this->database}.equipment ".($conditions_opt == '' ? '' : " WHERE {$conditions_opt}")) ;
         $nrows = mysql_numrows( $result ) ;

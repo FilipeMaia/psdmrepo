@@ -69,6 +69,9 @@ function (
         this.search_equipment_by_model = function (id) {
             this._search_impl({model_id: id}) ;
         } ;
+        this.quick_search = function (text2search) {
+            this._search_impl({text2search: text2search}) ;
+        } ;
 
         // -----------------------------
         // Parameters of the application
@@ -146,10 +149,10 @@ function (
 
         '<div id="controls" > ' +
           '<div style="float:left;" > ' +
-            '<button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="../irep/img/EXCEL_icon.gif" /></button> ' +
+            '<button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img style="height:28px;" src="../irep/img/EXCEL_icon.gif" /></button> ' +
           '</div> ' +
           '<div style="float:left; margin-left:20px;" > ' +
-            '<center><b>&nbsp;</b></center> ' +
+//            '<center><b>&nbsp;</b></center> ' +
             '<div id="view" > ' +
               '<input type="radio" id="view_table" name="view" checked="checked" ><label for="view_table" title="view as a table" ><img src="../irep/img/table.png" /></label> ' +
               '<input type="radio" id="view_grid"  name="view"                   ><label for="view_grid"  title="view as a grid"  ><img src="../irep/img/stock_table_borders.png" /></label> ' +
@@ -158,11 +161,14 @@ function (
           '<div style="float:left; margin-left:20px;" > ' +
             '<center><b>&nbsp;</b></center> ' +
             '<input type="checkbox" id="option-model-image"        ><label for="option-model-image"       > images of models</label><br> ' +
-            '<input type="checkbox" id="option-attachment-preview" ><label for="option-attachment-preview"> preview attachments     </label> ' +
           '</div> ' +
           '<div style="float:left; margin-left:20px;" > ' +
             '<center><b>&nbsp;</b></center> ' +
             '<input type="checkbox" id="option-model-descr"        ><label for="option-model-descr"       > descriptions of models</label><br> ' +
+          '</div> ' +
+          '<div style="float:left; margin-left:20px;" > ' +
+            '<center><b>&nbsp;</b></center> ' +
+            '<input type="checkbox" id="option-attachment-preview" ><label for="option-attachment-preview"> preview attachments     </label> ' +
           '</div> ' +
           '<div style="clear:both;" ></div> ' +
         '</div> ' +
@@ -360,6 +366,11 @@ function (
                 }
             }) ;
             this._init_form() ;
+            
+            // Finally (do it only once) check if there was a specific search request
+            
+            if (this._app_config.select_params.equipment_id)
+                this.search_equipment_by(this._app_config.select_params.equipment_id) ;
         } ;
 
         this._init_form = function () {
@@ -539,7 +550,7 @@ function (
                     }
                 } ,
                 {   name: 'manufacturer', hideable: true} ,
-                {   name: 'model',        hideable: true} ,
+                {   name: 'model',        hideable: true, style:  ' white-space: normal;'} ,
                 {   name: 'serial #',     hideable: true} ,
                 {   name: 'SLAC ID',      hideable: true} ,
                 {   name: 'PC #',         hideable: true} ,
@@ -655,8 +666,9 @@ function (
             var options = this._display_options() ;
             var elem    = this._wa().find('#grid') ;
 
-            var cell_left  = 'class="table_cell table_cell_left  " style="border:0; padding-right:0px;" align="right" ' ;
-            var cell_right = 'class="table_cell table_cell_right " style="border:0; padding-right:10px;" ' ;
+            var cell_left       = 'class="table_cell table_cell_left  " style="border:0; padding-right:0px;" align="right" ' ;
+            var cell_right      = 'class="table_cell table_cell_right " style="border:0; padding-right:10px;" ' ;
+            var cell_right_wrap = 'class="table_cell table_cell_right " style="border:0; padding-right:10px; white-space:normal!important;" ' ;
 
             var html = '' ;
             for (var i in this._equipment) {
@@ -704,32 +716,38 @@ function (
                     num_attachments++ ;
                 }
                 html +=
-'<div class="grid-cell" style="float:left;" > ' +
+'<div id="grid-cell-'+equipment.id+'" class="grid-cell" style="float:left;" > ' +
   '<div class="header" >' +
     '<div style="float:left;" > ' +
                     (this._can_edit_inventory() ?
                         SimpleTable.html.Button('D', {
                             name:    equipment.id,
-                            classes: 'inventory-delete',
+                            classes: 'inventory-delete control-button control-button-important',
                             title:   'delete this equipment from the database' }) +
                         SimpleTable.html.Button('E', {
                             name:    equipment.id,
-                            classes: 'inventory-edit',
+                            classes: 'inventory-edit control-button',
                             title:   'edit this equipment or change its status' }) :
                         ''
                     ) +
                     SimpleTable.html.Button('H', {
                         name:    equipment.id,
-                        classes: 'inventory-history',
-                        title:   'show a history of this equipment' })+
+                        classes: 'inventory-history control-button',
+                        title:   'show a history of this equipment' }) +
                     SimpleTable.html.Button('P', {
                         name:    equipment.id,
-                        classes: 'inventory-print',
+                        classes: 'inventory-print control-button',
                         title:   'print a summary page on this equipment' }) +
                     SimpleTable.html.Button('url', {
                         name:    equipment.id,
-                        classes: 'inventory-link',
+                        classes: 'inventory-link control-button',
                         title:   'persistent URL for this equipment' }) +
+    '</div> ' +
+    '<div style="float:right;" > ' +
+                    SimpleTable.html.Button('X', {
+                        name:    equipment.id,
+                        classes: 'inventory-close control-button',
+                        title:   'close this window' }) +
     '</div> ' ;
                     for(var j=0; j < num_attachments; j++) html += '<div style="float:right; margin-right:2px;"><img src="../irep/img/attachment.png" /></div> ' ;
                     for(var j=0; j < num_tags;        j++) html += '<div style="float:right; font-weight:bold; margin-right:2px;">T</div> ' ;
@@ -750,7 +768,7 @@ function (
         ? '<div class="visible model-image" name="'+equipment.id+'" ><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div> '
         : '<div class="hidden  model-image" name="'+equipment.id+'" ></div> ') +
         '</td> ' +
-        '<td '+cell_right+' rowspan="4" valign="top" style="white-space:normal!important;" > ' + (
+        '<td '+cell_right_wrap+' rowspan="4" valign="top" > ' + (
         options.model_descr
         ? '<div class="visible model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span>'+model_descr2html()+'</span></div> '
         : '<div class="hidden  model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span></span></div>') +
@@ -782,18 +800,19 @@ function (
       '</tr> ' +
     '</tbody></table> ' + (
     equipment.description != ''
-    ? '<div style="margin-top:5px; padding:10px; border-top:solid 1px #c0c0c0;" > ' +
-        '<pre>'+equipment.description+'</pre> ' +
+    ? '<div style="margin-top:5px; padding:10px; border-top:dashed 1px #c0c0c0;" > ' +
+//        '<pre>'+equipment.description+'</pre> ' +
+        equipment.description+
       '</div> '
     : '') + (
     num_tags
-    ? '<div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;" > ' +
+    ? '<div style="margin-top:5px; padding:5px; padding-top:10px; border-top:dashed 1px #c0c0c0;" > ' +
         '<div style="float:left;" class="tag-hdr" >Tags:</div>'+tags_html +
         '<div style="clear:both;"></div> ' +
       '</div> '
     : '') + (
     num_attachments
-    ? '<div style="margin-top:5px; padding:5px; padding-top:10px; border-top:solid 1px #c0c0c0;" >'+attachments_html+'</div> '
+    ? '<div style="margin-top:5px; padding:5px; padding-top:10px; border-top:dashed 1px #c0c0c0;" >'+attachments_html+'</div> '
     : '') +
   '</div> ' +
   '<div class="footer" > ' + 
@@ -833,6 +852,10 @@ function (
             elem.find('.inventory-link').button().click(function () {
                 var id = this.name ;
                 _that._url(id) ;
+            }) ;
+            elem.find('.inventory-close').button().click(function () {
+                var id = this.name ;
+                _that._wa().find('#grid').children('#grid-cell-'+id).remove() ;
             }) ;
 
             this._tabs().tabs('refresh') ;
@@ -928,9 +951,9 @@ function (
 '            will be the final name saved in the end of the editing session.</li>' +
 '    </div>' +
 '    <div style="float:left; padding:5px; margin-bottom:20px;">' +
-'      <button name="save"          >Save</button>' +
-'      <button name="save-w-comment">Save w/ Comment</button>' +
-'      <button name="cancel"        >Cancel</button>' +
+'      <button name="save"           class="control-button" >Save</button>' +
+'      <button name="save-w-comment" class="control-button" >Save w/ Comment</button>' +
+'      <button name="cancel"         class="control-button" >Cancel</button>' +
 '    </div>' +
 '    <div style="clear:both;"></div>' +
 
@@ -1014,7 +1037,7 @@ function (
 '          <div style="margin-bottom:20px; padding-left:10px;">' +
                 SimpleTable.html.Button('add more attachments', {
                     name:    equipment.id ,
-                    classes: 'attachment-add' ,
+                    classes: 'attachment-add control-button' ,
                     title:   'click to add an attachment placeholder' }) +
 '          </div>' +
 '          <form enctype="multipart/form-data" action="../irep/ws/equipment_attachment_upload.php" method="post">' +
@@ -1027,11 +1050,11 @@ function (
 '      </div>' +
 
 '      <div id="tags_tab" >' +
-'        <div style=" border:solid 1px #b0b0b0; padding:20px; padding-top:30px;" >' +
-'          <div style="margin-bottom:20px; padding-left:10px;">' +
+'        <div style="border:solid 1px #b0b0b0; padding:20px;" > ' +
+'          <div style="margin-bottom:20px;" > ' +
                 SimpleTable.html.Button('add more tags', {
                     name:    equipment.id ,
-                    classes: 'tag-add' ,
+                    classes: 'tag-add control-button' ,
                     title:   'click to add an placeholder for one more tag' }) +
 '          </div>' +
 '          <div class="tags-new"></div>' +
@@ -1073,7 +1096,7 @@ function (
             }
             var parents = [[
                 SimpleTable.html.Button('X', {
-                    classes: 'parent-disconect' ,
+                    classes: 'parent-disconect control-button control-button-important' ,
                     title:   'click to disconnect from the parent manufacturer' }) ,
                 SimpleTable.html.Select(manufacturers, equipment.parent.manufacturer , {
                     classes: 'parent-manufacturer' ,
@@ -1248,7 +1271,7 @@ function (
                 children.push ([
                     SimpleTable.html.Button('X', {
                         name:    child.id ,
-                        classes: 'child-evict' ,
+                        classes: 'child-evict control-button control-button-important' ,
                         title:   'click to evict the child from the composition' }) ,
                     child.manufacturer ,
                     child.model ,
@@ -1426,11 +1449,11 @@ function (
 '  <div style="float:left; width:72px;">' +
                 SimpleTable.html.Button('delete', {
                     name:    a.id,
-                    classes: 'attachment-delete visible',
+                    classes: 'attachment-delete visible control-button control-button-important',
                     title:   'delete this attachment' }) +
                 SimpleTable.html.Button('un-delete', {
                     name:    a.id,
-                    classes: 'attachment-cancel hidden',
+                    classes: 'attachment-cancel hidden control-button',
                     title:   'cancel previously made intent to delete this attachment' }) +
 '  </div>' +
 '  <div style="float:left;">' +
@@ -1505,7 +1528,8 @@ function (
 '<div class="tag-new-edit-entry" >' +
 '  <div style="float:left; width:72px;">' +
                     SimpleTable.html.Button('delete', {
-                       title:   'cancel previously made intent to add this tag' }) +
+                       title:   'cancel previously made intent to add this tag' ,
+                       classes: 'control-button control-button-important'}) +
 '  </div>' +
 '  <div style="float:left;">' +
 '    <input type="text" value="" />' +
@@ -1537,14 +1561,15 @@ function (
 '  <div style="float:left; width:72px;">' +
                     SimpleTable.html.Button('delete', {
                         name:    t.id,
-                        classes: 'tag-delete visible',
+                        classes: 'tag-delete visible control-button control-button-important',
                         title:   'delete this tag' }) +
                     SimpleTable.html.Button('un-delete', {
                         name:    t.id,
-                        classes: 'tag-cancel hidden',
+                        classes: 'tag-cancel hidden control-button',
                         title:   'cancel previously made intent to delete this tag' }) +
 '  </div>' +
 '  <div style="margin-left:10px; padding-left:20px; font-weight:bold;">'+t.name+'</div>' +
+'  <div style="clear:both;"></div>' +
 '</div>' ;
             }
             tags_old_elem.html(html) ;
@@ -1792,7 +1817,7 @@ function (
       '<div id="history-table-'+equipment_id+'" class="events" ></div> ' +
     '</div> ' +
     '<div style="float:left;" > ' +
-      '<button name="close">CLOSE</button> ' +
+      '<button name="close" class="control-button" >CLOSE</button> ' +
     '</div> ' +
     '<div style="clear:both ;"></div> ' +
   '</div> ' +
