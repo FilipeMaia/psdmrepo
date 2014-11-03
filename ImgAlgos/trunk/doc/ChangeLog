@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-66
+2014-11-03 Mikhail S. Dubrovin
+- EpixNDArrProducer - add support for Epix::ElementV2 and Epix::Config100aV1 (see PSAS-7)
+	
 Tag: V00-03-65
 2014-10-17 Mikhail S. Dubrovin
 - add NDArrImageProducer

@@ -52,7 +52,7 @@ EpixNDArrProducer::EpixNDArrProducer (const std::string& name)
   , m_outtype()
   , m_print_bits()
 {
-    m_str_src    = configSrc("source",     "DetInfo(:Epix)");
+    m_str_src    = configSrc("source",     "DetInfo(:Epix)"); // :Epix10k or :Epix100a
     m_key_in     = configStr("key_in",     "");
     m_key_out    = configStr("key_out",    "epix-ndarr");
     m_outtype    = configStr("outtype",    "asdata");
@@ -83,8 +83,9 @@ void
 EpixNDArrProducer::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
-  if ( getConfigData<Psana::Epix::ConfigV1>    (env, "ConfigV1"   ) ) return;
-  if ( getConfigData<Psana::Epix::Config10KV1> (env, "Config10KV1") ) return;
+  if ( getConfigData<Psana::Epix::ConfigV1>    (env, "ConfigV1"   )  ) return;
+  if ( getConfigData<Psana::Epix::Config10KV1> (env, "Config10KV1")  ) return;
+  if ( getConfigData<Psana::Epix::Config100aV1>(env, "Config100aV1") ) return;
 }
 
 //--------------------

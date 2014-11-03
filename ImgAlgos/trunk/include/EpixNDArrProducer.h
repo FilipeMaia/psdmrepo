@@ -55,10 +55,6 @@ public:
   /// Data type for detector image 
   typedef uint16_t data_t;
 
-  //const static size_t   Rows   = 100; 
-  //const static size_t   Cols   = 384; 
-  //const static size_t   Size   = Rows*Cols; 
-   
   // Default constructor
   EpixNDArrProducer (const std::string& name) ;
 
@@ -93,7 +89,7 @@ private:
  
 //--------------------
   /**
-   * @brief Get Psana::Epix::ConfigV1 or Psana::Epix::Config10KV1 data object and print it for m_print_bits.
+   * @brief Get Psana::Epix::ConfigV1, Config10KV1, Config100aV1 config object and print it for m_print_bits.
    * Returns true/false if config object is available/missing.
    */
 
@@ -110,7 +106,7 @@ private:
           str << "\n  digitalCardId1           = " << config1->digitalCardId1();
           str << "\n  analogCardId0            = " << config1->analogCardId0();
           str << "\n  analogCardId1            = " << config1->analogCardId1();
-          str << "\n  lastRowExclusions        = " << config1->lastRowExclusions();
+          //str << "\n  lastRowExclusions        = " << config1->lastRowExclusions(); //missing in Epix100a
           str << "\n  numberOfAsicsPerRow      = " << config1->numberOfAsicsPerRow();
           str << "\n  numberOfAsicsPerColumn   = " << config1->numberOfAsicsPerColumn();
           str << "\n  numberOfRowsPerAsic      = " << config1->numberOfRowsPerAsic();
@@ -129,7 +125,7 @@ private:
 
 //--------------------
   /**
-   * @brief Get Epix Psana::Epix::ElementV1 data object and copy it in the ndarray<TOUT, 2> out_ndarr
+   * @brief Get Epix Psana::Epix::ElementV1,V2 data object and copy it in the ndarray<TOUT, 2> out_ndarr
    * Returns false if data is missing.
    */
 
@@ -174,14 +170,53 @@ private:
             return true;
 	  }
       }
-      else
-      {
-	static unsigned counter = 0; ++counter;
-	if(counter > 20) return false;
-        if( m_print_bits & 16 ) MsgLog(name(), warning, "Epix::ElementV1 object is not available in the event(...) for source:"
-              << m_str_src << " key:" << m_key_in);
-	return false;
+
+
+
+      shared_ptr<Psana::Epix::ElementV2> data2 = evt.get(m_str_src, m_key_in, &m_src);
+      if (data2) {
+	
+          const ndarray<const data_t, 2> data = data2->frame();
+
+          std::stringstream str; 
+          if( m_print_bits & 2 ) {      
+            str << "Epix::ElementV2 at "      << m_src;
+            str << "\n  vc                = " << int(data2->vc());
+            str << "\n  lane              = " << int(data2->lane());
+            str << "\n  acqCount          = " << data2->acqCount();
+            str << "\n  frameNumber       = " << data2->frameNumber();
+            str << "\n  ticks             = " << data2->ticks();
+            str << "\n  fiducials         = " << data2->fiducials();
+            str << "\n  frame             = " << data2->frame();
+            str << "\n  calibrationRows   = " << data2->calibrationRows();      //New
+            str << "\n  environmentalRows = " << data2->environmentalRows();    //New
+            str << "\n  temperatures      = " << data2->temperatures();
+            str << "\n  lastWord          = " << data2->lastWord();
+            str << "\n  data_ndarr:\n"        << data;  
+            MsgLog(name(), info, str.str());
+	  }
+	  
+          if ( m_dtype == ASDATA ) { // return data of the same type
+            save2DArrayInEvent<data_t>(evt, m_src, m_key_out, data);
+            return true;
+	  }
+	  else { // copy and return data with type changing
+            ndarray<TOUT, 2> out_ndarr = make_ndarray<TOUT>(data.shape()[0], data.shape()[1]);
+            typename ndarray<TOUT, 2>::iterator it_out = out_ndarr.begin(); 
+            for ( ndarray<const data_t, 2>::iterator it=data.begin(); it!=data.end(); ++it, ++it_out) {
+              *it_out = (TOUT)*it;
+            }
+            save2DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_ndarr); 
+            return true;
+	  }
       }
+
+      static unsigned counter = 0; ++counter;
+      if(counter > 20) return false;
+      if( m_print_bits & 16 ) MsgLog(name(), warning, "Epix::ElementV1/V2 object is not available in the event(...) for source:"
+              << m_str_src << " key:" << m_key_in);
+      return false;
+
   }
 
 //-------------------

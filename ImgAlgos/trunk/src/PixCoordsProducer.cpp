@@ -222,10 +222,13 @@ PixCoordsProducer::getConfigPars(Env& env)
   if ( getConfigParsForType<Psana::CsPad2x2::ConfigV2>(env) ) { m_config_vers = "CsPad2x2::ConfigV2"; return true; }
 
   // check for ePix
-  if ( getConfigParsForType<Psana::Epix::ConfigV1>(env) ) { m_config_vers = "Epix::ConfigV1"; return true; }
+  if ( getConfigParsForType<Psana::Epix::ConfigV1>(env) )     { m_config_vers = "Epix::ConfigV1";     return true; }
+  if ( getConfigParsForType<Psana::Epix::Config10KV1>(env) )  { m_config_vers = "Epix::Config10KV1";  return true; }
+  if ( getConfigParsForType<Psana::Epix::Config100aV1>(env) ) { m_config_vers = "Epix::Config100aV1"; return true; }
 
   m_count_warnings++;
-  if (m_count_warnings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-5, CsPad2x2::ConfigV1-2, Epix::ConfigV1 is not available in this event...")
+  if (m_count_warnings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-5, CsPad2x2::ConfigV1,2, Epix::ConfigV1,10KV1,100aV1"
+				                     << " is not available in this event...")
   if (m_count_warnings ==20) MsgLog(name(), warning, "STOP PRINT WARNINGS !!!")
   return false;
 }
