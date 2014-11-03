@@ -339,8 +339,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
 #-----------------------------
     
-        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', \
-                               'OrcaFl40', 'Epix', 'Epix10k', 'Fccd960', 'Acqiris']
+        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', \
+                               'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', \
+                               'OrcaFl40', 'Epix', 'Epix10k', 'Epix100a', 'Fccd960', 'Acqiris']
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
         self.list_of_data_types  = ['CsPad::DataV',
@@ -353,6 +354,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Camera::FrameV',
                                     'Camera::FrameV',
                                     'Camera::FrameV',
+                                    'Epix::ElementV',
                                     'Epix::ElementV',
                                     'Epix::ElementV',
                                     'Camera::FrameV',
@@ -372,6 +374,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Camera::CalibV1',
                                     'Epix::CalibV1',
                                     'Epix10k::CalibV1',
+                                    'Epix100a::CalibV1',
                                     'Fccd960::CalibV1',
                                     'Acqiris::CalibV1']
         self.dict_of_det_calib_types = dict( zip(self.list_of_dets, self.list_of_calib_types) )
@@ -380,6 +383,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
 
         det_cbx_states = [ (False, False ,'bool'), \
+                           (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
@@ -480,7 +484,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
             'pedestals'
             ]
 
-        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Epix10k', 'Fccd960', 'Acqiris', etc.
         self.dict_of_det_const_types = dict( zip(self.list_of_dets, [ self.const_types_cspad 
                                                                      ,self.const_types_cspad2x2
                                                                      ,self.const_types_princeton
@@ -491,6 +494,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                      ,self.const_types_camera
                                                                      ,self.const_types_camera
                                                                      ,self.const_types_orcafl40
+                                                                     ,self.const_types_epix
                                                                      ,self.const_types_epix
                                                                      ,self.const_types_epix
                                                                      ,self.const_types_fccd960
@@ -635,6 +639,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
             'NoDetector.0:Epix10k.0'
            ]
 
+        self.srcs_epix100a = [ 
+            'NoDetector.0:Epix100a.0'
+           ]
+
         self.srcs_fccd960 = [ 
             'XcsEndstation.0:Fccd960.0'
            ]
@@ -655,7 +663,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'XppLas.0:Acqiris.0'
             ]
 
-        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'OrcaFl40', 'Epix', 'Epix10k', 'Fccd960', 'Acqiris', etc.
         self.dict_of_det_sources = dict( zip(self.list_of_dets, [ self.srcs_cspad 
                                                                  ,self.srcs_cspad2x2
                                                                  ,self.srcs_princeton
@@ -668,6 +675,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                  ,self.srcs_orcafl40
                                                                  ,self.srcs_epix
                                                                  ,self.srcs_epix10k
+                                                                 ,self.srcs_epix100a
                                                                  ,self.srcs_fccd960
                                                                  ,self.srcs_acqiris
                                                                   ]) )
@@ -685,6 +693,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                        ,['ORCAFL40V1']
                                                                        ,['EPIXV1']
                                                                        ,['EPIX10KV1']
+                                                                       ,['EPIX100AV1']
                                                                        ,['FCCD960V1']
                                                                        ,['ACQIRISV1']
                                                                         ]) )
