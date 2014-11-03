@@ -14,7 +14,7 @@ reverse time order.
 
 2014-10-03 Mikhail S. Dubrovin
 Tag: V00-00-67
-- ConfigParametersForApp, ConfigFileGenerator add support for Epix100a
+- ConfigParametersForApp, ConfigFileGenerator add support for Epix100a (see PSAS-6, PSAS-7)
 
 2014-10-24 Mikhail S. Dubrovin
 Tag: V00-00-66
