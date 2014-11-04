@@ -1076,7 +1076,7 @@ fclose( $debug_file );
                 __METHOD__,
                 "internal error" );
 
-        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/';
+        $url     = "https://".$_SERVER['SERVER_NAME'].'/apps/portal/?exper_id='.$this->id()."&app=elog:subscribe";
         $logbook = $this->instrument()->name().'/'.$this->name();
 
         $body =<<<HERE
@@ -1110,7 +1110,7 @@ HERE;
     	$this->logbook->query (
             "DELETE FROM {$this->logbook->database}.subscriber WHERE id={$id}" );
 
-        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/';
+        $url     = "https://".$_SERVER['SERVER_NAME'].'/apps/portal/?exper_id='.$this->id()."&app=elog:subscribe";
         $logbook = $this->instrument()->name().'/'.$this->name();
 
         $body =<<<HERE
@@ -1185,7 +1185,7 @@ HERE;
         $subscriptions = $this->subscriptions() ;
         if (count($subscriptions) <= 0) return ;
 
-        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/index.php?action=select_message&id='.$entry->id() ;
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['HTTP_HOST'].'/apps/logbook/index.php?action=select_message&id='.$entry->id() ;
         $author  = $entry->author() ;
         $time    = $entry->insert_time()->toStringShort() ;
         $logbook = $this->instrument()->name().'/'.$this->name() ;
@@ -1197,7 +1197,7 @@ HERE;
             $entry_str .= "  {$line}\n" ;
         }
 
-        $attachments_base_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['SERVER_NAME'].'/apps/logbook/attachments' ;
+        $attachments_base_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['HTTP_HOST'].'/apps/logbook/attachments' ;
         $attachments_str = '' ;
         foreach ($entry->attachments() as $a) {
             $attachments_str .= "  {$attachments_base_url}/{$a->id()}/{$a->description()}\n" ;

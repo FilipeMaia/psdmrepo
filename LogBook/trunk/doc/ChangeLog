@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-02
+2014-11-03 Igor Gaponenko
+- minor fix in the URL for e-log notifications
+
 Tag: V01-00-01
 2014-10-10 Igor Gaponenko
 - added Web services run_begin and run_end as per JIRA ticket PSWA-5
