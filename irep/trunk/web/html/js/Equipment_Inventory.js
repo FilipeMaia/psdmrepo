@@ -127,26 +127,26 @@ function (
     '<form id="form" style="float:left;" > ' +
       '<table><tbody> ' +
         '<tr> ' +
-          '<td class="form_table_key" >Manufacturer: </td> <td class="form-table-val" ><select name="manufacturer" class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >Custodian:    </td> <td class="form-table-val" ><select name="custodian"    class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >Serial #      </td> <td class="form-table-val" ><input  name="serial"       class="form-elem" type="text" size="4" value="" ></td> ' +
-          '<td class="form_table_key" >Status:       </td> <td class="form-table-val" ><select name="status"       class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >Tag:          </td> <td class="form-table-val" ><select name="tag"          class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Manufacturer: </td> <td class="form-table-val" ><select name="manufacturer" class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Custodian:    </td> <td class="form-table-val" ><select name="custodian"    class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Serial #      </td> <td class="form-table-val" ><input  name="serial"       class="form-elem" type="text" size="4" value="" ></td> ' +
+          '<td class="form-table-key" >Status:       </td> <td class="form-table-val" ><select name="status"       class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Tag:          </td> <td class="form-table-val" ><select name="tag"          class="form-elem" ></select></td> ' +
         '</tr> ' +
         '<tr> ' +
-          '<td class="form_table_key" >Model:        </td> <td class="form-table-val" ><select name="model"        class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >Location:     </td> <td class="form-table-val" ><select name="location"     class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >PC #          </td> <td class="form-table-val" ><input  name="pc"           class="form-elem" type="text" size="4" value="" title="property control number" /></td> ' +
-          '<td class="form_table_key" >Sub-status:   </td> <td class="form-table-val" ><select name="status2"      class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Model:        </td> <td class="form-table-val" ><select name="model"        class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >Location:     </td> <td class="form-table-val" ><select name="location"     class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >PC #          </td> <td class="form-table-val" ><input  name="pc"           class="form-elem" type="text" size="4" value="" title="property control number" /></td> ' +
+          '<td class="form-table-key" >Sub-status:   </td> <td class="form-table-val" ><select name="status2"      class="form-elem" ></select></td> ' +
         '</tr> ' +
         '<tr> ' +
-          '<td class="form_table_key" >&nbsp;        </td> <td class="form-table-val" >&nbsp;</td> ' +
-          '<td class="form_table_key" >Room:         </td> <td class="form-table-val" ><select name="room"         class="form-elem" ></select></td> ' +
-          '<td class="form_table_key" >SLAC ID #     </td> <td class="form-table-val" ><input  name="slacid"       class="form-elem" type="text" size="4" value="" ></td> ' +
+          '<td class="form-table-key" >&nbsp;        </td> <td class="form-table-val" >&nbsp;</td> ' +
+          '<td class="form-table-key" >Room:         </td> <td class="form-table-val" ><select name="room"         class="form-elem" ></select></td> ' +
+          '<td class="form-table-key" >SLAC ID #     </td> <td class="form-table-val" ><input  name="slacid"       class="form-elem" type="text" size="4" value="" ></td> ' +
         '</tr> ' +
         '<tr> ' +
-          '<td class="form_table_key" >Description:  </td> <td class="form-table-val" colspan="3" ><input  name="description"  class="form-elem" type="text" size="4" value="" title="search in the model descriptions"/></td> ' +
-          '<td class="form_table_key" >Notes:        </td> <td class="form-table-val" colspan="3" ><input name="notes"         class="form-elem" type="text" size="10" value="" title="search in the equipment notes"/></td> ' +
+          '<td class="form-table-key" >Description:  </td> <td class="form-table-val" colspan="3" ><input  name="description"  class="form-elem" type="text" size="4" value="" title="search in the model descriptions"/></td> ' +
+          '<td class="form-table-key" >Notes:        </td> <td class="form-table-val" colspan="3" ><input name="notes"         class="form-elem" type="text" size="10" value="" title="search in the equipment notes"/></td> ' +
         '</tr> ' +
       '</tbody></table> ' +
     '</form> ' +

@@ -1,6 +1,22 @@
 #equipment-inventory {
     padding:        0px;
 }
+
+#equipment-inventory span.toggler {
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  cursor: pointer;
+}
+#equipment-inventory div.visible {
+  display: block;
+}
+#equipment-inventory div.hidden {
+  display: none;
+}
+
+
 #equipment-inventory > #controls {
     background:     #f5f8f9;
     padding:        10px;
@@ -9,8 +25,15 @@
 #equipment-inventory > #controls > #form {
     margin-right:   20px;
 }
+#equipment-inventory > #controls > #form td.form-table-key {
+    font-weight: bold;
+    padding-right: 2px;
+}
 #equipment-inventory > #controls > #form td.form-table-val {
     padding-right:   10px;
+}
+#equipment-inventory > #controls > #form .form-elem {
+  width:100%;
 }
 #equipment-inventory > #updated-info {
     margin-top:     10px;
@@ -80,4 +103,5 @@
 #equipment-inventory > #tabs > #results > .tab-cont > #grid > .grid-cell > .footer {
     border-top: 1px solid #c0c0c0;
 }
+
 

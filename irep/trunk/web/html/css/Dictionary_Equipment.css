@@ -16,4 +16,9 @@
 #dictionary-equipment .info {
     color:          maroon;
 }
-
+#dictionary-equipment div.visible {
+  display: block;
+}
+#dictionary-equipment div.hidden {
+  display: none;
+}
