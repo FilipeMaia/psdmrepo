@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-04
+2014-11-03 Igor Gaponenko
+- fixed a bug in the Experiment Switch notification e-mail (JIRA ticket
+PSWA-18)
+
 Tag: V00-08-03
 2014-10-24 Igor Gaponenko
 - modified a configuration of the module loader (RequireJS) as per JIRA ticket

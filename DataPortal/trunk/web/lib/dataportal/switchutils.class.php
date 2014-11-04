@@ -94,8 +94,7 @@ class SwitchUtils {
         $instrument_experiment_names          = "{$instr->name()} / {$new_exper->name()}";
         $previous_experiment_instrument_names = "{$instr->name()} / {$prev_exper->name()}";
 
-        $request_uri = $_SERVER['REQUEST_URI'] ;
-        $switch_url  = "https://".$_SERVER['SERVER_NAME'].substr($request_uri, 0, strrpos($request_uri, '/'))."/experiment_switch.php?instr_name={$instr->name()}" ;
+        $switch_url  = "https://".$_SERVER['SERVER_NAME']."/apps/experiment_switch.php?instr_name={$instr->name()}" ;
 
         $message_option = '' ;
         if ($message)
