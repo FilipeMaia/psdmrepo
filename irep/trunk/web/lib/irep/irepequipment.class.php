@@ -249,6 +249,15 @@ HERE;
      *   History
      * -----------
      */
+    public function modified_time () {
+        $event = $this->last_history_event() ;
+        return $event ? $event->event_time() : null ;
+    }
+    public function modified_uid () {
+        $event = $this->last_history_event() ;
+        return $event ? $event->event_uid() : null ;
+    }
+
     public function last_history_event () {
         return $this->irep()->last_history_event($this->id()) ;
     }

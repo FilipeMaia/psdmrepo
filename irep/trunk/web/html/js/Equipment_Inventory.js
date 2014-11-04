@@ -8,6 +8,20 @@ function (
 
     cssloader.load('../irep/css/Equipment_Inventory.css') ;
 
+    function Inventory_Export2Excel (parent) {
+        this.parent   = parent ;
+        this.icon     = function () { return '../webfwk/img/MS_Excel_1.png' ; } ;
+        this.title    = function () { return 'Export into Microsoft Excel 2007 File' ; } ;
+        this.on_click = function () { this.parent._export('excel') ; } ;
+    }
+
+    function Inventory_Print (parent) {
+        this.parent   = parent ;
+        this.icon     = function () { return '../webfwk/img/Printer.png' ; } ;
+        this.title    = function () { return 'Print the document' ; } ;
+        this.on_click = function () { console.log('Equipment_Inventory.Inventory_Print.on_click() NOT IMPLEMENTED') ; } ;
+    }
+
     /**
      * The application for browsing and searching the Equipment Inventory
      *
@@ -39,6 +53,13 @@ function (
             if (this.active) {
                 this._init() ;
             }
+        } ;
+        this.tools = function () {
+            if (!this.my_tools)
+                this.my_tools = [
+                    new Inventory_Export2Excel(this) ,
+                    new Inventory_Print(this)] ;
+            return this.my_tools ;
         } ;
 
         // ----------------
@@ -88,6 +109,8 @@ function (
         this._equipment       = [] ;
         this._equipment_by_id = [] ;
         this._search_option   = [] ;
+
+        this._last_search_params = {} ;
 
         this._properies_before_edit = null ;
         this._editing_panel = {} ;
@@ -149,25 +172,18 @@ function (
 
         '<div id="controls" > ' +
           '<div style="float:left;" > ' +
-            '<button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img style="height:28px;" src="../irep/img/EXCEL_icon.gif" /></button> ' +
-          '</div> ' +
-          '<div style="float:left; margin-left:20px;" > ' +
-//            '<center><b>&nbsp;</b></center> ' +
             '<div id="view" > ' +
               '<input type="radio" id="view_table" name="view" checked="checked" ><label for="view_table" title="view as a table" ><img src="../irep/img/table.png" /></label> ' +
               '<input type="radio" id="view_grid"  name="view"                   ><label for="view_grid"  title="view as a grid"  ><img src="../irep/img/stock_table_borders.png" /></label> ' +
             '</div> ' +
           '</div> ' +
-          '<div style="float:left; margin-left:20px;" > ' +
-            '<center><b>&nbsp;</b></center> ' +
+          '<div style="float:left;" > ' +
             '<input type="checkbox" id="option-model-image"        ><label for="option-model-image"       > images of models</label><br> ' +
           '</div> ' +
-          '<div style="float:left; margin-left:20px;" > ' +
-            '<center><b>&nbsp;</b></center> ' +
+          '<div style="float:left;" > ' +
             '<input type="checkbox" id="option-model-descr"        ><label for="option-model-descr"       > descriptions of models</label><br> ' +
           '</div> ' +
-          '<div style="float:left; margin-left:20px;" > ' +
-            '<center><b>&nbsp;</b></center> ' +
+          '<div style="float:left;" > ' +
             '<input type="checkbox" id="option-attachment-preview" ><label for="option-attachment-preview"> preview attachments     </label> ' +
           '</div> ' +
           '<div style="clear:both;" ></div> ' +
@@ -1920,6 +1936,8 @@ function (
         } ;
         this._search_impl = function (params) {
 
+            this._last_search_params = params ;
+
             this._button_search().button('disable') ;
             this._button_reset ().button('disable') ;
 
@@ -1960,6 +1978,8 @@ function (
         } ;
         this._search_reset = function () {
 
+            this._last_search_params = {} ;
+
             this._form().find('select[name="status"]'      ).val(0) ;
             this._form().find('select[name="status2"]'     ).val(0) ;
             this._form().find('select[name="manufacturer"]').val(0) ;
@@ -1979,6 +1999,19 @@ function (
 
             this._close_all_history_panels() ;
             this._display() ;
+        } ;
+        this._export = function (format) {
+            
+            // Make a deep local copy
+
+            var params = jQuery.extend (
+                true ,
+                {   format: format
+                } ,
+                this._last_search_params
+            );
+            var url = '../irep/ws/equipment_export.php?'+$.param(params, true) ;
+            window.open(url) ;
         } ;
     }
     Class.define_class (Equipment_Inventory, FwkApplication, {}, {}) ;

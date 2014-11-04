@@ -37,6 +37,12 @@
     margin-top:     10px;
     margin-bottom:  5px;
 }
+#equipment-inventory > #tabs > #results #controls > div {
+    margin-right:    20px;
+}
+#equipment-inventory > #tabs > #results #controls > div:last {
+    margin-right:    0;
+}
 #equipment-inventory > #tabs .tab-cont.history > .table {
     margin-right:   20px;
 }
