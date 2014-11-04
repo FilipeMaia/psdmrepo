@@ -1,0 +1,107 @@
+#equipment-inventory {
+    padding:        0px;
+}
+
+#equipment-inventory span.toggler {
+  background-color: #ffffff;
+  border: 1px solid #c0c0c0;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  cursor: pointer;
+}
+#equipment-inventory div.visible {
+  display: block;
+}
+#equipment-inventory div.hidden {
+  display: none;
+}
+
+
+#equipment-inventory > #controls {
+    background:     #f5f8f9;
+    padding:        10px;
+    padding-top:    20px;
+}
+#equipment-inventory > #controls > #form {
+    margin-right:   20px;
+}
+#equipment-inventory > #controls > #form td.form-table-key {
+    font-weight: bold;
+    padding-right: 2px;
+}
+#equipment-inventory > #controls > #form td.form-table-val {
+    padding-right:   10px;
+}
+#equipment-inventory > #controls > #form .form-elem {
+  width:100%;
+}
+#equipment-inventory > #updated-info {
+    margin-top:     10px;
+    padding-right:  10px;
+}
+#equipment-inventory > #updated-info .info {
+    color:          maroon;
+}
+#equipment-inventory > #tabs {
+    font-size:      12px;
+}
+#equipment-inventory > #tabs > ul > li {
+    -webkit-border-radius:  0;
+    -moz-border-radius:     0;
+    -khtml-border-radius:   0;
+    border-radius:          0;
+}
+
+#equipment-inventory > #tabs .tab-cont {
+    border:         solid 1px #b0b0b0;
+    padding:        15px;
+}
+#equipment-inventory > #tabs > #results #controls {
+    margin-top:     10px;
+    margin-bottom:  5px;
+}
+#equipment-inventory > #tabs > #results #controls > div {
+    margin-right:    20px;
+}
+#equipment-inventory > #tabs > #results #controls > div:last {
+    margin-right:    0;
+}
+#equipment-inventory > #tabs .tab-cont.history > .table {
+    margin-right:   20px;
+}
+#equipment-inventory > #tabs .tab-cont.history .events {
+    margin-top:     10px;
+    margin-left:    10px;
+}
+#equipment-inventory > #tabs > #results > .tab-cont {
+    padding-left:   25px;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > .view-visible {
+    display:        block;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > .view-hidden {
+    display:        none;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > #table {
+    margin-top:     20px;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > #grid {
+    margin-top:     20px;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > #grid > .grid-cell {
+    max-width:      780px;
+    margin-right:   15px;
+    margin-bottom:  20px;
+    box-shadow:     0 5px 10px rgba(0,0,0,0.36);
+}
+
+#equipment-inventory > #tabs > #results > .tab-cont > #grid > .grid-cell > .body .tag-hdr {
+    padding-left:   5px;
+    margin-right:   5px;
+    font-weight:    bold;
+}
+#equipment-inventory > #tabs > #results > .tab-cont > #grid > .grid-cell > .footer {
+    border-top: 1px solid #c0c0c0;
+}
+
+

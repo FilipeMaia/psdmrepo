@@ -1,0 +1,9 @@
+#equipment-add {
+    padding:    20px;
+}
+#equipment-add span.form-element-info {
+  color:    maroon;
+}
+#equipment-add .form-elem {
+  width:100%;
+}
