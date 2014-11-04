@@ -449,20 +449,30 @@ private:
                    vector<epicsmap>& bit2SrcVec, vector<unsigned>& epicsmask) {
     bool ifirst = 1;
     int ifile = 0;
+    int firststream = -1;
     for (std::vector<XtcFileName>::const_iterator it = xtclist.begin(); it!=xtclist.end(); ++it) {
       Pds::Index::IndexList idxlist;
+      unsigned stream = (*it).stream();
       // get the DAQ index file, if it exists, otherwise ignore both idx/xtc files.
       if (_getidx(*it, idxlist)) continue;
       _xtc.add(*it);
-      if ((*it).stream()<80) {
+      if (stream<80) {
         // store them in event table that includes DAQ data
         _store(_idx,idxlist.getL1(),ifile);
         // begincalibs are a little tricky, I believe.  in principle
         // a begincalib for an event could be in a previous chunk
         // so I think we need to put them in one big list for the
         // whole run and search (although we could also add them
-        // to the one big IndexEvent table, like we do for epics data -cpo
-        _store(_idxcalib,idxlist.getCalib(),ifile);
+        // to the one big IndexEvent table, like we do for epics data.
+        // Only store the first stream's calibcycles, since all
+        // streams are identical -cpo
+        if (firststream==-1) {
+          _store(_idxcalib,idxlist.getCalib(),ifile);
+          firststream = stream;
+        } else {
+          if (stream==(unsigned)firststream)
+            _store(_idxcalib,idxlist.getCalib(),ifile);
+        }
 
         // epics is also tricky, because the ordering of the different
         // sources can change in the different DAQ index files.

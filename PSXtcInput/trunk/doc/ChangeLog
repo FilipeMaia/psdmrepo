@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-06
+2014-11-03 Christopher O'Grady
+- Fix a bug in the access to calibcycle times: multiple
+  streams' calibcycles were being included in the list.
+  To avoid duplicates, reduced it to just one stream's
+  calibcycles (since they are all identical).
+	
 Tag: V00-15-05
 2014-10-21 Christopher O'Grady
 - Change behavior of indexing to provide access to first
