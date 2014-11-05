@@ -39,6 +39,7 @@
 #include "pdscalibdata/PnccdBaseV1.h"
 #include "pdscalibdata/PrincetonBaseV1.h"
 #include "pdscalibdata/AndorBaseV1.h"
+#include "pdscalibdata/Epix100aBaseV1.h"
 #include "pdscalibdata/VarShapeCameraBaseV1.h"
 //#include "pdscalibdata/Opal1000BaseV1.h"
 //#include "pdscalibdata/Opal4000BaseV1.h"
@@ -193,6 +194,12 @@ public:
 	   return new PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>(calibdir, type_group, src, runnum, prbits);
 	}
 
+        if ( str_src.find(":Epix100a.") != std::string::npos ) {
+           MsgLog("CalibParsStore", info, "Get access to calibration store for Epix100a source: " << str_src);
+	   std::string type_group = (group==std::string()) ? "Epix100a::CalibV1" : group;
+	   return new PSCalib::GenericCalibPars<pdscalibdata::Epix100aBaseV1>(calibdir, type_group, src, runnum, prbits);
+	}
+
 	std::vector<std::string> v_camera_names;
 	v_camera_names.push_back(":Opal1000.");
 	v_camera_names.push_back(":Opal2000.");
@@ -200,6 +207,7 @@ public:
 	v_camera_names.push_back(":Opal8000.");
 	v_camera_names.push_back(":Tm6740.");
 	v_camera_names.push_back(":OrcaFl40.");
+	v_camera_names.push_back(":Fccd960.");
 
 	for (std::vector<std::string>::iterator it = v_camera_names.begin(); it != v_camera_names.end(); ++it) {
           if ( str_src.find(*it) != std::string::npos ) {
