@@ -342,6 +342,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', \
                                'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', \
                                'OrcaFl40', 'Epix', 'Epix10k', 'Epix100a', 'Fccd960', 'Acqiris']
+
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
         self.list_of_data_types  = ['CsPad::DataV',

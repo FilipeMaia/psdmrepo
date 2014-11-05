@@ -37,15 +37,15 @@ def get_list_of_deploy_commands_and_sources_dark(str_run_number, str_run_range):
 
     cp.str_run_number.setValue(str_run_number)
     #cp.blsp.print_list_of_types_and_sources()
-    list_of_types, list_of_sources = cp.blsp.list_of_types_and_sources_for_selected_detectors()
+    list_of_types, list_of_sources, list_of_ctypes = cp.blsp.list_of_types_and_sources_for_selected_detectors()
     # list_of_types  : ['CsPad::DataV1',    'CsPad::DataV1']
     # list_of_sources: ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
 
-    list_of_deploy_commands  = get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_ave(), 'pedestals', str_run_range)
-    list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_rms(), 'pixel_rms', str_run_range)
+    list_of_deploy_commands  = get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_peds_ave(), 'pedestals', str_run_range)
+    list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_peds_rms(), 'pixel_rms', str_run_range)
 
     if cp.dark_deploy_hotpix.value() :
-        list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status', str_run_range)
+        list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status', str_run_range)
 
     return list_of_deploy_commands, list_of_sources
     
@@ -104,22 +104,24 @@ def is_allowed_command(cmd, list_src_cbx):
 
 
 
-def get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, base_path, calibtype='pedestals', str_run_range='0-end'):
+def get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, base_path, calibtype='pedestals', str_run_range='0-end'):
     """Get list of deploy commands for lists of type and sources for calibtype"""
     
     list_of_files = gu.get_list_of_files_for_list_of_insets( base_path, list_of_sources )
 
     list_of_deploy_commands = []
 
-    for file, type, source in zip(list_of_files, list_of_types, list_of_sources) :
 
-        src  = source
+    for file, ctype, type, source in zip(list_of_files, list_of_ctypes, list_of_types, list_of_sources) :
+        # Ex.: ctype='Epix100a::CalibV1',  type='Epix::ElementV2',  source='NoDetector.0:Epix100a.0'
 
-        pos1 = type.find('::')
-        typ  = type[:pos1] + '::CalibV1'
+        #pos1 = source.find(':')
+        #pos2 = source.find('.',pos1)
+        #typ  = source[pos1+1:pos2] + '::CalibV1' # Ex.: typ='Epix100a::CalibV1'
+
         fname = '%s.data' % str_run_range
         
-        calib_path = os.path.join(cp.calib_dir.value(), typ, src, calibtype, fname)
+        calib_path = os.path.join(cp.calib_dir.value(), ctype, source, calibtype, fname)
         cmd = 'cp %s %s' % (file, calib_path)
 
         list_of_deploy_commands.append(cmd)

@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-10-05 Mikhail S. Dubrovin
+Tag: V00-00-68
+- BatchLogScanParser, ConfigParametersForApp, FileDeployer.py - use calibtypes from config pars in stead of evaluation from source (PSAS-6)
+	
 2014-10-03 Mikhail S. Dubrovin
 Tag: V00-00-67
 - ConfigParametersForApp, ConfigFileGenerator add support for Epix100a (see PSAS-6, PSAS-7)

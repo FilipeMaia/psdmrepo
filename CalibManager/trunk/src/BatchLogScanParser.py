@@ -239,21 +239,23 @@ class BatchLogScanParser :
         ['CsPad::DataV2',    'CsPad::DataV2'],
         ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
         """
-        lst_types = []
-        lst_srcs  = []
+        lst_ctypes = []
+        lst_types  = []
+        lst_srcs   = []
 
         for det_name in cp.list_of_dets_selected() :
             lst_t, lst_s = self.list_of_types_and_sources_for_detector(det_name)
+            lst_ctypes.append(cp.dict_of_det_calib_types[det_name])
             lst_types += lst_t
             lst_srcs += lst_s
-        return lst_types, lst_srcs
+        return lst_types, lst_srcs, lst_ctypes
 
 
 
     def list_of_sources_for_selected_detectors (self) :
         """Returns the list of sources in run for selected detectors.
         """
-        lst_types, lst_srcs = self.list_of_types_and_sources_for_selected_detectors()
+        lst_types, lst_srcs, lst_ctypes = self.list_of_types_and_sources_for_selected_detectors()
         return lst_srcs
 
 
