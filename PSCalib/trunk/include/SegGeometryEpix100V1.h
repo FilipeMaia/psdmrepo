@@ -1,12 +1,12 @@
-#ifndef PSCALIB_SEGGEOMETRYCSPAD2X1V1_H
-#define PSCALIB_SEGGEOMETRYCSPAD2X1V1_H
+#ifndef PSCALIB_SEGGEOMETRYEPIX100V1_H
+#define PSCALIB_SEGGEOMETRYEPIX100V1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class SegGeometryCspad2x1V1
+//	Class SegGeometryEpix100V1
 //
 //------------------------------------------------------------------------
 
@@ -40,15 +40,19 @@ namespace PSCalib {
 /**
  *  @ingroup PSCalib
  *
- *  @brief Class SegGeometryCspad2x1V1 defines the cspad 2x1 V1 sensor pixel coordinates in its local frame.
+ *  @brief Class SegGeometryEpix100V1 defines the Epix100 V1 sensor pixel coordinates in its local frame.
  *
  *
  *  2x1 sensor coordinate frame:
  * 
  *  @code
  *    (Xmin,Ymax)      ^ Y          (Xmax,Ymax)
- *    (0,0)            |            (0,387)
+ *    (0,0)            |            (0,768)
  *       +----------------------------+
+ *       |             |              |
+ *       |             |              |
+ *       |             |              |
+ *       |             |              |
  *       |             |              |
  *       |             |              |
  *       |             |              |
@@ -56,13 +60,19 @@ namespace PSCalib {
  *       |             |              |
  *       |             |              |
  *       |             |              |
+ *       |             |              |
+ *       |             |              |
+ *       |             |              |
+ *       |             |              |
  *       +----------------------------+
- *    (184,0)          |           (184,387)
+ *    (704,0)          |           (704,768)
  *    (Xmin,Ymin)                  (Xmax,Ymin)
  *  @endcode
  *
  *  Pixel (r,c)=(0,0) is in the top left corner of the matrix which has coordinates (Xmin,Ymax)
- *  Here we assume that 2x1 has 185 rows and 388 columns.
+ *  Here we assume that segment has 704 rows and 768 columns.
+ *  Epix100 has a pixel size 50x50um, 
+ *  Epix10k has a pixel size 100x100um,
  *  This assumption differs from the DAQ map, where rows and cols are interchanged:
  *  /reg/g/psdm/sw/external/lusi-xtc/2.12.0a/x86_64-rhel5-gcc41-opt/pdsdata/cspad/ElementIterator.hh,
  *  Detector.hh
@@ -72,42 +82,42 @@ namespace PSCalib {
  * 
  *  @li  Include and typedef
  *  @code
- *  #include "PSCalib/SegGeometryCspad2x1V1.h"
- *  typedef PSCalib::SegGeometryCspad2x1V1 SG2X1;
+ *  #include "PSCalib/SegGeometryEpix100V1.h"
+ *  typedef PSCalib::SegGeometryEpix100V1 SG;
  *  @endcode
  *
  *  @li  Instatiation
  *  @code
- *       SG2X1 *seg_geom_2x1 = new SG2X1();  
+ *       SG *seg_geom = new SG();  
  *  or
  *       bool use_wide_pix_center = true;
- *       SG2X1 *seg_geom_2x1 = new SG2X1(use_wide_pix_center);  
+ *       SG *seg_geom = new SG(use_wide_pix_center);  
  *  @endcode
  *
  *  @li  Print info
  *  @code
  *       unsigned pbits=0377; // 1-member data; 2-coordinate arrays; 4-min/max coordinate values
- *       seg_geom_2x1 -> print_seg_info(pbits);
+ *       seg_geom -> print_seg_info(pbits);
  *  @endcode
  *
  *  @li  Access methods
  *  @code
  *        // scalar values
- *        const size_t         array_size        = seg_geom_2x1 -> size(); // 185*388
- *        const size_t         number_of_rows    = seg_geom_2x1 -> rows(); // 185
- *        const size_t         number_of_cols    = seg_geom_2x1 -> cols(); // 388
- *        const pixel_coord_t  pixel_scale_size  = seg_geom_2x1 -> pixel_scale_size();             // 109.92 
- *        const pixel_coord_t  pixel_coord_min   = seg_geom_2x1 -> pixel_coord_min(SG2X1::AXIS_Z);
- *        const pixel_coord_t  pixel_coord_max   = seg_geom_2x1 -> pixel_coord_max(SG2X1::AXIS_X);
+ *        const size_t         array_size        = seg_geom -> size();
+ *        const size_t         number_of_rows    = seg_geom -> rows();
+ *        const size_t         number_of_cols    = seg_geom -> cols();
+ *        const pixel_coord_t  pixel_scale_size  = seg_geom -> pixel_scale_size();
+ *        const pixel_coord_t  pixel_coord_min   = seg_geom -> pixel_coord_min(SG::AXIS_Z);
+ *        const pixel_coord_t  pixel_coord_max   = seg_geom -> pixel_coord_max(SG::AXIS_X);
  * 
  *        // pointer to arrays with size equal to array_size
- *        const size_t*        p_array_shape     = seg_geom_2x1 -> shape();                        // {185, 388}
- *        const pixel_area_t*  p_pixel_area      = seg_geom_2x1 -> pixel_area_array(); // array of 1-for regular or 2.5-for long pixels
- *        const pixel_coord_t* p_pixel_size_arr  = seg_geom_2x1 -> pixel_size_array(SG2X1::AXIS_X);
- *        const pixel_coord_t* p_pixel_coord_arr = seg_geom_2x1 -> pixel_coord_array(SG2X1::AXIS_Y);
+ *        const size_t*        p_array_shape     = seg_geom -> shape();
+ *        const pixel_area_t*  p_pixel_area      = seg_geom -> pixel_area_array(); // array of 1-for regular or 2.5-for long pixels
+ *        const pixel_coord_t* p_pixel_size_arr  = seg_geom -> pixel_size_array(SG::AXIS_X);
+ *        const pixel_coord_t* p_pixel_coord_arr = seg_geom -> pixel_coord_array(SG::AXIS_Y);
  *
  *        unsigned mbits=0377; // 1-edges; 2-wide central cols; 4-non-bound; 8-non-bound neighbours
- *        const pixel_mask_t*  p_mask_arr = seg_geom_2x1 -> pixel_mask_array(mbits);
+ *        const pixel_mask_t*  p_mask_arr = seg_geom -> pixel_mask_array(mbits);
  *  @endcode
  *  
  *  This software was developed for the LCLS project.  If you use all or 
@@ -119,52 +129,55 @@ namespace PSCalib {
  *  @author Mikhail S. Dubrovin
  */ 
 
-class SegGeometryCspad2x1V1 : public PSCalib::SegGeometry {
+class SegGeometryEpix100V1 : public PSCalib::SegGeometry {
 public:
 
-  /// Number of pixel rows in 2x1 
-  static const size_t  ROWS     = 185;
+  /// Number of pixel rows in segment 
+  static const size_t  ROWS     = 704;
 
-  /// Number of pixel columnss in 2x1
-  static const size_t  COLS     = 388;
+  /// Number of pixel columns in segment
+  static const size_t  COLS     = 768;
 
-  /// Half number of pixel columnss in 2x1
-  static const size_t  COLSHALF = 194;
+  /// Half number of pixel rows in segment
+  static const size_t  ROWSHALF = 352;
 
-  /// Number of pixels in 2x1
+  /// Half number of pixel columns in segment
+  static const size_t  COLSHALF = 384;
+
+  /// Number of pixels in segment
   static const size_t  SIZE     = COLS*ROWS; 
 
   /// Number of corners
   static const size_t  NCORNERS = 4;
 
   /// Pixel scale size [um] for indexing  
-  static const pixel_coord_t PIX_SCALE_SIZE; // = 109.92;
+  static const pixel_coord_t PIX_SCALE_SIZE; // = 50.0;
 
   /// Pixel size [um] in column direction
-  static const pixel_coord_t PIX_SIZE_COLS; //  = 109.92;
+  static const pixel_coord_t PIX_SIZE_COLS; //  = 50.0;
 
   /// Pixel size [um] in row direction
-  static const pixel_coord_t PIX_SIZE_ROWS; //  = 109.92;
+  static const pixel_coord_t PIX_SIZE_ROWS; //  = 50.0;
 
   /// Wide pixel length [um] 
-  static const pixel_coord_t PIX_SIZE_WIDE; //  = 274.80;
+  static const pixel_coord_t PIX_SIZE_WIDE; //  = 200.0;
 
   /// Pixel size [um] in depth
   static const pixel_coord_t PIX_SIZE_DEPTH; // = 400.;
 
   /// Conversion factor between um and pix 
-  static const double UM_TO_PIX; //             = 1./109.92;
+  static const double UM_TO_PIX; //             = 1./50;
 
   // Constructor
 
   /**
-   *  @brief Fills-in the map of perfect 2x1 coordinates, defined through the chip geometry.
+   *  @brief Fills-in the map of perfect segment coordinates, defined through the chip geometry.
    *  @param[in] use_wide_pix_center Optional parameter can be used if the wide-pixel row coordinate is prefered to be in the raw center.
    */
-  SegGeometryCspad2x1V1 (const bool& use_wide_pix_center=false);
+  SegGeometryEpix100V1 (const bool& use_wide_pix_center=false);
 
   /// Destructor
-  virtual ~SegGeometryCspad2x1V1 ();
+  virtual ~SegGeometryEpix100V1 ();
 
   /// Implementation of interface methods
 
@@ -209,8 +222,6 @@ public:
    *  @param[in] mbits - mask control bits;
    *             + 1 - mask edges,
    *             + 2 - mask two central columns, 
-   *             + 4 - mask non-bounded pixels,
-   *             + 8 - mask nearest neighbours of nonbonded pixels. 
    */  
   virtual const pixel_mask_t* pixel_mask_array(const unsigned& mbits = 0377);
 
@@ -225,10 +236,10 @@ private:
   /// Prints class member data
   void print_member_data ();
 
-  /// Prints 2x1 pixel coordinates
+  /// Prints segment pixel coordinates
   void print_coord_arrs();
 
-  /// Prints minimal and maximal values of the 2x1 coordinates for X, Y, and Z axes
+  /// Prints minimal and maximal values of the segment coordinates for X, Y, and Z axes
   void print_min_max_coords();
 
 
@@ -240,6 +251,7 @@ private:
 
   /// 1-d pixel coordinates of rows and cols
   pixel_coord_t  m_x_rhs_um [COLSHALF];  
+  pixel_coord_t  m_y_rhs_um [ROWSHALF];  
   pixel_coord_t  m_x_arr_um [COLS];  
   pixel_coord_t  m_y_arr_um [ROWS];  
 
@@ -263,10 +275,10 @@ private:
   pixel_mask_t  m_pix_mask_arr [ROWS][COLS];  
 
   // Copy constructor and assignment are disabled by default
-  SegGeometryCspad2x1V1 ( const SegGeometryCspad2x1V1& ) ;
-  SegGeometryCspad2x1V1& operator = ( const SegGeometryCspad2x1V1& ) ;
+  SegGeometryEpix100V1 ( const SegGeometryEpix100V1& ) ;
+  SegGeometryEpix100V1& operator = ( const SegGeometryEpix100V1& ) ;
 };
 
 } // namespace PSCalib
 
-#endif // PSCALIB_SEGGEOMETRYCSPAD2X1V1_H
+#endif // PSCALIB_SEGGEOMETRYEPIX100V1_H

@@ -29,7 +29,7 @@ typedef PSCalib::SegGeometry SG;
 
 //-----------------
 
-int test01 () // Test 01
+int test01 () // Test 01 for CSPAD SENS2X1:V1
 {
   cout << "Test of PSCalib::SegGeometryStore::Create(...)\n";     
 
@@ -41,9 +41,13 @@ int test01 () // Test 01
 
 //-----------------
 
-int test02 () // Test for CXI
+int test02 () // Test 02 for EPIX100:V1
 {
-  cout << "Test of PSCalib::CSPadCalibPars\n";     
+  cout << "Test of PSCalib::SegGeometryStore::Create(...)\n";     
+
+  SG *seggeom = PSCalib::SegGeometryStore::Create("EPIX100:V1", 0377);  
+  seggeom -> print_seg_info(0377);
+
   return 0;
 }
 

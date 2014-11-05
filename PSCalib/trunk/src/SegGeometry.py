@@ -13,27 +13,23 @@ Usage of interface methods::
     from SegGeometryCspad2x1V1 import cspad2x1_one as sg
 
     sg.print_seg_info(pbits=0377)
-
     size_arr = sg.size()
     rows     = sg.rows()
     cols     = sg.cols()
     shape    = sg.shape()
-    pix_size = pixel_scale_size()
-
-    area  = sg.pixel_area_array()
-
-    mask  = sg.pixel_mask(mbits=0377)
-    
-    sizeX = sg.pixel_size_array('X')
+    pix_size = sg.pixel_scale_size()
+    area     = sg.pixel_area_array()
+    mask     = sg.pixel_mask(mbits=0377)    
+    sizeX    = sg.pixel_size_array('X')
     sizeX, sizeY, sizeZ = sg.pixel_size_array()
-
-    X     = sg.pixel_coord_array('X')
-    X,Y,Z = sg.pixel_coord_array()
-    print 'X.shape =', X.shape
-
-    xmin, ymin, zmin = sg.pixel_coord_min()
+    X        = sg.pixel_coord_array('X')
+    X,Y,Z    = sg.pixel_coord_array()
+    xmin = sg.pixel_coord_min('X')
     ymax = sg.pixel_coord_max('Y')
+    xmin, ymin, zmin = sg.pixel_coord_min()
+    xmax, ymax, zmax = sg.pixel_coord_mas()
     ...
+    print 'X.shape =', X.shape
 
 
 @see :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
@@ -55,6 +51,15 @@ import sys
 #import os
 #import math
 #import numpy as np
+
+#------------------------------
+
+def rotation(X, Y, C, S) :
+    """For numpy arrays X and Y returns the numpy arrays of Xrot and Yrot
+    """
+    Xrot = X*C - Y*S 
+    Yrot = Y*C + X*S 
+    return Xrot, Yrot
 
 #------------------------------
 
@@ -128,6 +133,11 @@ class SegGeometry :
         """
         print self.wmsg % 'pixel_mask_array(mask_bits)'
 
+    def return_switch(sp, meth, axis=None) :
+        """ Returns three x,y,z arrays if axis=None, or single array for specified axis 
+        """
+        if axis==None : return meth()
+        else          : return dict( zip( sp.AXIS, meth() ))[axis]
   
 #------------------------------
 

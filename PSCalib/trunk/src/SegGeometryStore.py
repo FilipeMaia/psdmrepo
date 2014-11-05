@@ -16,9 +16,24 @@ Usage::
     from PSCalib.SegGeometryStroe import sgs
 
     sg = sgs.Create('SENS2X1:V1', pbits=0377)
+    sg2= sgs.Create('EPIX100:V1', pbits=0377)
+
     sg.print_seg_info(pbits=0377)
     size_arr = sg.size()
     rows     = sg.rows()
+    cols     = sg.cols()
+    shape    = sg.shape()
+    pix_size = sg.pixel_scale_size()
+    area     = sg.pixel_area_array()
+    mask     = sg.pixel_mask(mbits=0377)    
+    sizeX    = sg.pixel_size_array('X')
+    sizeX, sizeY, sizeZ = sg.pixel_size_array()
+    X        = sg.pixel_coord_array('X')
+    X,Y,Z    = sg.pixel_coord_array()
+    xmin = sg.pixel_coord_min('X')
+    ymax = sg.pixel_coord_max('Y')
+    xmin, ymin, zmin = sg.pixel_coord_min()
+    xmax, ymax, zmax = sg.pixel_coord_mas()
     ...
 
 
@@ -53,6 +68,7 @@ import sys
 from PSCalib.SegGeometryCspad2x1V1 import SegGeometryCspad2x1V1 
 #from PSCalib.SegGeometryCspad2x1V2 import SegGeometryCspad2x1V2 
 #from PSCalib.SegGeometryCspad2x1V3 import SegGeometryCspad2x1V3 
+from PSCalib.SegGeometryEpix100V1 import SegGeometryEpix100V1 
 
 #------------------------------
 class SegGeometryStore() :
@@ -71,6 +87,7 @@ class SegGeometryStore() :
         if segname=='SENS2X1:V1' : return SegGeometryCspad2x1V1(use_wide_pix_center=False)
         #if segname=='SENS2X1:V2' : return SegGeometryCspad2x1V2(use_wide_pix_center=False)
         #if segname=='SENS2X1:V3' : return SegGeometryCspad2x1V3(use_wide_pix_center=False)
+        if segname=='EPIX100:V1' : return SegGeometryEpix100V1(use_wide_pix_center=False)
         return None
 
 #------------------------------
@@ -86,20 +103,23 @@ sgs = SegGeometryStore()
 #------------------------------
 
 def test_seggeom() :
-    sg = sgs.Create('SENS2X1:V1', pbits=0377)
-    sg.print_seg_info(pbits=0377)
+
+    if len(sys.argv)==1   : print 'For test(s) use command: python', sys.argv[0], '<test-number=0-1>'
+
+    elif(sys.argv[1]=='0') :
+        sg1 = sgs.Create('SENS2X1:V1', pbits=0377)
+        sg1.print_seg_info(pbits=0377)
+        
+    elif(sys.argv[1]=='1') :
+        sg2 = sgs.Create('EPIX100:V1', pbits=0377)
+        sg2.print_seg_info(pbits=0377)
+
+    else : print 'Non-expected arguments: sys.argv=', sys.argv, ' use 0,1,2,...'
 
 #------------------------------
 
 if __name__ == "__main__" :
-
     test_seggeom()
-
-    #if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=1-3>'
-    #elif sys.argv[1]=='0' : test_seggeom()
-    #elif sys.argv[1]=='1' : test_seggeom()
-    #else : print 'Non-expected arguments: sys.argv=', sys.argv
-
     sys.exit( 'End of test.' )
 
 #------------------------------

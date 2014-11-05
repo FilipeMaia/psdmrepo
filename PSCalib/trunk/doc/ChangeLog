@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+	
+Tag: V00-02-20
+2014-11-04 Mikhail S. Dubrovin	
+- Add geometry support for Epix100 (see PSAS-11)
+- SegGeometryCspad2x1V1.py - move common methods to SegGeometry.py, improve self-documentation
+- add SegGeometryEpix100V1(.py, .cpp, .h)
+- in SegGeometryStore(.py, .h) add SegGeometryEpix100V1
+- test/ex_seg_geometry_store.cpp - updated for epix100
+	
 Tag: V00-02-19
 2014-10-17 Mikhail S. Dubrovin	
 - GeometryObject - shuffle cspad2x2 pixel only if size==2*185*388 and oname=="CSPAD2X2V1"
