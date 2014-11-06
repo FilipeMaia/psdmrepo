@@ -1,0 +1,44 @@
+xtcav:
+- new analysis package (code written by Alvaro Sanchez-Gonzalez with some help
+  from Christopher O'Grady)
+
+psana:
+- PSShmemInput: Reduce queue depth in DgramSourceShmem from 32 to 3.
+  This is because shmem applications want minimal latency, which requires minimal
+  buffering (at the expense of potentially more dropped events).
+- add support for Epix100a
+
+psana_examples:
+- DumpEpix.cpp - add support for new types Psana::Epix::Config100aV1 and Psana::Epix::ElementV2
+
+ImgAlgos:
+- EpixNDArrProducer: add support for Epix::ElementV2 and Epix::Config100aV1
+
+CalibManager:
+- ConfigParametersForApp, ConfigFileGenerator add support for Epix100a
+- use calibtypes from config pars in stead of evaluation from source
+- ConfigParametersForApp: support for Epix100a, add 'geometry', update default list of sources
+
+PSCalib:
+- SegGeometryCspad2x1V1.py: move common methods to SegGeometry.py, improve self-documentation
+- add SegGeometryEpix100V1(.py, .cpp, .h)
+- in SegGeometryStore(.py, .h): add SegGeometryEpix100V1
+- test/ex_seg_geometry_store.cpp: updated for epix100
+- in CalibParsStore.h, GenericCalibPars.cpp: add support for Epix100a
+
+pdscalibdata:
+- add Epix100aBaseV1.h
+
+pypsalg:
+- Throttle warning messages in find_blobs.py.
+- Fix missing imports and add 2D histogram in Histogram.py.
+
+psmon:
+- Fix from Dan that prevents psplot from "falling behind" when ZMQ buffers
+  on the client (display side) fill up.
+
+PSXtcInput:
+- Fix a bug in the indexing access to calibcycle times: multiple streams' calibcycles were
+  being included in the list. To avoid duplicates, reduced it to just one stream's
+  calibcycles (since they are all identical).
+
