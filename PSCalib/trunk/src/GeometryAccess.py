@@ -142,9 +142,17 @@ class GeometryAccess :
     def _add_comment_to_dict(self, line) :
         """Splits the line of comments for keyward and value and store it in the dictionary
         """
-        beginline, endline = line.lstrip('# ').split(' ', 1)
-        #print 'line: ', line
-        #print '  split parts - key:%s  val:%s' % (beginline,  endline)
+        lst = line.lstrip('# ').split(' ', 1)
+        if len(lst)<1 : return
+        if len(lst)==1 :
+            self.dict_of_comments[lst[0]] = ''
+            return
+
+        beginline, endline = lst
+        #print '  lst      : "%s"' % lst
+        #print '  len(lst) : %d' % len(lst)        
+        #print '  line     : "%s"' % line
+
         self.dict_of_comments[beginline] = endline.strip()
 
     #------------------------------
@@ -646,6 +654,31 @@ def test_cspad2x2() :
     gg.show()
 
 #------------------------------
+
+def test_epix100a() :
+    """ Test test_epix100a geometry table
+    """
+    ## MecTargetChamber.0:Cspad2x2.1 
+    basedir = '/reg/neh/home1/dubrovin/LCLS/GeometryCalib/calib-xpp-Epix100a-2014-11-05/'    
+    fname_geometry = basedir + 'calib/Epix100a::CalibV1/NoDetector.0:Epix100a.0/geometry/0-end.data'
+    fname_data     = basedir + 'epix100a-ndarr-ave-clb-xppi0614-r0073.dat'    
+
+    geometry = GeometryAccess(fname_geometry, 0177777)
+    amp_range = (-4,10)
+
+    iX, iY = geometry.get_pixel_coord_indexes()
+
+    root, ext = os.path.splitext(fname_data)
+    arr = np.load(fname_data) if ext == '.npy' else np.loadtxt(fname_data, dtype=np.float) 
+
+    print 'iX, iY, W shape:', iX.shape, iY.shape, arr.shape 
+    img = img_from_pixel_arrays(iX,iY,W=arr)
+
+    axim = gg.plotImageLarge(img,amp_range=amp_range)
+    gg.move(500,10)
+    gg.show()
+
+#------------------------------
 #------------------------------
 #------------------------------
 #------------------------------
@@ -703,6 +736,7 @@ if __name__ == "__main__" :
     elif sys.argv[1]=='9' : test_mask_quad(geometry)
     elif sys.argv[1]=='10': geometry.print_psf()
     elif sys.argv[1]=='11': test_cspad2x2()
+    elif sys.argv[1]=='12': test_epix100a()
     else : print 'Wrong input parameter.' + msg
 
     sys.exit ('End of %s' % sys.argv[0])

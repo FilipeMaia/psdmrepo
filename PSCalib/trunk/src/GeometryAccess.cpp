@@ -48,6 +48,8 @@ GeometryAccess::GeometryAccess (const std::string& path, unsigned pbits)
   : m_path(path)
   , m_pbits(pbits)
 {
+  if(m_pbits & 1) MsgLog(name(), info, "m_pbits = " << m_pbits); 
+
   load_pars_from_file();
 
   if(m_pbits & 2) print_list_of_geos();
@@ -132,12 +134,23 @@ void GeometryAccess::add_comment_to_dict(const std::string& line)
   std::size_t p1 = line.find_first_not_of("# ");
   std::size_t p2 = line.find_first_of(" ", p1);
   std::size_t p3 = line.find_first_not_of(" ", p2);
-  std::string beginline(line, p1, p2-p1);
-  std::string endline(line, p3);
+
+  //std::cout << "  p1:" << p1 << "  p2:" << p2 << "  p3:" << p3 << '\n';
   //if (p1 == std::string::npos) ...
   //std::cout << "comment: " << line << '\n'; 
-  //std::cout << "  p1:" << p1  << "  p2:" << p2 << "  p3:" << p3 << '\n';
   //std::cout << "   split line: [" << beginline << "] = " << endline << '\n'; 
+
+  if (p1 == std::string::npos) return; // available # but missing keyword
+  if (p2 == std::string::npos) return;
+
+  std::string beginline(line, p1, p2-p1);
+
+  if (p3 == std::string::npos) { // keyword is available but comment is missing
+    m_dict_of_comments[beginline] = std::string();
+    return;
+  }
+
+  std::string endline(line, p3);
   m_dict_of_comments[beginline] = endline;
 }
 

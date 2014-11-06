@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-22
+2014-11-06 Mikhail S. Dubrovin	
+- GeometryAccess(.cpp and .py) - in file input add protection for non-complete comment string (PSAS-11)
+
+Tag: V00-02-21
+2014-11-05 Mikhail S. Dubrovin	
+- In CalibParsStore.h, GenericCalibPars.cpp - add support for Epix100a (PSAS-7)
 	
 Tag: V00-02-20
 2014-11-04 Mikhail S. Dubrovin	
