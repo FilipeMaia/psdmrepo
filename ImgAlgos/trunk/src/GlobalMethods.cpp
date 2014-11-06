@@ -320,20 +320,25 @@ std::string srcToString( const Pds::Src& src )
 
 DETECTOR_TYPE detectorTypeForStringSource(const std::string& str_src)
 { 
-  if      ( str_src.find("Cspad.")     != std::string::npos ) return CSPAD; // from GlobalMethods.h
-  else if ( str_src.find("Cspad2x2.")  != std::string::npos ) return CSPAD2X2;
-  else if ( str_src.find("pnCCD.")     != std::string::npos ) return PNCCD;
-  else if ( str_src.find("Princeton.") != std::string::npos ) return PRINCETON;
-  else if ( str_src.find("Acqiris.")   != std::string::npos ) return ACQIRIS;
-  else if ( str_src.find("Tm6740.")    != std::string::npos ) return TM6740;
-  else if ( str_src.find("Opal1000.")  != std::string::npos ) return OPAL1000;
-  else if ( str_src.find("Opal2000.")  != std::string::npos ) return OPAL2000;
-  else if ( str_src.find("Opal4000.")  != std::string::npos ) return OPAL4000;
-  else if ( str_src.find("Opal8000.")  != std::string::npos ) return OPAL8000;
-  else if ( str_src.find("Andor.")     != std::string::npos ) return ANDOR;
-  else if ( str_src.find("OrcaFl40.")  != std::string::npos ) return ORCAFL40;
-  else if ( str_src.find("Fccd960.")   != std::string::npos ) return FCCD960;
-  else                                                        return OTHER;
+  //std::cout << "str_src:" << str_src << '\n';
+  // USE LONG NAMES FIRST, othervise detector may be misidentified!
+  if      ( str_src.find("Cspad2x2")  != std::string::npos ) return CSPAD2X2;// from GlobalMethods.h
+  else if ( str_src.find("Cspad")     != std::string::npos ) return CSPAD; 
+  else if ( str_src.find("pnCCD")     != std::string::npos ) return PNCCD;
+  else if ( str_src.find("Princeton") != std::string::npos ) return PRINCETON;
+  else if ( str_src.find("Acqiris")   != std::string::npos ) return ACQIRIS;
+  else if ( str_src.find("Tm6740")    != std::string::npos ) return TM6740;
+  else if ( str_src.find("Opal1000")  != std::string::npos ) return OPAL1000;
+  else if ( str_src.find("Opal2000")  != std::string::npos ) return OPAL2000;
+  else if ( str_src.find("Opal4000")  != std::string::npos ) return OPAL4000;
+  else if ( str_src.find("Opal8000")  != std::string::npos ) return OPAL8000;
+  else if ( str_src.find("Andor")     != std::string::npos ) return ANDOR;
+  else if ( str_src.find("OrcaFl40")  != std::string::npos ) return ORCAFL40;
+  else if ( str_src.find("Fccd960")   != std::string::npos ) return FCCD960;
+  else if ( str_src.find("Epix100a")  != std::string::npos ) return EPIX100A;
+  else if ( str_src.find("Epix10k")   != std::string::npos ) return EPIX10K;
+  else if ( str_src.find("Epix")      != std::string::npos ) return EPIX;
+  else                                                       return OTHER;
 }
 
 //--------------------
@@ -361,6 +366,9 @@ std::string calibGroupForDetType(const DETECTOR_TYPE det_type)
   else if ( det_type == ANDOR     ) return "Andor::CalibV1";
   else if ( det_type == ORCAFL40  ) return "Camera::CalibV1";
   else if ( det_type == FCCD960   ) return "Camera::CalibV1";
+  else if ( det_type == EPIX      ) return "Epix::CalibV1";
+  else if ( det_type == EPIX100A  ) return "Epix100a::CalibV1";
+  else if ( det_type == EPIX10K   ) return "Epix10k::CalibV1";
   else                              return std::string(); 
 }
 

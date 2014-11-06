@@ -206,14 +206,14 @@ NDArrImageProducer::getCalibPars(Event& evt, Env& env)
 
   std::string calib_dir = (m_calibdir.empty()) ? env.calibDir() : m_calibdir;
   std::string group = (m_calibgroup.empty()) ? calibGroupForSource(m_source) : m_calibgroup; 
-  unsigned prbits = (m_print_bits & 64) ? 0377 : 0;
+  unsigned prbits = (m_print_bits & 64) ? 0177777 : 0;
   int runnum = getRunNumber(evt);
 
   PSCalib::CalibFileFinder calibfinder(calib_dir, group, prbits);
   std::string fname = calibfinder.findCalibFile(m_src, "geometry", runnum);
 
   if( fname.empty() ) {
-    if( m_print_bits & 2 ) MsgLog(name(), info, "NOT FOUND \"geometry\" file for calibdir: " << calib_dir
+    if( m_print_bits & 2 ) MsgLog(name(), warning, "NOT FOUND \"geometry\" file for calibdir: " << calib_dir
 				  << " group:" << group 
                                   << " src:"  << m_source
                                   << " run:" << runnum);
