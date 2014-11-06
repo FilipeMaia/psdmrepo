@@ -11,8 +11,8 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-03-66
-2014-11-03 Mikhail S. Dubrovin
+Tag: V00-03-67
+2014-11-06 Mikhail S. Dubrovin
 - GlobalMethods(.h,.cpp) - support for EPIX, EPIX100A, EPIX10K (PSAS-7, PSAS-11)
 - NDArrImageProducer.cpp - extend prbits for all bits from 0377 for 0177777
 
