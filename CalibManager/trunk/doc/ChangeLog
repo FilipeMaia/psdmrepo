@@ -13,6 +13,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2014-10-05 Mikhail S. Dubrovin
+Tag: V00-00-69
+- ConfigParametersForApp - support for Epix100a: add 'geometry', update default list of sources (PSAS-7, PSAS-11)
+- RegDBUtils - allow 'NoDetector' in source name, for example in 'NoDetector.0:Epix100a.0'
+
+2014-10-05 Mikhail S. Dubrovin
 Tag: V00-00-68
 - BatchLogScanParser, ConfigParametersForApp, FileDeployer.py - use calibtypes from config pars in stead of evaluation from source (PSAS-6)
 	

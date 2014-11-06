@@ -423,7 +423,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
             ]
         
         self.const_types_cspad2x2 = [
-            'center'
+            'geometry'
+           ,'center'
            ,'tilt'     
            ,'pedestals'
            ,'pixel_status'
@@ -471,6 +472,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_gain'
            ,'pixel_rms'
            ,'common_mode'
+           ,'geometry'
             ]
 
         self.const_types_fccd960 = [
@@ -642,6 +644,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         self.srcs_epix100a = [ 
             'NoDetector.0:Epix100a.0'
+           ,'XcsEndstation.0:Epix100a.0'
            ]
 
         self.srcs_fccd960 = [ 
