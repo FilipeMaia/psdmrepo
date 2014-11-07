@@ -240,6 +240,11 @@ ostream& operator<<(ostream& os, const IndexEvent& idx) {
     return os;
 }
 
+ostream& operator<<(ostream& os, const IndexCalib& idx) {
+  os << "time " << std::hex << idx.entry.uSeconds << "/" << idx.entry.uNanoseconds;
+    return os;
+}
+
 // this is the implementation of the per-run indexing.  shouldn't be too
 // hard to make it work for for per-calibcycle indexing as well.
 
@@ -306,6 +311,7 @@ private:
   // calibcycle.
   void _fillTimes() {
     IndexEvent last(0,0,0);
+    
     _calibTimeIndex.clear();
     std::vector<IndexCalib>::const_iterator caliter = _idxcalib.begin();
     for (vector<IndexEvent>::iterator itev = _idx.begin(); itev != _idx.end(); ++ itev) {
@@ -563,9 +569,11 @@ public:
   }
 
   void times(unsigned step, psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end) const {
-    if (_calibTimeIndex.size() != _idxcalib.size())
+    // if the last calibcycle has no events, the calibTimeIndex can have one fewer entries than the idxcalib
+    if (_calibTimeIndex.size() < _idxcalib.size()-1 || _calibTimeIndex.size() > _idxcalib.size()) {
       MsgLog(logger, fatal, "Incorrect number of calibcycles: " << _calibTimeIndex.size() << " " << _idxcalib.size());
-    if (step>=_calibTimeIndex.size()) MsgLog(logger, fatal, "Requested step " << step << " not in range.  Number of steps in this run: " << _idxcalib.size());
+    }
+    if (step>=_calibTimeIndex.size()) MsgLog(logger, fatal, "Requested step " << step << " not in range.  Number of steps in this run: " << _calibTimeIndex.size());
     begin = _times.begin()+_calibTimeIndex[step];
     if (step==_calibTimeIndex.size()-1) { // the last calibstep
       end = _times.end();
@@ -574,7 +582,7 @@ public:
     }
   }
 
-  unsigned nsteps() const {return _idxcalib.size();}
+  unsigned nsteps() const {return _calibTimeIndex.size();}
 
   void endrun() {
     Pds::Dgram* dg = new Pds::Dgram;
