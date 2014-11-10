@@ -27,25 +27,30 @@
 }
 
 //------------------ BldDataFEEGasDetEnergyV1 ------------------
-/* Four energy measurements from Front End Enclosure Gas Detector.
+/* Six energy measurements from Front End Enclosure Gas Detector.
    PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, 
 	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, 
 	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC 
-    *363* and *364* are duplicate measurements of *361* and *362* respectively. 
+   Each pair of methods (e.g. f_11_ENRC(), f_12_ENRC() contains
+   identical measurements using two different phototubes.  "11" and "12"
+   are before the gas attenuation.  "21" and "22" are after gas
+   attenuation.
+   "63" and "64" are duplicate measurements of "21" and "22" respectively. 
     The difference is that they cover a smaller (10%) dynamic range. 
-    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs kick in. */
+    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs should be used instead.  Dehong Zhang suggests that the threshold
+    for "weak" is around 0.5 mJ.  */
 
 @type BldDataFEEGasDetEnergyV1
   [[type_id(Id_FEEGasDetEnergy, 1)]]
   [[value_type]]
   [[pack(4)]]
 {
-  double _f_11_ENRC -> f_11_ENRC; /* Value of GDET:FEE1:241:ENRC, in mJ. */
-  double _f_12_ENRC -> f_12_ENRC; /* Value of GDET:FEE1:242:ENRC, in mJ. */
-  double _f_21_ENRC -> f_21_ENRC; /* Value of GDET:FEE1:361:ENRC, in mJ. */
-  double _f_22_ENRC -> f_22_ENRC; /* Value of GDET:FEE1:362:ENRC, in mJ. */
-  double _f_63_ENRC -> f_63_ENRC; /* Value of GDET:FEE1:363:ENRC, in mJ. */
-  double _f_64_ENRC -> f_64_ENRC; /* Value of GDET:FEE1:364:ENRC, in mJ. */
+  double _f_11_ENRC -> f_11_ENRC; /* First energy measurement (mJ) before attenuation. */
+  double _f_12_ENRC -> f_12_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. */
+  double _f_21_ENRC -> f_21_ENRC; /* First energy measurement (mJ) after attenuation. */
+  double _f_22_ENRC -> f_22_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. */
+  double _f_63_ENRC -> f_63_ENRC; /* First energy measurement (mJ) for small signals (<0.5 mJ), after attenuation. */
+  double _f_64_ENRC -> f_64_ENRC; /* Second (duplicate!) energy measurement (mJ) for small signals (<0.5mJ), after attenutation. */
 
   /* Constructor which takes values for every attribute */
   @init()  [[auto, inline]];
@@ -445,12 +450,12 @@
   [[type_id(Id_GMD, 2)]]
   [[pack(4)]]
 {
-  double _fMilliJoulesPerPulse    -> milliJoulesPerPulse;     /* Shot to shot pulse energy (mJ) */
-  double _fMilliJoulesAverage     -> milliJoulesAverage;      /* Average pulse energy from ION cup current (mJ) */
-  double _fSumAllPeaksFiltBkgd    -> sumAllPeaksFiltBkgd;     /* Sum of all peaks, normalized w/ filt bkgd level */
-  double _fRawAvgBkgd             -> rawAvgBkgd;              /* Avg background value per waveform in raw A/D counts */
-  double _fRelativeEnergyPerPulse -> relativeEnergyPerPulse;  /* Shot by shot pulse energy in arbitrary units */
-  double _fSumAllPeaksRawBkgd     -> sumAllPeaksRawBkgd;      /* Sum of all peaks, normalized w/ raw avg bkgd level */
+  double _fMilliJoulesPerPulse    -> milliJoulesPerPulse;     /* Shot to shot pulse energy (mJ).  Not as robust as relativeEnergyPerPulse() method. */
+  double _fMilliJoulesAverage     -> milliJoulesAverage;      /* Average pulse energy from ION cup current (mJ).  Not as robust as relativeEnergyPerPulse() method. */
+  double _fSumAllPeaksFiltBkgd    -> sumAllPeaksFiltBkgd;     /* Sum of all peaks, normalized w/ filt bkgd level.  Not typically used by the user. */
+  double _fRawAvgBkgd             -> rawAvgBkgd;              /* Avg background value per waveform in raw A/D counts.  Not typically used by the user. */
+  double _fRelativeEnergyPerPulse -> relativeEnergyPerPulse;  /* Shot by shot pulse energy in arbitrary units.  The most stable measurement.  Most users should use this. */
+  double _fSumAllPeaksRawBkgd     -> sumAllPeaksRawBkgd;      /* Sum of all peaks, normalized w/ raw avg bkgd level.  Not typically used by the user. */
 }
 
 //------------------ BldDataAcqADCV1 ------------------
