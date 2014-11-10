@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-11-10 Mikhail S. Dubrovin
+Tag: V00-00-70
+- data/scripts/psana-module-peds-aver-camera.cfg, ConfigFileGenerator.py - for Fccd960 use outtype='int' to account for gain bits (PSAS-44)
+	
 2014-10-05 Mikhail S. Dubrovin
 Tag: V00-00-69
 - ConfigParametersForApp - support for Epix100a: add 'geometry', update default list of sources (PSAS-7, PSAS-11)

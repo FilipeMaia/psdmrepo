@@ -165,7 +165,7 @@ class ConfigFileGenerator :
                 elif det_name == cp.list_of_dets[10]: self.add_cfg_module_peds_aver_epix()
                 elif det_name == cp.list_of_dets[11]: self.add_cfg_module_peds_aver_epix()
                 elif det_name == cp.list_of_dets[12]: self.add_cfg_module_peds_aver_epix()
-                elif det_name == cp.list_of_dets[13]: self.add_cfg_module_peds_aver_camera()
+                elif det_name == cp.list_of_dets[13]: self.add_cfg_module_peds_aver_camera(out_dtype='int')
                 elif det_name == cp.list_of_dets[14]: self.add_cfg_module_peds_aver_acqiris()
                 elif det_name == cp.list_of_dets[15]: self.print_warning()
                 else : logger.warning('UNKNOWN DETECTOR: %s' % det_name, __name__)
@@ -293,7 +293,7 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def add_cfg_module_peds_aver_camera (self, module='ImgAlgos.CameraImageProducer', ftype='metatxt') :
+    def add_cfg_module_peds_aver_camera (self, module='ImgAlgos.CameraImageProducer', ftype='metatxt', out_dtype='asdata') :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-camera.cfg').path()
         mod_img_rec = '%s:%i' % (module, self.ind)
         mod         = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
@@ -301,6 +301,7 @@ class ConfigFileGenerator :
                          'MODULE_IMG_REC'       : mod_img_rec,
                          'DETINFO'              : self.source, # str( cp.bat_det_info.value() ),
                          'KEY_TRANSIT'          : 'img-%i' % self.ind,
+                         'OUT_DATA_TYPE'        : out_dtype,
                          'MODULE_AVERAGE'       : mod,
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
