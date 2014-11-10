@@ -109,7 +109,8 @@ private:
   unsigned long  m_count_msg;        // number of messages counter
 
   DATA_TYPE      m_dtype;            // enumerated type of output data
- 
+  DETECTOR_TYPE  m_detector;         // enumerated type of detectors
+
 //--------------------
   /**
    * @brief Process event for requested data typename TDATA and output type TOUT
@@ -123,6 +124,43 @@ private:
 
 	  TOUT offset = (m_subtract_offset) ? (TOUT)frame->offset() : 0;
     
+          const ndarray<const data_t, 2>& data16 = frame->data16();
+          if (not data16.empty()) {
+
+              if(m_dtype == ASDATA) {
+                 save2DArrayInEvent<data_t> (evt, m_src, m_key_out, frame->data16());
+                 return true; 
+              } 
+ 	      
+              if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>,"
+                                                          <<" subtract offset=" << offset);
+              ndarray<TOUT, 2> data_out = make_ndarray<TOUT>(frame->height(), frame->width());
+              typename ndarray<TOUT, 2>::iterator oit;
+              typename ndarray<const data_t, 2>::iterator dit;
+              // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
+	      
+	      if(m_detector == FCCD960) { 
+                // Do special processing for FCCD960 gain factor bits
+                for(dit=data16.begin(), oit=data_out.begin(); dit!=data16.end(); ++dit, ++oit) { 
+
+		  uint16_t code = *dit;
+		  //std::cout << "  xx:" << (code>>14);
+		  switch ((code>>14)&03) {
+		    default :
+		    case  0 : *oit = TOUT((code&017777) << 3); break; // gain 8
+		    case  1 : *oit = TOUT((code&017777) << 1); break; // gain 2
+		    case  3 : *oit = TOUT( code&017777 );      break; // gain 1
+		  }
+                }
+	      }
+	      else {
+                for(dit=data16.begin(), oit=data_out.begin(); dit!=data16.end(); ++dit, ++oit) { *oit = TOUT(*dit) - offset; }
+	      }
+    	      
+    	      save2DArrayInEvent<TOUT> (evt, m_src, m_key_out, data_out);
+              return true;
+          }
+
           const ndarray<const uint8_t, 2>& data8 = frame->data8();
           if (not data8.empty()) {
 
@@ -139,26 +177,8 @@ private:
     	      
               save2DArrayInEvent<TOUT> (evt, m_src, m_key_out, data_out);
               return true;
-          }   
-    
-          const ndarray<const data_t, 2>& data16 = frame->data16();
-          if (not data16.empty()) {
-
-              if(m_dtype == ASDATA) {
-                 save2DArrayInEvent<data_t> (evt, m_src, m_key_out, frame->data16());
-                 return true; 
-              } 
- 	      
-              if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>, subtract offset=" << offset);
-              ndarray<TOUT, 2> data_out = make_ndarray<TOUT>(frame->height(), frame->width());
-              typename ndarray<TOUT, 2>::iterator oit;
-              typename ndarray<const data_t, 2>::iterator dit;
-              // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
-              for(dit=data16.begin(), oit=data_out.begin(); dit!=data16.end(); ++dit, ++oit) { *oit = TOUT(*dit) - offset; }
-    	      
-    	      save2DArrayInEvent<TOUT> (evt, m_src, m_key_out, data_out);
-              return true;
           }
+
       }
       return false;
   }
@@ -178,10 +198,11 @@ private:
     //if ( procDataForIOTypes <Psana::Camera::FrameV4, TOUT> (evt) ) return true;
 
       m_count_msg ++;
-      if (m_count_msg < 20)
-      MsgLog(name(), warning, "Camera::FrameV1 object is not available in the event:" << m_count << " for source:" << m_str_src << " key:" << m_key_in);
-      if (m_count_msg == 20)
-      MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
+      if (m_count_msg < 21) {
+        MsgLog(name(), warning, "Camera::FrameV1 object is not available in the event:" << m_count << " for source:" << m_str_src << " key:" << m_key_in);
+        if (m_count_msg == 20)
+          MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
+      }
     return false;
   }
 

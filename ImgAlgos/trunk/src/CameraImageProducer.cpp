@@ -74,7 +74,10 @@ CameraImageProducer::CameraImageProducer (const std::string& name)
   m_subtract_offset   = config   ("subtract_offset",      true);
   m_print_bits        = config   ("print_bits",             0 );
 
+  m_detector = detectorTypeForSource(m_str_src);
+
   checkTypeImplementation();
+  
 }
 
 //--------------------
@@ -90,6 +93,9 @@ CameraImageProducer::printInputParameters()
         << "\n outtype          : " << m_outtype
         << "\n subtract_offset  : " << m_subtract_offset     
         << "\n print_bits       : " << m_print_bits
+        << "\n\n Derived enum parameters:"
+        << "\n dtype            : " << m_dtype    
+        << "\n detector         : " << m_detector    
         << "\n";     
   }
 }

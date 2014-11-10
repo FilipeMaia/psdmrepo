@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-68
+2014-11-10 Mikhail S. Dubrovin
+- CameraImageProducer - For FCCD960 apply gain-bit factor 1,2,8 if outtype!='asdata' (PSAS-44)
+	
 Tag: V00-03-67
 2014-11-06 Mikhail S. Dubrovin
 - GlobalMethods(.h,.cpp) - support for EPIX, EPIX100A, EPIX10K (PSAS-7, PSAS-11)
