@@ -82,7 +82,7 @@ try {
 
 <head>
 
-<title><?=$title?></title>
+<title><?="{$title} : {$subtitle}"?></title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
@@ -95,8 +95,8 @@ try {
 
 var app_config = {
 
-    title : '<?=$title?>' ,
-    subtitle : 'Electronic Equipment' ,
+    title:    '<?=$title?>' ,
+    subtitle: '<?=$subtitle?>' ,
 
     current_user : {
         uid:               '<?php echo $authdb->authName        () ;         ?>' ,
@@ -105,10 +105,10 @@ var app_config = {
         can_edit_inventory: <?php echo $irep->can_edit_inventory()?'1':'0' ; ?>  ,
         has_dict_priv:      <?php echo $irep->has_dict_priv     ()?'1':'0' ; ?>
     } ,
-    users : [] ,
-    editors : [] ,
+    users:   [] ,
+    editors: [] ,
 
-    no_page_access_html :
+    no_page_access_html:
 '<br><br>' +
 '<center>' +
 '  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">' +
@@ -119,11 +119,11 @@ var app_config = {
 '  We\'re sorry! Our records indicate that your SLAC UNIX account has no proper permissions to access this page.' +
 '</div>' ,
 
-    select_app          : '<?=$select_app?>' ,
-    select_app_context1 : '<?=$select_app_context1?>' ,
+    select_app:          '<?=$select_app?>' ,
+    select_app_context1: '<?=$select_app_context1?>' ,
 
-    select_params : {
-        equipment_id : null
+    select_params: {
+        equipment_id: null
     }
 } ;
 
