@@ -212,7 +212,7 @@ function web_service_POST (url, params, on_success, on_failure) {
 
 function display_release_diff (release_data, cont) {
 
-    var base_url = 'https://pswww.slac.stanford.edu/trac/psdm/browser/psdm/' ;
+    var base_url = 'http://java.freehep.org/svn/repos/psdm/list/' ;
 
     // -- table of tags
 
@@ -391,9 +391,13 @@ function merge_tags (data) {
             'id'       => 'ana' ,
             'releases' => $releases['ana'] ) ,
         array (
-            'name'     => 'Data Management' ,
+            'name'     => 'Data Management (legacy)' ,
             'id'       => 'data' ,
             'releases' => $releases['data'] ) ,
+        array (
+            'name'     => 'Data Management' ,
+            'id'       => 'dm' ,
+            'releases' => $releases['dm'] ) ,
         array (
             'name'     => 'Web' ,
             'id'       => 'web' ,

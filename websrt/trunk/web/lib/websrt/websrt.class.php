@@ -6,11 +6,12 @@ require_once 'websrt/websrt.inc.php' ;
 
 class WebSrt {
 
-    public static $types = array ('ana', 'data', 'web') ;
+    public static $types = array ('ana', 'data', 'dm', 'web') ;
 
     public static $types2prefixes = array (
         'ana'  => 'ana-' ,
         'data' => '' ,
+        'dm'   => 'dm-' ,
         'web'  => 'web-'
     ) ;
 
