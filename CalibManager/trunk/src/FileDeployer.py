@@ -37,15 +37,20 @@ def get_list_of_deploy_commands_and_sources_dark(str_run_number, str_run_range):
 
     cp.str_run_number.setValue(str_run_number)
     #cp.blsp.print_list_of_types_and_sources()
-    list_of_types, list_of_sources, list_of_ctypes = cp.blsp.list_of_types_and_sources_for_selected_detectors()
-    # list_of_types  : ['CsPad::DataV1',    'CsPad::DataV1']
-    # list_of_sources: ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+    list_of_dtypes, list_of_sources, list_of_ctypes = cp.blsp.list_of_types_and_sources_for_selected_detectors()
+    # list_of_dtypes  : ['CsPad::DataV1',    'CsPad::DataV1']
+    # list_of_sources : ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+    # list_of_ctypes  : ['CsPad::CalibV1',   'CsPad::CalibV1']
 
-    list_of_deploy_commands  = get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_peds_ave(), 'pedestals', str_run_range)
-    list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_peds_rms(), 'pixel_rms', str_run_range)
+    #print 'list_of_dtypes  :', list_of_dtypes
+    #print 'list_of_sources:',  list_of_sources
+    #print 'list_of_ctypes :',  list_of_ctypes
+
+    list_of_deploy_commands  = get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_dtypes, list_of_sources, fnm.path_peds_ave(), 'pedestals', str_run_range)
+    list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_dtypes, list_of_sources, fnm.path_peds_rms(), 'pixel_rms', str_run_range)
 
     if cp.dark_deploy_hotpix.value() :
-        list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status', str_run_range)
+        list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_ctypes, list_of_dtypes, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status', str_run_range)
 
     return list_of_deploy_commands, list_of_sources
     

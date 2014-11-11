@@ -211,43 +211,57 @@ class BatchLogScanParser :
         if not self.scan_log_exists() : # Use RegDB
             ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
             lst_srcs = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+            dtype = cp.dict_of_det_data_types[det_name]
             ctype = cp.dict_of_det_calib_types[det_name]
-            lst_types = [ctype for src in lst_srcs]
-            return lst_types, lst_srcs
+            lst_dtypes = [dtype for src in lst_srcs]
+            lst_ctypes = [ctype for src in lst_srcs]
+            #print 'lst_ctypes ::: ', lst_ctypes
+            #print 'lst_dtypes ::: ', lst_dtypes
+            #print 'lst_srcs   ::: ', lst_srcs
+            return lst_dtypes, lst_srcs, lst_ctypes
 
         pattern_det = det_name.lower() + '.'
         pattern_type = self.dict_of_det_data_types[det_name]
         #print 'pattern_det, pattern_type', pattern_det, pattern_type
 
-        list_of_types_for_det=[]
+        list_of_ctypes_for_det=[]
+        list_of_dtypes_for_det=[]
         list_of_srcs_for_det=[]
         for type,src in self.get_list_of_type_sources() :
             #print '  type, src: %24s  %s' % (type,src)
             if type.find(pattern_type)       == -1 : continue
             if src.lower().find(pattern_det) == -1 : continue
-            list_of_types_for_det.append(type)
+            list_of_ctypes_for_det.append(cp.dict_of_det_calib_types[det_name])
+            list_of_dtypes_for_det.append(type)
             list_of_srcs_for_det.append(src)
         #print 'list of types and sources for detector %s:\n  %s\n  %s' \
         #      % (det_name, str(list_of_types_for_det), str(list_of_srcs_for_det))  
-        return list_of_types_for_det, list_of_srcs_for_det
+        return list_of_dtypes_for_det, list_of_srcs_for_det, list_of_ctypes_for_det
 
 
 
     def list_of_types_and_sources_for_selected_detectors (self) :
-        """Returns the list of types and sources in run for selected detector.
+        """Returns the list of data types, sources, and calib types in run for selected detector.
         For example, for CSPAD returns
         ['CsPad::DataV2',    'CsPad::DataV2'],
-        ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+        ['CxiDs1.0:Cspad.0', 'CxiDs2.0:Cspad.0']
+        ['CsPad::CalibV1',   'CsPad::CalibV1'],
         """
         lst_ctypes = []
         lst_types  = []
         lst_srcs   = []
 
         for det_name in cp.list_of_dets_selected() :
-            lst_t, lst_s = self.list_of_types_and_sources_for_detector(det_name)
-            lst_ctypes.append(cp.dict_of_det_calib_types[det_name])
+            lst_t, lst_s, lst_c = self.list_of_types_and_sources_for_detector(det_name)
+
+            #print 'lst_t: ', lst_t
+            #print 'lst_s: ', lst_s
+            #print 'lst_c: ', lst_c
+
+            lst_ctypes += lst_c
             lst_types += lst_t
             lst_srcs += lst_s
+
         return lst_types, lst_srcs, lst_ctypes
 
 

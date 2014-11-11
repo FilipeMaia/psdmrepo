@@ -136,7 +136,7 @@ class ConfigFileGenerator :
         self.ind = 0
 
         for det_name in cp.list_of_dets_selected() :
-            lst_types, lst_srcs = cp.blsp.list_of_types_and_sources_for_detector(det_name)
+            lst_types, lst_srcs, lst_ctypes = cp.blsp.list_of_types_and_sources_for_detector(det_name)
             list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst_srcs)
             list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst_srcs)
             list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst_srcs)
