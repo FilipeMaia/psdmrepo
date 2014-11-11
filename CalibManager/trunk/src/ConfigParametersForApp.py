@@ -376,7 +376,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Epix::CalibV1',
                                     'Epix10k::CalibV1',
                                     'Epix100a::CalibV1',
-                                    'Fccd960::CalibV1',
+                                    'Camera::CalibV1',
                                     'Acqiris::CalibV1']
         self.dict_of_det_calib_types = dict( zip(self.list_of_dets, self.list_of_calib_types) )
         #self.print_dict_of_det_calib_types()

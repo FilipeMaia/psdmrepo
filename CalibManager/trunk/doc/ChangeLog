@@ -13,6 +13,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2014-11-11 Mikhail S. Dubrovin
+Tag: V00-00-72
+- ConfigParametersForApp - use Camera::CalibV1 calibration type for Fccd960 in stead of Fccd960::CalibV1 (PSAS-44)
+
+2014-11-11 Mikhail S. Dubrovin
 Tag: V00-00-71
 - FileDeployer.py, ConfigFileGenerator.py, BatchLogScanParser.py - fix problem with generation of list of calib types (PSAS-6)
 	
