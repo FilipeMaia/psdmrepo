@@ -107,7 +107,7 @@ void GenericCalibPars<TBASE>::init()
   if( m_print_bits & 1 ) printInputPars();
   if( m_print_bits & 16) printCalibTypes(); // method from superclass
   m_prbits_cff  = ( m_print_bits &  2 ) ? 0377 : 0;
-  m_prbits_type = ( m_print_bits & 32 ) ?    1 : 0;
+  m_prbits_type = ( m_print_bits & 32 ) ? 0377 : 0;
 }
 
 //----------------
@@ -128,7 +128,7 @@ std::string GenericCalibPars<TBASE>::getCalibFileName (const CALIB_TYPE& calibty
 
   if( m_print_bits & 4 ) MsgLog(m_name, info, "Use calibration parameters from file: " << fname);
   if( m_print_bits & 8 && fname.empty() )
-       MsgLog(m_name, info, "File for calibration type " << map_type2str[calibtype]
+       MsgLog(m_name, warning, "File for calibration type " << map_type2str[calibtype]
 	      << " IS MISSING! Use default calibration parameters on your own risk..."); 
 
   return fname;
@@ -236,7 +236,7 @@ GenericCalibPars<TBASE>::size_of_ndarray()
   else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().size();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().size();
 
-  MsgLog(m_name, error, "CAN'T RETURN SIZE of non-loaded ndarray"); 
+  if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SIZE of non-loaded ndarray"); 
   return TBASE::Size;
 }
 
@@ -252,7 +252,7 @@ GenericCalibPars<TBASE>::shape_of_ndarray()
   else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().shape();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().shape();
  
-  MsgLog(m_name, error, "CAN'T RETURN SHAPE of non-loaded ndarray");
+  if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SHAPE of non-loaded ndarray");
   return TBASE::shape_base(); 
 }
 

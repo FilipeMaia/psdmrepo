@@ -165,37 +165,37 @@ public:
 	// Generic approach to calibration 
 
         if ( str_src.find(":Cspad.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPadBaseV2>(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":Cspad2x2.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad2x2 source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad2x2 source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad2x2::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPad2x2BaseV2>(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":pnCCD.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for pnCCD source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for pnCCD source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "PNCCD::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV1>(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":Princeton.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for Princeton source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Princeton source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Princeton::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":Andor.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for Andor source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Andor source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Andor::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>(calibdir, type_group, src, runnum, prbits);
 	}
 
         if ( str_src.find(":Epix100a.") != std::string::npos ) {
-           MsgLog("CalibParsStore", info, "Get access to calibration store for Epix100a source: " << str_src);
+           if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Epix100a source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Epix100a::CalibV1" : group;
 	   return new PSCalib::GenericCalibPars<pdscalibdata::Epix100aBaseV1>(calibdir, type_group, src, runnum, prbits);
 	}
@@ -211,14 +211,15 @@ public:
 
 	for (std::vector<std::string>::iterator it = v_camera_names.begin(); it != v_camera_names.end(); ++it) {
           if ( str_src.find(*it) != std::string::npos ) {
-            MsgLog("CalibParsStore", info, "Get access to calibration store for " << *it << " source: " << str_src);
 	    std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;
+            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for det " << *it 
+                                           << " source: " << str_src << " group: " << type_group);
 	    return new PSCalib::GenericCalibPars<pdscalibdata::VarShapeCameraBaseV1>(calibdir, type_group, src, runnum, prbits);
 	    //return new PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>(calibdir, type_group, src, runnum, prbits);
 	  }
 	}
 
-	std::string msg =  "Calibration parameters for source: " + str_src + " are not implemented yet...";
+	std::string msg = "Calibration parameters for source: " + str_src + " are not implemented yet...";
         MsgLog("CalibParsStore", error, msg);  
 
         abort();

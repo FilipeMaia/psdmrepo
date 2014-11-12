@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-23
+2014-11-11 Mikhail S. Dubrovin	
+- CalibParsStore.h, GenericCalibPars.cpp - improve all info-printout under control of print_bits (PSAS-44)
+	
 Tag: V00-02-22
 2014-11-06 Mikhail S. Dubrovin	
 - GeometryAccess(.cpp and .py) - in file input add protection for non-complete comment string (PSAS-11)
