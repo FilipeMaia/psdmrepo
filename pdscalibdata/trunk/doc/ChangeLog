@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-22
+2014-11-11 Mikhail S. Dubrovin
+- GlobalMethods - add method strDataTypeForEnum(...); NDArrIOV1.cpp - improve output supression
+	
 Tag: V00-05-21
 2014-11-05 Mikhail S. Dubrovin
 - add Epix100aBaseV1.h

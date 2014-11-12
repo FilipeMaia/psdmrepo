@@ -145,8 +145,8 @@ bool NDArrIOV1<TDATA, NDIM>::file_is_available()
 
   std::ifstream file(m_fname.c_str());
   if(!file.good()) {
-      if( m_print_bits & 8 ) MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST! Use default calibration parameters.");
-      return false;
+    if( m_print_bits & 8 ) MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST! Use default calibration parameters.");
+    return false;
   }
   file.close();
   return true;  
@@ -166,15 +166,16 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
     ss >> field;
 
     if (field=="DTYPE") { 
-       ss >> m_str_type;
-       m_enum_type = enumDataTypeForString(m_str_type);
+      ss >> m_str_type;
+      m_enum_type = enumDataTypeForString(m_str_type);
 
-       if (m_enum_type != enumDataType<TDATA>()) {
-	   std::stringstream smsg; 
-	   smsg << "(enum) DTYPE in file metadata: " << m_enum_type 
-                << " is different from declaration: " << enumDataType<TDATA>();
-           MsgLog(__name__(), warning, smsg.str());
-       }
+      if( m_print_bits & 32 )
+        if (m_enum_type != enumDataType<TDATA>()) {
+          std::stringstream smsg; 
+          smsg << "(enum) DTYPE in file metadata (" << strDataTypeForEnum(m_enum_type)
+               << ") is different from expected (" << strDataTypeForEnum(enumDataType<TDATA>()) << ")";
+          MsgLog(__name__(), warning, smsg.str());
+        }
     }
 
     else if (field=="NDIM") {

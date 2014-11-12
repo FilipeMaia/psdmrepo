@@ -102,6 +102,24 @@ enumDataTypeForString(std::string str_type)
 
 //--------------------
 
+std::string strDataTypeForEnum(DATA_TYPE enum_type)
+{
+    if      (enum_type == FLOAT   ) return std::string("float");  
+    else if (enum_type == DOUBLE  ) return std::string("double"); 
+    else if (enum_type == SHORT   ) return std::string("short");  
+    else if (enum_type == UNSIGNED) return std::string("unsigned");
+    else if (enum_type == INT     ) return std::string("int");    
+    else if (enum_type == INT16   ) return std::string("int16_t");
+    else if (enum_type == INT32   ) return std::string("int32_t");
+    else if (enum_type == UINT    ) return std::string("unsigned");   
+    else if (enum_type == UINT8   ) return std::string("uint8_t");
+    else if (enum_type == UINT16  ) return std::string("uint16_t");
+    else if (enum_type == UINT32  ) return std::string("uint32_t");
+    else return std::string("non-implemented");
+}
+
+//--------------------
+
 float 
 findCommonMode(const double* pars,
                const int16_t* sdata,
@@ -230,6 +248,7 @@ std::string strEnvVar(const std::string& str)
   if (var!=NULL) return std::string (var);
   else           return str + " IS NOT DEFINED!";
 }
+
 
 //--------------------
 //--------------------
