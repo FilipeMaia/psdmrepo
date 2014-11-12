@@ -236,11 +236,13 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
   //std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
   std::string calib_dir = env.calibDir();
 
-  MsgLog(name(), info, "Calibration directory: " << calib_dir);
+  if( m_print_bits & 2 ) MsgLog(name(), info, "Calibration directory: " << calib_dir);
   std::string m_group = std::string(); // for ex: "PNCCD::CalibV1";
-  m_calibpars = PSCalib::CalibParsStore::Create(calib_dir, m_group, m_src, getRunNumber(evt));
+  unsigned prbits = (m_print_bits & 2) ? 255 : 0;
 
-  if( m_print_bits & 2 ) m_calibpars->printCalibPars();
+  m_calibpars = PSCalib::CalibParsStore::Create(calib_dir, m_group, m_src, getRunNumber(evt), prbits);
+
+  //if( m_print_bits & 2 ) m_calibpars->printCalibPars();
 
   m_peds_data = (m_do_peds) ? m_calibpars->pedestals()    : 0;
   m_gain_data = (m_do_gain) ? m_calibpars->pixel_gain()   : 0;

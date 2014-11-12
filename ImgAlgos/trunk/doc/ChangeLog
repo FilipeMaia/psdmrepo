@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-69
+2014-11-11 Mikhail S. Dubrovin
+- NDArrCalib.cpp - improve all info printout under control of print_bits (PSAS-44) 
+	
 Tag: V00-03-68
 2014-11-10 Mikhail S. Dubrovin
 - CameraImageProducer - For FCCD960 apply gain-bit factor 1,2,8 if outtype!='asdata' (PSAS-44)
