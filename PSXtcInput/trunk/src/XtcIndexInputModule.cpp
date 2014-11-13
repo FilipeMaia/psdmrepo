@@ -51,6 +51,12 @@ XtcIndexInputModule::XtcIndexInputModule (const std::string& name)
   // DgramSourceIndex that we give to XtcInputModuleBase.
   boost::shared_ptr<DgramSourceIndex> dgSourceIndex = boost::dynamic_pointer_cast<DgramSourceIndex>(m_dgsource);
   dgSourceIndex->setQueue(_queue);
+
+  // disable features not supported by indexing
+  m_skipEvents = 0;
+  m_maxEvents = 0;
+  m_skipEpics = false;
+  m_l3tAcceptOnly = false;
 }
 
 //--------------

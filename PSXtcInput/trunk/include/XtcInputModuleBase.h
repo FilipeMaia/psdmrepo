@@ -122,10 +122,16 @@ private:
   std::vector<XtcInput::Dgram> m_putBack;             ///< Buffer for put-back datagrams
   psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
+
+protected:
+  /// Protected to allow specific input modules to ignore settings they
+  /// don't support
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
+
+private:
   int m_firstControlStream;                           ///< Starting index of control streams
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   long m_eventTagEpicsStore;                          ///< counter to pass to epicsStore

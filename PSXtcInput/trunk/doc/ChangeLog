@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-11-12 Christopher O'Grady
+- Disable some XtcInputModuleBase features not supported by indexing.
+  No tag until Dimosthenis confirms it fixes the problem he observes.
+
 Tag: V00-15-07
 2014-11-06 Christopher O'Grady
 - Handle case where last calibcycle in a run has no events.
