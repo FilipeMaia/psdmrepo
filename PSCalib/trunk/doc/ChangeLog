@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-24
+2014-11-13 Mikhail S. Dubrovin	
+- CalibParsStore.h - extend conditional output prbits up to 255
+- GenericCalibPars.cpp - improve conditional output (PSAS-44)
+	
 Tag: V00-02-23
 2014-11-11 Mikhail S. Dubrovin	
 - CalibParsStore.h, GenericCalibPars.cpp - improve all info-printout under control of print_bits (PSAS-44)

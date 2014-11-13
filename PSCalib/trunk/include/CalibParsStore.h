@@ -209,6 +209,8 @@ public:
 	v_camera_names.push_back(":OrcaFl40.");
 	v_camera_names.push_back(":Fccd960.");
 
+        prbits = (print_bits & 8) ? 255 : 0;
+
 	for (std::vector<std::string>::iterator it = v_camera_names.begin(); it != v_camera_names.end(); ++it) {
           if ( str_src.find(*it) != std::string::npos ) {
 	    std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;

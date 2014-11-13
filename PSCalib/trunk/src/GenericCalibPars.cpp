@@ -142,6 +142,7 @@ GenericCalibPars<TBASE>::pedestals()
 {
   if (m_pedestals == 0) {
       std::string fname = getCalibFileName(PEDESTALS);
+      //cout << "T: pedestals: " << fname << " size()=" << size() << '\n';
       if (size()) m_pedestals = new NDAIPEDS(fname, shape(), pedestals_t(0), m_prbits_type);
       else        m_pedestals = new NDAIPEDS(fname, m_prbits_type);
   }
@@ -156,7 +157,10 @@ GenericCalibPars<TBASE>::pixel_status()
 {
   if (m_pixel_status == 0) {
       std::string fname = getCalibFileName(PIXEL_STATUS);
-      if (size()) m_pixel_status = new NDAISTATUS(fname, shape(), pixel_status_t(1), m_prbits_type);
+      const CalibPars::shape_t* p_sha = shape();
+      //cout << "T: pixel_status: " << fname << " size()=" << size() << '\n';
+      //cout << "T: shape_nda() : [" << p_sha[0] << "," << p_sha[1] << "]\n";
+      if (size()) m_pixel_status = new NDAISTATUS(fname, p_sha, pixel_status_t(1), m_prbits_type);
       else        m_pixel_status = new NDAISTATUS(fname, m_prbits_type);
   }
   return m_pixel_status->get_ndarray().data();
@@ -210,8 +214,10 @@ template <typename TBASE>
 const size_t
 GenericCalibPars<TBASE>::size() 
 { 
-  if(TBASE::Size) return TBASE::Size; 
-  else return size_of_ndarray();
+  const size_t size_nda = size_of_ndarray();
+  //cout << "T: TBASE::Size : " << TBASE::Size << '\n';
+  //cout << "T: size_nda()  : " << size_nda << '\n';
+  return (size_nda) ? size_nda : TBASE::Size;
 }
 
 //----------------
@@ -221,8 +227,7 @@ const CalibPars::shape_t*
 //const unsigned*
 GenericCalibPars<TBASE>::shape()
 { 
-  if(TBASE::Size) return TBASE::shape_base(); 
-  else return shape_of_ndarray();
+  return (size_of_ndarray()) ? shape_of_ndarray() : TBASE::shape_base(); 
 }
 
 //----------------
@@ -316,15 +321,15 @@ void GenericCalibPars<TBASE>::loadAllCalibPars ()
 template <typename TBASE> 
 void GenericCalibPars<TBASE>::printCalibParsStatus ()
 {
-  loadAllCalibPars ();
+  //loadAllCalibPars ();
 
-  std::stringstream smsg; smsg << "\n  printCalibParsStatus():"
-      << "\n  pedestals    : " << m_pedestals    -> str_status()
-      << "\n  pixel_status : " << m_pixel_status -> str_status()
-      << "\n  pixel_gain   : " << m_pixel_gain   -> str_status()
-      << "\n  pixel_rms    : " << m_pixel_rms    -> str_status()
-      << "\n  common_mode  : " << m_common_mode  -> str_status();
-  MsgLog(m_name, info, smsg.str());
+    std::stringstream smsg; smsg << "\n  printCalibParsStatus():";
+    if (m_pedestals)    smsg << "\n  pedestals    : " << m_pedestals    -> str_status();
+    if (m_pixel_status) smsg << "\n  pixel_status : " << m_pixel_status -> str_status();
+    if (m_pixel_gain)   smsg << "\n  pixel_gain   : " << m_pixel_gain   -> str_status();
+    if (m_pixel_rms)    smsg << "\n  pixel_rms    : " << m_pixel_rms    -> str_status();
+    if (m_common_mode)  smsg << "\n  common_mode  : " << m_common_mode  -> str_status();
+    MsgLog(m_name, info, smsg.str());
 }
 
 //----------------
@@ -332,15 +337,18 @@ void GenericCalibPars<TBASE>::printCalibParsStatus ()
 template <typename TBASE> 
 void GenericCalibPars<TBASE>::printCalibPars()
 {
-    loadAllCalibPars ();
+  //loadAllCalibPars ();
+    printInputPars();
+    printCalibParsStatus ();
 
-    std::stringstream smsg; smsg << "\n  printCalibPars():"
-        << "\n  shape = ["       << m_pedestals    -> str_shape() << "]"
-    	<< "\n  pedestals    : " << m_pedestals    -> str_ndarray_info()
-    	<< "\n  pixel_status : " << m_pixel_status -> str_ndarray_info()
-    	<< "\n  pixel_gain   : " << m_pixel_gain   -> str_ndarray_info()
-        << "\n  pixel_rms    : " << m_pixel_rms    -> str_ndarray_info()
-        << "\n  common_mode  : " << m_common_mode  -> str_ndarray_info();
+    std::stringstream smsg; smsg << "\n  printCalibPars():";
+    if (m_pedestals) {  smsg << "\n  shape = ["       << m_pedestals    -> str_shape() << "]"
+                             << "\n  pedestals    : " << m_pedestals    -> str_ndarray_info();
+    }
+    if (m_pixel_status) smsg << "\n  pixel_status : " << m_pixel_status -> str_ndarray_info();
+    if (m_pixel_gain)   smsg << "\n  pixel_gain   : " << m_pixel_gain   -> str_ndarray_info();
+    if (m_pixel_rms)    smsg << "\n  pixel_rms    : " << m_pixel_rms    -> str_ndarray_info();
+    if (m_common_mode)  smsg << "\n  common_mode  : " << m_common_mode  -> str_ndarray_info();
     MsgLog(m_name, info, smsg.str());
 }
 
