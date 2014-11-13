@@ -167,12 +167,12 @@ namespace pdscalibdata {
 template <typename TDATA, unsigned NDIM> // stands for something like ndarray<TDATA, NDIM>
 class NDArrIOV1 {
 
-  static const unsigned int c_ndim = NDIM;
+  static const unsigned c_ndim = NDIM;
 
 public:
 
   typedef TDATA data_t;
-  typedef unsigned int shape_t;
+  typedef unsigned shape_t;
 
 
   /// Constructors have different default initialization
@@ -217,7 +217,8 @@ public:
   /**
    *  @param[in] fname std::string file name
    */ 
-  ndarray<const TDATA, NDIM> get_ndarray(const std::string& fname = std::string());
+  ndarray<TDATA, NDIM>& get_ndarray(const std::string& fname = std::string());
+  //ndarray<const TDATA, NDIM>& get_ndarray(const std::string& fname = std::string());
 
   /// returns string with status of calibration constants
   std::string& str_status() { return m_status; }

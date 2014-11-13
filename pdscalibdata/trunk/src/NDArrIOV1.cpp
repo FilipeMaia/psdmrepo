@@ -60,7 +60,11 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   , m_ctor(1)
 {
   init();
-  std::memcpy (m_shape, shape_def, c_ndim*sizeof(shape_t));  
+  std::memcpy (&m_shape[0], shape_def, c_ndim*sizeof(shape_t));  
+  //for(unsigned i=0; i<c_ndim; ++i) m_shape[i] = shape_def[i];
+  //cout << "TIOV1: shape_def : [" << shape_def[0] << "," << shape_def[1] << "]\n";
+  //cout << "TIOV1: m_shape   : [" << m_shape[0] << "," << m_shape[1] << "]\n";
+
 }
 
 //-----------------------------
@@ -77,7 +81,7 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   , m_ctor(2)
 {
   init();
-  std::memcpy (m_shape, nda_def.shape(), c_ndim*sizeof(shape_t));  
+  std::memcpy (&m_shape[0], nda_def.shape(), c_ndim*sizeof(shape_t));  
 }
 
 //-----------------------------
@@ -85,7 +89,10 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::init()
 {
-  if( m_print_bits & 2 ) MsgLog(__name__(), info, "ctor:" << m_ctor << ", fname=" << m_fname);
+  if( m_print_bits & 2 ) {
+    MsgLog(__name__(), info, "ctor:" << m_ctor << ", fname=" << m_fname);
+    print();
+  }
 }
 
 //-----------------------------
@@ -207,7 +214,7 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 	        << " is different from expected " << m_shape[dim] 
                 << " in file " << m_fname
 	        << "\nCheck that calibration file has expected shape and data...";
-           MsgLogRoot(error, smsg.str());
+           MsgLogRoot(warning, smsg.str());
            throw std::runtime_error(smsg.str());
 	   // override or not ?
 	   //m_shape[dim] = val;
@@ -288,7 +295,8 @@ void NDArrIOV1<TDATA, NDIM>::load_data(std::ifstream& in, const std::string& str
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
-ndarray<const TDATA, NDIM> 
+//ndarray<const TDATA, NDIM>& 
+ndarray<TDATA, NDIM>& 
 NDArrIOV1<TDATA, NDIM>::get_ndarray(const std::string& fname)
 {
   if (!fname.empty() and fname != m_fname) {

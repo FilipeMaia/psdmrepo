@@ -11,9 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-23
+2014-11-13 Mikhail S. Dubrovin
+- NDArrIOV1 - get_ndarray() now returns reference in stead of ndarray; improve conditional output for debugging (PSAS-44).
+	
 Tag: V00-05-22
 2014-11-11 Mikhail S. Dubrovin
-- GlobalMethods - add method strDataTypeForEnum(...); NDArrIOV1.cpp - improve output supression
+- GlobalMethods - add method strDataTypeForEnum(...); NDArrIOV1.cpp - improve output supression (PSAS-44)
 	
 Tag: V00-05-21
 2014-11-05 Mikhail S. Dubrovin
