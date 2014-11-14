@@ -116,22 +116,27 @@ protected:
   /// Protected since the Indexing input module needs access to it.
   boost::shared_ptr<IDatagramSource> m_dgsource;      ///< Datagram source instance
 
+  /// Protected to allow specific input modules to ignore settings they
+  /// don't support
+  void skipEvents(unsigned long nskip) {m_skipEvents = nskip;}
+  void maxEvents(unsigned long nmax)   {m_maxEvents = nmax;}
+  void skipEpics(bool skip)            {m_skipEpics = skip;}
+  void l3tAcceptOnly(bool l3tAccept)   {m_l3tAcceptOnly = l3tAccept;}
+  unsigned long skipEvents() const     {return m_skipEvents;}
+  unsigned long maxEvents()  const     {return m_maxEvents;}
+  bool skipEpics()           const     {return m_skipEpics;}
+  bool l3tAcceptOnly()       const     {return m_l3tAcceptOnly;}
+
 private:
 
   DamagePolicy m_damagePolicy;                        ///< Policy instance for damage data
   std::vector<XtcInput::Dgram> m_putBack;             ///< Buffer for put-back datagrams
   psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
-
-protected:
-  /// Protected to allow specific input modules to ignore settings they
-  /// don't support
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
-
-private:
   int m_firstControlStream;                           ///< Starting index of control streams
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   long m_eventTagEpicsStore;                          ///< counter to pass to epicsStore

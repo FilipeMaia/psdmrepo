@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSXtcInput/DgramSourceIndex.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -37,6 +38,10 @@ PSANA_INPUT_MODULE_FACTORY(XtcIndexInputModule)
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
+
+namespace {
+  const char* logger = "PSXtcInput::XtcIndexInputModule";
+}
 
 namespace PSXtcInput {
 
@@ -53,10 +58,16 @@ XtcIndexInputModule::XtcIndexInputModule (const std::string& name)
   dgSourceIndex->setQueue(_queue);
 
   // disable features not supported by indexing
-  m_skipEvents = 0;
-  m_maxEvents = 0;
-  m_skipEpics = false;
-  m_l3tAcceptOnly = false;
+  if (skipEvents()!=0) {
+    MsgLog(logger, warning, "Skip-events option not supported by indexing input module");
+    skipEvents(0);
+  }
+  if (maxEvents()!=0) {
+    MsgLog(logger, warning, "Max-events option not supported by indexing input module");
+    maxEvents(0);
+  }
+  if (skipEpics()) skipEpics(false);
+  if (l3tAcceptOnly()) l3tAcceptOnly(false);
 }
 
 //--------------
