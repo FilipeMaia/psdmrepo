@@ -80,6 +80,7 @@ def main():
                         help="checkall experiments. By default check only the active experiments.")
     parser.add_argument('--agereg', type=int, default=90, 
                         help="Select only experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
+    parser.add_argument('--scratchpath', default="/reg/data/ana04", help="Set ana path for scratch, res,...")
     parser.add_argument('sel_exper', nargs='*', help="list of experiments to check") 
     parser.add_argument("--verbose", "-v", action='count', default=0)
 
@@ -101,7 +102,8 @@ def main():
         gen = active_experiments()
         dirs_to_check = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
 
-
+    print(args.scratchpath)
+    return
     nexp, nmissing, nset = 0,0,0
     for expname, instr in gen:
         logging.debug("Exp %s %s", expname, instr)
@@ -128,6 +130,7 @@ def main():
             nset += 1
             print("Create dirs")
             exper = experiment.Experiment(name=expname)
+            exper.scratch_path = args.scratchpath 
             exper_folders.check_all_destpath(exper, missing_dirs)
     
         

@@ -37,6 +37,7 @@ class Experiment(object):
 
         self.instr = src.instr4id(expID)
         self.instr_lower = self.instr.lower()
+        self.scratchpath = None
 
     def __getattr__(self, attr):
         if attr in self.info:
@@ -47,12 +48,16 @@ class Experiment(object):
     @property
     def scratch_datapath(self):
         if self.instr_lower in ("cxi", "mec", "xcs", "mob"):
-            return "/reg/data/ana14"
+            return self.scratchpath if self.scratchpath else "/reg/data/ana14" 
         elif self.instr_lower in ("amo", "sxr", "xpp", "dia", "usr"):
-            return "/reg/data/ana04"
-    
+            return self.scratchpath if self.scratchpath else "/reg/data/ana04" 
+
         raise NameError("Could not get scratch anapath for %s" % instr)
 
+    @scratch_datapath.setter
+    def scratch_datapath(self, value):
+        self.scratchpath = value
+        
 
 class ExperimentInfo(object):
     """ Names and path-names for an experiment 
