@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-24
+2014-11-15 Mikhail S. Dubrovin	
+- In all *BaseV*.h classes add method size_base() in order to resolve compilation with dbg problem (PSAS-67)
+
 Tag: V00-05-23
 2014-11-13 Mikhail S. Dubrovin
 - NDArrIOV1 - get_ndarray() now returns reference in stead of ndarray; improve conditional output for debugging (PSAS-44).

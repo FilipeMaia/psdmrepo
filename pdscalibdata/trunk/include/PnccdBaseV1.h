@@ -54,6 +54,7 @@ public:
  
   const shape_t* shape_base() { return &m_shape[0]; }
   const cmod_t*  cmod_base()  { return &m_cmod[0]; }
+  const size_t   size_base()  { return Size; }
 
   ~PnccdBaseV1 () {};
 
