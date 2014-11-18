@@ -53,6 +53,9 @@ fi
 _remove_from_path () { 
     # 1. split original path at : into separate lines
     # 2. filter out matching lines and empty lines
+    #    if a path matches a relative pattern (e.g. .*/arch/[^/]*/lib/*)
+    #    split the path up to arch and check if a .sit_release exists in which
+    #    case the path is removed. 
     # 3. replace newlines with :
     # 4. strip trailing :
 
@@ -60,8 +63,8 @@ _remove_from_path () {
       awk -v pat="^$2\$" ' \
           $1 ~ pat  {
               if ( substr(pat,2,1) != "/" ) {
-                  where = match($1,/.*\/arch/, arr)
-                  cmd="test -e " arr[0]"/../.sit_release"
+                  where = match($1,/(.*)(\/arch)/, arr)
+                  cmd="test -e " arr[1]"/.sit_release"
                   rc = system(cmd)
                   if ( rc != 0 )
                       print $1
