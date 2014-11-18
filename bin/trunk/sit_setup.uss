@@ -11,6 +11,7 @@
 #    -b build     - define build type explicitely
 #    -a name      - define SIT_ARCH explicitely
 #    -e env       - override SIT_ENV
+#    -s           - strict mode. Exit if unknown cmdline options are found
 #
 
 # +++++++++ few adjustible parameters +++++++++
@@ -122,7 +123,7 @@ sit_arch=""
 sit_env=""
 
 # get the options
-while getopts p:o:c:b:a:e: c ; do
+while getopts p:o:c:b:a:e:s c ; do
     case $c in
         p) proc="$OPTARG" ;;
         o) os="$OPTARG" ;;
@@ -130,6 +131,7 @@ while getopts p:o:c:b:a:e: c ; do
         b) build="$OPTARG" ;;
         a) sit_arch="$OPTARG" ;;
         e) sit_env="$OPTARG" ;;
+        s) strict=1 ;;
         \?) exit 2 ;;
     esac
 done
@@ -154,19 +156,17 @@ test -n "$SIT_SVN_USER" || set_env SIT_SVN_USER "https://pswww.slac.stanford.edu
 
 unset_env SIT_RELEASE
 if [ -n "$1" ] ; then
-    if [ "$1" = "nobase" -o -d "$SIT_RELDIR/$1" ] ; then
+    if [ "$1" = "nobase" -o -f "$SIT_RELDIR/$1/.sit_release" ] ; then
         set_env SIT_RELEASE "$1"
         shift 1
     fi
 fi
 if [ -z "${SIT_RELEASE}" ] ; then
-    if [ -n "$1" ] ; then
-        if [ -f ${1}/.sit_release ] ; then
-            usrel=$1
-            shift 1
-        fi
-    else
-        [ -f .sit_release ] && usrel=./
+    if [ -n "$1" ] && [ -f ${1}/.sit_release ] ; then
+        usrel=$1
+        shift 1
+    elif [ -f .sit_release ] ; then
+        usrel=./
     fi
     if [ -n "${usrel}" ] ; then
         usrel=$(abspath ${usrel})
@@ -177,7 +177,7 @@ if [ -z "${SIT_RELEASE}" ] ; then
             # if .sit_release points to non-existing release it means new production
             set_env SIT_RELEASE "nobase"
         fi
-        [[ ${usrel} = "${SIT_RELDIR}/${rel}" ]] && usrel=""
+        [[ "${usrel}" = "${SIT_RELDIR}/${rel}" ]] && usrel=""
     fi
 fi
 
@@ -187,7 +187,7 @@ if [ -z "$SIT_RELEASE" -a -r "${HOME}/SIT_RELEASE" ] ; then
 fi
 if [ -z "$SIT_RELEASE" ] ; then
     if [ "$SIT_ENV" = "default" ] ; then
-        set_env SIT_RELEASE current
+        set_env SIT_RELEASE dm-current
     else
         set_env SIT_RELEASE ${SIT_ENV}-current
     fi
@@ -303,10 +303,12 @@ if [ -z "$sit_arch" -a -z "$build" ] ; then
     fi
 fi
 
-
 # check there are no unused options in command line
 unused=`set_subtract $options $used_options`
-test -z "$unused" || warn "Warning unrecognized command line arguments:" $unused 
+if [ -n "$unused" ] ; then
+    [ -n "$strict" ] && err "Error unrecognized command line arguments:" $unused 
+    warn "Warning unrecognized command line arguments:" $unused 
+fi
 
 # define architecture
 if [ -z "$sit_arch" ] ; then
@@ -390,10 +392,10 @@ has_pyextra="no"
 # for releases without base (these are brand new releases) assume that they all have pyextra links, 
 # otherwise check base release for pyextra and current release too
 test "$SIT_RELEASE" = "nobase" -o -e "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra" && has_pyextra="yes"
-[ -n ${usrel} ] && test -d "./pyextra" && has_pyextra="yes"
+[ -n "${usrel}" ] && test -d "./pyextra" && has_pyextra="yes"
 if [ $has_pyextra = "yes" ]; then
     test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python/pyextra"
-    [ -n ${usrel} ] && prepend_path PYTHONPATH "${usrel}/arch/$SIT_ARCH/python/pyextra"
+    [ -n "${usrel}" ] && prepend_path PYTHONPATH "${usrel}/arch/$SIT_ARCH/python/pyextra"
 else
     # we have a directory with extra Python modules, add it to PATH and PYTHONPATH
     prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python$pyver/site-packages"
@@ -403,13 +405,12 @@ test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELE
 
 [ -n "${usrel}" ] && prepend_path PYTHONPATH "${usrel}/arch/$SIT_ARCH/python"
 
-
 # extend SIT_DATA
 set_env SIT_DATA "$SIT_ROOT/data"
 test "$SIT_RELEASE" = "nobase" || prepend_path SIT_DATA "$SIT_RELDIR/$SIT_RELEASE/data"
 test -d "$SIT_ROOT/data/_override" && prepend_path SIT_DATA "$SIT_ROOT/data/_override"
 test -d "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE" && prepend_path SIT_DATA "$SIT_ROOT/data/_override/_releases/$SIT_RELEASE"
-[[ -n ${usrel} ]] && prepend_path SIT_DATA "${usrel}/data"
+[[ -n "${usrel}" ]] && prepend_path SIT_DATA "${usrel}/data"
 
 # if there is no base release but .sit_release is there then use it
 if [ "$SIT_RELEASE" = "nobase" ]; then
