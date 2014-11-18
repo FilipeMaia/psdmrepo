@@ -354,7 +354,7 @@ else
         # potentially this may need update to LD_LIBRARY_PATH as well,
         # but for now I know that we build python with correct RPATH
         test -n "$pypath" && prepend_path PATH "$pypath"
-  fi    
+    fi    
 fi
 
 # on rhel5 add OpenMPI library location
