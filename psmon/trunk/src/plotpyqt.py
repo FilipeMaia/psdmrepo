@@ -137,6 +137,8 @@ class ImageClient(Plot):
         if self.info.zrange is not None:
             self.cb.setLevels(*self.info.zrange)
             self.cb.setHistogramRange(*self.info.zrange)
+        else:
+            self.cb.setHistogramRange(*self.cb.getLevels())
 
         self.plot_view.addItem(self.im)
         self.fig_win.addItem(self.cb)
