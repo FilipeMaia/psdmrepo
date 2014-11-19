@@ -121,7 +121,7 @@ class ImageClient(Plot):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         self.set_aspect()
-        self.im = pg.ImageItem(image=init_im.image, border=config.PYQT_BORDERS)
+        self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)
 
         # Setting up the color map to use
@@ -140,16 +140,17 @@ class ImageClient(Plot):
         else:
             self.cb.setHistogramRange(*self.cb.getLevels())
 
+        if config.PYQT_USE_ALT_IMG_ORIGIN:
+            self.plot_view.invertY()
         self.plot_view.addItem(self.im)
         self.fig_win.addItem(self.cb)
-        #print self.plot_view.getViewBox().getState()
 
     def update_sub(self, data):
         """
         Updates the data in the image - none means their was no update for this interval
         """
         if data is not None:
-            self.im.setImage(data.image, autoLevels=False)
+            self.im.setImage(data.image.T, autoLevels=False)
         return self.im
 
 
