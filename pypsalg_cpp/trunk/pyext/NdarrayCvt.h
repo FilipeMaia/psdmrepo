@@ -30,6 +30,8 @@ using namespace boost::python;
 #define ND_RANKS (1)(2)(3)(4)(5)(6)
 #define ND_TYPES (int8_t)(uint8_t)(int16_t)(uint16_t)(int32_t)(uint32_t)(int64_t)(uint64_t)(float)(double)
 
+namespace psana_python {
+
 namespace {
 
   // type traits for selected set of C++ types that we support as
@@ -242,7 +244,7 @@ struct NDArrayToNumpy
 
     // Check NDArray is C array 
     // For now, use function from NdarrayCvt.h
-    if (::isCArray<Rank>(array.shape(),array.strides())) {
+    if (psana_python::isCArray<Rank>(array.shape(),array.strides())) {
       flags |= NPY_ARRAY_C_CONTIGUOUS;    
       
     }
@@ -306,7 +308,40 @@ struct NDArrayToNumpy
     return outgoing_numpy_array;
   }
 
+
+  // Function to register converter
+  void register_ndarray_to_numpy_cvt()  
+  {
+    // Check if converter already registered for this type
+    boost::python::type_info tinfo = boost::python::type_id<ndarray<T, Rank> >();
+    boost::python::converter::registration const* reg = boost::python::converter::registry::query(tinfo);
+    
+    if (reg == NULL) {
+      std::cout << "REGISTER NDARRAY<" << typeid(T) << "," << Rank << ">"
+		<< "TO NUMPY CONVERTER"
+		<< std::endl;
+      
+      boost::python::to_python_converter<ndarray<T,Rank>,NDArrayToNumpy<T,Rank> >();
+    } else if ( (*reg).m_to_python == NULL) {
+      std::cout << "REGISTER NDARRAY<" << typeid(T) << "," << Rank << ">"
+		<< "TO NUMPY CONVERTER"
+		<< std::endl;
+      
+      boost::python::to_python_converter<ndarray<T,Rank>,NDArrayToNumpy<T,Rank> >();
+    } else {
+      std::cout << "NDARRAY<" << typeid(T) << "," << Rank << ">"
+		<< "TO NUMPY CONVERTER ALREADY REGISTERED"
+		<< std::endl;
+    } 
+    
+    return;
+  }
+
+  
+
 };
+
+
 
 // Numpy to NDArray convert for BOOST
 template <typename T, unsigned Rank>
@@ -322,24 +357,39 @@ struct NumpyToNDArray
     std::cout << "registerting BOOST PYTHON converter for NUMPY to NDARRAY"
 	      << "<" << typeid(T) << "," << Rank << ">"
 	      << std::endl;
-    boost::python::converter::registry::push_back(
-      &NumpyToNDArray::convertible,
-      &NumpyToNDArray::construct,
-      boost::python::type_id< ndarray<T, Rank>  >() );
 
-    // Now check converter was registered
+    // Check if converter was already registered
     boost::python::type_info tinfo = boost::python::type_id<ndarray<T, Rank> >();
-    boost::python::converter::registration const* reg = 
-    boost::python::converter::registry::query(tinfo);
+    boost::python::converter::registration const* reg = boost::python::converter::registry::query(tinfo);
+
+    /*
+    std::cout << "reg:" << reg << std::endl;
+    std::cout << "reg.m_to_python:" << (*reg).m_to_python << std::endl;
+    std::cout << "reg.m_class_object:" << (*reg).m_class_object << std::endl;
+    std::cout << "reg.lvalue_chain:" << (*reg).lvalue_chain << std::endl;
+    std::cout << "reg.rvalue_chain:" << (*reg).rvalue_chain << std::endl;
+    */
+
     
-    if (reg) {
-      std::cout << "NDARRAY CONVERTER REGISTERED" << std::endl;
+    if (reg == NULL) {
+      boost::python::converter::registry::push_back(&NumpyToNDArray::convertible,
+						    &NumpyToNDArray::construct,
+						    boost::python::type_id< ndarray<T, Rank>  >() );
+      std::cout <<  "CONVERTER REGISTERED" << std::endl;
+    } else if ((*reg).rvalue_chain == NULL && (*reg).lvalue_chain == NULL) {
+      boost::python::converter::registry::push_back(&NumpyToNDArray::convertible,
+						    &NumpyToNDArray::construct,
+						    boost::python::type_id< ndarray<T, Rank>  >() );
+      std::cout <<  "CONVERTER REGISTERED" << std::endl;
     } else {
-      std::cout << "NDARRAY CONVERTER NOT REGISTERED" << std::endl;
-    }
+      std::cout << "CONVERTER WAS ALREADY REGISTERED" << std::endl;
+    } 
+    
+
     std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB" << std::endl;
     return *this;
   }
+
 
   // Check object can be converted
   static void* convertible(PyObject* obj) 
@@ -413,6 +463,8 @@ struct NumpyToNDArray
 
     return;
   }
+};
+
 };
 
 #endif // PYPSALG_CPP_NDARRAYCVT_H

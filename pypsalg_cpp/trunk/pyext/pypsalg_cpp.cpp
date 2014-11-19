@@ -7,25 +7,29 @@
 
 
 BOOST_PYTHON_MODULE(pypsalg_cpp)
-{
+{  
   import_array();
 
   // set of ranks and types for which we instantiate converters
-#define ND_RANKS (1)(2)(3)(4)(5)(6)
-#define ND_TYPES (int8_t)(uint8_t)(int16_t)(uint16_t)(int32_t)(uint32_t)(int64_t)(uint64_t)(float)(double)
-#define CONST_ND_TYPES (const int8_t)(const uint8_t)(const int16_t)(const uint16_t)(const int32_t)(const uint32_t)(const int64_t)(const uint64_t)(const float)(const double)
+  #define ND_RANKS (1)(2)(3)(4)(5)(6)
+  #define ND_TYPES (int8_t)(uint8_t)(int16_t)(uint16_t)(int32_t)(uint32_t)(int64_t)(uint64_t)(float)(double)
+  #define CONST_ND_TYPES (const int8_t)(const uint8_t)(const int16_t)(const uint16_t)(const int32_t)(const uint32_t)(const int64_t)(const uint64_t)(const float)(const double)
   
 
   // Preprocessor macro to define the call to create a NDArray to NUMPY converter. 
-#define REGISTER_NDARRAY_TO_NUMPY_CONVERTER(r,PRODUCT) \
-  boost::python::to_python_converter<ndarray<BOOST_PP_SEQ_ELEM(0,PRODUCT), \
+  #define REGISTER_NDARRAY_TO_NUMPY_CONVERTER(r,PRODUCT)			\
+    psana_python::NDArrayToNumpy<BOOST_PP_SEQ_ELEM(0,PRODUCT),BOOST_PP_SEQ_ELEM(1,PRODUCT)>().register_ndarray_to_numpy_cvt();
+
+  /*  boost::python::to_python_converter<ndarray<BOOST_PP_SEQ_ELEM(0,PRODUCT), \
 					     BOOST_PP_SEQ_ELEM(1,PRODUCT)>,\
 				     NDArrayToNumpy<BOOST_PP_SEQ_ELEM(0,PRODUCT),\
-						    BOOST_PP_SEQ_ELEM(1,PRODUCT)> >(); 
+				     BOOST_PP_SEQ_ELEM(1,PRODUCT)> >(); */
+						   
+
 
   // Preprocessor macro to define the call to create a NUMPY to NDArray converter 
-#define REGISTER_NUMPY_TO_NDARRAY_CONVERTER(r,PRODUCT) \
-  NumpyToNDArray<BOOST_PP_SEQ_ELEM(0,PRODUCT),BOOST_PP_SEQ_ELEM(1,PRODUCT)>().from_python();
+  #define REGISTER_NUMPY_TO_NDARRAY_CONVERTER(r,PRODUCT) \
+    psana_python::NumpyToNDArray<BOOST_PP_SEQ_ELEM(0,PRODUCT),BOOST_PP_SEQ_ELEM(1,PRODUCT)>().from_python();
   
   // BOOST preprocessor macro to create converters 1-6 dimensional NDArray, with
   // data type from int to double, both const and non const  
@@ -34,6 +38,7 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
 
   BOOST_PP_SEQ_FOR_EACH_PRODUCT(REGISTER_NUMPY_TO_NDARRAY_CONVERTER,(ND_TYPES)(ND_RANKS))
   BOOST_PP_SEQ_FOR_EACH_PRODUCT(REGISTER_NUMPY_TO_NDARRAY_CONVERTER,(CONST_ND_TYPES)(ND_RANKS))
+
 
   // These templates and BOOST preprocessor macros can be hard to understand what's
   // going on.  Here's a couple of examples of what they trying to do....
@@ -51,7 +56,7 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
   // 
   // Rather than typing each out each coverter, we used the BOOST
   // preprosser macros to generate the code for us.
-
+    
 
   // Create hooks between C++ psalg and PYTHON (via BOOST)      
   // NB: For all overloaded functions in psalg, have to unique
