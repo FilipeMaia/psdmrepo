@@ -14,7 +14,7 @@ set -u
 
 function run_cmd() {
     while [ 1 ] ; do 
-        ${cr_folder} --mkdir
+        ${cr_folder} --mkdir --active
         sleep ${wait_time}
     done
 }

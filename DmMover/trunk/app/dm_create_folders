@@ -54,20 +54,30 @@ def active_experiments():
             info = expinfo.active_experiment(instr, station_id)
             yield info[1], instr.lower()
             
+def single_experiment(name):
+    """ return exper-name and instr """
+
+    exp_id = expinfo.name2id(name)
+    if exp_id == None:
+        logging.error("Unknown experiment %s", name)
+        return
+        
+    yield name, name[:3].lower()
 
 # -------------------------------------------------------------------------------    
 
 usage="List and create missing experiment folders"
 help_epilog='''
-Check either all experiments or only the activated ones. 
-If --allexp is selected only the scratch,res,ftc and calib folders are created.
+Check either all experiments, only the activated ones or specific experiments 
 
 Examples:
-    # check all experiments registered last 5 days
-    %% %(prog)s --allexp --agereg 5                            (just list)
-    %% %(prog)s --allexp --agereg 5 --mkdir xppe1214 cxia3215  (select only two experiments) 
+    %% %(prog)s --allage 5               (list all experiments that were registered in last 5 days )
+    %% %(prog)s --allage 5 --mkdir       (create missing dirs for all experiments that were registered in last 5 days )
 
-    %% %(prog)s --mkdir   (check only active experiments)
+    %% %(prog)s --active --mkdir         (check only active experiments)
+
+    %% %(prog)s --scractchpath /reg/data/ana102 --mkdir cxidaq12   (create all folders for cxidaq12 and put the
+                                                                    scractch, res... to ana102)
 '''
 
 def main():
@@ -76,13 +86,14 @@ def main():
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--mkdir', action='store_true', 
                         help="create missing data folder (xtc, hdf5, scratch, ...) otherwise just list them")
-    parser.add_argument('--allexp', action='store_true', 
-                        help="checkall experiments. By default check only the active experiments.")
-    parser.add_argument('--agereg', type=int, default=90, 
-                        help="Select only experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
+    parser.add_argument('--active', action='store_true', help="checkall only active experiments.")
+    parser.add_argument('--allage', type=int, default=0, const=82, nargs='?', 
+                        help="Select all experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
+    parser.add_argument('--dirs', help='directories to create')
     parser.add_argument('--scratchpath', default="/reg/data/ana04", help="Set ana path for scratch, res,...")
-    parser.add_argument('sel_exper', nargs='*', help="list of experiments to check") 
+    parser.add_argument('--datapath', help="Set ana path for xtc,hdf5 and usr")
     parser.add_argument("--verbose", "-v", action='count', default=0)
+    parser.add_argument('sel_exper', nargs='?', help="experiments to check") 
 
     try:
         args = parser.parse_args()
@@ -94,19 +105,28 @@ def main():
     logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
                         datefmt="%Y%m%d %H:%M:%S")
 
+    all_dirs = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
 
-    if args.allexp:
-        gen = all_experiments(args.agereg)
-        dirs_to_check = ('res', 'ftc', 'scratch', 'calib')
-    else:
+    if args.active:
         gen = active_experiments()
+        dirs_to_check = all_dirs
+    elif args.allage > 0:
+        gen = all_experiments(args.allage)
+        dirs_to_check = ('res', 'ftc', 'scratch', 'calib')
+    elif args.sel_exper:
+        gen = single_experiment(args.sel_exper)
         dirs_to_check = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
+    else:
+        logging.error("No experiment option selected (--allage, --active or <expname>)")
+        return 1
 
-    print(args.scratchpath)
-    return
+    if args.dirs:
+        dirs_to_check = tuple( (d for d in args.dirs.split(',') if d in all_dirs) )
+
     nexp, nmissing, nset = 0,0,0
     for expname, instr in gen:
         logging.debug("Exp %s %s", expname, instr)
+
         nexp += 1
         if len(expname) != 8:
             logging.warning("Wrong detector name %s %s", expname, instr)
@@ -123,15 +143,18 @@ def main():
                 missing_dirs.append(dt)
 
         if missing_dirs:
-            print("-", instr, exppath, "missing dirs:", " ".join(missing_dirs))
+            logging.warn("- %s %s missing dirs: %s", instr, exppath, " ".join(missing_dirs))
             nmissing += 1
 
-        if args.mkdir and missing_dirs:
+        if missing_dirs:
             nset += 1
-            print("Create dirs")
             exper = experiment.Experiment(name=expname)
-            exper.scratch_path = args.scratchpath 
-            exper_folders.check_all_destpath(exper, missing_dirs)
+            exper.scratchpath = args.scratchpath 
+            if args.datapath:
+                exper.datapath = args.datapath
+            logging.debug(" ana dir: %s %s", exper.datapath, exper.scratchpath)
+            if args.mkdir:
+                exper_folders.check_all_destpath(exper, missing_dirs)
     
         
     date = datetime.datetime.now()
