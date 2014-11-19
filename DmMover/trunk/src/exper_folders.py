@@ -32,7 +32,7 @@ def check_all_destpath(exper, seldirs=None):
         create_exp_path(folder, exper.name, exper.instr_lower, exper.posix_gid, datapath)
         create_link(folder, exper.name, exper.instr_lower, datapath)
 
-    datapath = exper.scratch_datapath
+    datapath = exper.scratchpath
     print  "scratch", datapath
     for folder in ('scratch', 'res', 'ftc', 'calib'):
         if seldirs and folder not in seldirs:
