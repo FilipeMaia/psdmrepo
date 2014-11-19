@@ -30,14 +30,28 @@ def type_getter(data_type, mod_name=__name__):
 
 class Plot(object):
     def __init__(self, init, framegen, info, rate, **kwargs):
-        # Boilerplate code from pyqtgraph examples - might not be the ideal way to do this for this case
         if 'figwin' in kwargs:
             self.fig_win = kwargs['figwin']
+            self.fig_layout = self.fig_win.addLayout()
+            self.title_layout = self.fig_layout.addLayout()
+            self._set_row_stretch(0)
+            self.title_layout.addLabel(init.title, size='11pt', bold=True)
+            self.fig_layout.nextRow()
         else:
             self.fig_win = pg.GraphicsLayoutWidget()
             self.fig_win.setWindowTitle(init.title)
             self.fig_win.show()
-        self.plot_view = self.fig_win.addPlot()
+            self.fig_layout = self.fig_win.ci
+        # create a sublayout for the plot itself
+        self.plot_layout = self.fig_layout.addLayout()
+        self._set_row_stretch(1)
+        self.plot_view = self.plot_layout.addPlot()
+        # creat a sublayout under the plot for info/buttons
+        self.fig_layout.nextRow()
+        self.info_layout = self.fig_layout.addLayout()
+        self._set_row_stretch(0)
+        self.info_label = self.info_layout.addLabel('', justify='right')
+        # set labels
         self.set_title(init.ts)
         self.set_title_axis('bottom', init.xlabel)
         self.set_title_axis('left', init.ylabel)
@@ -48,6 +62,12 @@ class Plot(object):
         self.multi_plot = False
         # set any user specified default axis ranges
         self.set_xy_ranges()
+        # create cursor event listener
+        self.proxy = pg.SignalProxy(
+            self.plot_view.scene().sigMouseMoved,
+            rateLimit=config.PYQT_MOUSE_EVT_RATELIMIT,
+            slot=self.cursor_hover_evt
+        )
 
     def update_sub(self, data):
         pass
@@ -75,7 +95,7 @@ class Plot(object):
 
     def set_title(self, title):
         if title is not None:
-            self.plot_view.setTitle(title)
+            self.plot_view.setTitle(title, size='10pt', justify='right')
 
     def set_title_axis(self, axis_name, axis_label_data):
         """
@@ -116,6 +136,12 @@ class Plot(object):
         if self.info.yrange is not None:
             self.plot_view.setYRange(*self.info.yrange)
 
+    def _set_row_stretch(self, val):
+        self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
+
+    def cursor_hover_evt(self, evt):
+        pass
+
 
 class ImageClient(Plot):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
@@ -143,7 +169,7 @@ class ImageClient(Plot):
         if config.PYQT_USE_ALT_IMG_ORIGIN:
             self.plot_view.invertY()
         self.plot_view.addItem(self.im)
-        self.fig_win.addItem(self.cb)
+        self.plot_layout.addItem(self.cb)
 
     def update_sub(self, data):
         """
@@ -152,6 +178,21 @@ class ImageClient(Plot):
         if data is not None:
             self.im.setImage(data.image.T, autoLevels=False)
         return self.im
+
+    def cursor_hover_evt(self, evt):
+        pos = evt[0]
+        if self.plot_view.sceneBoundingRect().contains(pos):
+            mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
+            x_pos = int(mouse_pos.x())
+            y_pos = int(mouse_pos.y())
+            if 0 <= x_pos < self.im.image.shape[0] and 0 <= y_pos < self.im.image.shape[1]:
+                z_val = self.im.image[x_pos][y_pos]
+                # for image of float type show decimal places
+                if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
+                    label_str = 'x=%d, y=%d, z=%d'
+                else:
+                    label_str = 'x=%d, y=%d, z=%.3f'
+                self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
 
 class XYPlotClient(Plot):
