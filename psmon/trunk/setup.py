@@ -1,22 +1,36 @@
-from setuptools import setup, find_packages
+from setuptools import setup
 
-#workaround for LCLS scons compatibility
-import os
-if not os.path.exists('psmon'):
-    os.rename('src','psmon')
 
 setup(
     name='psmon',
-    version='0.0.1',
+    version='0.1.3',
     description='LCLS analysis monitoring',
-    author='SLAC RED/PCDS',
-    author_email='pcds-ana-l',
-    packages=find_packages(),
-    #install_requires=['numpy>=1.6.2'],
+    long_description='The psmom package is a remote data visualization tool used at LCLS for analysis monitoring',
+    author='Daniel Damiani',
+    author_email='ddamiani@slac.stanford.edu',
+    url='https://confluence.slac.stanford.edu/display/PSDM/psana+-+Python+Script+Analysis+Manual#psana-PythonScriptAnalysisManual-Real-timeOnlinePlotting/Monitoring',
+    package_dir={'psmon': 'src'},
+    packages=['psmon'],
+    install_requires=[
+        'pyqtgraph',
+        'pyzmq',
+    ],
     entry_points={
         'console_scripts': [
-            'psmonserver = psmon.psmonserver:main',
-            'psmonclient = psmon.psmonclient:main',
+            'psplot = psmon.client:main',
         ]
     },
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Environment :: Other Environment',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: MacOS :: MacOS X',
+        'Operating System :: Microsoft :: Windows',
+        'Operating System :: POSIX',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Topic :: Scientific/Engineering :: Visualization',
+        'Topic :: Utilities',
+    ],
 )
