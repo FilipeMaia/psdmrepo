@@ -1,0 +1,17 @@
+
+IRODS_HOME=/reg/g/psdm/psdatmgr/irods/iRODS-server
+#X509_USER_CERT=/etc/grid-security/irodscert.pem
+#X509_USER_KEY=/etc/grid-security/irodskey.pem
+KRB5_KTNAME=$IRODS_HOME/server/config/irods.keytab
+PORTS="svrPortRangeStart=40000 svrPortRangeEnd=41000"
+
+. /etc/init.d/functions
+RETVAL=0
+
+Env="HOME=/reg/neh/home1/psdatmgr"
+#Env="$Env X509_USER_CERT=$X509_USER_CERT X509_USER_KEY=$X509_USER_KEY"
+#Env="$Env LD_LIBRARY_PATH=/opt/vdt/globus/lib"
+test -f "$KRB5_KTNAME" && Env="$Env KRB5_KTNAME=$KRB5_KTNAME"
+    [ "$1" = start ] && _P=istart || _P=irestart
+
+sh -c "$Env $PORTS $IRODS_HOME/irodsctl start"
