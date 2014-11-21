@@ -1,0 +1,9 @@
+#!/bin/bash 
+
+
+#. /reg/g/psdm/bin/sit_setup.sh dm-current 
+. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/dm-prod
+
+which  dm_active_exp_folders
+exec dm_active_exp_folders -w 60
+

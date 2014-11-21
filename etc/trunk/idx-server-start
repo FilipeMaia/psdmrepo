@@ -1,0 +1,9 @@
+#!/bin/bash	
+#
+#  Start the queue that submits requests to create missing index files.
+#
+
+. /reg/g/psdm/bin/sit_setup.sh dm-current
+
+exec idx_q_server --maxrun 10 --wait 60
+
