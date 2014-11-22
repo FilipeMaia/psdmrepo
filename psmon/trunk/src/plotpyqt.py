@@ -1,4 +1,5 @@
 import sys
+import math
 import logging
 import collections
 import numpy as np
@@ -7,7 +8,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtCore, QtGui
 
 from psmon import config
-from psmon.util import is_py_iter, arg_inflate_tuple
+from psmon.util import is_py_iter, arg_inflate_tuple, window_ratio
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 from psmon.format import parse_fmt_xyplot, parse_fmt_hist
 
@@ -269,20 +270,26 @@ class MultiPlotClient(object):
         else:
             self.fig_win = pg.GraphicsLayoutWidget()
             self.fig_win.setWindowTitle(init.title)
-            self.fig_win.resize(config.PYQT_LARGE_WIN_X, config.PYQT_LARGE_WIN_Y)
             self.fig_win.show()
+            ratio_calc = window_ratio(config.PYQT_SMALL_WIN_X, config.PYQT_SMALL_WIN_Y, config.PYQT_LARGE_WIN_X, config.PYQT_LARGE_WIN_Y)
             if init.ncols is None:
+                self.fig_win.resize(*ratio_calc(init.size, 1))
                 self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
             else:
                 self.plots = []
-                for index, data_obj in enumerate(init.data_con):
-                    if isinstance(init.ncols, int) and 0 < init.ncols <= init.size:
-                        if index > 0 and index % init.ncols == 0:
-                            self.fig_win.nextRow()
-                    else:
-                        LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s',
+                if not isinstance(init.ncols, int) or not 0 < init.ncols <= init.size:
+                    ncols = init.size
+                    nrows = 1
+                    LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s',
                                     init.ncols,
                                     init.size)
+                else:
+                    ncols = init.ncols
+                    nrows = math.ceil(init.size/float(init.ncols))
+                self.fig_win.resize(*ratio_calc(ncols, nrows))
+                for index, data_obj in enumerate(init.data_con):
+                    if index > 0 and index % ncols == 0:
+                        self.fig_win.nextRow()
                     self.plots.append(type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win))
         self.framegen = framegen
         self.rate_ms = rate * 1000

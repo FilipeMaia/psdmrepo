@@ -43,6 +43,11 @@ def main(client_info, plot_info):
     # set widget background/foreground color if specified
     set_color_opt('background', plot_info.bkg_col)
     set_color_opt('foreground', plot_info.fore_col)
+    # get geometry of current screen at set max window geo
+    qtdesk = qtapp.desktop()
+    screen_geo = qtdesk.availableGeometry()
+    config.PYQT_LARGE_WIN_X = min(screen_geo.width(), config.PYQT_LARGE_WIN_X)
+    config.PYQT_LARGE_WIN_Y = min(screen_geo.height(), config.PYQT_LARGE_WIN_Y)
 
     # start the plotting rendering routine
     plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)

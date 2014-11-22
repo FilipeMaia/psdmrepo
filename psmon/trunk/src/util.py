@@ -48,6 +48,20 @@ def make_bins(nbins, bmin, bmax):
     return np.arange(bmin, bmax + step, step)[:nbins+1]
 
 
+def window_ratio(min_x, min_y, max_x, max_y):
+    def window_ratio_calc(ncols, nrows):
+        pref_x = min_x * ncols
+        pref_y = min_y * nrows
+
+        if pref_x > max_x or pref_y > max_y:
+            num = min(max_x/float(ncols), max_y/float(nrows))
+            pref_x = max(ncols * num, min_x)
+            pref_y = max(nrows * num, min_y)
+
+        return int(pref_x), int(pref_y)
+    return window_ratio_calc
+
+
 class Helper(object):
     def __init__(self, publisher, topic, title=None, pubrate=None):
         self.publisher = publisher
