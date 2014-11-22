@@ -139,8 +139,14 @@ class Plot(object):
     def _set_row_stretch(self, val):
         self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
 
+    def cursor_hover_evt_sub(self, x_pos, y_pos):
+        self.info_label.setText('x=%d, y=%d' % (x_pos, y_pos), size='10pt')
+
     def cursor_hover_evt(self, evt):
-        pass
+        pos = evt[0]
+        if self.plot_view.sceneBoundingRect().contains(pos):
+            mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
+            self.cursor_hover_evt_sub(int(mouse_pos.x()), int(mouse_pos.y()))
 
 
 class ImageClient(Plot):
@@ -179,20 +185,15 @@ class ImageClient(Plot):
             self.im.setImage(data.image.T, autoLevels=False)
         return self.im
 
-    def cursor_hover_evt(self, evt):
-        pos = evt[0]
-        if self.plot_view.sceneBoundingRect().contains(pos):
-            mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
-            x_pos = int(mouse_pos.x())
-            y_pos = int(mouse_pos.y())
-            if 0 <= x_pos < self.im.image.shape[0] and 0 <= y_pos < self.im.image.shape[1]:
-                z_val = self.im.image[x_pos][y_pos]
-                # for image of float type show decimal places
-                if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
-                    label_str = 'x=%d, y=%d, z=%d'
-                else:
-                    label_str = 'x=%d, y=%d, z=%.3f'
-                self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
+    def cursor_hover_evt_sub(self, x_pos, y_pos):
+        if 0 <= x_pos < self.im.image.shape[0] and 0 <= y_pos < self.im.image.shape[1]:
+            z_val = self.im.image[x_pos][y_pos]
+            # for image of float type show decimal places
+            if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
+                label_str = 'x=%d, y=%d, z=%d'
+            else:
+                label_str = 'x=%d, y=%d, z=%.3f'
+            self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
 
 class XYPlotClient(Plot):
