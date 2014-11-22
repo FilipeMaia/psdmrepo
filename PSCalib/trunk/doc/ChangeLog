@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-26
+2014-11-21 Mikhail S. Dubrovin	
+- GeometryAccess.py in img_from_pixel_arrays(iX, iY, W=None, ...) add protection for W=None (PSAS-11)
+	
 Tag: V00-02-25
 2014-11-15 Mikhail S. Dubrovin	
 - GenericCalibPars.cpp - replace BASE::Size with BASE::size_base() (PSAS-67)

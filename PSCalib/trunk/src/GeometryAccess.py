@@ -441,7 +441,7 @@ def img_from_pixel_arrays(iX, iY, W=None, dtype=np.float32, vbase=0) :
     """Returns image from iX, iY coordinate index arrays and associated weights W.
     """
     if iX.size != iY.size \
-    or iX.size !=  W.size :
+    or (W!=None and iX.size !=  W.size) :
         msg = 'img_from_pixel_arrays(): WARNING input array sizes are different;' \
             + ' iX.size=%d, iY.size=%d, W.size=%d' % (iX.size, iY.size, W.size)
         print msg
@@ -449,8 +449,8 @@ def img_from_pixel_arrays(iX, iY, W=None, dtype=np.float32, vbase=0) :
 
     xsize = iX.max()+1 
     ysize = iY.max()+1
-    if W==None : weight = np.ones_like(iX)
-    else       : weight = W
+
+    weight = W if W!=None else np.ones_like(iX)
     img = vbase*np.ones((xsize,ysize), dtype=dtype)
     img[iX,iY] = weight # Fill image array with data 
     return img

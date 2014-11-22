@@ -217,6 +217,7 @@ GenericCalibPars<TBASE>::size()
   const size_t size_nda = size_of_ndarray();
   //cout << "T: TBASE::Size : " << TBASE::size_base() << '\n';
   //cout << "T: size_nda()  : " << size_nda << '\n';
+  //return (size_nda) ? size_nda : TBASE::Size;
   return (size_nda) ? size_nda : TBASE::size_base();
 }
 
@@ -242,6 +243,7 @@ GenericCalibPars<TBASE>::size_of_ndarray()
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().size();
 
   if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SIZE of non-loaded ndarray"); 
+  //return TBASE::Size;
   return TBASE::size_base();
 }
 
