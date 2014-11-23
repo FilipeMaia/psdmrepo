@@ -1,5 +1,8 @@
 import logging
+from collections import namedtuple
 
+### COORDINATE TUPLE USED FOR CONFIGS ###
+Resolution = namedtuple('Resolution', 'x y')
 ### CONFIG KEYS FOR SERVER ###
 RESET_REQ_STR = 'reset signal - %s'
 RESET_REP_STR = 'reset signal recieved from %s'
@@ -21,10 +24,8 @@ APP_EXP_DEFAULT = 'xppb0114'
 APP_BIND_ATTEMPT = 32
 APP_RECV_LIMIT = 25
 ### PYQT DEFAULT APPEARANCE CONFIG ###
-PYQT_SMALL_WIN_X = 640
-PYQT_SMALL_WIN_Y = 480
-PYQT_LARGE_WIN_X = 3840
-PYQT_LARGE_WIN_Y = 2880
+PYQT_SMALL_WIN = Resolution(640, 480)
+PYQT_LARGE_WIN = Resolution(3840, 2880)
 PYQT_BORDERS = {'color': (150, 150, 150), 'width': 1.0}
 PYQT_PLOT_PEN = None
 PYQT_PLOT_SYMBOL = 'o'
@@ -40,6 +41,8 @@ PYQT_USE_WEAVE = False
 PYQT_USE_ALT_IMG_ORIGIN = True
 PYQT_MOUSE_EVT_RATELIMIT = 60
 ### MPL DEFAULT APPEARANCE CONFIG ###
+MPL_SMALL_WIN = Resolution(10, 5)
+MPL_LARGE_WIN = Resolution(40, 20)
 MPL_COLOR_PALETTE = 'hot'
 MPL_AXES_BKG_COLOR = 'w'
 MPL_HISTO_STYLE = 'steps-mid'

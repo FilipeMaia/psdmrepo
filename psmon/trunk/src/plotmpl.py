@@ -10,6 +10,7 @@ from matplotlib.axes import _process_plot_format
 
 from psmon import config
 from psmon.util import is_py_iter, arg_inflate_flat, arg_inflate_tuple, inflate_input
+from psmon.util import window_ratio
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
 
 
@@ -132,7 +133,10 @@ class MultiPlotClient(object):
                 LOG.warning('Invalid column number specified: %s - Must be a positive integer less than the number of plots: %s', init.ncols, init.size)
         if init.use_windows:
             LOG.warning('Separate windows for subplots is not supported in the matplotlib client')
-        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col)
+        ratio_calc = window_ratio(config.MPL_SMALL_WIN, config.MPL_LARGE_WIN)
+        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col, figsize=ratio_calc(nrows, ncols))
+        # flatten the axes array returned by suplot
+        self.ax = self.ax.flatten() if init.size > 1 else [self.ax]
         self.figure.canvas.set_window_title(init.title)
         self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax)) for data_obj, subax in zip(init.data_con, self.ax)]
         self.framegen = framegen

@@ -271,7 +271,7 @@ class MultiPlotClient(object):
             self.fig_win = pg.GraphicsLayoutWidget()
             self.fig_win.setWindowTitle(init.title)
             self.fig_win.show()
-            ratio_calc = window_ratio(config.PYQT_SMALL_WIN_X, config.PYQT_SMALL_WIN_Y, config.PYQT_LARGE_WIN_X, config.PYQT_LARGE_WIN_Y)
+            ratio_calc = window_ratio(config.PYQT_SMALL_WIN, config.PYQT_LARGE_WIN)
             if init.ncols is None:
                 self.fig_win.resize(*ratio_calc(init.size, 1))
                 self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figwin=self.fig_win) for data_obj in init.data_con]
