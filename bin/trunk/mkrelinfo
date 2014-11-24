@@ -1,0 +1,208 @@
+#!/usr/bin/env python
+#
+# DESCRIPTION:
+#
+#   This application will create a release information package ReleaseInfo
+#   for a release name provided as a command line parameter. The package
+#   location is expected to be specified in the command line.
+#
+#   The application supports the following formats of the release names:
+#
+#     nightly-YYYYMMDD      : for the nightly releases
+#     <type>-X.Y.Z          : for any other release types
+#
+#   Where the second part of a release name is treated as a version of
+#   of the relelease, and the first one - its type. All components of
+#   the release versions are numbers:
+#
+#     Major  Middle  Minor
+#     -----  ------  -----
+#     YYYY   MM      DD
+#     X      Y       Z
+#
+#   The package path must end with 'ReleaseInfo' or 'ReleaseInfo/'.
+#
+# USAGE:
+#
+#   [-v] <relname> <pkg_path>
+#
+# WHERE:
+#
+#   -v          : the optional verbose mode flag
+#   <relname>   : the name of a release
+#   <pkg_path>  : a path (relative or absolute) to the ReleaseInfo package
+#
+import sys
+import os
+
+##########################
+### Common definitions ###
+##########################
+
+USAGE_ERROR = 1
+OTHER_ERROR = 2
+
+def fail (msg):
+    print "Error: %s" % msg
+    sys.exit(OTHER_ERROR)
+
+##############################
+### Parse input parameters ###
+##############################
+
+def usage (msg=None):
+    if msg: print msg
+    print "Usage: %s [-v] <relname> <pkg_path>" % sys.argv[0]
+    sys.exit(USAGE_ERROR)
+
+argc = len(sys.argv)
+if (argc < 3) or (argc > 4): usage()
+
+nextarg = 1
+
+verbose = False
+if argc == 4:
+    if sys.argv[nextarg] != '-v': usage()
+    nextarg = nextarg + 1
+    verbose = True
+
+### Release name, type and version ###
+
+rel_name = sys.argv[nextarg]
+nextarg = nextarg + 1
+
+def parse_relname ():
+
+    if verbose:
+        print "Parsing release name"
+
+    import re
+
+    e = re.compile('([^-\\s]+)-(.+)')
+    m = e.findall(rel_name)
+    if (len(m) != 1) or (len(m[0]) != 2):
+        fail("Incorrect format of the release name")
+
+    rel_type        = m[0][0]
+    rel_version_str = m[0][1]
+
+    if rel_type == "nightly": e_ver = re.compile('(\\d{4})(\\d{2})(\\d{2})')
+    else:                     e_ver = re.compile('(\\d+)\\.(\\d+)\\.(\\d+)')
+    m_ver = e_ver.findall(rel_version_str)
+    if (len(m_ver) != 1) or (len(m_ver[0]) != 3):
+        fail("incorrect format of the release version")
+
+    return (rel_type,m_ver[0])
+
+(rel_type, rel_version) = parse_relname()
+
+### Location of the package ###
+
+pkg_path = os.path.normpath(sys.argv[nextarg])
+nextarg = nextarg + 1
+
+pkg_name = os.path.basename(pkg_path)
+if pkg_name == '':
+    if os.path.dirname(pkg_path) == '':
+        fail("Incorrect path")
+    pkg_name = os.path.basename(pkg_path[:-1])
+
+PKG_NAME_EXPECTED = "ReleaseInfo"
+if pkg_name != PKG_NAME_EXPECTED:
+    fail("The package path must end with %s instead of %s" % (PKG_NAME_EXPECTED,pkg_name,))
+
+##################
+### Operations ###
+##################
+
+def create_directory (path):
+
+    if verbose:
+        print "Creating: %s" % path
+
+    if os.path.exists(path):
+        fail("Directory already exists: %s" % path)
+    try:
+        os.mkdir(path)
+    except IOError as e:
+        fail("I/O error({0}): {1}".format(e.errno, e.strerror))
+    except:
+        fail("Unexpected error: %s" % sys.exc_info()[0])
+
+def create_package ():
+    create_directory(pkg_path)
+    create_directory("%s/include" % pkg_path)
+    create_directory("%s/src"     % pkg_path)
+
+def create_file (path, content):
+
+    if verbose:
+        print "Creating: %s" % path
+
+    try:
+        f = open(path,"w")
+        f.write(content)
+        f.close()
+        del f
+    except IOError as e:
+        fail("I/O error({0}): {1}".format(e.errno, e.strerror))
+    except:
+        fail("Unexpected error: %s" % sys.exc_info()[0])
+
+
+def create_SConscript ():
+
+    create_file("%s/SConscript" % pkg_path,
+"""Import('*')
+standardSConscript()""")
+
+
+def create_C_defs ():
+
+    create_file("%s/include/Release.hh" % pkg_path,
+"""#ifndef {0}_RELEASE_HH
+#define {0}_RELEASE_HH
+#define {0}_NAME "{1}"
+#define {0}_TYPE "{2}"
+#define {0}_VERSION_MAJOR  {3}
+#define {0}_VERSION_MIDDLE {4}
+#define {0}_VERSION_MINOR  {5}
+#endif // {0}_RELEASE_HH
+""".format(
+            pkg_name.upper(),
+            rel_name,
+            rel_type,
+            rel_version[0],
+            rel_version[1],
+            rel_version[2]))
+
+
+def create_Python_package ():
+
+    create_file("%s/src/__init__.py" % pkg_path,
+"""__all__ = ['Release']
+""")
+
+    create_file("%s/src/Release.py" % pkg_path,
+"""name = "{0}"
+type = "{1}"
+version = ({2},{3},{4})
+""".format(
+            rel_name,
+            rel_type,
+            rel_version[0],
+            rel_version[1],
+            rel_version[2]))
+
+
+#######################################################
+### Create the package and populate it with the content
+#######################################################
+
+create_package       ()
+create_SConscript    ()
+create_C_defs        ()
+create_Python_package()
+
+sys.exit(0)
+
