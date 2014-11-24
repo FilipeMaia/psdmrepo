@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-11-24 Mikhail S. Dubrovin
+Tag: V00-00-74
+- add app/roicon - polishing command line interface, add craetion of image from file with ndarray (PSAS-10)
+
 2014-11-21 Mikhail S. Dubrovin
 Tag: V00-00-73
 - add app/roicon - for conversion of the ROI mask into ndarray using geometry calib file (PSAS-10)
