@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-17
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
 Tag: V00-09-16
 2014-10-23 David Schneider
 - regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2

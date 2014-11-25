@@ -81,6 +81,84 @@ void make_datasets(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, cons
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::Quartz::ConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+
+namespace ns_ConfigV2_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::Quartz::ConfigV2& psanaobj);
+  ~dataset_config();
+
+  uint16_t black_level;
+  uint16_t gain_percent;
+  uint8_t output_resolution;
+  uint8_t horizontal_binning;
+  uint8_t vertical_binning;
+  uint8_t output_mirroring;
+  uint8_t output_lookup_table_enabled;
+  uint8_t defect_pixel_correction_enabled;
+  uint8_t use_hardware_roi;
+  Camera::ns_FrameCoord_v0::dataset_data roi_lo;
+  Camera::ns_FrameCoord_v0::dataset_data roi_hi;
+  uint32_t number_of_defect_pixels;
+  uint16_t output_offset;
+  uint32_t output_resolution_bits;
+
+
+};
+}
+
+
+class ConfigV2_v0 : public Psana::Quartz::ConfigV2 {
+public:
+  typedef Psana::Quartz::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
+  ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~ConfigV2_v0() {}
+  virtual uint16_t black_level() const;
+  virtual uint16_t gain_percent() const;
+  virtual Psana::Quartz::ConfigV2::Depth output_resolution() const;
+  virtual Psana::Quartz::ConfigV2::Binning horizontal_binning() const;
+  virtual Psana::Quartz::ConfigV2::Binning vertical_binning() const;
+  virtual Psana::Quartz::ConfigV2::Mirroring output_mirroring() const;
+  virtual uint8_t output_lookup_table_enabled() const;
+  virtual uint8_t defect_pixel_correction_enabled() const;
+  virtual uint8_t use_hardware_roi() const;
+  virtual const Psana::Camera::FrameCoord& roi_lo() const;
+  virtual const Psana::Camera::FrameCoord& roi_hi() const;
+  virtual uint32_t number_of_defect_pixels() const;
+  virtual ndarray<const uint16_t, 1> output_lookup_table() const;
+  virtual ndarray<const Psana::Camera::FrameCoord, 1> defect_pixel_coordinates() const;
+  virtual uint16_t output_offset() const;
+  virtual uint32_t output_resolution_bits() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Quartz::ns_ConfigV2_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable Psana::Camera::FrameCoord m_ds_storage_config_roi_lo;
+  mutable Psana::Camera::FrameCoord m_ds_storage_config_roi_hi;
+  mutable ndarray<const uint16_t, 1> m_ds_output_lookup_table;
+  void read_ds_output_lookup_table() const;
+  mutable ndarray<const Psana::Camera::FrameCoord, 1> m_ds_defect_pixel_coordinates;
+  void read_ds_defect_pixel_coordinates() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Quartz::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Quartz::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Quartz::ConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Quartz::ConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 } // namespace Quartz
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_QUARTZ_DDL_H

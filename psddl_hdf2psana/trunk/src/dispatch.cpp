@@ -111,6 +111,12 @@ try {
     // Lusi::DiodeFexConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexConfigV1(schema_version, group, idx), src);
     break;
+  case 647095708:
+    // TimeTool::DataV2
+    if (boost::shared_ptr<Psana::TimeTool::ConfigV2> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::TimeTool::make_DataV2(schema_version, group, idx, cfgPtr), src);
+    }
+    break;
   case 647095711:
     // TimeTool::DataV1
     if (boost::shared_ptr<Psana::TimeTool::ConfigV1> cfgPtr = cfgStore.get(src)) {
@@ -120,6 +126,10 @@ try {
   case 670963505:
     // Quartz::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Quartz::make_ConfigV1(schema_version, group, idx), src);
+    break;
+  case 670963506:
+    // Quartz::ConfigV2
+    cfgStore.putProxy(psddl_hdf2psana::Quartz::make_ConfigV2(schema_version, group, idx), src);
     break;
   case 738044564:
     // Bld::BldDataSpectrometerV0
@@ -643,6 +653,10 @@ try {
   case 3940776773:
     // TimeTool::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::TimeTool::make_ConfigV1(schema_version, group, idx), src);
+    break;
+  case 3940776774:
+    // TimeTool::ConfigV2
+    cfgStore.putProxy(psddl_hdf2psana::TimeTool::make_ConfigV2(schema_version, group, idx), src);
     break;
   case 3985960297:
     // Andor::FrameV1
