@@ -6587,6 +6587,75 @@ def Quartz_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Quartz_ConfigV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Quartz.ConfigV2.TypeId
+    assert obj.Version == psana.Quartz.ConfigV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_defect_pixels: %s' % uint32_to_str( obj.number_of_defect_pixels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table: %s' % ndarray_to_str( obj.output_lookup_table() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'black_level: %s' % uint16_to_str( obj.black_level() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'gain_percent: %s' % uint16_to_str( obj.gain_percent() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_lookup_table_enabled: %s' % uint8_to_str( obj.output_lookup_table_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'defect_pixel_correction_enabled: %s' % uint8_to_str( obj.defect_pixel_correction_enabled() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'use_hardware_roi: %s' % uint8_to_str( obj.use_hardware_roi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_offset: %s' % uint16_to_str( obj.output_offset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution_bits: %s' % uint32_to_str( obj.output_resolution_bits() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_resolution:\n'
+    methodStr += enum_to_str(obj.output_resolution(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'horizontal_binning:\n'
+    methodStr += enum_to_str(obj.horizontal_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'vertical_binning:\n'
+    methodStr += enum_to_str(obj.vertical_binning(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'output_mirroring:\n'
+    methodStr += enum_to_str(obj.output_mirroring(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.defect_pixel_coordinates() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'defect_pixel_coordinates[%d]:\n' % idx
+        subMethodStr += Camera_FrameCoord_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Rayonix_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Rayonix.ConfigV1.TypeId
     assert obj.Version == psana.Rayonix.ConfigV1.Version
@@ -7484,6 +7553,114 @@ def TimeTool_ConfigV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def TimeTool_ConfigV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.ConfigV2.TypeId
+    assert obj.Version == psana.TimeTool.ConfigV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_beam_event_codes: %s' % uint16_to_str( obj.number_of_beam_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_laser_event_codes: %s' % uint16_to_str( obj.number_of_laser_event_codes() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_cut: %s' % uint32_to_str( obj.signal_cut() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_convergence: %s' % double_to_str( obj.sb_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_convergence: %s' % double_to_str( obj.ref_convergence() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'weights: %s' % ndarray_to_str( obj.weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly: %s' % ndarray_to_str( obj.calib_poly() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name: %s' % str_to_str( obj.base_name() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_image: %s' % uint8_to_str( obj.write_image() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'write_projections: %s' % uint8_to_str( obj.write_projections() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'subtract_sideband: %s' % uint8_to_str( obj.subtract_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'use_reference_roi: %s' % uint8_to_str( obj.use_reference_roi() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'number_of_weights: %s' % uint16_to_str( obj.number_of_weights() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'calib_poly_dim: %s' % uint8_to_str( obj.calib_poly_dim() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'base_name_length: %s' % uint8_to_str( obj.base_name_length() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'signal_projection_size: %s' % uint32_to_str( obj.signal_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sideband_projection_size: %s' % uint32_to_str( obj.sideband_projection_size() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'reference_projection_size: %s' % uint32_to_str( obj.reference_projection_size() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sig_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sig_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sb_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.sb_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_roi_lo:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.ref_roi_lo(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_roi_hi:\n'
+    methodStr += Camera_FrameCoord_to_str(obj.ref_roi_hi(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'project_axis:\n'
+    methodStr += enum_to_str(obj.project_axis(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.beam_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'beam_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.laser_logic() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'laser_logic[%d]:\n' % idx
+        subMethodStr += TimeTool_EventLogic_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def TimeTool_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.TimeTool.DataV1.TypeId
     assert obj.Version == psana.TimeTool.DataV1.Version
@@ -7512,6 +7689,46 @@ def TimeTool_DataV1_to_str(obj, indent, lvl, methodSep):
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
     methodStr += 'projected_sideband: %s' % ndarray_to_str( obj.projected_sideband() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'event_type:\n'
+    methodStr += enum_to_str(obj.event_type(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def TimeTool_DataV2_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.TimeTool.DataV2.TypeId
+    assert obj.Version == psana.TimeTool.DataV2.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'amplitude: %s' % double_to_str( obj.amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_pixel: %s' % double_to_str( obj.position_pixel() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_time: %s' % double_to_str( obj.position_time() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'position_fwhm: %s' % double_to_str( obj.position_fwhm() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ref_amplitude: %s' % double_to_str( obj.ref_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'nxt_amplitude: %s' % double_to_str( obj.nxt_amplitude() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_signal: %s' % ndarray_to_str( obj.projected_signal() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_sideband: %s' % ndarray_to_str( obj.projected_sideband() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'projected_reference: %s' % ndarray_to_str( obj.projected_reference() )
     methodStrings.append(methodStr)                                 
     # multi_line_methods
     methodStr = doIndent(indent, lvl)
@@ -7691,10 +7908,13 @@ objFunctionTable = {
     (psana.Pulnix.TM6740ConfigV1.TypeId,1) : Pulnix_TM6740ConfigV1_to_str,
     (psana.Pulnix.TM6740ConfigV2.TypeId,2) : Pulnix_TM6740ConfigV2_to_str,
     (psana.Quartz.ConfigV1.TypeId,1) : Quartz_ConfigV1_to_str,
+    (psana.Quartz.ConfigV2.TypeId,2) : Quartz_ConfigV2_to_str,
     (psana.Rayonix.ConfigV1.TypeId,1) : Rayonix_ConfigV1_to_str,
     (psana.Rayonix.ConfigV2.TypeId,2) : Rayonix_ConfigV2_to_str,
     (psana.TimeTool.ConfigV1.TypeId,1) : TimeTool_ConfigV1_to_str,
+    (psana.TimeTool.ConfigV2.TypeId,2) : TimeTool_ConfigV2_to_str,
     (psana.TimeTool.DataV1.TypeId,1) : TimeTool_DataV1_to_str,
+    (psana.TimeTool.DataV2.TypeId,2) : TimeTool_DataV2_to_str,
     (psana.Timepix.ConfigV1.TypeId,1) : Timepix_ConfigV1_to_str,
     (psana.Timepix.ConfigV2.TypeId,2) : Timepix_ConfigV2_to_str,
     (psana.Timepix.ConfigV3.TypeId,3) : Timepix_ConfigV3_to_str,
