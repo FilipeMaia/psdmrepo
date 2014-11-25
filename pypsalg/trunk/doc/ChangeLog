@@ -11,6 +11,14 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2014-11-24 Ankush Mitra
+- python interface to C psalg functions and native python functions
+        => takes advantage of BOOST python converters defined in psana_python
+        => Uses BOOST to wrap native C/C++ functions for PYTHON
+- Removed  ScaleByN, chi2, and pypsalg_c native Python C API files
+- added example file
+	
 Tag: V00-00-07
 2014-10-29 Christopher O'Grady
 - Throttle warning messages in find_blobs.py.  Fix missing imports
