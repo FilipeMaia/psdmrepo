@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-22
+2014-11-25 David Schneider
+- bld.ddl: restoring pv names to documentation - see JIRA Issue PSAS-73
+
 Tag V01-00-21
 2014-11-25 Matt Weaver
 - quartz.ddl: Added ConfigV2 with hardware ROI

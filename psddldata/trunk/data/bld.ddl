@@ -45,12 +45,12 @@
   [[value_type]]
   [[pack(4)]]
 {
-  double _f_11_ENRC -> f_11_ENRC; /* First energy measurement (mJ) before attenuation. */
-  double _f_12_ENRC -> f_12_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. */
-  double _f_21_ENRC -> f_21_ENRC; /* First energy measurement (mJ) after attenuation. */
-  double _f_22_ENRC -> f_22_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. */
-  double _f_63_ENRC -> f_63_ENRC; /* First energy measurement (mJ) for small signals (<0.5 mJ), after attenuation. */
-  double _f_64_ENRC -> f_64_ENRC; /* Second (duplicate!) energy measurement (mJ) for small signals (<0.5mJ), after attenutation. */
+  double _f_11_ENRC -> f_11_ENRC; /* First energy measurement (mJ) before attenuation. (pv name GDET:FEE1:241:ENRC) */
+  double _f_12_ENRC -> f_12_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. (pv name GDET:FEE1:242:ENRC) */
+  double _f_21_ENRC -> f_21_ENRC; /* First energy measurement (mJ) after attenuation. (pv name  GDET:FEE1:361:ENRC) */
+  double _f_22_ENRC -> f_22_ENRC; /* Second (duplicate!) energy measurement (mJ) after attenuation. (pv name GDET:FEE1:362:ENRC)*/
+  double _f_63_ENRC -> f_63_ENRC; /* First energy measurement (mJ) for small signals (<0.5 mJ), after attenuation. (pv name GDET:FEE1:363:ENRC) */
+  double _f_64_ENRC -> f_64_ENRC; /* Second (duplicate!) energy measurement (mJ) for small signals (<0.5mJ), after attenutation. (pv name GDET:FEE1:364:ENRC) */
 
   /* Constructor which takes values for every attribute */
   @init()  [[auto, inline]];
