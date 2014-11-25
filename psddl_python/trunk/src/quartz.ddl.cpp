@@ -76,8 +76,56 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_QuartzConfig));
 
   {
-    PyObject* unvlist = PyList_New(1);
+  scope outer = 
+  class_<Psana::Quartz::ConfigV2, boost::shared_ptr<Psana::Quartz::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
+    .def("black_level", &Psana::Quartz::ConfigV2::black_level,"offset/pedestal setting for camera (before gain)")
+    .def("gain_percent", &Psana::Quartz::ConfigV2::gain_percent,"camera gain setting in percentile [100-3200] = [1x-32x]")
+    .def("output_resolution", &Psana::Quartz::ConfigV2::output_resolution,"bit-depth of pixel counts")
+    .def("horizontal_binning", &Psana::Quartz::ConfigV2::horizontal_binning,"horizontal re-binning of output (consecutive rows summed)")
+    .def("vertical_binning", &Psana::Quartz::ConfigV2::vertical_binning,"vertical re-binning of output (consecutive rows summed)")
+    .def("output_mirroring", &Psana::Quartz::ConfigV2::output_mirroring,"geometric transformation of the image")
+    .def("output_lookup_table_enabled", &Psana::Quartz::ConfigV2::output_lookup_table_enabled,"apply output lookup table corrections")
+    .def("defect_pixel_correction_enabled", &Psana::Quartz::ConfigV2::defect_pixel_correction_enabled,"correct defective pixels internally")
+    .def("use_hardware_roi", &Psana::Quartz::ConfigV2::use_hardware_roi,"enable hardware region of interest")
+    .def("roi_lo", &Psana::Quartz::ConfigV2::roi_lo, return_value_policy<copy_const_reference>(),"hardware ROI begin")
+    .def("roi_hi", &Psana::Quartz::ConfigV2::roi_hi, return_value_policy<copy_const_reference>(),"hardware ROI end")
+    .def("number_of_defect_pixels", &Psana::Quartz::ConfigV2::number_of_defect_pixels)
+    .def("output_lookup_table", &Psana::Quartz::ConfigV2::output_lookup_table)
+    .def("defect_pixel_coordinates", &Psana::Quartz::ConfigV2::defect_pixel_coordinates)
+    .def("output_offset", &Psana::Quartz::ConfigV2::output_offset,"offset/pedestal value in pixel counts")
+    .def("output_resolution_bits", &Psana::Quartz::ConfigV2::output_resolution_bits,"bit-depth of pixel counts")
+  ;
+
+  enum_<Psana::Quartz::ConfigV2::Depth>("Depth")
+    .value("Eight_bit",Psana::Quartz::ConfigV2::Eight_bit)
+    .value("Ten_bit",Psana::Quartz::ConfigV2::Ten_bit)
+  ;
+
+  enum_<Psana::Quartz::ConfigV2::Binning>("Binning")
+    .value("x1",Psana::Quartz::ConfigV2::x1)
+    .value("x2",Psana::Quartz::ConfigV2::x2)
+    .value("x4",Psana::Quartz::ConfigV2::x4)
+  ;
+
+  enum_<Psana::Quartz::ConfigV2::Mirroring>("Mirroring")
+    .value("None",Psana::Quartz::ConfigV2::None)
+    .value("HFlip",Psana::Quartz::ConfigV2::HFlip)
+    .value("VFlip",Psana::Quartz::ConfigV2::VFlip)
+    .value("HVFlip",Psana::Quartz::ConfigV2::HVFlip)
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_QuartzConfig);
+  scope().attr("LUT_Size")=4096;
+  scope().attr("Row_Pixels")=2048;
+  scope().attr("Column_Pixels")=2048;
+  scope().attr("Output_LUT_Size")=4096;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV2> >(Pds::TypeId::Id_QuartzConfig));
+
+  {
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "ConfigV2"));
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }

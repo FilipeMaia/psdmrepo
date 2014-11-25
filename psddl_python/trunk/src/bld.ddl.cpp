@@ -46,13 +46,13 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Bld::BldDataFEEGasDetEnergyV1 >("BldDataFEEGasDetEnergyV1", "Four energy measurements from Front End Enclosure Gas Detector.\n   PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, \n	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, \n	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC \n    *363* and *364* are duplicate measurements of *361* and *362* respectively. \n    The difference is that they cover a smaller (10%) dynamic range. \n    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs kick in.", no_init)
-    .def("f_11_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_11_ENRC,"Value of GDET:FEE1:241:ENRC, in mJ.")
-    .def("f_12_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_12_ENRC,"Value of GDET:FEE1:242:ENRC, in mJ.")
-    .def("f_21_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_21_ENRC,"Value of GDET:FEE1:361:ENRC, in mJ.")
-    .def("f_22_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_22_ENRC,"Value of GDET:FEE1:362:ENRC, in mJ.")
-    .def("f_63_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_63_ENRC,"Value of GDET:FEE1:363:ENRC, in mJ.")
-    .def("f_64_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_64_ENRC,"Value of GDET:FEE1:364:ENRC, in mJ.")
+  class_<Psana::Bld::BldDataFEEGasDetEnergyV1 >("BldDataFEEGasDetEnergyV1", "Six energy measurements from Front End Enclosure Gas Detector.\n   PV names: GDET:FEE1:241:ENRC, GDET:FEE1:242:ENRC, \n	GDET:FEE1:361:ENRC, GDET:FEE1:362:ENRC, \n	GDET:FEE1:363:ENRC, and GDET:FEE1:364:ENRC \n   Each pair of methods (e.g. f_11_ENRC(), f_12_ENRC() contains\n   identical measurements using two different phototubes.  \"11\" and \"12\"\n   are before the gas attenuation.  \"21\" and \"22\" are after gas\n   attenuation.\n   \"63\" and \"64\" are duplicate measurements of \"21\" and \"22\" respectively. \n    The difference is that they cover a smaller (10%) dynamic range. \n    When the beam is weak, 361 and 362 don't have good S/N, these 2 extra PVs should be used instead.  Dehong Zhang suggests that the threshold\n    for \"weak\" is around 0.5 mJ.", no_init)
+    .def("f_11_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_11_ENRC,"First energy measurement (mJ) before attenuation. (pv name GDET:FEE1:241:ENRC)")
+    .def("f_12_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_12_ENRC,"Second (duplicate!) energy measurement (mJ) after attenuation. (pv name GDET:FEE1:242:ENRC)")
+    .def("f_21_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_21_ENRC,"First energy measurement (mJ) after attenuation. (pv name  GDET:FEE1:361:ENRC)")
+    .def("f_22_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_22_ENRC,"Second (duplicate!) energy measurement (mJ) after attenuation. (pv name GDET:FEE1:362:ENRC)")
+    .def("f_63_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_63_ENRC,"First energy measurement (mJ) for small signals (<0.5 mJ), after attenuation. (pv name GDET:FEE1:363:ENRC)")
+    .def("f_64_ENRC", &Psana::Bld::BldDataFEEGasDetEnergyV1::f_64_ENRC,"Second (duplicate!) energy measurement (mJ) for small signals (<0.5mJ), after attenutation. (pv name GDET:FEE1:364:ENRC)")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_FEEGasDetEnergy);
@@ -402,12 +402,12 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Bld::BldDataGMDV2, boost::shared_ptr<Psana::Bld::BldDataGMDV2>, boost::noncopyable >("BldDataGMDV2", "Gas Monitor Detector data.", no_init)
-    .def("milliJoulesPerPulse", &Psana::Bld::BldDataGMDV2::milliJoulesPerPulse,"Shot to shot pulse energy (mJ)")
-    .def("milliJoulesAverage", &Psana::Bld::BldDataGMDV2::milliJoulesAverage,"Average pulse energy from ION cup current (mJ)")
-    .def("sumAllPeaksFiltBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksFiltBkgd,"Sum of all peaks, normalized w/ filt bkgd level")
-    .def("rawAvgBkgd", &Psana::Bld::BldDataGMDV2::rawAvgBkgd,"Avg background value per waveform in raw A/D counts")
-    .def("relativeEnergyPerPulse", &Psana::Bld::BldDataGMDV2::relativeEnergyPerPulse,"Shot by shot pulse energy in arbitrary units")
-    .def("sumAllPeaksRawBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksRawBkgd,"Sum of all peaks, normalized w/ raw avg bkgd level")
+    .def("milliJoulesPerPulse", &Psana::Bld::BldDataGMDV2::milliJoulesPerPulse,"Shot to shot pulse energy (mJ).  Not as robust as relativeEnergyPerPulse() method.")
+    .def("milliJoulesAverage", &Psana::Bld::BldDataGMDV2::milliJoulesAverage,"Average pulse energy from ION cup current (mJ).  Not as robust as relativeEnergyPerPulse() method.")
+    .def("sumAllPeaksFiltBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksFiltBkgd,"Sum of all peaks, normalized w/ filt bkgd level.  Not typically used by the user.")
+    .def("rawAvgBkgd", &Psana::Bld::BldDataGMDV2::rawAvgBkgd,"Avg background value per waveform in raw A/D counts.  Not typically used by the user.")
+    .def("relativeEnergyPerPulse", &Psana::Bld::BldDataGMDV2::relativeEnergyPerPulse,"Shot by shot pulse energy in arbitrary units.  The most stable measurement.  Most users should use this.")
+    .def("sumAllPeaksRawBkgd", &Psana::Bld::BldDataGMDV2::sumAllPeaksRawBkgd,"Sum of all peaks, normalized w/ raw avg bkgd level.  Not typically used by the user.")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_GMD);
