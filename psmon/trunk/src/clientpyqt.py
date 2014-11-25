@@ -7,6 +7,7 @@ import pyqtgraph as pg
 from pyqtgraph.Qt import QtGui
 
 import psmon.plotpyqt as psplot
+from psmon.plotpyqt import PyQtClientTypeError
 from psmon import app, config
 
 
@@ -26,7 +27,16 @@ def main(client_info, plot_info):
     zmqsub = app.ZMQSubscriber(client_info)
 
     # grab an initial datagram from the server
-    init_data = zmqsub.data_recv()
+    try:
+        init_data = zmqsub.data_recv()
+    except AttributeError as err:
+        LOG.critical('Server returned an unparsable datagram: %s', err)
+        return 1
+
+    # Check that the datagram is valid
+    if not init_data.valid:
+        LOG.critical('Server returned an invalid datagram of datatype: %s', type(init_data))
+        return 1
 
     # attempt to decode its type and go from there
     try:
@@ -52,8 +62,12 @@ def main(client_info, plot_info):
     )
 
     # start the plotting rendering routine
-    plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
-    plot.animate()
+    try:
+        plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
+        plot.animate()
+    except PyQtClientTypeError as err:
+        LOG.critical('Server returned datagram with an unsupported type: %s', err)
+        return 1
 
     # define signal sender function
     reset_req = app.ZMQRequester(
@@ -64,3 +78,5 @@ def main(client_info, plot_info):
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()
+
+    return 0

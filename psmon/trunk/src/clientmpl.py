@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
 import psmon.plotmpl as psplot
+from psmon.plotmpl import MplClientTypeError
 from psmon import app, config
 
 
@@ -18,7 +19,16 @@ def main(client_info, plot_info):
     zmqsub = app.ZMQSubscriber(client_info)
 
     # grab an initial datagram from the server
-    init_data = zmqsub.data_recv()
+    try:
+        init_data = zmqsub.data_recv()
+    except AttributeError as err:
+        LOG.critical('Server returned an unparsable datagram: %s', err)
+        return 1
+
+    # Check that the datagram is valid
+    if not init_data.valid:
+        LOG.critical('Server returned an invalid datagram of datatype: %s', type(init_data))
+        return 1
 
     # attempt to decode its type and go from there
     try:
@@ -27,8 +37,13 @@ def main(client_info, plot_info):
         LOG.exception('Server returned an unknown datatype: %s', type(init_data))
         return 1
 
-    plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
-    plot_ani = plot.animate()
+    # start the plotting rendering routine
+    try:
+        plot = data_type(init_data, zmqsub.get_socket_gen(), plot_info, rate=1.0/client_info.rate)
+        plot_ani = plot.animate()
+    except MplClientTypeError as err:
+        LOG.critical('Server returned datagram with an unsupported type: %s', err)
+        return 1
 
     # auto zoom button params
     az_xpos = 0.01

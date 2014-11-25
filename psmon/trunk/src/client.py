@@ -151,8 +151,8 @@ def parse_cmdline():
 
 def mpl_client(renderer, client_info, plot_info):
     render_mod = __import__('psmon.client%s'%renderer, fromlist=['main'])
+    sys.exit(render_mod.main(client_info, plot_info))
 
-    render_mod.main(client_info, plot_info)
 
 def main():
     try:

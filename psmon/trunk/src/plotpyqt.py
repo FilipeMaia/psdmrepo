@@ -26,10 +26,16 @@ TypeMap = {
 
 def type_getter(data_type, mod_name=__name__):
     plot_type_name = TypeMap.get(data_type)
-    return getattr(sys.modules[__name__], plot_type_name)
+    if plot_type_name is None:
+        raise PyQtClientTypeError('No plotting client for datatype: %s' % data_type)
+    return getattr(sys.modules[mod_name], plot_type_name)
 
 
-class Plot(object):
+class PyQtClientTypeError(Exception):
+    pass
+
+
+class PlotClient(object):
     def __init__(self, init, framegen, info, rate, **kwargs):
         if 'figwin' in kwargs:
             self.fig_win = kwargs['figwin']
@@ -150,7 +156,7 @@ class Plot(object):
             self.cursor_hover_evt_sub(int(mouse_pos.x()), int(mouse_pos.y()))
 
 
-class ImageClient(Plot):
+class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         self.set_aspect()
@@ -197,7 +203,7 @@ class ImageClient(Plot):
             self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
 
-class XYPlotClient(Plot):
+class XYPlotClient(PlotClient):
     def __init__(self, init_plot, framegen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate, **kwargs)
         self.plots = []
@@ -229,7 +235,7 @@ class XYPlotClient(Plot):
         return self.plots
 
 
-class HistClient(Plot):
+class HistClient(PlotClient):
     def __init__(self, init_hist, framegen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, framegen, info, rate, **kwargs)
         self.hists = []

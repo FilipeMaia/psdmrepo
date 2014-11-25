@@ -27,10 +27,16 @@ TypeMap = {
 
 def type_getter(data_type, mod_name=__name__):
     plot_type_name = TypeMap.get(data_type)
-    return getattr(sys.modules[__name__], plot_type_name)
+    if plot_type_name is None:
+        raise MplClientTypeError('No plotting client for datatype: %s' % data_type)
+    return getattr(sys.modules[mod_name], plot_type_name)
 
 
-class Plot(object):
+class MplClientTypeError(Exception):
+    pass
+
+
+class PlotClient(object):
     def __init__(self, init, framegen, info, rate, **kwargs):
         if 'figax' in kwargs:
             self.figure, self.ax = kwargs['figax']
@@ -156,7 +162,7 @@ class MultiPlotClient(object):
         yield self.framegen.next()
 
 
-class ImageClient(Plot):
+class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         # if a color palette is specified check to see if it valid
@@ -187,7 +193,7 @@ class ImageClient(Plot):
             self.set_ax_col(self.cb.ax)
 
 
-class HistClient(Plot):
+class HistClient(PlotClient):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
         # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
@@ -212,7 +218,7 @@ class HistClient(Plot):
         return self.hists
 
 
-class XYPlotClient(Plot):
+class XYPlotClient(PlotClient):
     def __init__(self, init_plot, datagen, info, rate=1, **kwargs):
         super(XYPlotClient, self).__init__(init_plot, datagen, info, rate, **kwargs)
         plot_args = arg_inflate_flat(1, init_plot.xdata, init_plot.ydata, init_plot.formats)

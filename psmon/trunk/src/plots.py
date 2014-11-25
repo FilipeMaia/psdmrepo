@@ -1,15 +1,28 @@
-class Data(object):
+class Plot(object):
+    """
+    A data container representing a Plot object for the psmon client
+    """
     def __init__(self, ts, title, xlabel, ylabel):
         self.ts = ts
         self.title = title
         self.xlabel = xlabel
         self.ylabel = ylabel
 
+    @property
+    def valid(self):
+        """
+        This attribute is True if this Plot object is valid
+
+        Conditions:
+         - Always True for Plot class objects - subclasses can override
+        """
+        return True
+
 
 class MultiPlot(object):
     """
-    A data container of arbitary plot types - can contain an arbitrary number of
-    objects inheiriting 
+    A data container of arbitary subtypes of the Plot class - can contain an
+    arbitrary number of Plot objects
 
     Optional arguments
     - ncols: indicates to the client the number of columns to be used for 
@@ -29,29 +42,65 @@ class MultiPlot(object):
             self.data_con = data_con
 
     def add(self, data):
+        """
+        Add an additional Plot to MultiPlot objects plot list
+        """
         self.data_con.append(data)
 
     def get(self, index):
+        """
+        Returns a reference to the Plot object cooresponding to the index
+        """
         return self.data_con[index]
 
     @property
     def size(self):
+        """
+        Returns the number of Plot objects contained in the Multiplot object
+        """
         return len(self.data_con)
 
+    @property
+    def valid(self):
+        """
+        This attribute is True if this MultiPlot object is valid
 
-class Image(Data):
+        Conditions:
+         - The Multiplot object must contain at least one Plot object
+         - All the objects contained in the Multiplot object must be valid
+        """
+        try:
+            for data in self.data_con:
+                if not data.valid:
+                    return False
+        except AttributeError:
+            return False
+        return len(self.data_con) != 0
+
+
+class Image(Plot):
     """
-    A data container for image data
+    A data container for image data for the psmon client
     """
 
     def __init__(self, ts, title, image, xlabel=None, ylabel=None):
         super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
 
+    @property
+    def valid(self):
+        """
+        This attribute is True if this Image object is valid
 
-class Hist(Data):
+        Conditions:
+         - The 'image' attribute of must not be None 
+        """
+        return self.image is not None
+
+
+class Hist(Plot):
     """
-    A data container for 1-d histogram data
+    A data container for 1-d histogram data for the psmon client
     """
 
     def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, formats='-'):
@@ -61,7 +110,10 @@ class Hist(Data):
         self.formats = formats
 
 
-class XYPlot(Data):
+class XYPlot(Plot):
+    """
+    A data container for xy scatter plot data for the psmon client
+    """
 
     def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None, formats='-'):
         super(XYPlot, self).__init__(ts, title, xlabel, ylabel)
