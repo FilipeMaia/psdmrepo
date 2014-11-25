@@ -71,6 +71,11 @@ checkout() {
     # checkout all packages from the tag list
     #
     addpkg -x -f ./tags || return 3
+
+    #
+    # inject release information package into the release
+    #
+    mkrelinfo "$rel" "$rels/$rel/ReleaseInfo"
 }
 
 
