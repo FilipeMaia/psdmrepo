@@ -99,8 +99,8 @@ def parse_cmdline():
         '-i',
         '--interpolation',
         metavar='INTERPOLATION',
-        default='none',
-        help='the interpolation type for images (default: \'none\')'
+        default=config.APP_IMG_INTERPOLATION,
+        help='the interpolation type for images (default: \'%s\')'%config.APP_IMG_INTERPOLATION
     )
 
     parser.add_argument(
@@ -122,6 +122,14 @@ def parse_cmdline():
         metavar='PALETTE',
         default=None,
         help='the color palette to use for images'
+    )
+
+    parser.add_argument(
+        '-g',
+        '--grid',
+        action='store_true',
+        default=False,
+        help='show grid lines overlaid on plots'
     )
 
     parser.add_argument(
@@ -170,7 +178,8 @@ def main():
             bkg_col=args.bkg_color,
             fore_col=args.text_color,
             interpol=args.interpolation,
-            palette=args.palette
+            palette=args.palette,
+            grid=args.grid
         )
 
         proc_list = []

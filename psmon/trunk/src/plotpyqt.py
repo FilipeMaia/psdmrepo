@@ -69,6 +69,8 @@ class PlotClient(object):
         self.multi_plot = False
         # set any user specified default axis ranges
         self.set_xy_ranges()
+        # show grid lines if requested
+        self.set_grid_lines()
         # create cursor event listener
         self.proxy = pg.SignalProxy(
             self.plot_view.scene().sigMouseMoved,
@@ -143,6 +145,11 @@ class PlotClient(object):
         if self.info.yrange is not None:
             self.plot_view.setYRange(*self.info.yrange)
 
+    def set_grid_lines(self, show=None, alpha=config.PYQT_GRID_LINE_ALPHA):
+        if show is None:
+            show = self.info.grid
+        self.plot_view.showGrid(x=show, y=show, alpha=alpha)
+
     def _set_row_stretch(self, val):
         self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
 
@@ -160,6 +167,7 @@ class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         self.set_aspect()
+        self.set_grid_lines(False)
         self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)
 

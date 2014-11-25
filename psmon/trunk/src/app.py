@@ -23,7 +23,7 @@ class ClientInfo(object):
 
 
 class PlotInfo(object):
-    def __init__(self, xrange=None, yrange=None, zrange=None, aspect=None, fore_col=None, bkg_col=None, interpol=None, palette=None):
+    def __init__(self, xrange=None, yrange=None, zrange=None, aspect=None, fore_col=None, bkg_col=None, interpol=None, palette=None, grid=False):
         self.xrange = xrange
         self.yrange = yrange
         self.zrange = zrange
@@ -32,6 +32,7 @@ class PlotInfo(object):
         self.bkg_col = bkg_col
         self.interpol = interpol
         self.palette = palette
+        self.grid = grid
 
 
 class ZMQPublisher(object):

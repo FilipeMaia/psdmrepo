@@ -109,6 +109,11 @@ class PlotClient(object):
             ax.yaxis.label.set_color(self.info.fore_col)
             ax.xaxis.label.set_color(self.info.fore_col)
 
+    def set_grid_lines(self, show=None):
+        if show is None:
+            show = self.info.grid
+        self.ax.grid(show)
+
     def update_plot_data(self, plots, x_vals, y_vals, new_fmts, old_fmts):
         for index, (plot, data_tup, old_fmt) in enumerate(zip(plots, arg_inflate_tuple(1, x_vals, y_vals, new_fmts), old_fmts)):
             x_val, y_val, new_fmt = data_tup
@@ -140,9 +145,9 @@ class MultiPlotClient(object):
         if init.use_windows:
             LOG.warning('Separate windows for subplots is not supported in the matplotlib client')
         ratio_calc = window_ratio(config.MPL_SMALL_WIN, config.MPL_LARGE_WIN)
-        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col, figsize=ratio_calc(nrows, ncols))
+        self.figure, self.ax = plt.subplots(nrows=nrows, ncols=ncols, facecolor=info.bkg_col, edgecolor=info.bkg_col, figsize=ratio_calc(ncols, nrows), squeeze=False)
         # flatten the axes array returned by suplot
-        self.ax = self.ax.flatten() if init.size > 1 else [self.ax]
+        self.ax = self.ax.flatten()
         self.figure.canvas.set_window_title(init.title)
         self.plots = [type_getter(type(data_obj))(data_obj, None, info, rate, figax=(self.figure, subax)) for data_obj, subax in zip(init.data_con, self.ax)]
         self.framegen = framegen
@@ -205,6 +210,7 @@ class HistClient(PlotClient):
         self.formats = inflate_input(init_hist.formats, init_hist.values)
         self.set_aspect()
         self.set_xy_ranges()
+        self.set_grid_lines()
 
     def update_sub(self, data):
         if data is not None:
@@ -226,6 +232,7 @@ class XYPlotClient(PlotClient):
         self.formats = inflate_input(init_plot.formats, init_plot.ydata)
         self.set_aspect()
         self.set_xy_ranges()
+        self.set_grid_lines()
 
     def update_sub(self, data):
         if data is not None:
