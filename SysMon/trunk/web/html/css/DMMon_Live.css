@@ -26,6 +26,18 @@
     border:         solid 1px #b0b0b0;
     padding:        25px;
 }
+
+.dmmon-live > #tabs .tab-cont .control-group {
+    float:          left;
+    margin-right:   20px;
+}
+.dmmon-live > #tabs .tab-cont .control-group span.control-group-title {
+    font-size:      12px;
+    font-weight:    bold;
+}
+.dmmon-live > #tabs .tab-cont .control-group-end {
+    clear:          both;
+}
 .dmmon-live .presentation {
     margin-top:     10px;
 }
