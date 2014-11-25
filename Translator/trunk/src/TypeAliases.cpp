@@ -268,6 +268,7 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet Quartz;
   Quartz.insert( & typeid(Psana::Quartz::ConfigV1));
+  Quartz.insert( & typeid(Psana::Quartz::ConfigV2));
   m_alias2TypesMap["Quartz"] = Quartz;
 
   TypeInfoSet Rayonix;
@@ -300,7 +301,9 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet TimeTool;
   TimeTool.insert( & typeid(Psana::TimeTool::ConfigV1));
+  TimeTool.insert( & typeid(Psana::TimeTool::ConfigV2));
   TimeTool.insert( & typeid(Psana::TimeTool::DataV1));
+  TimeTool.insert( & typeid(Psana::TimeTool::DataV2));
   m_alias2TypesMap["TimeTool"] = TimeTool;
 
   TypeInfoSet Timepix;

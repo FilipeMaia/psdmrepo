@@ -262,10 +262,13 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Pulnix::TM6740ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Pulnix::TM6740ConfigV1> >();
   m_mainMap[ & typeid(Psana::Pulnix::TM6740ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Pulnix::TM6740ConfigV2> >();
   m_mainMap[ & typeid(Psana::Quartz::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Quartz::ConfigV1> >();
+  m_mainMap[ & typeid(Psana::Quartz::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Quartz::ConfigV2> >();
   m_mainMap[ & typeid(Psana::Rayonix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Rayonix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV2> >();
   m_mainMap[ & typeid(Psana::TimeTool::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::ConfigV1> >();
+  m_mainMap[ & typeid(Psana::TimeTool::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::ConfigV2> >();
   m_mainMap[ & typeid(Psana::TimeTool::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::DataV1> >();
+  m_mainMap[ & typeid(Psana::TimeTool::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::TimeTool::DataV2> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV2> >();
   m_mainMap[ & typeid(Psana::Timepix::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV3> >();
