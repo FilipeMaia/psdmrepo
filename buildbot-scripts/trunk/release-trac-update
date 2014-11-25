@@ -1,0 +1,25 @@
+#!/bin/sh
+#
+# Script which adds new release to Trac.
+# Used as one of the steps in buildbot builder. 
+#
+
+# First positional argument gives release name
+relname=${1:?Required parameter missing (release name)}
+
+tracinst='/reg/g/psdm/sw/external/Trac/x86_64-rhel5-gcc41-opt'
+tracproj='/reg/g/psdm/web/trac/psdm'
+
+echo "Registering release $relname in Trac"
+
+# virtualenv
+unset PYTHONPATH
+. $tracinst/bin/activate
+
+# run trac-admin command
+time=`date +%Y%m%dT%H%M%S`
+trac-admin $tracproj version add "$relname" "$time"
+
+# ignore any errors
+true
+ 

@@ -1,0 +1,117 @@
+#!/bin/sh
+#
+# Script which creates RPM for the new release from previously built SRPM.
+# Used as one of the steps in buildbot builder. 
+#
+
+# stop if anything happens
+set -e
+
+# First positional argument gives release name
+relname=${1:?Required parameter missing (release name)}
+shift
+relarch=${1:?Required parameter missing (release architectures)}
+relarch="$@"
+
+version=$(echo $relname | sed 's/\(.*-\)*\(.*\)/\2/')
+reltype=$(echo $relname | sed 's/\(.*-\)*\(.*\)/\1/')
+
+# location for SRPM files
+srpmdir="/reg/g/psdm/sw/releases/buildbot/rpm-stage/SRPMS"
+
+# location for generated RPMs
+rpmoutdir='/reg/g/psdm/sw/releases/buildbot/rpm-stage/RPMS'
+
+# location for repositories
+repodir='/reg/g/psdm/sw/dist/repos'
+
+# SRPM name
+srpmname="psdm-release-$relname-1psdm.src.rpm"
+srpm="$srpmdir/$srpmname"
+
+#
+# Check that all RPMS are there
+#
+check_rpm() {
+    _rpm="$1"
+    _rpmdir="$2"
+    _repo="$3"
+	test -f "$_rpmdir/$_rpm" || error="${error}*** [error] RPM file not found: $_rpmdir/$_rpm\n"
+	test -f "$_repo/$_rpm" && error="${error}*** [error] RPM file already in repository: $_repo/$_rpm\n"
+	true
+}
+
+check_rpm "$srpmname" "$srpmdir" "$repodir/src/src"
+for arch in $relarch ; do
+
+    os=$(echo $arch | cut -d- -f2)
+    rpmarch=$(echo $arch | cut -d- -f1)
+
+    rpmdir="$rpmoutdir/$os/$rpmarch"
+    check_rpm "psdm-release-$relname-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/common/$rpmarch"
+    check_rpm "psdm-release-$relname-$arch-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/$os/$rpmarch"
+    check_rpm "psdm-release-${reltype}latest-$os-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/$os/$rpmarch"
+
+done
+if [ -n "$error" ] ; then
+    printf "$error" 2>&1
+    exit 2
+fi
+
+#
+# Move everything
+#
+move_rpm() {
+    _rpm="$1"
+    _rpmdir="$2"
+    _repo="$3"
+	if [ -f "$_rpmdir/$_rpm" ] ; then
+	    if [ -f "$_repo/$_rpm" ] ; then
+	        rm "$_rpmdir/$_rpm"
+	    else
+	        echo Move "$_rpmdir/$_rpm" to "$_repo"
+	        mkdir -p "$_repo"
+	        mv "$_rpmdir/$_rpm" "$_repo"
+	    fi
+	fi
+}
+
+echo Move "$srpm" to "$repodir/src/src"
+mkdir -p "$repodir/src/src"
+mv "$srpm" "$repodir/src/src"
+
+for rpmarch in $(for arch in $relarch ; do echo $arch | cut -d- -f1; done | sort -u); do 
+    installs="$installs $repodir/common/$rpmarch/psdm-release-$relname-$version-1psdm.$rpmarch.rpm"
+done
+for arch in $relarch ; do
+  
+    os=$(echo $arch | cut -d- -f2)
+    rpmarch=$(echo $arch | cut -d- -f1)
+
+    rpmdir="$rpmoutdir/$os/$rpmarch"
+    move_rpm "psdm-release-$relname-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/common/$rpmarch" 
+    move_rpm "psdm-release-$relname-$arch-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/$os/$rpmarch"
+    move_rpm "psdm-release-${reltype}latest-$os-$version-1psdm.$rpmarch.rpm" "$rpmdir" "$repodir/$os/$rpmarch"
+
+    installs="$installs $repodir/$os/$rpmarch/psdm-release-$relname-$arch-$version-1psdm.$rpmarch.rpm"
+
+done
+
+#
+# Update repository indices
+#
+oses=$(for arch in $relarch ; do echo $arch | cut -d- -f2; done | sort -u)
+for os in src common $oses ; do
+    repo=$repodir/$os
+    echo Updating index in $repo
+    createrepo -q $repo
+done
+
+#
+# install it
+#
+rpmdir=/reg/g/psdm/sw/dist/apt-rpm/$(echo $SIT_ARCH|gawk -F- '{print $2 FS $1}')
+echo $rpmdir/bin/rpm -ivh $installs
+$rpmdir/bin/rpm -ivh $installs
+
+echo "RPMs for release $relname installed successfully"
