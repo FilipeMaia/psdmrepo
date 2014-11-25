@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-21
+2014-11-25 Matt Weaver
+- quartz.ddl: Added ConfigV2 with hardware ROI
+	
 Tag V01-00-20
 2014-11-18 Matt Weaver
 - timetool.ddl: Added ConfigV2, DataV2 to include 2 spectral line analysis
