@@ -56,6 +56,54 @@ private:
 };
 
 
+class ConfigV2 : public Psana::TimeTool::ConfigV2 {
+public:
+  typedef Pds::TimeTool::ConfigV2 XtcType;
+  typedef Psana::TimeTool::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual Psana::TimeTool::ConfigV2::Axis project_axis() const;
+  virtual uint8_t write_image() const;
+  virtual uint8_t write_projections() const;
+  virtual uint8_t subtract_sideband() const;
+  virtual uint8_t use_reference_roi() const;
+  virtual uint16_t number_of_weights() const;
+  virtual uint8_t calib_poly_dim() const;
+  virtual uint8_t base_name_length() const;
+  virtual uint16_t number_of_beam_event_codes() const;
+  virtual uint16_t number_of_laser_event_codes() const;
+  virtual uint32_t signal_cut() const;
+  virtual const Psana::Camera::FrameCoord& sig_roi_lo() const;
+  virtual const Psana::Camera::FrameCoord& sig_roi_hi() const;
+  virtual const Psana::Camera::FrameCoord& sb_roi_lo() const;
+  virtual const Psana::Camera::FrameCoord& sb_roi_hi() const;
+  virtual double sb_convergence() const;
+  virtual const Psana::Camera::FrameCoord& ref_roi_lo() const;
+  virtual const Psana::Camera::FrameCoord& ref_roi_hi() const;
+  virtual double ref_convergence() const;
+  virtual ndarray<const Psana::TimeTool::EventLogic, 1> beam_logic() const;
+  virtual ndarray<const Psana::TimeTool::EventLogic, 1> laser_logic() const;
+  virtual ndarray<const double, 1> weights() const;
+  virtual ndarray<const double, 1> calib_poly() const;
+  virtual const char* base_name() const;
+  virtual uint32_t signal_projection_size() const;
+  virtual uint32_t sideband_projection_size() const;
+  virtual uint32_t reference_projection_size() const;
+  virtual std::vector<int> base_name_shape() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  Psana::Camera::FrameCoord _sig_roi_lo;
+  Psana::Camera::FrameCoord _sig_roi_hi;
+  Psana::Camera::FrameCoord _sb_roi_lo;
+  Psana::Camera::FrameCoord _sb_roi_hi;
+  Psana::Camera::FrameCoord _ref_roi_lo;
+  Psana::Camera::FrameCoord _ref_roi_hi;
+  ndarray<Psana::TimeTool::EventLogic, 1> _beam_logic_ndarray_storage_;
+  ndarray<Psana::TimeTool::EventLogic, 1> _laser_logic_ndarray_storage_;
+};
+
+
 template <typename Config>
 class DataV1 : public Psana::TimeTool::DataV1 {
 public:
@@ -72,6 +120,30 @@ public:
   virtual double nxt_amplitude() const;
   virtual ndarray<const int32_t, 1> projected_signal() const;
   virtual ndarray<const int32_t, 1> projected_sideband() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  boost::shared_ptr<const Config> m_cfgPtr;
+};
+
+
+template <typename Config>
+class DataV2 : public Psana::TimeTool::DataV2 {
+public:
+  typedef Pds::TimeTool::DataV2 XtcType;
+  typedef Psana::TimeTool::DataV2 PsanaType;
+  DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
+  virtual ~DataV2();
+  virtual Psana::TimeTool::DataV2::EventType event_type() const;
+  virtual double amplitude() const;
+  virtual double position_pixel() const;
+  virtual double position_time() const;
+  virtual double position_fwhm() const;
+  virtual double ref_amplitude() const;
+  virtual double nxt_amplitude() const;
+  virtual ndarray<const int32_t, 1> projected_signal() const;
+  virtual ndarray<const int32_t, 1> projected_sideband() const;
+  virtual ndarray<const int32_t, 1> projected_reference() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

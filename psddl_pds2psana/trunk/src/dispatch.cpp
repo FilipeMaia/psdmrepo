@@ -1961,6 +1961,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 2:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Quartz::ConfigV2> xptr(xtc, (Pds::Quartz::ConfigV2*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Quartz::ConfigV2> obj = boost::make_shared<psddl_pds2psana::Quartz::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -2185,6 +2195,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 2:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::TimeTool::ConfigV2> xptr(xtc, (Pds::TimeTool::ConfigV2*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::TimeTool::ConfigV2> obj = boost::make_shared<psddl_pds2psana::TimeTool::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -2200,12 +2220,30 @@ try {
           }
         }
         break;
+      case 2:
+        {
+          if (boost::shared_ptr<Pds::TimeTool::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::TimeTool::DataV2, psddl_pds2psana::TimeTool::DataV2<Pds::TimeTool::ConfigV2>, Pds::TimeTool::DataV2, Pds::TimeTool::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::TimeTool::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
       case 32769:
         {
           if (boost::shared_ptr<Pds::TimeTool::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
             typedef EvtProxyCfg<Psana::TimeTool::DataV1, psddl_pds2psana::TimeTool::DataV1<Pds::TimeTool::ConfigV1>, Pds::TimeTool::DataV1, Pds::TimeTool::ConfigV1> ProxyType;
             if (evt) evt->putProxy<Psana::TimeTool::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32770:
+        {
+          if (boost::shared_ptr<Pds::TimeTool::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::TimeTool::DataV2, psddl_pds2psana::TimeTool::DataV2<Pds::TimeTool::ConfigV2>, Pds::TimeTool::DataV2, Pds::TimeTool::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::TimeTool::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -3011,6 +3049,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Quartz::ConfigV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Quartz::ConfigV2) );
+      break;
     } // end version switch
     break;
   case Pds::TypeId::Id_RayonixConfig:
@@ -3109,6 +3150,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::TimeTool::ConfigV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::ConfigV2) );
+      break;
     } // end version switch
     break;
   case Pds::TypeId::Id_TimeToolData:
@@ -3116,8 +3160,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV1) );
       break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV2) );
+      break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::TimeTool::DataV2) );
       break;
     } // end version switch
     break;
