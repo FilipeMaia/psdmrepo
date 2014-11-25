@@ -1,0 +1,79 @@
+#!/bin/sh
+#
+#  Script which builds the release
+#
+
+set -e
+
+# host and port where buildbot listens
+bbot=psdev106:9989
+
+usage() {
+  echo Usage: `basename $0` '<release-name> <tags-file> [<description-file>]' 1>&2
+}
+
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
+tmp=${SIT_SVN:?Missing SIT_SVN}
+
+# check arguments
+if [ $# -lt 2 ] ; then
+  echo "Required parameters missing" 1>&2
+  usage
+  exit 2
+elif [ $# -gt 3 ] ; then
+  echo "Too many parameters" 1>&2
+  usage
+  exit 2
+fi
+
+rel="$1"
+tags="$2"
+desc="$3"
+
+reldirsvn="$SIT_SVN/_releases/$rel"
+
+#
+# check that release does not exist 
+#
+if svn ls "$reldirsvn" >/dev/null 2>&1 ; then
+    echo "Release directory $reldirsvn already there, aborting." 1>&2
+    exit 2
+fi
+
+#
+# check that tags file is there 
+#
+if [ ! -f "$tags" ] ; then
+    echo "Tags file $tags does not exist, aborting." 1>&2
+    exit 2
+fi
+
+#
+# make temporary directory and copy files there
+#
+tmpdir="/tmp/start-regular-build-repo-$$"
+rm -rf "$tmpdir" 2>/dev/null
+mkdir -p "$tmpdir"
+cp -p "$tags" "$tmpdir/tags"
+test -f "$desc" && cp -p "$desc" "$tmpdir/release-notes"
+
+#
+# copy files to a new directory in SVN
+#
+svn import -m "Setting up release $rel" "$tmpdir" "$reldirsvn"
+
+#
+# inject release information package into the release
+#
+mkrelinfo "$rel" "$tmpdir/ReleaseInfo"
+
+#
+# Send a signal to buildbot
+#
+echo "Sending notification to BuildBot"
+buildbotdir="/reg/g/psdm/sw/external/buildbot/$SIT_ARCH"
+pyextradir="/reg/g/psdm/sw/external/pyextra-python2.7/$SIT_ARCH"
+PYTHONPATH=$buildbotdir/lib/python2.7/site-packages:$pyextradir/lib/python2.7/site-packages \
+	$buildbotdir/bin/buildbot sendchange \
+		--user=$USER --master=$bbot --branch="$rel" --category="regular-rpm" \
+		--comments="Requesting to build release $rel" tags
