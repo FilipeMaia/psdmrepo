@@ -1,0 +1,58 @@
+#!/bin/sh
+#
+# Script which creates RPM for the new release from previously built SRPM.
+# Used as one of the steps in buildbot builder. 
+#
+
+# stop if anything happens
+set -e
+
+# First positional argument gives release name
+relname=${1:?Required parameter missing (release name)}
+relarch=${2:?Required parameter missing (release architecture)}
+
+# location for SRPM files
+srpmdir="/reg/g/psdm/sw/releases/buildbot/rpm-stage/SRPMS"
+
+# location for generated RPMs
+os=$(echo $relarch | cut -d- -f2)
+rpmoutdir="/reg/g/psdm/sw/releases/buildbot/rpm-stage/RPMS/$os"
+
+# SRPM name
+srpm="$srpmdir/psdm-release-$relname-1psdm.src.rpm"
+
+# temporary directory
+reldir="/reg/g/psdm/sw/releases/buildbot/_tmp/rpm-$$"
+
+#
+# Check that SRPM is there
+#
+if [ ! -f "$srpm" ] ; then
+    echo "*** [error] SRPM file not found: $srpm" 1>&2
+    exit 2
+fi
+
+#
+# directory where we build stuff
+#
+mkdir -p "$reldir"
+cd "$reldir"
+
+#
+# build it
+#
+mkdir BUILD
+mkdir -p "$rpmoutdir"
+rpmdir=/reg/g/psdm/sw/dist/apt-rpm/$(echo $relarch|gawk -F- '{print $2 FS $1}')
+SIT_ARCH="$relarch" $rpmdir/bin/rpmbuild --define "_topdir $PWD" --define "_specdir $PWD/SPECS" \
+    --define "_builddir $PWD/BUILD" --define "_rpmdir $rpmoutdir" \
+    --define "_srcrpmdir $PWD/SRPM" --define "_sourcedir $PWD/SOURCES" \
+    --define "_tmppath $PWD/tmp" --rebuild "$srpm"
+
+#
+# final cleanup
+#
+cd /
+rm -rf "$reldir"
+
+echo "RPMs for release $relname created successfully in $rpmoutdir"
