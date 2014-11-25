@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-10
+2014-11-24 David schneider
+- add check for corrupted xtc to address JIRA issue PSAS-71
+
 Tag: V00-10-09
 2014-09-18 David schneider
 - adjust debug printout
