@@ -159,15 +159,15 @@ standardSConscript()""")
 
 def create_C_defs ():
 
-    create_file("%s/include/Release.hh" % pkg_path,
-"""#ifndef {0}_RELEASE_HH
-#define {0}_RELEASE_HH
+    create_file("%s/include/Release.h" % pkg_path,
+"""#ifndef {0}_RELEASE_H
+#define {0}_RELEASE_H
 #define {0}_NAME "{1}"
 #define {0}_TYPE "{2}"
 #define {0}_VERSION_MAJOR  {3}
 #define {0}_VERSION_MIDDLE {4}
 #define {0}_VERSION_MINOR  {5}
-#endif // {0}_RELEASE_HH
+#endif // {0}_RELEASE_H
 """.format(
             pkg_name.upper(),
             rel_name,
