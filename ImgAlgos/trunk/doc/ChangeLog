@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-71
+2014-11-25 Mikhail S. Dubrovin
+- add AlgSmearing, AlgDroplet, CommonMode
+- move common mode correction algorithms from GlobalMethods.h to CommonMode.h
+- in NDArrCalib add common mode support for Epix100a
+
 Tag: V00-03-70
 2014-11-13 Mikhail S. Dubrovin
 - NDArrCalib.cpp - move conditional printCalibPars() after constants loading (PSAS-44)

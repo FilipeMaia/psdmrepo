@@ -24,6 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ImgAlgos/CommonMode.h"
 #include "ImgAlgos/GlobalMethods.h"
 #include "PSCalib/CalibPars.h"
 
@@ -180,6 +181,8 @@ private:
       const PSCalib::CalibPars::common_mode_t* pars = &m_cmod_data[1]; // [0] element=mode is excluded from parameters
       float cmod_corr = 0;
 
+      if ( m_print_bits & 128 ) MsgLog( name(), info, "mode:" << mode << "  dettype:" << m_dettype);
+
       if ( mode == 0 ) return;
 
       // Algorithm 1 for CSPAD
@@ -230,7 +233,7 @@ private:
           length = (length<100) ? 128 : length;
           
           for (unsigned i0=0; i0<m_size; i0+=length) {
-              psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
+	      psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
               //     commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // from GlobalMethods.h
           }
           return; 
@@ -248,6 +251,43 @@ private:
               psalg::commonModeMedian<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
           }
           return; 
+      }
+
+      // Algorithm 4 for EPIX100A    common_mode file example: 4 5 10
+      else if ( mode == 4 && m_dettype == EPIX100A ) {
+
+        //T threshold     = (T) m_cmod_data[1];
+        //T maxCorrection = (T) m_cmod_data[2];
+
+	unsigned shape[2] = {704, 768};
+
+	//size_t nregs = 4;	
+	//size_t nrows = shape[0]/2;
+	//size_t ncols = shape[1]/2;
+	//size_t rowmin[nregs]  = {0,     0, nrows, nrows};
+	//size_t colmin[nregs]  = {0, ncols,     0, ncols};
+
+	size_t nregs  = 16;	
+	size_t nrows  = shape[0]/2;
+	size_t ncols  = shape[1]/8;
+	size_t rowmin = 0;
+        size_t colmin = 0;
+        
+        ndarray<T,2> d(data, shape);
+        ndarray<const uint16_t,2> stat(m_stat_data, shape);
+	
+        unsigned pbits = ( m_print_bits & 128 ) ? 0xffff : 0;
+
+	for(size_t s=0; s<nregs; s++) {
+	  //meanInRegion<T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
+	  //medianInRegion<T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
+	  
+	  rowmin = (s/8)*nrows;
+	  colmin = (s%8)*ncols;
+	  
+	  medianInRegion<T>(pars, d, stat, rowmin, colmin, nrows, ncols, 1, 1, pbits); 
+        }
+        return; 
       }
 
       // Other algorithms which are not implemented yet

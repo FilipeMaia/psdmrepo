@@ -154,6 +154,10 @@ NDArrCalib::findDetectorType()
   else if ( str_src.find("Opal2000.")  != std::string::npos ) m_dettype = OPAL2000;
   else if ( str_src.find("Opal4000.")  != std::string::npos ) m_dettype = OPAL4000;
   else if ( str_src.find("Opal8000.")  != std::string::npos ) m_dettype = OPAL8000;
+  else if ( str_src.find("Epix100a")   != std::string::npos ) m_dettype = EPIX100A;
+  else if ( str_src.find("Epix10k.")   != std::string::npos ) m_dettype = EPIX10K;
+  else if ( str_src.find("Epix.")      != std::string::npos ) m_dettype = EPIX;
+  else if ( str_src.find("Fccd960.")   != std::string::npos ) m_dettype = FCCD960;
   else                                                        m_dettype = OTHER;
 }
 
