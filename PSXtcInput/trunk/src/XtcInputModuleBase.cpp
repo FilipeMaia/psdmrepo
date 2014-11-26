@@ -159,9 +159,8 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
     std::vector<XtcInput::Dgram> nonEventDg;
     if (not m_dgsource->next(eventDg, nonEventDg)) {
       if (count == 0) {
-        // Nothing there at all, this can happen with indexing, since
-        // the user has not called "jump" yet.
-        return;
+        // Nothing there at all, this is unexpected
+        throw EmptyInput(ERR_LOC);
       } else {
         // just stop here
         break;
