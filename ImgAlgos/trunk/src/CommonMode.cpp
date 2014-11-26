@@ -49,6 +49,7 @@ namespace ImgAlgos {
 //--------------------
 // Matthew Weaver's code from ami/event/FrameCalib.cc
 
+/*
 int median(ndarray<const uint32_t,2> d,
            unsigned& iLo, unsigned& iHi)
 {
@@ -112,6 +113,8 @@ int median(ndarray<const uint32_t,2> d,
   return (iLo+i);
 }
 
+
+*/
 
 //--------------------
 //--------------------

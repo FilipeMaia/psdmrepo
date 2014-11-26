@@ -18,6 +18,7 @@
 #include <fstream>   // ofstream
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for stringstream
+#include <stdint.h>  // uint8_t, uint32_t, etc.
 #include <iostream>
 #include <cmath>
 //#include <math.h>
@@ -45,7 +46,7 @@ using namespace std;
 
 //--------------------
 // Code from ami/event/FrameCalib.cc
- int median(ndarray<const uint32_t,2> d, unsigned& iLo, unsigned& iHi);
+// int median(ndarray<const uint32_t,2> d, unsigned& iLo, unsigned& iHi);
 
 //--------------------
 //--------------------
@@ -100,6 +101,7 @@ using namespace std;
 // mask is either a null pointer (in which case nothing is masked)
 // or a list of values arranged like the data where non-zero means ignore
 
+/*
 template <typename T>
 void commonModeMedian(const T* data, const uint16_t* mask, const unsigned length, const T threshold, const T maxCorrection, T& cm) {
   cm = 0;
@@ -136,6 +138,8 @@ void commonModeMedian(const T* data, const uint16_t* mask, const unsigned length
     }
   }
 }
+
+*/
 
 //--------------------
 

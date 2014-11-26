@@ -11,11 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-72
+2014-11-25 Mikhail S. Dubrovin
+- CommonMode - fixesd for RHEL6
+	
 Tag: V00-03-71
 2014-11-25 Mikhail S. Dubrovin
-- add AlgSmearing, AlgDroplet, CommonMode
+- add AlgSmearing, AlgDroplet, (PSAS-68) CommonMode 
 - move common mode correction algorithms from GlobalMethods.h to CommonMode.h
-- in NDArrCalib add common mode support for Epix100a
+- in NDArrCalib and CommonMode add common mode support for Epix100a (PSAS-7)
 
 Tag: V00-03-70
 2014-11-13 Mikhail S. Dubrovin

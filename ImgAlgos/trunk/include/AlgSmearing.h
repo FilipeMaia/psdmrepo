@@ -16,6 +16,8 @@
 #include <string>
 #include <iostream> // for cout
 #include <cstddef>  // for size_t
+#include <cstring>  // for memcpy
+
 using namespace std;
 
 //----------------------
