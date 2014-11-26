@@ -1,0 +1,47 @@
+Release identity mechanism (NEW):
+- This is the first release supporting release self-identity mechanism.
+The release information is provided via a special package ReleaseInfo
+which is injected at a release build stage. Details can be found in
+the description of the JIRA ticket PSRT-36.
+
+ImgAlgos: 
+- NDArrCalib.cpp: move conditional printCalibPars() after constants loading (PSAS-44)
+- AlgSmearing, AlgDroplet: for droplet/peak finding (PSAS-68)
+- CommonMode: to collect all common mode correction algorithms
+- NDArrCalib, CommonMode: add common mode support for Epix100a (PSAS-7)
+
+PSCalib:
+- CalibParsStore.h, GenericCalibPars.cpp: improve conditional output (PSAS-44)
+- GenericCalibPars.cpp: workaround for compilation problems with dbg (PSAS-67)
+
+pdscalibdata:
+- in all *BaseV*.h classes: workaround for compilation problems with dbg (PSAS-67)
+
+CalibManager:
+- add app/roicon for conversion of the ROI mask into ndarray using geometry calib file (PSAS-10)
+
+psana_python, pypsalg:
+- new BOOST converters and functions to allow psalg to be called from python, courtesy of Ankush Mitra.
+
+DDL packages:
+- support for new DAQ types in pdsdata 8.1.10 - TimeTool::ConfigV2, TimeTool::DataV2, and Quartz::ConfigV2.
+- Improved documentation for two DDL types: FEEGasDetEnergyV1 and BldDataGMDV2
+
+pdsdata (external package):
+- update to 8.1.10 for new DAQ types discussed above
+
+pdscalibdata (fixed bugs):
+- NDArrIOV1: get_ndarray() now returns reference in stead of ndarray
+- improve conditional output for debugging (PSAS-44).
+
+PSXtcInput (fixed bugs):
+- allow individual input modules to customize what features of PSXtcInputModuleBase
+they support (necessary for indexing input module to not hang in certain instances). (PSAS-66).
+
+PSCalib (fixed bugs):
+- GeometryAccess.py in img_from_pixel_arrays(iX, iY, W=None, ...) add protection for W=None (PSAS-11)
+
+XtcInput (fixed bugs):
+- check for certain kinds of damage in Xtc to allow psana to get through data produced
+in some runs of xppc014, xppf0814, meca2614. Xtc problem has since been fixed. (PSAS-71).
+
