@@ -1,0 +1,106 @@
+#!/bin/sh
+#
+# Script which creates SRPM for the new release. Used as one of the steps in
+# buildbot builder. 
+#
+
+# stop if anything happens
+set -e
+
+# First positional argument gives release name
+relname=${1:?Required parameter missing (release name)}
+
+# location for generated SRPM files
+srpmdir="/reg/g/psdm/sw/releases/buildbot/rpm-stage/SRPMS"
+
+# temporary directory
+reldir="/reg/g/psdm/sw/releases/buildbot/_tmp/srpm-$$"
+
+#
+# We do not want to overwrite anything
+#
+if [ -f "$srpmdir/psdm-release-$relname-1psdm.src.rpm" ] ; then
+    echo "*** [error] SRPM file already exists: $srpmdir/psdm-release-$relname-1psdm.src.rpm" 1>&2
+    exit 2
+fi
+
+#
+# Standard SIT setup
+#
+. /reg/g/psdm/bin/sit_setup.sh
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
+
+# override SVN repo
+export SIT_SVN=file://localhost/reg/g/psdm/svnrepo/psdmrepo
+
+#
+# directory for the new release
+#
+mkdir -p "$reldir"
+cd "$reldir"
+newrel -n "$relname" "$relname"
+
+# checkout tags and release-notes into the new release
+echo "=== Checkout tags ==="
+svn export --force "$SIT_SVN/_releases/$relname" "$relname"
+cd "$relname"
+
+#
+# checkout all packages from the tag list
+#
+test -f ./tags
+echo "=== Checkout packages ==="
+addpkg -x -q -f ./tags
+
+#
+# inject release information package into the release
+#
+mkrelinfo "$relname" "./ReleaseInfo"
+
+#
+# make a tarball, remove sources
+#
+cd ..
+echo "=== Make tarball ==="
+tar -c -f - "$relname" | gzip -9 > "psdm-release-${relname}.tar.gz"
+rm -rf "$relname"
+
+#
+# Get us good spec file 
+#
+echo "=== Checkout spec file ==="
+svn export --force "$SIT_SVN/_releases/_specs" ./
+
+#
+# burn in release name into spec file
+#
+sed -i "s/@RELNAME@/$relname/g" psdm-release.spec
+
+#
+# build srpm
+#
+rpmdir=/reg/g/psdm/sw/dist/apt-rpm/$(echo $SIT_ARCH|gawk -F- '{print $2 FS $1}')
+$rpmdir/bin/rpmbuild --define "_topdir $PWD" --define "_specdir $PWD" \
+    --define "_srcrpmdir $PWD" --define "_sourcedir $PWD" --define "_tmppath $PWD/tmp" \
+    --define "relname $relname" -bs psdm-release.spec
+
+#
+# SRPM file name need a bit of adjustment
+#
+version=$(echo $relname | sed 's/\(.*-\)*\(.*\)/\2/')
+mv "psdm-release-$relname-$version-1psdm.src.rpm" "psdm-release-$relname-1psdm.src.rpm"
+
+#
+# Move it to its final destination
+#
+echo "=== Moving SRPM to $srpmdir ==="
+mkdir -p "$srpmdir"
+mv "psdm-release-$relname-1psdm.src.rpm" "$srpmdir/psdm-release-$relname-1psdm.src.rpm"
+
+#
+# final cleanup
+#
+cd /
+rm -rf "$reldir"
+
+echo "SRPM psdm-release-$relname-1psdm.src.rpm created successfully"

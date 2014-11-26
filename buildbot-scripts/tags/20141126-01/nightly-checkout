@@ -1,0 +1,90 @@
+#!/bin/sh
+
+reldir="/reg/g/psdm/sw/releases"
+
+rel=${1:?Required parameter missing (release name)}
+
+#
+# Standard SIT setup
+#
+. /reg/g/psdm/bin/sit_setup.sh
+tmp=${SIT_ROOT:?Missing SIT_ROOT}
+tmp=${SIT_SVN:?Missing SIT_SVN}
+
+# override SVN repo
+export SIT_SVN=file://localhost/reg/g/psdm/svnrepo/psdmrepo
+
+getPkgList() {
+    svn list "$SIT_SVN" | sed 's%^\(.*\)/$%\1%'
+}
+
+getPkgTag() {
+
+    pkg=${1:?No package name provided}
+
+    # get latest version of standard tag VNN-NN-NN
+    svn -v list "$SIT_SVN/$pkg/tags" | sed -n 's%.* \(V[[0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)/$%\1%p' | sort | tail -1
+    
+}
+
+getTags() {
+
+    # get all packages in repository
+    packages=`getPkgList` || return 2
+    
+    # for every package find its tag
+    for pkg in $packages ; do
+        tag=`getPkgTag $pkg` || return 2
+        if [ -n "$tag" ] ; then
+            if [ $pkg = "SConsTools" ] ; then
+                # SConsTools does not have SConscript file
+                echo $pkg $tag
+            else
+                # check also that SConscript file is there
+                svn ls "$SIT_SVN/$pkg/tags/$tag/SConscript" >/dev/null 2>&1 && echo $pkg $tag
+            fi
+        fi
+    done
+    return 0
+}
+
+
+checkout() {
+
+    #
+    # directory for the new release
+    #
+    if [ -d "$reldir/$rel" ] ; then
+        echo "Directory $reldir/$rel already exists" 1>&2
+        return 2
+    fi
+    cd "$reldir" || return 3
+    newrel -n "$rel" "$rel" || return 3
+    cd "$rel"
+
+    #
+    # get the list of the tags
+    #
+    getTags > ./tags || return 3
+
+    #
+    # checkout all packages from the tag list
+    #
+    addpkg -x -f ./tags || return 3
+}
+
+
+#
+# execute it, get its output in the logs
+#
+log=/tmp/cron-rel-co-$$
+checkout > $log.out 2> $log.err
+    
+#
+# copy the logs to the release, these will be used by the next stage
+# as a sign that we are done
+#
+test -s $log.err && cp $log.err "$reldir/$rel/.co-done.err"
+rm $log.err
+mv $log.out "$reldir/$rel/.co-done.out"
+mv "$reldir/$rel/.co-done.out" "$reldir/$rel/.co-done"
