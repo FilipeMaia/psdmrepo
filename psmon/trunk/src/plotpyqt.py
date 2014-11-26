@@ -166,7 +166,8 @@ class PlotClient(object):
 class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
-        self.set_aspect()
+        if init_im.aspect is None:
+            self.set_aspect()
         self.set_grid_lines(False)
         self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)

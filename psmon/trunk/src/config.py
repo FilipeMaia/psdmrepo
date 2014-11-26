@@ -4,6 +4,7 @@ from collections import namedtuple
 ### COORDINATE TUPLE USED FOR CONFIGS ###
 Resolution = namedtuple('Resolution', 'x y')
 ### CONFIG KEYS FOR SERVER ###
+RESET_REQ_HEADER = 'reset'
 RESET_REQ_STR = 'reset signal - %s'
 RESET_REP_STR = 'reset signal recieved from %s'
 ZMQ_TOPIC_DELIM_CHAR = '\0'

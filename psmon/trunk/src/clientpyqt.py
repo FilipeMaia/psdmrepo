@@ -70,11 +70,7 @@ def main(client_info, plot_info):
         return 1
 
     # define signal sender function
-    reset_req = app.ZMQRequester(
-        config.RESET_REQ_STR%socket.gethostname(),
-        config.RESET_REP_STR%socket.gethostname(),
-        zmqsub.comm_socket
-    )
+    reset_req = app.ZMQRequester(zmqsub.comm_socket)
 
     if (sys.flags.interactive != 1) or not hasattr(QtCore, 'PYQT_VERSION'):
         QtGui.QApplication.instance().exec_()

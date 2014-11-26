@@ -83,9 +83,10 @@ class Image(Plot):
     A data container for image data for the psmon client
     """
 
-    def __init__(self, ts, title, image, xlabel=None, ylabel=None):
+    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect=None):
         super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
+        self.aspect = aspect
 
     @property
     def valid(self):

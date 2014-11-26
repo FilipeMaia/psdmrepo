@@ -3,8 +3,11 @@ import re
 import sys
 import zmq
 import pwd
+import Queue
+import socket
 import logging
 import threading
+from collections import namedtuple
 
 from psmon import config
 
@@ -33,6 +36,31 @@ class PlotInfo(object):
         self.interpol = interpol
         self.palette = palette
         self.grid = grid
+
+
+class MessageHandler(object):
+    def __init__(self, name, qlimit, is_pyobj):
+        self.name = name
+        self.is_pyobj = is_pyobj
+        self.__mqueue = Queue.Queue(maxsize=qlimit)
+
+    def get(self):
+        return self.__mqueue.get_nowait()
+
+    def put(self, msg):
+        self.__mqueue.put_nowait(msg)
+
+    @property
+    def size(self):
+        return self.__mqueue.qsize()
+
+    @property
+    def empty(self):
+        return self.__mqueue.empty()
+
+    @property
+    def full(self):
+        return self.__mqueue.full() 
 
 
 class ZMQPublisher(object):
@@ -147,65 +175,124 @@ class ZMQSubscriber(object):
 
 
 class ZMQListener(object):
-    def __init__(self, request_pattern, reply_str, comm_socket):
-        self.signal = re.compile(request_pattern)
-        self.reply = reply_str
-        self.comm_socket = comm_socket
-        self.reset_lock = threading.Lock()
-        self.reset_flag = threading.Event()
-        self.thread = threading.Thread(target=self.comm_listener)
-        self.thread.daemon = True
+    MessageHandle = namedtuple('MessageHandle', 'msg type')
+
+    def __init__(self, comm_socket):
+        self._reset = config.RESET_REQ_HEADER
+        self._signal = re.compile(config.RESET_REQ_STR%'(.*)')
+        self._reply = config.RESET_REP_STR
+        self.__comm_socket = comm_socket
+        self.__reset_flag = threading.Event()
+        self.__message_handler = {}
+        self.__thread = threading.Thread(target=self.comm_listener)
+        self.__thread.daemon = True
+
+    def send_reply(self, header, msg, send_py_obj=False):
+        self.__comm_socket.send_string(header, zmq.SNDMORE)
+        if send_py_obj:
+            self.__comm_socket.send_pyobj(msg)
+        else:
+            self.__comm_socket.send_string(msg)
+
+    def register_handler(self, name, limit=0, is_pyobj=True):
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug('Attempting to register message handler: name=%s, limit=%s, pyobj=%s', (name, limit, is_pyobj))
+        if name in self.__message_handler:
+            if LOG.isEnabledFor(logging.WARN):
+                LOG.warning('Attempted to register message handler which already exists: %s', name)
+            raise ValueError('Message handler \'%s\' already registered'%name)
+        handler = self.__message_handler[name] = MessageHandler(name, limit, is_pyobj)
+        if LOG.isEnabledFor(logging.INFO):
+            LOG.info('Sucessfully registered message handler: %s'%name)
+        return handler
 
     def comm_listener(self):
-        while not self.comm_socket.closed:
-            msg = self.comm_socket.recv()
-            signal_matcher = self.signal.match(msg)
-            if signal_matcher is not None:
-                self.set_flag()
-                self.comm_socket.send(self.reply%signal_matcher.group(1))
-                if LOG.isEnabledFor(logging.INFO):
-                    LOG.info('Received valid comm request: %s', msg)
+        while not self.__comm_socket.closed:
+            header = self.__comm_socket.recv_string()
+            if header == self._reset:
+                msg = self.__comm_socket.recv_string()
+                signal_matcher = self._signal.match(msg)
+                if signal_matcher is not None:
+                    self.set_flag()
+                    self.send_reply(self._reset, self._reply%signal_matcher.group(1))
+                    if LOG.isEnabledFor(logging.INFO):
+                        LOG.info('Received valid reset request: %s', msg)
+                else:
+                    self.send_reply(self._reset, "invalid request from client")
+                    if LOG.isEnabledFor(logging.WARN):
+                        LOG.warning('Invalid request received on comm port: %s', msg)
             else:
-                self.comm_socket.send("invalid request from client")
-                if LOG.isEnabledFor(logging.WARN):
-                    LOG.warning('Invalid request received on comm port: %s', msg)
+                if header in self.__message_handler:
+                    if self.__message_handler[header].is_pyobj:
+                        msg = self.__comm_socket.recv_pyobj()
+                    else:
+                        msg = self.__comm_socket.recv_string()
+                    try:
+                        self.__message_handler[header].put(msg)
+                        if LOG.isEnabledFor(logging.DEBUG):
+                            LOG.debug('Message for handler \'%s\' processed', header)
+                        self.send_reply(header, 'Message for handler processed')
+                    except Queue.Full:
+                        if LOG.isEnabledFor(logging.WARN):
+                            LOG.warning('Message handler \'%s\' is full - request dropped', header)
+                        self.send_reply(header, 'Message handler full - request dropped')
+                else:
+                    if LOG.isEnabledFor(logging.DEBUG):
+                        LOG.debug('Received message for unregistered handler: %s', header)
 
     def get_flag(self):
-        with self.reset_lock:
-            return self.reset_flag.is_set()
+        return self.__reset_flag.is_set()
 
     def set_flag(self):
-        with self.reset_lock:
-            self.reset_flag.set()
+        self.__reset_flag.set()
 
     def clear_flag(self):
-        with self.reset_lock:
-            self.reset_flag.clear()
+        self.__reset_flag.clear()
 
     def start(self):
-        if not self.thread.isAlive():
-            self.thread.start()
+        if not self.__thread.isAlive():
+            self.__thread.start()
 
 
 class ZMQRequester(object):
-    def __init__(self, request, req_reply, comm_socket):
-        self.request = request
-        self.req_reply = req_reply
-        self.comm_socket = comm_socket
-        self.pending_flag = threading.Event()
-        self.thread = None
+    def __init__(self, comm_socket):
+        self._reset = config.RESET_REQ_HEADER
+        self._request = config.RESET_REQ_STR%socket.gethostname()
+        self._req_reply = config.RESET_REP_STR%socket.gethostname()
+        self.__comm_socket = comm_socket
+        self.__comm_lock = threading.Lock()
+        self.__pending_flag = threading.Event()
+        self.__thread = None
 
+    def send_request(self, header, msg, send_py_obj=True, recv_py_obj=False):
+        with self.__comm_lock:
+            self.__comm_socket.send_string(header, zmq.SNDMORE)
+            if send_py_obj:
+                self.__comm_socket.send_pyobj(msg)
+            else:
+                self.__comm_socket.send_string(msg)
+            rep_header = self.__comm_socket.recv_string()
+            if header != rep_header and LOG.isEnabledFor(logging.WARN):
+                LOG.warning('Request header does not match repy header: \'%s\' and \'%s\'', header, rep_header)
+            if recv_py_obj:
+                rep_msg = self.__comm_socket.recv_pyobj()
+            else:
+                rep_msg = self.__comm_socket.recv_string()
+
+            return rep_msg
+        
     def reset_signal(self):
         # check to see if there is another pending reset req
-        if not self.pending_flag.is_set():
-            self.pending_flag.set()
-            self.comm_socket.send(self.request)
-            reply = self.comm_socket.recv()
-            if reply != self.req_reply:
-                LOG.error(reply)
-            self.pending_flag.clear()
+        if not self.__pending_flag.is_set():
+            if LOG.isEnabledFor(logging.DEBUG):
+                LOG.debug('Sending reset request to server')
+            self.__pending_flag.set()
+            reply = self.send_request(self._reset, self._request, False)
+            if reply != self._req_reply and LOG.isEnabledFor(logging.ERROR):
+                LOG.error('Server returned unexpected reply to reset request: %s', reply)
+            self.__pending_flag.clear()
 
     def send_reset_signal(self, *args):
-        self.thread = threading.Thread(target=self.reset_signal)
-        self.thread.daemon = True
-        self.thread.start()
+        self.__thread = threading.Thread(target=self.reset_signal)
+        self.__thread.daemon = True
+        self.__thread.start()

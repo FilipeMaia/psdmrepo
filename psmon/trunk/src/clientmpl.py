@@ -67,11 +67,7 @@ def main(client_info, plot_info):
         auto_zoom_button.on_clicked(plot.ax.autoscale)
 
     # define signal sender function
-    reset_req = app.ZMQRequester(
-        config.RESET_REQ_STR%socket.gethostname(),
-        config.RESET_REP_STR%socket.gethostname(),
-        zmqsub.comm_socket
-    )
+    reset_req = app.ZMQRequester(zmqsub.comm_socket)
 
     reset_plots_button = Button(plt.axes([0.87, 0.015, 0.12, 0.035]), 'Reset Plots')
     reset_plots_button.on_clicked(reset_req.send_reset_signal)

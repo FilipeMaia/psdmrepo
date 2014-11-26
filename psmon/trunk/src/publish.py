@@ -9,7 +9,7 @@ LOG = logging.getLogger(__name__)
 
 LOG.info('Importing publish')
 __publisher = app.ZMQPublisher()
-__reset_listener = app.ZMQListener(config.RESET_REQ_STR%'(.*)', config.RESET_REP_STR, __publisher.comm_socket)
+__reset_listener = app.ZMQListener(__publisher.comm_socket)
 
 
 def initialized():
@@ -26,6 +26,14 @@ def send(topic, data):
         __publisher.send(topic, data)
         if LOG.isEnabledFor(logging.DEBUG):
             LOG.debug('Published data to topic: %s', topic)
+
+
+def register_handler(name, **kwargs):
+    return __reset_listener.register_handler(name, **kwargs)
+
+
+def get_handler(name):
+   return __reset_listener.message_handler.get(name)
 
 
 def get_reset_flag():
