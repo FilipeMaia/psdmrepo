@@ -27,6 +27,11 @@ dir="$rels/$rel"
 cd "$dir"
 
 #
+# inject release information package into the release
+#
+mkrelinfo "$rel" "$dir/ReleaseInfo"
+
+#
 # setup release
 #
 SIT_RELEASE="$rel"
