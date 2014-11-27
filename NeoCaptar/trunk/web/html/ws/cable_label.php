@@ -24,43 +24,42 @@ function report_error($msg) {
     print $msg;
     exit;
 }
-function label($pdf, $cable, $now, $src2dst=true) {
 
-    $font_size = 6;
-    $angle = 0;
+/**
+ * The original roll of labels had a slightly different configuration
+ * 
+ * It has to be used with the following printer parameters:
+ * 
+ *   width:  3.54 inches
+ *   height: 1.0 inch
+ *   all margins (top,bottom,left,right): 0
+ *   orientation: auto portrait/landscape
+ *   size option: actual size
+ */
+function label_1($pdf, $cable, $now, $src2dst=true) {
+
+    $font_size  =  6;
+    $angle      =  0;
     $max_length = 23+7;
-    $first = 10;
-    $second = 20;
-    // Visible areas:
-    //
-    //   Left label: x:10..110, y: 150..250
+    $first      = 10;
+    $second     = 20;
 
-//    $xmin = 0;
-//    $xmax = 255; // experimentaly detected
-//    $ymin = 0;
-//    $ymax = 35;  // experimentaly detected
+//    // Test rectangles
 //
 //    $pdf->setLineStyle(1);
-//
 //    $pdf->rectangle(  0, 0,110,35);
-//    $pdf->rectangle(  5, 5,100,25);
-//
 //    $pdf->rectangle(145, 0,110,35);
-//    $pdf->rectangle(150, 5,100,25);
 
     $revision_str = 'R'.sprintf("%02d",$cable->revision());
-    //$pdf->selectFont( './fonts/Courier.afm' );
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (     $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
     $pdf->addText  (    40, 29, $font_size, $revision_str,                                           $angle);
-    //$pdf->addText  (    58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (    53, 29, $font_size, $cable->origin_pinlist(),                                $angle);
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (145+ $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
     $pdf->addText  (145+40, 29, $font_size, $revision_str,                                           $angle);
-    //$pdf->addText  (145+58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (145+53, 29, $font_size, $cable->destination_pinlist(),                           $angle);
 
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
@@ -95,25 +94,83 @@ function label($pdf, $cable, $now, $src2dst=true) {
 
     $pdf->addText  (     $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
     $pdf->addText  (145+ $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
-
-//    $pdf->addText  (    25, 28, $font_size, $cable->cable(),            $angle);
-//    $pdf->addText  (145+25, 28, $font_size, $cable->cable(),            $angle);
-//
-//    $pdf->addText  (     8, 20, $font_size, "to:", $angle);
-//    $pdf->addText  (    25, 20, $font_size, $cable->destination_name(), $angle);
-//
-//    $pdf->addText  (145+ 8, 20, $font_size, "to:", $angle);
-//    $pdf->addText  (145+25, 20, $font_size, $cable->origin_name(),      $angle);
-//
-//    $pdf->addText  (     8, 12, $font_size, "fr:",                      $angle);
-//    $pdf->addText  (    25, 12, $font_size, $cable->origin_name(),      $angle);
-//
-//    $pdf->addText  (145+ 8, 12, $font_size, "fr:",                      $angle);
-//    $pdf->addText  (145+25, 12, $font_size, $cable->destination_name(), $angle);
-//
-//    $pdf->addText  (    25,  4, $font_size,       $cable->device(),     $angle);
-//    $pdf->addText  (145+25,  4, $font_size,       $cable->device(),     $angle);
 }
+
+/**
+ * The new roll of labels
+ * 
+ * It has to be used with the following printer parameters:
+ * 
+ *   width:  3.54 inches
+ *   height: 0.75 inch
+ *   all margins (top,bottom,left,right): 0
+ *   orientation: auto portrait/landscape
+ *   size option: actual size
+ */
+function label_2($pdf, $cable, $now, $src2dst=true) {
+
+    $font_size  =  6;
+    $angle      =  0;
+    $max_length = 23+7;
+    $first      =  0;
+    $second     = 10;
+
+//    // Test rectangles
+//
+//    $pdf->setLineStyle(1);
+//    $pdf->rectangle(  0, 0, 95,35);
+//    $pdf->rectangle(160, 0, 95,35);
+
+    $revision_str = 'R'.sprintf("%02d",$cable->revision());
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    40, 29, $font_size, $revision_str,                                           $angle);
+    $pdf->addText  (    53, 29, $font_size, $cable->origin_pinlist(),                                $angle);
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (160+ $first, 29, $font_size, $cable->cable(),                                    $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (160+40, 29, $font_size, $revision_str,                                           $angle);
+    $pdf->addText  (160+53, 29, $font_size, $cable->destination_pinlist(),                           $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 22, $font_size, "to:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second, 22, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (160+ $first, 22, $font_size, "to:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (160+$second, 22, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first, 16, $font_size, "fr:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second, 16, $font_size, substr($cable->origin_name(), 0, $max_length),      $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (160+ $first, 16, $font_size, "fr:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (160+$second, 16, $font_size, substr($cable->destination_name(), 0, $max_length), $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (     $first,  9, $font_size, "fn:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (    $second,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
+
+    $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
+    $pdf->addText  (160+ $first,  9, $font_size, "fn:",                                              $angle);
+    $pdf->selectFont( './fonts/Helvetica.afm' );
+    $pdf->addText  (160+$second,  9, $font_size, substr($cable->func(), 0, $max_length),             $angle);
+
+    $pdf->addText  (     $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
+    $pdf->addText  (160+ $first,  2, $font_size, substr($cable->device(), 0, $max_length),           $angle);
+}
+
+
+
+
 try {
 
     $cable_id   = null;
@@ -146,10 +203,7 @@ try {
         }
     }
 
-    // IMPORTANT: set printer driver parameters to:
-    // width: 3.54 inches, height: 1.0 inch, all margins (top,bottom,left,right) are set to 0
-    // orientation: auto portrait/landscape , size option: actual size
-    //
+
     $pdf = new Cezpdf(array(3.54*2.54,0.50*2.54));
     $pdf->ezSetMargins(0,0,0,0);
     $pdf->setColor(0,0,0);
@@ -158,7 +212,7 @@ try {
     foreach($cables as $cable) {
         if($first) $first = false;
         else       $pdf->ezSetDY(-48);
-        label($pdf,$cable,true);
+        label_2($pdf,$cable,true);
     }
 
     $pdf->stream();

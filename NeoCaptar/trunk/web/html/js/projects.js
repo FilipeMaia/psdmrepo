@@ -1815,7 +1815,7 @@ required_field_html+' required feild';
 '                <td class="table_cell table_cell_left"  >width</td>'+
 '                <td class="table_cell"                  >3.54 in</td>'+
 '                <td class="table_cell table_cell_left"  >height</td>'+
-'                <td class="table_cell table_cell_right" >1.0 in</td>'+
+'                <td class="table_cell table_cell_right" >0.75 in</td>'+
 '              </tr>'+
 '              <tr>'+
 '                <td class="table_cell table_cell_left  table_cell_bottom" >all margins</td>'+
