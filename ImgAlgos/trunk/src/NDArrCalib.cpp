@@ -143,6 +143,7 @@ NDArrCalib::printInputParameters()
 void 
 NDArrCalib::findDetectorType()
 { 
+  /* THIS STUFF IS MOVED TO GlobalMethods  
   std::stringstream ss; ss << m_str_src; std::string str_src = ss.str();
   if      ( str_src.find("Cspad.")     != std::string::npos ) m_dettype = CSPAD; // from GlobalMethods.h
   else if ( str_src.find("Cspad2x2.")  != std::string::npos ) m_dettype = CSPAD2X2;
@@ -159,6 +160,9 @@ NDArrCalib::findDetectorType()
   else if ( str_src.find("Epix.")      != std::string::npos ) m_dettype = EPIX;
   else if ( str_src.find("Fccd960.")   != std::string::npos ) m_dettype = FCCD960;
   else                                                        m_dettype = OTHER;
+  */
+
+  m_dettype = detectorTypeForSource(m_str_src);
 }
 
 //--------------------

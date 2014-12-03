@@ -133,7 +133,7 @@ private:
               } 
  	      
               if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>,"
-                                                          <<" subtract offset=" << offset);
+                                                          <<" frame offset=" << offset);
               ndarray<TOUT, 2> data_out = make_ndarray<TOUT>(frame->height(), frame->width());
               typename ndarray<TOUT, 2>::iterator oit;
               typename ndarray<const data_t, 2>::iterator dit;

@@ -27,6 +27,7 @@
 #include "ImgAlgos/CommonMode.h"
 #include "ImgAlgos/GlobalMethods.h"
 #include "PSCalib/CalibPars.h"
+#include "ImgAlgos/TimeInterval.h"
 
 //#include "ImgAlgos/ImgParametersV1.h"
 //#include "PSCalib/PnccdCalibPars.h"
@@ -181,7 +182,9 @@ private:
       const PSCalib::CalibPars::common_mode_t* pars = &m_cmod_data[1]; // [0] element=mode is excluded from parameters
       float cmod_corr = 0;
 
-      if ( m_print_bits & 128 ) MsgLog( name(), info, "mode:" << mode << "  dettype:" << m_dettype);
+      if ( m_print_bits & 128 ) MsgLog( name(), info, "mode:" << mode 
+                                                 << "  dettype:" << m_dettype
+                                                 << "  source:" << m_str_src);
 
       if ( mode == 0 ) return;
 
@@ -204,7 +207,7 @@ private:
           return;
       }
 
-      // Algorithm 1 for other detectors 
+      // Algorithm 1 for any detector 
       else if ( mode == 1 ) {  
 	//unsigned mode     = m_cmod_data[0]; // mode - algorithm number for common mode
 	//unsigned mean_max = m_cmod_data[1]; // maximal value for the common mode correctiom
@@ -224,7 +227,7 @@ private:
           return;
       }
 
-      // Algorithm 2 - MEAN
+      // Algorithm 2 - MEAN for any detector 
       else if (mode == 2) {
           T threshold     = (T)        m_cmod_data[1];
           T maxCorrection = (T)        m_cmod_data[2];
@@ -239,7 +242,7 @@ private:
           return; 
       }
 
-      // Algorithm 3 - MEDIAN
+      // Algorithm 3 - MEDIAN for any detector 
       else if (mode == 3) {
           T threshold     = (T)        m_cmod_data[1];
           T maxCorrection = (T)        m_cmod_data[2];
@@ -253,19 +256,47 @@ private:
           return; 
       }
 
-      // Algorithm 4 for EPIX100A    common_mode file example: 4 5 10
-      else if ( mode == 4 && m_dettype == EPIX100A ) {
 
-        //T threshold     = (T) m_cmod_data[1];
+      // Algorithm 4 - MEDIAN algorithm, detector-dependent
+      else if ( mode == 4 ) { 
+
+        TimeInterval dt;
+	if (do_common_mode_median<T>(data)) {
+          if ( m_print_bits & 128 ) MsgLog("medianInRegion", info, " common mode dt(sec) = " << dt.getCurrentTimeInterval() );
+          return; 
+	}
+
+      }
+
+
+      // Other algorithms which are not implemented yet
+      else {
+	  static long counter = 0; counter ++;
+	  if (counter<21) {  MsgLog( name(), warning, "Algorithm " << mode << " requested in common_mode parameters is not implemented.");
+	    if (counter==20) MsgLog( name(), warning, "STOP PRINTING ABOVE WARNING MESSAGE.");
+	  }
+      }
+    }
+
+//-------------------
+
+  template <typename T>
+    bool do_common_mode_median(T* data)
+    {
+      const PSCalib::CalibPars::common_mode_t* pars = &m_cmod_data[1]; 
+      // [0] element=mode is excluded from parameters
+      unsigned cmtype = (unsigned) m_cmod_data[1];
+
+      unsigned pbits = ( m_print_bits & 256 ) ? 0xffff : 0;
+
+      // EPIX100A, common_mode file example: 4 1 20
+      if ( m_dettype == EPIX100A ) {
+
+        if ( m_print_bits & 128 ) MsgLog( name(), info, "EPIX100A cmtype:" << cmtype);
+
         //T maxCorrection = (T) m_cmod_data[2];
 
 	unsigned shape[2] = {704, 768};
-
-	//size_t nregs = 4;	
-	//size_t nrows = shape[0]/2;
-	//size_t ncols = shape[1]/2;
-	//size_t rowmin[nregs]  = {0,     0, nrows, nrows};
-	//size_t colmin[nregs]  = {0, ncols,     0, ncols};
 
 	size_t nregs  = 16;	
 	size_t nrows  = shape[0]/2;
@@ -276,27 +307,78 @@ private:
         ndarray<T,2> d(data, shape);
         ndarray<const uint16_t,2> stat(m_stat_data, shape);
 	
-        unsigned pbits = ( m_print_bits & 128 ) ? 0xffff : 0;
-
 	for(size_t s=0; s<nregs; s++) {
-	  //meanInRegion<T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
-	  //medianInRegion<T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
-	  
-	  rowmin = (s/8)*nrows;
-	  colmin = (s%8)*ncols;
-	  
-	  medianInRegion<T>(pars, d, stat, rowmin, colmin, nrows, ncols, 1, 1, pbits); 
-        }
-        return; 
+	  //meanInRegion  <T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
+          rowmin = (s/8)*nrows;
+          colmin = (s%8)*ncols;
+
+  	  if ( cmtype & 1 ) {
+            //common mode for 352x96-pixel 16 banks
+	    medianInRegion<T>(pars, d, stat, rowmin, colmin, nrows, ncols, 1, 1, pbits); 
+	  }
+
+	  if ( cmtype & 2 ) {
+            //common mode for 96-pixel rows in 16 banks
+	    for(size_t r=0; r<nrows; r++) {
+	      medianInRegion<T>(pars, d, stat, rowmin+r, colmin, 1, ncols, 1, 1, pbits); 
+	    }
+          }
+
+	  if ( cmtype & 4 ) {
+            //common mode for 352-pixel columns in 16 banks
+	    for(size_t c=0; c<ncols; c++) {
+	      medianInRegion<T>(pars, d, stat, rowmin, colmin+c, nrows, 1, 1, 1, pbits); 
+	    }
+          }
+	}
+       return true; 
       }
 
-      // Other algorithms which are not implemented yet
-      else {
-	  static long counter = 0; counter ++;
-	  if (counter<21) {  MsgLog( name(), warning, "Algorithm " << mode << " requested in common_mode parameters is not implemented.");
-	    if (counter==20) MsgLog( name(), warning, "STOP PRINTING ABOVE WARNING MESSAGE.");
+      // FCCD960, common_mode file example: 4 1 20
+      else if ( m_dettype == FCCD960 ) {
+
+        if ( m_print_bits & 128 ) MsgLog( name(), info, "FCCD960 cmtype:" << cmtype);
+
+        //T maxCorrection = (T) m_cmod_data[2];
+
+	unsigned shape[2] = {960, 960};
+
+        ndarray<T,2> d(data, shape);
+        ndarray<const uint16_t,2> stat(m_stat_data, shape);
+	
+  	if ( cmtype & 1 ) {
+          //common mode correction for 1x160-pixel rows with stride 2
+	  size_t nregs  = 6;	
+	  size_t ncols  = shape[1]/nregs; // 160-pixel
+	  size_t nrows  = 1;
+          size_t colmin = 0;
+
+	  for(size_t row=0; row<shape[1]; row++) {
+	    for(size_t s=0; s<nregs; s++) {
+	      colmin = s * ncols;
+	      for(size_t k=0; k<2; k++)
+	        medianInRegion<T>(pars, d, stat, row, colmin+k, nrows, ncols, 1, 2, pbits); 
+	    }
 	  }
+	}
+
+  	if ( cmtype & 2 ) {
+          //common mode correction for 480x10-pixel 96*2 supercolumns
+	  size_t nregs  = 96*2;	
+	  size_t nrows  = shape[0]/2;
+	  size_t ncols  = shape[1]/96;
+        
+	  for(size_t s=0; s<nregs; s++) {
+	    //meanInRegion  <T>(pars, d, stat, rowmin[s], colmin[s], nrows, ncols, 1, 1); 
+            size_t rowmin = (s/96)*nrows;
+            size_t colmin = (s%96)*ncols;
+	    medianInRegion<T>(pars, d, stat, rowmin, colmin, nrows, ncols, 1, 1, pbits); 
+	  }
+	}
+        return true; 
       }
+
+      return false; 
     }
 
 //-------------------

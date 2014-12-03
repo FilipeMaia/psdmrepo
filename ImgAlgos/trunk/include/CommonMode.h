@@ -35,7 +35,6 @@
 #include "MsgLogger/MsgLogger.h"
 #include "ndarray/ndarray.h"
 
-
 namespace ImgAlgos {
 
 using namespace std;
@@ -345,8 +344,7 @@ template <typename T>
 }
 //--------------------
 // Median, similar to ami/event/FrameCalib::median, 
-// but 1) w/o moving median range, 
-//     2) finding median for entire good statistics w/o discarding edge bins
+// but finding median for entire good statistics w/o discarding edge bins
 
   template <typename T>
   void medianInRegion(const double* pars
@@ -361,73 +359,95 @@ template <typename T>
 		    , const unsigned& pbits=0
                     ) {
 
-    //T threshold = pars[0];
-      T maxcorr   = pars[1];
+      int hint_range = (int)pars[1];
+      int maxcorr    = (int)pars[2];
 
       bool check_status = (status.data()) ? true : false;
 
       // declare array for histogram
-      int rangehalf = max(int(maxcorr)+1, 10);
-      const int low = -rangehalf;
-      const int high = rangehalf;
-      const int nbins = high-low+1;
-      int hist[nbins];
-      std::fill_n(hist, nbins, 0);
-      int count = 0;
-      
-      // fill histogram
-      for (size_t r=rowmin; r<rowmin+nrows; r+=srows) { 
-        for (size_t c=colmin; c<colmin+ncols; c+=scols) {
-        
-          // ignore pixels that are too noisy
-          if (check_status && status[r][c]) continue; // Discard  pixels with any status > 0
-        
-          //pixel value with pedestal subtracted
-          //T v = data[r][c];
-          //int val = v < 0 ? int(v - 0.5) : int(v + 0.5); // rounding to integer
-        
-          // histogram bin
-	  int bin = int(data[r][c]) - low;
-        
-          // increment bin value if in range
-          if      (bin < 1)     hist[0]++;
-          else if (bin < nbins) hist[bin]++;
-          else                  hist[nbins-1]++;
-          count++;
-	}
-      }
-      
-      if (pbits & 2) {
-          MsgLog("medianInRegion", info, "histo filled count = " << count);
-          for (int b=0; b<nbins; ++b) std::cout << " " << b << ":" << hist[b]; 
-          std::cout  << '\n';
-      }
+      int half_range = max(int(hint_range), 10);
 
-      if (hist[0]>count/2) return;       // correction exceeds -maxcorr
-      if (hist[nbins-1]>count/2) return; // correction exceeds +maxcorr
+      int low  = -half_range;
+      int high =  half_range;
+      unsigned* hist  = 0;
+      int       nbins = 0;
+      int       bin   = 0;
+      unsigned  iter  = 0;
+      unsigned  count = 0;
 
-      // searching for the median of the histogram statistics excluding edge bins. 
-      //int i=1;
-      //int s = (count-hist[0]-hist[nbins-1])/2;
-      //while( s>0 ) s -= hist[i++];
-      // This works worse then non-excluding edge bins
+      while(1) { // loop continues untill the range does not contain a half of statistics
+
+	  iter ++;
+
+          nbins = high-low+1;
+	  if (nbins>10000) {
+            if (pbits & 4) MsgLog("medianInRegion", warning, "Too many bins " << nbins 
+                                  << ", common mode correction is not allied");
+	    return;
+	  }
+
+          if (hist) delete[] hist;
+          hist = new unsigned[nbins];
+          std::fill_n(hist, nbins, 0);
+          count = 0;
+      
+          // fill histogram
+          for (size_t r=rowmin; r<rowmin+nrows; r+=srows) { 
+            for (size_t c=colmin; c<colmin+ncols; c+=scols) {
+            
+              // ignore pixels that are too noisy; discard pixels with any status > 0
+              if (check_status && status[r][c]) continue;
+            
+              bin = int(data[r][c]) - low;            
+              if      (bin < 1)     hist[0]++;
+              else if (bin < nbins) hist[bin]++;
+              else                  hist[nbins-1]++;
+              count++;
+            }
+          }
+          
+          if (pbits & 2) {
+              MsgLog("medianInRegion", info, "Iter:" << iter 
+                                   << "  histo nbins:" << nbins 
+                                   << "  low:" << low 
+                                   << "  high:" << high 
+                                   << "  count:" << count);
+              for (int b=0; b<nbins; ++b) std::cout << " " << b << ":" << hist[b]; 
+              std::cout  << '\n';
+          }
+    
+          // do not apply correction if the number of good pixels is small
+          if (count < 10) return; 
+
+          if (hist[0]>count/2) {
+	    if (maxcorr && low < -maxcorr) return; // do not apply cm correction
+            low  -= nbins/4;
+	  }
+          else if (hist[nbins-1]>count/2) {
+	    if (maxcorr && high > maxcorr) return; // do not apply cm correction
+	    high += nbins/4;
+	  }
+	  else
+            break; 
+      } // while(1)
 
       int i=-1;
       int s = count/2;
       while( s>0 ) s -= hist[++i];
 
-      if (abs(-s) > hist[i-1]/2) i--; // step back
+      if (unsigned(abs(-s)) > hist[i-1]/2) i--; // step back
 
-      T cm = low+i+1; // +1 is an empiric shift of distribution to 0.
+      int icm = low+i+1; // +1 is an empiric shift of distribution to 0.
 
+      if (maxcorr && abs(icm)>maxcorr) return; // do not apply cm correction
+
+      T cm = (T)icm;
       if (pbits & 1) MsgLog("medianInRegion", info, "cm correction = " << cm);
 
       // Apply common mode correction to data
-      if (fabs(cm)<=maxcorr) {
-        for (size_t r=rowmin; r<rowmin+nrows; r+=srows) { 
-          for (size_t c=colmin; c<colmin+ncols; c+=scols) {
-            data[r][c] -= cm;
-          }
+      for (size_t r=rowmin; r<rowmin+nrows; r+=srows) { 
+        for (size_t c=colmin; c<colmin+ncols; c+=scols) {
+          data[r][c] -= cm;
         }
       }
   }
