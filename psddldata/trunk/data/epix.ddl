@@ -761,7 +761,8 @@
     uint8_t _digitalMonitor1Enable:1 -> digitalMonitor1Enable;
     uint8_t _digitalMonitor2Enable:1 -> digitalMonitor2Enable;
     uint8_t _inputLeakageCompensation:2 -> inputLeakageCompensation;
-    uint32_t _z2:28;
+    uint8_t _inputLeakageCompensationEnable:1 -> inputLeakageCompensationEnable;
+    uint32_t _z:27;
   }
   uint32_t _reg7 {
     uint8_t _VRefBaseLineDac:6 -> VRefBaselineDac;
@@ -820,7 +821,7 @@
     uint8_t _CCK_RegDelayEnable:1 -> CCK_RegDelayEnable;
     uint8_t _syncPinEnable:1 -> syncPinEnable;
     uint8_t _LVDS_ImpedenceMatchingEnable:1 -> LVDS_ImpedenceMatchingEnable;
-    uint32_t _z:27;
+    uint32_t _z:26;
   }
   uint32_t _reg17 {
     uint16_t _RowStartAddr:9 -> RowStartAddr;
