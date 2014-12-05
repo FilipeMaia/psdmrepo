@@ -289,8 +289,8 @@
     @attribute nPeaks;
   }
   @dataset hproj;
-  @dataset peakPos;
-  @dataset peakHeight;
-  @dataset FWHM;
+  @dataset peakPos [[zero_dims]];
+  @dataset peakHeight [[zero_dims]];
+  @dataset FWHM [[zero_dims]];
 }
 } //- @package Bld
