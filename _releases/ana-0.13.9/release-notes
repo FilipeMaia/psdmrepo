@@ -1,0 +1,15 @@
+psmon:
+- improvements from Dan: when hovering over an Image or XYPlot,
+  get X,Y,(Z) coordinates displayed. Also generalize information
+  that user can send on the "communication" port to all python objects.
+
+ImgAlgos:
+- common mode correction for Epix100a (JIRA PSAS-7) and Fccd960 (JIRA PSAS-44)
+- NDArrCalib.h: add do_common_mode_median, re-organize do_common_mode
+
+PSXtcInput:
+- fix bug which causes psana to hang on empty xtc file (JIRA PSAS-74)
+
+psddl_hdf2psana:
+- fix bug which cased Translator to crash on BldDataSpectrometerV1 when there
+  were zero peaks.
