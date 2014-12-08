@@ -5,7 +5,7 @@ cfg=/reg/g/psdm/etc/supervisord_$(hostname -s).conf
 
 [[ ! -e $cfg ]] && echo "No config $cfg" && exit 1
 
-/reg/g/psdm/bin/sit_setup.sh 0.7.1
+/reg/g/psdm/bin/sit_setup.sh dm-current
 
 ${superd} -c ${cfg}
 
