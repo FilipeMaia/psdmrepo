@@ -1,0 +1,53 @@
+.dmmon-fs-usage {
+    padding:    20px;
+}
+.dmmon-fs-usage {
+    padding:        0;
+}
+.dmmon-fs-usage > #controls {
+    background:     #f5f8f9;
+    padding:        10px;
+    padding-top:    20px;
+}
+.dmmon-fs-usage > #update_info {
+    margin-top:     10px;
+    padding-right:  10px;
+}
+.dmmon-fs-usage > #update_info > .info {
+    color:          maroon;
+}
+.dmmon-fs-usage > #tabs  {
+    font-size:      12px;
+}
+.dmmon-fs-usage > #tabs > ul > li {
+    -webkit-border-radius:  0;
+    -moz-border-radius:     0;
+    -khtml-border-radius:   0;
+    border-radius:          0;
+}
+.dmmon-fs-usage > #tabs .tab-cont {
+    border:         solid 1px #b0b0b0;
+    padding:        25px;
+}
+
+.dmmon-fs-usage > #tabs .tab-cont .control-group {
+    float:          left;
+    margin-right:   20px;
+}
+.dmmon-fs-usage > #tabs .tab-cont .control-group span.control-group-title {
+    font-size:      12px;
+    font-weight:    bold;
+}
+.dmmon-fs-usage > #tabs .tab-cont .control-group-end {
+    clear:          both;
+}
+.dmmon-fs-usage .presentation {
+    margin-top:     10px;
+}
+.dmmon-fs-usage .presentation.view-visible {
+    display:        block;
+}
+.dmmon-fs-usage .presentation.view-hidden {
+    display:        none;
+}
+

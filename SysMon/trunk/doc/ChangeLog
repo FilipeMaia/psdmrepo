@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2014-12-08 Igor Gaponenko
+- saving results of the ongoing development of the Web application
+
 Tag: V00-01-10
 2014-11-24 Igor Gaponenko
 - added schema for disk space utilization monitoring as per JIRA

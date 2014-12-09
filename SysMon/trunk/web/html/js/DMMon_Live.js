@@ -233,7 +233,7 @@ function (
                         renderTo:  this._view(dir, 'plot').get(0) ,
                         animation: Highcharts.svg , // don't animate in old IE
                         type:      'scatter' ,
-                        margin:    [40, 20, 70, 40] ,
+                        margin:    [50, 20, 70, 40] ,
                     } ,
                     title: {
                         text: '<b>MB/s</b>'
@@ -265,7 +265,7 @@ function (
                         enabled: true
                     } ,
                     exporting: {
-                        enabled: false
+                        enabled: true
                     } ,
                     plotOptions: {
                         series: {

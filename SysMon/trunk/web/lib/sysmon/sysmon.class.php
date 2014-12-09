@@ -390,6 +390,59 @@ class SysMon extends DbConnection {
             $this ,
             mysql_fetch_array ($result, MYSQL_ASSOC)) ;
     }
+    
+
+    
+    /* --------------------------------
+     *   File system usage monitoring
+     * --------------------------------
+     */
+    public function fs_mon_def () {
+        $list = array () ;
+        $sql = "SELECT * FROM {$this->database}.fs_mon_def ORDER BY 'group', 'name'" ;
+        $result = $this->query($sql) ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
+            $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
+            array_push($list, array (
+                'id'    => intval($attr['id']) ,
+                'group' => $attr['group'] ,
+                'name'  => $attr['name']
+            )) ;
+        }
+        return $list ;
+    }
+    public function fs_mon_def_by_id ($id) {
+        $id = intval($id) ;
+        $sql = "SELECT * FROM {$this->database}.fs_mon_def WHERE id={$id}" ;        
+        $result = $this->query($sql) ;
+        $nrows = mysql_numrows($result) ;
+        if ($nrows == 0) return null ;
+        if ($nrows != 1) throw new SysMonException (
+            __class__.'::'.__METHOD__ ,
+            'inconsistent result returned from the database. Wrong schema?') ;
+        $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
+        return array (
+            'id'    => intval($attr['id']) ,
+            'group' =>        $attr['group'] ,
+            'name'  =>        $attr['name']
+        ) ;
+    }
+    
+    public function fs_mon_stat ($id) {
+        $id = intval($id) ;
+        $list = array () ;
+        $sql = "SELECT  insert_time, used, available FROM {$this->database}.fs_mon_stat WHERE fs_id={$id} ORDER BY insert_time DESC" ;
+        $result = $this->query($sql) ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
+            $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
+            array_push($list, array (
+                'insert_time' => new LusiTime (intval($attr['insert_time'])) ,
+                'used'        =>               intval($attr['used']) ,
+                'available'   =>               intval($attr['available'])
+            )) ;
+        }
+        return $list ;
+    }
 }
 
 ?>
