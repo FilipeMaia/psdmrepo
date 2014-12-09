@@ -1247,6 +1247,73 @@ HERE;
         }
     }
 
+    /**
+     * 
+     * @param {LogBookFFEntry} $entry
+     * @param {bool} $new_vs_modified
+     * @return undefined
+     */
+    public function forward ($entry, $recipients, $requestor_uid) {
+
+        if (count($recipients) <= 0) return ;
+
+        $url     = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['HTTP_HOST'].'/apps/logbook/index.php?action=select_message&id='.$entry->id() ;
+        $author  = $entry->author() ;
+        $time    = $entry->insert_time()->toStringShort() ;
+        $logbook = $this->instrument()->name().'/'.$this->name() ;
+        $subject = strtr(substr($entry->content(), 0, 72), array("'" => '"', "\n" => " ")) ;
+        $time_str = 'Posted  ';
+
+        $entry_str = '' ;
+        foreach (explode("\n", $entry->content()) as $line) {
+            $entry_str .= "  {$line}\n" ;
+        }
+
+        $attachments_base_url = ($_SERVER[HTTPS] ? "https://" : "http://" ).$_SERVER['HTTP_HOST'].'/apps/logbook/attachments' ;
+        $attachments_str = '' ;
+        foreach ($entry->attachments() as $a) {
+            $attachments_str .= "  {$attachments_base_url}/{$a->id()}/{$a->description()}\n" ;
+        }
+        
+        $tags_str = '  ' ;
+        foreach ($entry->tags() as $t) {
+            $tags_str .= "{$t->tag()} " ;
+        }
+
+        foreach ($recipients as $r) {
+           
+            $body =<<<HERE
+_______
+SUMMARY
+
+  Message:    {$url}
+  Author:     {$author}
+  {$time_str}:   {$time}
+  Experiment: {$logbook}
+____________
+MESSAGE TEXT
+
+{$entry_str}
+___________
+ATTACHMENTS
+
+{$attachments_str}
+____
+TAGS
+
+{$tags_str}
+_______________
+THE SENDER INFO
+
+  The message was forwarded to you upon a request made by user '{$requestor_uid}'.
+  Please, contact that pearson directly if you think the request was made
+  by a misstake.
+_________________________________________________________________________
+HERE;
+            $this->do_notify ($r, $logbook, $subject, $body) ;
+        }
+    }
+
     private function do_notify( $address, $logbook, $subject, $body ) {
         $tmpfname = tempnam("/tmp", "logbook");
         $handle = fopen( $tmpfname, "w" );

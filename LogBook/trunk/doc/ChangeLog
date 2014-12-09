@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-03
+2014-12-08 Igor Gaponenko
+- server-side implementation for e-Log message forwarding
+as per JIRA PSWA-19
+
 Tag: V01-00-02
 2014-11-03 Igor Gaponenko
 - minor fix in the URL for e-log notifications

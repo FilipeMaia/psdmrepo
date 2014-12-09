@@ -50,6 +50,9 @@ class LogBookFFEntry {
     public function parent() {
         return $this->experiment; }
 
+    public function experiment() {
+        return $this->experiment; }
+
     public function hdr_id() {
         return $this->attr['hdr_id']; }
 
