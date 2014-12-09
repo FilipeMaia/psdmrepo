@@ -1,0 +1,580 @@
+@CHARSET "ISO-8859-1";
+
+/* -----------------------------------
+ * - Naming convention for shortcuts -
+ * -----------------------------------
+ *
+ *   el          elog
+ *   el-l        .....live
+ *   el-l-ms     ..........messages
+ *   el-l-m      ..........message
+ *   el-l-m-d    ....................messages groupped into a day
+ *   el-l-m-re   ....................message reply
+ *   el-l-m-re-s ....................submit message reply
+ *   el-l-m-re-c ....................cancel message reply
+ *   el-l-m-ed   ....................message editing
+ *   el-l-m-ed-s ....................submit message editing
+ *   el-l-m-ed-c ....................cancel message editing
+ *   el-l-m-mv   ....................message move
+ *   el-l-m-mv-s ....................submit message move
+ *   el-l-m-mv-c ....................cancel message move
+ *   el-l-c      ..........child of a message
+ *   el-l-rs     ..........runs
+ *   el-l-r      ..........run
+ *   el-p        .....post 
+ *
+ * Suffixes:
+ *
+ *   -auto    autorefresh
+ *   -con     container
+ *   -hdr     header
+ *   -dsc     description
+ *   -dlg     dialog
+ *   -dlgs    dialogs
+ *   -rdlg    'reply' dialog
+ *   -edlg    'edit' dialog
+ *   -mdlg    'move' dialog
+ *   -tgl     toggler
+ *   -hdn     hidden
+ *   -vis     visible
+ *   -info    information
+ *   -subj    subject
+ */
+
+#el-l-mctrl {
+  padding: 10px 15px 5px 5px;
+  /*
+  width: inherit;
+  padding: 10px 10px 5px 10px;
+  background-color:#f0f0f0;
+  */
+}
+
+#el-s-ctrl {
+  width: inherit;
+  padding: 10px 10px 0px 10px;
+  background-color:#f0f0f0;
+}
+
+#el-p {
+  width: inherit;
+  padding: 10px 20px 0px 20px;
+}
+
+#el-l-auto {
+  border-bottom: 1px solid #c0c0c0;
+}
+
+.el-wa {
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+.el-ms-mctrl {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+.el-ms-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+.el-ms {
+  height: inherit;
+  width: inherit;
+}
+.el-l-m-d-tgl,
+.el-l-m-tgl,
+.el-l-c-tgl,
+.el-l-r-tgl,
+.el-l-a-tgl {}
+
+.el-l-m-d {
+  font-size:100%;
+  margin-left:10px;
+}
+
+.el-l-a-dsc {
+  font-weight:bold;
+  margin-left:10px;
+}
+
+.el-l-m-time {
+  margin-left:10px;
+  width: 60px;
+}
+
+.el-r-m-time {
+  margin-left:10px;
+  width: 140px;
+}
+
+.el-l-c-time {
+  margin-left:10px;
+  width: 140px;
+}
+
+.el-l-m-author,
+.el-l-c-author {
+  font-weight:bold;
+  margin-left:10px;
+  min-width:80px;
+}
+
+.el-l-m-subj,
+.el-l-c-subj {
+  margin-left:10px;
+}
+.el-l-m-subj-deleted,
+.el-l-c-subj-deleted {
+  text-decoration: line-through;
+}
+.el-l-m-subj-notes,
+.el-l-c-subj-notes {
+  color: red;
+}
+
+.el-l-a {
+  margin-right:10px;
+  margin-bottom:10px;
+  padding:5px;
+}
+
+div.el-l-a:hover {
+  background-color:#d0d0d0;
+
+  border-radius:5px;
+
+  -moz-border-radius: 5px;
+}
+
+.el-l-m-d-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#b9dcf5;
+
+  border:1px solid #A6C9E2;
+  border-bottom:0px;
+
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-l-m-d-hdr:hover {
+  background-color:#A6C9E2;
+}
+
+.el-l-m-d-con {
+  padding:25px;
+  padding-top:20px;
+
+  border:1px solid #A6C9E2;
+  border-top:0px;
+  border-bottom:0px;
+
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-topright: 0;
+}
+.el-d-ctrl {
+  padding-bottom: 20px;
+}
+.el-l-m-hdr,
+.el-l-c-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#e0e0e0;
+
+  border:1px solid #d0d0d0;
+  border-bottom:1px solid #080808;
+  
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-l-m-hdr:hover,
+div.el-l-c-hdr:hover {
+  background-color:#d0d0d0;
+}
+	
+.el-l-r-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#DEF0CD;
+
+  border:1px solid #B9DD97;
+  border-bottom:1px solid #080808;
+
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-l-r-hdr:hover {
+  background-color:#B9DD97;
+}
+
+.el-r-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#E6E680;
+
+  border:1px solid #CFCF73;
+  border-bottom:1px solid #080808;
+
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-r-hdr:hover {
+  background-color:#CFCF73;
+}
+
+.el-sh-hdr {
+  margin-bottom:1px;
+  padding:3px;
+  background-color:#FFDA8F;
+
+  border:1px solid #E6B85C;
+  border-bottom:1px solid #080808;
+
+  border-radius:5px;
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+
+  cursor:pointer;
+}
+
+div.el-sh-hdr:hover {
+  background-color:#E6B85C;
+}
+
+.el-l-m-con,
+.el-l-c-con {
+  padding:25px;
+  padding-top:5px;
+
+  background-color:#f8f8f8;
+
+  border:1px solid #d0d0d0;
+  border-top:0px;
+
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-topright: 0;
+}
+
+.el-l-r-con,
+.el-r-con {
+  padding:20px;
+  padding-top:15px;
+
+  border:1px solid #B9DD97;
+  border-top:0px;
+
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-topright: 0;
+}
+
+.el-sh-con {
+  padding:20px;
+
+  border:1px solid #E6B85C;
+  border-top:0px;
+
+  border-radius:5px;
+  border-top-left-radius:0px;
+  border-top-right-radius:0px;
+
+  -moz-border-radius: 5px;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-topright: 0;
+}
+
+.el-l-a-con {
+  margin-left:10px;
+  padding-top:5px;
+  padding-left:20px;
+}
+
+.el-l-m-body,
+.el-l-c-body {
+  padding-top:10px;
+  padding-bottom:10px;
+}
+
+.el-l-m-body pre {
+  margin: 0px;
+  padding-top: 5px;
+  padding-bottom: 10px;
+  overflow: auto;
+}
+
+.el-l-m-as {
+  padding:10px;
+  border-top:1px solid #c8c8c8;
+}
+
+.el-l-a-info {
+  margin-left:5px;
+}
+
+.el-l-m-tags {
+  padding:10px;
+  border-top:1px solid #c8c8c8;
+}
+
+.el-l-m-rdlg,
+.el-l-m-xtdlg,
+.el-l-m-xadlg,
+.el-l-r-rdlg,
+.el-l-m-edlg,
+.el-l-m-mdlg {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 20px;
+  padding-bottom: 10px;
+  background-color: #ffffff;
+  border:1px solid #c0c0c0;
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+}
+
+.el-l-m-highlight {
+  background-color:#ff6666;
+  color: #ffffff;
+}
+
+.el-l-m-d-hdn,
+.el-l-m-hdn,
+.el-l-c-hdn,
+.el-l-r-hdn,
+.el-l-a-hdn,
+.el-l-ctx-hdn,
+.el-l-m-dlg-hdn,
+.el-l-r-dlg-hdn,
+.el-r-hdn,
+.el-sh-hdn,
+.el-sh-new-hdn {
+  display: none;
+}
+
+.el-l-m-d-vis,
+.el-l-m-vis,
+.el-l-c-vis,
+.el-l-r-vis,
+.el-l-a-vis,
+.el-l-m-dlg-vis,
+.el-l-r-dlg-vis,
+.el-r-vis,
+.el-sh-vis,
+.el-sh-new-vis {
+  display: block;
+}
+
+#el-at-ctrl {
+  width: inherit;
+  padding: 10px 10px 10px 10px;
+  background-color:#f0f0f0;
+}
+
+#el-at-wa {
+  width: inherit;
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+
+#el-at-list {
+  margin-top: 15px;
+}
+
+.el-at-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.el-subscribe {
+  padding: 20px;
+  padding-bottom: 5px;
+  max-width: 540px; 
+}
+
+#el-subscribe-all {
+  padding-left: 20px;
+  font-size: 120%;
+}
+
+#el-r-ctrl {
+  width: inherit;
+  padding: 10px 10px 10px 10px;
+  background-color:#f0f0f0;
+}
+
+#el-r-wa {
+  width: inherit;
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+
+#el-r-list {
+  margin-top: 15px;
+}
+
+.el-r-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.el-r-num {
+  margin-left:20px;
+  width: 50px;
+  font-weight:bold;
+}
+
+.el-r-day {
+  width: 100px;
+}
+
+.el-r-ival {
+  width: 150px;
+}
+
+.el-r-durat {
+  width: 100px;
+}
+
+.el-r-bar {
+  background-color: #5C5C33;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#el-sh-ctrl {
+  width: inherit;
+  padding: 10px 10px 10px 10px;
+  background-color:#f0f0f0;
+}
+
+#el-sh-wa {
+  width: inherit;
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+
+#el-sh-new-wa {
+
+  margin-top: 15px;
+  padding: 10px;
+  background: #f0f0f0;
+
+  border: 1px solid #c0c0c0;
+
+  border-radius:5px;
+  /*
+  border-bottom-left-radius:0px;
+  border-bottom-right-radius:0px;
+*/
+  -moz-border-radius: 5px;
+  /*
+  -moz-border-radius-bottomleft: 0;
+  -moz-border-radius-bottomright: 0;
+  */
+}
+
+#el-sh-new-submit,
+#el-sh-new-cancel {
+  font-size: 100%;
+}
+
+#el-sh-list {
+  margin-top: 15px;
+}
+
+.el-sh-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.el-sh-begin {
+  margin-left:10px;
+  width: 140px;
+}
+
+.el-sh-end {
+  margin-left:10px;
+  width: 140px;
+}
+
+.el-sh-leader {
+  margin-left:10px;
+  width: 120px;
+}
+
+.el-sh-runs {
+  margin-left:10px;
+  width: 40px;
+}
+
+.el-sh-durat {
+  margin-left:10px;
+  width: 150px;
+}
+
+.el-sh-bar {
+  background-color: #806D48;
+}
+
+
