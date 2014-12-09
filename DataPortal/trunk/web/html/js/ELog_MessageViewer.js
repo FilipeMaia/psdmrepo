@@ -956,7 +956,7 @@ function ELog_MessageBody (parent, message) {
     
     this._PREDEFINED_EMAIL_ADDRESSES = [
         {   recipient: 'pcds-help',  email: 'pcds-help@slac.stanford.edu',  descr: 'PCDS General Support'} ,
-        {   recipient: 'pcds-it-l',  email: 'pcds-it-l@slac.stanford.edu',  descr: 'PCDS IT Infrustrucure Support'} ,
+        {   recipient: 'pcds-it-l',  email: 'pcds-it-l@slac.stanford.edu',  descr: 'PCDS IT Infrastructure Support'} ,
         {   recipient: 'pcds-poc-l', email: 'pcds-poc-l@slac.stanford.edu', descr: 'LCLS Points Of Contacts Crew'} ,
         {   recipient: 'pcds-daq-l', email: 'pcds-daq-l@slac.stanford.edu', descr: 'LCLS DAQ Crew'} ,
         {   recipient: 'pcds-ana-l', email: 'pcds-ana-l@slac.stanford.edu', descr: 'LCLS Data Analysis & Data Management Crew'} ,
