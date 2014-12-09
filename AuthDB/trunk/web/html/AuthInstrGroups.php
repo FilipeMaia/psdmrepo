@@ -74,13 +74,34 @@ HERE;
 
 <style type="text/css">
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+h2 {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+p {
+  font-size: 15px;
+}
+li {
+  font-size: 14px;
+}
+table pre {
+  margin: 0;
+  padding: 0;
+}
 td.table_hdr {
   background-color:#d0d0d0;
   padding: 4px 8px 4px 8px;
   border: solid 1px #000000;
   border-top: none;
   border-left: none;
+  /*
   font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-weight: bold;
   font-size: 75%;
 }
@@ -109,10 +130,10 @@ td.table_cell_within_group {
 
 <body>
 
-<div style="padding-left:20px; padding-right:20px;">
+<div style="padding:20px;">
 
   <h2>About</h2>
-  <div style="padding-left:20px;">
+  <div style="padding-left:20px; max-width:720px;">
     <p>This script will check if instrument-specific POSIX groups are authorized as e-log 'Editor's of
        the corresponding experiments, and if the optional parameter <b>fix</b> is present then assign
        the role to the groups. Specifically, for each instrument 'XYZ', the tool will:</p>

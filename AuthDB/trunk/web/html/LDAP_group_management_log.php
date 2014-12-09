@@ -67,13 +67,31 @@ HERE
 
 <style type="text/css">
 
+body {
+  margin: 0;
+  padding: 0;
+}
+h2 {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+p {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 13px;
+}
+table pre {
+  margin: 0;
+  padding: 0;
+}
 td.table_hdr {
   background-color:#d0d0d0;
   padding: 2px 8px 2px 8px;
   border: solid 1px #000000;
   border-top: none;
   border-left: none;
+  /*
   font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-weight: bold;
   font-size: 75%;
 }
@@ -102,7 +120,7 @@ td.table_cell_within_group {
 
 <body>
 
-<div style="padding-left:20px; padding-right:20px;">
+<div style="padding:20px;" >
 
   <h2>Group Management Operations in PCDS LDAP</h2>
   <div style="padding-left:20px;">
