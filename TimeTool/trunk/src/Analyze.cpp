@@ -87,9 +87,9 @@ namespace {
     return v;
   }
 
-  class TimeToolData : public Psana::TimeTool::DataV1 {
+  class TimeToolData : public Psana::TimeTool::DataV2 {
   public:
-    TimeToolData(Psana::TimeTool::DataV1::EventType event_type_arg,
+    TimeToolData(Psana::TimeTool::DataV2::EventType event_type_arg,
                  double amplitude_arg,
                  double position_pixel_arg,
                  double position_time_arg,
@@ -97,18 +97,21 @@ namespace {
                  double ref_amplitude_arg,
                  double nxt_amplitude_arg,
                  ndarray<const int32_t, 1> projected_signal_arg,
-                 ndarray<const int32_t, 1> projected_sideband)
+                 ndarray<const int32_t, 1> projected_sideband_arg,
+                 ndarray<const int32_t, 1> projected_reference_arg)
       : m_event_type(event_type_arg),
         m_amplitude(amplitude_arg),
         m_position_pixel(position_pixel_arg),
-      m_position_time(position_time_arg),
-      m_position_fwhm(position_fwhm_arg),
-      m_ref_amplitude(ref_amplitude_arg),
-      m_nxt_amplitude(nxt_amplitude_arg),
-      m_projected_signal(projected_signal_arg),
-      m_projected_sideband(projected_sideband) {}
+        m_position_time(position_time_arg),
+        m_position_fwhm(position_fwhm_arg),
+        m_ref_amplitude(ref_amplitude_arg),
+        m_nxt_amplitude(nxt_amplitude_arg),
+        m_projected_signal(projected_signal_arg),
+        m_projected_sideband(projected_sideband_arg),
+        m_projected_reference(projected_reference_arg)
+    {}
 
-    virtual enum Psana::TimeTool::DataV1::EventType event_type() const { return m_event_type; }
+    virtual enum Psana::TimeTool::DataV2::EventType event_type() const { return m_event_type; }
     virtual double amplitude() const { return m_amplitude; }
     virtual double position_pixel() const { return m_position_pixel; }
     virtual double position_time() const { return m_position_time; };
@@ -117,9 +120,10 @@ namespace {
     virtual double nxt_amplitude() const { return m_nxt_amplitude; };
     virtual ndarray<const int32_t, 1> projected_signal() const { return m_projected_signal; };
     virtual ndarray<const int32_t, 1> projected_sideband() const { return m_projected_sideband; };
+    virtual ndarray<const int32_t, 1> projected_reference() const { return m_projected_reference; };
 
   private:
-    Psana::TimeTool::DataV1::EventType m_event_type;
+    Psana::TimeTool::DataV2::EventType m_event_type;
     double m_amplitude;
     double m_position_pixel;
     double m_position_time;
@@ -128,8 +132,8 @@ namespace {
     double m_nxt_amplitude;
     ndarray<const int32_t, 1> m_projected_signal;
     ndarray<const int32_t, 1> m_projected_sideband;
+    ndarray<const int32_t, 1> m_projected_reference;
   };
-
 }
 
 
@@ -145,6 +149,8 @@ namespace TimeTool {
 Analyze::Analyze (const std::string& name)
   : Module(name)
 {
+  std::string emptys;
+
   // get the values from configuration or use defaults
   m_get_key = configSrc("get_key","DetInfo(:Opal1000)");
   m_put_key = configStr("put_key","TTSPEC");
@@ -182,7 +188,7 @@ Analyze::Analyze (const std::string& name)
     m_laser_logic = e;
   }
 
-  m_ipm_get_key        = configStr("ipm_get_key");
+  m_ipm_get_key        = configStr("ipm_get_key",emptys);
   m_ipm_beam_threshold = config("ipm_beam_threshold",DBL_MIN);
 
   { std::vector<double> v = configList("calib_poly");
@@ -196,8 +202,11 @@ Analyze::Analyze (const std::string& name)
   m_projectX     = config("projectX",true);
   m_proj_cut     = config("proj_cut" ,INT_MIN);
 
-#define initList(l)                             \
-  std::vector<unsigned> l = configList(#l);
+  std::vector<unsigned> uempty;
+#define initList(l)                                     \
+  std::vector<unsigned> l;                              \
+  try { l = configList(#l); }                           \
+  catch(ConfigSvc::Exception& e) { l = uempty; }
 
   initList(sig_roi_x)
   initList(sig_roi_y)
@@ -261,6 +270,12 @@ Analyze::Analyze (const std::string& name)
     m_sig_roi_hi[1] = 0;
   }
 
+  m_ref_roi_set = false;
+  m_ref_roi_lo[0] = 0;
+  m_ref_roi_hi[0] = 0;
+  m_ref_roi_lo[1] = 0;
+  m_ref_roi_hi[1] = 0;
+
   m_sb_avg_fraction  = config("sb_avg_fraction",DBL_MIN);
   m_ref_avg_fraction = config("ref_avg_fraction",DBL_MIN);
 
@@ -298,9 +313,19 @@ Analyze::Analyze (const std::string& name)
       s >> v;
       ref.push_back(v);
     }
-    m_ref = make_ndarray<double>(ref.size());
+    ref.resize(ref.size()-1);
+
+    m_ref_avg = make_ndarray<double>(ref.size());
     for(unsigned i=0; i<ref.size(); i++)
-      m_ref[i] = ref[i];
+      m_ref_avg[i] = ref[i];
+
+    MsgLog(name, info, name <<": loaded reference of size " << m_ref_avg.size());
+    for(unsigned i=0; i<5; i++) 
+      MsgLog(name, info, name <<": ref[" << i << "=" << m_ref_avg[i]);
+    MsgLog(name, info, name << ": ..");
+    for(unsigned i=m_ref_avg.size()-5; i<m_ref_avg.size(); i++) 
+      MsgLog(name, info, name <<": ref[" << i << "=" << m_ref_avg[i]);
+
   }
 
   m_ref_store = configStr("ref_store");
@@ -325,22 +350,12 @@ Analyze::~Analyze ()
 void 
 Analyze::beginJob(Event& evt, Env& env)
 {
-  {
-    shared_ptr<Psana::Opal1k::ConfigV1> config = 
-      env.configStore().get(m_get_key);
-    if (config.get()) {
-      m_pedestal = config->output_offset();
-      MsgLog(name(), info, 
-             name() << ": found configured offset of " << m_pedestal);
-    }
-  }
-
   m_analyze_projections = false;
 
-  shared_ptr<Psana::TimeTool::ConfigV1> c = 
+  shared_ptr<Psana::TimeTool::ConfigV2> c = 
     env.configStore().get(m_get_key);
   if (c.get()) {
-    const Psana::TimeTool::ConfigV1& config = *c.get();
+    const Psana::TimeTool::ConfigV2& config = *c.get();
     if (m_beam_logic.size()==0)
       m_beam_logic  = config.beam_logic();
     if (m_laser_logic.size()==0)
@@ -348,7 +363,7 @@ Analyze::beginJob(Event& evt, Env& env)
     if (m_calib_poly.size()==0)
       m_calib_poly  = config.calib_poly();
     if (!m_projectX_set)
-      m_projectX    = config.project_axis()==Psana::TimeTool::ConfigV1::X;
+      m_projectX    = unsigned(config.project_axis())==unsigned(Psana::TimeTool::ConfigV1::X);
     if (m_proj_cut != INT_MIN)
       m_proj_cut    = config.signal_cut();
     if (!m_sig_roi_set) {
@@ -373,7 +388,7 @@ Analyze::beginJob(Event& evt, Env& env)
     m_analyze_projections = config.write_projections();
 
     m_analyze_projections &= 
-      m_projectX == (config.project_axis()==Psana::TimeTool::ConfigV1::X) &&
+      m_projectX == (unsigned(config.project_axis())==unsigned(Psana::TimeTool::ConfigV1::X)) &&
       m_sig_roi_lo[0] == config.sig_roi_lo().row() &&
       m_sig_roi_lo[1] == config.sig_roi_lo().column() &&
       m_sig_roi_hi[0] == config.sig_roi_hi().row() &&
@@ -386,6 +401,59 @@ Analyze::beginJob(Event& evt, Env& env)
         m_sb_roi_lo[1] == config.sb_roi_lo().column() &&
         m_sb_roi_hi[0] == config.sb_roi_hi().row() &&
         m_sb_roi_hi[1] == config.sb_roi_hi().column();
+    }
+  }
+  else {
+    shared_ptr<Psana::TimeTool::ConfigV1> c = 
+      env.configStore().get(m_get_key);
+    if (c.get()) {
+      const Psana::TimeTool::ConfigV1& config = *c.get();
+      if (m_beam_logic.size()==0)
+        m_beam_logic  = config.beam_logic();
+      if (m_laser_logic.size()==0)
+        m_laser_logic = config.laser_logic();
+      if (m_calib_poly.size()==0)
+        m_calib_poly  = config.calib_poly();
+      if (!m_projectX_set)
+        m_projectX    = config.project_axis()==Psana::TimeTool::ConfigV1::X;
+      if (m_proj_cut != INT_MIN)
+        m_proj_cut    = config.signal_cut();
+      if (!m_sig_roi_set) {
+        m_sig_roi_lo[0] = config.sig_roi_lo().row();
+        m_sig_roi_lo[1] = config.sig_roi_lo().column();
+        m_sig_roi_hi[0] = config.sig_roi_hi().row();
+        m_sig_roi_hi[1] = config.sig_roi_hi().column();
+      }
+      if (!m_sb_roi_set && config.subtract_sideband()) {
+        m_sb_roi_lo[0] = config.sb_roi_lo().row();
+        m_sb_roi_lo[1] = config.sb_roi_lo().column();
+        m_sb_roi_hi[0] = config.sb_roi_hi().row();
+        m_sb_roi_hi[1] = config.sb_roi_hi().column();
+      }
+      if (m_sb_avg_fraction != DBL_MIN)
+        m_sb_avg_fraction = config.sb_convergence();
+      if (m_ref_avg_fraction != DBL_MIN)
+        m_ref_avg_fraction = config.ref_convergence();
+      if (m_weights.size()==0)
+        m_weights          = config.weights();
+
+      m_analyze_projections = config.write_projections();
+
+      m_analyze_projections &= 
+        m_projectX == (config.project_axis()==Psana::TimeTool::ConfigV1::X) &&
+        m_sig_roi_lo[0] == config.sig_roi_lo().row() &&
+        m_sig_roi_lo[1] == config.sig_roi_lo().column() &&
+        m_sig_roi_hi[0] == config.sig_roi_hi().row() &&
+        m_sig_roi_hi[1] == config.sig_roi_hi().column();
+      
+      if (m_sb_roi_set) {
+        m_analyze_projections &= 
+          config.subtract_sideband() &&
+          m_sb_roi_lo[0] == config.sb_roi_lo().row() &&
+          m_sb_roi_lo[1] == config.sb_roi_lo().column() &&
+          m_sb_roi_hi[0] == config.sb_roi_hi().row() &&
+          m_sb_roi_hi[1] == config.sb_roi_hi().column();
+      }
     }
   }
 
@@ -437,6 +505,9 @@ Analyze::beginJob(Event& evt, Env& env)
       s << "Raw projection: event " << i;
       it->hraw = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
     { std::stringstream s;
+      s << "Ref projection: event " << i;
+      it->href = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
+    { std::stringstream s;
       s << "Ratio: event " << i;
       it->hrat = env.hmgr().hist1d(s.str().c_str(),"ratio",a); }
     { std::stringstream s;
@@ -474,7 +545,10 @@ Analyze::event(Event& evt, Env& env)
                                   evr.get()->fifoEvents());
   bool nolaser = !calculate_logic(m_laser_logic, 
                                   evr.get()->fifoEvents());
-  
+
+  bool use_sb_roi  = (m_sb_roi_lo [0]!=m_sb_roi_hi [0]);
+  bool use_ref_roi = (m_ref_roi_lo[0]!=m_ref_roi_hi[0]);
+
   MsgLog(name(), trace, name() << ": evr_codes " << evr.get()->fifoEvents().size()
          << ": nobeam " << (nobeam ? 'T':'F')
          << ": nolaser " << (nolaser ? 'T':'F'));
@@ -485,24 +559,48 @@ Analyze::event(Event& evt, Env& env)
   //  Beam is absent if not enough signal on the IPM detector
   //
   if (!m_ipm_get_key.empty()) {
-    shared_ptr<Psana::Lusi::IpmFexV1> ipm = evt.get(m_ipm_get_key);
-    if (ipm.get())
+    shared_ptr<Psana::Lusi::IpmFexV1> ipm = evt.get(Source(m_ipm_get_key));
+    if (ipm.get()) {
+      MsgLog(name(), info, name() << ": ipm sum = " << ipm.get()->sum());
       nobeam |= ipm.get()->sum() < m_ipm_beam_threshold;
+    }
+    else {
+      MsgLog(name(), info, name() << ": failed to get ipm " << m_ipm_get_key);
+
+      MsgLog(name(), info, name() << ":\t  src   \tkey\talias");
+      std::list<EventKey> keys = evt.keys();
+      for(std::list<EventKey>::iterator it=keys.begin(); it!=keys.end(); it++) {
+        MsgLog(name(), info, name() << ": "
+               << '\t' << std::setw(8) << std::hex << it->src().phy() 
+               << '\t' << it->key()
+               << '\t' << it->alias());
+      }
+    }
   }
 
   ndarray<const int32_t,1> sig;
   ndarray<const int32_t,1> sb;
+  ndarray<const int32_t,1> ref;
   unsigned pdim = m_projectX ? 1:0;
 
   if (m_analyze_projections) {
-    shared_ptr<Psana::TimeTool::DataV1> tt = evt.get(m_get_key);
-    if (!tt.get()) {
-      MsgLog(name(), warning, name() << ": Could not fetch timetool data");
-      return;
+    shared_ptr<Psana::TimeTool::DataV2> tt = evt.get(m_get_key);
+    if (tt.get()) {
+      sig  = tt.get()->projected_signal();
+      sb   = tt.get()->projected_sideband();
+      ref  = tt.get()->projected_reference();
     }
-
-    sig  = tt.get()->projected_signal();
-    sb   = tt.get()->projected_sideband();
+    else {
+      shared_ptr<Psana::TimeTool::DataV1> tt = evt.get(m_get_key);
+      if (tt.get()) {
+        sig  = tt.get()->projected_signal();
+        sb   = tt.get()->projected_sideband();
+      }
+      else {
+        MsgLog(name(), warning, name() << ": Could not fetch timetool data");
+        return;
+      }
+    }
   }
   else {
     // example of getting frame data from event
@@ -511,6 +609,8 @@ Analyze::event(Event& evt, Env& env)
       MsgLog(name(), warning, name() << ": Could not fetch frame data");
       return;
     }
+
+    m_pedestal = frame->offset();
 
     ndarray<const uint16_t,2> f = frame->data16();
     bool lfatal=false;
@@ -531,6 +631,14 @@ Analyze::event(Event& evt, Env& env)
                << f.shape()[i] << "].");
         m_sb_roi_hi[i] = f.shape()[i]-1;
       }
+      if (m_ref_roi_hi[i] >= f.shape()[i]) {
+        lfatal |= (m_projectX == (i==0));
+        MsgLog(name(), warning, 
+               name() << ": reference " << (i==0 ? 'Y':'X') << " upper bound ["
+               << m_ref_roi_hi[i] << "] exceeds frame bounds ["
+               << f.shape()[i] << "].");
+        m_ref_roi_hi[i] = f.shape()[i]-1;
+      }
     }
     if (lfatal)
       MsgLog(name(), fatal, 
@@ -547,14 +655,24 @@ Analyze::event(Event& evt, Env& env)
     //
     //  Calculate sideband correction
     //
-    if (m_sb_roi_lo[0]!=m_sb_roi_hi[0])
+    if (use_sb_roi)
       sb = psalg::project(f, 
                           m_sb_roi_lo , 
                           m_sb_roi_hi,
                           m_pedestal, pdim);
+
+    //
+    //  Calculate reference correction
+    //
+    if (use_ref_roi)
+      ref = psalg::project(f, 
+                           m_ref_roi_lo , 
+                           m_ref_roi_hi,
+                           m_pedestal, pdim);
   }
     
   ndarray<double,1> sigd = make_ndarray<double>(sig.shape()[0]);
+  ndarray<double,1> refd = make_ndarray<double>(sig.shape()[0]);
 
   //
   //  Correct projection for common mode found in sideband
@@ -564,12 +682,24 @@ Analyze::event(Event& evt, Env& env)
       
     ndarray<const double,1> sbc = psalg::commonModeLROE(sb, m_sb_avg);
 
-    for(unsigned i=0; i<sig.shape()[0]; i++)
-      sigd[i] = double(sig[i])-sbc[i];
+    if (use_ref_roi)
+      for(unsigned i=0; i<sig.shape()[0]; i++) {
+	sigd[i] = double(sig[i])-sbc[i];
+	refd[i] = double(ref[i])-sbc[i];
+      }
+    else
+      for(unsigned i=0; i<sig.shape()[0]; i++)
+        sigd[i] = double(sig[i])-sbc[i];
   }
   else {
-    for(unsigned i=0; i<sig.shape()[0]; i++)
-      sigd[i] = double(sig[i]);
+    if (use_ref_roi)
+      for(unsigned i=0; i<sig.shape()[0]; i++) {
+	sigd[i] = double(sig[i]);
+	refd[i] = double(ref[i]);
+      }
+    else
+      for(unsigned i=0; i<sig.shape()[0]; i++)
+        sigd[i] = double(sig[i]);
   }
   
   //
@@ -584,8 +714,8 @@ Analyze::event(Event& evt, Env& env)
   
   if (nobeam) {
     MsgLog(name(), trace, name() << ": Updating reference.");
-    psalg::rolling_average(ndarray<const double,1>(sigd),
-                           m_ref, m_ref_avg_fraction);
+    psalg::rolling_average(ndarray<const double,1>(use_ref_roi? refd:sigd),
+                           m_ref_avg, m_ref_avg_fraction);
     
     //
     //  If we are analyzing one event against all references,
@@ -599,8 +729,12 @@ Analyze::event(Event& evt, Env& env)
     else
       return;
   }
-  
-  if (m_ref.size()==0) {
+  else if (use_ref_roi) {
+    psalg::rolling_average(ndarray<const double,1>(refd),
+                           m_ref_avg, m_ref_avg_fraction);
+  }
+
+  if (m_ref_avg.size()==0) {
     MsgLog(name(), warning, name() << ": No reference.");
     return;
   }
@@ -624,7 +758,7 @@ Analyze::event(Event& evt, Env& env)
   //  Divide by the reference
   //
   for(unsigned i=0; i<sig.shape()[0]; i++)
-    sigd[i] = sigd[i]/m_ref[i] - 1;
+    sigd[i] = sigd[i]/m_ref_avg[i] - 1;
 
   //
   //  Apply the digital filter
@@ -634,11 +768,13 @@ Analyze::event(Event& evt, Env& env)
   if (!m_hdump.empty()) {
     DumpH& h = m_hdump.front();
     for(unsigned i=0; i<sig.shape()[0]; i++)
-      h.hraw->fill(double(i),double(sig[i]));
+      h.hraw->fill(double(i)+m_sig_roi_lo[pdim],double(sig[i]));
+    for(unsigned i=0; i<sig.shape()[0]; i++)
+      h.href->fill(double(i)+m_sig_roi_lo[pdim],m_ref_avg[i]);
     for(unsigned i=0; i<sigd.shape()[0]; i++)
-      h.hrat->fill(double(i),sigd[i]);
+      h.hrat->fill(double(i)+m_sig_roi_lo[pdim],sigd[i]);
     for(unsigned i=0; i<qwf.shape()[0]; i++)
-      h.hflt->fill(double(i),qwf[i]);
+      h.hflt->fill(double(i)+m_sig_roi_lo[pdim],qwf[i]);
     m_hdump.pop_front();
   }
     
@@ -667,13 +803,13 @@ Analyze::event(Event& evt, Env& env)
         evt.put(boost_double(xflt)     ,m_put_key+std::string(":FLTPOS"));
         evt.put(boost_double(xfltc)    ,m_put_key+std::string(":FLTPOS_PS"));
         evt.put(boost_double(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
-        evt.put(boost_double(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
+        evt.put(boost_double(m_ref_avg[ix]),m_put_key+std::string(":REFAMPL"));
       } else {
         evt.put(boost_double_as_ndarray(pFit0[0]) ,m_put_key+std::string(":AMPL"));
         evt.put(boost_double_as_ndarray(xflt)     ,m_put_key+std::string(":FLTPOS"));
         evt.put(boost_double_as_ndarray(xfltc)    ,m_put_key+std::string(":FLTPOS_PS"));
         evt.put(boost_double_as_ndarray(pFit0[2]) ,m_put_key+std::string(":FLTPOSFWHM"));
-        evt.put(boost_double_as_ndarray(m_ref[ix]),m_put_key+std::string(":REFAMPL"));
+        evt.put(boost_double_as_ndarray(m_ref_avg[ix]),m_put_key+std::string(":REFAMPL"));
       }
                 
       double nxtAmpl=0;
@@ -690,17 +826,20 @@ Analyze::event(Event& evt, Env& env)
       }
 
       // put 
-      boost::shared_ptr<Psana::TimeTool::DataV1> timeToolEvtData = 
-        boost::make_shared<TimeToolData>(Psana::TimeTool::DataV1::Signal,
+#if 0
+      boost::shared_ptr<Psana::TimeTool::DataV2> timeToolEvtData = 
+        boost::make_shared<TimeToolData>(Psana::TimeTool::DataV2::Signal,
                                          pFit0[0],
                                          xflt,
                                          xfltc,
                                          pFit0[2],
-                                         m_ref[ix],
+                                         m_ref_avg[ix],
                                          nxtAmpl,
+                                         ndarray<const int32_t,1>(),
                                          ndarray<const int32_t,1>(),
                                          ndarray<const int32_t,1>());
       evt.put(timeToolEvtData,m_put_key);
+#endif
       
 #undef boost_double
     }
@@ -725,8 +864,8 @@ Analyze::endJob(Event& evt, Env& env)
 {
   if (!m_ref_store.empty()) {
     ofstream f(m_ref_store.c_str());
-    for(unsigned i=0; i<m_ref.size(); i++)
-      f << m_ref[i] << ' ';
+    for(unsigned i=0; i<m_ref_avg.size(); i++)
+      f << m_ref_avg[i] << ' ';
     f << std::endl;
   }
 }

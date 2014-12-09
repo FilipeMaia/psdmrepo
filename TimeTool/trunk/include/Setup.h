@@ -120,8 +120,10 @@ private:
 
   class DumpH {
   public:
-    DumpH() : hraw(0), hrat(0), hacf(0) {}
+    DumpH() : hraw(0), hcor(0), hrat(0), hacf(0) {}
     PSHist::H1* hraw;
+    PSHist::H1* hcor;
+    PSHist::H1* href;
     PSHist::H1* hrat;
     PSHist::H1* hacf;
   };

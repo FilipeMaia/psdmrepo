@@ -216,6 +216,12 @@ Setup::beginJob(Event& evt, Env& env)
       s << "Raw projection: event " << i;
       m_hdump[i].hraw = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
     { std::stringstream s;
+      s << "Corr projection: event " << i;
+      m_hdump[i].hcor = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
+    { std::stringstream s;
+      s << "Corr reference: event " << i;
+      m_hdump[i].href = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
+    { std::stringstream s;
       s << "Ratio: event " << i;
       m_hdump[i].hrat = env.hmgr().hist1d(s.str().c_str(),"ratio",a); }
     { std::stringstream s;
@@ -380,13 +386,17 @@ Setup::event(Event& evt, Env& env)
 
     if (m_count < m_hdump.size()) {
       for(unsigned i=0; i<sig.shape()[0]; i++)
-        m_hdump[m_count].hraw->fill(double(i),double(sig[i]));
+        m_hdump[m_count].hraw->fill(double(i)+m_sig_roi_lo[pdim],double(sig[i]));
       for(unsigned i=0; i<sigd.shape()[0]; i++)
-        m_hdump[m_count].hrat->fill(double(i),drat[i]);
+        m_hdump[m_count].hcor->fill(double(i)+m_sig_roi_lo[pdim],sigd[i]);
+      for(unsigned i=0; i<m_ref.shape()[0]; i++)
+        m_hdump[m_count].href->fill(double(i)+m_sig_roi_lo[pdim],m_ref[i]);
+      for(unsigned i=0; i<sigd.shape()[0]; i++)
+        m_hdump[m_count].hrat->fill(double(i)+m_sig_roi_lo[pdim],drat[i]);
       for(unsigned i=0; i<sigd.shape()[0]; i++) {
         double wt = 1./double(sigd.shape()[0]-i);
         for(unsigned j=0; (i+j)<sigd.shape()[0]; j++)
-          m_hdump[m_count].hacf->fill(double(i),drat[j]*drat[i+j]*wt);
+          m_hdump[m_count].hacf->fill(double(i)+m_sig_roi_lo[pdim],drat[j]*drat[i+j]*wt);
       }
       m_count++;
     }

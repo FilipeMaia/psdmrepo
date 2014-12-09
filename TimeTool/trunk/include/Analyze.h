@@ -119,14 +119,18 @@ private:
   unsigned m_sb_roi_lo[2];  // image sideband is projected within ROI
   unsigned m_sb_roi_hi[2];  // image sideband is projected within ROI
 
+  bool     m_ref_roi_set;
+  unsigned m_ref_roi_lo[2];  // image reference is projected within ROI
+  unsigned m_ref_roi_hi[2];  // image reference is projected within ROI
+
   unsigned m_frame_roi[2];  // frame data is an ROI
 
   double   m_sb_avg_fraction ; // rolling average fraction (1/N)
   double   m_ref_avg_fraction; // rolling average fraction (1/N)
 
   ndarray<const double,1> m_weights; // digital filter weights
-  ndarray<double,1> m_ref;     // accumulated reference
-  ndarray<double,1> m_sb_avg;  // averaged sideband
+  ndarray<double,1> m_ref_avg;       // accumulated reference
+  ndarray<double,1> m_sb_avg;        // averaged sideband
 
   bool     m_analyze_projections;
 
@@ -140,8 +144,9 @@ private:
 
   class DumpH {
   public:
-    DumpH() : hraw(0), hrat(0), hflt(0) {}
+    DumpH() : hraw(0), href(0), hrat(0), hflt(0) {}
     PSHist::H1* hraw;
+    PSHist::H1* href;
     PSHist::H1* hrat;
     PSHist::H1* hflt;
   };
