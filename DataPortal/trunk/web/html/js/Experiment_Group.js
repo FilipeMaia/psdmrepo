@@ -72,7 +72,7 @@ function (
             var html =
 '<div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">' +
 '  <div style="height:55px;">' +
-'    <div style="float:left; font-size: 300%; font-family: Times, sans-serif;"><b>'+this.experiment.posix_group+'</b></div>' +
+'    <div style="float:left; font-size: 28px;"><b>'+this.experiment.posix_group+'</b></div>' +
 '    <div style="float:left; margin-left:10px; padding-top:4px;"><button class="control-button" id="refresh">Refresh</button></div>' +
 '    <div style="clear:both;"></div>' +
 '  </div>' +

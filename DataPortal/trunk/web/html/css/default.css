@@ -14,7 +14,10 @@ body {
 
 .document_title,
 .document_subtitle {
+  /*
   font-family: "Times", serif;
+  */
+  font-family: 'Source Sans Pro',Arial,sans-serif;
   font-size: 32px;
   font-weight: bold;
   text-align: left;
@@ -24,8 +27,8 @@ body {
 }
 .login {
   font-size: 70%;
-	/*font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;*/
-	font-family: Arial, Helvetica, Verdana, Sans-Serif;
+  /*font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;*/
+  font-family: Arial, Helvetica, Verdana, Sans-Serif;
 }
 
 a, a.link {
@@ -42,7 +45,10 @@ a:hover, a.link:hover {
   border: solid 1px #000000;
   border-top: none;
   border-left: none;
+  /*
   font-family: "Times", serif;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  */
   font-weight: bold;
   font-size: 0.8em;
 }
@@ -55,7 +61,10 @@ a:hover, a.link:hover {
   border-top: none;
   border-left: none;
   padding: 4px 8px 4px 8px;
+  /*
   font-family: "Times", serif;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  */
   font-size: 0.8em;
 }
 .table_cell_left {
@@ -73,7 +82,10 @@ a:hover, a.link:hover {
 .section1,
 .section2 {
   margin: 0.5em 0 0.5em 0;
+  /*
   font-family: "Times", serif;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  */
   font-size: 36px;
   font-weight: bold;
   text-align:left;

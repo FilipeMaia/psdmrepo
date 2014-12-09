@@ -954,34 +954,82 @@ function ELog_MessageBody (parent, message) {
         this.form_attachments_cont.find('input:file[name="file2attach_'+num+'"]').change(function () { that.add_attachment() ; }) ;
     } ;
     
+    this._PREDEFINED_EMAIL_ADDRESSES = [
+        {   recipient: 'pcds-help',  email: 'pcds-help@slac.stanford.edu',  descr: 'PCDS General Support'} ,
+        {   recipient: 'pcds-it-l',  email: 'pcds-it-l@slac.stanford.edu',  descr: 'PCDS IT Infrustrucure Support'} ,
+        {   recipient: 'pcds-poc-l', email: 'pcds-poc-l@slac.stanford.edu', descr: 'LCLS Points Of Contacts Crew'} ,
+        {   recipient: 'pcds-daq-l', email: 'pcds-daq-l@slac.stanford.edu', descr: 'LCLS DAQ Crew'} ,
+        {   recipient: 'pcds-ana-l', email: 'pcds-ana-l@slac.stanford.edu', descr: 'LCLS Data Analysis & Data Management Crew'} ,
+        {   recipient: 'self',       email: this.access_list.user.email,    descr: 'My SLAC address: <b>'+this.access_list.user.email+'</b>'}
+    ] ;
+    
+    /**
+     * Initiate a dialog for worwarding a select message to 
+     * @returns {undefined}
+     */
     this.email_message = function () {
-        console.log('ELog_MessageBody.email_message(): this operation is not fully implemented') ;
         Fwk.form_dialog (
-            'Forwarding message via e-Mail' ,
-            '<div>Recipient 1 : <input type="text" size=24 val=""/></div>' +
-            '<div>Recipient 2 : <input type="text" size=24 val=""/></div>' +
-            '<div>Recipient 3 : <input type="text" size=24 val=""/></div>' ,
+'Forwarding message via e-Mail gateway' ,
+'<div style="padding-top: 5px;" > ' +
+'  Select any pre-defined mailing list, your own SLAC address, or fill ' +
+'  in arbitrary e-mail addresses of persons you want to share the content of this e-log entry. ' +
+'</div>' +
+'<div style="padding-top: 5px;" > ' +
+'  <b>NOTE</b>: your recipients must have a valid UNIX account at SLAC in order to access attachments ' +
+'  of the message entry.' +
+'</div>' +
+'<table><tbody> ' +
+'  <tr> ' +
+'    <td colspan="0" >&nbsp;</td> ' +
+'  </tr> ' + _.reduce(this._PREDEFINED_EMAIL_ADDRESSES, function (html, e) { return html +=
+'  <tr class="email selectable" > ' +
+'    <td class="selector"                             ><input type="checkbox" /></td> ' +
+'    <td class="recipient" style="font-weight:bold;"  >'+e.recipient+'</td> ' +
+'    <td class="descr"     style="padding-left:10px;" >'+e.descr+'</td> ' +
+'    <td class="email"                                ><input type="hidden" value="'+e.email+'" /></td> ' +
+'  </tr> ' ; }, '') +
+'  <tr> ' +
+'    <td colspan="0" >&nbsp;</td> ' +
+'  </tr> ' + _.reduce([1,2,3], function (html, idx) { return html +=
+'  <tr class="email" > ' +
+'    <td >&nbsp;</td> ' +
+'    <td                   style="font-style:italic;" >e-mail:</td> ' +
+'    <td class="email"     style="padding-left:10px;" ><input type="text" style="width:100%" title="full e-mail address of a recipient" value="" /></td> ' +
+'  </tr> ' ; }, '') +
+'</tbody></table> ' ,
             function (form) {
-                console.log('ELog_MessageBody.email_message() input:', $.makeArray(form.find('input'))) ;
-                var params = {
-                    id: that.message.id ,
-                    recipients: _.reduce($.makeArray(form.find('input')), function (recipients, input) {
-                        console.log('ELog_MessageBody.email_message() input:', input) ;
-                        //var email = input.val() ;
-                        //if (email) recipients.push(email) ;
+                var recipients = _.reduce (
+                    $.makeArray(form.find('tr.email').children('td.email').children('input')) ,
+                    function (recipients, input) {
+                        var input = $(input) ;
+                        var tr = input.parent().parent('tr.selectable') ;
+                        if (tr.length) {
+                            if (tr.children('td.selector').children('input').get(0).checked) {
+                                var email = tr.children('td.email').children('input').val() ;
+                                if (email) recipients.push(email) ;
+                            }  
+                        } else {
+                            var email = input.val() ;
+                            if (email) recipients.push(email) ;
+                        }
                         return recipients ;
-                    }, [])
-                } ;
-                if (!params.recipients.length) {
+                    } ,
+                    []
+                ) ;
+                if (!recipients.length) {
                     Fwk.report_error('Please, provide at least one e-mail address or cancel the operation.' ) ;
-
-                    // keep the dialog open
-                    return false ;
+                    return false ;  // keep the dialog open
                 }
-                console.log('ELog_MessageBody.email_message() recipients:', params.recipients) ;
-
-                // close the dialog
-                return true ;
+                console.log('ELog_MessageBody.email_message() recipients:', recipients) ;
+                Fwk.web_service_POST (
+                    '../logbook/ws/message_forward.php' ,
+                    {   id:         that.message.id ,
+                        recipients: JSON.stringify(recipients)
+                    } ,
+                    function (data) { /* nothing to do on the successfull completion */ } ,
+                    function (msg)  { Fwk.report_error(msg) ; }
+                );
+                return true ;   // close the dialog
             }
         ) ;
     } ;

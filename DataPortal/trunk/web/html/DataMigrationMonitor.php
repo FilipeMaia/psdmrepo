@@ -27,7 +27,7 @@ try {
     $is_subscribed = !is_null( $config->check_if_subscribed4migration ( $subscriber, $address ));
 
 ?>
-<!DOCTYPE html"> 
+<!DOCTYPE html> 
 <html>
 <head>
 
@@ -42,6 +42,16 @@ try {
 
 <style type="text/css">
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.comment {
+  padding-left:20px;
+  max-width: 720px;
+  font-size: 13px;
+}
 a, a.link {
   text-decoration: none;
   font-weight: bold;
@@ -189,7 +199,7 @@ $(function() {
 
 <body>
 
-<div style="padding-left:20px; padding-right:20px;">
+<div style="padding:20px;">
 
   <span style="font-size:32px; font-weight:bold;">Data Migration Monitor</span>
   <br>

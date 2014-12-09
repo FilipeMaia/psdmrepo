@@ -382,14 +382,32 @@ try {
         header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
         print <<<HERE
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<!DOCTYPE html>
 <html>
 <head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+<style type="text/css">
+body {
+  margin: 0;
+  padding: 0;
+}
+h2 {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+p {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 13px;
+}
+table pre {
+  margin: 0;
+  padding: 0;
+}
+</style>
 </head>
 <body>
 
-<div style="padding-left:20px; padding-right:20px;">
+<div style="padding:20px;">
 
   <h2>About</h2>
   <div style="padding-left:20px;">
