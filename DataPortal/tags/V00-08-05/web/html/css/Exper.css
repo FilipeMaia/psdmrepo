@@ -1,0 +1,20 @@
+@CHARSET "ISO-8859-1";
+
+#experiment-summary {
+  padding: 20px;
+}
+
+#experiment-manage {
+  padding: 20px;
+}
+
+.exp-group-members-hidden { display: none; }
+.exp-group-members-visible { display: block; }
+
+#exp-group-members {
+  margin-left: 8px;
+  /*background-color: #f0f0f0;*/
+  border-left: 1px solid #c0c0c0;
+  border-radius:4px;
+  -moz-border-radius: 4px;
+}
