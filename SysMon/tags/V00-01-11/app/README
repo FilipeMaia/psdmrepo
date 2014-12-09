@@ -1,0 +1,39 @@
+How to run LCLS Beam-Time Monitor:
+
+ssh -i
+source /reg/g/pcds/setup/pyca.sh
+export PYTHONPATH=/reg/neh/home/gapon//lib/amd64_linux26/lib/python2.5/site-packages/:$PYTHONPATH
+./LCLSBeamTimeMon.py
+
+Amedeo's instructions:
+
+-----Original Message-----
+From: Amedeo Perazzo [mailto:perazzo@slac.stanford.edu]
+Sent: Tuesday, March 13, 2012 11:39 AM
+To: Gaponenko, Igor
+Cc: Zhang, Dehong
+Subject: Re: EPICS PV names for LCLS Beam Status monitoring
+
+On 03/13/2012 11:13 AM, Gaponenko, Igor wrote:
+> I agree. The only (actually) minor problem (for what I'm trying to achieve) is that LCLS schedule isn't in any database which I can query in run-time. But this isn't so critical.
+
+The schedule would be an unrealiable source even it we had online access to it: plans often change on the hour. The XRAY_DESTINATIONS PV that Dehong sent in combination LIGHT:LCLS:STATE with is the right solution.
+
+> I'll give it a try (of reading PVs) as soon as I'll learn how to do it from Python.
+
+ssh psdev101
+source /reg/g/pcds/setup/pyca.sh
+/reg/g/pcds/controls/pyca/pycatools/caget.py --pv LIGHT:LCLS:STATE /reg/g/pcds/controls/pyca/pycatools/caget.py --pv XRAY_DESTINATIONS /reg/g/pcds/controls/pyca/pycatools/cainfo.py --pv XRAY_DESTINATIONS /reg/g/pcds/controls/pyca/pycatools/camonitor.py --pv XRAY_DESTINATIONS
+
+The above python scripts are examples on how to use pyca. The most interesting is camonitor because that's what you can use to monitor changes in LIGHT:LCLS:STATE and XRAY_DESTINATIONS.
+
+Use psdev101 for now, but we need to find a better machine for running the production scripts.
+
+Dehong, XRAY_DESTINATIONS is currently a double, shouldn't it be a long int or something like that?
+
+Thank you for looking at this,
+Amedeo
+
+
+
+

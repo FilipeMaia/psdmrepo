@@ -1,0 +1,90 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package SysMon
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+Software components and tools for monitoring various aspects of the PCDS
+Data Management and Computing systems.
+
+Detailed description:
+=====================
+
+________________________________________________
+1. Continious beam time monitoring: LCLSBeamTime
+
+This application fetches values of certain (see the code of the scripts)
+EPICS PVs and puts them into MySQL database (database name 'sysmon').
+There are two relevant tables in the database:
+
+  pv     - definitions of PVs and their categories
+  pv_val - actual values of the PVs
+
+The application is deployed at the following directory:
+
+  /reg/g/pcds/pds/sysmon/
+
+There are three relevant scripts in the binary sub-directory of
+the deployment directory:
+
+  bin/LCLSBeamTimeMonitor.sh
+
+    the driver script to be started aither as a cron job or
+    as a procServ process. It will check and set up an execution
+    environment for the actual monitoring script.
+
+  bin/LCLSBeamTimeWatch.py
+
+    the actual monitoring script performing continious monitoring
+    of the EPICS variables (PVs). The script will invoke a database
+    recorder script to store values of the PVs in the database.
+
+
+  bin/LCLSBeamTimeStore.py
+
+    the script to be invoked to store a value of a select PV in
+    the database.
+
+And there is a Python library for MySQL found at:
+
+  lib/python2.5/site-packages
+
+The monitoring is run as follows:
+
+  bin/LCLSBeamTimeMonitor.sh <sampling-interval> <heart-beat-interval>
+
+The first parameter (<sampling-interval>) controls how frequently values of
+the EPICS PVs are sampled. The second parameter (<heartbeat-interval>)
+controls the hearbeat interval. The monitoring system implements the heartbeat
+as a mechanism of signaling to potential recipients of the monitoring
+information that the monitoring is still "alive". Both parameters are
+expressed in seconds. The minimal allowed values for each is 1 second.
+The parameters are optional. Their default values are 10.0 and 20.0 seconds
+respectively.
+
+_________________________________________________________________
+2. Database schema for storing the beam-time usage by experiments
+
+The schema is used for producing various summary reports about data taking
+activities at PCDS. The contents of the databas is populatd from various
+sources.
+
+The schema is represented in database 'sysmon' by four tables:
+
+  beamtime_config   - configuration parameters of the application
+  beamtime_runs     - data taking run records extracted from the Electronic
+                      LogBook of teh LCLS experiments
+  beamtime_gaps     - gaps of not taking data between runs; the gaps
+                      are found automatically based on the above mentioned
+                      information about runs
+  beamtime_comments - comments with justtifications for the gaps provided
+                      by relevant personell involved into data taking
+
+

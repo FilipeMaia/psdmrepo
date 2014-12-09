@@ -1,0 +1,20 @@
+@CHARSET "ISO-8859-1";
+
+/* Overload default styles for JQuery UI buttons
+ */
+button.control-button,
+label.control-label {
+    font-size:  10px !important;
+    color:      black !important;
+}
+button.control-button-important {
+    color:      red !important;
+}
+button.control-button-small {
+    font-size:  9px !important;    
+}
+
+button {
+    background: rgba(240, 248, 255, 0.39) !important;
+    border-radius: 2px !important;
+}
