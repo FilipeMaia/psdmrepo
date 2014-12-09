@@ -14,7 +14,9 @@
 .stack-controls {
   /*margin: 15px 0px 5px 0px;*/
   font-size: 12px;
+  /*
   font-family: 'Times', serif;
+  */
 }
 .stack-controls > button {
   font-size: 9px;
@@ -26,7 +28,9 @@
   border-bottom: solid 1px #000000;
   border-radius: 3px 3px 0px 0px;
   font-size: 12px;
+  /*
   font-family: 'Times', serif;
+  */
   cursor: pointer;
 }
 .stack-header:hover {

@@ -76,6 +76,6 @@ function (
             'etc.'
         ] ;
         var table = new SmartTable(hdr, rows, num_hdr_rows, max_hdr_rows) ;
-        table.display($('#test')) ;
+        table.display($('#smarttable')) ;
     }) ;
 }) ;

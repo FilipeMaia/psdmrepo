@@ -32,7 +32,11 @@ body {
 }
 #fwk-title,
 #fwk-subtitle {
+  /*
   font-family: "Times", serif;
+  font-family: 'lucida grande',tahoma,verdana,arial,sans-serif;
+  */
+  font-family: 'Source Sans Pro',Arial,sans-serif;
   font-size: 32px;
   font-weight: bold;
   text-align: left;

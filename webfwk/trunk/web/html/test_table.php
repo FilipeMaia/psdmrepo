@@ -19,6 +19,10 @@
 body {
   margin: 0;
   padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
 }
 .first {
   float: left;

@@ -693,7 +693,7 @@ function (
                 resizable: true ,
                 modal: true ,
                 width:  470 ,
-                height: 300 ,
+                height: 420 ,
                 buttons: {
                     "Ok": function () {
                         if (on_ok) {

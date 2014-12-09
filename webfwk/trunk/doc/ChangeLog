@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2014-12-08 Igor Gaponenko
+- minor changes in CSS (fonts)
+
 Tag: V00-01-02
 2014-10-24 Igor Gaponenko
 - new dynamuically loadable module SimpleTable to replace Table as per JIRA

@@ -12,9 +12,7 @@
 .stack-row-visible { display: block; }
 
 .stack-controls {
-  /*margin: 15px 0px 5px 0px;*/
   font-size: 12px;
-  font-family: 'Times', serif;
 }
 .stack-controls > button {
   font-size: 9px;
@@ -26,7 +24,13 @@
   border-bottom: solid 1px #000000;
   border-radius: 3px 3px 0px 0px;
   font-size: 12px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  /*
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  */
+  /*
   font-family: 'Times', serif;
+  */
   cursor: pointer;
 }
 .stack-header:hover {
@@ -60,11 +64,11 @@
 .stack-body > .stack-row > .stack-row-header {
   padding: 2px;
   background-color: #f0f0f0;
-  /*border: solid 1px #b0b0b0;*/
   border: solid 1px #c0c0c0;
   border-bottom: 0;
   border-radius: 3px 3px 0px 0px;
   cursor: pointer;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
 }
 .stack-body > .stack-row > .stack-row-header:hover {
   background-color: #c0c0c0;
@@ -104,6 +108,7 @@
   border-top: 0;
   border-bottom: 0;
   border-radius: 0px 0px 3px 3px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
 }
 .stack-body > .stack-row:last-child > .stack-row-body {
   border-bottom: solid 1px #b0b0b0;

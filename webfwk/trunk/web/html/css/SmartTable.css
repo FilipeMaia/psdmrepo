@@ -34,6 +34,7 @@ and open the template in the editor.
 
 .t-cont > .menu .item {
   padding: 2px;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
   font-size: 12px;
   color: rgb(94, 66, 66);
 }
