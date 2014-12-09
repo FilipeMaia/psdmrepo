@@ -1,4 +1,4 @@
-<!DOCTYPE html">
+<!DOCTYPE html>
 <html>
 <head>
 
@@ -13,13 +13,21 @@
 
 <style type="text/css">
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
 td.table_hdr {
   background-color:#d0d0d0;
   padding: 2px 8px 2px 8px;
   border: solid 1px #000000;
   border-top: none;
   border-left: none;
+  /*
   font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-weight: bold;
   font-size: 12px;
 }
@@ -101,7 +109,7 @@ $(function() {
 
 <body>
 
-  <div style="padding:10px; padding-left:20px;">
+  <div style="padding:20px;">
 
     <h2>File Restore Requests</h2>
 

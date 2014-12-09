@@ -81,13 +81,26 @@ try {
 
 <style type="text/css">
 
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.comment {
+  padding-left:20px;
+  max-width: 720px;
+  font-size: 13px;
+}
 td.table_hdr {
   background-color:#d0d0d0;
   padding: 2px 8px 2px 8px;
   border: solid 1px #000000;
   border-top: none;
   border-left: none;
+  /*
   font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-weight: bold;
   font-size: 12px;
 }
@@ -401,12 +414,13 @@ $(function() {
 
     <h2>View/Modify Experiment Data Retention Policies</h2>
 
-    <p style="width:720px;">
-    This application is meant to view and (if your account has sufficient privileges) to modify
-    parameters of the data retention policy. The <b>Default Policies</b> tab allows to set default
-    policies affecting all experiments.  These values can be changed for individual experiments
-    using experiment-specific tables on other tabs of this application.
-    </p>
+    <div class="comment" >
+      <p>This application is meant to view and (if your account has sufficient privileges) to modify
+      parameters of the data retention policy. The <b>Default Policies</b> tab allows to set default
+      policies affecting all experiments.  These values can be changed for individual experiments
+      using experiment-specific tables on other tabs of this application.
+      </p>
+    </div>
     <div id="tabs" style="padding-left:10px; font-size:12px;">
       <ul>
         <li><a href="#default">Default Policies</a></li>

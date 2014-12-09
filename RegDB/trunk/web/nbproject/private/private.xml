@@ -2,15 +2,6 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/lib/regdb/regdb.class.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/html/ws/ping.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/lib/regdb/regdbfile.class.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/html/ws/ProcessGenerateRun.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/html/AutoTranslate2HDF5.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/html/ws/run_allocate.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/lib/regdb/regdbrun.class.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/RegDB/web/lib/regdb/regdbexperiment.class.php</file>
-        </group>
+        <group name="PCDS Web Apps"/>
     </open-files>
 </project-private>

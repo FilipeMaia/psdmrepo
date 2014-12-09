@@ -151,15 +151,35 @@ HERE;
 
 <style type="text/css">
 
+body {
+    margin:             0;
+    padding:            0;
+    font-family:        'Source Sans Pro',Arial,sans-serif;
+    font-size:          14px;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+p {
+    /*
+    font-family:  Lucida Grande, Lucida Sans, Arial, sans-serif;
+    */
+    font-family:    'Source Sans Pro',Arial,sans-serif;
+    font-size:      14px;
+    line-height:    1.4;
+}
 td.table_hdr {
     background-color: #d0d0d0;
     padding:            2px 8px 2px 8px;
     border:             solid 1px #000000;
     border-top:         none;
     border-left:        none;
-    font-family:        Arial, sans-serif;
+    /*
+    font-family: Arial, sans-serif;
+    */
+    font-family:        Lucida Grande, Lucida Sans, Arial, sans-serif;
     font-weight:        bold;
-    font-size:          75%;
+    font-size:          13px;
 }
 td.table_cell {
     border:             solid 1px #d0d0d0;
@@ -167,7 +187,8 @@ td.table_cell {
     border-left:        none;
     padding:            2px 8px 2px 8px;
     font-family:        Arial, sans-serif;
-    font-size:          75%;
+    font-size:          13px;
+
 }
 td.table_cell_left {
     font-weight:        bold;
@@ -182,13 +203,13 @@ td.table_cell_within_group {
     border-bottom:      none;
 }
 
-input.auto {
+input {
     padding-left:       2px;
     padding-right:      2px;
+    border:             solid 1px #ffffff;
 }
-input.ffb {
-    padding-left:       2px;
-    padding-right:      2px;
+input[type="text"]:hover {
+    border:             solid 1px #d0d0d0;
 }
 
 #descr {
@@ -201,6 +222,15 @@ input.ffb {
 #descr table td.key {
     font-weight:        bold;
     padding-right:      10px;
+}
+#descr table td.val {
+    /*
+    font-family:        Lucida Grande, Lucida Sans, Arial, sans-serif;
+    */
+    font-family:        'Source Sans Pro',Arial,sans-serif;
+    font-size:          14px;
+    line-height:        1.4;
+    padding-bottom:     7px;
 }
 
 </style>
@@ -309,14 +339,15 @@ $(function () {
 
 </head>
     <body>
-        <div style="padding-left:20px; padding-right:20px;">
+        <div style="padding:20px;" >
 
             <h2>View/Modify HDF5 translation options across all experiments</h2>
 
             <div id="descr" >
-
-                This tool is mean to view and (if your account has sufficient privileges) to modify
+                
+                <p>This tool is mean to view and (if your account has sufficient privileges) to modify
                 values of the following parameters of experiments:
+                </p>
 
                 <table>
                     <tbody>

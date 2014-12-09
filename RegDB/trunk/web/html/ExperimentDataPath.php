@@ -16,6 +16,16 @@
 
 <style type="text/css">
 
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.comment {
+  padding-left:20px;
+  max-width: 720px;
+  font-size: 13px;
+}
 td.table_hdr {
   background-color:#d0d0d0;
   padding: 2px 8px 2px 8px;
@@ -99,15 +109,17 @@ $(function() {
 
 <body>
 
-  <div style="padding-left:20px; padding-right:20px;">
+  <div style="padding:20px;" >
 
     <h2>View/Modify Experiment Data Path</h2>
-    <p>This tool is mean to view and (if your account has sufficient privileges) to modify
-    values of the experiments' parameter 'DATA_PATH'. This parameter is normally set
-    when registering an experiment in the <a target="_blank" href="../regdb/">Experiment Registry Database</a>.
-    To avoid inconcsistencies between the database and the experiments' data file systems it's not advised
-    to modify values of the parameter for those experiments which have already taken data.
-    </p>
+    <div class="comment" >
+        <p>This tool is mean to view and (if your account has sufficient privileges) to modify
+        values of the experiments' parameter 'DATA_PATH'. This parameter is normally set
+        when registering an experiment in the <a target="_blank" href="../regdb/">Experiment Registry Database</a>.
+        To avoid inconcsistencies between the database and the experiments' data file systems it's not advised
+        to modify values of the parameter for those experiments which have already taken data.
+        </p>
+    </div>
     <div style="padding-left:20px;">
       <form id="save-form" enctype="multipart/form-data" action="../regdb/ws/SetExperimentdataPath.php" method="post">
         <input type="hidden" name="exper_id" value="" />
