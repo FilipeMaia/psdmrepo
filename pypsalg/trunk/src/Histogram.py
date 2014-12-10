@@ -27,7 +27,7 @@ class hist1d:
             self.data[xbin] += weight
 
 class hist2d:
-    def __init__(self,xlow,xhigh,nbinx,ylow,yhigh,nbiny):
+    def __init__(self,nbinx,xlow,xhigh,nbiny,ylow,yhigh):
         self.data = np.zeros((nbinx,nbiny))
         self.xaxis = histaxis(xlow,xhigh,nbinx)
         self.yaxis = histaxis(ylow,yhigh,nbiny)

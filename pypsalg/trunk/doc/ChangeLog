@@ -11,6 +11,10 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2014-12-10 Christopher O'Grady
+- Change order of hist2d arguments to match hist1d
+
 Tag: V00-01-00
 2014-11-24 Ankush Mitra
 - python interface to C psalg functions and native python functions
