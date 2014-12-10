@@ -172,9 +172,9 @@ def create_C_defs ():
             pkg_name.upper(),
             rel_name,
             rel_type,
-            rel_version[0],
-            rel_version[1],
-            rel_version[2]))
+            int(rel_version[0]),
+            int(rel_version[1]),
+            int(rel_version[2])))
 
 
 def create_Python_package ():
@@ -190,9 +190,9 @@ version = ({2},{3},{4})
 """.format(
             rel_name,
             rel_type,
-            rel_version[0],
-            rel_version[1],
-            rel_version[2]))
+            int(rel_version[0]),
+            int(rel_version[1]),
+            int(rel_version[2])))
 
 
 #######################################################
