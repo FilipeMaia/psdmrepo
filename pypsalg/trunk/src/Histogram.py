@@ -29,11 +29,10 @@ class hist1d:
 class hist2d:
     def __init__(self,nbinx,xlow,xhigh,nbiny,ylow,yhigh):
         self.data = np.zeros((nbinx,nbiny))
-        self.xaxis = histaxis(xlow,xhigh,nbinx)
-        self.yaxis = histaxis(ylow,yhigh,nbiny)
+        self.xaxis = histaxis(nbinx,xlow,xhigh)
+        self.yaxis = histaxis(nbiny,ylow,yhigh)
     def fill(self,xval,yval,weight=1.0):
         xbin=self.xaxis.bin(xval)
         ybin=self.yaxis.bin(yval)
-        #print xbin,ybin
         if xbin>=0 and xbin<self.xaxis.nbin and ybin>=0 and ybin<self.yaxis.nbin:
-            self.data[xbin,ybin] = self.data[xbin,ybin]+weight
+            self.data[xbin,ybin] += weight
