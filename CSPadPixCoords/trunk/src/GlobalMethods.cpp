@@ -174,6 +174,7 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
   if ( defineImageShapeForType<uint16_t>(evt, src, key, shape) ) return;
   if ( defineImageShapeForType<uint8_t> (evt, src, key, shape) ) return;
 
+  //static unsigned counter = 0; counter++;
   const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t and is not defined in the event(...)\nfor source:" 
                         + boost::lexical_cast<std::string>(src) + " key:" + key + "\nEXIT psana...";
   MsgLogRoot(error, msg);

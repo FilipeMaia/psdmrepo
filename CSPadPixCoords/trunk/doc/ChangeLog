@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-30
+2014-12-11 Mikhail S. Dubrovin
+- in CSPadImageProducer.cpp, GlobalMethods.cpp, CSPad2x2NDArrReshape.cpp, CSPad2x2ImageProducer.cpp - 
+	put warnind messages about missing data under control of print_bits (PSAS-83)
+	
 Tag: V00-03-29
 2014-10-27 Mikhail S. Dubrovin
 - add CSPad2x2NDArrReshape, JIRA issue PSAS-45

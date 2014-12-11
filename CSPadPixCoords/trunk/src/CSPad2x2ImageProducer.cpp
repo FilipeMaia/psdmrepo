@@ -194,9 +194,12 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
   if ( getConfigParsForType <Psana::CsPad2x2::ConfigV2> (env) ) return;
 
   m_count_msg++;
-  if (m_count_msg < 20) MsgLog(name(), warning, "No CsPad2x2 configuration objects found. event:"<< m_count << " for source:" << m_source);
-  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_source);
+  if (m_count_msg < 11 && m_print_bits) {
+    MsgLog(name(), warning, "No CsPad2x2 configuration objects found. event:"
+                                                 << m_count << " for source:" << m_source);
+    if (m_count_msg ==10) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_source);
   //terminate();
+  }
 }
 
 
@@ -287,10 +290,12 @@ CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
   if ( procCSPad2x2NDArrForType <uint16_t> (evt) ) return;
 
   m_count_msg++;
-  if (m_count_msg < 20) MsgLog(name(), warning, "processEvent(...): cspad2x2 data or ndarr is not available in event:" << m_count << " for source:"
+  if (m_count_msg < 11 && m_print_bits) {
+    MsgLog(name(), warning, "processEvent(...): cspad2x2 data or ndarr is not available in event:" << m_count 
+                            << " for source:" << m_source << " key:" << m_inkey);
+    if (m_count_msg ==10) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:"
 			       << m_source << " key:" << m_inkey);
-  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:"
-			       << m_source << " key:" << m_inkey);
+  }
 }
 
 //--------------------

@@ -223,7 +223,7 @@ CSPad2x2NDArrReshape::procEvent(Event& evt)
     if ( procEventForType<int>     (evt, i) ) { is_found = true; continue; } 
   }
 
-  if(m_print_bits & 4 && !is_found && ++m_count_msg < 11) {
+  if(m_print_bits && !is_found && ++m_count_msg < 11) {
     MsgLog(name(), info, "ndarray is not available in the eventStore, event:" << m_count_evt 
                             << " source:" << m_source << " keys:" << m_keys_in);
     if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_source << " keys:" << m_keys_in);    
@@ -246,7 +246,7 @@ CSPad2x2NDArrReshape::procCalib(Env& env)
     if ( procCalibForType<int>     (env, i) ) { is_found = true; continue; } 
   }
 
-  if(m_print_bits & 8 && !is_found && ++m_count_msg < 11) {
+  if(m_print_bits && !is_found && ++m_count_msg < 11) {
     MsgLog(name(), info, "ndarray is not available in the calibStore, event:" << m_count_evt 
                             << " source:" << m_source << " keys:" << m_keys_in);
     if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_source << " keys:" << m_keys_in);    
