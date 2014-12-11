@@ -13,6 +13,10 @@ reverse time order.
 
 Tag: V00-03-74
 2014-12-11 Mikhail S. Dubrovin
+- in CameraImageProducer.h, PrincetonImageProducer.h, GlobalMethods.h, AndorImageProducer.h,
+  GlobalMethods.cpp, NDArrDropletFinder.cpp, NDArrImageProducer.cpp, NDArrAverage.cpp,
+  NDArrCalib.cpp, ImgAverage.cpp, ImgCalib.cpp - put warning messages about missing 
+  data under control of print_bits (PSAS-83)
 - add NDArrDropletFinder - non-copleted psana module (PSAS-68)
 - in GlobalMethods add dataType() and strDataType() methods
 

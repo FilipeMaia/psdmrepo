@@ -260,10 +260,10 @@ NDArrDropletFinder::print_windows()
 void 
 NDArrDropletFinder::printWarningMsg(const std::string& add_msg)
 {
-  if (++m_count_msg < 21) {
+  if (++m_count_msg < 11 && m_print_bits) {
     MsgLog(name(), info, "method:"<< std::setw(10) << add_msg << " input ndarray is not available in the event:" << m_count_evt 
                          << " for source:\"" << m_source << "\"  key:\"" << m_key << "\"");
-    if (m_count_msg == 20) MsgLog(name(), warning, "STOP WARNINGS for source:\"" << m_source << "\"  key:\"" << m_key << "\"");    
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:\"" << m_source << "\"  key:\"" << m_key << "\"");    
   }
 }
 

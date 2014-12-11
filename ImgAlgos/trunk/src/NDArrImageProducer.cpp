@@ -253,11 +253,13 @@ NDArrImageProducer::procEvent(Event& evt, Env& env)
   if ( procNDArrForType <int>      (evt, env) ) return;
 
   m_count_msg++;
-  if (m_count_msg < 20) MsgLog(name(), warning, "procEvent(...): Input data or geometry file is not available in event:" 
+  if (m_count_msg < 11 && m_print_bits) {
+    MsgLog(name(), warning, "procEvent(...): Input data or geometry file is not available in event:" 
                                << m_count_evt << " for source:"
 			       << m_source << " key:" << m_inkey);
-  if (m_count_msg ==20) MsgLog(name(), warning, "STOP PRINT WARNINGS for source:"
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP PRINT WARNINGS for source:"
 			       << m_source << " key:" << m_inkey);
+  }
 }
 
 //--------------------

@@ -202,15 +202,14 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
 
   static long counter = 0; counter ++;
 
-  if (counter < 50) {
+  if (counter < 11) {
     const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
                           + boost::lexical_cast<std::string>(src) + " key:" + key;
     MsgLog("GlobalMethods::defineImageShape", warning, msg);
-  }
-  if (counter == 50)
-     MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINT WARNINGS for source:" 
-             << boost::lexical_cast<std::string>(src) << " key:" << key);
+    if (counter == 10) MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINT WARNINGS for source:" 
+              << boost::lexical_cast<std::string>(src) << " key:" << key);
   //throw std::runtime_error("EXIT psana...");
+  }
   return false;
 }
 

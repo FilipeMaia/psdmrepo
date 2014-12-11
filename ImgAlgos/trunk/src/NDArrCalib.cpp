@@ -284,7 +284,7 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
 void
 NDArrCalib::initAtFirstGetNdarray(Event& evt, Env& env)
 {
-  if ( !defineNDArrPars(evt, m_str_src, m_key_in, m_ndarr_pars) ) return;
+  if ( !defineNDArrPars(evt, m_str_src, m_key_in, m_ndarr_pars, bool(m_print_bits)) ) return;
 
   // Do initialization for known ndarray type and NDims
   if( m_print_bits & 8 ) m_ndarr_pars -> print();
@@ -313,9 +313,10 @@ NDArrCalib::procEvent(Event& evt, Env& env)
   else if (m_dtype == UINT8    && procEventForType<uint8_t,  data_out_t> (evt) ) return;
   else if (m_dtype == DOUBLE   && procEventForType<double,   data_out_t> (evt) ) return;
 
-  if (++m_count_msg < 21) {
-    MsgLog(name(), info, "Image is not available in the event:" << m_count_event << " for source:" << m_str_src << " key:" << m_key_in);
-    if (m_count_msg == 20) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key_in);    
+  if (++m_count_msg < 11 && m_print_bits) {
+    MsgLog(name(), warning, "Image is not available in the event:" << m_count_event 
+                            << " for source:" << m_str_src << " key:" << m_key_in);
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key_in);    
   }
 }
 

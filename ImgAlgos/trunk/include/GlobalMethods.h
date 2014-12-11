@@ -188,7 +188,7 @@ private:
   void printSizeOfTypes();
   /// Define the shape or throw message that can not do that.
   bool defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape);
-  bool defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars, bool print_wng=true);
+  bool defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars, bool print_wng=false);
   void saveTextInFile(const std::string& fname, const std::string& text, bool print_msg);
   std::string stringInstrument(PSEnv::Env& env);
   std::string stringExperiment(PSEnv::Env& env);

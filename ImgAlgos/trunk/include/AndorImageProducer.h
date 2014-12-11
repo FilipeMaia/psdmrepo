@@ -148,11 +148,11 @@ private:
     //if ( procDataForIOTypes <Psana::Camera::FrameV2, TOUT> (evt) ) return true;
 
     m_count_msg ++;
-    if (m_count_msg < 20)
-    MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event:" << m_count << " for source:" << m_str_src << " key:" << m_key_in);
-    if (m_count_msg == 20)
-    MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
-
+    if (m_count_msg < 11 && m_print_bits) {
+      MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event:" << m_count 
+                              << " for source:" << m_str_src << " key:" << m_key_in);
+      if (m_count_msg == 10) MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
+    }
     return false;
   }
 

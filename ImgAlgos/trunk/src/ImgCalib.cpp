@@ -249,9 +249,9 @@ ImgCalib::procEvent(Event& evt, Env& env)
   if ( procEventForType<double,   data_out_t> (evt) ) return;
   if ( procEventForType<uint8_t,  data_out_t> (evt) ) return;
 
-  if (++m_count_msg < 21) {
-    MsgLog(name(), info, "Image is not available in the event:" << m_count_event << " for source:" << m_str_src << " key:" << m_key_in);
-    if (m_count_msg == 20) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key_in);    
+  if (++m_count_msg < 11 && m_print_bits) {
+    MsgLog(name(), warning, "Image is not available in the event:" << m_count_event << " for source:" << m_str_src << " key:" << m_key_in);
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key_in);    
   }
 }
 
