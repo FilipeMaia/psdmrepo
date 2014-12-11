@@ -10,9 +10,6 @@
 //
 //------------------------------------------------------------------------
 
-//-----------------------
-// This Class's Header --
-//-----------------------
 #include "ImgAlgos/AlgDroplet.h"
 
 //-----------------
@@ -47,6 +44,7 @@ AlgDroplet::AlgDroplet(   const int&      radius
                         , const double&   thr_low
                         , const double&   thr_high
                         , const unsigned& pbits
+                        , const size_t&   seg
                         , const size_t&   rowmin
                         , const size_t&   rowmax
                         , const size_t&   colmin
@@ -56,6 +54,7 @@ AlgDroplet::AlgDroplet(   const int&      radius
   , m_thr_low(thr_low)
   , m_thr_high(thr_high)
   , m_pbits(pbits)
+  , m_seg(seg)
   , m_rowmin(rowmin)
   , m_rowmax(rowmax)
   , m_colmin(colmin)
@@ -74,6 +73,7 @@ AlgDroplet::printInputPars()
      << "thr_low : " << m_thr_low
      << "thr_high: " << m_thr_high
      << "pbits   : " << m_pbits
+     << "seg     : " << m_seg
      << "rowmin  : " << m_rowmin
      << "rowmax  : " << m_rowmax
      << "colmin  : " << m_colmin
@@ -97,19 +97,47 @@ AlgDroplet::saveDropletInfo(size_t& row, size_t& col, double& amp, double& amp_t
 }
 
 //--------------------
-// Print peak info
+// Print droplet info
 void 
-AlgDroplet::printDropletInfo(Droplet& d)
+AlgDroplet::printDropletInfo(const Droplet& d)
 {
-  MsgLog(name(), info, "Droplet is found: x="   << d.x 
-                                  << " y="      << d.y
-                                  << " ampmax=" << d.ampmax
-                                  << " amptot=" << d.amptot 
-                                  << " npix="   << d.npix
-                                  << " v_droplets.size()=" << v_droplets.size()
-                                  << " capacity()=" << v_droplets.capacity() );
+  MsgLog(name(), info, "Droplet is found: "  << strDropletPars(d) 
+                       << " v_droplets.size()=" << v_droplets.size()
+                       << " capacity()=" << v_droplets.capacity() );
 }
 
+//--------------------
+// Returns string with droplet parameters
+std::string
+AlgDroplet::strDropletPars(const Droplet& d)
+{
+  std::stringstream ss; 
+  ss <<  "x="      << d.x 
+     << " y="      << d.y
+     << " ampmax=" << d.ampmax
+     << " amptot=" << d.amptot 
+     << " npix="   << d.npix;
+  return ss.str();  
+}
+
+//--------------------
+// Print all droplets
+void 
+AlgDroplet::printDroplets()
+{
+  std::stringstream ss; ss << "Vector of Droplets"
+                           << " v_droplets.size()=" << v_droplets.size()
+                           << " capacity()=" << v_droplets.capacity();
+
+  for( vector<Droplet>::iterator itv  = v_droplets.begin();
+                                 itv != v_droplets.end(); itv++ ) {
+    
+    ss <<  "   " << strDropletPars(*itv) << '\n';  
+  }
+  MsgLog(name(), info, ss.str()); 
+}
+
+//--------------------
 //--------------------
 
 //template class ImgAlgos::AlgDroplet<int16_t>;

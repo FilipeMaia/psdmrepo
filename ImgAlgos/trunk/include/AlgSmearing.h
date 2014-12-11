@@ -71,6 +71,7 @@ public:
    * @param[in] nsm   - (radial) number of neighbour rows and columns around pixel involved in smearing 
    * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in smearing
    * @param[in] opt - pre-fill options for output array outside window region; 0-fill by zeros, 1-copy raw, 2-do nothing
+   * @param[in] seg    - ROI segment index in the ndarray
    * @param[in] rowmin - ROI window limit
    * @param[in] rowmax - ROI window limit
    * @param[in] colmin - ROI window limit
@@ -81,6 +82,7 @@ public:
 	      , const int& nsm=5
               , const double& thr_low = -1e10
               , const unsigned& opt  = 1
+              , const size_t& seg    = -1
               , const size_t& rowmin = 0
               , const size_t& rowmax = 1e6
               , const size_t& colmin = 0
@@ -112,6 +114,14 @@ public:
    */
   double weight(int& dr, int& dc) { return m_weights[abs(dr)][abs(dc)]; }
 
+  /// Returns segment index in the ndarray
+  const size_t& segind(){ return m_seg; }
+
+  // Copy constructor and assignment are disabled by default
+  AlgSmearing ( const AlgSmearing& ) ;
+  AlgSmearing& operator = ( const AlgSmearing& ) ;
+
+
 protected:
 
 private:
@@ -121,6 +131,7 @@ private:
   int      m_nsm1;     // = m_nsm + 1
   double   m_thr_low;  // low threshold on pixel amplitude which will be involved in smearing
   unsigned m_opt;      // options for ndarray pre-fill
+  size_t   m_seg;      // segment index in the ndarray, <0 - for all segments
   size_t   m_rowmin;   // window for smearing
   size_t   m_rowmax;
   size_t   m_colmin;
@@ -130,11 +141,6 @@ private:
 
   /// Returns string name of the class for messanger
   std::string name(){return std::string("ImgAlgos::AlgSmearing");}
-
-  // Copy constructor and assignment are disabled by default
-  AlgSmearing ( const AlgSmearing& ) ;
-  AlgSmearing& operator = ( const AlgSmearing& ) ;
-
 
 //--------------------
   /**

@@ -45,9 +45,7 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief C++ source file code template.
- *
- *  Droplet(peak) finding algorithm which works on const ndarray<const T,2> 
+ *  @brief Droplet(peak) finding algorithm which works in ROI window on const ndarray<const T,2> 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -78,10 +76,11 @@ public:
   /**
    * @brief Constructor
    * 
-   * @param[in] sigma - smearing width parameter to generate the matrix of weights
-   * @param[in] nsm   - (radial) number of neighbour rows and columns around pixel involved in smearing 
-   * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in smearing
-   * @param[in] opt - pre-fill options for output array outside window region; 0-fill by zeros, 1-copy raw, 2-do nothing
+   * @param[in] radius - (radial) number of neighbour rows and columns around pixel involved in droplet finding
+   * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in droplet formation
+   * @param[in] thr_high - threshold on intensity; pixels with intensity above this threshold are considered as a droplet
+   * @param[in] pbits  - print control bit-word
+   * @param[in] seg    - ROI segment index in the ndarray
    * @param[in] rowmin - ROI window limit
    * @param[in] rowmax - ROI window limit
    * @param[in] colmin - ROI window limit
@@ -92,6 +91,7 @@ public:
               , const double&   thr_low  = -1e10
               , const double&   thr_high = -1e10
               , const unsigned& pbits    = 0
+              , const size_t&   seg      = -1
               , const size_t&   rowmin   = 0
               , const size_t&   rowmax   = 1e6
               , const size_t&   colmin   = 0
@@ -110,15 +110,27 @@ public:
   /// Prints memeber data
   void printInputPars();
 
+  /// Prints vector of droplets
+  void printDroplets();
+
+  /// Returns segment index in the ndarray
+  const size_t& segind(){ return m_seg; }
+
+  // Copy constructor and assignment are disabled by default
+  AlgDroplet ( const AlgDroplet& ) ;
+  AlgDroplet& operator = ( const AlgDroplet& ) ;
+
+
 protected:
 
 private:
 
   int      m_radius;   // (radial) number of pixels for smearing [i0-m_radius, i0+m_radius]
-  double   m_thr_low;  // low threshold on pixel amplitude which will be accounted for total amp
-  double   m_thr_high; // high threshold on pixel amplitude which will be considered as droplet
+  double   m_thr_low;  // low threshold on pixel amplitude which are accounted in droplet formation
+  double   m_thr_high; // high threshold on pixel amplitude which are considered as a droplet
   unsigned m_pbits;    // pirnt control bit-word
-  size_t   m_rowmin;   // window for smearing
+  size_t   m_seg;      // segment index in the ndarray, <0 - for all segments
+  size_t   m_rowmin;   // limits on the ROI window where algorithm is applied
   size_t   m_rowmax;
   size_t   m_colmin;
   size_t   m_colmax;
@@ -129,16 +141,16 @@ private:
   void saveDropletInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
 
   /// Prints droplet information
-  void printDropletInfo(Droplet& d);
- 
+  void printDropletInfo(const Droplet& d);
+
+  /// Returns string with droplet parameters
+  std::string strDropletPars(const Droplet& d);
+
+  /// Returns reference to the accumulated vector of droplets
+  const std::vector<Droplet>& getDroplets() { return v_droplets; }
 
   /// Returns string name of the class for messanger
   std::string name(){return std::string("ImgAlgos::AlgDroplet");}
-
-  // Copy constructor and assignment are disabled by default
-  AlgDroplet ( const AlgDroplet& ) ;
-  AlgDroplet& operator = ( const AlgDroplet& ) ;
-
 
 //--------------------
   /**
@@ -155,7 +167,8 @@ void _checkIfPixIsDroplet( const ndarray<const T,2>& nda, size_t r0, size_t c0 )
   size_t nrows = nda.shape()[0];
   size_t ncols = nda.shape()[1];
 
-  double   a0    = nda[r0*ncols + c0];
+  //double   a0    = nda[r0*ncols + c0];
+  double   a0    = nda[r0][c0];
   double   a     = 0;
   double   sum_a = 0;
   unsigned n_pix = 0;
@@ -168,7 +181,8 @@ void _checkIfPixIsDroplet( const ndarray<const T,2>& nda, size_t r0, size_t c0 )
   for (size_t r = rmin; r < rmax; r++) {
     for (size_t c = cmin; c < cmax; c++) {
 
-      a = nda[r*ncols + c];
+      //a = nda[r*ncols + c];
+      a = nda[r][c];
 
       if( a > a0 ) return; // This is not a local droplet...
 
@@ -197,9 +211,8 @@ bool findDroplets( const ndarray<const T,2>& nda )
   v_droplets.reserve(NDROPLETSBLOCK);
 
   const T* p_nda = nda.data();
-
-  size_t nrows = nda.shape()[0];
-  size_t ncols = nda.shape()[1];
+  size_t   nrows = nda.shape()[0];
+  size_t   ncols = nda.shape()[1];
 
   // Check thet ROI limits are consistent with image size
   size_t rmin = std::max(0, int(m_rowmin));
@@ -218,6 +231,8 @@ bool findDroplets( const ndarray<const T,2>& nda )
   }
 
   if(m_pbits & 2) MsgLog(name(), info, "Found number of droplets: " << (int)v_droplets.size() ) ;
+
+  return (v_droplets.size()) ? true : false;
 }
 
 //--------------------

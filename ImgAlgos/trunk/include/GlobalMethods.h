@@ -125,7 +125,7 @@ using namespace std;
 //typedef image<gray_double_pixel_t,false> gray_double_image_t;
 //typedef gray_double_image_t::view_t      gray_double_view_t; 
 
- enum DATA_TYPE {ASDATA, ASINP, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+ enum DATA_TYPE {NONDEFDT, ASDATA, ASINP, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
  enum FILE_MODE {BINARY, TEXT, TIFF, PNG, METADTEXT};
 
@@ -200,6 +200,8 @@ private:
   DETECTOR_TYPE detectorTypeForSource(PSEvt::Source& src);
   std::string calibGroupForDetType(const DETECTOR_TYPE det_type);
   std::string calibGroupForSource(PSEvt::Source& src);
+  std::string split_string_left(const std::string& s, size_t& pos, const char& sep=':');
+  std::string strDataType(const DATA_TYPE& dtype);
 
 //--------------------
 //--------------------
@@ -226,6 +228,32 @@ private:
 	  return false;
         }
 	return true;
+    }
+
+//--------------------
+
+  template <typename T>
+    DATA_TYPE dataType()
+    {
+      if      ( typeid(T) == typeid(double  )) return DOUBLE;
+      else if ( typeid(T) == typeid(float   )) return FLOAT;
+      else if ( typeid(T) == typeid(int     )) return INT;
+      else if ( typeid(T) == typeid(int32_t )) return INT32;
+      else if ( typeid(T) == typeid(uint32_t)) return UINT32;
+      else if ( typeid(T) == typeid(uint16_t)) return UINT16;
+      else if ( typeid(T) == typeid(uint8_t )) return UINT8;
+      else if ( typeid(T) == typeid(int16_t )) return INT16;
+      else if ( typeid(T) == typeid(short   )) return SHORT;
+      else if ( typeid(T) == typeid(unsigned)) return UNSIGNED;
+      else                                     return NONDEFDT;
+    }
+
+//--------------------
+
+  template <typename T>
+    std::string strDataType()
+    {
+      return strDataType(dataType<T>());
     }
 
 //--------------------

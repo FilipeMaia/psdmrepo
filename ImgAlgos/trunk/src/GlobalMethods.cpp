@@ -381,6 +381,37 @@ std::string calibGroupForSource(PSEvt::Source& src)
 }
 
 //--------------------
+
+std::string
+split_string_left(const std::string& s, size_t& pos, const char& sep)
+{
+  size_t p0 = pos;
+  size_t p1 = s.find(sep, p0);
+  size_t nchars = p1-p0; 
+  pos = p1+1; // move position to the next character after separator
+
+  if (p1 != std::string::npos) return std::string(s,p0,nchars);
+  else if (p0 < s.size())      return std::string(s,p0);
+  else                         return std::string();
+}
+
+//--------------------
+
+std::string strDataType(const DATA_TYPE& dtype)
+{
+  if      ( dtype == DOUBLE  ) return "DOUBLE";
+  else if ( dtype == FLOAT   ) return "FLOAT";
+  else if ( dtype == INT     ) return "INT";
+  else if ( dtype == INT32   ) return "INT32";
+  else if ( dtype == UINT32  ) return "UINT32";
+  else if ( dtype == UINT16  ) return "UINT16";
+  else if ( dtype == UINT8   ) return "UINT8";
+  else if ( dtype == INT16   ) return "INT16";
+  else if ( dtype == SHORT   ) return "SHORT";
+  else if ( dtype == UNSIGNED) return "UNSIGNED";
+  else                         return "NONDEFDT";
+}
+
 //--------------------
 //--------------------
 //--------------------

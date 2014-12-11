@@ -47,6 +47,7 @@ AlgSmearing::AlgSmearing( const double& sigma
                         , const int& nsm
                         , const double& thr_low
                         , const unsigned& opt
+                        , const size_t&   seg
                         , const size_t& rowmin
                         , const size_t& rowmax
                         , const size_t& colmin
@@ -57,6 +58,7 @@ AlgSmearing::AlgSmearing( const double& sigma
   , m_nsm1(nsm+1)
   , m_thr_low(thr_low)
   , m_opt(opt)
+  , m_seg(seg)
   , m_rowmin(rowmin)
   , m_rowmax(rowmax)
   , m_colmin(colmin)
@@ -117,6 +119,7 @@ AlgSmearing::printInputPars()
      << "nsm1    : " << m_nsm1
      << "thr_low : " << m_thr_low
      << "opt     : " << m_opt
+     << "seg     : " << m_seg
      << "rowmin  : " << m_rowmin
      << "rowmax  : " << m_rowmax
      << "colmin  : " << m_colmin

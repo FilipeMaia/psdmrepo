@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-74
+2014-12-11 Mikhail S. Dubrovin
+- add NDArrDropletFinder - non-copleted psana module (PSAS-68)
+- in GlobalMethods add dataType() and strDataType() methods
+
 Tag: V00-03-73
 2014-12-03 Mikhail S. Dubrovin
 - Implementation of common mode correction for Epix100a (PSAS-7) and Fccd960 (PSAS-44) 
