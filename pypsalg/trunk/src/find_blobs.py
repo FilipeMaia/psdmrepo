@@ -6,21 +6,31 @@ find_blobs.py
 This script extracts OPAL images and does a basic peakfinding algorithm on them.
 
 -- TJ Lane 9.4.41
+
+CHANGELOG
+---------
+
+12/11/14 :: TJL
+-- Fixed "firsttime" bug
+-- Added discard_small_blobs functionality
+-- Fixed x/y flip in draw_blobs
+
+
 """
 
 
 from glob import glob
 import argparse
+import time
 
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import ndimage
 
-import psana
 
-firsttime=True
 
-def find_blobs(image, sigma_threshold=5.0, discard_border=1):
+def find_blobs(image, sigma_threshold=5.0, discard_border=1,
+               discard_small_blobs=0):
     """
     Find peaks, or `blobs`, in a 2D image.
     
@@ -37,10 +47,10 @@ def find_blobs(image, sigma_threshold=5.0, discard_border=1):
     Returns
     -------
     centers : list of tuples of floats
-        A list of the (x,y) positions of each peak, in pixels.
+        A list of the (x,y)/(col,row) positions of each peak, in pixels.
         
     widths : list of tuples of floats
-        A list of the (x,y) size of each peak, in pixels.
+        A list of the (x,y)/(col,row) size of each peak, in pixels.
         
     Optional Parameters
     -------------------
@@ -51,6 +61,12 @@ def find_blobs(image, sigma_threshold=5.0, discard_border=1):
         The size of a border region to ignore. In many images, the borders are
         noisy or systematically erroneous.
     
+    discard_small_blobs : int
+        Discard few-pixel blobs, which are the most common false positives
+        for the blob finder. The argument specifies the minimal area
+        (in pixels) a blob must encompass to be counted. Default: no
+        rejections (0 pixels).
+
     Notes
     -----
     Tests indicate this algorithm takes ~200 ms to process a single image, so
@@ -79,29 +95,39 @@ def find_blobs(image, sigma_threshold=5.0, discard_border=1):
     #   x and y direction at the center of each blob
     
     widths = []
-    for i in range(num_labels):
+    warning_printed = False
+
+    for i in range(num_labels)[::-1]: # backwards so pop works below
         
         c = centers[i]
         r_slice = labeled[int(c[0]),:]
-        zx = np.where( np.abs(r_slice - np.roll(r_slice, 1)) == i+1 )[0]
+        zy = np.where( np.abs(r_slice - np.roll(r_slice, 1)) == i+1 )[0]
         
         c_slice = labeled[:,int(c[1])]
-        zy = np.where( np.abs(c_slice - np.roll(c_slice, 1)) == i+1 )[0]
+        zx = np.where( np.abs(c_slice - np.roll(c_slice, 1)) == i+1 )[0]
         
         
-        global firstTime
         if not (len(zx) == 2) or not (len(zy) == 2):
-            if firstTime:
+            if not warning_printed:
                 print "WARNING: Peak algorithm confused about width of peak at", c
-                print "         Setting default peak width (5,5)"
-                print "         This warning will not be repeated"
-                firstTime=False
+                print "         Setting default peak width (5,5). This warning"
+                print "         will only be printed ONCE. Proceed w/caution!"
+                warning_printed = True
             widths.append( (5.0, 5.0) )
         else:
             x_width = zx[1] - zx[0]
             y_width = zy[1] - zy[0]
-            widths.append( (x_width, y_width) )
+
+            # if the blob is a "singleton" and we want to get rid
+            # of it, we do so, otherwise we add the widths
+            if (x_width * y_width) < discard_small_blobs:
+                #print "Discarding small blob %d, area %d" % (i, (x_width * y_width))
+                centers.pop(i)
+            else:
+                widths.append( (x_width, y_width) )
         
+    assert len(centers) == len(widths), 'centers and widths not same len'
+
     return centers, widths
     
     
@@ -127,17 +153,19 @@ def draw_blobs(image, centers, widths):
     centers = np.array(centers)
     widths = np.array(widths)
     
+    # flip the y-sign to for conv. below
     diagonal_widths = widths.copy()
-    diagonal_widths[:,0] *= -1.0
-    
+    diagonal_widths[:,1] *= -1
+
     for i in range(len(centers)):
-        
+       
+        # draw a rectangle around the center 
         pts = np.array([
-               centers[i] + widths[i] / 2.0,
-               centers[i] - diagonal_widths[i] / 2.0,
-               centers[i] - widths[i] / 2.0,
-               centers[i] + diagonal_widths[i] / 2.0,
-               centers[i] + widths[i] / 2.0
+               centers[i] - widths[i] / 2.0,          # bottom left
+               centers[i] - diagonal_widths[i] / 2.0, # top left
+               centers[i] + widths[i] / 2.0,          # top right
+               centers[i] + diagonal_widths[i] / 2.0, # bottom right
+               centers[i] - widths[i] / 2.0           # bottom left
               ])
         
         plt.plot(pts[:,0], pts[:,1], color='orange', lw=3)
@@ -149,7 +177,7 @@ def draw_blobs(image, centers, widths):
     return
 
 
-def parse_args():
+def _parse_args():
     
     parser = argparse.ArgumentParser(description='Analyze OPAL images')
     
@@ -167,9 +195,11 @@ def parse_args():
     return args
 
 
-def main():
+def _main():
+
+    import psana
     
-    args = parse_args()
+    args = _parse_args()
     
     if args.run == 0:
         print 'Analyzing data from shared memory...'
@@ -206,7 +236,7 @@ def main():
     return
 
 
-def test():
+def _test_on_local_image():
     
     for f in glob('*.npy'):
         print f
@@ -217,6 +247,31 @@ def test():
             
     return
 
+
+def _test_on_sxra8513_data():
+
+    import psana
+
+    ds = psana.DataSource('exp=sxra8513:run=50')
+    opal_src = psana.Source('DetInfo(SxrEndstation.0:Opal1000.2)')
+
+    for i,evt in enumerate(ds.events()):
+        opal = evt.get(psana.Camera.FrameV1, opal_src)
+        opal_img = opal.data16().copy()
+
+        if opal_img.sum() > 33900000:
+
+            centers, widths = find_blobs(opal_img, 20.0, 1, 5)
+            draw_blobs(opal_img, centers, widths)
+
+            print i, opal.data16().sum()
+
+    return
+
     
 if __name__ == '__main__':
-    main()
+    #_main()
+    _test_on_sxra8513_data()
+    
+    
+    
