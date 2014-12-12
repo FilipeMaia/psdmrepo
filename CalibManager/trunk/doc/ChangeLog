@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-12-11 Mikhail S. Dubrovin
+Tag: V00-00-75
+- add Frame.py, re-factoring GUIHelp.py (PSAS-6)
+	
 2014-11-24 Mikhail S. Dubrovin
 Tag: V00-00-74
 - add app/roicon - polishing command line interface, add craetion of image from file with ndarray (PSAS-10)

@@ -16,37 +16,31 @@ __version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
-#  Imports of standard modules --
-#--------------------------------
 import sys
 import os
 
 from PyQt4 import QtGui, QtCore
-#import time   # for sleep(sec)
 
-#-----------------------------
-# Imports for other modules --
-#-----------------------------
-
+from CalibManager.Frame     import Frame
 from ConfigParametersForApp import cp
 from Logger                 import logger
 #import GlobalUtils          as     gu
+#import time   # for sleep(sec)
 
 #---------------------
-#  Class definition --
-#---------------------
-class GUIHelp ( QtGui.QWidget ) :
+#class GUIHelp ( QtGui.QWidget ) :
+class GUIHelp ( Frame ) :
     """GUI Help"""
 
     def __init__ ( self, parent=None, msg='No message in GUIHelp...' ) :
 
-        QtGui.QWidget.__init__(self, parent)
+        #QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
 
         self.setGeometry(100, 100, 730, 200)
         self.setWindowTitle('GUI Help')
         try : self.setWindowIcon(cp.icon_help)
         except : pass
-        self.setFrame()
 
         self.box_txt    = QtGui.QTextEdit()
         self.tit_status = QtGui.QLabel('Status:')
@@ -81,15 +75,6 @@ class GUIHelp ( QtGui.QWidget ) :
         self.but_close .setToolTip('Close this window.')
 
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
-
-
     def setStyle(self):
         self.setMinimumHeight(300)
         self.           setStyleSheet (cp.styleBkgd)
@@ -105,8 +90,8 @@ class GUIHelp ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
-        self.frame.setGeometry(self.rect())
-
+        #self.frame.setGeometry(self.rect())
+        pass
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 

@@ -78,6 +78,8 @@ class PlotImgSpe (QtGui.QWidget) :
              and os.path.exists(ifname) : self.arr = gu.get_image_array_from_file(ifname)
         else                            : self.arr = get_array2d_for_test()
 
+        if verb : print '     Image shape :', self.arr.shape
+
         self.ext_ref = None
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(self, self.arr, orient, y_is_flip)
