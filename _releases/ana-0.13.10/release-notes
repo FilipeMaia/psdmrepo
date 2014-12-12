@@ -1,0 +1,29 @@
+
+- xtcav: Included python-docstrings for the relevant
+  classes/methods/functions; some cleanup from the repo of some old
+  files that were not longer in use; added a few more retrieval
+  functions to the ShotToShotCharacterization class, all of them
+  follow the format where the last argument is a flag telling whether
+  it was possible to retrieve the data; solved minor bugs (courtesy of
+  Alvaro Sanchez-Gonzales).
+
+- CSPadPixCoords: in CSPadImageProducer.cpp, GlobalMethods.cpp,
+  CSPad2x2NDArrReshape.cpp, CSPad2x2ImageProducer.cpp - put warning
+  messages about missing data under control of print_bits (PSAS-83)
+
+- ImgAlgos: in many moduls put warning messages about missing data
+  under control of print_bits (PSAS-83)
+
+- pypsalg: Include new find_blobs.py (courtesy of TJ Lane) which has
+  an extra optional keyword argument to discard small blobs.  Fix bugs
+  in 2D histogram in Histogram.py.
+
+- CalibManager: add Frame.py, re-factoring GUIHelp.py (PSAS-6)
+
+- TimeTool: updated to understand ConfigV2 data from more recent
+  experiments. Likewise publishes a DataV2 in the event store as
+  opposed to a DataV1. Users modifying code from older experiments
+  will have to update similar to how they do for new data types in xtc
+  files. Additionally, added more histograms for dump to root file,
+  two ROI analysis, and removed need to specify empty ROIs,
+  ipm_get_key.
