@@ -89,26 +89,26 @@ namespace {
 
   class TimeToolData : public Psana::TimeTool::DataV2 {
   public:
+    // class to provide high level TimeTool::DataV2 type to users in the
+    // event store. Presently we do not save the three arrays
+    // projected_signal, projected_sideband, and projected_reference in this
+    // event store data. If all of these are needed, note that the make_shared 
+    // pattern used to create an instance of this object has a limit of 9 
+    // parameters for the constructor, and those 3 would bring us to 10 parameters.
     TimeToolData(Psana::TimeTool::DataV2::EventType event_type_arg,
                  double amplitude_arg,
                  double position_pixel_arg,
                  double position_time_arg,
                  double position_fwhm_arg,
                  double ref_amplitude_arg,
-                 double nxt_amplitude_arg,
-                 ndarray<const int32_t, 1> projected_signal_arg,
-                 ndarray<const int32_t, 1> projected_sideband_arg,
-                 ndarray<const int32_t, 1> projected_reference_arg)
+                 double nxt_amplitude_arg)
       : m_event_type(event_type_arg),
         m_amplitude(amplitude_arg),
         m_position_pixel(position_pixel_arg),
         m_position_time(position_time_arg),
         m_position_fwhm(position_fwhm_arg),
         m_ref_amplitude(ref_amplitude_arg),
-        m_nxt_amplitude(nxt_amplitude_arg),
-        m_projected_signal(projected_signal_arg),
-        m_projected_sideband(projected_sideband_arg),
-        m_projected_reference(projected_reference_arg)
+        m_nxt_amplitude(nxt_amplitude_arg)
     {}
 
     virtual enum Psana::TimeTool::DataV2::EventType event_type() const { return m_event_type; }
@@ -826,7 +826,6 @@ Analyze::event(Event& evt, Env& env)
       }
 
       // put 
-#if 0
       boost::shared_ptr<Psana::TimeTool::DataV2> timeToolEvtData = 
         boost::make_shared<TimeToolData>(Psana::TimeTool::DataV2::Signal,
                                          pFit0[0],
@@ -834,12 +833,8 @@ Analyze::event(Event& evt, Env& env)
                                          xfltc,
                                          pFit0[2],
                                          m_ref_avg[ix],
-                                         nxtAmpl,
-                                         ndarray<const int32_t,1>(),
-                                         ndarray<const int32_t,1>(),
-                                         ndarray<const int32_t,1>());
+                                         nxtAmpl);
       evt.put(timeToolEvtData,m_put_key);
-#endif
       
 #undef boost_double
     }

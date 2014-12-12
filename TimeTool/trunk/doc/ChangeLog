@@ -11,6 +11,12 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2014-12-11 David Schneider
+- restore adding results into the psana Event. Note, results are now added
+  as TimeTool::DataV2 as opposed to TimeTool::DataV1. Users will have to update  
+  their code.
+	
 Tag: V00-01-03
 2014-12-09 Matt Weaver
 - added more histograms for dump to root file
