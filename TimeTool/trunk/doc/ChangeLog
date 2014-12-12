@@ -15,7 +15,7 @@ Tag: V00-01-04
 2014-12-11 David Schneider
 - restore adding results into the psana Event. Note, results are now added
   as TimeTool::DataV2 as opposed to TimeTool::DataV1. Users will have to update  
-  their code.
+  their code. Track JIRA issue PSAS-82.
 	
 Tag: V00-01-03
 2014-12-09 Matt Weaver
