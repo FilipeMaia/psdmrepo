@@ -147,9 +147,9 @@ private:
 		  //std::cout << "  xx:" << (code>>14);
 		  switch ((code>>14)&03) {
 		    default :
-		    case  0 : *oit = TOUT((code&017777) << 3); break; // gain 8
-		    case  1 : *oit = TOUT((code&017777) << 1); break; // gain 2
-		    case  3 : *oit = TOUT( code&017777 );      break; // gain 1
+		    case  0 : *oit = TOUT( code&017777 );      break; // gain 8 - max gain in electronics - use factor 1 
+		    case  1 : *oit = TOUT((code&017777) << 2); break; // gain 2 - use factor 4
+		    case  3 : *oit = TOUT((code&017777) << 3); break; // gain 1 - use factor 8
 		  }
                 }
 	      }
