@@ -1,0 +1,3 @@
+openmpi:
+- build against openmpi 1.8.1a w/o multithreaded support. Otherwise
+  identical to release ana-0.13.11.
