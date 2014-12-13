@@ -68,40 +68,39 @@ AlgDroplet::AlgDroplet(   const int&      radius
 void 
 AlgDroplet::printInputPars()
 {
-  std::stringstream ss; 
-  ss << "radius  : " << m_radius
-     << "thr_low : " << m_thr_low
-     << "thr_high: " << m_thr_high
-     << "pbits   : " << m_pbits
-     << "seg     : " << m_seg
-     << "rowmin  : " << m_rowmin
-     << "rowmax  : " << m_rowmax
-     << "colmin  : " << m_colmin
-     << "colmax  : " << m_colmax  
-     << '\n';
-  MsgLog(name(), info, ss.str()); 
+  std::stringstream ss; ss << "Input parameters:";
+  ss << "\nradius  : " << m_radius
+     << "\nthr_low : " << m_thr_low
+     << "\nthr_high: " << m_thr_high
+     << "\npbits   : " << m_pbits
+     << "\nseg     : " << m_seg
+     << "\nrowmin  : " << m_rowmin
+     << "\nrowmax  : " << m_rowmax
+     << "\ncolmin  : " << m_colmin
+     << "\ncolmax  : " << m_colmax;
+  MsgLog(_name(), info, ss.str()); 
 }
 
 //--------------------
 // Save droplet info in vector
 void 
-AlgDroplet::saveDropletInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
+AlgDroplet::_saveDropletInfo(size_t& seg, size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix )
 {
-  if ( v_droplets.size() == v_droplets.capacity() ) {
+  if( v_droplets.size() == v_droplets.capacity() ) {
       v_droplets.reserve( v_droplets.capacity() + NDROPLETSBLOCK );
-      if(m_pbits & 4) MsgLog( name(), info, "Droplets vector capacity is increased to:" << v_droplets.capacity() );
+      if(m_pbits & 4) MsgLog( _name(), info, "Droplets vector capacity is increased to:" << v_droplets.capacity() );
   }
-  Droplet oneDroplet = { (double)col, (double)row, amp, amp_tot, npix };
+  Droplet oneDroplet = {(unsigned)seg, (double)row, (double)col, amp, amp_tot, npix};
   v_droplets.push_back(oneDroplet);
-  if(m_pbits & 4) printDropletInfo( oneDroplet );
+  //if(m_pbits & 4) _printDropletInfo( oneDroplet );
 }
 
 //--------------------
 // Print droplet info
 void 
-AlgDroplet::printDropletInfo(const Droplet& d)
+AlgDroplet::_printDropletInfo(const Droplet& d)
 {
-  MsgLog(name(), info, "Droplet is found: "  << strDropletPars(d) 
+  MsgLog(_name(), info, "Droplet is found: "  << _strDropletPars(d) 
                        << " v_droplets.size()=" << v_droplets.size()
                        << " capacity()=" << v_droplets.capacity() );
 }
@@ -109,14 +108,15 @@ AlgDroplet::printDropletInfo(const Droplet& d)
 //--------------------
 // Returns string with droplet parameters
 std::string
-AlgDroplet::strDropletPars(const Droplet& d)
+AlgDroplet::_strDropletPars(const Droplet& d)
 {
   std::stringstream ss; 
-  ss <<  "x="      << d.x 
-     << " y="      << d.y
-     << " ampmax=" << d.ampmax
-     << " amptot=" << d.amptot 
-     << " npix="   << d.npix;
+  ss << "  seg="    << std::setw(4) << d.seg 
+     << "  row="    << std::setw(4) << d.row 
+     << "  col="    << std::setw(4) << d.col
+     << "  ampmax=" << std::fixed << std::setprecision(2) << std::setw(8) << d.ampmax
+     << "  amptot=" << std::fixed << std::setprecision(2) << std::setw(8) << d.amptot 
+     << "  npix="   << std::setw(4) << d.npix;
   return ss.str();  
 }
 
@@ -125,19 +125,18 @@ AlgDroplet::strDropletPars(const Droplet& d)
 void 
 AlgDroplet::printDroplets()
 {
-  std::stringstream ss; ss << "Vector of Droplets"
-                           << " v_droplets.size()=" << v_droplets.size()
-                           << " capacity()=" << v_droplets.capacity();
+  std::stringstream ss; ss << "Vector of Droplets v_droplets in seg:" << m_seg
+                           << " size:" << v_droplets.size()
+                           << " capacity:" << v_droplets.capacity();  
 
   for( vector<Droplet>::iterator itv  = v_droplets.begin();
                                  itv != v_droplets.end(); itv++ ) {
     
-    ss <<  "   " << strDropletPars(*itv) << '\n';  
+    ss <<  "   " << _strDropletPars(*itv) << '\n';  
   }
-  MsgLog(name(), info, ss.str()); 
+  MsgLog(_name(), info, ss.str()); 
 }
 
-//--------------------
 //--------------------
 
 //template class ImgAlgos::AlgDroplet<int16_t>;

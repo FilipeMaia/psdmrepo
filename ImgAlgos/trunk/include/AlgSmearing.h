@@ -29,6 +29,7 @@ using namespace std;
 // Collaborating Class Headers --
 //-------------------------------
 
+#include "MsgLogger/MsgLogger.h"
 #include "ndarray/ndarray.h"
 
 //------------------------------------
@@ -71,6 +72,7 @@ public:
    * @param[in] nsm   - (radial) number of neighbour rows and columns around pixel involved in smearing 
    * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in smearing
    * @param[in] opt - pre-fill options for output array outside window region; 0-fill by zeros, 1-copy raw, 2-do nothing
+   * @param[in] pbits  - print control bit-word
    * @param[in] seg    - ROI segment index in the ndarray
    * @param[in] rowmin - ROI window limit
    * @param[in] rowmax - ROI window limit
@@ -78,15 +80,16 @@ public:
    * @param[in] colmax - ROI window limit
    */
 
-  AlgSmearing ( const double& sigma=2
-	      , const int& nsm=5
-              , const double& thr_low = -1e10
-              , const unsigned& opt  = 1
-              , const size_t& seg    = -1
-              , const size_t& rowmin = 0
-              , const size_t& rowmax = 1e6
-              , const size_t& colmin = 0
-              , const size_t& colmax = 1e6
+  AlgSmearing ( const double&   sigma   = 2
+	      , const int&      nsm     = 5
+              , const double&   thr_low = -1e10
+              , const unsigned& opt     = 1
+              , const unsigned& pbits   = 0
+              , const size_t&   seg     = -1
+              , const size_t&   rowmin  = 0
+              , const size_t&   rowmax  = 1e6
+              , const size_t&   colmin  = 0
+              , const size_t&   colmax  = 1e6
               ) ;
 
   /// Destructor
@@ -112,7 +115,7 @@ public:
    * @param[in] dr - deviatin in rows from smeared pixel
    * @param[in] dc - deviatin in columns from smeared pixel
    */
-  double weight(int& dr, int& dc) { return m_weights[abs(dr)][abs(dc)]; }
+  double weight(int dr, int dc) { return m_weights[abs(dr)][abs(dc)]; }
 
   /// Returns segment index in the ndarray
   const size_t& segind(){ return m_seg; }
@@ -131,6 +134,7 @@ private:
   int      m_nsm1;     // = m_nsm + 1
   double   m_thr_low;  // low threshold on pixel amplitude which will be involved in smearing
   unsigned m_opt;      // options for ndarray pre-fill
+  unsigned m_pbits;    // pirnt control bit-word
   size_t   m_seg;      // segment index in the ndarray, <0 - for all segments
   size_t   m_rowmin;   // window for smearing
   size_t   m_rowmax;
@@ -140,7 +144,7 @@ private:
   ndarray<double,2> m_weights; //2-d array of weights
 
   /// Returns string name of the class for messanger
-  std::string name(){return std::string("ImgAlgos::AlgSmearing");}
+  std::string _name(){return std::string("ImgAlgos::AlgSmearing");}
 
 //--------------------
   /**
@@ -163,16 +167,16 @@ double _smearPixAmp(const ndarray<const T,2>& nda_raw, const size_t& r0, const s
   double     w  = 0;
   unsigned ind  = 0;
 
-  size_t rmin = std::max(0, int(r0-m_nsm));
-  size_t rmax = std::min(nrows, r0+m_nsm+1);
-  size_t cmin = std::max(0, int(c0-m_nsm));
-  size_t cmax = std::min(ncols, c0+m_nsm+1);
+  int rmin = std::max(0, int(r0-m_nsm));
+  int rmax = std::min(nrows, r0+m_nsm+1);
+  int cmin = std::max(0, int(c0-m_nsm));
+  int cmax = std::min(ncols, c0+m_nsm+1);
 
   for (int r = rmin; r < rmax; r++) {
     for (int c = cmin; c < cmax; c++) {
 
       ind = r*ncols + c;
-      w = weight(int(r-r0), int(c-c0));
+      w = weight(r-r0, c-c0);
       sum_w  += w;
       sum_aw += p_raw[ind] * w;
 
@@ -181,6 +185,11 @@ double _smearPixAmp(const ndarray<const T,2>& nda_raw, const size_t& r0, const s
   }
   return (sum_w>0)? sum_aw / sum_w : 0;
 }
+
+
+
+
+//--------------------
 
 public:
 
@@ -197,8 +206,8 @@ public:
 template <typename T>
 void smearing(const ndarray<const T,2>& nda_raw, ndarray<T,2>& nda_sme)
 {
-  T*       p_sme = nda_sme.data();
   const T* p_raw = nda_raw.data();
+  T*       p_sme = nda_sme.data();
 
   if(m_sigma == 0) { std::memcpy(p_sme, p_raw, nda_raw.size()*sizeof(T)); return; }
 
@@ -211,7 +220,18 @@ void smearing(const ndarray<const T,2>& nda_raw, ndarray<T,2>& nda_sme)
   size_t cmin = std::max(0, int(m_colmin));
   size_t cmax = std::min(ncols, m_colmax+1);
 
-  if     (m_opt==0) std::fill_n(p_sme, int(nda_raw.size()*sizeof(T)), T(0));
+  if(m_pbits & 128) MsgLog(_name(), info, "  seg:"   << m_seg
+            		               << "  nrows:" << nrows
+            		               << "  ncols:" << ncols
+            		               << "  rmin:"  << rmin
+            		               << "  rmax:"  << rmax
+            		               << "  cmin:"  << cmin
+            		               << "  cmax:"  << cmax
+            		               << "  nda_raw.size:"  << nda_raw.size()
+           		               << "  nda_sme.size:"  << nda_sme.size()
+			   );
+
+  if     (m_opt==0) std::fill_n(p_sme, int(nda_raw.size()), T(0));
   else if(m_opt==1) std::memcpy(p_sme, p_raw, nda_raw.size()*sizeof(T));
 
   for (size_t r = rmin; r < rmax; r++) {

@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 #--------------------
 
+import os
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import sys
 
 # FOR ALIGNED CSPAD IMAGE:
 from PyCSPadImage import CalibPars          as calp
@@ -137,8 +138,9 @@ def getCSPadGeometryShort() :
 
 def get_array_from_file(fname) :
     print 'get_array_from_file:', fname
-    return np.loadtxt(fname, dtype=np.float32)
-
+    base, ext = os.path.splitext(fname)
+    if ext == '.npy' : return np.load(fname)
+    else             : return np.loadtxt(fname, dtype=np.float32)
 
 #--------------------
 

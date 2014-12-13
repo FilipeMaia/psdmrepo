@@ -261,9 +261,10 @@ void
 NDArrDropletFinder::printWarningMsg(const std::string& add_msg)
 {
   if (++m_count_msg < 11 && m_print_bits) {
-    MsgLog(name(), info, "method:"<< std::setw(10) << add_msg << " input ndarray is not available in the event:" << m_count_evt 
-                         << " for source:\"" << m_source << "\"  key:\"" << m_key << "\"");
-    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:\"" << m_source << "\"  key:\"" << m_key << "\"");    
+    MsgLog(name(), info, "method:"<< std::setw(10) << add_msg << " input ndarray is not available in the event:" 
+                         << m_count_evt << " for source:\"" << m_source << "\"  key:\"" << m_key << "\"");
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:\"" << m_source 
+                                                   << "\"  key:\"" << m_key << "\"");    
   }
 }
 
@@ -305,201 +306,56 @@ NDArrDropletFinder::procEvent(Event& evt, Env& env)
 void 
 NDArrDropletFinder::printFoundNdarray()
 {
-          MsgLog(name(), info, "printFoundNdarray(): found ndarray with NDim:" << m_ndim
-                   << "  dtype:"   << strDataType(m_dtype)
-                   << "  isconst:" << m_isconst
-		 );
+  MsgLog(name(), info, "printFoundNdarray(): found ndarray with NDim:" << m_ndim
+           << "  dtype:"   << strDataType(m_dtype)
+           << "  isconst:" << m_isconst
+         );
 }
 
 //--------------------
+
+void
+NDArrDropletFinder::appendVectorOfDroplets(const std::vector<AlgDroplet::Droplet>& v)
+{
+  for( vector<AlgDroplet::Droplet>::const_iterator it  = v.begin();
+                                                   it != v.end(); it++ ) {
+    v_droplets.push_back(*it); 
+  }
+}
+
 //--------------------
 
-/*
-bool
-NDArrDropletFinder::getAndProcImage(Event& evt)
-{
-  //MsgLog(name(), info, "::getAndProcImage(...)");
+void
+NDArrDropletFinder::saveDropletsInEvent(Event& evt)
+{	
+  if (m_print_bits & 8) MsgLog(name(), info, "Save array of " << v_droplets.size() << "droplets in the event");
 
-  shared_ptr< CSPadPixCoords::Image2D<double> > img2d = evt.get(m_source, m_key, &m_src); 
-  if (img2d.get()) {
-    if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as Image2D<double>");
-    m_img2d = img2d.get();
-    const unsigned shape[] = {m_img2d->getNRows(), m_img2d->getNCols()};
-    m_ndarr = new ndarray<const double,2>(m_img2d->data(), shape);
-    return procImage(evt);
+  size_t ndroplets = v_droplets.size();
+  ndarray<droplet_t,2> nda = make_ndarray<droplet_t>(ndroplets, 6);
+
+  int i=0;
+  for( vector<AlgDroplet::Droplet>::iterator it  = v_droplets.begin();
+                                             it != v_droplets.end(); it++, i++ ) {
+    droplet_t* p = &nda[i][0];
+    p[0]= droplet_t(it->seg);
+    p[1]= droplet_t(it->row);
+    p[2]= droplet_t(it->col);
+    p[3]= droplet_t(it->ampmax);
+    p[4]= droplet_t(it->amptot);
+    p[5]= droplet_t(it->npix);
   }
 
-  shared_ptr< ndarray<const double,2> > img = evt.get(m_source, m_key, &m_src);
-  if (img.get()) {
-    if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<double,2>");
-    m_img2d = new CSPadPixCoords::Image2D<double>(img->data(), img->shape()[0], img->shape()[1]);
-    m_ndarr = img.get();
-    return procImage(evt);
-  }
+  if (m_print_bits & 128) MsgLog(name(), info, "Save in the event store ndarray with peaks:\n" << nda);
 
-  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_source, "", &m_src);
-  if (frmData.get()) {
-
-    //unsigned h      = frmData->height();
-    //unsigned w      = frmData->width();
-    int offset = frmData->offset();
-
-    //m_data = new double [h*w];
-    double *p_data = &m_data_arr[0];
-    unsigned ind = 0;
-
-      const ndarray<const uint8_t, 2>& data8 = frmData->data8();
-      if (not data8.empty()) {
-        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<const uint8_t,2>");
-	const unsigned *shape = data8.shape();
-	ndarray<const uint8_t, 2>::iterator cit;
-	for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
-
-        m_ndarr = new ndarray<const double,2>(p_data, shape);
-        m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
-        return procImage(evt);
-      }
-
-      const ndarray<const uint16_t, 2>& data16 = frmData->data16();
-      if (not data16.empty()) {
-        if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<const uint16_t,2>");
-	const unsigned *shape = data16.shape();
-	ndarray<const uint16_t, 2>::iterator cit;
-	// This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
-	for(cit=data16.begin(); cit!=data16.end(); cit++) { p_data[ind++] = double(*cit) - offset; }
-
-        m_ndarr = new ndarray<const double,2>(p_data, shape);
-        m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
-
-        return procImage(evt);
-      }
-  }
-    return false; // if the image object is not found in evt
+  save2DArrayInEvent<droplet_t>(evt, m_src, m_key_out, nda);
 }
-
-*/
 
 //--------------------
-
-/*
-void 
-NDArrDropletFinder::printWindowRange()
-{
-    MsgLog(name(), info, "Window range: m_colmin=" << m_colmin
-                                   << " m_colmax=" << m_colmax
-                                   << " m_rowmin=" << m_rowmin
-                                   << " m_rowmax=" << m_rowmax );
-}
-*/
-
 //--------------------
-
- /*
-bool
-NDArrDropletFinder::procImage(Event& evt)
-{
-                     v_peaks.clear();
-                     v_peaks.reserve(100);
-                     setWindowRange();
-                     saveImageInFile0(evt);
-    if(m_sigma != 0) smearImage();        // convolution with Gaussian
-
-    else             initImage();         // non-zero pixels only in window above the lower threshold
-                     saveImageInFile1(evt);
-		     findPeaks(evt);      // above higher threshold as a maximal in the center of 3x3 or 5x5 
-		     savePeaksInEvent(evt);
-		     savePeaksInEventAsNDArr(evt);
-		     savePeaksInFile(evt);
-    return true;
-}
-
- */
-
 //--------------------
-
-  /*
-void 
-NDArrDropletFinder::saveImageInFile0(Event& evt)
-{
-  if(m_count != m_event ) return;
-  m_img2d -> saveImageInFile(getCommonFileName(evt) + ".txt",0);
-}
-  */
 //--------------------
-/*
-void 
-NDArrDropletFinder::saveImageInFile1(Event& evt)
-{
-  if(m_count != m_event ) return;
-  m_work2d -> saveImageInFile(getCommonFileName(evt) + "-smeared.txt",0);
-}
-  */
 //--------------------
-/*
-void 
-NDArrDropletFinder::saveImageInFile2(Event& evt)
-{
-  if(m_count != m_event ) return;
-  m_work2d -> saveImageInFile(getCommonFileName(evt) + "-2.txt",0);
-}
-
-*/
-
 //--------------------
-// Save peak vector in the event as ndarray
-/*
-void 
-NDArrDropletFinder::savePeaksInEventAsNDArr(Event& evt)
-{
-  if(m_key_out.empty()) return;
-
-  ndarray<float, 2> peaks_nda = make_ndarray<float>(int(v_peaks.size()), 5);
-
-  int i=-1;
-  for(vector<Peak>::const_iterator itv  = v_peaks.begin();
-                                   itv != v_peaks.end(); itv++) {
-    i++;
-    peaks_nda[i][0] = float(itv->x);
-    peaks_nda[i][1] = float(itv->y);
-    peaks_nda[i][2] = float(itv->ampmax);
-    peaks_nda[i][3] = float(itv->amptot);
-    peaks_nda[i][4] = float(itv->npix);
-  }
-
-  save2DArrayInEvent<float>(evt, m_src, m_key_out, peaks_nda);
-}
-*/
-
-//--------------------
-// Save peak vector info in the file for test event
- /*
-void 
-NDArrDropletFinder::savePeaksInFile(Event& evt)
-{
-  if(m_count != m_event ) return;
-
-  string fname; fname = getCommonFileName(evt) + "-peaks.txt";
-  MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
-
-  ofstream file; 
-  file.open(fname.c_str(),ios_base::out);
-
-  for( std::vector<Peak>::iterator itv  = v_peaks.begin();
-                                   itv != v_peaks.end(); itv++ ) {
-
-    if( m_print_bits & 16 ) printPeakInfo(*itv);
-
-    file << itv->x        << "  "
-         << itv->y	  << "  "
-         << itv->ampmax	  << "  "
-         << itv->amptot	  << "  "
-         << itv->npix     << endl; 
-  }
-
-  file.close();
-}
- */
-
 //--------------------
 
 } // namespace ImgAlgos

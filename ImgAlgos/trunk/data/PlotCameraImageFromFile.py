@@ -11,6 +11,8 @@ import sys
 import h5py
 import math
 
+import GlobalGraphics as gg
+
 #--------------------
 # Define graphical methods
 
@@ -23,12 +25,13 @@ def plot_image (arr, img_range=None, zrange=None) :    # range = (left, right, l
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
     colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
 
+
 def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=40) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
     axhi = fig.add_axes([0.15, 0.1, 0.8, 0.85])
-    weights, bins, patches = axhi.hist(arr.flatten(), bins=bins, range=amp_range)
-    axhi.set_xlim([bins[0],bins[-1]]) 
-    add_stat_text(axhi, weights, bins)
+    weights, binedges, patches = axhi.hist(arr.flatten(), bins=bins, range=amp_range)
+    axhi.set_xlim([binedges[0],binedges[-1]]) 
+    add_stat_text(axhi, weights, binedges)
 
 
 def add_stat_text(axhi, weights, bins) :
@@ -121,7 +124,8 @@ def get_array(fname) :
     #fname, ampRange = get_input_parameters()
 
     if os.path.splitext(fname)[1] == '.txt' \
-    or os.path.splitext(fname)[1] == '.dat' :
+    or os.path.splitext(fname)[1] == '.dat' \
+    or os.path.splitext(fname)[1] == '.data' :
         return get_array_from_file(fname) 
 
     elif os.path.splitext(fname)[1] == '.npy' :
@@ -168,13 +172,13 @@ def do_main() :
     print 'arr:\n', arr
     print 'arr.shape=', arr.shape
 
-    plot_image(arr, zrange=ampRange)
+    gg.plot_image(arr, zrange=ampRange)
     #plt.get_current_fig_manager().window.move(10,10)       # works for GTk
     plt.get_current_fig_manager().window.geometry("+10+10") # works for Tk 
     plt.savefig('camera-img.png')
 
 
-    plot_histogram(arr, amp_range=ampRange, bins=80)
+    gg.plot_histogram(arr, amp_range=ampRange, bins=80)
     plt.get_current_fig_manager().window.geometry("+950+10")
     plt.savefig('camera-spe.png')
 

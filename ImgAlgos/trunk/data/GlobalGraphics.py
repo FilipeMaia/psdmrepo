@@ -19,11 +19,19 @@ def plot_image (arr, img_range=None, zrange=None, title='',figsize=(12,12), dpi=
     colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
     fig.canvas.set_window_title(title)
 
-def plot_histogram(arr, amp_range=None, figsize=(6,6)) :
+#def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=100) :
+#    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+#    axhi = fig.add_axes([0.14, 0.06, 0.81, 0.90])
+#    weights, bins, patches = axhi.hist(arr.flatten(), bins, range=amp_range)
+#    add_stat_text(axhi, weights, bins)
+
+def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=40) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    axhi = fig.add_axes([0.14, 0.06, 0.81, 0.90])
-    weights, bins, patches = axhi.hist(arr.flatten(), bins=100, range=amp_range)
-    add_stat_text(axhi, weights, bins)
+    axhi = fig.add_axes([0.15, 0.1, 0.8, 0.85])
+    weights, binedges, patches = axhi.hist(arr.flatten(), bins=bins, range=amp_range)
+    axhi.set_xlim([binedges[0],binedges[-1]]) 
+    add_stat_text(axhi, weights, binedges)
+
 
     #fig.canvas.manager.window.move(500,10)
 

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+???Tag: V00-03-76
+2014-12-12 Mikhail S. Dubrovin
+- NDArrDropletFinder, AlgDroplet, AlgSmearing - test version of the NDArrDropletFinder
+
 Tag: V00-03-75
 2014-12-11 Mikhail S. Dubrovin
 - CameraImageProducer.h - change gain factors for Fccd960 (PSAS-44)

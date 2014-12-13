@@ -67,6 +67,8 @@ namespace ImgAlgos {
 class NDArrDropletFinder : public Module {
 public:
 
+  typedef float droplet_t;
+
   // Default constructor
   NDArrDropletFinder (const std::string& name) ;
 
@@ -108,6 +110,9 @@ private:
   void   initProc(Event& evt, Env& env);
   void   procEvent(Event& evt, Env& env);
   void   printFoundNdarray();
+
+  void   appendVectorOfDroplets(const std::vector<AlgDroplet::Droplet>& v);
+  void   saveDropletsInEvent(Event& evt);
 
   //void   setWindowRange();
   //void   printWindowRange();
@@ -154,12 +159,14 @@ private:
   size_t          m_nsegs;
   size_t          m_nrows;
   size_t          m_ncols;
+  size_t          m_stride;
 
   TimeInterval   *m_time;
 
-  std::vector<WINDOW>       v_windows; // vector of the WINDOW structure with input parameters
-  std::vector<AlgDroplet*>  v_algdf;   // vector of pointers to the AlgDroplet objects for windows
-  std::vector<AlgSmearing*> v_algsm;   // vector of pointers to the AlgSmearing objects for windows
+  std::vector<WINDOW>       v_windows;  // vector of the WINDOW structure with input parameters
+  std::vector<AlgDroplet*>  v_algdf;    // vector of pointers to the AlgDroplet objects for windows
+  std::vector<AlgSmearing*> v_algsm;    // vector of pointers to the AlgSmearing objects for windows
+  std::vector<AlgDroplet::Droplet> v_droplets; // vector of droplets for entire event
 
 //-------------------
 //-------------------
@@ -180,18 +187,30 @@ private:
 	// std::cout << nda << '\n';
 
 	const unsigned* shape = nda.shape();
+	const int* strides = nda.strides();
 
-        m_ncols = shape[m_ndim-1];
-        m_nrows = shape[m_ndim-2];
-	m_nsegs = (m_ndim>2) ? nda.size()/m_ncols/m_nrows : 1;
+        m_ncols  = shape[m_ndim-1];
+        m_nrows  = shape[m_ndim-2];
+	m_nsegs  = (m_ndim>2) ? nda.size()/m_ncols/m_nrows : 1;
+	m_stride = (m_ndim>2) ? strides[m_ndim-3] : 1;
 
-	std::cout << "shape:"; for(unsigned i=0; i<m_ndim; ++i) std::cout << " " << shape[i];
-	std::cout << " size:" << nda.size() << '\n'; 
+	if (m_print_bits & 128) {
+            std::stringstream ss; ss << "Input parameters:";
+	    ss << "size   :" << nda.size() << '\n'; 
+	    ss << "shape  :"; for(unsigned i=0; i<m_ndim; ++i) ss << " " << shape[i];   ss << '\n';
+	    ss << "strides:"; for(unsigned i=0; i<m_ndim; ++i) ss << " " << strides[i]; ss << '\n';
 
-	std::cout << " m_ncols:" << m_ncols
-                  << " m_nrows:" << m_nrows 
-                  << " m_nsegs:" << m_nsegs 
-                  << '\n';
+    	    ss << " m_ncols:"  << m_ncols
+               << " m_nrows:"  << m_nrows 
+               << " m_nsegs:"  << m_nsegs 
+               << " m_stride:" << m_stride;
+
+            MsgLog(name(), info, ss.str());  
+	}
+
+	unsigned pbits_sm = (m_print_bits & 128) ? 0177777 : 0;
+	unsigned pbits_df = (m_print_bits & 128) ? 0177777 : 0;
+
 
 	// Fill-in vectors of processing algorithms
 	//------------------------------------------
@@ -204,12 +223,12 @@ private:
 	    
 	    for(size_t seg=0; seg<m_nsegs; ++seg) {
 	    
-                AlgDroplet* p_df = new AlgDroplet ( m_rpeak, m_thr_low, m_thr_high, m_print_bits,
-	                    		          seg, 0, m_nrows, 0, m_ncols );
+                AlgDroplet* p_df = new AlgDroplet ( m_rpeak, m_thr_low, m_thr_high, pbits_df,
+	                    		            seg, 0, m_nrows, 0, m_ncols );
                 v_algdf.push_back(p_df);
 	        
 	        
-                AlgSmearing* p_sm = (m_sigma)? new AlgSmearing( m_sigma, m_nsm, m_thr_low, 0,
+                AlgSmearing* p_sm = (m_sigma)? new AlgSmearing( m_sigma, m_nsm, m_thr_low, 0, pbits_sm,
 								seg, 0, m_nrows, 0, m_ncols ) : 0;
                 v_algsm.push_back(p_sm);
 	        
@@ -247,41 +266,71 @@ private:
 	    }
 	    
 	    
-	    AlgDroplet*  p_df = new AlgDroplet (m_rpeak, m_thr_low, m_thr_high, m_print_bits,
+	    AlgDroplet*  p_df = new AlgDroplet (m_rpeak, m_thr_low, m_thr_high, pbits_df,
 	          				       it->seg, it->rowmin, it->rowmax, it->colmin, it->colmax );
             v_algdf.push_back(p_df);
 	    
 	    
-            AlgSmearing* p_sm = (m_sigma) ? new AlgSmearing( m_sigma, m_nsm, m_thr_low, 0,
+            AlgSmearing* p_sm = (m_sigma) ? new AlgSmearing( m_sigma, m_nsm, m_thr_low, 0, pbits_sm,
 							     it->seg, it->rowmin, it->rowmax, it->colmin, it->colmax ) : 0;
                                               
             v_algsm.push_back(p_sm);
 	    
-
 	} // for ( ;
     }
 
 //-------------------
 
   template <typename T, unsigned NDim>
-    void procEventForNDArr( ndarray<const T,NDim>& nda )
+    void procEventForNDArr( Event& evt, ndarray<const T,NDim>& nda )
     {
         m_count_get ++;
+
+        v_droplets.clear();
+        v_droplets.reserve(AlgDroplet::NDROPLETSBLOCK);
+
         //m_ndim
         //m_dtype
-
+	bool has_data = false;
 	const T* data = nda.data();
-	std::cout << "procEventForNDArr: m_count_get=" << m_count_get << " data:";
-	for(unsigned i=0; i<10; ++i) std::cout << " " << data[i];  std::cout << '\n'; 
+
+	if (m_print_bits & 128) {
+          std::stringstream ss; ss << "m_count_get=" << m_count_get << " data:";
+	  for(unsigned i=0; i<10; ++i) ss << " " << data[i];  ss << '\n'; 
+          MsgLog(name(), info, ss.str());  
+	}
 
         std::vector<AlgSmearing*>::iterator ism = v_algsm.begin();
         std::vector<AlgDroplet*>::iterator  idf = v_algdf.begin();
         for ( ; idf != v_algdf.end(); ++idf, ++ism) {
 
-	  cout << "df seg:" << (*idf)->segind() << '\n';
-	  if (*ism) cout << "sm seg:" << (*ism)->segind() << '\n';
+            //AlgDroplet*  p_df = (*idf);
+            //AlgSmearing* p_sm = (*ism);
+	    
+	    size_t seg = (*idf)->segind();
+	    
+	    //cout << "df seg:" << seg << '\n';
+	    
+	    unsigned int shape[2] = {m_nrows, m_ncols};
+            ndarray<const T,2> nda_raw(&data[seg*m_stride], shape);
+            //ndarray<const T,2> nda_raw = make_ndarray(&data[seg*m_stride], m_nrows, m_ncols);
+	    
+	    if (m_sigma) {
+                // Apply smearing before droplet-finder
+	        //ndarray<T,2> nda_sme = make_ndarray<T>(m_nrows, m_ncols);
+	        ndarray<T,2> nda_sme(shape);
+	        (*ism)->smearing<T>(nda_raw, nda_sme);
+	        has_data = (*idf)->findDroplets<T>(nda_sme);
+	    }
+	    else {
+	      has_data = (*idf)->findDroplets<T>(nda_raw);
+	    }
+	    
+	    if (has_data) appendVectorOfDroplets( (*idf)->getDroplets() );
 	}
 
+	if (m_print_bits & 8) MsgLog(name(), info, "Total number of droplets found: " << v_droplets.size());
+        if (v_droplets.size()) saveDropletsInEvent(evt);
     }
 
 //-------------------
@@ -324,7 +373,7 @@ private:
       if (m_isconst ) { // CONST
         shared_ptr< ndarray<const T,NDim> > shp_const = evt.get(m_source, m_key, &m_src);
         if (shp_const.get()) {
-          procEventForNDArr<T,NDim>( *shp_const.get() );
+          procEventForNDArr<T,NDim>(evt, *shp_const.get());
  	  return true;
         } 
       }
@@ -332,7 +381,7 @@ private:
         shared_ptr< ndarray<T,NDim> > shp = evt.get(m_source, m_key, &m_src);
         if (shp.get()) {
 	  ndarray<const T,NDim> nda_const(shp->data(), shp->shape());
-          procEventForNDArr<T,NDim>( nda_const );
+          procEventForNDArr<T,NDim>(evt, nda_const);
  	  return true;
         } 
       }

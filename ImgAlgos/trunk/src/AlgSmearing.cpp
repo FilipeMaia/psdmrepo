@@ -47,6 +47,7 @@ AlgSmearing::AlgSmearing( const double& sigma
                         , const int& nsm
                         , const double& thr_low
                         , const unsigned& opt
+                        , const unsigned& pbits
                         , const size_t&   seg
                         , const size_t& rowmin
                         , const size_t& rowmax
@@ -58,13 +59,16 @@ AlgSmearing::AlgSmearing( const double& sigma
   , m_nsm1(nsm+1)
   , m_thr_low(thr_low)
   , m_opt(opt)
+  , m_pbits(pbits)
   , m_seg(seg)
   , m_rowmin(rowmin)
   , m_rowmax(rowmax)
   , m_colmin(colmin)
   , m_colmax(colmax)
 {
+  if(m_pbits & 1) printInputPars();
   evaluateWeights();
+  printWeights();
 }
 
 //--------------------
@@ -74,8 +78,10 @@ AlgSmearing::evaluateWeights()
 {
   m_weights = make_ndarray<double>(m_nsm1, m_nsm1);
 
+  //std::cout << "In AlgSmearing::evaluateWeights()\n";
+
   if ( m_sigma == 0 ) { 
-    MsgLog( name(), info, "Smearing is turned OFF by sigma = " << m_sigma ); 
+    MsgLog(_name(), info, "Smearing is turned OFF by sigma = " << m_sigma); 
     std::fill_n(m_weights.data(), int(m_weights.size()*sizeof(double)), double(0));
     m_weights[0][0] = 1;
     return;
@@ -94,18 +100,18 @@ AlgSmearing::evaluateWeights()
 void 
 AlgSmearing::printWeights()
 {
-  // if ( m_sigma == 0 ) { MsgLog( name(), info, "Smearing is turned OFF by sigma =" << m_sigma ); }
+  // if ( m_sigma == 0 ) { MsgLog(_name(), info, "Smearing is turned OFF by sigma =" << m_sigma ); }
 
-  WithMsgLog(name(), info, log) { log << "printWeights() - Weights for smearing";
+    std::stringstream ss; ss << "printWeights() - Weights for smearing";
+    ss << "\n   cols :   ";
+    for (int c = 0; c < m_nsm1; c++) ss << std::left << std::setw(10) << c;
     for (int r = 0; r < m_nsm1; r++) {
-          log << "\n   row=" << r << ":     "; 
+      ss << "\n   row=" << r << ": " << fixed; 
       for (int c = 0; c < m_nsm1; c++) {
-          std::stringstream ss; ss.setf(ios::fixed,ios::floatfield); //setf(ios::left);
-          ss << std::left << std::setw(8) << m_weights[r][c];
-          log << ss.str() << "  ";       
+	ss << "  " << std::left << std::setw(8) << m_weights[r][c];
       }
     }
-  } // WithMsgLog 
+    MsgLog(_name(), info, ss.str()); 
 }
 
 //--------------------
@@ -114,18 +120,18 @@ void
 AlgSmearing::printInputPars()
 {
   std::stringstream ss; 
-  ss << "sigma   : " << m_sigma
-     << "nsm     : " << m_nsm
-     << "nsm1    : " << m_nsm1
-     << "thr_low : " << m_thr_low
-     << "opt     : " << m_opt
-     << "seg     : " << m_seg
-     << "rowmin  : " << m_rowmin
-     << "rowmax  : " << m_rowmax
-     << "colmin  : " << m_colmin
-     << "colmax  : " << m_colmax  
+  ss << "\nsigma   : " << m_sigma
+     << "\nnsm     : " << m_nsm
+     << "\nnsm1    : " << m_nsm1
+     << "\nthr_low : " << m_thr_low
+     << "\nopt     : " << m_opt
+     << "\nseg     : " << m_seg
+     << "\nrowmin  : " << m_rowmin
+     << "\nrowmax  : " << m_rowmax
+     << "\ncolmin  : " << m_colmin
+     << "\ncolmax  : " << m_colmax  
      << '\n';
-  MsgLog(name(), info, ss.str()); 
+  MsgLog(_name(), info, ss.str()); 
 }
 
 //--------------------

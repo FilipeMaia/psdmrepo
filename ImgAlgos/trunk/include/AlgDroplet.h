@@ -62,10 +62,11 @@ public:
   static const size_t NDROPLETSBLOCK = 100;
 
   struct Droplet{
-    double x;
-    double y; 
-    double ampmax;
-    double amptot;
+    unsigned seg;
+    double   row;
+    double   col; 
+    double   ampmax;
+    double   amptot;
     unsigned npix;
   };
    // ? double s1;
@@ -116,6 +117,10 @@ public:
   /// Returns segment index in the ndarray
   const size_t& segind(){ return m_seg; }
 
+  /// Returns reference to the accumulated vector of droplets
+  const std::vector<Droplet>& getDroplets() { return v_droplets; }
+
+
   // Copy constructor and assignment are disabled by default
   AlgDroplet ( const AlgDroplet& ) ;
   AlgDroplet& operator = ( const AlgDroplet& ) ;
@@ -138,19 +143,16 @@ private:
   std::vector<Droplet> v_droplets;
 
   /// Saves droplet information in the vector
-  void saveDropletInfo(size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
+  void _saveDropletInfo(size_t& seg, size_t& row, size_t& col, double& amp, double& amp_tot, unsigned& npix );
 
   /// Prints droplet information
-  void printDropletInfo(const Droplet& d);
+  void _printDropletInfo(const Droplet& d);
 
   /// Returns string with droplet parameters
-  std::string strDropletPars(const Droplet& d);
-
-  /// Returns reference to the accumulated vector of droplets
-  const std::vector<Droplet>& getDroplets() { return v_droplets; }
+  std::string _strDropletPars(const Droplet& d);
 
   /// Returns string name of the class for messanger
-  std::string name(){return std::string("ImgAlgos::AlgDroplet");}
+  std::string _name(){return std::string("ImgAlgos::AlgDroplet");}
 
 //--------------------
   /**
@@ -194,9 +196,14 @@ void _checkIfPixIsDroplet( const ndarray<const T,2>& nda, size_t r0, size_t c0 )
   }
 
   // Save the droplet info here ----------
-  saveDropletInfo(r0, c0, a0, sum_a, n_pix);
+  _saveDropletInfo(m_seg, r0, c0, a0, sum_a, n_pix);
 
 }
+
+
+
+//--------------------
+public:
 
 //--------------------
   /**
@@ -230,7 +237,9 @@ bool findDroplets( const ndarray<const T,2>& nda )
     }
   }
 
-  if(m_pbits & 2) MsgLog(name(), info, "Found number of droplets: " << (int)v_droplets.size() ) ;
+  if(m_pbits & 2) MsgLog(_name(), info, "Found number of droplets:" << (int)v_droplets.size() 
+                                        << "  in seg:" << m_seg);
+  if(m_pbits & 4) printDroplets();
 
   return (v_droplets.size()) ? true : false;
 }
