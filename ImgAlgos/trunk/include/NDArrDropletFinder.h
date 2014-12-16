@@ -38,7 +38,7 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief Finds "droplets" (wide peaks) in data ndarray and saves their list in output ndarray
+ *  @brief NDArrDropletFinder - psana module, finds "droplets" (wide peaks) in data ndarray and saves their list in output ndarray
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -47,7 +47,6 @@ namespace ImgAlgos {
  *
  *  @author Mikhail S. Dubrovin
  */
-
 
   //typedef boost::shared_ptr<AlgDroplet>  shpDF;
   //typedef boost::shared_ptr<AlgSmearing> shpSM;
@@ -114,30 +113,11 @@ private:
   void   appendVectorOfDroplets(const std::vector<AlgDroplet::Droplet>& v);
   void   saveDropletsInEvent(Event& evt);
 
-  //void   setWindowRange();
-  //void   printWindowRange();
-  //void   initImage();
-  //void   smearImage();
-  //double smearPixAmp(size_t& r0, size_t& c0);
-
-  //void   saveImageInFile0(Event& evt);
-  //void   saveImageInFile1(Event& evt);
-  //void   saveImageInFile2(Event& evt);
-  //bool   getAndProcImage(Event& evt);
-  //bool   procImage(Event& evt);
-  //void   findPeaks(Event& evt);
-
-  //void   savePeaksInEventAsNDArr(Event& evt);
-  //void   savePeaksInFile(Event& evt);
-
-
-  //enum{ MAX_IMG_SIZE=2000*2000 };
-  //enum{ MARGIN=10, MARGIN1=11 };
-
   Pds::Src    m_src;
   Source      m_source;
   std::string m_key;
   std::string m_key_out;
+  std::string m_key_sme;
   double      m_thr_low;
   double      m_thr_high;
   double      m_sigma;    // smearing sigma in pixel size
@@ -182,7 +162,7 @@ private:
 	//-----------------------------
         m_ndim    = NDim;
         m_dtype   = dataType<T>();
-        printFoundNdarray();
+        if (m_print_bits & 1) printFoundNdarray();
 	
 	// std::cout << nda << '\n';
 
@@ -194,7 +174,7 @@ private:
 	m_nsegs  = (m_ndim>2) ? nda.size()/m_ncols/m_nrows : 1;
 	m_stride = (m_ndim>2) ? strides[m_ndim-3] : 1;
 
-	if (m_print_bits & 128) {
+	if (m_print_bits & 256) {
             std::stringstream ss; ss << "Input parameters:";
 	    ss << "size   :" << nda.size() << '\n'; 
 	    ss << "shape  :"; for(unsigned i=0; i<m_ndim; ++i) ss << " " << shape[i];   ss << '\n';
@@ -208,8 +188,10 @@ private:
             MsgLog(name(), info, ss.str());  
 	}
 
-	unsigned pbits_sm = (m_print_bits & 128) ? 0177777 : 0;
-	unsigned pbits_df = (m_print_bits & 128) ? 0177777 : 0;
+	unsigned pbits_sm = (m_print_bits &  64) ?     017 : 0;
+	         pbits_sm = (m_print_bits & 128) ? 0177777 : pbits_sm;
+	unsigned pbits_df = (m_print_bits &  64) ?     017 : 0;
+	         pbits_df = (m_print_bits & 128) ? 0177777 : pbits_df;
 
 
 	// Fill-in vectors of processing algorithms
@@ -294,6 +276,17 @@ private:
 	bool has_data = false;
 	const T* data = nda.data();
 
+
+	// create and pre-fill output ndarray for smearing
+        ndarray<T,NDim> data_sme(nda.shape());
+        T* p_data_sme = data_sme.data();
+
+	if (! m_key_sme.empty() && m_sigma)
+            std::fill_n(p_data_sme, int(nda.size()), T(0));
+	    // if     (m_opt==0) std::fill_n(data_sme.data(), int(data.size()), T(0));
+            // else if(m_opt==1) std::memcpy(data_sme.data(), data, data.size()*sizeof(T));
+
+
 	if (m_print_bits & 128) {
           std::stringstream ss; ss << "m_count_get=" << m_count_get << " data:";
 	  for(unsigned i=0; i<10; ++i) ss << " " << data[i];  ss << '\n'; 
@@ -321,6 +314,10 @@ private:
 	        ndarray<T,2> nda_sme(shape);
 	        (*ism)->smearing<T>(nda_raw, nda_sme);
 	        has_data = (*idf)->findDroplets<T>(nda_sme);
+
+		// Save smeared ndarray in the event store
+	        if (! m_key_sme.empty())
+		    std::memcpy(&p_data_sme[seg*m_stride], nda_sme.data(), nda_sme.size()*sizeof(T));
 	    }
 	    else {
 	      has_data = (*idf)->findDroplets<T>(nda_raw);
@@ -329,10 +326,14 @@ private:
 	    if (has_data) appendVectorOfDroplets( (*idf)->getDroplets() );
 	}
 
-	if (m_print_bits & 8) MsgLog(name(), info, "Total number of droplets found: " << v_droplets.size());
+	//if (m_print_bits & 8) MsgLog(name(), info, "Total number of droplets found: " << v_droplets.size());
         if (v_droplets.size()) saveDropletsInEvent(evt);
+
+        if (! m_key_sme.empty() && m_sigma) 
+            saveNDArrayInEvent<T,NDim>(evt, m_src, m_key_sme, data_sme);
     }
 
+//-------------------
 //-------------------
 //-------------------
 //-------------------

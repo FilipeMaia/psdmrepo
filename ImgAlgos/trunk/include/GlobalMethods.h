@@ -569,6 +569,16 @@ private:
 //--------------------
 //--------------------
 //--------------------
+//--------------------
+/// Save N-D array in event for const T
+  template <typename T, unsigned NDim>
+  void saveNDArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,NDim>& nda)
+  {
+    boost::shared_ptr< ndarray<const T,NDim> > shp( new ndarray<const T,NDim>(nda) );
+    evt.put(shp, src, key);
+  }
+
+
 /// Save 1-D array in event for const T
   template <typename T>
   void save1DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,1>& data)

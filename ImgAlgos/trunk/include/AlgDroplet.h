@@ -45,14 +45,84 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief Droplet(peak) finding algorithm which works in ROI window on const ndarray<const T,2> 
+ *  @brief AlgDroplet is a droplet(peak) finding algorithm. Works in ROI window on ndarray<const T,2>.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
  *
- *  @author Mikhail S. Dubrovin
+ *  @author Mikhail Dubrovin
+ *
+ *
+ *  @see AlgSmearing
+ *
+ *
+ *  @anchor interface
+ *  @par<interface> Interface Description
+ *
+ *
+ * 
+ *  @li  Include
+ *  @code
+ *  #include "ImgAlgos/AlgDroplet.h"
+ *  #include "ndarray/ndarray.h"     // need it for I/O arrays
+ *  @endcode
+ *
+ *
+ *
+ *  @li Initialization
+ *  \n
+ *  @code
+ *  int         rpeak    = 3;
+ *  double      thr_low  = 10;
+ *  double      thr_high = 30;
+ *  unsigned    pbits    = 0177777;
+ *  size_t      seg      = 2;
+ *  size_t      rowmin   = 10;
+ *  size_t      rowmax   = 170;
+ *  size_t      colmin   = 100;
+ *  size_t      colmax   = 200;
+ *  
+ *  AlgDroplet* p_df = new AlgDroplet (rpeak, thr_low, thr_high, pbits,
+ *	                    	     seg, rowmin, rowmax, colmin, colmax );
+ *  @endcode
+ *
+ *
+ *
+ *  @li Find droplets in 2-d ndarray
+ *  @code
+ *  ndarray<const T,2> nda_raw = ....;
+ *  p_df->findDroplets<T>(nda_raw);  
+ *  @endcode
+ *
+ *
+ *
+ *  @li Access methods
+ *  @code
+ *  const size_t seg = p_df->segind();
+ *
+ *  const std::vector<Droplet> vec = p_df->getDroplets();
+ *
+ *  std::stringstream ss;
+ *  for( vector<AlgDroplet::Droplet>::iterator it  = vec.begin();
+ *                                             it != vec.end(); it++) {
+ *    ss  << "     seg:" << it->seg
+ *        << "     row:" << it->row  
+ *        << "     col:" << it->col  
+ *        << "  ampmax:" << it->ampmax 
+ *        << "  amptot:" << it->amptot
+ *        << "    npix:" << it->npix; 
+ *  }
+ *  @endcode
+ *
+ *
+ *
+ *  @li Print methods
+ *  @code
+ *  p_df->printInputPars();
+ *  p_df->printDroplets();
+ *  @endcode
  */
 
 //template <typename T>
@@ -65,9 +135,9 @@ public:
     unsigned seg;
     double   row;
     double   col; 
-    double   ampmax;
-    double   amptot;
-    unsigned npix;
+    double   ampmax;  // amplitude in the peak maximum
+    double   amptot;  // total amplitude in the range of peak_radius
+    unsigned npix;    // number of pixels in the range of peak_radius
   };
    // ? double s1;
    // ? double s2; 
@@ -75,12 +145,12 @@ public:
 
 
   /**
-   * @brief Constructor
+   * @brief Class constructor is used for initialization of all paramaters. 
    * 
    * @param[in] radius - (radial) number of neighbour rows and columns around pixel involved in droplet finding
    * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in droplet formation
    * @param[in] thr_high - threshold on intensity; pixels with intensity above this threshold are considered as a droplet
-   * @param[in] pbits  - print control bit-word
+   * @param[in] pbits  - print control bit-word; =0-print nothing, +1-input parameters, +2-increase droplets' vector size, +64-number of droplets, +128-list of droplets. 
    * @param[in] seg    - ROI segment index in the ndarray
    * @param[in] rowmin - ROI window limit
    * @param[in] rowmax - ROI window limit
@@ -237,9 +307,9 @@ bool findDroplets( const ndarray<const T,2>& nda )
     }
   }
 
-  if(m_pbits & 2) MsgLog(_name(), info, "Found number of droplets:" << (int)v_droplets.size() 
+  if(m_pbits & 64) MsgLog(_name(), info, "Found number of droplets:" << (int)v_droplets.size() 
                                         << "  in seg:" << m_seg);
-  if(m_pbits & 4) printDroplets();
+  if(m_pbits & 128) printDroplets();
 
   return (v_droplets.size()) ? true : false;
 }

@@ -88,11 +88,11 @@ AlgDroplet::_saveDropletInfo(size_t& seg, size_t& row, size_t& col, double& amp,
 {
   if( v_droplets.size() == v_droplets.capacity() ) {
       v_droplets.reserve( v_droplets.capacity() + NDROPLETSBLOCK );
-      if(m_pbits & 4) MsgLog( _name(), info, "Droplets vector capacity is increased to:" << v_droplets.capacity() );
+      if(m_pbits & 2) MsgLog( _name(), info, "Droplets vector capacity is increased to:" << v_droplets.capacity() );
   }
   Droplet oneDroplet = {(unsigned)seg, (double)row, (double)col, amp, amp_tot, npix};
   v_droplets.push_back(oneDroplet);
-  //if(m_pbits & 4) _printDropletInfo( oneDroplet );
+  //if(m_pbits & 32) _printDropletInfo( oneDroplet );
 }
 
 //--------------------
@@ -127,7 +127,8 @@ AlgDroplet::printDroplets()
 {
   std::stringstream ss; ss << "Vector of Droplets v_droplets in seg:" << m_seg
                            << " size:" << v_droplets.size()
-                           << " capacity:" << v_droplets.capacity();  
+                           << " capacity:" << v_droplets.capacity()
+                           << '\n';  
 
   for( vector<Droplet>::iterator itv  = v_droplets.begin();
                                  itv != v_droplets.end(); itv++ ) {

@@ -47,9 +47,7 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief C++ source file code template.
- *
- *  Smearing algorithm for ndarray<T,2> using Gaussian weights
+ *  @brief AlgSmearing - is a smearing algorithm for ndarray<T,2> using 2-d Gaussian weights.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -57,6 +55,65 @@ namespace ImgAlgos {
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
+ *
+ *  @see AlgSmearing
+ *
+ *
+ *  @anchor interface
+ *  @par<interface> Interface Description
+ *
+ *
+ * 
+ *  @li  Include
+ *  @code
+ *  #include "ImgAlgos/AlgSmearing.h"
+ *  #include "ndarray/ndarray.h"     // need it for I/O arrays
+ *  @endcode
+ *
+ *
+ *
+ *  @li Initialization
+ *  \n
+ *  @code
+ *  double      sigma    = 2.5;
+ *  int         nsm      = 3;
+ *  double      thr_low  = 10;
+ *  unsigned    opt      = 1;
+ *  unsigned    pbits    = 0177777;
+ *  size_t      seg      = 2;
+ *  size_t      rowmin   = 10;
+ *  size_t      rowmax   = 170;
+ *  size_t      colmin   = 100;
+ *  size_t      colmax   = 200;
+ * 
+ *  AlgSmearing* p_sm = new AlgSmearing( sigma, nsm, thr_low, opt, pbits,
+ *		      			 seg, rowmin, rowmax, colmin, colmax );
+ *  @endcode
+ *
+ *
+ *
+ *  @li Do smearing
+ *  @code
+ *  ndarray<const T,2> nda_raw = ....;    // input raw ndarray
+ *  ndarray<T,2> nda_sme(shape);          // output smeared ndarray
+ *
+ *  p_sm->smearing<T>(nda_raw, nda_sme);  // do smearing of input  ndarray<const T,2> nda_raw to output nda_sme
+ *  @endcode
+ *
+ *
+ *
+ *  @li Access methods
+ *  @code
+ *  const size_t seg = p_sm->segind();
+ *  @endcode
+ *
+ *
+ *
+ *  @li Print methods
+ *  @code
+ *  p_sm->printInputPars();
+ *  p_sm->printWeights();
+ *  @endcode
  */
 
 //template <typename T>
@@ -66,13 +123,13 @@ public:
   //static const size_t RSMMAX = 10;
 
   /**
-   * @brief Constructor
+   * @brief Class constructor is used for initialization of all paramaters. 
    * 
    * @param[in] sigma - smearing width parameter to generate the matrix of weights
    * @param[in] nsm   - (radial) number of neighbour rows and columns around pixel involved in smearing 
    * @param[in] thr_low - threshold on intensity; pixels with intensity above this threshold are accounted in smearing
    * @param[in] opt - pre-fill options for output array outside window region; 0-fill by zeros, 1-copy raw, 2-do nothing
-   * @param[in] pbits  - print control bit-word
+   * @param[in] pbits  - print control bit-word; =0-print nothing, +1-input parameters, +2-matrix of weights, +128-detail at smearing.
    * @param[in] seg    - ROI segment index in the ndarray
    * @param[in] rowmin - ROI window limit
    * @param[in] rowmax - ROI window limit

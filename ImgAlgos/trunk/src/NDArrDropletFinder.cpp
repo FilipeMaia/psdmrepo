@@ -44,6 +44,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   , m_source()
   , m_key()
   , m_key_out()
+  , m_key_sme()
   , m_thr_low()
   , m_thr_high()
   , m_sigma()
@@ -61,6 +62,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   m_source        = configSrc("source",  "DetInfo()");
   m_key           = configStr("key",              "");
   m_key_out       = configStr("key_droplets",     "");
+  m_key_sme       = configStr("key_smeared",      "");
   m_thr_low       = config   ("threshold_low",    10);
   m_thr_high      = config   ("threshold_high",  100);
   m_sigma         = config   ("sigma",           1.5);
@@ -95,11 +97,10 @@ NDArrDropletFinder::~NDArrDropletFinder ()
 void 
 NDArrDropletFinder::beginJob(Event& evt, Env& env)
 {
-  if( m_print_bits & 1 ) {
+  if (m_print_bits & 1) {
     printInputPars();
     print_windows();
   }
-
   m_time = new TimeInterval();
 }
 
@@ -107,8 +108,6 @@ NDArrDropletFinder::beginJob(Event& evt, Env& env)
 void 
 NDArrDropletFinder::beginRun(Event& evt, Env& env)
 {
-  //  evaluateWeights();
-  //  if( m_print_bits & 1 ) printWeights();
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -126,10 +125,6 @@ NDArrDropletFinder::event(Event& evt, Env& env)
   ++ m_count_evt;
 
   procEvent(evt, env);
-
-  //if ( !m_finderIsOn )        { ++  m_count_sel; return; } // If the filter is OFF then event is selected
-  //if ( getAndProcImage(evt) ) { ++  m_count_sel; return; } // if event is selected
-  //else                        { skip();          return; } // if event is discarded
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -148,7 +143,7 @@ NDArrDropletFinder::endRun(Event& evt, Env& env)
 void 
 NDArrDropletFinder::endJob(Event& evt, Env& env)
 {
-  if( m_print_bits & 2 ) {
+  if (m_print_bits & 2) {
     MsgLog(name(), info, "Number of events with found data = " << m_count_sel << " of total " << m_count_evt
 	   << " for source:" << m_source << " and key:" << m_key);
     m_time -> stopTime(m_count_evt);
@@ -168,6 +163,7 @@ NDArrDropletFinder::printInputPars()
          << "\n source        : " << m_source
 	 << "\n key           : " << m_key      
 	 << "\n key_out       : " << m_key_out
+	 << "\n key_sme       : " << m_key_sme
 	 << "\n thr_low       : " << m_thr_low
 	 << "\n thr_high      : " << m_thr_high
 	 << "\n sigma         : " << m_sigma
@@ -204,14 +200,14 @@ NDArrDropletFinder::parse_windows_pars()
   const size_t nvals = 5;
   int v[nvals];
 
-  if(m_windows.empty()) {
-    MsgLog(name(), warning, "The list of windows is empty. " 
-                         << "All segments will be processed");
-    // throw std::runtime_error("Check CSPad2x2NDArrReshape parameters in the configuration file!");
+  if (m_windows.empty()) {
+    if (m_print_bits) MsgLog(name(), warning, "The list of windows is empty. " 
+                                              << "All segments will be processed");
+    // throw std::runtime_error("Check NDArrDropletFinder parameters in the configuration file!");
     return;
   }
 
-  if( m_print_bits & 4 ) MsgLog(name(), info, "Parse window parameters:");
+  if (m_print_bits & 256) MsgLog(name(), info, "Parse window parameters:");
 
   unsigned ind = 0;
   while (ss >> s) {
@@ -221,7 +217,7 @@ NDArrDropletFinder::parse_windows_pars()
     WINDOW win = {v[0], v[1], v[2], v[3], v[4]};
     v_windows.push_back(win);
 
-    if( m_print_bits & 4 ) MsgLog( name(), info, "Window for"
+    if (m_print_bits & 256) MsgLog( name(), info, "Window for"
                                    << "     seg:" << std::setw(3) << v[0]
             			   << "  rowmin:" << std::setw(6) << v[1] 
             			   << "  rowmax:" << std::setw(6) << v[2] 
@@ -229,10 +225,10 @@ NDArrDropletFinder::parse_windows_pars()
 				   << "  colmax:" << std::setw(6) << v[4] );
   }
 
-  if (v_windows.empty()) { MsgLog(name(), warning, "Vector of window parameters is empty." 
-                                  << " Entire segments will be processed.");
+  if (v_windows.empty() && m_print_bits) { MsgLog(name(), warning, "Vector of window parameters is empty." 
+                                                                   << " All segments will be processed.");
   }
-  else if( m_print_bits & 4 ) MsgLog(name(), info, "Number of specified windows: " 
+  else if (m_print_bits & 256) MsgLog(name(), info, "Number of specified windows: " 
                                      << v_windows.size());
 }
 
@@ -260,7 +256,7 @@ NDArrDropletFinder::print_windows()
 void 
 NDArrDropletFinder::printWarningMsg(const std::string& add_msg)
 {
-  if (++m_count_msg < 11 && m_print_bits) {
+  if (++m_count_msg < 11) {
     MsgLog(name(), info, "method:"<< std::setw(10) << add_msg << " input ndarray is not available in the event:" 
                          << m_count_evt << " for source:\"" << m_source << "\"  key:\"" << m_key << "\"");
     if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:\"" << m_source 
@@ -280,7 +276,7 @@ NDArrDropletFinder::initProc(Event& evt, Env& env)
   else if ( initProcForType<uint16_t> (evt) ) {m_dtype = UINT16; return;}
   else if ( initProcForType<uint8_t > (evt) ) {m_dtype = UINT8;  return;}
 
-  printWarningMsg("initProc");
+  if (m_print_bits) printWarningMsg("initProc");
 }
 
 //--------------------
@@ -288,8 +284,8 @@ NDArrDropletFinder::initProc(Event& evt, Env& env)
 void 
 NDArrDropletFinder::procEvent(Event& evt, Env& env)
 {
-  if ( ! m_count_get ) initProc(evt, env);
-  if ( ! m_count_get ) return;
+  if (! m_count_get) initProc(evt, env);
+  if (! m_count_get) return;
 
   if      ( m_dtype == INT16  && procEventForType<int16_t > (evt)) return;
   else if ( m_dtype == INT    && procEventForType<int     > (evt)) return;
@@ -298,7 +294,7 @@ NDArrDropletFinder::procEvent(Event& evt, Env& env)
   else if ( m_dtype == UINT16 && procEventForType<uint16_t> (evt)) return;
   else if ( m_dtype == UINT8  && procEventForType<uint8_t > (evt)) return;
 
-  printWarningMsg("procEvent");
+  if (m_print_bits) printWarningMsg("procEvent");
 }
 
 //--------------------
@@ -328,7 +324,7 @@ NDArrDropletFinder::appendVectorOfDroplets(const std::vector<AlgDroplet::Droplet
 void
 NDArrDropletFinder::saveDropletsInEvent(Event& evt)
 {	
-  if (m_print_bits & 8) MsgLog(name(), info, "Save array of " << v_droplets.size() << "droplets in the event");
+  if (m_print_bits & 4) MsgLog(name(), info, "Save array of " << v_droplets.size() << " droplets in the event");
 
   size_t ndroplets = v_droplets.size();
   ndarray<droplet_t,2> nda = make_ndarray<droplet_t>(ndroplets, 6);
@@ -345,16 +341,11 @@ NDArrDropletFinder::saveDropletsInEvent(Event& evt)
     p[5]= droplet_t(it->npix);
   }
 
-  if (m_print_bits & 128) MsgLog(name(), info, "Save in the event store ndarray with peaks:\n" << nda);
+  if (m_print_bits & 8) MsgLog(name(), info, "Save in the event store ndarray with peaks:\n" << nda);
 
   save2DArrayInEvent<droplet_t>(evt, m_src, m_key_out, nda);
 }
 
-//--------------------
-//--------------------
-//--------------------
-//--------------------
-//--------------------
 //--------------------
 //--------------------
 

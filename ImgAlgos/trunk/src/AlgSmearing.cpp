@@ -68,7 +68,7 @@ AlgSmearing::AlgSmearing( const double& sigma
 {
   if(m_pbits & 1) printInputPars();
   evaluateWeights();
-  printWeights();
+  if(m_pbits & 2) printWeights();
 }
 
 //--------------------
@@ -81,7 +81,7 @@ AlgSmearing::evaluateWeights()
   //std::cout << "In AlgSmearing::evaluateWeights()\n";
 
   if ( m_sigma == 0 ) { 
-    MsgLog(_name(), info, "Smearing is turned OFF by sigma = " << m_sigma); 
+    if(m_pbits) MsgLog(_name(), info, "Smearing is turned OFF by sigma = " << m_sigma); 
     std::fill_n(m_weights.data(), int(m_weights.size()*sizeof(double)), double(0));
     m_weights[0][0] = 1;
     return;
