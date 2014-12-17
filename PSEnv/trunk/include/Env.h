@@ -119,11 +119,11 @@ public:
   const std::string& experiment() const { return m_expNameProvider->experiment(); }
 
   /// Returns experiment number or 0
-  const unsigned expNum() const { return m_expNameProvider->expNum(); }
+  unsigned expNum() const { return m_expNameProvider->expNum(); }
 
   /// Returns sub-process number. In case of multi-processing job it will be a non-negative number
   /// ranging from 0 to a total number of sub-processes. In case of single-process job it will return -1.
-  const int subprocess() const { return m_subproc; }
+  int subprocess() const { return m_subproc; }
 
   /// Returns that name of the calibration directory for current
   /// instrument/experiment.

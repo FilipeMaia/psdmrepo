@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-08 David Schneider
+- apply patches from user to eliminate warnings produced when -Wextra
+  compiler option is used. 
+	
 Tag: V00-13-07
 2014-09-09 David Schneider
 - Jira ticket PSAS-25 - extend EnvObjectStore to take a key string.

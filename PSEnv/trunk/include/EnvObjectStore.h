@@ -139,7 +139,7 @@ public:
    */
   GetResultProxy get(const Pds::Src& source, const std::string& key=std::string()) 
   {
-    GetResultProxy pxy = { m_dict, PSEvt::Source(source), key };
+    GetResultProxy pxy = { m_dict, PSEvt::Source(source), key, NULL };
     return pxy;
   }
 
@@ -151,7 +151,7 @@ public:
    *                       with the exact source address of the returned object.
    *  @return Shared pointer (or object convertible to it) which can be zero when object is not found.
    */
-  GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=0, const std::string& key=std::string()) 
+  GetResultProxy get(const PSEvt::Source& source, Pds::Src* foundSrc=NULL, const std::string& key=std::string()) 
   {
     GetResultProxy pxy = { m_dict, source, key, foundSrc};
     return pxy;
