@@ -43,4 +43,16 @@
   @init()  [[auto, inline]];
 
 }
+
+//------------------ TypeId ------------------
+@type TypeId
+  [[external]]
+  [[value_type]]
+{
+  uint32_t _value -> value;
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto, inline]];
+
+}
 } //- @package Pds
