@@ -35,3 +35,11 @@ BINDIR = "bin"
 PKGLIBS = "hdf5 hdf5_cpp hdf5_hl hdf5_hl_cpp"
 DEPS = "szip"
 standardExternalPackage('hdf5', **locals())
+
+h5check_ver = "2.0.1"
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "h5check", h5check_ver)
+INCDIR = None
+LIBDIR = None
+BINDIR = "bin"
+standardExternalPackage('h5check', **locals())
+
