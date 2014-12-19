@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-05
+2014-12-19 Igor Gaponenko
+- following a migration of Web services as per JIRA issue PSDH-20
+- moved forward the ata Policy Retention dates evaluator
+
 Tag: V00-02-04
 2014-12-08 Igor Gaponenko
 - minor changes in CSS (fonts)

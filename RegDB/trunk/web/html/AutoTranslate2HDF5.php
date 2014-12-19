@@ -242,7 +242,7 @@ input[type="text"]:hover {
 function load_hdf5_files (exper_id) {
     $.ajax ({
         type: 'GET' ,
-        url: '../portal/ws/SearchFiles.php' ,
+        url: '../portal/ws/filemgr_files_search.php' ,
         data: {
             exper_id: exper_id ,
             types: 'hdf5'

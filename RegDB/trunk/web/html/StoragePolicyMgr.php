@@ -180,7 +180,7 @@ function load_stats_for_experiment (descr) {
             $('#medium_usage_gb_'       +descr.exper_id).html(data.medium_usage_gb    ? data.medium_usage_gb    : '');
             $.ajax({
                 type: 'GET',
-                url: '../portal/ws/SearchFiles.php',
+                url: '../portal/ws/filemgr_files_search.php',
                 data: {
                     exper_id: descr.exper_id
                 },
@@ -238,13 +238,13 @@ function load_stats_for_experiment (descr) {
 var total_short_usage_files = 0;
 var total_short_usage_tb = 0;
 var total_short_expired_tb = {
-    '2014-06-02': 0,
-    '2014-07-02': 0,
-    '2014-08-02': 0,
-    '2014-09-02': 0,
-    '2014-10-02': 0,
-    '2014-11-02': 0,
-    '2014-12-02': 0
+    '2014-12-02': 0,
+    '2015-01-02': 0,
+    '2015-02-02': 0,
+    '2015-03-02': 0,
+    '2015-04-02': 0,
+    '2015-05-02': 0,
+    '2015-06-02': 0
 };
 var total_medium_usage_files = 0;
 var total_medium_usage_tb = 0;
@@ -730,13 +730,13 @@ HERE;
             <tr>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
-              <td class="table_hdr"             align="right"  >2014-06-01</td>
-              <td class="table_hdr"             align="right"  >2014-07-01</td>
-              <td class="table_hdr"             align="right"  >2014-08-01</td>
-              <td class="table_hdr"             align="right"  >2014-09-01</td>
-              <td class="table_hdr"             align="right"  >2014-10-01</td>
-              <td class="table_hdr"             align="right"  >2014-11-01</td>
               <td class="table_hdr"             align="right"  >2014-12-01</td>
+              <td class="table_hdr"             align="right"  >2015-01-01</td>
+              <td class="table_hdr"             align="right"  >2015-02-01</td>
+              <td class="table_hdr"             align="right"  >2015-03-01</td>
+              <td class="table_hdr"             align="right"  >2015-04-01</td>
+              <td class="table_hdr"             align="right"  >2015-05-01</td>
+              <td class="table_hdr"             align="right"  >2015-06-01</td>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
             </tr>
@@ -776,13 +776,13 @@ HERE;
               <td class="table_cell table_cell_left"  align="left"  >{$instrument_name}</td>
               <td class="table_cell "                 align="right" id="short_usage_files_{$instrument_name}"           >Loading</td>
               <td class="table_cell highlighted "     align="right" id="short_usage_tb_{$instrument_name}"              >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-06-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-07-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-08-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-09-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-10-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2014-11-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2014-12-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-01-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-02-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-03-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-04-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-05-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2015-06-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="medium_usage_files_{$instrument_name}"          >Loading...</td>
               <td class="table_cell highlighted "     align="right" id="medium_usage_tb_{$instrument_name}"             >Loading...</td>
               <td class="table_cell table_cell_right" align="right" id="medium_quota_tb_{$instrument_name}"             >Loading...</td>
