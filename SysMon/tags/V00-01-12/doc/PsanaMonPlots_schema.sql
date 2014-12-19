@@ -1,0 +1,66 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
+
+CREATE SCHEMA IF NOT EXISTS `SYSMON` ;
+USE `SYSMON`;
+
+-- -----------------------------------------------------
+-- Table `SYSMON`.`psanamon_plot`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `SYSMON`.`PSANAMON_PLOT` ;
+
+CREATE  TABLE IF NOT EXISTS `SYSMON`.`PSANAMON_PLOT` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `exper_id` INT NOT NULL ,
+
+  `name`  VARCHAR(255) NOT NULL ,
+  `type`  VARCHAR(255) NOT NULL ,
+  `descr` MEDIUMTEXT   NOT NULL ,
+  `data`  LONGBLOB     NOT NULL ,
+
+  `update_time`   BIGINT UNSIGNED  NOT NULL ,
+  `update_uid`    VARCHAR(32)      NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+  CONSTRAINT `PSANAMON_PLOT_FK_1`
+    FOREIGN KEY (`exper_id` )
+    REFERENCES `REGDB`.`EXPERIMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE  = InnoDB
+COMMENT = 'Real-time monitoring plots';
+
+
+CREATE  TABLE IF NOT EXISTS `SYSMON`.`PSANAMON_PLOT_M` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `exper_id` INT NOT NULL ,
+
+  `name`  VARCHAR(255) NOT NULL ,
+  `type`  VARCHAR(255) NOT NULL ,
+  `descr` MEDIUMTEXT   NOT NULL ,
+  `data`  LONGBLOB     NOT NULL ,
+
+  `update_time`   BIGINT UNSIGNED  NOT NULL ,
+  `update_uid`    VARCHAR(32)      NOT NULL ,
+
+  PRIMARY KEY (`id`) ,
+  CONSTRAINT `PSANAMON_PLOT_M_FK_1`
+    FOREIGN KEY (`exper_id` )
+    REFERENCES `REGDB`.`EXPERIMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+)
+ENGINE  = MYISAM
+COMMENT = 'Real-time monitoring plots';
+
+
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
+
