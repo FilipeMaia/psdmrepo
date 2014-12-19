@@ -98,6 +98,23 @@ class ServiceJSON {
     //   Parameters parsers
     // ----------------------
 
+    /**
+     * Case-controlled version of the standard 'in_array()'
+     *
+     * @param  string  $needle      - a string value to search in the array
+     * @param  array   $haystack    - an input array of strings where to search
+     * @param  boolean $ignore_case - set to 'true' for case-insensitive comparision
+     * @return boolean
+     */
+    private static function _in_array_case ($needle, $haystack, $ignore_case=false) {
+        foreach ($haystack as $v) {
+            if ($ignore_case ?
+                strtolower($needle) === strtolower($v) :
+                $needle             === $v) return true ;
+        }
+        return false ;
+    }
+
     private function parse ($name, $required=true, $has_value=true, $allow_empty_value=false) {
         $name = trim($name) ;
         if (isset($this->method_var[$name])) {
@@ -212,18 +229,195 @@ class ServiceJSON {
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
 
-    public function required_enum ($name, $allowed_values) {
-        $str = $this->required_str($name) ;
-        if (in_array($str, $allowed_values)) return $str ;
-        throw new DataPortalException (
-            __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+    public static $_ENUM_OPTIONS = array (
+        'ignore_case'     => false ,
+        'convert'         => 'none'
+    ) ;
+    public function required_enum (
+        $name ,
+        $allowed_values ,
+        $options = null) {
+
+        return $this->_parse_enum (
+            $this->required_str($name) ,
+            $name ,
+            $allowed_values ,
+            $options
+        ) ;
     }
-    public function optional_enum ($name, $allowed_values, $default) {
+    public function optional_enum (
+        $name ,
+        $allowed_values ,
+        $default ,
+        $options = null) {
+
         $str = $this->optional_str($name, null) ;
         if (is_null($str)) return $default ;
-        if (in_array($str, $allowed_values)) return $str ;
+
+        return $this->_parse_enum (
+            $this->required_str($name) ,
+            $name ,
+            $allowed_values ,
+            $options
+        ) ;
+    }
+    private function _parse_enum (
+        $str ,
+        $name ,
+        $allowed_values ,
+        $options) {
+
+        $options = is_null($options) ? self::$_ENUM_OPTIONS : $options ;
+
+        $ignore_case = array_key_exists('ignore_case', $options) && $options['ignore_case'] ;
+
+        $convert = array_key_exists('convert', $options) ?  $options['convert'] : 'none' ;
+        if (!in_array($convert, array('none', 'toupper', 'tolower')))
+            throw new DataPortalException (
+                    __CLASS__.'::'.__METHOD__, "invalid value of the string case conversion option: {$convert}'") ;
+
+        // Note that we this check has to be done first before applying
+        // the optional case conversion rule
+
+        if (!ServiceJSON::_in_array_case($str, $allowed_values, $ignore_case))
+            throw new DataPortalException (
+                __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+
+        // (Optional) case conversion has to be made before placing result
+        // in case if duplicates aren't allowed.
+
+        switch ($convert) {
+            case 'none'    : break ;
+            case 'toupper' : $str = strtoupper($str) ; break ;
+            case 'tolower' : $str = strtolower($str) ; break ;
+        }
+        return $str ;
+    }
+        
+    public static $_LIST_OPTIONS = array (
+        'ignore_case'     => false ,
+        'convert'         => 'none' ,
+        'skip_duplicates' => false
+    ) ;
+
+    public function required_list (
+        $name ,
+        $allowed_values ,
+        $options = null) {
+
+        return $this->_parse_list (
+            $this->required_str($name) ,
+            $name ,
+            $allowed_values ,
+            $options) ;
+    }
+    public function optional_list (
+        $name ,
+        $allowed_values ,
+        $default ,
+        $options = null) {
+
+        $str = $this->optional_str($name, null) ;
+        if (is_null($str)) return $default ;
+
+        return $this->_parse_list (
+            $str ,
+            $name ,
+            $allowed_values ,
+            $options) ;
+    }
+
+    private function _parse_list (
+        $str ,
+        $name ,
+        $allowed_values ,
+        $options) {
+
+        $options = is_null($options) ? self::$_LIST_OPTIONS : $options ;
+
+        $skip_duplicates = array_key_exists('skip_duplicates', $options) && $options['skip_duplicates'] ;
+        $ignore_case     = array_key_exists('ignore_case',     $options) && $options['ignore_case'] ;
+
+        $convert = array_key_exists('convert',         $options) ? $options['convert'] : 'none' ;
+        if (!in_array($convert, array('none', 'toupper', 'tolower')))
+            throw new DataPortalException (
+                    __CLASS__.'::'.__METHOD__, "invalid value of the string case conversion option: {$convert}'") ;
+        
+        $values = array() ;
+        foreach (explode(',', $str) as $v) {
+
+            // Note that we this check has to be done first before applying
+            // the optional case conversion rule
+
+            if (!ServiceJSON::_in_array_case($v, $allowed_values, $ignore_case))
+                throw new DataPortalException (
+                    __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+
+            // (Optional) case conversion has to be made before placing result
+            // in case if duplicates aren't allowed.
+
+            switch ($convert) {
+                case 'none'    : break ;
+                case 'toupper' : $v = strtoupper($v) ; break ;
+                case 'tolower' : $v = strtolower($v) ; break ;
+            }
+            if ($skip_duplicates && ServiceJSON::_in_array_case($v, $values, $ignore_case)) continue ;
+            array_push($values, $v) ;
+        }
+        return $values ;
+    }
+
+    public function required_range ($name, $default_range) {
+
+        $str = $this->required_str($name, null) ;
+
+        $values = explode('-', $str);
+        switch (count($values)) {
+
+        case 0:
+            return array('min' => null, 'max' => null) ;
+            
+        case 1:
+            $min = intval($values[0]) ;
+            if ($min <= 0) break ;
+            return array('min' => $min, 'max' => $min);
+
+        case 2:
+            $min = $runs[0] ? intval($runs[0]) : null ;
+            $max = $runs[1] ? intval($runs[1]) : null ;
+            if ((!is_null($min) && ($min <= 0)) || (!is_null($max) && ($max <= 0)) || (($min && $max) && ($min > $max))) break ;
+            return array('min' => $min, 'max' => $max);
+        }
         throw new DataPortalException (
-            __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+            __CLASS__.'::'.__METHOD__ ,
+            "invalid value of parameter '{$name}'. Please use simple range like: '13', '1-20', '100-', '-200'") ;
+    }
+
+    public function optional_range ($name, $default_range) {
+
+        $str = $this->optional_str($name, null) ;
+        if (is_null($str)) return $default_range ;
+
+        $values = explode('-', $str);
+        switch (count($values)) {
+
+        case 0:
+            return array('min' => null, 'max' => null) ;
+            
+        case 1:
+            $min = intval($values[0]) ;
+            if ($min <= 0) break ;
+            return array('min' => $min, 'max' => $min);
+
+        case 2:
+            $min = $values[0] ? intval($values[0]) : null ;
+            $max = $values[1] ? intval($values[1]) : null ;
+            if ((!is_null($min) && ($min <= 0)) || (!is_null($max) && ($max <= 0)) || (($min && $max) && ($min > $max))) break ;
+            return array('min' => $min, 'max' => $max);
+        }
+        throw new DataPortalException (
+            __CLASS__.'::'.__METHOD__ ,
+            "invalid value of parameter '{$name}'. Please use simple range like: '13', '1-20', '100-', '-200'") ;
     }
 
     public function required_file () {

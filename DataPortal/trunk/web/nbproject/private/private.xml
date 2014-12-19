@@ -6,7 +6,16 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Attachments.js</file>
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Post.js</file>
         </group>
-        <group name="PCDS Web App"/>
-        <group name="PCDS Web Apps"/>
+        <group name="PCDS Web Apps">
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_search.php</file>
+        </group>
+        <group name="PCDS Web App">
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/MoveFiles.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_move.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/index_main.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_search.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/lib/dataportal/servicejson.class.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Filemanager_Files.js</file>
+        </group>
     </open-files>
 </project-private>

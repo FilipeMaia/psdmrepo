@@ -130,7 +130,7 @@ function (
             this._updated.html('Updating...') ;
 
             Fwk.web_service_GET (
-                '../portal/ws/SearchFiles.php' ,
+                '../portal/ws/filemgr_files_search.php' ,
                 {exper_id: this.experiment.id} ,
                 function (data) {
 

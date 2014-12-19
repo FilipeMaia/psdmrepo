@@ -188,8 +188,13 @@ try {
 
 <link rel="icon" href="../webfwk/img/Portal_favicon.ico"/>
 
-<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+<!--The old-style Table is still required to display experiment status (CSS only),
+    group management table (CSS only), and Run Tables for 'Detectors' and 'Calibratons'.
+    The later two require the old Table class.
 
+    TODO: migrate them all to the SimpleTable widget.-->
+
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <script type="text/javascript">

@@ -322,7 +322,7 @@ function (
             button.button('disable') ;
 
             Fwk.web_service_GET (
-                '../portal/ws/MoveFiles.php' ,
+                '../portal/ws/filemgr_files_move.php' ,
                 {   exper_id: this.experiment.id ,
                     runnum  : runnum ,
                     type    : type ,
@@ -769,7 +769,7 @@ function (
             this._updated.html('Updating...') ;
 
             Fwk.web_service_GET (
-                '../portal/ws/SearchFiles.php' ,
+                '../portal/ws/filemgr_files_search.php' ,
                 params ,
                 function (data) {
 
