@@ -139,7 +139,7 @@ function (
 
         this._manufacturer = null ;
 
-        this._can_manage = function () { return this._app_config.current_user.is_administrator ; } ;
+        this._can_manage = function () { return this._app_config.current_user.has_dict_priv ; } ;
 
         this._wa = function (html) {
             if (!this._wa_elem) {
