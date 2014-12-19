@@ -17,7 +17,7 @@ function (
 
         var _that = this ;
 
-        var GB = 1024 * 1024 * 1024;
+        var TB = 1024 * 1024 * 1024;
 
         var _LOAD_INTERVAL = [
             {name: 'day',   sec:     24*3600} ,
@@ -201,8 +201,8 @@ function (
                 var rows = [] ;
                 var hdr = [
                     {   name: 'time'} ,
-                    {   name: 'used [GB]',      type: SimpleTable.Types.Number, sorted: false, align: "right"} ,
-                    {   name: 'available [GB]', type: SimpleTable.Types.Number, sorted: false, align: "right"} ,
+                    {   name: 'used [TB]',      type: SimpleTable.Types.Number, sorted: false, align: "right"} ,
+                    {   name: 'available [TB]', type: SimpleTable.Types.Number, sorted: false, align: "right"} ,
                     {   name: 'available [%]',  type: SimpleTable.Types.Number, sorted: false, align: "right"}
                 ] ;
                 var rows = [] ;
@@ -243,7 +243,7 @@ function (
                         margin:    [50, 20, 70, 40] ,
                     } ,
                     title: {
-                        text: '<b>Available [%]</b>'
+                        text: '<b>Used [%]</b>'
                     } ,
                     xAxis: {
                         type: 'datetime' ,
@@ -413,9 +413,9 @@ function (
             for (var i in fs.stats) {
                 var s = fs.stats[i] ;
                 rows.push([
-                    '<span style="font-weight:normal;" >'+s.insert_time.day+'</span>&nbsp;&nbsp;'+s.insert_time.hms ,
-                    Math.floor(s.used / GB) ,
-                    Math.floor(s.available / GB) ,
+                    s.insert_time.day+'&nbsp;&nbsp;&nbsp;&nbsp;<span style="font-weight:normal;" >'+s.insert_time.hms+'</span>' ,
+                    Math.floor(s.used / TB) ,
+                    Math.floor(s.available / TB) ,
                     Math.floor((s.available / (s.used + s.available)) * 100.)
                 ]) ;
             }
@@ -432,7 +432,7 @@ function (
                 var t_msec = s.insert_time.sec * 1000 ;
                 data.push ([
                     t_msec ,
-                    Math.floor((s.available / (s.used + s.available)) * 100.)
+                    Math.floor((s.used / (s.used + s.available)) * 100.)
                 ]) ;
             }
             series.setData(data, false) ;   // do the bulk redraw later

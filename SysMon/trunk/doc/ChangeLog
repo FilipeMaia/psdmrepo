@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-01-11
+2014-12-19 Igor Gaponenko
+- JIRA tickets: PSDH-12, PSDH-14, PSDH-17
+- full implementation of the disk space monitoring
+- fixed bugs in the data mover monitoring Web UI
+
+Tag: V00-01-11
 2014-12-08 Igor Gaponenko
 - saving results of the ongoing development of the Web application
 

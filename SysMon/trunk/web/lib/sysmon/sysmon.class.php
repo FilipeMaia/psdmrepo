@@ -443,6 +443,28 @@ class SysMon extends DbConnection {
         }
         return $list ;
     }
+    public function fs_mon_summary () {
+        $list = array () ;
+        foreach ($this->fs_mon_def() as $fs) {
+            $fs_id = intval($fs['id']) ;
+            $sql = "SELECT used, available FROM {$this->database}.fs_mon_stat WHERE fs_id={$fs_id} ORDER BY insert_time DESC LIMIT 1" ;
+            $result = $this->query($sql) ;
+            $nrows = mysql_numrows($result) ;
+            if ($nrows == 0) return null ;
+            if ($nrows != 1) throw new SysMonException (
+                __class__.'::'.__METHOD__ ,
+                'inconsistent result returned from the database. Wrong schema?') ;
+            $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
+            array_push($list, array (
+                'id'        => intval($fs['id']) ,
+                'group'     =>        $fs['group'] ,
+                'name'      =>        $fs['name'] ,
+                'used'      => intval($attr['used']) ,
+                'available' => intval($attr['available'])
+            )) ;
+        }
+        return $list ;
+    }
 }
 
 ?>
