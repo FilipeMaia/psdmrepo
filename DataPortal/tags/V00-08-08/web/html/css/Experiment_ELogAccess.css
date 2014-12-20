@@ -1,0 +1,31 @@
+#exp-elog {
+  padding: 10px 20px 10px 20px;
+}
+
+#exp-elog > #body {
+  margin-top: 20px;
+}
+
+#exp-elog .info {
+  color: maroon;
+}
+#exp-elog #operator > h2 {
+  margin-top: 5px;
+}
+#exp-elog #operator > div {
+  padding-left: 10px;
+  max-width: 640px;
+}
+#exp-elog #operator span.large {
+  font-size: 16px;
+  font-weight: bold;
+}
+#exp-elog #operator #access {
+  margin-top: 10px;
+  margin-left: 15px;
+  margin-bottom: 15px;
+}
+#exp-elog #operator #access button {
+  font-size: 11px;
+  color: black;
+}

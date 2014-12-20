@@ -1,0 +1,11 @@
+#elog-post {
+  padding:      20px;
+}
+
+#elog-post #extra_options {
+  margin-top:   10px;
+}
+
+#elog-post .info {
+  color:        maroon;
+}
