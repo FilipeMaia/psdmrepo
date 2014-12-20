@@ -379,7 +379,7 @@ function (
             button.button('disable') ;
 
             Fwk.web_service_GET (
-                '../portal/ws/RestoreFiles.php',
+                '../portal/ws/filemgr_files_restore.php',
                 {   exper_id : this.experiment.id ,
                     runnum   : runnum ,
                     type     : type ,
@@ -454,7 +454,7 @@ function (
             button.button('disable') ;
 
             Fwk.web_service_GET (
-                '../portal/ws/DeleteFiles.php',
+                '../portal/ws/filemgr_files_delete.php',
                 {   exper_id : this.experiment.id ,
                     runnum   : runnum ,
                     type     : type ,

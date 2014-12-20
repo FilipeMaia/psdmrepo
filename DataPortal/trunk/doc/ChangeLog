@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-08
+2014-12-19 Igor Gaponenko
+- finished refactoring Web services as per JIRA ticket PSDH-20
+
 Tag: V00-08-07
 2014-12-19 Igor Gaponenko
 - refactoring Web services as per JIRA ticket PSDH-20

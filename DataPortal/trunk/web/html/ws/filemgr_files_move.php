@@ -14,37 +14,37 @@
  * When finished the script will return the amount of the MEDIUM-TERM storage
  * space which is available to teh experiment.
  */
-
 require_once 'dataportal/dataportal.inc.php' ;
-require_once 'lusitime/lusitime.inc.php' ;
-
-use LusiTime\LusiTime;
 
 define ('BYTES_IN_GB', 1024.0 * 1024.0 * 1024.0) ;
 
 function handler ($SVC) {
     
-    $KNOWN_TYPES = array('xtc', 'hdf5') ;
+    $exper_id = $SVC->required_int('exper_id') ;
+    $runnum   = $SVC->required_int('runnum') ;
 
-    // -------------------------------------
-    // Parse input parameters of the request
-    // -------------------------------------
-    
-    $exper_id = $SVC->required_int  ('exper_id') ;
-    $runnum   = $SVC->required_int  ('runnum') ;
+    $type = $SVC->required_enum (
+        'type' ,
+         array('xtc', 'hdf5') ,
+         array('ignore_case' => true ,      // when comparing parameters
+               'convert'     => 'tolower'   // before storing elements in the result list
+         )) ;
 
-    $type     = $SVC->required_enum ('type', array('xtc', 'hdf5') ,
-                                             array('ignore_case' => true ,          // when comparing parameters
-                                                   'convert'     => 'tolower'       // before storing elements in the result list
-                                             )) ;
+    $storage = $SVC->required_enum (
+        'storage' ,
+        array('SHORT-TERM', 'MEDIUM-TERM') ,
+        array('ignore_case' => true ,       // when comparing parameters
+              'convert'     => 'toupper'    // before storing elements in the result list
+        )) ;
 
-    $storage  = $SVC->required_enum ('storage', array('SHORT-TERM', 'MEDIUM-TERM') ,
-                                                array('ignore_case' => true ,       // when comparing parameters
-                                                      'convert'     => 'toupper'    // before storing elements in the result list
-                                                )) ;
+    $experiment = $SVC->safe_assign (
+        $SVC->logbook()->find_experiment_by_id($exper_id) ,
+        "no experiment found for id={$exper_id}" );
 
-    $experiment = $SVC->safe_assign ($SVC->logbook()->find_experiment_by_id($exper_id) ,
-                                     "no experiment found for id={$exper_id}" );
+    $SVC->assert (
+            $SVC->logbookauth()->canEditMessages($experiment->id()) ||
+            $SVC->authdb()->hasPrivilege($SVC->authdb()->authName(), null, 'StoragePolicyMgr', 'edit') ,
+            "you don't possess sufficient privileges for this operation") ;
 
     /* ATTENTION: This test is temporary disabled to allow moving files
      *            adopted from other experiments.
@@ -85,8 +85,8 @@ function handler ($SVC) {
         }
     }
 
-    // Move the files to their destinatin storage.
-    //
+    // Move the files to their destination storage.
+
     switch( $storage ) {
 
         case 'SHORT-TERM' :
