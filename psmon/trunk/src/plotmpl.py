@@ -96,9 +96,14 @@ class PlotClient(object):
         if self.info.yrange is not None:
             self.ax.set_ylim(self.info.yrange)
 
-    def set_aspect(self):
-        if self.info.aspect is not None:
-            self.ax.set_aspect(self.info.aspect)
+    def set_aspect(self, lock, ratio):
+        if ratio is None:
+            ratio=self.info.aspect
+        if lock:
+            if ratio is not None:
+                self.ax.set_aspect(ratio)
+        else:
+            self.ax.set_aspect('auto')
 
     def set_ax_col(self, ax):
         if self.info.fore_col is not None:
@@ -181,7 +186,7 @@ class ImageClient(PlotClient):
         self.im.set_clim(self.info.zrange)
         self.cb = self.figure.colorbar(self.im, ax=self.ax)
         self.set_cb_col()
-        self.set_aspect()
+        self.set_aspect(init_im.aspect_lock, init_im.aspect_ratio)
         self.set_xy_ranges()
 
     def update_sub(self, data):

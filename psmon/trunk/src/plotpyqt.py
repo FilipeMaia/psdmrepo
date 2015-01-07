@@ -129,15 +129,24 @@ class PlotClient(object):
         if axis_title is not None:
             self.plot_view.setLabel(axis_name, text=axis_title, units=axis_units, unitPrefix=axis_unit_prefix)
 
-    def set_aspect(self):
+    def set_aspect(self, ratio):
         """
         Set the ascept ratio of the viewbox of the plot/image to the specified ratio.
+
+        If no ratio is passed it uses the client side default.
 
         Note: this is disabled if explicit x/y ranges are set for view box since the
         two options fight each other.
         """
+        if ratio is None:
+            ratio=self.info.aspect
+
+        # Since the images are technically transposed this is needed for the ratio to work the same as mpl
+        if ratio is not None:
+            ratio = 1.0 / ratio
+
         if self.info.xrange is None and self.info.yrange is None:
-            self.plot_view.getViewBox().setAspectLocked(lock=True, ratio=self.info.aspect)
+            self.plot_view.getViewBox().setAspectLocked(lock=True, ratio=ratio)
 
     def set_xy_ranges(self):
         if self.info.xrange is not None:
@@ -166,8 +175,8 @@ class PlotClient(object):
 class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
-        if init_im.aspect is None:
-            self.set_aspect()
+        if init_im.aspect_lock:
+            self.set_aspect(init_im.aspect_ratio)
         self.set_grid_lines(False)
         self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)

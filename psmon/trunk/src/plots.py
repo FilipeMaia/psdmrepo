@@ -83,10 +83,11 @@ class Image(Plot):
     A data container for image data for the psmon client
     """
 
-    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect=None):
+    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect_ratio=None, aspect_lock=True):
         super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
-        self.aspect = aspect
+        self.aspect_ratio = aspect_ratio
+        self.aspect_lock = aspect_lock
 
     @property
     def valid(self):
