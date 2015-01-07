@@ -814,7 +814,7 @@ def get_image_array_from_file(fname, dtype=np.float32) :
         img_arr = cspadimg.get_cspad_raw_data_array_image(arr)
 
     elif arr.size == 185*388*2 : # CSPAD2x2
-        arr.shape = (185,388,2) 
+        #arr.shape = (185,388,2) 
         img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(arr)
 
     elif arr.ndim == 2 : # Use it as any camera 2d image
