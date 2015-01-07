@@ -48,7 +48,7 @@ public:
   const static size_t   Rows = 704; 
   const static size_t   Cols = 768; 
   const static size_t   Size = Rows*Cols; 
-  const static size_t   SizeCM = 7; 
+  const static size_t   SizeCM = 16; 
 
   const shape_t* shape_base() { return &m_shape[0]; }
   const cmod_t*  cmod_base()  { return &m_cmod[0]; }
@@ -60,7 +60,8 @@ protected:
 
   Epix100aBaseV1 (){ 
     shape_t shape[Ndim]={Rows,Cols};            
-    cmod_t cmod[SizeCM]={1,50,50,100,1,Size,1}; // use algorithm 1 to entire image
+    cmod_t cmod[SizeCM]={4,1,20,0, 0,0,0,0, 0,0,0,0, 0,0,0,0}; 
+    // 4-Epix100a, 1-median for 16 352x96 banks, 20-maximal allowed correction
     std::memcpy(m_shape, &shape[0], sizeof(shape_t)*Ndim);
     std::memcpy(m_cmod,  &cmod[0],  sizeof(cmod_t)*SizeCM);
   };

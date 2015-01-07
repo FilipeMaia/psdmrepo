@@ -48,7 +48,7 @@ public:
   const static size_t   Rows = 0;         // FOR VARIABLE SHAPE DATA PARAMETERS WILL BE TAKEN FROM FILE METADATA
   const static size_t   Cols = 0;         // FOR VARIABLE SHAPE DATA PARAMETERS WILL BE TAKEN FROM FILE METADATA 
   const static size_t   Size = Rows*Cols; // FOR VARIABLE SHAPE DATA PARAMETERS WILL BE TAKEN FROM FILE METADATA 
-  const static size_t   SizeCM = 7; 
+  const static size_t   SizeCM = 16; 
 
   const shape_t* shape_base() { return &m_shape[0]; }
   const cmod_t*  cmod_base()  { return &m_cmod[0]; }
@@ -60,7 +60,7 @@ protected:
 
   VarShapeCameraBaseV1 (){ 
     shape_t shape[Ndim]={Rows,Cols};            
-    cmod_t cmod[SizeCM]={1,50,50,100,1,Size,1}; // use algorithm 1 to entire image
+    cmod_t cmod[SizeCM]={1,50,50,100, 1,Size,1,0, 0,0,0,0, 0,0,0,0}; // use algorithm 1 to entire image
     std::memcpy(m_shape, &shape[0], sizeof(shape_t)*Ndim);
     std::memcpy(m_cmod,  &cmod[0],  sizeof(cmod_t)*SizeCM);
   };

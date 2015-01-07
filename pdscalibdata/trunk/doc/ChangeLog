@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-25
+2015-01-06 Mikhail S. Dubrovin	
+- NDArrIOV1.cpp - add instatiation of templates for int16_t, uint8_t
+- include/VarShapeCameraBaseV1.h, Epix100aBaseV1.h - extend cmod initialization for 16 elements
+
 Tag: V00-05-24
 2014-11-15 Mikhail S. Dubrovin	
 - In all *BaseV*.h classes add method size_base() in order to resolve compilation with dbg problem (PSAS-67)

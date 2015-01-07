@@ -18,8 +18,9 @@
 #include <stdexcept>
 #include <fstream>
 #include <sstream>   // for stringstream
-#include <stdlib.h> // for atoi
-#include <cstring>  // for memcpy
+#include <stdlib.h>  // for atoi
+#include <cstring>   // for memcpy
+#include <stdint.h>  // uint8_t, uint32_t, etc.
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -468,30 +469,40 @@ template class pdscalibdata::NDArrIOV1<unsigned,1>;
 template class pdscalibdata::NDArrIOV1<unsigned short,1>; 
 template class pdscalibdata::NDArrIOV1<float,1>; 
 template class pdscalibdata::NDArrIOV1<double,1>; 
+template class pdscalibdata::NDArrIOV1<int16_t,1>; 
+template class pdscalibdata::NDArrIOV1<uint8_t,1>; 
 
 template class pdscalibdata::NDArrIOV1<int,2>; 
 template class pdscalibdata::NDArrIOV1<unsigned,2>; 
 template class pdscalibdata::NDArrIOV1<unsigned short,2>; 
 template class pdscalibdata::NDArrIOV1<float,2>; 
 template class pdscalibdata::NDArrIOV1<double,2>; 
+template class pdscalibdata::NDArrIOV1<int16_t,2>; 
+template class pdscalibdata::NDArrIOV1<uint8_t,2>; 
 
 template class pdscalibdata::NDArrIOV1<int,3>; 
 template class pdscalibdata::NDArrIOV1<unsigned,3>; 
 template class pdscalibdata::NDArrIOV1<unsigned short,3>; 
 template class pdscalibdata::NDArrIOV1<float,3>; 
 template class pdscalibdata::NDArrIOV1<double,3>; 
+template class pdscalibdata::NDArrIOV1<int16_t,3>; 
+template class pdscalibdata::NDArrIOV1<uint8_t,3>; 
 
 template class pdscalibdata::NDArrIOV1<int,4>; 
 template class pdscalibdata::NDArrIOV1<unsigned,4>; 
 template class pdscalibdata::NDArrIOV1<unsigned short,4>; 
 template class pdscalibdata::NDArrIOV1<float,4>; 
 template class pdscalibdata::NDArrIOV1<double,4>; 
+template class pdscalibdata::NDArrIOV1<int16_t,4>; 
+template class pdscalibdata::NDArrIOV1<uint8_t,4>; 
 
 template class pdscalibdata::NDArrIOV1<int,5>; 
 template class pdscalibdata::NDArrIOV1<unsigned,5>; 
 template class pdscalibdata::NDArrIOV1<unsigned short,5>; 
 template class pdscalibdata::NDArrIOV1<float,5>; 
 template class pdscalibdata::NDArrIOV1<double,5>; 
+template class pdscalibdata::NDArrIOV1<int16_t,5>; 
+template class pdscalibdata::NDArrIOV1<uint8_t,5>; 
 
 //-----------------------------
 //-----------------------------
