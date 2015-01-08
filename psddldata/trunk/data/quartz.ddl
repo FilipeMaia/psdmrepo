@@ -98,6 +98,8 @@
     uint8_t _bf_lookup:1 -> output_lookup_table_enabled;	/* apply output lookup table corrections */
     uint8_t _bf_corr:1 -> defect_pixel_correction_enabled;	/* correct defective pixels internally */
     uint8_t _use_roi:1 -> use_hardware_roi;     /* enable hardware region of interest */
+    uint8_t _use_test_pattern:1 -> use_test_pattern;     /* enable the test pattern */
+    uint8_t _max_taps:4 -> max_taps;            /* maximum taps in output driver */
   }
 
   /* hardware ROI begin */

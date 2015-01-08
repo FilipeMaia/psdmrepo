@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-23
+2015-01-08 Matt Weaver
+- quartz.ddl: add taps,testpattern to ConfigV2 
+- epix.ddl: comment out EpixSConfigV1 (devel) from EpixData [config] list	
+
 Tag V01-00-22
 2014-11-25 David Schneider
 - bld.ddl: restoring pv names to documentation - see JIRA Issue PSAS-73
