@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-42
+2015-01-08 David Schneider
+- add library code and unit test for live mode test. 
+- tests data with s80 stream to merge.
+- added multifile/test_009 test files - modified shrunken down xtc files for test
+- Track JIRA issue PSAS-4
+
 Tag: V00-00-41
 2014-11-25 David Schneider
 - regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 

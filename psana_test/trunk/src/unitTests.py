@@ -13,11 +13,16 @@ import os
 import tempfile
 import unittest
 import subprocess as sb
-from psana_test import epicsPvToStr
-import psana_test.psanaTestLib as ptl
 import psana
 import pickle
+import shutil
 import numpy as np
+from psana_test import epicsPvToStr
+import psana_test.psanaTestLib as ptl
+import psana_test.liveModeSimLib as liveModeLib
+
+from AppUtils.AppDataPath import AppDataPath
+import multiprocessing
 
 DATADIR = ptl.getTestDataDir()
 OUTDIR = "data/psana_test"
@@ -650,5 +655,142 @@ class Psana( unittest.TestCase ) :
         testStr = evt.get(str,'testkey')
         self.assertEqual(testStr,'testing string', msg="testStr does not have expected value")
 
+    def testLiveMode(self):
+        '''Test that live mode works works. In particular, we are concerned about 
+        merging with control streams. Tests:
+
+          delay s80, then it catches up with the DAQ streams
+          delay DAQ streams, then they catch up with s80
+
+        This test uses some reduced xtc files produced with the current version of Tomy's small xtc data
+        tool. This tool will change, and psana will change to understand proxy types, so we may need to
+        recreate the files and rewrite the test at that point.
+
+        Each xtc test file is about 500kb.
+        '''
+        expname = 'amob5114'
+        run = 477
+
+        srcDir = os.path.join(ptl.getMultiFileDataDir(), 'test_009_%s' % expname)
+        assert os.path.exists(srcDir), "srcDir=%s doesn't exist" % srcDir
+
+        destDirBase = AppDataPath(os.path.join("psana_test",'liveModeSim')).path()
+        assert len(destDirBase)>0, "did not find liveModeSim base dir in the psana_test data dir"
+
+        # make a random directory for the testing that we will remove when done
+        destDir = tempfile.mkdtemp(dir=destDirBase)
+
+        offlineStdoutFilename = os.path.join(destDir, 'offline_DumpDgram.stdout')
+        offlineStderrFilename = os.path.join(destDir, 'offline_DumpDgram.stderr')
+
+        offlineCmd = 'psana -m psana_examples.DumpDgram '
+        offlineCmd += 'exp=%s:run=%d:dir=%s' % (expname, run, srcDir)
+        offlineCmd += ' >%s 2>%s' %(offlineStdoutFilename, offlineStderrFilename)
+        
+        # get ground truth for what we should see:
+        os.system(offlineCmd)
+        
+        # make sure no errors
+        offlineStderr = file(offlineStderrFilename,'r').read().strip()
+        self.assertEqual(offlineStderr,'',msg="There were errors in offline cmd=%s\nstderr=\n%s" % (offlineCmd, offlineStderr))
+
+        # below is the md5sum of what we expect above
+        md5sum_offline_mode = '8cc65ac5deeafaeb0316a5e841d9d414'
+        new_md5sum_offline = ptl.get_md5sum(offlineStdoutFilename)
+        self.assertEqual(md5sum_offline_mode, new_md5sum_offline, 
+                         msg="output of DumpDgram has changed. Check output of cmd=%s, edit test with new md5sum if neccessary" % offlineCmd)
+
+        ##### - helper function to do live mode comparison - #######
+        def testLiveModeHelper(self, testlabel, srcDir, destDir, run, md5sum_offline_mode, daqInitialDelay, s80InitialDelay,
+                               mbPerWrites, daqDelayBetweenWrites, s80DelayBetweenWrites, offlineStdoutFile):
+
+            # create string arguments for routine
+            initialDelays = '0-12:%.2f,80:%.2f' % (daqInitialDelay, s80InitialDelay)
+            mb_per_writes='0-255:%.2f' % mbPerWrites
+            delays_between_writes='0-12:%.2f,80:%.2f' % (daqDelayBetweenWrites, s80DelayBetweenWrites)
+
+            liveModeArgs = ['.inprogress',
+                            run,
+                            srcDir, 
+                            destDir, 
+                            initialDelays, 
+                            mb_per_writes, 
+                            '0-255:-1',  # read everything
+                            delays_between_writes,
+                            True,   # force overwrite
+                            False]  # verbose, set this to True when debugging to see how files written
+            liveModeProcess = multiprocessing.Process(target=liveModeLib.simLiveMode, args=liveModeArgs)
+        
+            dumpStdOutFile = os.path.join(destDir, "livemode-%s.stdout" % testlabel)
+            dumpStdErrFile = os.path.join(destDir, "livemode-%s.stderr" % testlabel)
+            assert not os.path.exists(dumpStdOutFile), "unexpected, dump file exists in new random dir. filename=%s" % dumpStdOutFile
+            assert not os.path.exists(dumpStdErrFile), "unexpected, dump file exists in new random dir. filename=%s" % dumpStdErrFile
+
+            dumpCmd = "psana -m psana_examples.DumpDgram exp=amob5114:run=%d:dir=%s:live" % (run, destDir)
+            dumpCmd += " > %s 2> %s" % (dumpStdOutFile, dumpStdErrFile)
+
+            liveModeProcess.start()
+            os.system(dumpCmd)
+            liveModeProcess.join()
+        
+            # we're done. Check for unexpected error output:
+
+            liveDumpStderr = file(dumpStdErrFile,'r').read().strip()
+            self.assertEqual(liveDumpStderr, '', msg="%s: There were errors in the live mode DumpDgram\ncmd=%s" % (testlabel, dumpCmd))
+
+            # The only difference between the DumpDgram output on
+            # live mode should be mention of the .inprogress files. If we subsititute that
+            # back, it should look just like the offline output. We want to check that a lot
+            # of datagrams show up from the inprogress files:
+        
+            seeInProgressCmd = '''grep '.xtc.inprogress' %s | wc''' % dumpStdOutFile
+            inProgressStdout, inProgressStderr = ptl.cmdTimeOut(seeInProgressCmd)
+            numberLines = int(inProgressStdout.split()[0])
+            expected = 10
+            self.assertGreaterEqual(numberLines, expected, 
+                                    msg="expected at least %d lines with .xtc.inprogress in DumpDamage output, but only found %d\ngrep cmd was:\n%s" % (expected, numberLines, seeInProgressCmd))
+
+            # replace .xtc.inprogress with .xtc so we can compare output
+            replacedStdOutFile = os.path.join(destDir, "livemode-%s-sub-inprogress.stdout" % testlabel)
+            cmd = '''sed 's/\.xtc\.inprogress/\.xtc/' %s >%s''' % (dumpStdOutFile, replacedStdOutFile)
+            os.system(cmd)
+            md5replaced = ptl.get_md5sum(replacedStdOutFile)
+            self.assertEqual(md5replaced, md5sum_offline_mode, 
+                             msg="md5 of DumpDgram output with .xtc.inprogress replaced with .xtc is not equal to offline result.\n sed replace cmd:\n%s\n Compare files:\nlive mode=%s\noffline=%s" % \
+                             (cmd, replacedStdOutFile, offlineStdoutFile))
+        ##### -- end helper function -- ###
+
+        # a test where we delay s80 and then it catches up
+        testLiveModeHelper(self,
+                           'delay_s80_then_catchup',
+                           srcDir, destDir, run,
+                           md5sum_offline_mode, 
+                           daqInitialDelay = 0.3,
+                           s80InitialDelay = 1.2,
+                           mbPerWrites = .05,
+                           daqDelayBetweenWrites=.1,
+                           s80DelayBetweenWrites=.06,
+                           offlineStdoutFile=offlineStdoutFilename)
+
+        os.system('rm %s' % os.path.join(destDir, '*.xtc'))
+
+        # a test where we delay the DAQ and then it catches up
+        testLiveModeHelper(self,
+                           'delay_DAQ_then_catchup',
+                           srcDir, destDir, run,
+                           md5sum_offline_mode, 
+                           daqInitialDelay = 1.2,
+                           s80InitialDelay = .3,
+                           mbPerWrites = .05,
+                           daqDelayBetweenWrites=.06,
+                           s80DelayBetweenWrites=.1,
+                           offlineStdoutFile=offlineStdoutFilename)
+
+        # now that we've finished and tests have passed, remove the temp directory under data/psana_test/liveModeSim
+        shutil.rmtree(destDir)
+        
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
+
+#live mode=/reg/neh/home/davidsch/rel/liveMode/data/psana_test/liveModeSim/tmpq_1lty/livemode-delay_s80_then_catchup-sub-inprogress.stdout
+# offline=/reg/neh/home/davidsch/rel/liveMode/data/psana_test/liveModeSim/tmpq_1lty/offline_DumpDgram.stdout
