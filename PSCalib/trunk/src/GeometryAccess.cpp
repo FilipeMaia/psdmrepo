@@ -291,14 +291,15 @@ GeometryAccess::get_pixel_coords( const double*& X,
                                   const double*& Z, 
 				  unsigned& size,
                                   const std::string& oname, 
-                                  const unsigned& oindex)
+                                  const unsigned& oindex,
+                                  const bool do_tilt)
 {
   GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
   if(m_pbits & 32) {
     std::string msg = "get_pixel_coords(...) for geo:\n" + geo -> string_geo_children();
     MsgLog(name(), info, msg);
   }
-  geo -> get_pixel_coords(X, Y, Z, size);
+  geo -> get_pixel_coords(X, Y, Z, size, do_tilt);
 }
 
 //-------------------
@@ -448,7 +449,8 @@ GeometryAccess::print_pixel_coords( const std::string& oname,
   const double* Y;
   const double* Z;
   unsigned   size;
-  get_pixel_coords(X,Y,Z,size,oname,oindex);
+  const bool do_tilt=true;
+  get_pixel_coords(X,Y,Z,size,oname,oindex,do_tilt);
 
   std::stringstream ss; ss << "print_pixel_coords():\n"
 			   << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
@@ -469,13 +471,14 @@ GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX,
                                          const std::string& oname, 
 					 const unsigned& oindex, 
                                          const double& pix_scale_size_um, 
-                                         const int* xy0_off_pix )
+                                         const int* xy0_off_pix,
+                                         const bool do_tilt )
 {
   const double* X;
   const double* Y;
   const double* Z;
 
-  get_pixel_coords(X,Y,Z,size,oname,oindex);
+  get_pixel_coords(X,Y,Z,size,oname,oindex,do_tilt);
   
   double pix_size = (pix_scale_size_um) ? pix_scale_size_um : get_pixel_scale_size(oname, oindex);
 

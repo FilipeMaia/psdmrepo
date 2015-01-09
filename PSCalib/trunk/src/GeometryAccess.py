@@ -10,7 +10,7 @@ Usage::
     geometry = GeometryAccess(fname_geometry, 0377)
 
     # get pixel coordinate [um] arrays
-    X, Y, Z = geometry.get_pixel_coords(oname=None, oindex=0)
+    X, Y, Z = geometry.get_pixel_coords(oname=None, oindex=0, do_tilt=True)
 
     # get pixel area array; A=1 for regular pixels, =2.5 for wide.
     area = geometry.get_pixel_areas(oname=None, oindex=0)
@@ -20,10 +20,10 @@ Usage::
     mask = geometry.get_pixel_mask(oname=None, oindex=0, mbits=0377)
 
     # get index arrays for entire CSPAD
-    iX, iY = geometry.get_pixel_coord_indexes()
+    iX, iY = geometry.get_pixel_coord_indexes(do_tilt=True)
 
     # get index arrays for specified quad with offset
-    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=(1000,1000))
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=(1000,1000), do_tilt=True)
 
     # get 2-d image from index arrays
     img = img_from_pixel_arrays(iX,iY,W=arr)
@@ -246,7 +246,7 @@ class GeometryAccess :
     
     #------------------------------
 
-    def get_pixel_coords(self, oname=None, oindex=0) :
+    def get_pixel_coords(self, oname=None, oindex=0, do_tilt=True) :
         """Returns three pixel X,Y,Z coordinate arrays for top or specified geometry object 
         """
         geo = self.get_top_geo() if oname is None else self.get_geo(oname, oindex)
@@ -254,7 +254,7 @@ class GeometryAccess :
             print 'get_pixel_coords(...) for geo:',
             geo.print_geo_children();
         
-        return geo.get_pixel_coords() 
+        return geo.get_pixel_coords(do_tilt) 
 
     #------------------------------
 
@@ -342,7 +342,7 @@ class GeometryAccess :
     def print_pixel_coords(self, oname=None, oindex=0) :
         """Partial print of pixel coordinate X,Y,Z arrays for selected or top(by default) geo
         """
-        X, Y, Z = self.get_pixel_coords(oname, oindex)
+        X, Y, Z = self.get_pixel_coords(oname, oindex, do_tilt=True)
 
         print 'size=', X.size
         print 'X: %s...'% ', '.join(['%10.1f'%v for v in X.flatten()[0:9]])
@@ -351,10 +351,10 @@ class GeometryAccess :
 
     #------------------------------
 
-    def get_pixel_coord_indexes(self, oname=None, oindex=0, pix_scale_size_um=None, xy0_off_pix=None) :
+    def get_pixel_coord_indexes(self, oname=None, oindex=0, pix_scale_size_um=None, xy0_off_pix=None, do_tilt=True) :
         """Returns three pixel X,Y,Z coordinate index arrays for top or specified geometry object 
         """
-        X, Y, Z = self.get_pixel_coords(oname, oindex)
+        X, Y, Z = self.get_pixel_coords(oname, oindex, do_tilt)
 
         pix_size = self.get_pixel_scale_size() if pix_scale_size_um is None else pix_scale_size_um
         pix_half = pix_size/2
@@ -486,7 +486,7 @@ def test_access(geometry) :
     geo.print_geo_children()
 
     t0_sec = time()
-    X,Y,Z = geo.get_pixel_coords()
+    X,Y,Z = geo.get_pixel_coords(do_tilt=True)
     #X,Y = geo.get_2d_pixel_coords()
     print 'X:\n', X
     print 'Consumed time to get 3d pixel coordinates = %7.3f sec' % (time()-t0_sec)
@@ -526,7 +526,7 @@ def test_plot_quad(geometry) :
     """ Tests geometry acess methods of the class GeometryAccess object for CSPAD quad
     """
     ## get index arrays
-    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None)
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None, do_tilt=True)
 
     # get intensity array
     arr = tig.cspad_nparr(n2x1=iX.shape[0])
@@ -546,7 +546,7 @@ def test_mask_quad(geometry) :
     """ Tests geometry acess methods of the class GeometryAccess object for CSPAD quad
     """
     ## get index arrays
-    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None)
+    iX, iY = geometry.get_pixel_coord_indexes('QUAD:V1', 1, pix_scale_size_um=None, xy0_off_pix=None, do_tilt=True)
 
     # get intensity array
     arr = geometry.get_pixel_mask('QUAD:V1', 1, 1+2+4+8)
@@ -573,7 +573,7 @@ def test_plot_cspad(geometry, fname_data, amp_range=(0,0.5)) :
     # get pixel coordinate index arrays:
     xyc = xc, yc = 1000, 1000
     #iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=None)
-    iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=xyc)
+    iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=xyc, do_tilt=True)
 
     root, ext = os.path.splitext(fname_data)
     arr = np.load(fname_data) if ext == '.npy' else np.loadtxt(fname_data, dtype=np.float) 
@@ -640,7 +640,7 @@ def test_cspad2x2() :
     #xyc = xc, yc = 1000, 1000
     #iX, iY = geometry.get_pixel_coord_indexes(xy0_off_pix=xyc)
 
-    iX, iY = geometry.get_pixel_coord_indexes()
+    iX, iY = geometry.get_pixel_coord_indexes(do_tilt=True)
 
     root, ext = os.path.splitext(fname_data)
     arr = np.load(fname_data) if ext == '.npy' else np.loadtxt(fname_data, dtype=np.float) 
@@ -658,7 +658,6 @@ def test_cspad2x2() :
 def test_epix100a() :
     """ Test test_epix100a geometry table
     """
-    ## MecTargetChamber.0:Cspad2x2.1 
     basedir = '/reg/neh/home1/dubrovin/LCLS/GeometryCalib/calib-xpp-Epix100a-2014-11-05/'    
     fname_geometry = basedir + 'calib/Epix100a::CalibV1/NoDetector.0:Epix100a.0/geometry/0-end.data'
     fname_data     = basedir + 'epix100a-ndarr-ave-clb-xppi0614-r0073.dat'    
@@ -697,6 +696,7 @@ if __name__ == "__main__" :
     #fname_geometry = basedir + 'calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     #fname_geometry = '/reg/d/psdm/cxi/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
     fname_geometry = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+    #fname_geometry = '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/koglin-geometry-0-end.data'
     amp_range = (0,500)
 
     ## XPP

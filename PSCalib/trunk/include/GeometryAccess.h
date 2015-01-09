@@ -79,11 +79,12 @@ namespace PSCalib {
  *        const double* Y;
  *        const double* Z;
  *        unsigned   size;
+ *        bool do_tilt=true;
  *        geometry.get_pixel_coords(X,Y,Z,size);
  *        cout << "size=" << size << '\n' << std::fixed << std::setprecision(1);  
  *        cout << "X: "; for(unsigned i=0; i<10; ++i) cout << std::setw(10) << X[i] << ", "; cout << "...\n"; 
  *        // or get coordinate arrays for specified geometry object:
- *        geometry.get_pixel_coords(X,Y,Z,size, "QUAD:V1", 1);
+ *        geometry.get_pixel_coords(X,Y,Z,size, "QUAD:V1", 1, do_tilt);
  *        // then use X, Y, Z, size
  *    
  *    // Access pixel areas:
@@ -113,7 +114,7 @@ namespace PSCalib {
  *        const int xy0_off_pix[] = {200,200};
  *        
  *        // this call returns index arrays iX, iY of size=isize for QUAD with offset 
- *        geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix);
+ *        geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix, do_tilt);
  *        
  *        // this call returns index arrays for entire detector with auto generated minimal offset
  *        geometry.get_pixel_coord_indexes(iX, iY, isize);
@@ -194,13 +195,15 @@ public:
    *  @param[out] size - size of the pixel coordinate array (number of pixels)
    *  @param[in]  oname - object name
    *  @param[in]  oindex - object index
+   *  @param[in]  do_tilt - on/off tilt angle correction
    */
   void  get_pixel_coords(const double*& X, 
                          const double*& Y, 
                          const double*& Z, 
                          unsigned& size,
 			 const std::string& oname = std::string(), 
-			 const unsigned& oindex = 0);
+			 const unsigned& oindex = 0,
+                         const bool do_tilt=true);
 
   /// Returns pixel areas array A, of size for specified geometry object 
   /**
@@ -265,6 +268,7 @@ public:
    *  @param[in]  oindex - object index (default = 0)
    *  @param[in]  pix_scale_size_um - ex.: 109.92 (default - search for the first segment pixel size)
    *  @param[in]  xy0_off_pix - array containing X and Y coordinates of the offset (default - use xmin, ymin)
+   *  @param[in]  do_tilt - on/off tilt angle correction
    */
   void get_pixel_coord_indexes( const unsigned *& iX, 
                                 const unsigned *& iY, 
@@ -272,7 +276,8 @@ public:
                                 const std::string& oname = std::string(), 
 				const unsigned& oindex = 0, 
                                 const double& pix_scale_size_um = 0, 
-                                const int* xy0_off_pix = 0 );
+                                const int* xy0_off_pix = 0,
+                                const bool do_tilt=true );
 
   /// Returns image as ndarray<image_t, 2> object
  /**

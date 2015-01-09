@@ -97,7 +97,8 @@ namespace PSCalib {
  *    const double* Y;
  *    const double* Z;
  *    unsigned   size;
- *    geo->get_pixel_coords(X, Y, Z, size);
+ *    bool       do_tilt=true;
+ *    geo->get_pixel_coords(X, Y, Z, size, do_tilt);
  *
  *    // get pixel areas
  *    const double* A;
@@ -230,8 +231,9 @@ public:
    *  @param[out] Y - pointer to y pixel coordinate array
    *  @param[out] Z - pointer to z pixel coordinate array
    *  @param[out] size - size of the pixel coordinate array (number of pixels)
+   *  @param[in]  do_tilt - on/off tilt angle correction
    */
-  void get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size);
+  void get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt=true);
 
   /**
    *  @brief Returns pointers to pixel areas array
@@ -337,7 +339,8 @@ private:
                                    double*  Zt,
                                    const bool do_tilt=true
                                   );
-  void evaluate_pixel_coords();
+
+  void evaluate_pixel_coords(const bool do_tilt=true);
 
   const static double DEG_TO_RAD = 3.141592653589793238463 / 180; 
 

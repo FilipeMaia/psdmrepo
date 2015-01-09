@@ -237,9 +237,9 @@ double GeometryObject::get_pixel_scale_size()
 }
 
 //-------------------
-void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size)
+  void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt)
 {
-  if(p_xarr==0) evaluate_pixel_coords();
+  if(p_xarr==0) evaluate_pixel_coords(do_tilt);
   X    = p_xarr;
   Y    = p_yarr;
   Z    = p_zarr;
@@ -263,7 +263,7 @@ void GeometryObject::get_pixel_mask(const int*& mask, unsigned& size, const unsi
 }
 
 //-------------------
-void GeometryObject::evaluate_pixel_coords()
+void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
 {
   // allocate memory for pixel coordinate arrays
   m_size = get_size_geo_array();
@@ -280,7 +280,7 @@ void GeometryObject::evaluate_pixel_coords()
   //       const double* y_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM);
   //       const double* z_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM);
   //
-  //       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr);
+  //       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr, do_tilt);
   //       return;
   //  }
 
@@ -292,7 +292,7 @@ void GeometryObject::evaluate_pixel_coords()
        const double* a_arr = m_seggeom -> pixel_area_array();
        const int*    m_arr = m_seggeom -> pixel_mask_array(m_mbits);
 
-       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr);
+       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr, do_tilt);
        std::memcpy(&p_aarr[0], a_arr, m_size*sizeof(double));
        std::memcpy(&p_marr[0], m_arr, m_size*sizeof(int));
        return;
@@ -319,7 +319,7 @@ void GeometryObject::evaluate_pixel_coords()
     unsigned      sizech;
 
     (*it)->get_pixel_coords(pXch, pYch, pZch, sizech);       
-    transform_geo_coord_arrays(pXch, pYch, pZch, sizech, &p_xarr[ibase], &p_yarr[ibase], &p_zarr[ibase]);
+    transform_geo_coord_arrays(pXch, pYch, pZch, sizech, &p_xarr[ibase], &p_yarr[ibase], &p_zarr[ibase], do_tilt);
 
     (*it)->get_pixel_areas(pAch, sizech);
     std::memcpy(&p_aarr[ibase], pAch, sizech*sizeof(double));

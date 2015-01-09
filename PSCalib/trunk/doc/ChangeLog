@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-27
+2015-01-09 Mikhail S. Dubrovin	
+- GeometryAccess & GeometryObject (C++ & py) - propagate do-tilt parameter 
+	from get_pix_coords and get_pix_coord_indexes to transform_geo_coord_arrays
+
 Tag: V00-02-26
 2014-11-21 Mikhail S. Dubrovin	
 - GeometryAccess.py in img_from_pixel_arrays(iX, iY, W=None, ...) add protection for W=None (PSAS-11)

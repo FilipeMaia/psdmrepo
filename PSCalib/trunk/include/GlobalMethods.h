@@ -96,7 +96,7 @@ static const size_t SIZE2X2 = N2X1*SIZE2X1;
 /**
  * @brief Converts cspad2x2 ndarray two2x1[2,185,388] to data2x2[185,388,2]
  * 
- * @param[in]  two2x1 - input ndarray shaped as [2,185,388]
+ * @param[in]  A - pointer to input array with data shaped as [2,185,388]
  */
   template <typename T>
   void two2x1ToData2x2(T* A)
