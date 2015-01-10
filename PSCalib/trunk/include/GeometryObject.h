@@ -310,6 +310,8 @@ private:
   double      m_tilt_y;
   double      m_tilt_x;
 
+  bool        m_do_tilt;
+
   shpGO m_parent;
   std::vector<shpGO> v_list_of_children;
 

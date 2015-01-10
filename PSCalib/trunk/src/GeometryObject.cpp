@@ -90,6 +90,7 @@ namespace PSCalib {
   p_marr = 0;
   m_size = 0;
   m_mbits = 0377;
+  m_do_tilt = true;
 }
 
 //--------------
@@ -237,9 +238,10 @@ double GeometryObject::get_pixel_scale_size()
 }
 
 //-------------------
-  void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt)
+void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt)
 {
-  if(p_xarr==0) evaluate_pixel_coords(do_tilt);
+  // std::cout << "  ============ do_tilt : " << do_tilt << '\n';
+  if(p_xarr==0 || do_tilt != m_do_tilt) evaluate_pixel_coords(do_tilt);
   X    = p_xarr;
   Y    = p_yarr;
   Z    = p_zarr;
@@ -265,6 +267,8 @@ void GeometryObject::get_pixel_mask(const int*& mask, unsigned& size, const unsi
 //-------------------
 void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
 {
+  m_do_tilt = do_tilt; 
+
   // allocate memory for pixel coordinate arrays
   m_size = get_size_geo_array();
 
@@ -318,7 +322,7 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
     const int*    pMch; 
     unsigned      sizech;
 
-    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech);       
+    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech, do_tilt);       
     transform_geo_coord_arrays(pXch, pYch, pZch, sizech, &p_xarr[ibase], &p_yarr[ibase], &p_zarr[ibase], do_tilt);
 
     (*it)->get_pixel_areas(pAch, sizech);
