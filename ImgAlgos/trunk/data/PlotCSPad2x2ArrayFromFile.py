@@ -17,11 +17,13 @@ def get_array_from_file(fname) :
 
 #---------------------
 
-def getImageArrayForCSpad2x2ElementPair(arr1ev, pair=0):
+def getImageArrayForCSpad2x1Segment(arr2x1):
     """Returns the image array for pair of ASICs"""
 
     #arr2x1 = arr1ev[0:185,0:388,pair]
-    arr2x1 = arr1ev[:,:,pair]
+    #arr2x1 = arr1ev[:,:,pair]
+    #print '2x1 array shape:', arr2x1.shape
+      
     asics  = np.hsplit(arr2x1,2)
     arrgap = np.zeros ((185,3), dtype=np.float32)
     arr2d  = np.hstack((asics[0],arrgap,asics[1]))
@@ -29,11 +31,11 @@ def getImageArrayForCSpad2x2ElementPair(arr1ev, pair=0):
 
 #---------------------
 
-def getImageArrayForCSpad2x2Element(arr1ev):
+def getImageArrayForCSpad2x2FromSegments(arrseg0, arrseg1):
     """Returns the image array for the CSpad2x2Element or CSpad2x2"""       
 
-    arr2x1Pair0 = getImageArrayForCSpad2x2ElementPair(arr1ev,0)
-    arr2x1Pair1 = getImageArrayForCSpad2x2ElementPair(arr1ev,1)
+    arr2x1Pair0 = getImageArrayForCSpad2x1Segment(arrseg0) # arr1ev[:,:,0])
+    arr2x1Pair1 = getImageArrayForCSpad2x1Segment(arrseg1) # arr1ev[:,:,1])
     wid2x1      = arr2x1Pair0.shape[0]
     len2x1      = arr2x1Pair0.shape[1]
 
@@ -43,6 +45,21 @@ def getImageArrayForCSpad2x2Element(arr1ev):
     #print 'arr2d.shape=', arr2d.shape
     #print 'arr2d=',       arr2d
     return arr2d
+
+#---------------------
+
+def getImageArrayForCSpad2x2(arr1ev):
+    """Returns the image array for the CSPAD2x2 array as (185,388,2) or (2,185,388)"""       
+
+    if (arr1ev.shape[-1] == 2) :
+        arr1ev.shape = (185,388,2)
+        print 'Shaped as data:', arr1ev.shape
+        return getImageArrayForCSpad2x2FromSegments(arr1ev[:,:,0], arr1ev[:,:,1])
+
+    else :
+        arr1ev.shape = (2,185,388)
+        print 'Shaped as in natural order:', arr1ev.shape
+        return getImageArrayForCSpad2x2FromSegments(arr1ev[0,:,:], arr1ev[1,:,:])
 
 #--------------------
 
@@ -84,23 +101,28 @@ def get_input_parameters() :
 
 #--------------------
 
+#--------------------
+
 def do_main() :
 
     fname, ampRange = get_input_parameters()
-    arr1ev = get_array_from_file(fname) 
+    arr1ev = get_array_from_file(fname)    
+    if (arr1ev.size != 185*388*2) :
+        msg = 'Input array size %s is not consistent with CSPAD2x2 (185*388*2)' % arr1ev.size
+        sys.exit(msg)
     print 'arr:\n', arr1ev
     print 'arr1ev.shape=', arr1ev.shape
-    arr1ev.shape = (185,388,2)
 
-    arr = getImageArrayForCSpad2x2Element(arr1ev)
+    arr = getImageArrayForCSpad2x2(arr1ev)
     
-    print 'Re-shaped arr.shape=', arr.shape
+    print 'Image arr.shape=', arr.shape
 
     gg.plot_image(arr, zrange=ampRange)
     plt.get_current_fig_manager().window.geometry('+10+10') # move(10,10)
     plt.savefig('cspad2x2-img.png')
 
-    gg.plot_histogram(arr, ampRange)
+    print 'Histogram contains pixels only!'
+    gg.plot_histogram(arr1ev, ampRange)
     plt.get_current_fig_manager().window.geometry('+950+10') # .move(950,10)
     plt.savefig('cspad2x2-spe.png')
 

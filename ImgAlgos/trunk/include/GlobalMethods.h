@@ -792,6 +792,16 @@ private:
       in.close();
   }
 
+//--------------------
+/// Re-call to pdscalibdata::NDArrIOV1,
+/// Save N-D array in file with metadata
+
+  template <typename T, unsigned NDim>
+  void saveNDArrayInFile(const ndarray<const T,NDim>& nda, const std::string& fname, const std::vector<std::string>& comments = std::vector<std::string>())
+  {
+    pdscalibdata::NDArrIOV1<T,NDim>::save_ndarray(nda, fname, comments);
+  }
+
 
 //--------------------
 /// Save ndarray in file

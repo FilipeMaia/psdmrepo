@@ -112,6 +112,8 @@ private:
 
   void   appendVectorOfDroplets(const std::vector<AlgDroplet::Droplet>& v);
   void   saveDropletsInEvent(Event& evt);
+  void   saveDropletsInFile(Event& evt);
+  //  void   saveNDArrInFile(Event& evt);
 
   Pds::Src    m_src;
   Source      m_source;
@@ -124,7 +126,7 @@ private:
   int         m_nsm;      // number of pixels for smearing [i0-m_nsm, i0+m_nsm]
   int         m_rpeak;    // number of pixels for peak finding in [i0-m_npeak, i0+m_npeak]
   std::string m_windows;  // windows for processing
-  unsigned    m_event;
+  std::string m_ofname_pref; // output file name common prefix
   unsigned    m_print_bits;
   unsigned    m_count_evt;
   unsigned    m_count_get;
@@ -315,7 +317,7 @@ private:
 	        (*ism)->smearing<T>(nda_raw, nda_sme);
 	        has_data = (*idf)->findDroplets<T>(nda_sme);
 
-		// Save smeared ndarray in the event store
+		// Copy in order to save smeared ndarray in the event store
 	        if (! m_key_sme.empty())
 		    std::memcpy(&p_data_sme[seg*m_stride], nda_sme.data(), nda_sme.size()*sizeof(T));
 	    }
@@ -326,11 +328,28 @@ private:
 	    if (has_data) appendVectorOfDroplets( (*idf)->getDroplets() );
 	}
 
-	//if (m_print_bits & 8) MsgLog(name(), info, "Total number of droplets found: " << v_droplets.size());
-        if (v_droplets.size()) saveDropletsInEvent(evt);
+	// Save here whatever need to be saved after processing
 
-        if (! m_key_sme.empty() && m_sigma) 
-            saveNDArrayInEvent<T,NDim>(evt, m_src, m_key_sme, data_sme);
+	//if (m_print_bits & 8) MsgLog(name(), info, "Total number of droplets found: " << v_droplets.size());
+        if (v_droplets.size()) {
+          saveDropletsInEvent(evt);
+	  if(! m_ofname_pref.empty()) saveDropletsInFile(evt);
+	}
+
+
+	if(! m_ofname_pref.empty()) {
+	  std::string fname = getCommonFileName(evt) + "-raw.txt";
+	  saveNDArrayInFile<T,NDim>(nda, fname);
+	}
+
+
+        if (! m_key_sme.empty() && m_sigma) {
+          saveNDArrayInEvent<T,NDim>(evt, m_src, m_key_sme, data_sme);
+	  if(! m_ofname_pref.empty()) {
+            std::string fname = getCommonFileName(evt) + "-smeared.txt";
+	    saveNDArrayInFile<T,NDim>(data_sme, fname);
+	  }
+	}
     }
 
 //-------------------

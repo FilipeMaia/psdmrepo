@@ -129,7 +129,8 @@ private:
   int         m_x0_off_pix;
   int         m_y0_off_pix;
   int        *m_xy0_off_pix;
-
+  int         m_mode;           // mode of mapping pixels from ndarray to 2-d image
+  bool        m_do_tilt;        // on/off tilt angles
   unsigned    m_print_bits;
   unsigned    m_count_evt;
   unsigned    m_count_clb;
@@ -189,12 +190,37 @@ public:
   
     const T* p_data = data.data();
 
-    for (unsigned i=0; i<m_size; ++i) {
-  
-      unsigned ix = m_coor_x_ind[i];
-      unsigned iy = m_coor_y_ind[i];
-  
-      img_nda[ix][iy] += p_data[i]; 
+
+    if (m_mode == 0) {
+      // Pixel intensity is replaced by the latest mapped pixel
+      for (unsigned i=0; i<m_size; ++i)
+        img_nda[m_coor_x_ind[i]][m_coor_y_ind[i]] = p_data[i];
+    }
+
+    else if (m_mode == 1) {
+      // Select maximal intensity of two overlapping pixels
+      for (unsigned i=0; i<m_size; ++i) {  
+	 T* p_tmp = &img_nda[m_coor_x_ind[i]][m_coor_y_ind[i]];
+	 if ( *p_tmp==0 || p_data[i] > *p_tmp) *p_tmp = p_data[i];
+      }
+    }
+
+    else if (m_mode == 2) {
+      // Accumulate pixel intensity in the 2-d image
+      for (unsigned i=0; i<m_size; ++i) {  
+        //unsigned ix = m_coor_x_ind[i];
+        //unsigned iy = m_coor_y_ind[i];  
+        img_nda[m_coor_x_ind[i]][m_coor_y_ind[i]] += p_data[i]; 
+      }
+    }
+
+    //else if (m_mode == 3) 
+      // Interpolation TBA
+
+    else {
+      // The same as mode 0
+      for (unsigned i=0; i<m_size; ++i)
+        img_nda[m_coor_x_ind[i]][m_coor_y_ind[i]] = p_data[i];
     }
 
     if      ( m_dtype == ASINP  ) save2DArrayInEvent<T>(evt, m_src, m_outimgkey, img_nda);

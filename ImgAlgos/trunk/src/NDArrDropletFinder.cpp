@@ -51,7 +51,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   , m_nsm()
   , m_rpeak()
   , m_windows()  
-  , m_event()
+  , m_ofname_pref()
   , m_print_bits()
   , m_count_evt(0)
   , m_count_get(0)
@@ -69,7 +69,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   m_nsm           = config   ("smear_radius",      3);
   m_rpeak         = config   ("peak_radius",       3);
   m_windows       = configStr("windows",          "");
-  m_event         = config   ("testEvent",         0);
+  m_ofname_pref   = configStr("fname_prefix",     "");
   m_print_bits    = config   ("print_bits",        0);
 
   //std::fill_n(&m_data_arr[0], int(MAX_IMG_SIZE), double(0));
@@ -170,7 +170,7 @@ NDArrDropletFinder::printInputPars()
 	 << "\n rsm           : " << m_nsm
 	 << "\n npeak         : " << m_rpeak
 	 << "\n windows       : " << m_windows
-	 << "\n event         : " << m_event     
+	 << "\n ofname_pref   : " << m_ofname_pref
 	 << "\n print_bits    : " << m_print_bits;
 	)
 }
@@ -181,9 +181,10 @@ std::string
 NDArrDropletFinder::getCommonFileName(Event& evt)
 {
   std::string fname; 
-  fname = "nda-r" + stringRunNumber(evt) 
-        + "-"     + stringTimeStamp(evt) 
-        + "-ev"   + stringFromUint(m_count_evt);
+  fname = m_ofname_pref
+        + "-r"  + stringRunNumber(evt) 
+        + "-e"  + stringFromUint(m_count_evt);
+  //+ "-"   + stringTimeStamp(evt) 
   return fname;
 }
 
@@ -345,6 +346,41 @@ NDArrDropletFinder::saveDropletsInEvent(Event& evt)
 
   save2DArrayInEvent<droplet_t>(evt, m_src, m_key_out, nda);
 }
+
+//--------------------
+//void 
+//NDArrDropletFinder::saveNDArrInFile(Event& evt)
+//{
+//  std::string fname = getCommonFileName(evt) + "-smeared.txt"; 
+//  MsgLog( name(), info, "Save ndarray in file:" << fname.data() );
+//  //m_work2d -> saveImageInFile(fname,0);
+//}
+
+//--------------------
+// Save peak vector info in the file
+void 
+NDArrDropletFinder::saveDropletsInFile(Event& evt)
+{
+  string fname; fname = getCommonFileName(evt) + "-peaks.txt";
+  MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
+
+  ofstream file; 
+  file.open(fname.c_str(),ios_base::out);
+
+  for( std::vector<AlgDroplet::Droplet>::iterator itv  = v_droplets.begin();
+                                                  itv != v_droplets.end(); itv++ ) {
+
+    file  << std::setw(8) << std::left << itv->seg << "  "
+          << std::setw(8) << itv->row      << "  "
+          << std::setw(8) << itv->col      << "  "
+          << std::setw(8) << itv->ampmax   << "  "
+          << std::setw(8) << itv->amptot   << "  "
+          << std::setw(8) << itv->npix     << endl; 
+  }
+
+  file.close();
+}
+
 
 //--------------------
 //--------------------

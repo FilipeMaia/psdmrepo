@@ -11,8 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-76 
+2015-01-09 Mikhail S. Dubrovin
+- NDArrImageProducer - add parameters
+	mode - for mapping algorithm of ndarray to 2-D image
+	do_tilt - on/off tilt angle correction for sensors (PSAS-11)
+- NDArrDropletFinder - add saving image and droplets/peaks in files for test purpose (PSAS-68)
 
-???Tag: V00-03-76 
 DO NOT TAG BEFORE VACATION
 
 2014-12-16 Mikhail S. Dubrovin

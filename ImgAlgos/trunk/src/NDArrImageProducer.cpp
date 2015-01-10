@@ -66,6 +66,8 @@ NDArrImageProducer::NDArrImageProducer (const std::string& name)
   , m_x0_off_pix()
   , m_y0_off_pix()
   , m_xy0_off_pix(0)
+  , m_mode()
+  , m_do_tilt()
   , m_print_bits()
   , m_count_evt(0)
   , m_count_msg(0)
@@ -82,6 +84,8 @@ NDArrImageProducer::NDArrImageProducer (const std::string& name)
   m_pix_scale_size_um= config   ("pix_scale_size_um",   0);
   m_x0_off_pix       = config   ("x0_off_pix",          0);
   m_y0_off_pix       = config   ("y0_off_pix",          0);
+  m_mode             = config   ("mode",                0);
+  m_do_tilt          = config   ("do_tilt",          true);
   m_print_bits       = config   ("print_bits",          0);
 
   //m_source = Source(m_str_src);
@@ -130,6 +134,8 @@ NDArrImageProducer::printInputParameters()
         << "\n pix_scale_size_um     : " << m_pix_scale_size_um
         << "\n x0_off_pix            : " << m_x0_off_pix       
         << "\n y0_off_pix            : " << m_y0_off_pix       
+        << "\n mode                  : " << m_mode
+        << "\n do_tilt               : " << m_do_tilt
         << "\n print_bits            : " << m_print_bits
         << "\n";     
   }
@@ -225,10 +231,11 @@ NDArrImageProducer::getCalibPars(Event& evt, Env& env)
                                               << " from file:\n" << fname);
 
   m_geometry = new PSCalib::GeometryAccess(fname, prbits);
-  if( m_print_bits & 32 ) m_geometry->print_pixel_coords();
 
   m_geometry->get_pixel_coord_indexes(m_coor_x_ind, m_coor_y_ind, m_size, 
-                                      m_oname, m_oindex, m_pix_scale_size_um, m_xy0_off_pix );
+                                      m_oname, m_oindex, m_pix_scale_size_um, m_xy0_off_pix, m_do_tilt);
+
+  if( m_print_bits & 32 ) m_geometry->print_pixel_coords();
 
   m_x_ind_max = m_coor_x_ind[0];
   m_y_ind_max = m_coor_y_ind[0];
