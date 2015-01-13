@@ -137,7 +137,8 @@ namespace pdscalibdata {
  *  comments.push_back("DETECTOR   Camp.0:pnCCD.1");
  *  comments.push_back("CALIB_TYPE pedestals");
  *
- *  NDAIO::save_ndarray(nda, fname, comments);  
+ *  unsigned print_bits=1;
+ *  NDAIO::save_ndarray(nda, fname, comments, print_bits);  
  *  @endcode
  *  where each record in the vector is added to the file header as a commented string. 
  *  The last command saves the file with content
@@ -234,10 +235,12 @@ public:
    *  @param[in] nda ndarray to save in file
    *  @param[in] fname std::string file name to save ndarray
    *  @param[in] vcoms std::vector<std::string> vector of strings with comments; one-string comment per vector entry
+   *  @param[in] print_bits for output control; 0-print nothing, +1-info about saved files
    */ 
   static void save_ndarray(const ndarray<const TDATA, NDIM>& nda, 
                            const std::string& fname,
-                           const std::vector<std::string>& vcoms = std::vector<std::string>());
+                           const std::vector<std::string>& vcoms = std::vector<std::string>(), 
+	                   const unsigned& print_bits=0377);
 
 protected:
 

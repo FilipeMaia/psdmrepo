@@ -403,18 +403,21 @@ std::string NDArrIOV1<TDATA, NDIM>::str_shape()
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::save_ndarray(const ndarray<const TDATA, NDIM>& nda, 
                                           const std::string& fname,
-                                          const std::vector<std::string>& vcoms)
+                                          const std::vector<std::string>& vcoms, 
+	                                  const unsigned& print_bits)
 {
     const unsigned ndim = NDIM;
     std::string str_dtype = strDataType<TDATA>();
     std::stringstream sstype; sstype << "ndarray<" << str_dtype 
                                      << "," << ndim << ">";
 
-    std::stringstream smsg; 
-    smsg << "Save " << sstype.str()
-         << " of size=" << nda.size()
-         << " in file: " << fname;
-    MsgLog(__name__(), info, smsg.str());
+    if (print_bits & 1) {
+        std::stringstream smsg; 
+        smsg << "Save " << sstype.str()
+             << " of size=" << nda.size()
+             << " in file: " << fname;
+        MsgLog(__name__(), info, smsg.str());
+    }
 
     // open file
     std::ofstream out(fname.c_str());
