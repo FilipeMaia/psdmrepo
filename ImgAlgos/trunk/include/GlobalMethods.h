@@ -797,9 +797,9 @@ private:
 /// Save N-D array in file with metadata
 
   template <typename T, unsigned NDim>
-  void saveNDArrayInFile(const ndarray<const T,NDim>& nda, const std::string& fname, const std::vector<std::string>& comments = std::vector<std::string>())
+    void saveNDArrayInFile(const ndarray<const T,NDim>& nda, const std::string& fname, const std::vector<std::string>& comments = std::vector<std::string>(), const unsigned& print_bits=1)
   {
-    pdscalibdata::NDArrIOV1<T,NDim>::save_ndarray(nda, fname, comments);
+    pdscalibdata::NDArrIOV1<T,NDim>::save_ndarray(nda, fname, comments, print_bits);
   }
 
 

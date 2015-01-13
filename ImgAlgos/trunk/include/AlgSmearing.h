@@ -85,9 +85,10 @@ namespace ImgAlgos {
  *  size_t      rowmax   = 170;
  *  size_t      colmin   = 100;
  *  size_t      colmax   = 200;
+ *  double      value    = 0;
  * 
  *  AlgSmearing* p_sm = new AlgSmearing( sigma, nsm, thr_low, opt, pbits,
- *		      			 seg, rowmin, rowmax, colmin, colmax );
+ *		      			 seg, rowmin, rowmax, colmin, colmax, value );
  *  @endcode
  *
  *
@@ -135,6 +136,7 @@ public:
    * @param[in] rowmax - ROI window limit
    * @param[in] colmin - ROI window limit
    * @param[in] colmax - ROI window limit
+   * @param[in] value  - pre-fill value 
    */
 
   AlgSmearing ( const double&   sigma   = 2
@@ -147,6 +149,7 @@ public:
               , const size_t&   rowmax  = 1e6
               , const size_t&   colmin  = 0
               , const size_t&   colmax  = 1e6
+              , const double&   value   = 0
               ) ;
 
   /// Destructor
@@ -197,6 +200,7 @@ private:
   size_t   m_rowmax;
   size_t   m_colmin;
   size_t   m_colmax;
+  double   m_value;    // pre-fill and below threshold value
 
   ndarray<double,2> m_weights; //2-d array of weights
 
@@ -240,7 +244,7 @@ double _smearPixAmp(const ndarray<const T,2>& nda_raw, const size_t& r0, const s
       //cout << "dr, dc, ind, w=" << r-r0 << " " << c-c0 << " " << ind << " " << w << endl;
     }
   }
-  return (sum_w>0)? sum_aw / sum_w : 0;
+  return (sum_w>0)? sum_aw / sum_w : m_value;
 }
 
 
@@ -269,6 +273,7 @@ void smearing(const ndarray<const T,2>& nda_raw, ndarray<T,2>& nda_sme)
   if(m_sigma == 0) { std::memcpy(p_sme, p_raw, nda_raw.size()*sizeof(T)); return; }
 
   T      thr   = (T) m_thr_low;
+  T      val   = (T) m_value;
   size_t nrows = nda_raw.shape()[0];
   size_t ncols = nda_raw.shape()[1];
 
@@ -288,13 +293,13 @@ void smearing(const ndarray<const T,2>& nda_raw, ndarray<T,2>& nda_sme)
            		               << "  nda_sme.size:"  << nda_sme.size()
 			   );
 
-  if     (m_opt==0) std::fill_n(p_sme, int(nda_raw.size()), T(0));
+  if     (m_opt==0) std::fill_n(p_sme, int(nda_raw.size()), T(m_value));
   else if(m_opt==1) std::memcpy(p_sme, p_raw, nda_raw.size()*sizeof(T));
 
   for (size_t r = rmin; r < rmax; r++) {
     for (size_t c = cmin; c < cmax; c++) {
       unsigned ind = r*ncols + c;
-      p_sme[ind] = (p_raw[ind]>thr) ? (T)_smearPixAmp<T>(nda_raw, r, c) : 0;
+      p_sme[ind] = (p_raw[ind]>thr) ? (T)_smearPixAmp<T>(nda_raw, r, c) : val;
     }
   }
 }

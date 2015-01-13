@@ -50,6 +50,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   , m_sigma()
   , m_nsm()
   , m_rpeak()
+  , m_low_value()
   , m_windows()  
   , m_ofname_pref()
   , m_print_bits()
@@ -68,6 +69,7 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   m_sigma         = config   ("sigma",           1.5);
   m_nsm           = config   ("smear_radius",      3);
   m_rpeak         = config   ("peak_radius",       3);
+  m_low_value     = config   ("low_value",         0);
   m_windows       = configStr("windows",          "");
   m_ofname_pref   = configStr("fname_prefix",     "");
   m_print_bits    = config   ("print_bits",        0);
@@ -108,6 +110,7 @@ NDArrDropletFinder::beginJob(Event& evt, Env& env)
 void 
 NDArrDropletFinder::beginRun(Event& evt, Env& env)
 {
+  m_str_exp = stringExperiment(env);
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -169,6 +172,7 @@ NDArrDropletFinder::printInputPars()
 	 << "\n sigma         : " << m_sigma
 	 << "\n rsm           : " << m_nsm
 	 << "\n npeak         : " << m_rpeak
+	 << "\n low_value     : " << m_low_value
 	 << "\n windows       : " << m_windows
 	 << "\n ofname_pref   : " << m_ofname_pref
 	 << "\n print_bits    : " << m_print_bits;
@@ -182,6 +186,7 @@ NDArrDropletFinder::getCommonFileName(Event& evt)
 {
   std::string fname; 
   fname = m_ofname_pref
+        + "-"   + m_str_exp
         + "-r"  + stringRunNumber(evt) 
         + "-e"  + stringFromUint(m_count_evt);
   //+ "-"   + stringTimeStamp(evt) 
@@ -362,7 +367,7 @@ void
 NDArrDropletFinder::saveDropletsInFile(Event& evt)
 {
   string fname; fname = getCommonFileName(evt) + "-peaks.txt";
-  MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
+  if (m_print_bits & 16) MsgLog( name(), info, "Save the peak info in file:" << fname.data() );
 
   ofstream file; 
   file.open(fname.c_str(),ios_base::out);

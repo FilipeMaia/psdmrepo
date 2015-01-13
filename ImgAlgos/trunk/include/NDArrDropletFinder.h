@@ -122,16 +122,19 @@ private:
   std::string m_key_sme;
   double      m_thr_low;
   double      m_thr_high;
-  double      m_sigma;    // smearing sigma in pixel size
-  int         m_nsm;      // number of pixels for smearing [i0-m_nsm, i0+m_nsm]
-  int         m_rpeak;    // number of pixels for peak finding in [i0-m_npeak, i0+m_npeak]
-  std::string m_windows;  // windows for processing
+  double      m_sigma;       // smearing sigma in pixel size
+  int         m_nsm;         // number of pixels for smearing [i0-m_nsm, i0+m_nsm]
+  int         m_rpeak;       // number of pixels for peak finding in [i0-m_npeak, i0+m_npeak]
+  double      m_low_value;   // low value of intensity of pixels below threshold and outside windows
+  std::string m_windows;     // windows for processing
   std::string m_ofname_pref; // output file name common prefix
   unsigned    m_print_bits;
   unsigned    m_count_evt;
   unsigned    m_count_get;
   unsigned    m_count_msg;
   unsigned    m_count_sel;
+
+  std::string m_str_exp;
 
   unsigned        m_ndim;             // ndarray number of dimensions
   DATA_TYPE       m_dtype;            // numerated data type for data array
@@ -256,7 +259,8 @@ private:
 	    
 	    
             AlgSmearing* p_sm = (m_sigma) ? new AlgSmearing( m_sigma, m_nsm, m_thr_low, 0, pbits_sm,
-							     it->seg, it->rowmin, it->rowmax, it->colmin, it->colmax ) : 0;
+							     it->seg, it->rowmin, it->rowmax, it->colmin, it->colmax, 
+                                                             m_low_value ) : 0;
                                               
             v_algsm.push_back(p_sm);
 	    
@@ -284,7 +288,7 @@ private:
         T* p_data_sme = data_sme.data();
 
 	if (! m_key_sme.empty() && m_sigma)
-            std::fill_n(p_data_sme, int(nda.size()), T(0));
+            std::fill_n(p_data_sme, int(nda.size()), T(m_low_value));
 	    // if     (m_opt==0) std::fill_n(data_sme.data(), int(data.size()), T(0));
             // else if(m_opt==1) std::memcpy(data_sme.data(), data, data.size()*sizeof(T));
 
@@ -317,9 +321,15 @@ private:
 	        (*ism)->smearing<T>(nda_raw, nda_sme);
 	        has_data = (*idf)->findDroplets<T>(nda_sme);
 
-		// Copy in order to save smeared ndarray in the event store
-	        if (! m_key_sme.empty())
-		    std::memcpy(&p_data_sme[seg*m_stride], nda_sme.data(), nda_sme.size()*sizeof(T));
+		// Copy in order to save smeared ndarray in the file and event store
+	        if (! m_key_sme.empty()) {
+		  //std::memcpy(&p_data_sme[seg*m_stride], nda_sme.data(), nda_sme.size()*sizeof(T));
+
+	          T* p_tot = &p_data_sme[seg*m_stride];
+	          const T* p_seg = nda_sme.data();
+		  for(unsigned i=0; i<nda_sme.size(); i++)
+		    if (p_seg[i] != T(m_low_value)) p_tot[i] = p_seg[i];
+		}
 	    }
 	    else {
 	      has_data = (*idf)->findDroplets<T>(nda_raw);
@@ -336,10 +346,13 @@ private:
 	  if(! m_ofname_pref.empty()) saveDropletsInFile(evt);
 	}
 
+	const std::vector<std::string>& comments = std::vector<std::string>();
+        const unsigned pbits = (m_print_bits & 16) ? 0377 : 0;
+
 
 	if(! m_ofname_pref.empty()) {
 	  std::string fname = getCommonFileName(evt) + "-raw.txt";
-	  saveNDArrayInFile<T,NDim>(nda, fname);
+	  saveNDArrayInFile<T,NDim>(nda, fname, comments, pbits);
 	}
 
 
@@ -347,7 +360,7 @@ private:
           saveNDArrayInEvent<T,NDim>(evt, m_src, m_key_sme, data_sme);
 	  if(! m_ofname_pref.empty()) {
             std::string fname = getCommonFileName(evt) + "-smeared.txt";
-	    saveNDArrayInFile<T,NDim>(data_sme, fname);
+	    saveNDArrayInFile<T,NDim>(data_sme, fname, comments, pbits);
 	  }
 	}
     }

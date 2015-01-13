@@ -53,6 +53,7 @@ AlgSmearing::AlgSmearing( const double& sigma
                         , const size_t& rowmax
                         , const size_t& colmin
                         , const size_t& colmax
+                        , const double& value
                         )
   : m_sigma(sigma)
   , m_nsm(nsm)
@@ -65,6 +66,7 @@ AlgSmearing::AlgSmearing( const double& sigma
   , m_rowmax(rowmax)
   , m_colmin(colmin)
   , m_colmax(colmax)
+  , m_value(value)
 {
   if(m_pbits & 1) printInputPars();
   evaluateWeights();
@@ -130,6 +132,7 @@ AlgSmearing::printInputPars()
      << "\nrowmax  : " << m_rowmax
      << "\ncolmin  : " << m_colmin
      << "\ncolmax  : " << m_colmax  
+     << "\nvalue   : " << m_value  
      << '\n';
   MsgLog(_name(), info, ss.str()); 
 }

@@ -132,10 +132,10 @@ public:
   static const size_t NDROPLETSBLOCK = 100;
 
   struct Droplet{
-    unsigned seg;
-    double   row;
-    double   col; 
-    double   ampmax;  // amplitude in the peak maximum
+    unsigned seg;     // segment index (in 3-d ndarray of data) of the found droplet
+    double   row;     // row index of the droplet center
+    double   col;     // columnindex of the droplet center 
+    double   ampmax;  // amplitude in the droplet maximum
     double   amptot;  // total amplitude in the range of peak_radius
     unsigned npix;    // number of pixels in the range of peak_radius
   };

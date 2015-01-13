@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-77
+2015-01-13 Mikhail S. Dubrovin
+- NDArrDropletFinder - parameter value, control on print out etc. (PSAS-68)
+- AlgSmearing - add parameter value for base intensity level
+- AlgDroplet.h - add comments 
+- add data/PlotNDArrayAndPeaks.py
+- GlobalMethods.h - add parameter print_bits in the method saveNDArrayInFile
+	
 Tag: V00-03-76 
 2015-01-09 Mikhail S. Dubrovin
 - NDArrImageProducer - add parameters
