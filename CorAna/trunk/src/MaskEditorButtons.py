@@ -78,9 +78,11 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.ccd_rot_n90 = ccd_rot_n90
         self.y_is_flip   = y_is_flip
 
+        
+        mfroot, mfext = os.path.splitext(self.mfname)
         self.mfname_img  = ifname
-        self.mfname_mask = self.mfname + '.txt'
-        self.mfname_objs = self.mfname + '-shape-objs.txt'
+        self.mfname_mask = self.mfname + '.txt' if mfext == '' else self.mfname
+        self.mfname_objs = mfroot + '-shape-objs.txt'
 
         self.widgimage = widgimage
 
@@ -467,11 +469,14 @@ class MaskEditorButtons (QtGui.QWidget) :
                 return            
 
             self.setStatus(1, 'Waiting\nfor input...')
-            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
             if path == None :
                 self.setStatus()
                 return
-            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+
+            ext = os.path.splitext(path)[1]
+            if ext == '.npy' : np.save(path, mask_total)
+            else             : np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
             self.setStatus(0, 'Mask\nis saved')
 
 
@@ -490,11 +495,14 @@ class MaskEditorButtons (QtGui.QWidget) :
                 return            
 
             self.setStatus(1, 'Waiting\nfor input')
-            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
             if path == None : 
                 self.setStatus()
                 return
-            np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+            
+            ext = os.path.splitext(path)[1]
+            if ext == '.npy' : np.save(path, mask_total)
+            else             : np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
             self.setStatus(0, 'Mask\nis ready')
 
 

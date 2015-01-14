@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21
+2015-01-13 Mikhail S. Dubrovin
+- MaskEditorButtons.py - extend option -m to save the mask as a *.npy file
+	
 Tag: V00-00-20
 2014-06-17 Mikhail S. Dubrovin
 - ArrFileExchange constrain print for print_bits=32
