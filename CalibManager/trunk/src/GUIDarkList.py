@@ -151,6 +151,13 @@ class GUIDarkList ( QtGui.QWidget ) :
         if self.instr_name.value() == self.instr_name.value_def() : return
         if self.exp_name  .value() == self.exp_name  .value_def() : return
 
+        str_exp_name = self.exp_name.value()
+        if 'tut' in str_exp_name :
+            msg = 'Tutorial directory %s can not be used to generate the list of runs,'\
+                  ' because their xtc files are not registered in the DB.' % str_exp_name
+            logger.warning(msg, __name__)
+            return
+
         msg = 'Begin to update the list of runs. It is slow procedure that takes ~0.1s/run, stay calm and wait.'
         logger.info(msg, __name__)
         #print msg

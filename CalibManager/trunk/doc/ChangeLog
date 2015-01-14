@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-01-14 Mikhail S. Dubrovin
+Tag: V00-00-78
+GUIDarkList - protection against creation of the list of dark files for tutorial directories like xpptut13 (PSAS-6).
+app/roicon - Use new algorithm to generate ndarray for mask: [mask_roi[r,c] for r,c in zip(iX, iY)] (PSAS-10)
+	
 2015-01-13 Mikhail S. Dubrovin
 Tag: V00-00-77
 - app/roicon - extend I/O to work with *.npy files (PSAS-10) 
