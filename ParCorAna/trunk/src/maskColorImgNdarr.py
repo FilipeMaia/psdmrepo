@@ -142,6 +142,9 @@ def findImageManyToOne(iX, iY):
     return newManyToOneImagePos
 
 
+class NoGeomFile(Exception):
+    pass
+        
 def getGeometryFile(dsetstring, srcString, typeString):
     dataRoot = '/reg/d/psdm'
     assert os.path.exists(dataRoot), "data base directory=%s does not exist" % dataRoot
@@ -157,10 +160,11 @@ def getGeometryFile(dsetstring, srcString, typeString):
     cf = CalibFileFinder(calibDir, group)
     run = dsetParts['run'][0]
     geomFile = cf.findCalibFile(srcDir, 'geometry', run)
-    assert os.path.exists(geomFile), ("geometry file %s doesn't exist.\n" + \
-                                      "Parameters: group=%s src=%s run=%s calibDir=%s\n" + \
-                                      "Note: geometry file may not be deployed, or inferred group is wrong Check calibDir.") % \
-        (geomFile, group, srcDir, run, calibDir)
+    if not os.path.exists(geomFile):
+        raise NoGeomFile(("geometry file %s doesn't exist.\n" + \
+                         "Parameters: group=%s src=%s run=%s calibDir=%s\n" + \
+                         "Note: geometry file may not be deployed, or inferred group is wrong Check calibDir.") % \
+                         (geomFile, group, srcDir, run, calibDir))
     return geomFile
 
 def ndarr2img(ndarr, iX, iY, backgroundValue = None):
@@ -181,7 +185,56 @@ def img2ndarr(img, iX, iY):
     ndarr = np.zeros(ndarrShape, img.dtype)
     ndarr[:] = img[iX.flatten(), iY.flatten()].reshape(ndarr.shape)
     return ndarr
+
+__psana2DTypeLists=[psana.Epix.Element,
+                    psana.Camera.Frame]
+
+def typeIs2D(psanaType):
+    for typeList in __psana2DTypeLists:
+        if isinstance(typeList, list):
+            if psanaType in typeList:
+                return True
+        elif isinstance(psanaType, typeList):
+            return True
+    return False
+
+def getNdarr2ImageMapping(dsetstring, srcString, psanaType, psanaTypeStr, geom):
+    if geom is None:
+        try:
+            geometryFile = getGeometryFile(dsetstring, srcString, psanaTypeStr)
+        except NoGeomFile,e:
+            if typeIs2D(psanaType):
+                iX=None
+                iY=None
+                return iX, iY
+            else:
+                raise e
+    else:
+        assert os.path.exists(geom), "user supplied geometry file: %s not found" % geom
+        geometryFile = geom
+
+    geometry = GeometryAccess(geometryFile)
+    iX, iY = geometry.get_pixel_coord_indexes()
+    return iX, iY
     
+def saveNdarr2ImgMapping(iX,iY,iXfname,iYfname):
+    iXfout = file(iXfname, 'w')
+    np.save(iXfout, iX)
+    iXfout.close()
+
+    iYfout = file(iYfname, 'w')
+    np.save(iYfout, iY)
+    iYfout.close()
+
+def makeNdarrImageMappingFor2D(shape2D):
+    iX = np.zeros(shape2D, np.int)
+    iY = np.zeros(shape2D, np.int)
+    for x in range(shape2D[0]):
+        iX[x,:]=x
+    for y in range(shape2D[1]):
+        iY[:,y]=y
+    return iX, iY
+
 def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300, 
                      colors=6, basename=None, geom=None, debug=False, force=False):
     #### helper function ####
@@ -214,13 +267,15 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     else:
         basename = makeBaseName(dsetstring, srcString)
 
-    if geom is None:
-        geometryFile = getGeometryFile(dsetstring, srcString, psanaTypeStr)
-    else:
-        assert os.path.exists(geom), "user supplied geometry file: %s not found" % geom
-        geometryFile = geom
-    geometry = GeometryAccess(geometryFile)
-    iX, iY = geometry.get_pixel_coord_indexes()
+    assert psanaTypeStr.startswith('psana.'), "psana type must start with psana."
+    try:
+        psanaType = eval(psanaTypeStr)
+    except NameError,e:
+        raise NameError("Unable to evaluate psana type from string: %s" % psanaTypeStr)
+    except AttributeError,e:
+        raise AttributeError("psana type string: % s has attribute that is wrong. Check type spec" % psanaTypeStr)
+
+    iX, iY = getNdarr2ImageMapping(dsetstring, srcString, psanaType, psanaTypeStr, geom)
 
     iXfname = basename + '_iX.npy'
     iYfname = basename + '_iY.npy'
@@ -238,48 +293,33 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
                   maskNdarrFname, maskImgFname, colorNdarrFname, colorImgFname]:
         assert (not os.path.exists(fname)) or force, "file %s exists. pass --force to overwrite" % fname
 
-    iXfout = file(iXfname, 'w')
-    np.save(iXfout, iX)
-    iXfout.close()
-
-    iYfout = file(iYfname, 'w')
-    np.save(iYfout, iY)
-    iYfout.close()
-
-    print "*** Analyzing ndarr -> img mapping from geometry file: ***"
-    manyToOne = findImageManyToOne(iX,iY)
-    if len(manyToOne)>0:
-        print "INFO: There are %d image pixels with more than one ndarr pixel mapped to it" % len(manyToOne)
-        for imagePos, ndarrList in manyToOne.iteritems():
-            points = arrIndexListsToPoints(ndarrList)
-            points = [','.join(map(str,point)) for point in points]
-            print "image pixel = %r  has ndarray elements = (%s)" % (imagePos, '), ('.join(points))
-    else:
-        print "INFO: all ndarr elements are mapped to a unique image pixel"
-    imageGaps = findImageGaps(iX, iY)
-    if len(imageGaps)>0:
-        print "INFO: There appear to be %d gaps in the image, pixels in detctor areas for which no ndarr element is mapped" % \
-            len(imageGaps)
-        for gap in imageGaps:
-            msg = '  gap:'
-            for point in arrIndexListsToPoints(gap):
-                msg += ' (%s)' % ','.join(map(str,point))
-            print msg
-
-    print "*** done analyzing ndarr -> img mapping. Computing average. ***"
+    if iX is not None and iY is not None:
+        saveNdarr2ImgMapping(iX,iY,iXfname,iYfname)
+        print "*** Analyzing ndarr -> img mapping from geometry file: ***"
+        manyToOne = findImageManyToOne(iX,iY)
+        if len(manyToOne)>0:
+            print "INFO: There are %d image pixels with more than one ndarr pixel mapped to it" % len(manyToOne)
+            for imagePos, ndarrList in manyToOne.iteritems():
+                points = arrIndexListsToPoints(ndarrList)
+                points = [','.join(map(str,point)) for point in points]
+                print "image pixel = %r  has ndarray elements = (%s)" % (imagePos, '), ('.join(points))
+        else:
+            print "INFO: all ndarr elements are mapped to a unique image pixel"
+        imageGaps = findImageGaps(iX, iY)
+        if len(imageGaps)>0:
+            print "INFO: There appear to be %d gaps in the image, pixels in detctor areas for which no ndarr element is mapped" % \
+                len(imageGaps)
+            for gap in imageGaps:
+                msg = '  gap:'
+                for point in arrIndexListsToPoints(gap):
+                    msg += ' (%s)' % ','.join(map(str,point))
+                print msg
+        print "*** done analyzing ndarr -> img mapping. Computing average. ***"
 
     # make a psana configuration to load ndarray producer and ndarrCalib to go through
     # events and make an average
     ndarray_out_key = "ndarray"
     calib_out_key = "calibrated"
-    assert psanaTypeStr.startswith('psana.'), "psana type must start with psana."
-    try:
-        psanaType = eval(psanaTypeStr)
-    except NameError,e:
-        raise NameError("Unable to evaluate psana type from string: %s" % psanaTypeStr)
-    except AttributeError,e:
-        raise AttributeError("psana type string: % s has attribute that is wrong. Check type spec" % psanaTypeStr)
-
     psanaOptions, outArrayType = ParCorAna.makePsanaOptions(srcString, 
                                                             psanaType,
                                                             ndarray_out_key,
@@ -331,6 +371,11 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     fout = file(avgNdarrFname,'w')
     np.save(fout, ndarrAverage)
     fout.close()
+
+    if iX is None and iY is None:
+        assert len(ndarrAverage.shape)==2, "Internal error - thought that ndarray producer for %s outputed a 2D array, but it did not. The shape is %r" % (psanaTypeStr, ndarrAverage.shape)
+        iX, iY = makeNdarrImageMappingFor2D(ndarrAverage.shape)
+        saveNdarr2ImgMapping(iX, iY, iXfname, iYfname)
 
     print "saving img average"
     fout = file(avgImgFname,'w')
