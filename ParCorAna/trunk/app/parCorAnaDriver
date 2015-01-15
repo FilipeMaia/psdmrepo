@@ -1,0 +1,103 @@
+#!@PYTHON@
+
+from mpi4py import MPI
+import os
+import sys
+import argparse
+import logging
+import numpy as np
+
+import ParCorAna as pca
+
+programDescription = '''
+mpi program to distribute processing of detector data across multiple 
+workers. Divides elements amoung workers. A config file must be provided
+'''
+
+programDescriptionEpilog = '''
+# TODO: add epilog with examples of how to run, use parameters
+'''
+
+def getSystemAndUserParams(filename):
+    assert os.path.exists(filename), "configuration file does not exist"
+    configGlobals={'__name__':'__mpiFnDriver__'}
+    configLocals={}
+    execfile(filename, configGlobals, configLocals)
+    assert 'system_params' in configLocals.keys(), "config file did not define 'system_params'"
+    assert 'user_params' in configLocals.keys(), "config file did not define 'user_params'"
+    system_params = configLocals['system_params']
+    user_params = configLocals['user_params']
+    assert isinstance(system_params, dict), "system_params is not a dict"
+    assert isinstance(user_params, dict), "user_params is not a dict"
+
+    expectedSystemKeys = set(['dataset','numservers', 'serverhosts',
+                              'src','psanaType', 'ndarrayProducerOutKey',
+                              'ndarrayCalibOutKey', 'psanaOptions',
+                              'outputArrayType', 'times', 'update', 
+                              'mask_ndarrayCoords', 'h5output', 'overwrite',
+                              'verbosity', 'numevents', 'elementsperworker',
+                              'delays','user_class'])
+
+    undefinedSystemKeys = expectedSystemKeys.difference(set(system_params.keys()))
+    newSystemKeys = set(system_params.keys()).difference(expectedSystemKeys)
+    assert len(undefinedSystemKeys)==0, "param config file %s does not define required keys: %r" % \
+        (filename, undefinedSystemKeys)
+    if len(newSystemKeys)>0 and MPI.COMM_WORLD.Get_rank()==0:
+        sys.stderr.write("Warning: unexpected keys in param config file %s. Keys are: %r\n" % (filename, newSystemKeys))
+    return system_params, user_params
+
+def mainRoutine(system_params, user_params):
+    framework = pca.CommSystemFramework(system_params, user_params)
+    framework.run()
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=programDescription, 
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    ########################
+    # server paramemeters
+    parser.add_argument('-n', '--numevents', type=int, help="number of events to process, default is all", default=None)
+    parser.add_argument('-v', '--verbosity', type=str, help="logger verbosity (debug, info, warn) default is info", default=None)
+    parser.add_argument('-e', '--elementsperworker', type=int, help="testing, maximum number of elements per worker", default=None)
+    parser.add_argument('-c', '--config', type=str, help="config file - Python code defining dictionary params.", default=None)
+    parser.add_argument('-o', '--h5output', type=str, help="h5 output file - (replace config file value)", default=None)
+    parser.add_argument('-d', '--dataset', type=str, help="set dataset string (replace config file value)", default=None)
+    parser.add_argument('-s', '--numservers', type=int, help="number of servers (replace config file value)", default=None)
+    parser.add_argument('--overwrite', action='store_true', help="overwrite h5output file if given. overrides config file", default=False)
+    #######################
+    
+    args = parser.parse_args()
+    
+    assert args.config is not None, "You must provide a config file"
+    system_params, user_params = getSystemAndUserParams(args.config)
+
+    if args.verbosity is not None:
+        if args.verbosity == 'debug':
+            verbosity = logging.DEBUG
+        elif args.verbosity == 'info':
+            verbosity = logging.INFO
+        elif args.verbosity == 'warn':
+            verbosity = logging.WARNING
+        else:
+            raise Exception("command line argument verbosity %s not understood. must be 'debug', 'info', or 'warn'" % args.verbosity)
+        system_params['verbosity'] = verbosity
+
+    for arg, dictkey, argtype in zip([args.numevents, args.elementsperworker, args.h5output, args.dataset, args.numservers], \
+                                     ['numevents','elementsperworker', 'h5output', 'dataset', 'numservers'], \
+                                     [int,int,str,str,int]):
+        if arg is not None:
+            system_params[dictkey]=argtype(arg)
+
+    if args.overwrite:
+        system_params['overwrite'] = True
+
+    # if numEvents is given, adjust times
+    if args.numevents is not None and args.numevents > 0:
+        warnmsg = ''
+        if system_params['times'] > args.numevents:
+            warnmsg += 'set times from %d to %d based on numevents\n' % (system_params['times'], args.numevents)
+            system_params['times'] = args.numevents
+        if MPI.COMM_WORLD.Get_rank()==0:
+            print 'WARNING: %s' % warnmsg
+
+    mainRoutine(system_params=system_params, user_params=user_params)
