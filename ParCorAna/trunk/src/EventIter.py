@@ -86,7 +86,7 @@ class EventIter(object):
                 logger.warning("multiple servers in h5 mode, servers will handle the same events")
             elif (not self.isIndex) and (not self.isShmem):
                 assert self.isXtc, "dataset string: %s does not appear to be xtc" % dataSourceString
-                if streams in datasetParts:
+                if 'streams' in datasetParts:
                     streams = datasetParts['streams']
                     daqStreams = [stream for stream in streams if stream < 80]
                     ctrlStreams = [stream for stream in streams if stream >= 80]
@@ -94,10 +94,10 @@ class EventIter(object):
                     daqStreams = range(80)
                     ctrlStreams = range(80,160)
                 thisServerDaqStreams = [daqStreams[k] for k in range(self.serverNumber, len(daqStreams), numServers)]
-                thisServerStreams = thisServerStreams + ctrlStreams
+                thisServerStreams = thisServerDaqStreams + ctrlStreams
                 thisServerStreams.sort()
                 dataSourceString = PsanaUtil.changeDatasetStreams(dataSourceString, thisServerDaqStreams)
-                logger.debug("server %d of %d, changed streams. dataset=%s" % dataSourceString)
+                logger.debug("server %d of %d, changed streams. new dataset=%s" % (self.serverNumber, numServers, dataSourceString))
         self.dataSourceString = dataSourceString
 
         self.called = False

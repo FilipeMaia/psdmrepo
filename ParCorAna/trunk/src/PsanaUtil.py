@@ -40,7 +40,7 @@ def changeDatasetStreams(dataset, newStreams):
     '''
     # need to either add streams, or replace it
     if dataset.find('stream=')<0:
-        dataset += ':stream=%s' % (','.map(str,newStreams),)
+        dataset += ':stream=%s' % (','.join(map(str,newStreams),))
     else:
         beforeStream, afterStream = dataSourceString.split('stream=')
         afterParts = afterStream.split(':')

@@ -11,7 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-00
+2015-1-15 David A. Schneider
+- Fix bugs when using more than one server in live/offline mode when streams are not specified.
+
 2015-1-15 David A. Schneider
 - Initial check in. Based on package MpiDetectFn from users svn repo.
 - JIRA Issue PSAS-63
