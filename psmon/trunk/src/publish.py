@@ -12,6 +12,10 @@ __publisher = app.ZMQPublisher()
 __reset_listener = app.ZMQListener(__publisher.comm_socket)
 
 
+class PsmonPublishError(Exception):
+    pass
+
+
 def initialized():
     return __publisher.initialized
 
@@ -22,10 +26,19 @@ def init(port=config.APP_PORT, bufsize=config.APP_BUFFER):
 
 
 def send(topic, data):
-    if initialized():
-        __publisher.send(topic, data)
-        if LOG.isEnabledFor(logging.DEBUG):
-            LOG.debug('Published data to topic: %s', topic)
+    if not initialized():
+        try:
+            from mpi4py import MPI
+            if MPI.COMM_WORLD.Get_rank() == 0:
+                init()
+            else:
+                raise PsmonPublishError('Cannot send messages on a non-rank-zero MPI process without explicitly calling publish.init')
+        except ImportError:
+            init()
+
+    __publisher.send(topic, data)
+    if LOG.isEnabledFor(logging.DEBUG):
+        LOG.debug('Published data to topic: %s', topic)
 
 
 def register_handler(name, **kwargs):
