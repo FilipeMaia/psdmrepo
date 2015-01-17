@@ -53,7 +53,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     #char_shrink    = u'\u25B6' # solid right-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle 
 
-    list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
+    list_of_queues    = ['psanaq', 'psnehq', 'psfehq', 'psanaidleq', 'psanacsq'] # keep removed "psanacsq" in order to not crash calibman
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
@@ -101,7 +101,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guiexpcalibdir    = None
         self.guidirtree        = None
         self.dirtreemodel      = None
-
+        self.maskeditor        = None
         #self.thread_check_new_xtc_files = None
 
 #-----------------------------
@@ -325,11 +325,19 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',      val_def= True,  type='bool'  )
 
         # For batch jobs
-        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psanacsq', type='str' )
+        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def=self.list_of_queues[0], type='str' )
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=30,      type='int' )
 
         # GUIMaskEditor.py
-        self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )
+        def_fname_geometry    = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+        def_fname_roi_img_nda = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/cspad-ndarr-ave-cxii0114-r0227.dat'
+        self.fname_geometry         = self.declareParameter( name='FNAME_GEOMETRY',             val_def=def_fname_geometry,              type='str' )
+        self.fname_roi_img_nda      = self.declareParameter( name='FNAME_ROI_IMAGE_NDARRAY',    val_def=def_fname_roi_img_nda,           type='str' )
+        self.fname_roi_img          = self.declareParameter( name='FNAME_ROI_IMAGE',            val_def='./work/roi_img.npy',            type='str' )
+        self.fname_roi_mask_img     = self.declareParameter( name='FNAME_ROI_MASK_IMAGE',       val_def='./work/roi_mask_img.npy',       type='str' )
+        self.fname_roi_mask_nda     = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY',     val_def='./work/roi_mask_nda.npy',       type='str' )
+        self.fname_roi_mask_nda_tst = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY_TEST',val_def='./work/roi_mask_nda_tst.npy',   type='str' )
+        self.sensor_mask_cbits      = self.declareParameter( name='SENSOR_MASK_CONTROL_BITS',   val_def=255,       type='int' )
 
         # GUIFileManagerSingleControl.py
         #self.path_fm_selected   = self.declareParameter( name='PATH_FM_SELECTED',  val_def='./work/*.txt',       type='str' )
@@ -754,6 +762,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.styleLabel        = self.styleBlue
         self.styleEdit         = self.styleWhite
         self.styleEditInfo     = self.styleBkgd # self.styleGreenish
+        #self.styleEditInfo     = self.styleGreenish
         #self.styleEditInfo     = self.styleGreenish # Bluish
         self.styleEditBad      = self.styleRedBkgd
         self.styleButton       = self.styleGray

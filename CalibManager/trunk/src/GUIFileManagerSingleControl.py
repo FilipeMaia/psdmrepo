@@ -44,7 +44,7 @@ from ConfigParametersForApp import cp
 from Logger               import logger
 from FileNameManager      import fnm
 
-from CorAna.MaskEditor import MaskEditor
+#from CorAna.MaskEditor import MaskEditor
 import GlobalUtils     as     gu
 import RegDBUtils      as     ru
 from GUIFileBrowser         import *
@@ -483,8 +483,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
 
     def onButPlot(self):
-        logger.debug('onButPlot', __name__)
-
         logger.debug('onButPlot', __name__)
         try :
             cp.plotimgspe.close()

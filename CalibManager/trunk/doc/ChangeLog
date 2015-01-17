@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-01-16 Mikhail S. Dubrovin
+Tag: V00-00-79
+GUIMaskEditor - re-implement in GUI algorithm of the command-line (roicon) mask processing PSAS-6, PSAS-10, PSAS-11 
+	
 2015-01-14 Mikhail S. Dubrovin
 Tag: V00-00-78
 GUIDarkList - protection against creation of the list of dark files for tutorial directories like xpptut13 (PSAS-6).
