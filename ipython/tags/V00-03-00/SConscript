@@ -1,0 +1,56 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package ipython
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+# tornado and zmq, and pyzmq are required for ipython notebook
+pkg = "zeromq"
+pkg_ver = "3.2.3"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+LIBDIR = 'lib'
+PKGINFO = (pkg, pkg_ver, '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
+del LIBDIR
+
+
+pkg = "tornado"
+pkg_ver = "2.4.1"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
+
+
+pkg = "pyzmq"
+pkg_ver = "13.1.0"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
+
+
+pkg = "ipython"
+pkg_ver = "2.3.1"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin("lib", '$PYTHON', "site-packages")
+BINDIR = "bin"
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
