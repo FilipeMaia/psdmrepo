@@ -46,7 +46,7 @@ standardExternalPackage(pkg, **locals())
 
 
 pkg = "ipython"
-pkg_ver = "0.13.1"
+pkg_ver = "2.3.1"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin("lib", '$PYTHON', "site-packages")
