@@ -212,12 +212,16 @@ class MPI_Communicators:
             serverCommDict = self.serverWorkers[serverRank]
             serverRankInComm = serverCommDict['serverRankInComm']
             scatterCounts = copy.copy(workerCounts)
-            scatterCounts.insert(serverRankInComm, 0)
+            serverCount = 0
+            scatterCounts.insert(serverRankInComm, serverCount)
             scatterOffsets = copy.copy(workerOffsets)
-            previousOffset = 0
-            if serverRankInComm > 0:
-                previousOffset = scatterOffsets[serverRankInComm-1]
-            scatterOffsets.insert(serverRankInComm, previousOffset)
+            # the value we use for the server offset is not important, but checkCountsOffsets
+            # which we call below checks for offset[i+1]=offset[i]+count[i]
+            if serverRankInComm == 0:
+                serverOffset = 0
+            else:
+                serverOffset = workerOffsets[serverRankInComm-1]+workerCounts[serverRankInComm-1]
+            scatterOffsets.insert(serverRankInComm, serverOffset)
             self.serverWorkers[serverRank]['groupScattervCounts'] = tuple(scatterCounts)
             self.serverWorkers[serverRank]['groupScattervOffsets'] = tuple(scatterOffsets)
             CommSystemUtil.checkCountsOffsets(scatterCounts, scatterOffsets, self.totalElements)
