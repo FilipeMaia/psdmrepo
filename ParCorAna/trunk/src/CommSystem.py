@@ -9,9 +9,11 @@ import time
 import StringIO
 import traceback
 import copy
+import collections
 
 ## this package
 import CommSystemUtil
+import PsanaUtil
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 import Timing
 from XCorrBase import XCorrBase
@@ -22,14 +24,45 @@ timingorder =[]  # list of names in order inserted
 timingdict = {}
 ###########
 
-def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None, isShmem=None):
+def roundRobin(n, dictData):
+    '''returns a list of n items from the values of a dict, in a 
+    round robin fashion over the keys. Raises an Exception if
+    to few items in the dictData.
+    '''
+    if n==0:
+        return []
+    keys = dictData.keys()
+    assert len(keys)>0, "rounRobin will fail to find n=%d items from empty dict" % n
+    nextVal = dict([(ky,0) for ky in keys])
+    results = []
+    keyIndex = 0
+    keysWithAllValuesUsed = set()
+    while len(results)<n:
+        ky = keys[keyIndex]
+        if nextVal[ky] < len(dictData[ky]):
+            results.append(dictData[ky][nextVal[ky]])
+            nextVal[ky] += 1
+        else:
+            keysWithAllValuesUsed.add(ky)
+        if len(keysWithAllValuesUsed)==len(keys):
+            break
+        keyIndex += 1
+        keyIndex %= len(keys)
+
+    if len(results)!=n:
+        raise Exception("roundRobin did not get n=%d values from dictData=%r" % (n, dictData))
+    return results
+                           
+        
+def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None):
     '''returns ranks to be the servers. 
 
-    If the datasource comes from shared memory, one probably wants to use ranks on 
-    specific hosts for the servers. For example daq-amo-mon01 if this is a amo experiment.
-    By default, this function detects shmem in the dataSourceString and then looks for
-    specific hosts. The caller can override this by passing an explicit host list, as well
-    as turning off the detection of shmem.
+    In shared memory, you must provide the hosts to use, and the number of hosts
+    must be equal to the number of servers.
+
+    If not shared memory, ranks will be picked in a round robin fashion among the servers 
+    given, or all servers in the MPI communicator. The idea is to maximum the number
+    of hosts used for servers.
 
     ARGS:
        comm             - communicatior to identify hostnames in mpi world.
@@ -40,94 +73,51 @@ def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None, is
        dataSourceString - str - psana datasource string. 
        serverHosts      - None or list of str - None or empty means use default host 
                           assignment. Otherwise list must be a set of unique hostnames. 
-                          A non-empty list means find ranks on these hosts for servers - 
-                          round robin among the hosts, that is don't put two ranks on a host
-                          until all other hosts have a server rank.
-                          raise exception if serverHost list is to short or 
-                          specifies to few hosts that are in the mpi world.
-       isShmem          - override detection of shared memory server in datasource string.
-                          Default value of None means detect from datasourcestring, however
-                          it can be set to True or False. 
     RETURNS:
        (servers, hostmsg) where servers is a list of ranks in the comm to use as servers,
                           hostmsg is a logging string about the hosts chosen.
     '''
-    #########################################
-    # helper functions
-    def getMonitoringNodeShmemHosts(dataSourceString):
-        if dataSourceString.startswith('exp='):
-            dataSourceString = dataSourceString[4:]
-        if dataSourceString.startswith('shmem='):
-            dataSourceString = dataSourceString[6:]
-        instr = dataSourceString[0:3].lower()
-        hosts = {'amo':['daq-amo-mon01', 'daq-amo-mon02', 'daq-amo-mon03'],
-                 'xcs':['daq-xcs-mon01', 'daq-xcs-mon02', 'daq-xcs-mon03'],
-                 'xpp':['daq-xpp-mon01', 'daq-xpp-mon02', 'daq-xpp-mon03'],
-                 'cxi':['daq-cxi-mon01', 'daq-cxi-mon02', 'daq-cxi-mon03'],
-                 'mec':['daq-mec-mon01', 'daq-mec-mon02'],
-                 'sxr':['daq-sxr-mon01', 'daq-sxr-mon02', 'daq-sxr-mon03']}
-        if not (instr in hosts):
-            return []
-        return hosts[instr]
-    # end helper
-    assert comm.Get_size()>=numServers, "numServers=%d > MPI World Size=%d" % \
+
+    assert comm.Get_size() >= numServers, "More servers requested than are in the MPI World. numServers=%d > MPI World Size=%d" % \
         (numServers, comm.Get_size())
-    if isShmem is None:
-        isShmem = dataSourceString.find('shmem') > 0
+
     if serverHosts is None:
         serverHosts = []
-    if isShmem and len(serverHosts)==0:
-        serverHosts = getMonitoringNodeShmemHosts(dataSourceString)
-        if len(serverHosts) and comm.Get_rank()==0:
-            sys.stderr.write(('WARNING: detected shmem in datasource=%s, or ' + \
-                             'isShmem argument was True, but did not identify ' + \
-                              'known instrument to look up monitoring node hosts\n') % \
-                             dataSourceString)
-    if len(serverHosts) == 0:
-        # no server hosts even after looking up shmem monitoring nodes, just use first ranks
-        return range(numServers), "did not choose servers to be on specific hosts"
 
-    serverHosts = set(serverHosts) # get uniq server hosts
-    # choose ranks from non empty list of server hosts
+    isShmem = bool(PsanaUtil.parseDataSetString(dataSourceString)['shmem'])
+
+    if isShmem:
+        assert numServers == len(serverHosts), "shmem but numServers(%d) != length(%d) of serverHosts (hosts=%r)" % (numServers, len(serverHosts), serverHosts)
+        
+    ## identify host -> rank map through collective MPI communication
     localHostName = MPI.Get_processor_name()
     allHostNames = []
     allHostNames = comm.allgather(localHostName, None)
     assert len(allHostNames) == comm.Get_size(), 'allgather failed - did not get one host per rank'
-    serverHost2ranks = {}
+    serverHost2ranks = collections.defaultdict(list)
     for ii, hostName in enumerate(allHostNames):
-        if hostName not in serverHosts: continue
-        if hostName in serverHost2ranks:
-            serverHost2ranks[hostName].append(ii)
-        else:
-            serverHost2ranks[hostName]=[ii]
+        serverHost2ranks[hostName].append(ii)
 
-    hostMsg = ''
-    if len(serverHost2ranks.keys()) < len(serverHosts):
-        hostMsg += "WARNING: server host list contains more hosts than available in MPI world.\n"
-        hostMsg += "sever list=%r available=%r\n" % (serverHosts, serverHost2ranks.keys())
+    for host in serverHosts:
+        assert host in serverHost2ranks.keys(), "specified host: %s not in MPI world hosts: %r" % (host, serverHost2ranks.keys())
 
-    totalRanksOnServerHosts = sum(map(len,serverHost2ranks.values()))
-    assert totalRanksOnServerHosts >= numServers, ("%sERROR: There are only %d ranks " + \
-                                              "among the available server hosts: %r. " + \
-                                              " This is less than requested number: %d" % \
-        (hostMsg, totalRanksOnServerHosts, serverHost2ranks.keys(), numServers))
+    if len(serverHosts) == 0:
+        ranksForRoundRobin = serverHost2ranks
+    else:
+        ranksForRoundRobin = dict()
+        for host in serverHosts:
+            ranksForRoundRobin[host]=serverHost2ranks[host]
 
-    serverRanks = []
-    hostmsg += 'server host assignment:'
-    hostsToUse = serverHosts2ranks.keys()
-    hostsToUse.sort()
-    while len(hostsToUse) < numServers:
-        hostsToUse += hosts # doubles len of hostToUse each time
+    serverRanks = roundRobin(numServers, ranksForRoundRobin)
 
-    while len(serverRanks) < numServers and len(hostsToUse)>0:
-        nextHost = hostsToUse.pop(0)
-        hasRank = len(serverHost2ranks[nextHost])>0
-        if hasRank:
-            nextRank = serverHost2ranks[nextHost].pop(0)
-            serverRanks.append(nextRank)
-            hostMsg += '  rank=%d:host=%s' % (nextRank, nextHost)
-    assert len(serverRanks)==numServers, "unexpected: too few serverRanks assigned."
+    hostmsg = 'server host assignment:'
+    rank2host=collections.defaultdict(list)
+    for host,rankList in serverHost2ranks.iteritems():
+        for rank in rankList:
+            rank2host[rank].append(host)
 
+    hostmsg += ", ".join(["rnk=%d->host=%s" % (rank, rank2host[rank]) for rank in serverRanks \
+                          if rank in serverRanks])
     return serverRanks, hostmsg
 
 class MPI_Communicators:
@@ -832,10 +822,8 @@ class CommSystemFramework(object):
                                                    numservers,
                                                    dataset,
                                                    serverhosts)
-
-        mp = identifyCommSubsystems(serverRanks=serverRanks, 
-                                       worldComm=MPI.COMM_WORLD)
-
+        if MPI.COMM_WORLD.Get_rank()==0:
+            print "CommSystemFramework: %s" % hostmsg
         # set mpi paramemeters for framework
         mp = identifyCommSubsystems(serverRanks=serverRanks, worldComm=MPI.COMM_WORLD)
         verbosity = system_params['verbosity']

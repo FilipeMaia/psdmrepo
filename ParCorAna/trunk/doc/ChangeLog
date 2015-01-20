@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-1-20 David A. Schneider
+- change default server assignment to round robin on available hosts
+- take out automatic detection of server hosts for shmem
+- identify instrument in psana datasource for shmem as well as exp=
+	
 2015-1-15 David A. Schneider
 - get mask color tool to work with a detector that produces a 2D ndarray for which there is no geometry file
 

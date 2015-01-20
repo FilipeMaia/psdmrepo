@@ -80,7 +80,7 @@ def parseDataSetString(dataset):
         else:
             keyValues[eqSplit[0]] = True
 
-    # check for things like exp=CXI/sss to get instrument
+    # check for things like exp=CXI/sss to get instrument as well as shmem=CXI
     if 'exp' in keyValues:
         expValue = keyValues['exp']
         expValueSplit = expValue.split('/')
@@ -92,8 +92,14 @@ def parseDataSetString(dataset):
             keyValues['exp'] = expValueSplit[0]
             assert len(expValueSplit[0])>3, "exp key=%s does not have more than 3 characters" % expValueSplit[0]
             keyValues['instr']=expValueSplit[0][0:3].upper()
+    elif 'shmem' in keyValues:
+        assert len(keyValues['shmem'])>=3, "shmem in datasource string, but value=%s has < 3 characters?" % keyValues['shmem']
+        keyValues['instr']=keyValues['shmem'][0:3].upper()
     else:
-        raise Exception("exp=xx does not appear appear in datasource specification")
+        raise Exception("neither exp= nor shmem= appears in datasource specification")
+    knownInstruments = 'AMO  CXI  DIA  MEC  MOB  SXR  USR  XCS  XPP'.split()
+    assert keyValues['instr'] in knownInstruments, "Could not find KNOWN instrument in datasource string: %s. Found %s. Looking for one of %s" % \
+        (dataset, keyValues['instr'],knownInstruments)
 
     # convert range lists for run or stream
     if 'run' in keyValues:

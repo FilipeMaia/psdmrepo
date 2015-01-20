@@ -132,7 +132,17 @@ system_params['mask_ndarrayCoords'] = "see __init__.py in ParCorAna/src for docu
 #
 system_params['numservers'] = 1
 system_params['serverhosts'] = None  # None means system selects which hosts to use (default). 
+
+# when explicitly listing hosts, the number of hosts much agree with the number of servers
 # system_params['serverhosts'] = ['host1', 'host2']  # to explicitly set hosts, use a list of hostnames
+
+# here are the hosts used for each instrument in shared memory mode
+# system_params['serverhosts'] = ['daq-amo-mon01', 'daq-amo-mon02', 'daq-amo-mon03'] 
+# system_params['serverhosts'] = ['daq-xcs-mon01', 'daq-xcs-mon02', 'daq-xcs-mon03']
+# system_params['serverhosts'] = ['daq-xpp-mon01', 'daq-xpp-mon02', 'daq-xpp-mon03']
+# system_params['serverhosts'] = ['daq-cxi-mon01', 'daq-cxi-mon02', 'daq-cxi-mon03']
+# system_params['serverhosts'] = ['daq-sxr-mon01', 'daq-sxr-mon02', 'daq-sxr-mon03']
+# system_params['serverhosts'] = ['daq-mec-mon01', 'daq-mec-mon02']
 
 
 ########### times ######## update ##############
