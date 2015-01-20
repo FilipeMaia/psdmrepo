@@ -412,7 +412,7 @@ class RunMaster(object):
     '''
     def __init__(self, worldComm, masterRank, viewerRank, serverRanks, 
                  masterWorkersComm, masterRankInMasterWorkersComm,
-                 updateIntervalEvents, logger):
+                 updateIntervalEvents, hostmsg, logger):
 
         self.worldComm = worldComm
         self.masterRank = masterRank
@@ -423,6 +423,7 @@ class RunMaster(object):
         self.worldComm = worldComm
         self.viewerRank = viewerRank
         self.logger = logger
+        self.logger.info(hostmsg)
 
         self.firstSec = None
         # initially all servers are not ready
@@ -554,6 +555,9 @@ class RunMaster(object):
         serverReceiveData, serverRequests = self.initRecvRequestsFromServers()
 
         relTime = 0.0
+        numEventsAtLastDataRateMsg = 0
+        timeAtLastDataRateMsg = time.time()
+        startTime = time.time()
         while True:
             # a server must be in one of: ready, noReady or finished
             serversAccountedFor = len(self.readyServers) + len(self.finishedServers) + \
@@ -606,6 +610,19 @@ class RunMaster(object):
                 self.logger.debug("CommSystem: Informing viewers and workers to update" )
                 self.informViewerOfUpdate(relTime)
                 self.informWorkersToUpdateViewer()
+
+            # check to display message
+            eventsSinceLastDataRateMsg = self.numEvents - numEventsAtLastDataRateMsg
+            if eventsSinceLastDataRateMsg > 2400: # about 20 seconds of data at 120hz
+                curTime = time.time()
+                dataRateHz = eventsSinceLastDataRateMsg/(curTime-timeAtLastDataRateMsg)
+                self.logger.info("Current data rate is %.2f Hz" % dataRateHz)
+                timeAtLastDataRateMsg = cutTime
+                numEventsAtLastDataRateMsg = self.numEvents
+
+        # one last datarate msg
+        dataRateHz = self.numEvents/(time.time()-startTime)
+        self.logger.info("Overall data rate is %.2f Hz" % dataRateHz)
 
         # send one last update at the end
         self.logger.debug("CommSystem: servers finished. sending one last update")
@@ -738,7 +755,7 @@ class RunViewer(object):
                 raise Exception("unknown msgtag")
         self.g2.shutdown_viewer()
 
-def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase):
+def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg):
     '''main driver for the system. 
     ARGS:
     mp - a 
@@ -764,7 +781,7 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase):
         elif mp.isMaster:
             runMaster = RunMaster(mp.comm, mp.masterRank, mp.viewerRank, mp.serverRanks, 
                                   mp.masterWorkersComm, mp.masterRankInMasterWorkersComm,
-                                  updateInterval, logger)
+                                  updateInterval, hostmsg, logger)
             runMaster.run()
             reportTiming = True
             timingNode = 'MASTER'
@@ -822,8 +839,7 @@ class CommSystemFramework(object):
                                                    numservers,
                                                    dataset,
                                                    serverhosts)
-        if MPI.COMM_WORLD.Get_rank()==0:
-            print "CommSystemFramework: %s" % hostmsg
+        self.hostmsg = hostmsg
         # set mpi paramemeters for framework
         mp = identifyCommSubsystems(serverRanks=serverRanks, worldComm=MPI.COMM_WORLD)
         verbosity = system_params['verbosity']
@@ -852,5 +868,5 @@ class CommSystemFramework(object):
         self.updateInterval = system_params['update']
         
     def run(self):
-        runCommSystem(self.mp, self.updateInterval, self.maxTimes, self.xcorrBase)
+        runCommSystem(self.mp, self.updateInterval, self.maxTimes, self.xcorrBase, self.hostmsg)
 
