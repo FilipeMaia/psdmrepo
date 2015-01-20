@@ -53,7 +53,13 @@ class ConfigParametersForApp ( ConfigParameters ) :
     #char_shrink    = u'\u25B6' # solid right-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle 
 
-    list_of_queues    = ['psanaq', 'psnehq', 'psfehq', 'psanaidleq', 'psanacsq'] # keep removed "psanacsq" in order to not crash calibman
+    list_of_queues    = [ 'psnehprioq' \
+                        , 'psfehprioq' \
+                        , 'psanaq' \
+                        , 'psnehq' \
+                        , 'psfehq' \
+                         ]
+
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
@@ -76,6 +82,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.readParametersFromFile (fname)
         self.initRunTimeParameters()
         self.defineStyles()
+
   
     def initRunTimeParameters( self ) :
         self.iconsAreLoaded    = False
@@ -103,6 +110,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dirtreemodel      = None
         self.maskeditor        = None
         #self.thread_check_new_xtc_files = None
+
+        if self.bat_queue.value() == 'psanacsq' : self.bat_queue.setValue('psnehprioq')
 
 #-----------------------------
 
