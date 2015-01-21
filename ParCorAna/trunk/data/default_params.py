@@ -88,48 +88,44 @@ system_params['psanaOptions'], \
 system_params['mask_ndarrayCoords'] = "see __init__.py in ParCorAna/src for documentation on this parameter"
 
 ####### numservers serverhosts #################
+# The servers are responsible for working through the data. If they do a lot of 
+# processing of the detector data, such as complicated calibration, they can become a bottleneck.
+# Running several servers in parallel can increase performance. The 'numservers' parameter allows
+# users to increase the number of servers. When running from shared memory, only certain nodes have 
+# access to the data. In this case, users need to specify the names of these hosts. This is what the
+# 'serverhosts' parameter is for. 
 #
-# The server(s) calibrates the detector data and scatters it to the workers. 
-# The user module do processing to filter what events are scattered. The servers
-# can become a bottleneck. You want just enough servers to keep up with the data
-# rate, but not so many that you take away resources from the workers. 
+# There are limits on the number of servers on can use. These depend on the input mode specified in the
+# psana datasource string. When running in live mode, the most servers one can run is the number of 
+# distinct DAQ streams (usually six). When running in indexing mode, there is no limit, but more 
+# servers creates more I/O. Performance in index mode has not been evaluated. When running from shared 
+# memory, there is no I/O limit on the number of servers. 
 #
-# in index mode, it is easy to add more servers, the index files are used to
-# distribute the events.
+# The big limit on the number of servers is the balance of how many MPI ranks are servers vs. workers.
+# Ideally, one uses as many workers as possible, while using enough servers to read through the data.
 #
-# in shared memory mode, servers have to run on hosts with shared memory slices.
-# These shared memory slices distribute the events, and each server only serves an
-# event once, so it is easy to distribute the events among the servers - multiple 
-# framework servers can request events from the same shared memory server and not get
-# the same event. However to cover all the events, you want at least one server on each
-# daq monitoring node with a shared memory server (Assuming these servers partition the
-# events among themselves).  The framework knows the daq monitoring nodes for each 
-# instrument. By default it will distribute the servers among these hosts in a round
-# robin fashion, but it presently does not check if shared memory servers are running
-# on those nodes. It assumes all monitoring nodes get a shared memory slice. Users can 
-# specify a host list to override this default behavior. The system will pick ranks on 
-# these hosts for the framework servers.
+# For testing locally, it is reccommended that you use 1 server. 
 #
-# in live & offline linear mode, it is more difficult to distribute events (note, there 
-# should be no point to running offline linear mode, use indexing mode instead). To do so,
-# each server handles a fraction of the streams. Typically there are 6 DAQ streams and
-# 1 or 2 IOC control streams. The IOC control streams with xtcav and other data require 
-# special handling. Since these streams (numbered 80 and above) have data that 
-# needs to be merged with all the other streams, they must be passed to each server.
+# When running in live mode on the batch farm, it is recommended that you use the same number of 
+# servers as you have DAQ streams. Most always this is 6. In addition, it is recommended that
+# you run an MPI job with at least 12 * (numservers-1) + 1 procs - or at least 61. The framework will choose
+# MPI ranks on distinct nodes when it can. It seems that having servers be on distinct nodes increases
+# performance. Presently, each psana node has 12 cores, once you use 61 cores you're job will cover at 
+# least 6 nodes.
 #
-# For example, if there are 6 streams, 0,1,2,3,4,5 and a stream 80, then if numservers = 3 
-# the stream assignment will be
+# To see exactly how many DAQ streams you have, look at the files for your run. For example
 #
-# server 0: streams 0,3,80
-# server 1: streams 1,4,80
-# server 2: streams 2,5,80
+#  ls -lrth /reg/d/psdm/xpp/xpptut13/xtc/*-r1437*.xtc
+
+#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 20  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s00-c00.xtc
+#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 21  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s02-c00.xtc
+#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 21  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s01-c00.xtc
 #
-# If 80 is excluded from the streams via the :stream=0-6 command in the datasource string, then 
-# none of the servers will read stream 80 and one should expect better performance.
-#
-# If one is scattering a camera from s80 to the workers in live mode, one should probably 
-# only use one server.
-#
+# Shows that there are only 3 streams for run 1437 of the xpp tutorial data. Note, there is a difference
+# between streams that are numbered at 80+ vs streams numbered less than 80. 80+ are control streams, and
+# streams less than 80 are DAQ streams. Do not count control streams, only count DAQ streams. For live
+# mode, do not use more streams than there are DAQ streams.
+
 system_params['numservers'] = 1
 system_params['serverhosts'] = None  # None means system selects which hosts to use (default). 
 
