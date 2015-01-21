@@ -26,7 +26,7 @@ del LIBDIR
 
 
 pkg = "tornado"
-pkg_ver = "2.4.1"
+pkg_ver = "3.2.2"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
 PYDIR = pjoin("lib", '$PYTHON', "site-packages")
