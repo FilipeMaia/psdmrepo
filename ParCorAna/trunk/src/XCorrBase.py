@@ -18,21 +18,65 @@ from EventIter import EventIter
 # utitlity functions users may use
 def makeDelayList(start, stop, num, spacing, logbase=np.e):
     '''Constructs a list of delays, from [start,top] with endpoints, with either linear or log spacing.
-    returns list as array of int32.
+    returns list as array of int32. Always returns a list of unique integer values. Makes a best effort to 
+    hit the number of user requested delays.
     '''
+    ####### helper function #######
+    def getUniqueRoundedIntegerDelays(start, stop, numToMakeUserNum, spacing, logbase):
+        if spacing == 'log':
+            logStart = np.log(start)
+            logStop = np.log(stop)
+            delays = np.logspace(start=logStart, stop=logStop, num=numToMakeUserNum, endpoint=True, base=logbase)
+        else:
+            delays = np.linspace(start, stop, numToMakeUserNum)
+        delays = list(set(np.round(delays).astype(np.int32)))
+        delays.sort()
+        return np.array(delays, dtype=np.int32)
+
+    ###### end helper function #####
+
     assert spacing in ['log','lin'], "spacing must be 'log' or 'lin'"
     assert stop >= start
+    assert isinstance(num,int), "num parameter must be an integer"
     assert num > 0
     assert start > 0
-    if spacing == 'log':
-        logStart = np.log(start)
-        logStop = np.log(stop)
-        delays = np.logspace(start=logStart, stop=logStop, num=num, endpoint=True, base=logbase)
-    else:
-        delays = np.linspace(start, stop, num)
-    delays = list(set(np.round(delays).astype(np.int32)))
-    delays.sort()
-    return np.array(delays, dtype=np.int32)
+    if num >= (stop-start+1):
+        return np.array(range(start,stop+1),dtype=np.int32)
+    candDelays = getUniqueRoundedIntegerDelays(start, stop, num, spacing, logbase)
+    if len(candDelays)==num:
+        return candDelays
+    assert len(candDelays) < num, "rounding to integers and taking unique values should have produced fewer values"
+    delaysLow = candDelays
+    del candDelays
+    numLow = num
+    numHigh = 2*num
+    delaysHigh = getUniqueRoundedIntegerDelays(start, stop, numHigh, spacing, logbase)
+    while len(delaysHigh) < num:
+        print "numHigh=%d len(delaysHigh)=%d" % (numHigh, len(delaysHigh))
+        numHigh = 2*numHigh
+        delaysHigh = getUniqueRoundedIntegerDelays(start, stop, numHigh, spacing, logbase)
+    if len(delaysHigh)==num:
+        return delaysHigh
+    # try binary search to get user requested number of delays. I'm not positive that the
+    # number of delays returned is monotonic with the number of delays requested, 
+    # so stop after a certain number of iterations to prevent an infinite loop (and just
+    # return however many delays we are generating, should be close to what was requested).
+    maxIter = 20
+    curIter = 1
+    candNum = (numLow + numHigh)/2
+    candDelays = getUniqueRoundedIntegerDelays(start, stop, candNum, spacing, logbase)
+    while (len(candDelays) != num) and (curIter <= maxIter):
+#        print "iter=%3d low=%3d high=%3d cand=%3d candDelays=%3d" % (curIter, numLow, numHigh, candNum, len(candDelays))
+        curIter += 1
+        if len(candDelays) > num:
+            numHigh = candNum
+        else:
+            numLow = candNum
+        candNum = (numLow + numHigh)/2
+        candDelays = getUniqueRoundedIntegerDelays(start, stop, candNum, spacing, logbase)
+    return candDelays
+            
+
 
 def writeToH5Group(h5Group, name2delay2ndarray):
     '''This writes the name2delay2ndarray 2D dict that the user module viewerPublish receives

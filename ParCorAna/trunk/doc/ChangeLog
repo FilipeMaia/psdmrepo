@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-1-21 David A. Schneider
+- improve helper function returning delay list to always return requested # of delays
+	
 2015-1-20 David A. Schneider
 - change default server assignment to round robin on available hosts
 - take out automatic detection of server hosts for shmem

@@ -159,10 +159,11 @@ system_params['update'] = 120*60*4  # update/viewer publish every n events.
 
 ######### delays ############
 system_params['delays'] = ParCorAna.makeDelayList(start=1,
-                                                    stop=25000, 
-                                                    num=100,
-                                                    spacing='log',  # can also be 'lin'
-                                                    logbase=np.e)
+                                                  stop=25000, 
+                                                  num=100,  # may return fewer than num delays, returns
+                                                  # unique integer delays after rounding
+                                                  spacing='log',  # can also be 'lin'
+                                                  logbase=np.e)
 
 ######## User Module ########
 import ParCorAna.UserG2 as UserG2
