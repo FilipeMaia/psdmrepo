@@ -54,15 +54,11 @@ def roundRobin(n, dictData):
     return results
                            
         
-def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None):
+def identifyServerRanks(comm, numServers, serverHosts=None):
     '''returns ranks to be the servers. 
 
-    In shared memory, you must provide the hosts to use, and the number of hosts
-    must be equal to the number of servers.
-
-    If not shared memory, ranks will be picked in a round robin fashion among the servers 
-    given, or all servers in the MPI communicator. The idea is to maximum the number
-    of hosts used for servers.
+    ranks will be picked in a round robin fashion among the servers given, or all servers 
+    in the MPI communicator. The idea is to maximum the number of hosts used for servers.
 
     ARGS:
        comm             - communicatior to identify hostnames in mpi world.
@@ -70,7 +66,6 @@ def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None):
                           with comm. All ranks in comm should call this during initialization.
                           best to call this function during the driver program for the system.
        numServers       - int - number of servers to find
-       dataSourceString - str - psana datasource string. 
        serverHosts      - None or list of str - None or empty means use default host 
                           assignment. Otherwise list must be a set of unique hostnames. 
     RETURNS:
@@ -84,11 +79,6 @@ def identifyServerRanks(comm, numServers, dataSourceString, serverHosts=None):
     if serverHosts is None:
         serverHosts = []
 
-    isShmem = bool(PsanaUtil.parseDataSetString(dataSourceString)['shmem'])
-
-    if isShmem:
-        assert numServers == len(serverHosts), "shmem but numServers(%d) != length(%d) of serverHosts (hosts=%r)" % (numServers, len(serverHosts), serverHosts)
-        
     ## identify host -> rank map through collective MPI communication
     localHostName = MPI.Get_processor_name()
     allHostNames = []
@@ -620,13 +610,13 @@ class RunMaster(object):
             if eventsSinceLastDataRateMsg > 2400: # about 20 seconds of data at 120hz
                 curTime = time.time()
                 dataRateHz = eventsSinceLastDataRateMsg/(curTime-timeAtLastDataRateMsg)
-                self.logger.info("Current data rate is %.2f Hz" % dataRateHz)
-                timeAtLastDataRateMsg = cutTime
+                self.logger.info("Current data rate is %.2f Hz. %d events processed" % (dataRateHz, self.numEvents))
+                timeAtLastDataRateMsg = curTime
                 numEventsAtLastDataRateMsg = self.numEvents
 
         # one last datarate msg
         dataRateHz = self.numEvents/(time.time()-startTime)
-        self.logger.info("Overall data rate is %.2f Hz" % dataRateHz)
+        self.logger.info("Overall data rate is %.2f Hz. Number of events is %d" % (dataRateHz, self.numEvents))
 
         # send one last update at the end
         self.logger.debug("CommSystem: servers finished. sending one last update")
@@ -841,7 +831,6 @@ class CommSystemFramework(object):
         assert isNoneOrListOfStrings(serverhosts), "system_params['serverhosts'] is neither None or a list of str"
         serverRanks, hostmsg = identifyServerRanks(MPI.COMM_WORLD,
                                                    numservers,
-                                                   dataset,
                                                    serverhosts)
         self.hostmsg = hostmsg
         # set mpi paramemeters for framework

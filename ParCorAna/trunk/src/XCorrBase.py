@@ -4,6 +4,8 @@ import numpy as np
 import os
 import time
 import shutil
+import StringIO
+import pprint
 
 import h5py
 
@@ -48,6 +50,29 @@ def writeToH5Group(h5Group, name2delay2ndarray):
             dataSetDType = ndarray.dtype
             delayDataset = nmGroup.create_dataset(dataSetName, dataSetShape, dataSetDType)
             delayDataset[:] = ndarray[:]
+
+def writeConfig(h5Group, system_params, user_params):
+    dictBuffer = StringIO.StringIO()
+    pprint.pprint(system_params, dictBuffer)
+    dictString = dictBuffer.getvalue()
+    h5Group["system_params"] = dictString
+
+    dictBuffer = StringIO.StringIO()
+    pprint.pprint(user_params, dictBuffer)
+    dictString = dictBuffer.getvalue()
+    h5Group["user_params"] = dictString
+
+    maskFile = system_params['mask_ndarrayCoords']
+    assert os.path.exists(maskFile), "mask file doesn't exist"
+    maskNumpyArray = np.load(file(maskFile,'r'))
+    h5Group['mask_ndarrayCoords']=maskNumpyArray
+    
+    # really the system shouldn't know about details of user_params, but right now we
+    # will look for the color file and write it to the h5 file
+    colorFile = user_params['color_ndarrayCoords']
+    assert os.path.exists(colorFile), "specified color file doesn't exist: %s" % colorFile
+    colorNumpyArray = np.load(file(colorFile,'r'))
+    h5Group['color_ndarrayCoords'] = colorNumpyArray        
 
 ###############################
 class XCorrBase(object):
@@ -197,6 +222,9 @@ class XCorrBase(object):
                 raise Exception("inprogress file for given h5output: %s exists. System will not overwrite even with --overwrite. Delete file before running" % self.h5inprogress)
             self.h5file = h5py.File(self.h5inprogress,'w')
             self.h5GroupFramework = self.h5file.create_group('system')
+            writeConfig(self.h5GroupFramework,
+                        self.system_params,
+                        self.user_params)
             self.h5GroupUser = self.h5file.create_group('user')
         else:
             self.h5file = None
