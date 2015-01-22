@@ -177,12 +177,21 @@ class ImageClient(PlotClient):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         # if a color palette is specified check to see if it valid
         cmap = plt.get_cmap(config.MPL_COLOR_PALETTE)
+        # deal with custom axis ranges if requested
+        if init_im.pos is None and init_im.scale is None:
+            extent = None
+        else:
+            x1 = 0 if init_im.pos is None else init_im.pos[0]
+            xscale = 1 if init_im.scale is None else init_im.scale[0]
+            y1 = 0 if init_im.pos is None else init_im.pos[1]
+            yscale = 1 if init_im.scale is None else init_im.scale[1]
+            extent = [x1, x1 + xscale * init_im.image.shape[1], y1 + yscale * init_im.image.shape[0], y1]
         if self.info.palette is not None:
             try:
                 cmap = plt.get_cmap(self.info.palette)
             except ValueError:
                 LOG.warning('Inavlid color palette for matplotlib: %s - Falling back to default: %s', self.info.palette, cmap.name)
-        self.im = self.ax.imshow(init_im.image, interpolation=self.info.interpol, cmap=cmap)
+        self.im = self.ax.imshow(init_im.image, interpolation=self.info.interpol, cmap=cmap, extent=extent)
         self.im.set_clim(self.info.zrange)
         self.cb = self.figure.colorbar(self.im, ax=self.ax)
         self.set_cb_col()
