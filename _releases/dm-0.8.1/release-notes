@@ -1,0 +1,4 @@
+- Changed the interface to dm_create_folders. Allow to create path for single experiments and
+  specifying the datapath and scratchpath.
+- Added tools to list mover processes on data mover hosts.
+- Added tool to check u2 and acls of instrument directory on dss node.
