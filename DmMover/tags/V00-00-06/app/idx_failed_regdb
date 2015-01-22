@@ -1,0 +1,128 @@
+#!@PYTHON@
+
+import os
+import sys
+import stat
+import time
+import logging
+import argparse
+
+import DmMover.db_access as regdb
+from DmMover.xtcidxjob import IdxSrvClient
+
+pjoin = os.path.join
+
+
+# ========================================================================
+
+db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
+test_db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
+
+usage="""
+Find index files that were not transfered by the data movers and add them to 
+the idx creation queue.
+"""
+help_epilog=""" """
+
+# ========================================================================
+    
+class ExperInfo:
+    def __init__(self,conn):
+        self.conn = conn
+    
+        self.id2name = {}
+
+    def id2exp_instr(self, exp_id):
+        """ Return name and instr for an experiment using its ID """
+        if exp_id in self.id2name:
+            return  self.id2name[exp_id] 
+        
+        name, instr = (self.conn.id2name(exp_id), self.conn.instr4id(exp_id))
+        self.id2name[exp_id] = (name, instr)
+        return name, instr
+
+
+class ExpFile:
+    def __init__(self,name,instr,xtc_dir,idx_file):
+        self.name, self.instr = name, instr
+        self.xtc_dir = xtc_dir
+        self.idx_file = idx_file
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("--hours", type=int, default=24, help="max age of failed idx entries in RegDB")
+    parser.add_argument("--nmax", type=int, default=-1, help="Max number of index files to process (-1: all found)")
+    parser.add_argument("--wait", type=int, default=-1, help="Wait [min] between checking for failed files. If <0 run only once")
+    parser.add_argument("--instr", help="select only index files from a specific instr")
+    parser.add_argument("--listonly", action='store_true', default=False)
+    parser.add_argument("--verbose", "-v", action='count', default=0)
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    log_levels = [logging.WARNING, logging.INFO, logging.DEBUG]
+    args.verbose = min(args.verbose, len(log_levels)-1)
+    logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
+                        datefmt="%Y%m%d %H:%M:%S")
+    regdb.select_db(db_conn)
+    logging.warning("use production db")
+
+    exp_info = ExperInfo(regdb)
+    queue = IdxSrvClient("/u1/psdm/srv_idx/db")
+
+    while True:        
+        age_ns = long(1E9 * (time.time() - args.hours*3600))
+        idx_files = regdb.failed_idx_files(age=age_ns)
+        
+        logging.info("Found %d files", len(idx_files))
+    
+        ndone, nexists = 0, 0 
+        for idx in idx_files:
+            if args.nmax >= 0 and ndone >= args.nmax:
+                logging.warning("exit loop limit")
+                break
+
+            exp_id =  idx['exper_id']
+            name, instr = exp_info.id2exp_instr(exp_id)
+        
+            if args.instr and args.instr != instr.lower():
+                continue
+
+            xtc_path = pjoin("/reg/d/psdm", instr.lower(), name, 'xtc')
+            ind = idx['file'].find(".xtc")
+            xtc_name = idx['file'][:ind+4]
+            idx_file = pjoin(xtc_path, 'index', idx['file'])
+            
+            if os.path.exists(idx_file):
+                logging.debug("Exists %s", idx_file)
+                continue
+            if not os.path.exists(pjoin(xtc_path, xtc_name)):
+                logging.debug("Xtc file is missing %s %s", xtc_name, xtc_path)
+                continue
+
+            rc = queue.add_request(xtc_name,xtc_path) if not args.listonly else 999
+            logging.info("Added %s %s %d", xtc_name, xtc_path, rc)            
+
+            if rc == -1: nexists += 1
+            if rc >= 0:  ndone += 1
+        
+        if args.wait <= 0:
+            break
+        else:
+            time.sleep(args.wait * 60)
+
+
+    logging.info("Done %s exists %d", ndone, nexists)
+    return 
+
+  
+# Main Entry
+if __name__ == "__main__":
+    
+    main()
