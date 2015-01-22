@@ -83,11 +83,13 @@ class Image(Plot):
     A data container for image data for the psmon client
     """
 
-    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect_ratio=None, aspect_lock=True):
+    def __init__(self, ts, title, image, xlabel=None, ylabel=None, aspect_ratio=None, aspect_lock=True, pos=None, scale=None):
         super(Image, self).__init__(ts, title, xlabel, ylabel)
         self.image = image
         self.aspect_ratio = aspect_ratio
         self.aspect_lock = aspect_lock
+        self.pos = pos
+        self.scale = scale
 
     @property
     def valid(self):
@@ -111,6 +113,16 @@ class Hist(Plot):
         self.values = values
         self.formats = formats
 
+    @property
+    def valid(self):
+        """
+        This attribute is True if this Hist object is valid
+
+        Conditions:
+         - The 'bins' and 'values' attributes must not be None
+        """
+        return self.bins is not None and self.values is not None
+
 
 class XYPlot(Plot):
     """
@@ -122,3 +134,13 @@ class XYPlot(Plot):
         self.xdata = xdata
         self.ydata = ydata
         self.formats = formats
+
+    @property
+    def valid(self):
+        """
+        This attribute is True if this XYPlot object is valid
+
+        Conditions:
+         - The 'xdata' and 'ydata' attributes must not be None
+        """
+        return self.xdata is not None and self.ydata is not None

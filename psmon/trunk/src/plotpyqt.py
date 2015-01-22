@@ -175,10 +175,16 @@ class PlotClient(object):
 class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
+        self.im_pos = init_im.pos
+        self.im_scale = init_im.scale
         if init_im.aspect_lock:
             self.set_aspect(init_im.aspect_ratio)
         self.set_grid_lines(False)
         self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
+        if self.im_pos is not None:
+            self.im.setPos(*self.im_pos)
+        if self.im_scale is not None:
+            self.im.scale(*self.im_scale)
         self.cb = pg.HistogramLUTItem(self.im, fillHistogram=True)
 
         # Setting up the color map to use
@@ -208,6 +214,12 @@ class ImageClient(PlotClient):
         """
         if data is not None:
             self.im.setImage(data.image.T, autoLevels=False)
+            if data.pos is not None and data.pos != self.im_pos:
+                self.im.setPos(*data.pos)
+                self.im_pos = data.pos
+            if data.scale is not None and data.scale != self.im_scale:
+                self.im.scale(*data.scale)
+                self.im_scale = data.scale
         return self.im
 
     def cursor_hover_evt_sub(self, x_pos, y_pos):
