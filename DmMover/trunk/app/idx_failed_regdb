@@ -56,7 +56,7 @@ def main():
 
     parser.add_argument("--hours", type=int, default=24, help="max age of failed idx entries in RegDB")
     parser.add_argument("--nmax", type=int, default=-1, help="Max number of index files to process (-1: all found)")
-    parser.add_argument("--wait", type=int, default=-1, help="run continously, wait %(metavar)s min") 
+    parser.add_argument("--wait", type=int, default=-1, help="Wait [min] between checking for failed files. If <0 run only once")
     parser.add_argument("--instr", help="select only index files from a specific instr")
     parser.add_argument("--listonly", action='store_true', default=False)
     parser.add_argument("--verbose", "-v", action='count', default=0)

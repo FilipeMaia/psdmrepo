@@ -1,14 +1,19 @@
 #!/bin/bash 
 #
-# Usage:  idx_queue.sh comand [options | arg]
-#   commands:
+# Simple command to access the service for creating missing index files.
+# Needs to run on the same server that runs the queue
+#
+# Usage:  idx_queue.sh [-v]  comand [options | arg]
+#
+#  commands:
 #      new | sub | done   
-#              count files with corresponding status
+#         count files with corresponding status. With -v option print the file names
+#         instead of the file count.
 #      wait [stat|set|rm]  (default stat)
-#              actions on wait semaphore file
+#         actions on wait semaphore file
 #      add [-l] xtcfile1 .. xtcfile2  
-#              add requests to queue to create idx files for xtc's.
-#              -l: do not add request if idx exists
+#         add requests to queue to create idx files for xtc's.
+#         -l: do not add request if idx exists
 #
 
 readonly DB=/u1/psdm/srv_idx/db
@@ -17,7 +22,11 @@ readonly WAITFN=/u1/psdm/srv_idx/WAIT
 
 list_status() {
     local stat=$1
-    sqlite3 ${DB} "select count(*) from idx where status = '$stat';"
+    if [[ ${VERBOSE} -eq 1 ]] ; then
+        sqlite3 ${DB} "select fpath || '/' || xtcfn from idx where status = '$stat';"
+    else
+        sqlite3 ${DB} "select count(*) from idx where status = '$stat';"
+    fi
 }
 
 wait_status() {
@@ -68,6 +77,17 @@ EOF
 }
 
 # --------------------------------------------------------------------
+
+VERBOSE=0
+while getopts :v OPT; do
+    case $OPT in
+        v|+v) VERBOSE=1 ;;
+        *) sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
 
 
 [[ ! -e ${DB} ]] && echo "No DB ${DB}" && exit 1
