@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-01-22 Mikhail S. Dubrovin
+Tag: V00-00-81
+- ConfigParametersForApp.py - get default example files from /reg/g/psdm/detector/alignment/cspad/... (PSAS-10)
+	
 2015-01-20 Mikhail S. Dubrovin
 Tag: V00-00-80
 - ConfigParametersForApp.py - change list of queues - set psnehprioq as default (PSAS-6)

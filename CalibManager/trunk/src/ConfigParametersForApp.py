@@ -338,8 +338,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=30,      type='int' )
 
         # GUIMaskEditor.py
-        def_fname_geometry    = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
-        def_fname_roi_img_nda = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/cspad-ndarr-ave-cxii0114-r0227.dat'
+        #def_fname_geometry    = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+        #def_fname_roi_img_nda = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/cspad-ndarr-ave-cxii0114-r0227.dat'
+        cdir = '/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-03-19/calib/'
+        def_fname_geometry    = cdir + 'CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+        def_fname_roi_img_nda = cdir + '../cspad-ndarr-ave-cxii0114-r0227.npy'
         self.fname_geometry         = self.declareParameter( name='FNAME_GEOMETRY',             val_def=def_fname_geometry,              type='str' )
         self.fname_roi_img_nda      = self.declareParameter( name='FNAME_ROI_IMAGE_NDARRAY',    val_def=def_fname_roi_img_nda,           type='str' )
         self.fname_roi_img          = self.declareParameter( name='FNAME_ROI_IMAGE',            val_def='./work/roi_img.npy',            type='str' )
