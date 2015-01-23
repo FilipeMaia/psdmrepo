@@ -7,8 +7,8 @@ from psmon.plots import XYPlot
 
 
 def main():
-    exp = 'xcsc0114'
-    run = '9'
+    exp = 'xcsi0314'
+    run = '12'
     counter = 0
     status_rate = 100
     myrate = .2 # sleep time between data sends - crudely limit rate to < 5 Hz
@@ -21,7 +21,7 @@ def main():
 
     ipimb_srcs = [
         (Source('BldInfo(XCS-IPM-02)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-02', [[], []], [[], []]),
-        (Source('DetInfo(XcsBeamline.1:Ipimb.4)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-04', [[], []], [[], []]),
+        (Source('BldInfo(XCS-IPM-04)'), Lusi.IpmFexV1, Lusi.IpmFexV1.channel, 'xcs-ipm-04', [[], []], [[], []]),
     ]
 
     # initialize socket connections
