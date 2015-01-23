@@ -1,0 +1,41 @@
+psana:
+- added better trace diagnostic about modules psana loads
+
+psmon:
+-add automatic publish.init() so user no longer needs to call it
+
+ImgAlgos:
+- NDArrImageProducer: add parameters mode and do_tilt by David's request (PSAS-11)
+- NDArrDropletFinder: add saving of images and droplets/peaks in files for test
+  purpose, add parameter value, control on print out etc. (PSAS-68)
+- AlgSmearing: add parameter value for base intensity level
+- AlgDroplet.h: add comments
+- data/PlotNDArrayAndPeaks.py: new file
+
+pdscalibdata:
+- NDArrIOV1<T,NDim>::save_ndarray: add print_bits parameter in static method save_ndarray (PSAS-44)
+
+CorAna:
+- MaskEditorButtons.py: extend the med option -m to save the mask as a *.npy
+  file (PSAS-10)
+
+CalibManager:
+- app/roicon: extend I/O to work with *.npy files,  use new algorithm to generate
+  ndarray for mask (PSAS-10)
+- GUIDarkList: protection against creation of the list of dark files for tutorial
+  directories like xpptut13 ( PSAS-6)
+- GUIMaskEditor: re-implement in GUI algorithm of the command-line (roicon) mask
+  processing (PSAS-6, PSAS-10, PSAS-11)
+- ConfigParametersForApp.py: change list of queues - set psnehprioq as default (PSAS-6).
+  Get default example files from /reg/g/psdm/detector/alignment/cspad/... (PSAS-10)
+
+External packages:
+- ipython: upgraded to version 2.3.1 (this comes with the new version of
+  the Python notebook)
+- tornado: upgraded to version 3.2.2 (the Python package needed by the new
+  version of Python notebook)
+- psutil: added support for version 2.2.0 of the Python interface to
+  the Linux operating system. Added to pyextra.
+- backports.ssl_match_hostname: the ssl.match_hostname() function backported
+  from Python 3.4. Added to pyextra.
+
