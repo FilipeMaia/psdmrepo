@@ -19,6 +19,7 @@
 //#include "PSCalib/SegGeometryCspad2x1V2.h"
 //#include "PSCalib/SegGeometryCspad2x1V3.h"
 #include "PSCalib/SegGeometryEpix100V1.h"
+#include "PSCalib/SegGeometryMatrixV1.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -67,6 +68,8 @@ namespace PSCalib {
  *  std::string source = "SENS2X1:V1";
  *  or 
  *  std::string source = "EPIX100:V1";
+ *  or 
+ *  std::string source = "PNCCD:V1";
  *  unsigned print_bits=0377; // does not print by default if parameter omited
  *  PSCalib::SegGeometry* segeo = PSCalib::SegGeometryStore::Create(segname, print_bits);
  *  @endcode
@@ -126,6 +129,8 @@ public:
         //if ( segname=="SENS2X1:V3" ) { return new PSCalib::SegGeometryCspad2x1V3(); }
 
         if ( segname=="EPIX100:V1" ) { return new PSCalib::SegGeometryEpix100V1(); }
+
+        if ( segname=="PNCCD:V1" ) { return new PSCalib::SegGeometryMatrixV1(512,512); }
 
         if (print_bits & 2) MsgLog("SegGeometryStore", info, "Segment geometry is undefined for segment name " << segname << " - return 0-pointer...");  
         //abort();

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-29
+2015-01-22 Mikhail S. Dubrovin	
+- add SegGeometryMatrixV1.py/ccp/h - add PNCCD in SegGeometryStore (PSAS-94)
+	
 Tag: V00-02-28
 2015-01-09 Mikhail S. Dubrovin	
 - GeometryObject (C++) - fix minor issue with update of coordinate eveluation

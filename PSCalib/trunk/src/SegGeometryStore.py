@@ -17,6 +17,7 @@ Usage::
 
     sg = sgs.Create('SENS2X1:V1', pbits=0377)
     sg2= sgs.Create('EPIX100:V1', pbits=0377)
+    sg3= sgs.Create('PNCCD:V1',   pbits=0377)
 
     sg.print_seg_info(pbits=0377)
     size_arr = sg.size()
@@ -69,6 +70,7 @@ from PSCalib.SegGeometryCspad2x1V1 import SegGeometryCspad2x1V1
 #from PSCalib.SegGeometryCspad2x1V2 import SegGeometryCspad2x1V2 
 #from PSCalib.SegGeometryCspad2x1V3 import SegGeometryCspad2x1V3 
 from PSCalib.SegGeometryEpix100V1 import SegGeometryEpix100V1 
+from PSCalib.SegGeometryMatrixV1 import SegGeometryMatrixV1 
 
 #------------------------------
 class SegGeometryStore() :
@@ -88,6 +90,7 @@ class SegGeometryStore() :
         #if segname=='SENS2X1:V2' : return SegGeometryCspad2x1V2(use_wide_pix_center=False)
         #if segname=='SENS2X1:V3' : return SegGeometryCspad2x1V3(use_wide_pix_center=False)
         if segname=='EPIX100:V1' : return SegGeometryEpix100V1(use_wide_pix_center=False)
+        if segname=='PNCCD:V1' :   return SegGeometryMatrixV1()
         return None
 
 #------------------------------
@@ -104,14 +107,18 @@ sgs = SegGeometryStore()
 
 def test_seggeom() :
 
-    if len(sys.argv)==1   : print 'For test(s) use command: python', sys.argv[0], '<test-number=0-1>'
+    if len(sys.argv)==1   : print 'For test(s) use command: python', sys.argv[0], '<test-number=1-3>'
 
-    elif(sys.argv[1]=='0') :
+    elif(sys.argv[1]=='1') :
         sg1 = sgs.Create('SENS2X1:V1', pbits=0377)
         sg1.print_seg_info(pbits=0377)
         
-    elif(sys.argv[1]=='1') :
+    elif(sys.argv[1]=='2') :
         sg2 = sgs.Create('EPIX100:V1', pbits=0377)
+        sg2.print_seg_info(pbits=0377)
+
+    elif(sys.argv[1]=='3') :
+        sg2 = sgs.Create('PNCCD:V1', pbits=0377)
         sg2.print_seg_info(pbits=0377)
 
     else : print 'Non-expected arguments: sys.argv=', sys.argv, ' use 0,1,2,...'

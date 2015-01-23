@@ -29,7 +29,7 @@ typedef PSCalib::SegGeometry SG;
 
 //-----------------
 
-int test01 () // Test 01 for CSPAD SENS2X1:V1
+int test01 () // Test for CSPAD SENS2X1:V1
 {
   cout << "Test of PSCalib::SegGeometryStore::Create(...)\n";     
 
@@ -41,11 +41,23 @@ int test01 () // Test 01 for CSPAD SENS2X1:V1
 
 //-----------------
 
-int test02 () // Test 02 for EPIX100:V1
+int test02 () // Test for EPIX100:V1
 {
   cout << "Test of PSCalib::SegGeometryStore::Create(...)\n";     
 
   SG *seggeom = PSCalib::SegGeometryStore::Create("EPIX100:V1", 0377);  
+  seggeom -> print_seg_info(0377);
+
+  return 0;
+}
+
+//-----------------
+
+int test03 () // Test for PNCCD:V1
+{
+  cout << "Test of PSCalib::SegGeometryStore::Create(...)\n";     
+
+  SG *seggeom = PSCalib::SegGeometryStore::Create("PNCCD:V1", 0377);  
   seggeom -> print_seg_info(0377);
 
   return 0;
@@ -60,6 +72,7 @@ int main (int argc, char* argv[])
   if      (argc == 1)                     {test01();}
   else if (argc == 2 && atoi(argv[1])==1) {test01();}
   else if (argc == 2 && atoi(argv[1])==2) {test02();}
+  else if (argc == 2 && atoi(argv[1])==3) {test03();}
   else    {
         cout << "WARNING!!! Unexpected input arguments, argc=" << argc << endl; 
         for(int i = 0; i < argc; i++)
