@@ -420,7 +420,7 @@ class GeometryObject :
     def det_shape(self, arr) :
         """ Check detector dependency and re-shape array if necessary
         """
-        print 'arr.size: %d   self.oname: %s' % (arr.size, self.oname)
+        #print 'PSCalib.GeometryObject.det_shape(...):  arr.size: %d   self.oname: %s' % (arr.size, self.oname)
         if arr.size == 143560 and self.oname == 'CSPAD2X2:V1' : # Shuffle pixels once for 2*185*388 and CSPAD2X2:V1 ONLY:
             # shaffle array for cspad2x2
             return two2x1ToData2x2(arr)

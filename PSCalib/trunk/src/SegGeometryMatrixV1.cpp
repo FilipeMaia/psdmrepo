@@ -264,7 +264,7 @@ const SegGeometry::pixel_mask_t* SegGeometryMatrixV1::pixel_mask_array(const uns
 {
   //cout << "SegGeometryMatrixV1::pixel_mask_array(): mbits =" << mbits << '\n';   
 
-  if ( ! m_done_bits & 4) m_pix_mask_arr = new pixel_mask_t[SIZE];
+  if ( !(m_done_bits & 4)) m_pix_mask_arr = new pixel_mask_t[SIZE];
 
   std::fill_n(m_pix_mask_arr, int(SIZE), SegGeometry::pixel_mask_t(1));
 

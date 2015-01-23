@@ -134,7 +134,9 @@ class SegGeometryMatrixV1(SegGeometry) :
         sp.x_arr_um = np.arange(sp._rows)*sp._pix_size_rows
         sp.y_arr_um = np.arange(sp._cols)*sp._pix_size_cols
 
-        sp.x_pix_arr_um, sp.y_pix_arr_um  = np.meshgrid(sp.x_arr_um, sp.y_arr_um)
+        # Arguments x and y are swapped in order to get grids for "matrix" coordinate system
+        # where X is directed from up to down, Y from left to right
+        sp.y_pix_arr_um, sp.x_pix_arr_um = np.meshgrid(sp.y_arr_um, sp.x_arr_um)
         sp.z_pix_arr_um = np.zeros((sp._rows,sp._cols))
         
 #------------------------------
@@ -144,10 +146,10 @@ class SegGeometryMatrixV1(SegGeometry) :
         """        
         if sp.pix_area_arr is not None : return
 
-        y_arr_size_um = np.ones(sp._cols) * sp._pix_size_cols
         x_arr_size_um = np.ones(sp._rows) * sp._pix_size_rows
+        y_arr_size_um = np.ones(sp._cols) * sp._pix_size_cols
 
-        sp.x_pix_size_um, sp.y_pix_size_um = np.meshgrid(x_arr_size_um, y_arr_size_um)
+        sp.y_pix_size_um, sp.x_pix_size_um = np.meshgrid(y_arr_size_um, x_arr_size_um)
         sp.z_pix_size_um = np.ones((sp._rows,sp._cols)) * sp._pix_size_depth
  
         sp.pix_area_arr = np.ones((sp._rows,sp._cols))

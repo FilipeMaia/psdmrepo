@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-30
+2015-01-23 Mikhail S. Dubrovin	
+- GeometryObject.det_shape(...) - comment print for debugging
+- SegGeometryMatrixV1.cpp - in pixel_mask_array(...) fix logical bug (order of logical operations)
+- SegGeometryMatrixV1.py - for matrix-like coordinate system have to use ymesh, xmesh = np.meshgrid(y,x)
+	
 Tag: V00-02-29
 2015-01-22 Mikhail S. Dubrovin	
 - add SegGeometryMatrixV1.py/ccp/h - add PNCCD in SegGeometryStore (PSAS-94)
