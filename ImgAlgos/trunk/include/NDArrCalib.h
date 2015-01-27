@@ -66,7 +66,7 @@ namespace ImgAlgos {
 class NDArrCalib : public Module {
 public:
 
-  typedef double data_out_t;
+  typedef double data_proc_t;
 
   // Default constructor
   NDArrCalib (const std::string& name) ;
@@ -100,6 +100,7 @@ public:
   void printEventRecord(Event& evt);
 
 protected:
+  void checkOutTypeImplementation();
   void getCalibPars(Event& evt, Env& env);
   //void getConfigPars(Env& env);
   void defImgIndexesForBkgdNorm();
@@ -131,6 +132,7 @@ private:
   unsigned        m_ind_min;          // window for background normalization from      m_ind_min
   unsigned        m_ind_max;          // window for background normalization to        m_ind_max
   unsigned        m_ind_inc;          // window for background normalization increment m_ind_inc
+  std::string     m_outtype;          // output ndarray data type; double (df), float, int int16
   unsigned        m_print_bits;       // bit mask for print options
   long            m_count_event;      // local event counter
   long            m_count_get;        // local successful get() counter
@@ -138,7 +140,9 @@ private:
   NDArrPars*      m_ndarr_pars;       // holds input data ndarray parameters
   unsigned        m_ndim;             // rank of the input data ndarray 
   unsigned        m_size;             // number of elements in the input data ndarray 
-  DATA_TYPE       m_dtype;            // numerated data type for data array
+  DATA_TYPE       m_dtype;            // numerated data type for input array
+  DATA_TYPE       m_ptype;            // numerated data type for processing array
+  DATA_TYPE       m_otype;            // numerated data type for output array
   DETECTOR_TYPE   m_dettype;          // numerated detector type source
 
   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
@@ -149,10 +153,10 @@ private:
 
   PSCalib::CalibPars::pixel_bkgd_t*    m_bkgd_data;
   PSCalib::CalibPars::pixel_mask_t*    m_mask_data;
-  data_out_t*                          m_nrms_data;
+  data_proc_t*                         m_nrms_data;
 
   PSCalib::CalibPars* m_calibpars;    // pointer to calibration store
-  //data_out_t* p_cdata;                // pointer to calibrated data array
+  //data_proc_t* p_cdata;                // pointer to calibrated data array
 
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
 
@@ -383,8 +387,9 @@ private:
 
 //-------------------
 
-  template <typename T, typename TOUT>
-    void applyCorrections(Event& evt, const T* p_rdata, TOUT* p_cdata)
+  template <typename T, typename TPROC>
+    // !!!!!!!!!!!!! void applyCorrections(Event& evt, const T* p_rdata, TPROC* p_cdata)
+    void applyCorrections(Event& evt, T* p_rdata, TPROC* p_cdata)
     {
      	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - comm_mode[...] - norm*m_bkgd[i]) * m_gain[i]; 
      	  // 2) apply bad pixel status: m_stat[i];
@@ -394,19 +399,19 @@ private:
 
 	  m_count_get++;
 
-	  TOUT low_val  = (TOUT) m_low_val; 
-	  TOUT low_thre = (TOUT) m_low_thre; 
-	  TOUT mask_val = (TOUT) m_mask_val; 
+	  TPROC low_val  = (TPROC) m_low_val; 
+	  TPROC low_thre = (TPROC) m_low_thre; 
+	  TPROC mask_val = (TPROC) m_mask_val; 
 
-     	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TOUT)p_rdata[i];
+     	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TPROC)p_rdata[i];
 
-     	  if (m_do_peds) { for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i]; }
-     	  if (m_do_cmod && m_do_peds) { do_common_mode<TOUT>(p_cdata); }
+     	  if (m_do_peds) { for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TPROC) m_peds_data[i]; }
+     	  if (m_do_cmod && m_do_peds) { do_common_mode<TPROC>(p_cdata); }
      	  if (m_do_bkgd) { 
                            double norm = normBkgd(p_cdata);  
-                           for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*norm); 
+                           for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TPROC)(m_bkgd_data[i]*norm); 
           }
-     	  if (m_do_gain) { for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i]; }
+     	  if (m_do_gain) { for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TPROC) m_gain_data[i]; }
 
      	  if (m_do_stat) {             
      	    for(unsigned i=0; i<m_size; i++) {
@@ -442,144 +447,79 @@ private:
             MsgLog( name(), info, ss.str());
           }
  	  
-          //saveNDArrInEvent <TOUT> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
+          //saveNDArrInEvent <TPROC> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
     }  
+
 //-------------------
 
-  template <typename T, typename TOUT>
+  template <typename TIN, typename TOUT, unsigned NDim>
+  void saveNDArrayInEventChangeType(PSEvt::Event& evt, ndarray<TIN,NDim>& nda)
+  {
+    ndarray<TOUT,NDim> out_nda(nda.shape());
+
+    // Pixel-by-pixel copy of input to output ndarray with type conversion:
+    typename ndarray<TIN,NDim>::iterator it = nda.begin(); 
+    typename ndarray<TOUT,NDim>::iterator it_out = out_nda.begin(); 
+    for (; it!=nda.end(); ++it, ++it_out) {
+        *it_out = (TOUT)*it;
+    } 
+
+    saveNDArrayInEvent<TOUT,NDim>(evt, m_src, m_key_out, out_nda); 
+    return;
+  }
+
+//-------------------
+
+  template <typename T, unsigned NDim>
+  void saveNDArrayInEventForOutType(PSEvt::Event& evt, ndarray<T,NDim>& nda)
+  {
+    if(m_otype == m_ptype) {saveNDArrayInEvent<T,NDim>(evt, m_src, m_key_out, nda); return; }
+
+    if(m_otype == FLOAT  ) {saveNDArrayInEventChangeType<T,float,NDim>   (evt, nda); return; }
+    if(m_otype == INT    ) {saveNDArrayInEventChangeType<T,int,NDim>     (evt, nda); return; }
+    if(m_otype == INT16  ) {saveNDArrayInEventChangeType<T,int16_t,NDim> (evt, nda); return; }
+    if(m_otype == DOUBLE ) {saveNDArrayInEventChangeType<T,double,NDim>  (evt, nda); return; }
+  }
+ 
+//-------------------
+
+  template <typename T, typename TPROC, unsigned NDim>
+    bool procEventForTypeNDim(Event& evt)
+    {
+      if (m_ndim != NDim) return false;
+
+      shared_ptr< ndarray<T,NDim> > shp = evt.get(m_str_src, m_key_in, &m_src);
+      if (shp.get()) { 
+        ndarray<TPROC,NDim> out_nda(shp->shape());
+        applyCorrections<T,TPROC>(evt, shp->data(), out_nda.data()); 
+        saveNDArrayInEventForOutType<TPROC,NDim>(evt, out_nda);
+        return true;
+      } 
+      return false;
+    }  
+
+//-------------------
+
+  template <typename T, typename TPROC>
     bool procEventForType(Event& evt)
     {
       // CONST
-
-      if (m_ndim == 2) {
-     	shared_ptr< ndarray<const T,2> > shp2_const= evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp2_const.get()) {
-	  ndarray<TOUT,2> out_nda(shp2_const->shape());
-          applyCorrections<T,TOUT>(evt, shp2_const->data(), out_nda.data()); 
-          save2DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 3) {
-     	shared_ptr< ndarray<const T,3> > shp3_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp3_const.get()) { 
-	  ndarray<TOUT,3> out_nda(shp3_const->shape());
-          applyCorrections<T,TOUT>(evt, shp3_const->data(), out_nda.data()); 
-          save3DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 4) {
-     	shared_ptr< ndarray<const T,4> > shp4_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp4_const.get()) { 
-	  ndarray<TOUT,4> out_nda(shp4_const->shape());
-          applyCorrections<T,TOUT>(evt, shp4_const->data(), out_nda.data());
-          save4DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 5) {
-     	shared_ptr< ndarray<const T,5> > shp5_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp5_const.get()) {
-	  ndarray<TOUT,5> out_nda(shp5_const->shape());
-          applyCorrections<T,TOUT>(evt, shp5_const->data(), out_nda.data());
-          save5DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 1) {
-     	shared_ptr< ndarray<const T,1> > shp1_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp1_const.get()) {
-	  ndarray<TOUT,1> out_nda(shp1_const->shape());
-          applyCorrections<T,TOUT>(evt, shp1_const->data(), out_nda.data());
-          save1DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
+      if (m_ndim == 2 && procEventForTypeNDim<const T,TPROC,2>(evt)) return true;
+      if (m_ndim == 3 && procEventForTypeNDim<const T,TPROC,3>(evt)) return true;
+      if (m_ndim == 4 && procEventForTypeNDim<const T,TPROC,4>(evt)) return true;
+      if (m_ndim == 5 && procEventForTypeNDim<const T,TPROC,5>(evt)) return true;
+      if (m_ndim == 1 && procEventForTypeNDim<const T,TPROC,1>(evt)) return true;
 
       // NON-CONST
-
-      if (m_ndim == 2) {
-     	shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp2.get()) { 
-	  ndarray<TOUT,2> out_nda(shp2->shape());
-          applyCorrections<T,TOUT>(evt, shp2->data(), out_nda.data()); 
-          save2DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 3) {
-     	shared_ptr< ndarray<T,3> > shp3 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp3.get()) { 
-	  ndarray<TOUT,3> out_nda(shp3->shape());
-          applyCorrections<T,TOUT>(evt, shp3->data(), out_nda.data());
-          save3DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 4) {
-     	shared_ptr< ndarray<T,4> > shp4 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp4.get()) { 
-	  ndarray<TOUT,4> out_nda(shp4->shape());
-          applyCorrections<T,TOUT>(evt, shp4->data(), out_nda.data());
-          save4DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 5) {
-     	shared_ptr< ndarray<T,5> > shp5 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp5.get()) { 
-	  ndarray<TOUT,5> out_nda(shp5->shape());
-          applyCorrections<T,TOUT>(evt, shp5->data(), out_nda.data());
-          save5DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
-      if (m_ndim == 1) {
-     	shared_ptr< ndarray<T,1> > shp1 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp1.get()) { 
-	  ndarray<TOUT,1> out_nda(shp1->shape());
-          applyCorrections<T,TOUT>(evt, shp1->data(), out_nda.data());
-          save1DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
-          return true;
-        } 
-      }
-
+      if (m_ndim == 2 && procEventForTypeNDim<T,TPROC,2>(evt)) return true;
+      if (m_ndim == 3 && procEventForTypeNDim<T,TPROC,3>(evt)) return true;
+      if (m_ndim == 4 && procEventForTypeNDim<T,TPROC,4>(evt)) return true;
+      if (m_ndim == 5 && procEventForTypeNDim<T,TPROC,5>(evt)) return true;
+      if (m_ndim == 1 && procEventForTypeNDim<T,TPROC,1>(evt)) return true;
       return false;
     }  
 
-//--------------------
-
-/*
-  template <typename T>
-  bool getConfigParsForType(Env& env)
-  {
-      shared_ptr<T> config = env.configStore().get(m_str_src, &m_src);
-      if (config) {
-
-        std::string str_src = srcToString(m_src); 
-
-        WithMsgLog(name(), info, str) {
-          str << "Get configuration parameters for source: " << str_src << "\n";
-          //str << " roiMask = "          << config->roiMask();
-          //str << " m_numAsicsStored = " << config->numAsicsStored();
-         }  
-        return true;
-      }
-      return false;
-  }
-*/
-
-//--------------------
-//--------------------
+//-------------------
 };
 
 } // namespace ImgAlgos

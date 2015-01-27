@@ -68,6 +68,7 @@ NDArrCalib::NDArrCalib (const std::string& name)
   , m_ind_min()
   , m_ind_max()
   , m_ind_inc()
+  , m_outtype()
   , m_print_bits()
   , m_count_event(0)
   , m_count_get(0)
@@ -94,10 +95,12 @@ NDArrCalib::NDArrCalib (const std::string& name)
   m_ind_min           = config   ("bkgd_ind_min",             0 );
   m_ind_max           = config   ("bkgd_ind_max",           100 );
   m_ind_inc           = config   ("bkgd_ind_inc",             2 );
+  m_outtype           = configStr("outtype",            "double");
   m_print_bits        = config   ("print_bits",               0 );
 
   m_ndarr_pars = new NDArrPars();
 
+  checkOutTypeImplementation();
   findDetectorType();
 }
 
@@ -129,8 +132,9 @@ NDArrCalib::printInputParameters()
         << "\n m_ind_max         : " << m_ind_max    
         << "\n m_ind_inc         : " << m_ind_inc
         << "\n m_print_bits      : " << m_print_bits
-	<< "\n Output data type  : " << typeid(data_out_t).name() << " of size " << sizeof(data_out_t)
         << "\n m_dettype         : " << m_dettype
+	<< "\n Proc data type    : " << typeid(data_proc_t).name() << " of size " << sizeof(data_proc_t)
+        << "\n outtype           : " << m_outtype
         << "\n";     
 
     printSizeOfTypes();
@@ -263,7 +267,7 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
          is_done_once = true;
       m_bkgd_data = new PSCalib::CalibPars::pixel_bkgd_t[m_size];
       m_mask_data = new PSCalib::CalibPars::pixel_mask_t[m_size];
-      m_nrms_data = new data_out_t[m_size];
+      m_nrms_data = new data_proc_t[m_size];
 
       if( m_do_mask && !m_fname_mask.empty())
         pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_mask_t> (m_fname_mask, "Mask", m_size, m_mask_data);
@@ -293,7 +297,7 @@ NDArrCalib::initAtFirstGetNdarray(Event& evt, Env& env)
   m_ndim  = m_ndarr_pars->ndim();
   m_src   = m_ndarr_pars->src();
 
-  //p_cdata = new data_out_t[m_size];
+  //p_cdata = new data_proc_t[m_size];
 
   getCalibPars(evt, env);
 }
@@ -306,12 +310,12 @@ NDArrCalib::procEvent(Event& evt, Env& env)
   if ( ! m_count_get ) initAtFirstGetNdarray(evt, env);
   if ( ! m_ndarr_pars -> is_set() ) return;
 
-  if      (m_dtype == UINT16   && procEventForType<uint16_t, data_out_t> (evt) ) return;
-  else if (m_dtype == INT      && procEventForType<int,      data_out_t> (evt) ) return;
-  else if (m_dtype == INT16    && procEventForType<int16_t,  data_out_t> (evt) ) return;
-  else if (m_dtype == FLOAT    && procEventForType<float,    data_out_t> (evt) ) return;
-  else if (m_dtype == UINT8    && procEventForType<uint8_t,  data_out_t> (evt) ) return;
-  else if (m_dtype == DOUBLE   && procEventForType<double,   data_out_t> (evt) ) return;
+  if      (m_dtype == UINT16   && procEventForType<uint16_t, data_proc_t> (evt) ) return;
+  else if (m_dtype == INT      && procEventForType<int,      data_proc_t> (evt) ) return;
+  else if (m_dtype == INT16    && procEventForType<int16_t,  data_proc_t> (evt) ) return;
+  else if (m_dtype == FLOAT    && procEventForType<float,    data_proc_t> (evt) ) return;
+  else if (m_dtype == UINT8    && procEventForType<uint8_t,  data_proc_t> (evt) ) return;
+  else if (m_dtype == DOUBLE   && procEventForType<double,   data_proc_t> (evt) ) return;
 
   if (++m_count_msg < 11 && m_print_bits) {
     MsgLog(name(), warning, "Image is not available in the event:" << m_count_event 
@@ -351,6 +355,24 @@ NDArrCalib::printCommonModePars()
      for (int i=0; i<16;  ++i) ss << " " << m_cmod_data[i];
      MsgLog(name(), info, ss.str());
 }
+
+//--------------------
+
+void 
+NDArrCalib::checkOutTypeImplementation()
+{  
+  m_ptype = dataType<data_proc_t>();
+
+  if (m_outtype == "double") { m_otype = DOUBLE; return; } 
+  if (m_outtype == "float" ) { m_otype = FLOAT;  return; }
+  if (m_outtype == "int"   ) { m_otype = INT;    return; } 
+  if (m_outtype == "int16" ) { m_otype = INT16;  return; } 
+
+  const std::string msg = "The requested output type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
+}
+
 
 //--------------------
 } // namespace ImgAlgos

@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-78
+2015-01-27 Mikhail S. Dubrovin
+- NDArrCalib - add parameter outtype to save calibrated ndarray in double(def), float, int, int16 (PSAS-95)
+	
 Tag: V00-03-77
 2015-01-13 Mikhail S. Dubrovin
 - NDArrDropletFinder - parameter value, control on print out etc. (PSAS-68)

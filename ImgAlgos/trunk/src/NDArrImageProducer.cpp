@@ -229,7 +229,6 @@ NDArrImageProducer::getCalibPars(Event& evt, Env& env)
 
   if( m_print_bits & 2 ) MsgLog(name(), info, "Use \"geometry\" constants for run: " << runnum 
                                               << " from file:\n" << fname);
-
   m_geometry = new PSCalib::GeometryAccess(fname, prbits);
 
   m_geometry->get_pixel_coord_indexes(m_coor_x_ind, m_coor_y_ind, m_size, 
