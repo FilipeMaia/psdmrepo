@@ -279,44 +279,35 @@ private:
 
 //--------------------
 /// Define ndarray parameters in the event for specified type, src, and key 
-  template <typename T>
-  bool defineNDArrParsForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, DATA_TYPE dtype, NDArrPars* ndarr_pars)
+  template <typename T, unsigned NDim>
+  bool defineNDArrParsForTypeNDim(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, DATA_TYPE dtype, NDArrPars* ndarr_pars)
   {
     Pds::Src pds_src;    
 
+    boost::shared_ptr< ndarray<T,NDim> >  shp = evt.get(src, key, &pds_src);
+    if (shp.get()) { ndarr_pars->setPars(NDim, shp->size(), shp->shape(), dtype, pds_src); return true; } 
+
+    return false;
+  }
+
+//--------------------
+/// Define ndarray parameters in the event for specified type, src, and key 
+  template <typename T>
+  bool defineNDArrParsForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, DATA_TYPE dtype, NDArrPars* ndarr_pars)
+  {
     // CONST
-
-    boost::shared_ptr< ndarray<const T,2> >  shp2_const = evt.get(src, key, &pds_src);
-    if (shp2_const.get()) { ndarr_pars->setPars(2, shp2_const->size(), shp2_const->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<const T,3> >  shp3_const = evt.get(src, key, &pds_src);
-    if (shp3_const.get()) { ndarr_pars->setPars(3, shp3_const->size(), shp3_const->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<const T,4> >  shp4_const = evt.get(src, key, &pds_src);
-    if (shp4_const.get()) { ndarr_pars->setPars(4, shp4_const->size(), shp4_const->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<const T,5> >  shp5_const = evt.get(src, key, &pds_src);
-    if (shp5_const.get()) { ndarr_pars->setPars(5, shp5_const->size(), shp5_const->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<const T,1> >  shp1_const = evt.get(src, key, &pds_src);
-    if (shp1_const.get()) { ndarr_pars->setPars(1, shp1_const->size(), shp1_const->shape(), dtype, pds_src); return true; } 
+    if (defineNDArrParsForTypeNDim<const T,2>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<const T,3>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<const T,4>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<const T,5>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<const T,1>(evt, src, key, dtype, ndarr_pars)) return true;
 
     // NON-CONST
-
-    boost::shared_ptr< ndarray<T,2> >  shp2 = evt.get(src, key, &pds_src);
-    if (shp2.get()) { ndarr_pars->setPars(2, shp2->size(), shp2->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<T,3> >  shp3 = evt.get(src, key, &pds_src);
-    if (shp3.get()) { ndarr_pars->setPars(3, shp3->size(), shp3->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<T,4> >  shp4 = evt.get(src, key, &pds_src);
-    if (shp4.get()) { ndarr_pars->setPars(4, shp4->size(), shp4->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<T,5> >  shp5 = evt.get(src, key, &pds_src);
-    if (shp5.get()) { ndarr_pars->setPars(5, shp5->size(), shp5->shape(), dtype, pds_src); return true; } 
-
-    boost::shared_ptr< ndarray<T,1> >  shp1 = evt.get(src, key, &pds_src);
-    if (shp1.get()) { ndarr_pars->setPars(1, shp1->size(), shp1->shape(), dtype, pds_src); return true; } 
+    if (defineNDArrParsForTypeNDim<T,2>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<T,3>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<T,4>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<T,5>(evt, src, key, dtype, ndarr_pars)) return true;
+    if (defineNDArrParsForTypeNDim<T,1>(evt, src, key, dtype, ndarr_pars)) return true;
 
     return false;
   }
@@ -450,29 +441,6 @@ private:
     if (file_type == PNG) {
 
         using namespace boost::gil;
-
-        //gray32f_image_t img(400,200);
-        //gray32f_pixel_t col(150);
-        //fill_pixels(view(img), col);
-        //tiff_write_view("grayrect32.tiff", view(img));
-        // DOES NOT WORK: png_write_view("grayrect32.png", view(img));
-	//cout <<  "Save files : grayrect32.*" << endl;
-
-        //png_write_view("grayrect32.png", view(img)); // DOES NOT WORK!!!
-
-        //rgb8_image_t img(rows, cols);
-        //rgb8_pixel_t red(255, 0, 0); fill_pixels(view(img), red);
-        //png_write_view(fname, const_view(img));
-        
-        //type_from_x_iterator<T*>::view_t 
-        //rgb8c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const rgb8_pixel_t*>(&arr[0]), cols*sizeof(T));
-        //rgb8c_view_t image = interleaved_view(cols, rows, (const rgb8_pixel_t*)arr, cols*sizeof(T));
-        //rgb16c_view_t image = interleaved_view(cols/3, rows, (const rgb16_pixel_t*)arr, cols*sizeof(T));
-
-	//if (! isSupportedDataType<T>()) return;
-	//gray32c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray32_pixel_t*>(&arr[0]), cols*sizeof(T));
-	//gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
-        //png_write_view(fname, image);
 
         if (save2DArrayInPNGForType<T>(fname, arr, rows, cols)) return;
         MsgLog("GlobalMethods", warning, "Input data type " << strOfDataTypeAndSize<T>() << " is not implemented for saving in PNG. File IS NOT saved!");
@@ -662,6 +630,15 @@ private:
    * @param[in]  print_bits = 1-warnings
    */
 
+  template <typename T, unsigned NDim>
+  void saveNDArrInEventForTypeNDim(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, T* arr, NDArrPars* ndarr_pars, unsigned print_bits=1)
+  {
+      boost::shared_ptr< ndarray<T,NDim> > shp( new ndarray<T,NDim>(arr, ndarr_pars->shape()) );
+      evt.put(shp, src, key);    
+  }
+
+//-------------------
+
   template <typename T>
   void saveNDArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, T* arr, NDArrPars* ndarr_pars, unsigned print_bits=1)
   {
@@ -672,30 +649,11 @@ private:
       if ( print_bits & 1 && ndim > 5 ) MsgLog("saveNDArrInEvent", warning, "ndim=" << ndim << " out of the range of implemented ndims [1,5]");
       if ( print_bits & 1 && ndim < 1 ) MsgLog("saveNDArrInEvent", warning, "ndim=" << ndim << " out of the range of implemented ndims [1,5]");
 
-      if (ndim == 2) {
-        boost::shared_ptr< ndarray<const T,2> > shp( new ndarray<const T,2>(arr, ndarr_pars->shape()) );
-        evt.put(shp, src, key);
-      } 
-
-      else if (ndim == 3) {
-        boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(arr, ndarr_pars->shape()) );
-        evt.put(shp, src, key);
-      }
-
-      else if (ndim == 4) {
-        boost::shared_ptr< ndarray<const T,4> > shp( new ndarray<const T,4>(arr, ndarr_pars->shape()) );
-        evt.put(shp, src, key);
-      }
-
-      else if (ndim == 5) {
-        boost::shared_ptr< ndarray<const T,5> > shp( new ndarray<const T,5>(arr, ndarr_pars->shape()) );
-        evt.put(shp, src, key);
-      }
-
-      else if (ndim == 1) {
-        boost::shared_ptr< ndarray<const T,1> > shp( new ndarray<const T,1>(arr, ndarr_pars->shape()) );
-        evt.put(shp, src, key);
-      }
+      if      (ndim == 2) saveNDArrInEventForTypeNDim<const T,2>(evt, src, key, arr, ndarr_pars, print_bits);
+      else if (ndim == 3) saveNDArrInEventForTypeNDim<const T,3>(evt, src, key, arr, ndarr_pars, print_bits);
+      else if (ndim == 4) saveNDArrInEventForTypeNDim<const T,4>(evt, src, key, arr, ndarr_pars, print_bits);
+      else if (ndim == 5) saveNDArrInEventForTypeNDim<const T,5>(evt, src, key, arr, ndarr_pars, print_bits);
+      else if (ndim == 1) saveNDArrInEventForTypeNDim<const T,1>(evt, src, key, arr, ndarr_pars, print_bits);
   }
 
 //--------------------

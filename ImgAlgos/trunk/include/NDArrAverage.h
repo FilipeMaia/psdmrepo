@@ -171,61 +171,11 @@ private:
   double*        m_max;   // maximal value over events per pixel
 
 protected:
-//-------------------
-
-    template <typename T>
-    bool collectStatForType(Event& evt)
-    { 
-      unsigned ndim = m_ndarr_pars->ndim();
-
-      // CONST AND NON-CONST
-      if (ndim == 2) {
-        shared_ptr< ndarray<const T,2> > shp2_const = evt.get(m_str_src, m_key, &m_src);
-        if (shp2_const.get()) { accumulateCorrelators<T>(shp2_const->data()); return true; } 
-
-        shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key, &m_src);
-        if (shp2.get()) { accumulateCorrelators<T>(shp2->data()); return true; } 
-      }
-
-      else if (ndim == 3) {
-        shared_ptr< ndarray<const T,3> > shp3_const = evt.get(m_str_src, m_key, &m_src);
-        if (shp3_const.get()) { accumulateCorrelators<T>(shp3_const->data()); return true; } 
-
-        shared_ptr< ndarray<T,3> > shp3 = evt.get(m_str_src, m_key, &m_src);
-        if (shp3.get()) { accumulateCorrelators<T>(shp3->data()); return true; } 
-      }
-
-      else if (ndim == 4) {
-        shared_ptr< ndarray<const T,4> > shp4_const = evt.get(m_str_src, m_key, &m_src);
-        if (shp4_const.get()) { accumulateCorrelators<T>(shp4_const->data()); return true; } 
-
-        shared_ptr< ndarray<T,4> > shp4 = evt.get(m_str_src, m_key, &m_src);
-        if (shp4.get()) { accumulateCorrelators<T>(shp4->data()); return true; } 
-      }
-
-      else if (ndim == 5) {
-        shared_ptr< ndarray<const T,5> > shp5_const = evt.get(m_str_src, m_key, &m_src);
-        if (shp5_const.get()) { accumulateCorrelators<T>(shp5_const->data()); return true; } 
-
-        shared_ptr< ndarray<T,5> > shp5 = evt.get(m_str_src, m_key, &m_src);
-        if (shp5.get()) { accumulateCorrelators<T>(shp5->data()); return true; } 
-      }
-
-      else if (ndim == 1) {
-        shared_ptr< ndarray<const T,1> > shp1_const = evt.get(m_str_src, m_key, &m_src);
-        if (shp1_const.get()) { accumulateCorrelators<T>(shp1_const->data()); return true; } 
-
-        shared_ptr< ndarray<T,1> > shp1 = evt.get(m_str_src, m_key, &m_src);
-        if (shp1.get()) { accumulateCorrelators<T>(shp1->data()); return true; } 
-      }
-
-      return false;
-    }
 
 //-------------------
 
     template <typename T>
-    void accumulateCorrelators(const T* data)
+    void accumulateCorrelators(T* data)
     { 
       double amp(0);
       for (unsigned i=0; i<m_size; ++i) {
@@ -245,6 +195,40 @@ protected:
 	}
       } // m_do_max
     }          
+
+//-------------------
+
+    template <typename T, unsigned NDim>
+    bool collectStatForTypeNdim(Event& evt)
+    { 
+        shared_ptr< ndarray<T,NDim> > shp = evt.get(m_str_src, m_key, &m_src);
+        if (shp.get()) { accumulateCorrelators<T>(shp->data()); return true; } 
+        return false;
+    }
+
+//-------------------
+
+    template <typename T>
+    bool collectStatForType(Event& evt)
+    { 
+      unsigned ndim = m_ndarr_pars->ndim();
+
+      // CONST
+      if (ndim == 2 && collectStatForTypeNdim<const T,2>(evt)) return true;
+      if (ndim == 3 && collectStatForTypeNdim<const T,3>(evt)) return true;
+      if (ndim == 4 && collectStatForTypeNdim<const T,4>(evt)) return true;
+      if (ndim == 5 && collectStatForTypeNdim<const T,5>(evt)) return true;
+      if (ndim == 1 && collectStatForTypeNdim<const T,1>(evt)) return true;
+
+      // NON-CONST
+      if (ndim == 2 && collectStatForTypeNdim<T,2>(evt)) return true;
+      if (ndim == 3 && collectStatForTypeNdim<T,3>(evt)) return true;
+      if (ndim == 4 && collectStatForTypeNdim<T,4>(evt)) return true;
+      if (ndim == 5 && collectStatForTypeNdim<T,5>(evt)) return true;
+      if (ndim == 1 && collectStatForTypeNdim<T,1>(evt)) return true;
+
+      return false;
+    }
 
 //-------------------
 
