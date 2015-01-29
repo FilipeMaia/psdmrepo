@@ -39,6 +39,8 @@
 #include "pdsdata/xtc/Sequence.hh"
 #include "IData/Dataset.h"
 #include "XtcInput/XtcFileName.h"
+#include "pdsdata/xtc/XtcIterator.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -245,11 +247,81 @@ ostream& operator<<(ostream& os, const IndexCalib& idx) {
     return os;
 }
 
+// The index files do not support multiple archiving intervals
+
+class myLevelIter : public XtcIterator {
+public:
+  enum {Stop, Continue};
+  myLevelIter(Xtc* xtc, bool allowCorruptEpics) :
+    XtcIterator(xtc), _allowCorruptEpics(allowCorruptEpics) {}
+
+  void process(const Epics::ConfigV1& e) {
+    int32_t numpv = e.numPv();
+    ndarray<const Epics::PvConfigV1, 1> pv = e.getPvConfig();
+    float interval = pv[0].interval();
+    for (int i=1;i<numpv;i++) {
+      float nextinterval = pv[i].interval();
+      if (interval != nextinterval) {
+        if (_allowCorruptEpics) {
+          MsgLog(logger, warning,
+                 "Index mode does not support multiple epics archiving "
+                 "intervals."
+                 << " Variable 0 interval: " << interval
+                 << ", Variable " << i << " interval " << nextinterval);
+        } else {
+          MsgLog(logger, fatal,
+                 "Index mode does not support multiple epics archiving intervals."
+                 << " Variable 0 interval: " << interval
+                 << ", Variable " << i << " interval " << nextinterval
+                 << endl << " This error can be turned into a warning "
+                 "by setting the parameter ""allow-corrupt-epics"" "
+                 "in the [psana] section of the configuration file, "
+                 "but slow EPICS data will be corrupt."
+                 );
+        }
+        break;
+      }
+    }
+  }
+  int process(Xtc* xtc) {
+    Level::Type   level     = xtc->src.level();
+    if (level < 0 || level >= Level::NumberOfLevels )
+    {
+        MsgLog(logger, fatal,
+               "Unsupported level " << (int) level);
+        return Continue;
+    }    
+    switch (xtc->contains.id()) {
+    case (TypeId::Id_Xtc) : {
+      myLevelIter iter(xtc,_allowCorruptEpics);
+      iter.iterate();
+      break;
+    }
+    case (TypeId::Id_EpicsConfig) :
+      process(*(const Epics::ConfigV1*)(xtc->payload()));
+      break;
+    default:
+      break;
+    }
+    return Continue;
+  }
+private:
+  bool _allowCorruptEpics;
+};
+
 // this is the implementation of the per-run indexing.  shouldn't be too
 // hard to make it work for for per-calibcycle indexing as well.
 
 class IndexRun {
 private:
+  // the index files do not support multiple recording intervals
+  // for epics variables (happened in ~20% of experiments before
+  // we started saving every variable in every shot (summer 2014)).
+  void _checkEpicsInterval(Pds::Dgram* dg, bool allowCorruptEpics) {
+    myLevelIter iter(&(dg->xtc),allowCorruptEpics);
+    iter.iterate();
+  }
+
   // read an index file corresponding to an xtc file
   bool _getidx(const XtcFileName &xtcfile, Pds::Index::IndexList& idxlist) {
     string idxname = xtcfile.path();
@@ -357,11 +429,12 @@ private:
   // look for configure in first 2 datagrams from the first file.  this will fail
   // if we don't get a chunk0 first in the list of files.  we have previously
   // sorted the files in RunMap to ensure this is the case.
-  void _configure() {
+  void _configure(bool allowCorruptEpics) {
     int64_t offset = 0;
     for (int i=0; i<2; i++) {
       Pds::Dgram* dg = _xtc.jump(0, offset);
       if (dg->seq.service()==Pds::TransitionId::Configure) {
+        _checkEpicsInterval(dg,allowCorruptEpics);
         _postOneDg(dg);
         _beginrunOffset = dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
         return;
@@ -540,7 +613,7 @@ private:
 
 public:
 
-  IndexRun(queue<DgramPieces>& queue, const vector<XtcFileName> &xtclist) :
+  IndexRun(queue<DgramPieces>& queue, const vector<XtcFileName> &xtclist, bool allowCorruptEpics) :
     _xtc(), _beginrunOffset(0), _lastcalib(0,0), _queue(queue) {
 
     // store the index files in our table, and get some information about epics
@@ -555,7 +628,7 @@ public:
     // fill in the list of unique event times that the users will use to jump()
     _fillTimes();
     // send a configure transition
-    _configure();
+    _configure(allowCorruptEpics);
     // send a beginrun transition
     _beginrun();
   }
@@ -648,7 +721,10 @@ Index::Index(const std::string& name, std::queue<DgramPieces>& queue) : Configur
   _fileNames = configList("files");
   if ( _fileNames.empty() ) MsgLog(logger, fatal, "Empty file list");
   _rmap = new RunMap(_fileNames);
+  _allowCorruptEpics = false;
 }
+
+void Index::allowCorruptEpics() {_allowCorruptEpics = true;}
 
 Index::~Index() {
   delete _rmap;
@@ -674,7 +750,7 @@ void Index::setrun(int run) {
   _run=run;
   if (not _rmap->runFiles.count(run)) MsgLog(logger, fatal, "Run " << run << " not found");
   delete _idxrun;
-  _idxrun = new IndexRun(_queue,_rmap->runFiles[run]);
+  _idxrun = new IndexRun(_queue,_rmap->runFiles[run],_allowCorruptEpics);
 }
 
 unsigned Index::nsteps() {

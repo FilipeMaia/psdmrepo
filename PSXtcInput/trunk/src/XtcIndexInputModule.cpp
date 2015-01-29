@@ -68,6 +68,9 @@ XtcIndexInputModule::XtcIndexInputModule (const std::string& name)
   }
   if (skipEpics()) skipEpics(false);
   if (l3tAcceptOnly()) l3tAcceptOnly(false);
+  ConfigSvc::ConfigSvc cfg = configSvc();
+  bool allowCorruptEpics = cfg.get("psana", "allow-corrupt-epics", false);
+  if (allowCorruptEpics) _idx.allowCorruptEpics();
 }
 
 //--------------

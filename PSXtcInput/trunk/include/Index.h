@@ -32,6 +32,7 @@ public:
   ~Index();
   int jump(psana::EventTime t);
   void setrun(int run);
+  void allowCorruptEpics();
   unsigned nsteps();
   void end();
   void times(psana::Index::EventTimeIter& begin, psana::Index::EventTimeIter& end);
@@ -43,6 +44,7 @@ private:
   IndexRun*                _idxrun;
   RunMap*                  _rmap;
   int                      _run;
+  bool                     _allowCorruptEpics;
 };
 
 }

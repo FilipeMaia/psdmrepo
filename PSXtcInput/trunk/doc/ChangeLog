@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-10
+2015-01-28 Christopher O'Grady
+- Generate a fatal error when data is analyzed that has different
+  archiving rates for different epics variables (unsupported by
+  indexing).  This can be changed into a warning if the user
+  sets allow-corrupt-epics in the [psana] section of the cfg file.
+
 Tag: V00-15-09
 2014-11-26 David Schneider
 - Fix bug introduced in V00-14-00 which causes psana to hang on empty xtc file - see JIRA Issua PSAS-74
