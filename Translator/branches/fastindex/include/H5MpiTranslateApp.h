@@ -191,6 +191,10 @@ private:
   int64_t m_minEventsPerWorker;
   int64_t m_numEventsToCheckForDoneWorkers;
 
+  bool m_fastIndex;
+  int m_fastIndexMBhalfBlock;
+  int m_fastIndexNumberBlocksToTry;
+
   LusiTime::Time m_startTime, m_endTime;
   double m_eventTime;  // time iterating through events, as opposed to idle time when waiting for
                        // a message (workers) or waiting for a workers to finish (master)
