@@ -21,7 +21,7 @@
   [[pack(4)]]
   [[config(ConfigV1)]]
 {
-  uint64_t   _fileOffset -> fileOffset;
+  int64_t    _fileOffset -> fileOffset;
   uint32_t   _extent     -> extent;
 
   /* Construct from all attributes */
@@ -34,8 +34,8 @@
   [[pack(4)]]
   [[config(ConfigV1)]]
 {
+  int64_t    _fileOffset  -> fileOffset;
   Pds.TypeId _type        -> type;
-  uint32_t   _dgramOffset -> dgramOffset;
   uint32_t   _extent      -> extent;
 
   /* Construct from all attributes */
