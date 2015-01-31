@@ -18,6 +18,10 @@
   /* Construct from all attributes */
   @init()  [[auto, inline]];
 
+  int32_t deviceType()  [[inline]]
+  [[language("C++")]] @{
+    return 0;
+  @}
 }
 
 //------------------ ConfigV2 ------------------
@@ -55,12 +59,11 @@
 
 }
 
-
 //------------------ DataV1 ------------------
 @type DataV1
   [[type_id(Id_OceanOpticsData, 1)]]
   [[pack(4)]]
-  [[config(ConfigV1,ConfigV2)]]
+  [[config(ConfigV1, ConfigV2)]]
 {
   @const int32_t iDataReadSize = 8192;
   @const int32_t iNumPixels = 3840;
@@ -87,7 +90,7 @@
 
   double nonlinerCorrected(uint32_t iPixel)
   [[language("C++")]] @{
-    double fRawValue = (double) (@self.data()[iPixel] ^ 0x2000);
+    double fRawValue = (double) (@config.deviceType() == 0 ? (@self.data()[iPixel] ^ 0x2000) : @self.data()[iPixel]);
     const ndarray<const double, 1>& corr = @config.nonlinCorrect();
     return fRawValue / (
   corr[0] + fRawValue *

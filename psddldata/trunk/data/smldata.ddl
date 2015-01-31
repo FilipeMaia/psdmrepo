@@ -1,11 +1,11 @@
 @include "psddldata/xtc.ddl" [[headers("pdsdata/xtc/TypeId.hh")]];
 
-@package Index {
+@package SmlData {
 
 
 //------------------ ConfigV1 ------------------
 @type ConfigV1
-  [[type_id(Id_IndexConfig, 1)]]
+  [[type_id(Id_SmlDataConfig, 1)]]
   [[config_type]]
   [[pack(4)]]
 {
@@ -16,8 +16,8 @@
 
 }
 
-@type TagV1
-  [[type_id(Id_IndexTag, 1)]]
+@type OrigDgramOffsetV1
+  [[type_id(Id_SmlDataOrigDgramOffset, 1)]]
   [[pack(4)]]
   [[config(ConfigV1)]]
 {
@@ -30,7 +30,7 @@
 
 
 @type ProxyV1
-  [[type_id(Id_IndexProxy, 1)]]
+  [[type_id(Id_SmlDataProxy, 1)]]
   [[pack(4)]]
   [[config(ConfigV1)]]
 {
