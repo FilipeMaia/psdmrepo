@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <memory>
 #include <math.h>
+#include <sys/stat.h>
 #include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
 //-------------------------------
@@ -103,8 +104,16 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
     return (0 == a.compare(a.length()-ending.length(), ending.length(), ending));
   }
 
-  int64_t findDg(boost::shared_ptr<XtcInput::DgHeader> knownDg, int64_t candidateOffset, 
-                 std::string otherPath, int64_t halfRange, int stepIdx) {
+  bool fileExists(const std::string & filename) {
+    struct stat buffer;
+    return (stat (filename.c_str(), &buffer) == 0); 
+  }
+
+  typedef enum {BLOCKBEFOREFILE, FILEDOESNTEXIST, FOUND, NOTFOUND, BLOCKPASTFILE} FindDgStatus;
+  typedef std::pair<FindDgStatus, int64_t> FindDgResult;
+  
+  FindDgResult findDg(boost::shared_ptr<XtcInput::DgHeader> knownDg, int64_t candidateOffset, 
+         std::string otherPath, int64_t halfRange, int stepIdx) {
     XtcInput::Dgram::ptr pdsDgPtr = knownDg->dgram();
     if (not pdsDgPtr) throw std::runtime_error("findDg: knownDg is null");
     if ((std::abs(candidateOffset) % 4) != 0) throw std::runtime_error("findDg: known offset is not a multiple of 4");
@@ -114,26 +123,43 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
     XtcInput::XtcFileName otherXtc(otherPath);
     int64_t startOffset = std::max(int64_t(0), candidateOffset - halfRange);
     int64_t endOffset = std::max(int64_t(0), candidateOffset + halfRange);
-    if ((endOffset - startOffset) < int64_t(sizeof(Pds::Dgram))) return -1;
+    int64_t bytesToRead = endOffset - startOffset + 1;
+    if (bytesToRead < int64_t(sizeof(Pds::Dgram))) return FindDgResult(BLOCKBEFOREFILE, -1);
     const int64_t cutOffForFirst = 0x200000;
     if ((candidateOffset < cutOffForFirst) and (otherXtc.chunk()==0)) {
       endOffset = cutOffForFirst + 0x1000;
     }
-    int64_t bytesToRead = endOffset - startOffset + 1;
 
-    // open other file, seek to start of this region. 
-    unsigned liveTimeout = 300;
-    XtcInput::SharedFile otherSharedFile(otherXtc, liveTimeout);
-    struct stat fileStat;
-    otherSharedFile.stat(&fileStat);
-    unsigned timeWaited = 0;
-    unsigned sleepTime = 1;
     const std::string INPROGRESS = ".inprogress";
-    bool isInProgress = otherSharedFile.path().extension() == INPROGRESS;
+    bool isInProgress = endsWith(otherPath,INPROGRESS);
     std::string otherPathNotInProgress(otherPath);
     if (isInProgress) {
       otherPathNotInProgress.erase(otherPath.size()-INPROGRESS.length());
     }
+        
+    const unsigned liveTimeout = 300;
+    unsigned timeWaited = 0;
+    const unsigned sleepTime = 1;
+    
+    bool neitherFileExists = not (fileExists(otherPath) or fileExists(otherPathNotInProgress));
+    // open other file. We may have to wait until it appears
+    while (neitherFileExists and (timeWaited < liveTimeout)) {
+      sleep(sleepTime);
+      timeWaited += sleepTime;
+      neitherFileExists = not (fileExists(otherPath) or fileExists(otherPathNotInProgress));
+    }
+
+    if (neitherFileExists) {
+      MsgLog(loggerMaster, info, "findDg: timeout waiting for one of " << otherPath << " or " << otherPathNotInProgress
+             << " to exist");
+      return FindDgResult(FILEDOESNTEXIST, -1);
+    }
+
+    timeWaited = 0;
+
+    XtcInput::SharedFile otherSharedFile(otherXtc, liveTimeout);
+    struct stat fileStat;
+    otherSharedFile.stat(&fileStat);
     bool changedFromInProgressToNot = false;
 
     while ((fileStat.st_size < off_t(startOffset)) and (timeWaited < liveTimeout) and isInProgress) {
@@ -162,7 +188,7 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
         MsgLog(loggerMaster, info, "findDg: unable to search region because file ends before starting guess. Dg should be earlier in file."
                << "changedFromInProgressToNot=" << changedFromInProgressToNot);
       }
-      return -1;
+      return FindDgResult(BLOCKPASTFILE,-1);
     }
     otherSharedFile.seek(startOffset, SEEK_SET);
 
@@ -204,14 +230,15 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
            << " inProgress->not: " << changedFromInProgressToNot);
 
     // return result, -1 or the found offset
-    return foundOffset;
+    if (foundOffset >=0) return FindDgResult(FOUND, foundOffset);
+    return FindDgResult(NOTFOUND, -1);
   }
 
   boost::shared_ptr<XtcInput::XtcFilesPosition> fastIndexFindOtherStreamStarts(int streamInSet, 
                                                                                boost::shared_ptr<XtcInput::XtcFilesPosition>beginStepPos, 
                                                                                const std::vector<int> & fastIndexOtherStreams,
                                                                                int stepIdx,
-                                                                               int MBforHalfRangeBlock,
+                                                                               double MBforHalfRangeBlock,
                                                                                int numBlocksToTry) {
     if (streamInSet != 0) throw std::runtime_error("fastIndexFindOtherStreamStarts: streamInSet != 0");
 
@@ -242,7 +269,12 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
       newOffsets.push_back(currentOffsets.at(idx));
     }
                              
-    const int64_t halfRange = MBforHalfRangeBlock << 20l;
+    const double MB = double(1 << 20);
+    int64_t halfRangeTmp = int64_t(MBforHalfRangeBlock * MB);
+    int64_t remainder = (halfRangeTmp % 4);
+    halfRangeTmp -= remainder;
+    const int64_t halfRange = halfRangeTmp;
+    
     if ((halfRange % 4) != 0) throw std::runtime_error("halfRange must be word aligned, 4 byte boundary");
     std::vector<int64_t> candidateOffsets;
     candidateOffsets.push_back(knownOffset);
@@ -266,7 +298,8 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
       int64_t otherOffset = -1;
       for (unsigned candIdx = 0; candIdx < candidateOffsets.size(); ++candIdx) {
         int64_t candOffset = candidateOffsets.at(candIdx);
-        otherOffset = findDg(knownDg, candOffset, otherPath, halfRange, stepIdx);
+        FindDgResult otherResult = findDg(knownDg, candOffset, otherPath, halfRange, stepIdx);
+        otherOffset = otherResult.second;
         if (otherOffset >=0) break;
       }
       if (otherOffset < 0) {
@@ -403,12 +436,12 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
                                                 NUM_EVENTS_CHECK_DONE_CALIB_FILE_DEFAULT);
 
   m_fastIndex = cfgSvc.get("Translator.H5Output", "fast_index", false);
-  m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12);
+  m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12.0);
   m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks",3);
 
   if (m_fastIndex) {
-    m_minEventsPerWorker = int(round(m_minEventsPerWorker/6.0));
-    m_numEventsToCheckForDoneWorkers = int(round(m_numEventsToCheckForDoneWorkers/2.0));
+    m_minEventsPerWorker = std::max(1,int(round(m_minEventsPerWorker/6.0)));
+    m_numEventsToCheckForDoneWorkers = std::max(1,int(round(m_numEventsToCheckForDoneWorkers/2.0)));
     MsgLog(loggerMaster,info, "fast_index is true. master sees 1/6 of total events. set master parameters minEventsPerWorker to " << m_minEventsPerWorker
            << " and numEventsToCheckForDoneWorkers to " << m_numEventsToCheckForDoneWorkers);
   }

@@ -192,7 +192,7 @@ private:
   int64_t m_numEventsToCheckForDoneWorkers;
 
   bool m_fastIndex;
-  int m_fastIndexMBhalfBlock;
+  double m_fastIndexMBhalfBlock;
   int m_fastIndexNumberBlocksToTry;
 
   LusiTime::Time m_startTime, m_endTime;
