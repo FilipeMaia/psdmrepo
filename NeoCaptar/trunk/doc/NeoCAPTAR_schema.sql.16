@@ -581,8 +581,7 @@ CREATE  TABLE IF NOT EXISTS `NEOCAPTAR`.`CABLENUMBER_ALLOCATED` (
   `allocated_time`   BIGINT UNSIGNED NOT NULL ,
   `allocated_by_uid` VARCHAR(32)     NOT NULL ,
 
-  UNIQUE KEY `cablenumber`                (`range_id`,`cablenumber`,`cable_id`) ,
-  UNIQUE KEY `CABLENUMBER_ALLOCATED_UK_1` (`range_id`,`cablenumber`) ,
+  UNIQUE KEY `cablenumber` (`range_id`,`cablenumber`,`cable_id`) ,
 
   CONSTRAINT `CABLENUMBER_ALLOCATED_FK_1`
     FOREIGN KEY (`range_id` )
