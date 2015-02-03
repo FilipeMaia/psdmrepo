@@ -82,7 +82,7 @@ public:
     
       IData::Dataset ds(*it);
       if (ds.exists("live")) MsgLog(logger, fatal, "Live mode not supported with xtc indexing");
-    
+
       if (ds.isFile()) {
 
         // must be file name
@@ -116,20 +116,22 @@ public:
 
 class IndexXtcReader {
 public:
-  IndexXtcReader() : _nfiles(0) {}
+  IndexXtcReader() {}
 
   void add(const XtcFileName& xtcfile) {
-    _fd.resize(_nfiles+1);
-
-    _fd[_nfiles] = ::open(xtcfile.path().c_str(), O_RDONLY | O_LARGEFILE);
-    if (_fd[_nfiles]==-1) MsgLog(logger, fatal,
+    int fd = ::open(xtcfile.path().c_str(), O_RDONLY | O_LARGEFILE);
+    if (fd==-1) MsgLog(logger, fatal,
                                "File " << xtcfile.path().c_str() << " not found");
-    _nfiles++;
+    _xtcFileList.push_back(xtcfile);
+    _fd.push_back(fd);
   }
 
   ~IndexXtcReader() {
-    for (unsigned i=0;i<_nfiles;i++) ::close(_fd[i]);
+    for  (vector<int>::const_iterator it = _fd.begin(); it!= _fd.end(); it++)
+      ::close(*it);
   }
+
+  const vector<XtcFileName>& files() {return _xtcFileList;}
 
   Pds::Dgram* jump(int file, int64_t offset) {
     int64_t found = lseek64(_fd[file],offset, SEEK_SET);
@@ -154,8 +156,8 @@ public:
 
 private:
   enum {MaxDgramSize=0x2000000};
-  unsigned _nfiles;
   vector<int> _fd;
+  vector<XtcFileName> _xtcFileList;
 };
 
 // class which is used by IndexBase. for each event in the index table,
@@ -404,8 +406,8 @@ private:
 
   // add a datagram with "event" data (versus nonEvent data, like epics)
   // to the vector of pieces (i.e. add another "piece")
-  void _add(Pds::Dgram* dg) {
-    _pieces.eventDg.push_back(XtcInput::Dgram(XtcInput::Dgram::make_ptr(dg),XtcFileName("")));
+  void _add(Pds::Dgram* dg, int file) {
+    _pieces.eventDg.push_back(XtcInput::Dgram(XtcInput::Dgram::make_ptr(dg),_xtc.files()[file]));
   }
 
   // copy the event-pieces onto the queue where the DgramSourceIndex object
@@ -415,27 +417,46 @@ private:
   }
 
   // add only one "event" datagram and post
-  void _post(Pds::Dgram* dg) {
-    _add(dg);
+  void _post(Pds::Dgram* dg, int file) {
+    _add(dg, file);
     _post();
   }
 
   // post only this dg
-  void _postOneDg(Pds::Dgram* dg) {
+  void _postOneDg(Pds::Dgram* dg, int file) {
     _pieces.reset();
-    if (dg) _post(dg);
+    if (dg) _post(dg, file);
+  }
+
+  void _addIocConfigure() {
+    Pds::Dgram* dg=0;
+    int file = 0;
+    for (vector<XtcFileName>::const_iterator it = _xtc.files().begin();
+         it != _xtc.files().end(); it++,file++) {
+      if ((*it).stream()>=80) {
+        dg = _xtc.jump(file, 0);
+        if (dg->seq.service()!=Pds::TransitionId::Configure) {
+          MsgLog(logger, fatal, "Configure transition not found at beginning of file" << (*it));
+        }
+        _add(dg,file);
+      }
+    }
   }
 
   // look for configure in first 2 datagrams from the first file.  this will fail
   // if we don't get a chunk0 first in the list of files.  we have previously
   // sorted the files in RunMap to ensure this is the case.
   void _configure(bool allowCorruptEpics) {
+
+    _pieces.reset();
+
     int64_t offset = 0;
     for (int i=0; i<2; i++) {
       Pds::Dgram* dg = _xtc.jump(0, offset);
       if (dg->seq.service()==Pds::TransitionId::Configure) {
         _checkEpicsInterval(dg,allowCorruptEpics);
-        _postOneDg(dg);
+        _addIocConfigure();
+        _post(dg,0);
         _beginrunOffset = dg->xtc.sizeofPayload()+sizeof(Pds::Dgram);
         return;
       }
@@ -449,7 +470,7 @@ private:
     Pds::Dgram* dg = _xtc.jump(0, _beginrunOffset);
     if (dg->seq.service()!=Pds::TransitionId::BeginRun)
       MsgLog(logger, fatal, "BeginRun transition not found after configure transition");
-    _postOneDg(dg);
+    _postOneDg(dg,0);
   }
 
   // check to see if we need to send a begincalib by looking
@@ -467,7 +488,7 @@ private:
       if (*calib!=_lastcalib) {
         // it appears that psana takes care of sending endcalib for us
         // need to send begincalib
-        _postOneDg(_xtc.jump((*calib).file, (*calib).entry.i64Offset));
+        _postOneDg(_xtc.jump((*calib).file, (*calib).entry.i64Offset),(*calib).file);
         _lastcalib=*calib;
       }
     }
@@ -485,7 +506,7 @@ private:
       if (it->entry.uFiducial==fiducial) {
         Pds::Dgram* dg=0;
         dg = _xtc.jump((*it).file, (*it).entry.i64OffsetXtc);
-        _add(dg); // don't return: there can be a match from another ioc stream
+        _add(dg,(*it).file); // don't return: there can be a match from another ioc stream
       }
       it++;
     }
@@ -504,7 +525,7 @@ private:
         if (request.file != evt.file || request.offset != evt.entry.i64OffsetXtc) {
           Pds::Dgram* epicsdg = _xtc.jump(request.file,request.offset);
           if (epicsdg) {
-            _pieces.nonEventDg.push_back(XtcInput::Dgram(XtcInput::Dgram::make_ptr(epicsdg),XtcFileName("")));
+            _pieces.nonEventDg.push_back(XtcInput::Dgram(XtcInput::Dgram::make_ptr(epicsdg),_xtc.files()[request.file]));
           } else {
             MsgLog(logger, fatal, "Epics data not found at offset" << request.offset);
           }
@@ -665,7 +686,7 @@ public:
                       Pds::TransitionId::EndRun,
                       ct, ts);
     dg->seq = seq;
-    _postOneDg(dg);
+    _postOneDg(dg,0);
   }
 
   // jump to an event
@@ -684,7 +705,7 @@ public:
       int ifirst = 1;
       while (it!=_idx.end() && *it==request) {
         dg = _xtc.jump((*it).file, (*it).entry.i64OffsetXtc);
-        _add(dg);
+        _add(dg,(*it).file);
         if (ifirst) {
           ifirst = 0;
           _maybeAddEpics(*it,_epicsSource,dg);
