@@ -113,9 +113,34 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV2> >(Pds::TypeId::Id_OceanOpticsData));
 
   {
-    PyObject* unvlist = PyList_New(2);
+  scope outer = 
+  class_<Psana::OceanOptics::DataV3, boost::shared_ptr<Psana::OceanOptics::DataV3>, boost::noncopyable >("DataV3", no_init)
+    .def("data", &Psana::OceanOptics::DataV3::data)
+    .def("frameCounter", &Psana::OceanOptics::DataV3::frameCounter)
+    .def("numDelayedFrames", &Psana::OceanOptics::DataV3::numDelayedFrames)
+    .def("numDiscardFrames", &Psana::OceanOptics::DataV3::numDiscardFrames)
+    .def("timeFrameStart", &Psana::OceanOptics::DataV3::timeFrameStart, return_value_policy<copy_const_reference>())
+    .def("timeFrameFirstData", &Psana::OceanOptics::DataV3::timeFrameFirstData, return_value_policy<copy_const_reference>())
+    .def("timeFrameEnd", &Psana::OceanOptics::DataV3::timeFrameEnd, return_value_policy<copy_const_reference>())
+    .def("numSpectraInData", &Psana::OceanOptics::DataV3::numSpectraInData)
+    .def("numSpectraInQueue", &Psana::OceanOptics::DataV3::numSpectraInQueue)
+    .def("numSpectraUnused", &Psana::OceanOptics::DataV3::numSpectraUnused)
+    .def("durationOfFrame", &Psana::OceanOptics::DataV3::durationOfFrame)
+    .def("nonlinerCorrected", &Psana::OceanOptics::DataV3::nonlinerCorrected)
+  ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OceanOpticsData);
+  scope().attr("iDataReadSize")=8192;
+  scope().attr("iNumPixels")=3840;
+  scope().attr("iActivePixelIndex")=22;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV3> >(Pds::TypeId::Id_OceanOpticsData));
+
+  {
+    PyObject* unvlist = PyList_New(3);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV1"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "DataV2"));
+    PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "DataV3"));
     PyObject_SetAttrString(submodule, "Data", unvlist);
     Py_CLEAR(unvlist);
   }

@@ -87,6 +87,8 @@ void createWrappers(PyObject* module) {
     .def("output_lookup_table_enabled", &Psana::Quartz::ConfigV2::output_lookup_table_enabled,"apply output lookup table corrections")
     .def("defect_pixel_correction_enabled", &Psana::Quartz::ConfigV2::defect_pixel_correction_enabled,"correct defective pixels internally")
     .def("use_hardware_roi", &Psana::Quartz::ConfigV2::use_hardware_roi,"enable hardware region of interest")
+    .def("use_test_pattern", &Psana::Quartz::ConfigV2::use_test_pattern,"enable the test pattern")
+    .def("max_taps", &Psana::Quartz::ConfigV2::max_taps,"maximum taps in output driver")
     .def("roi_lo", &Psana::Quartz::ConfigV2::roi_lo, return_value_policy<copy_const_reference>(),"hardware ROI begin")
     .def("roi_hi", &Psana::Quartz::ConfigV2::roi_hi, return_value_policy<copy_const_reference>(),"hardware ROI end")
     .def("number_of_defect_pixels", &Psana::Quartz::ConfigV2::number_of_defect_pixels)

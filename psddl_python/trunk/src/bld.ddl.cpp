@@ -314,6 +314,57 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
+  class_<Psana::Bld::BldDataEBeamV7 >("BldDataEBeamV7", "BldDataEBeamV7 is the same as BldDataEBeamV6.\nA sign-error error was discovered in the calculation of the photon energy that goes into the ebeam bld.\nThis is fixed on the accelerator side, but we will increment the ebeam bld version number to V7 so the\ndata is clearly marked as changed.", no_init)
+    .def("damageMask", &Psana::Bld::BldDataEBeamV7::damageMask,"Damage mask.")
+    .def("ebeamCharge", &Psana::Bld::BldDataEBeamV7::ebeamCharge,"Beam charge in nC.")
+    .def("ebeamL3Energy", &Psana::Bld::BldDataEBeamV7::ebeamL3Energy,"Beam energy in MeV.")
+    .def("ebeamLTUPosX", &Psana::Bld::BldDataEBeamV7::ebeamLTUPosX,"LTU beam position (BPMS:LTU1:720 through 750) in mm.")
+    .def("ebeamLTUPosY", &Psana::Bld::BldDataEBeamV7::ebeamLTUPosY,"LTU beam position in mm.")
+    .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV7::ebeamLTUAngX,"LTU beam angle in mrad.")
+    .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV7::ebeamLTUAngY,"LTU beam angle in mrad.")
+    .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV7::ebeamPkCurrBC2,"Beam current in Amps.")
+    .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV7::ebeamEnergyBC2,"Beam position in mm (related to beam energy).")
+    .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV7::ebeamPkCurrBC1,"Beam current in Amps.")
+    .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV7::ebeamEnergyBC1,"Beam position in mm (related to beam energy).")
+    .def("ebeamUndPosX", &Psana::Bld::BldDataEBeamV7::ebeamUndPosX,"Undulator launch feedback (BPMs U4 through U10) beam x-position in mm.")
+    .def("ebeamUndPosY", &Psana::Bld::BldDataEBeamV7::ebeamUndPosY,"Undulator launch feedback beam y-position in mm.")
+    .def("ebeamUndAngX", &Psana::Bld::BldDataEBeamV7::ebeamUndAngX,"Undulator launch feedback beam x-angle in mrad.")
+    .def("ebeamUndAngY", &Psana::Bld::BldDataEBeamV7::ebeamUndAngY,"Undulator launch feedback beam y-angle in mrad.")
+    .def("ebeamXTCAVAmpl", &Psana::Bld::BldDataEBeamV7::ebeamXTCAVAmpl,"XTCAV Amplitude in MVolt.")
+    .def("ebeamXTCAVPhase", &Psana::Bld::BldDataEBeamV7::ebeamXTCAVPhase,"XTCAV Phase in degrees.")
+    .def("ebeamDumpCharge", &Psana::Bld::BldDataEBeamV7::ebeamDumpCharge,"Bunch charge at Dump in num. electrons")
+    .def("ebeamPhotonEnergy", &Psana::Bld::BldDataEBeamV7::ebeamPhotonEnergy,"computed photon energy, in eV")
+    .def("ebeamLTU250", &Psana::Bld::BldDataEBeamV7::ebeamLTU250,"LTU250 BPM value in mm, used to compute photon energy. from BPMS:LTU1:250:X")
+    .def("ebeamLTU450", &Psana::Bld::BldDataEBeamV7::ebeamLTU450,"LTU450 BPM value in mm, used to compute photon energy. from BPMS:LTU1:450:X")
+  ;
+
+  enum_<Psana::Bld::BldDataEBeamV7::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV7::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV7::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV7::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV7::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV7::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV7::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV7::EbeamPkCurrBC2Damage)
+    .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV7::EbeamEnergyBC2Damage)
+    .value("EbeamPkCurrBC1Damage",Psana::Bld::BldDataEBeamV7::EbeamPkCurrBC1Damage)
+    .value("EbeamEnergyBC1Damage",Psana::Bld::BldDataEBeamV7::EbeamEnergyBC1Damage)
+    .value("EbeamUndPosXDamage",Psana::Bld::BldDataEBeamV7::EbeamUndPosXDamage)
+    .value("EbeamUndPosYDamage",Psana::Bld::BldDataEBeamV7::EbeamUndPosYDamage)
+    .value("EbeamUndAngXDamage",Psana::Bld::BldDataEBeamV7::EbeamUndAngXDamage)
+    .value("EbeamUndAngYDamage",Psana::Bld::BldDataEBeamV7::EbeamUndAngYDamage)
+    .value("EbeamXTCAVAmplDamage",Psana::Bld::BldDataEBeamV7::EbeamXTCAVAmplDamage)
+    .value("EbeamXTCAVPhaseDamage",Psana::Bld::BldDataEBeamV7::EbeamXTCAVPhaseDamage)
+    .value("EbeamDumpChargeDamage",Psana::Bld::BldDataEBeamV7::EbeamDumpChargeDamage)
+    .value("EbeamPhotonEnergyDamage",Psana::Bld::BldDataEBeamV7::EbeamPhotonEnergyDamage)
+  ;
+  scope().attr("Version")=7;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV7> >(Pds::TypeId::Id_EBeam));
+
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", "PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2,\n                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1,"UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds.")
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2,"UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds.")
@@ -473,7 +524,7 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(7);
+    PyObject* unvlist = PyList_New(8);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataEBeamV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataEBeamV1"));
     PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataEBeamV2"));
@@ -481,6 +532,7 @@ void createWrappers(PyObject* module) {
     PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "BldDataEBeamV4"));
     PyList_SET_ITEM(unvlist, 5, PyObject_GetAttrString(submodule, "BldDataEBeamV5"));
     PyList_SET_ITEM(unvlist, 6, PyObject_GetAttrString(submodule, "BldDataEBeamV6"));
+    PyList_SET_ITEM(unvlist, 7, PyObject_GetAttrString(submodule, "BldDataEBeamV7"));
     PyObject_SetAttrString(submodule, "BldDataEBeam", unvlist);
     Py_CLEAR(unvlist);
   }
