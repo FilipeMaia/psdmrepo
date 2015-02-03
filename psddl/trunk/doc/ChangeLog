@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-14
+2015-2-03 David Schneider
+- add Python library to use for analysis release wrapper scripts.
+  No change to compiler or need for DAQ to update package.
+- See JIRA issue PSAS-103
+
 Tag: V00-13-13
 2014-10-09 David
 - add [[DEVEL]] tag for type definitions. psddlc will skip parseing of these
