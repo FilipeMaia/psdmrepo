@@ -1,0 +1,19 @@
+psana:
+- update to pdsata 8.1.2 (PSAS-91)
+- PSXtcInput: add fatal error in indexing mode when epics variables archived
+  at different rates (unsupported by indexing).  This can be changed into
+  a warning if the user sets allow-corrupt-epics in the [psana] section of
+  the cfg file.  Fix bug that was preventing IOC recorder EPICS data from
+  getting into the eventstore.
+
+psmon:
+- add user-definable axes for image plot
+
+Imaging and calibration tools:
+- PSCalib: add SegGeometryMatrixV1.py/ccp/h, add PNCCD in SegGeometryStore (PSAS-94) 
+- ImgAlgos: NDArrCalib - add parameter outtype to save calibrated ndarray
+  in double(def), float, int, int16 (PSAS-95). Re-factoring templated code
+  in NDArrAverage, GlobalMethods.
+
+External Packages:
+- updated ROOT to version 5.34.25 (PSAS-96)
