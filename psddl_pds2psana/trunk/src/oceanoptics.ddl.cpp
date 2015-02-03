@@ -230,5 +230,81 @@ double DataV2<Config>::nonlinerCorrected(uint32_t iPixel) const {
 }
 
 template class DataV2<Pds::OceanOptics::ConfigV2>;
+template <typename Config>
+DataV3<Config>::DataV3(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
+  : Psana::OceanOptics::DataV3()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr(cfgPtr)
+  , _tsTimeFrameStart(psddl_pds2psana::OceanOptics::pds_to_psana(xtcPtr->timeFrameStart()))
+  , _tsTimeFrameFirstData(psddl_pds2psana::OceanOptics::pds_to_psana(xtcPtr->timeFrameFirstData()))
+  , _tsTimeFrameEnd(psddl_pds2psana::OceanOptics::pds_to_psana(xtcPtr->timeFrameEnd()))
+{
+}
+template <typename Config>
+DataV3<Config>::~DataV3()
+{
+}
+
+
+template <typename Config>
+ndarray<const uint16_t, 1> DataV3<Config>::data() const {
+  return m_xtcObj->data(m_xtcObj);
+}
+
+
+template <typename Config>
+uint64_t DataV3<Config>::frameCounter() const {
+  return m_xtcObj->frameCounter();
+}
+
+
+template <typename Config>
+uint64_t DataV3<Config>::numDelayedFrames() const {
+  return m_xtcObj->numDelayedFrames();
+}
+
+
+template <typename Config>
+uint64_t DataV3<Config>::numDiscardFrames() const {
+  return m_xtcObj->numDiscardFrames();
+}
+
+template <typename Config>
+const Psana::OceanOptics::timespec64& DataV3<Config>::timeFrameStart() const { return _tsTimeFrameStart; }
+template <typename Config>
+const Psana::OceanOptics::timespec64& DataV3<Config>::timeFrameFirstData() const { return _tsTimeFrameFirstData; }
+template <typename Config>
+const Psana::OceanOptics::timespec64& DataV3<Config>::timeFrameEnd() const { return _tsTimeFrameEnd; }
+
+template <typename Config>
+int8_t DataV3<Config>::numSpectraInData() const {
+  return m_xtcObj->numSpectraInData();
+}
+
+
+template <typename Config>
+int8_t DataV3<Config>::numSpectraInQueue() const {
+  return m_xtcObj->numSpectraInQueue();
+}
+
+
+template <typename Config>
+int8_t DataV3<Config>::numSpectraUnused() const {
+  return m_xtcObj->numSpectraUnused();
+}
+
+
+template <typename Config>
+double DataV3<Config>::durationOfFrame() const {
+  return m_xtcObj->durationOfFrame();
+}
+
+
+template <typename Config>
+double DataV3<Config>::nonlinerCorrected(uint32_t iPixel) const {
+  return m_xtcObj->nonlinerCorrected(*m_cfgPtr, iPixel);
+}
+
+template class DataV3<Pds::OceanOptics::ConfigV2>;
 } // namespace OceanOptics
 } // namespace psddl_pds2psana

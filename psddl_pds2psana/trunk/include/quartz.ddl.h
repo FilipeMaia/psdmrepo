@@ -52,6 +52,8 @@ public:
   virtual uint8_t output_lookup_table_enabled() const;
   virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint8_t use_hardware_roi() const;
+  virtual uint8_t use_test_pattern() const;
+  virtual uint8_t max_taps() const;
   virtual const Psana::Camera::FrameCoord& roi_lo() const;
   virtual const Psana::Camera::FrameCoord& roi_hi() const;
   virtual uint32_t number_of_defect_pixels() const;

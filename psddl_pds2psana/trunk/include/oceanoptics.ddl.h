@@ -102,6 +102,35 @@ private:
   Psana::OceanOptics::timespec64 _tsTimeFrameEnd;
 };
 
+
+template <typename Config>
+class DataV3 : public Psana::OceanOptics::DataV3 {
+public:
+  typedef Pds::OceanOptics::DataV3 XtcType;
+  typedef Psana::OceanOptics::DataV3 PsanaType;
+  DataV3(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
+  virtual ~DataV3();
+  virtual ndarray<const uint16_t, 1> data() const;
+  virtual uint64_t frameCounter() const;
+  virtual uint64_t numDelayedFrames() const;
+  virtual uint64_t numDiscardFrames() const;
+  virtual const Psana::OceanOptics::timespec64& timeFrameStart() const;
+  virtual const Psana::OceanOptics::timespec64& timeFrameFirstData() const;
+  virtual const Psana::OceanOptics::timespec64& timeFrameEnd() const;
+  virtual int8_t numSpectraInData() const;
+  virtual int8_t numSpectraInQueue() const;
+  virtual int8_t numSpectraUnused() const;
+  virtual double durationOfFrame() const;
+  virtual double nonlinerCorrected(uint32_t iPixel) const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  boost::shared_ptr<const Config> m_cfgPtr;
+  Psana::OceanOptics::timespec64 _tsTimeFrameStart;
+  Psana::OceanOptics::timespec64 _tsTimeFrameFirstData;
+  Psana::OceanOptics::timespec64 _tsTimeFrameEnd;
+};
+
 } // namespace OceanOptics
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_OCEANOPTICS_DDL_H

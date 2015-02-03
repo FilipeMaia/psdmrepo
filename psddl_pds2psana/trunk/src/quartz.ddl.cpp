@@ -185,6 +185,16 @@ uint8_t ConfigV2::use_hardware_roi() const {
   return m_xtcObj->use_hardware_roi();
 }
 
+
+uint8_t ConfigV2::use_test_pattern() const {
+  return m_xtcObj->use_test_pattern();
+}
+
+
+uint8_t ConfigV2::max_taps() const {
+  return m_xtcObj->max_taps();
+}
+
 const Psana::Camera::FrameCoord& ConfigV2::roi_lo() const { return _roi_lo; }
 const Psana::Camera::FrameCoord& ConfigV2::roi_hi() const { return _roi_hi; }
 

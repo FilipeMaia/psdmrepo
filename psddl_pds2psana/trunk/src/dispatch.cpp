@@ -34,6 +34,7 @@
 #include "psddl_pds2psana/timetool.ddl.h"
 #include "psddl_pds2psana/alias.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
+#include "psddl_pds2psana/smldata.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/cspad2x2.ddl.h"
 #include "psddl_pds2psana/arraychar.ddl.h"
@@ -584,6 +585,16 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV6>(data), xtc->src);
         }
         break;
+      case 7:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataEBeamV7& xdata = *(Pds::Bld::BldDataEBeamV7*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV7& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV7>(data), xtc->src);
+        }
+        break;
       case 32768:
         {
           // XTC data object
@@ -652,6 +663,16 @@ try {
           const Psana::Bld::BldDataEBeamV6& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
           // store data
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV6>(data), xtc->src);
+        }
+        break;
+      case 32775:
+        {
+          // XTC data object
+          const Pds::Bld::BldDataEBeamV7& xdata = *(Pds::Bld::BldDataEBeamV7*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV7& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV7>(data), xtc->src);
         }
         break;
       } // end switch (version)
@@ -1538,6 +1559,15 @@ try {
           }
         }
         break;
+      case 3:
+        {
+          if (boost::shared_ptr<Pds::OceanOptics::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::OceanOptics::DataV3, psddl_pds2psana::OceanOptics::DataV3<Pds::OceanOptics::ConfigV2>, Pds::OceanOptics::DataV3, Pds::OceanOptics::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::OceanOptics::DataV3>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
       case 32769:
         {
           if (boost::shared_ptr<Pds::OceanOptics::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
@@ -1557,6 +1587,15 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::OceanOptics::DataV2, psddl_pds2psana::OceanOptics::DataV2<Pds::OceanOptics::ConfigV2>, Pds::OceanOptics::DataV2, Pds::OceanOptics::ConfigV2> ProxyType;
             if (evt) evt->putProxy<Psana::OceanOptics::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32771:
+        {
+          if (boost::shared_ptr<Pds::OceanOptics::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::OceanOptics::DataV3, psddl_pds2psana::OceanOptics::DataV3<Pds::OceanOptics::ConfigV2>, Pds::OceanOptics::DataV3, Pds::OceanOptics::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::OceanOptics::DataV3>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -2078,6 +2117,70 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_SmlDataConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::SmlData::ConfigV1> xptr(xtc, (Pds::SmlData::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::SmlData::ConfigV1> obj = boost::make_shared<psddl_pds2psana::SmlData::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_SmlDataOrigDgramOffset:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<Pds::SmlData::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::SmlData::OrigDgramOffsetV1, psddl_pds2psana::SmlData::OrigDgramOffsetV1<Pds::SmlData::ConfigV1>, Pds::SmlData::OrigDgramOffsetV1, Pds::SmlData::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::SmlData::OrigDgramOffsetV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<Pds::SmlData::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::SmlData::OrigDgramOffsetV1, psddl_pds2psana::SmlData::OrigDgramOffsetV1<Pds::SmlData::ConfigV1>, Pds::SmlData::OrigDgramOffsetV1, Pds::SmlData::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::SmlData::OrigDgramOffsetV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_SmlDataProxy:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<Pds::SmlData::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::SmlData::ProxyV1, psddl_pds2psana::SmlData::ProxyV1<Pds::SmlData::ConfigV1>, Pds::SmlData::ProxyV1, Pds::SmlData::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::SmlData::ProxyV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<Pds::SmlData::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::SmlData::ProxyV1, psddl_pds2psana::SmlData::ProxyV1<Pds::SmlData::ConfigV1>, Pds::SmlData::ProxyV1, Pds::SmlData::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::SmlData::ProxyV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_Spectrometer:
     {
       switch (version) {
@@ -2535,6 +2638,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 6:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV6) );
       break;
+    case 7:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV7) );
+      break;
     case 32768:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV0) );
       break;
@@ -2555,6 +2661,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     case 32774:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV6) );
+      break;
+    case 32775:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV7) );
       break;
     } // end version switch
     break;
@@ -2914,11 +3023,17 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 2:
       typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV2) );
       break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV3) );
+      break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV1) );
       break;
     case 32770:
       typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV2) );
+      break;
+    case 32771:
+      typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV3) );
       break;
     } // end version switch
     break;
@@ -3097,6 +3212,33 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     case 32769:
       typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataPimV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SmlDataConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::SmlData::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SmlDataOrigDgramOffset:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::SmlData::OrigDgramOffsetV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::SmlData::OrigDgramOffsetV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SmlDataProxy:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::SmlData::ProxyV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::SmlData::ProxyV1) );
       break;
     } // end version switch
     break;
