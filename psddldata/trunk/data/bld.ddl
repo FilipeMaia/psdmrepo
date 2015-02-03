@@ -347,6 +347,66 @@
 }
 
 
+//------------------ BldDataEBeamV7 ------------------
+/* BldDataEBeamV7 is the same as BldDataEBeamV6. */
+/* A sign-error error was discovered in the calculation of the photon energy that goes into the ebeam bld.  */
+/* This is fixed on the accelerator side, but we will increment the ebeam bld version number to V7 so the   */
+/* data is clearly marked as changed. */
+@type BldDataEBeamV7
+  [[type_id(Id_EBeam, 7)]]
+  [[value_type]]
+  [[pack(4)]]
+{
+  /* Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  @enum DamageMask (int32_t) {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+    EbeamEnergyBC2Damage = 0x080,
+    EbeamPkCurrBC1Damage = 0x100,
+    EbeamEnergyBC1Damage = 0x200,
+    EbeamUndPosXDamage = 0x400,
+    EbeamUndPosYDamage = 0x800,
+    EbeamUndAngXDamage = 0x1000,
+    EbeamUndAngYDamage = 0x2000,
+    EbeamXTCAVAmplDamage  = 0x4000,
+    EbeamXTCAVPhaseDamage = 0x8000,
+    EbeamDumpChargeDamage = 0x10000,
+    EbeamPhotonEnergyDamage = 0x20000
+  }
+
+  uint32_t _uDamageMask -> damageMask;  /* Damage mask. */
+  double _fEbeamCharge -> ebeamCharge;  /* Beam charge in nC. */
+  double _fEbeamL3Energy -> ebeamL3Energy;  /* Beam energy in MeV. */
+  double _fEbeamLTUPosX -> ebeamLTUPosX;  /* LTU beam position (BPMS:LTU1:720 through 750) in mm. */
+  double _fEbeamLTUPosY -> ebeamLTUPosY;  /* LTU beam position in mm. */
+  double _fEbeamLTUAngX -> ebeamLTUAngX;  /* LTU beam angle in mrad. */
+  double _fEbeamLTUAngY -> ebeamLTUAngY;  /* LTU beam angle in mrad. */
+  double _fEbeamPkCurrBC2 -> ebeamPkCurrBC2;  /* Beam current in Amps. */
+  double _fEbeamEnergyBC2 -> ebeamEnergyBC2;  /* Beam position in mm (related to beam energy). */
+  double _fEbeamPkCurrBC1 -> ebeamPkCurrBC1;  /* Beam current in Amps. */
+  double _fEbeamEnergyBC1 -> ebeamEnergyBC1;  /* Beam position in mm (related to beam energy). */
+  double _fEbeamUndPosX -> ebeamUndPosX;  /* Undulator launch feedback (BPMs U4 through U10) beam x-position in mm. */
+  double _fEbeamUndPosY -> ebeamUndPosY;  /* Undulator launch feedback beam y-position in mm. */
+  double _fEbeamUndAngX -> ebeamUndAngX;  /* Undulator launch feedback beam x-angle in mrad. */
+  double _fEbeamUndAngY -> ebeamUndAngY;  /* Undulator launch feedback beam y-angle in mrad. */
+  double _fEbeamXTCAVAmpl  -> ebeamXTCAVAmpl ;  /* XTCAV Amplitude in MVolt. */
+  double _fEbeamXTCAVPhase -> ebeamXTCAVPhase;  /* XTCAV Phase in degrees. */
+  double _fEbeamDumpCharge -> ebeamDumpCharge;  /* Bunch charge at Dump in num. electrons */
+  double _fEbeamPhotonEnergy  -> ebeamPhotonEnergy ;  /* computed photon energy, in eV */
+  double _fEbeamLTU250 -> ebeamLTU250;  /* LTU250 BPM value in mm, used to compute photon energy. from BPMS:LTU1:250:X */
+  double _fEbeamLTU450 -> ebeamLTU450;  /* LTU450 BPM value in mm, used to compute photon energy. from BPMS:LTU1:450:X */
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto, inline]];
+
+}
+
+
 //------------------ BldDataPhaseCavity ------------------
 /* PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2,
                 UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2 */
