@@ -4,8 +4,6 @@ Edit the template which resides in
 psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 */
 
-// TODO: I have editied the file, taken out small data
-
 #include "PSEvt/EventKey.h"
 #include "PSEvt/TypeInfoUtils.h"
 #include "Translator/HdfWriterFromEvent.h"
@@ -78,9 +76,9 @@ using namespace psddl_hdf2psana::CsPad;
 using namespace psddl_hdf2psana::Opal1k;
 using namespace psddl_hdf2psana::Pimax;
 using namespace psddl_hdf2psana::Princeton;
+using namespace psddl_hdf2psana::ControlData;
 using namespace psddl_hdf2psana::GenericPgp;
 using namespace psddl_hdf2psana::Partition;
-using namespace psddl_hdf2psana::ControlData;
 using namespace psddl_hdf2psana::FCCD;
 using namespace psddl_hdf2psana::Alias;
 using namespace psddl_hdf2psana::Ipimb;

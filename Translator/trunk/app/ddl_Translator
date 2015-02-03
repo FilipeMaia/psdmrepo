@@ -1,11 +1,43 @@
-#!/bin/sh
+#!@PYTHON@
 
-set -e
+import os
+import sys
+import argparse
+import subprocess
+import psddl.WrapperScriptCommon as wsc
 
-if [ ! -d psddldata/data/ ]; then
-    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
-    exit 1
-fi
+programDescription = '''
+script to run the Translator DDL back end to produce the DDL generated 
+for the Translator package.
+'''
 
-psddlc -I data -B package_dir:Translator -b hdf5Translator data/psddldata/*.ddl
+programDescriptionEpilog = '''
+Note, do not use the --devel switch to generate code for production releases.
+'''
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=programDescription,
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-d','--devel', action='store_true', help="include DDL types with the DEVEL tag", default=False)
+    parser.add_argument('-v','--verbose', action='store_true', help="verbose output for script (not backend)", default=False)
+    args = parser.parse_args()
+
+    wsc.checkForDataDirWithOnlyDDL('psddldata')
+    wsc.checkForDataDirWithOnlyDDL('psddl_hdf2psana')
+    packagesToExclude = ['xtc','smldata']
+    ddlFiles = wsc.getDDLfilenames('psddldata', exclude=packagesToExclude, verbose=args.verbose)
+
+    ddlFilesArg = ' '.join(ddlFiles)
+
+    develSwitch = ''
+    if args.devel:
+        develSwitch = ' -D'
+    
+    cmd = 'psddlc -I data ' + develSwitch + ' -B package_dir:Translator -b hdf5Translator ' + ddlFilesArg
+    if args.verbose:
+        sys.stdout.write("Running cmd:\n%s\n" % cmd)
+        sys.stdout.flush()
+    status = subprocess.call(cmd, shell=True)
+    sys.exit(status)
 
