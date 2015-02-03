@@ -18,5 +18,8 @@ DataV1::~DataV1() {}
 
 DataV2::~DataV2() {}
 
+
+DataV3::~DataV3() {}
+
 } // namespace OceanOptics
 } // namespace Psana

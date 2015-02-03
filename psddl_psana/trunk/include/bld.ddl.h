@@ -611,6 +611,114 @@ private:
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV6::DamageMask enval);
 
+/** @class BldDataEBeamV7
+
+  BldDataEBeamV7 is the same as BldDataEBeamV6.
+A sign-error error was discovered in the calculation of the photon energy that goes into the ebeam bld.
+This is fixed on the accelerator side, but we will increment the ebeam bld version number to V7 so the
+data is clearly marked as changed.
+*/
+
+
+class BldDataEBeamV7 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 7 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+    EbeamEnergyBC2Damage = 0x080,
+    EbeamPkCurrBC1Damage = 0x100,
+    EbeamEnergyBC1Damage = 0x200,
+    EbeamUndPosXDamage = 0x400,
+    EbeamUndPosYDamage = 0x800,
+    EbeamUndAngXDamage = 0x1000,
+    EbeamUndAngYDamage = 0x2000,
+    EbeamXTCAVAmplDamage = 0x4000,
+    EbeamXTCAVPhaseDamage = 0x8000,
+    EbeamDumpChargeDamage = 0x10000,
+    EbeamPhotonEnergyDamage = 0x20000,
+  };
+  BldDataEBeamV7(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2, double arg__fEbeamEnergyBC2, double arg__fEbeamPkCurrBC1, double arg__fEbeamEnergyBC1, double arg__fEbeamUndPosX, double arg__fEbeamUndPosY, double arg__fEbeamUndAngX, double arg__fEbeamUndAngY, double arg__fEbeamXTCAVAmpl, double arg__fEbeamXTCAVPhase, double arg__fEbeamDumpCharge, double arg__fEbeamPhotonEnergy, double arg__fEbeamLTU250, double arg__fEbeamLTU450)
+    : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1), _fEbeamUndPosX(arg__fEbeamUndPosX), _fEbeamUndPosY(arg__fEbeamUndPosY), _fEbeamUndAngX(arg__fEbeamUndAngX), _fEbeamUndAngY(arg__fEbeamUndAngY), _fEbeamXTCAVAmpl(arg__fEbeamXTCAVAmpl), _fEbeamXTCAVPhase(arg__fEbeamXTCAVPhase), _fEbeamDumpCharge(arg__fEbeamDumpCharge), _fEbeamPhotonEnergy(arg__fEbeamPhotonEnergy), _fEbeamLTU250(arg__fEbeamLTU250), _fEbeamLTU450(arg__fEbeamLTU450)
+  {
+  }
+  BldDataEBeamV7() {}
+  /** Damage mask. */
+  uint32_t damageMask() const { return _uDamageMask; }
+  /** Beam charge in nC. */
+  double ebeamCharge() const { return _fEbeamCharge; }
+  /** Beam energy in MeV. */
+  double ebeamL3Energy() const { return _fEbeamL3Energy; }
+  /** LTU beam position (BPMS:LTU1:720 through 750) in mm. */
+  double ebeamLTUPosX() const { return _fEbeamLTUPosX; }
+  /** LTU beam position in mm. */
+  double ebeamLTUPosY() const { return _fEbeamLTUPosY; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngX() const { return _fEbeamLTUAngX; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC2() const { return _fEbeamEnergyBC2; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
+  /** Undulator launch feedback (BPMs U4 through U10) beam x-position in mm. */
+  double ebeamUndPosX() const { return _fEbeamUndPosX; }
+  /** Undulator launch feedback beam y-position in mm. */
+  double ebeamUndPosY() const { return _fEbeamUndPosY; }
+  /** Undulator launch feedback beam x-angle in mrad. */
+  double ebeamUndAngX() const { return _fEbeamUndAngX; }
+  /** Undulator launch feedback beam y-angle in mrad. */
+  double ebeamUndAngY() const { return _fEbeamUndAngY; }
+  /** XTCAV Amplitude in MVolt. */
+  double ebeamXTCAVAmpl() const { return _fEbeamXTCAVAmpl; }
+  /** XTCAV Phase in degrees. */
+  double ebeamXTCAVPhase() const { return _fEbeamXTCAVPhase; }
+  /** Bunch charge at Dump in num. electrons */
+  double ebeamDumpCharge() const { return _fEbeamDumpCharge; }
+  /** computed photon energy, in eV */
+  double ebeamPhotonEnergy() const { return _fEbeamPhotonEnergy; }
+  /** LTU250 BPM value in mm, used to compute photon energy. from BPMS:LTU1:250:X */
+  double ebeamLTU250() const { return _fEbeamLTU250; }
+  /** LTU450 BPM value in mm, used to compute photon energy. from BPMS:LTU1:450:X */
+  double ebeamLTU450() const { return _fEbeamLTU450; }
+  static uint32_t _sizeof() { return 164; }
+private:
+  uint32_t	_uDamageMask;	/**< Damage mask. */
+  double	_fEbeamCharge;	/**< Beam charge in nC. */
+  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position (BPMS:LTU1:720 through 750) in mm. */
+  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
+  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
+  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC2;	/**< Beam position in mm (related to beam energy). */
+  double	_fEbeamPkCurrBC1;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
+  double	_fEbeamUndPosX;	/**< Undulator launch feedback (BPMs U4 through U10) beam x-position in mm. */
+  double	_fEbeamUndPosY;	/**< Undulator launch feedback beam y-position in mm. */
+  double	_fEbeamUndAngX;	/**< Undulator launch feedback beam x-angle in mrad. */
+  double	_fEbeamUndAngY;	/**< Undulator launch feedback beam y-angle in mrad. */
+  double	_fEbeamXTCAVAmpl;	/**< XTCAV Amplitude in MVolt. */
+  double	_fEbeamXTCAVPhase;	/**< XTCAV Phase in degrees. */
+  double	_fEbeamDumpCharge;	/**< Bunch charge at Dump in num. electrons */
+  double	_fEbeamPhotonEnergy;	/**< computed photon energy, in eV */
+  double	_fEbeamLTU250;	/**< LTU250 BPM value in mm, used to compute photon energy. from BPMS:LTU1:250:X */
+  double	_fEbeamLTU450;	/**< LTU450 BPM value in mm, used to compute photon energy. from BPMS:LTU1:450:X */
+};
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV7::DamageMask enval);
+
 /** @class BldDataPhaseCavity
 
   PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2,

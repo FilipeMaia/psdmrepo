@@ -122,6 +122,10 @@ public:
   virtual uint8_t defect_pixel_correction_enabled() const = 0;
   /** enable hardware region of interest */
   virtual uint8_t use_hardware_roi() const = 0;
+  /** enable the test pattern */
+  virtual uint8_t use_test_pattern() const = 0;
+  /** maximum taps in output driver */
+  virtual uint8_t max_taps() const = 0;
   /** hardware ROI begin */
   virtual const Camera::FrameCoord& roi_lo() const = 0;
   /** hardware ROI end */

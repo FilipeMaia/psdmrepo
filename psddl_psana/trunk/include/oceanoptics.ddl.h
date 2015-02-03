@@ -125,6 +125,35 @@ public:
   virtual double durationOfFrame() const = 0;
   virtual double nonlinerCorrected(uint32_t iPixel) const = 0;
 };
+
+/** @class DataV3
+
+  
+*/
+
+class ConfigV2;
+
+class DataV3 {
+public:
+  enum { TypeId = Pds::TypeId::Id_OceanOpticsData /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 3 /**< XTC type version number */ };
+  enum { iDataReadSize = 8192 };
+  enum { iNumPixels = 3840 };
+  enum { iActivePixelIndex = 22 };
+  virtual ~DataV3();
+  virtual ndarray<const uint16_t, 1> data() const = 0;
+  virtual uint64_t frameCounter() const = 0;
+  virtual uint64_t numDelayedFrames() const = 0;
+  virtual uint64_t numDiscardFrames() const = 0;
+  virtual const OceanOptics::timespec64& timeFrameStart() const = 0;
+  virtual const OceanOptics::timespec64& timeFrameFirstData() const = 0;
+  virtual const OceanOptics::timespec64& timeFrameEnd() const = 0;
+  virtual int8_t numSpectraInData() const = 0;
+  virtual int8_t numSpectraInQueue() const = 0;
+  virtual int8_t numSpectraUnused() const = 0;
+  virtual double durationOfFrame() const = 0;
+  virtual double nonlinerCorrected(uint32_t iPixel) const = 0;
+};
 } // namespace OceanOptics
 } // namespace Psana
 #endif // PSANA_OCEANOPTICS_DDL_H
