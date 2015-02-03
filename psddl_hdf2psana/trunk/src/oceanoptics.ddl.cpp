@@ -473,5 +473,51 @@ void store_at(const Psana::OceanOptics::DataV2* obj, hdf5pp::Group group, long i
   store_DataV2(obj, group, index, version, true);
 }
 
+boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV2>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::DataV3> >(boost::make_shared<DataV3_v0<Psana::OceanOptics::ConfigV2> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::DataV3> >(boost::shared_ptr<Psana::OceanOptics::DataV3>());
+  }
+}
+
+void make_datasets(const Psana::OceanOptics::DataV3& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_DataV3_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV3", version);
+  }
+}
+
+void store_DataV3(const Psana::OceanOptics::DataV3* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_DataV3_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV3", version);
+  }
+}
+
+void store(const Psana::OceanOptics::DataV3& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV3(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::OceanOptics::DataV3* obj, hdf5pp::Group group, long index, int version)
+{
+  store_DataV3(obj, group, index, version, true);
+}
+
 } // namespace OceanOptics
 } // namespace psddl_hdf2psana

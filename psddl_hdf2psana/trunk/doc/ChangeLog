@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-19
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103. Note issue with smlData. Some generated code was modified in this package.
+	
 Tag: V00-09-18
 2014-12-04 David Schneider
 - Fix bug. JIRA PSAS-78. Translator crashing on BldDataSpectrometerV1 because the peaks are not specified as possible zero dim.

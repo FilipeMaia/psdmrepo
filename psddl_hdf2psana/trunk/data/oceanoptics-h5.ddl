@@ -56,4 +56,11 @@
 {
 }
 
+//------------------ DataV3 ------------------
+@h5schema DataV3
+  [[version(0)]]
+  [[external("psddl_hdf2psana/oceanoptics.h")]]
+{
+}
+
 } //- @package OceanOptics

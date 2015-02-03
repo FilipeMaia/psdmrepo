@@ -100,6 +100,8 @@ struct dataset_config {
   uint8_t output_lookup_table_enabled;
   uint8_t defect_pixel_correction_enabled;
   uint8_t use_hardware_roi;
+  uint8_t use_test_pattern;
+  uint8_t max_taps;
   Camera::ns_FrameCoord_v0::dataset_data roi_lo;
   Camera::ns_FrameCoord_v0::dataset_data roi_hi;
   uint32_t number_of_defect_pixels;
@@ -127,6 +129,8 @@ public:
   virtual uint8_t output_lookup_table_enabled() const;
   virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint8_t use_hardware_roi() const;
+  virtual uint8_t use_test_pattern() const;
+  virtual uint8_t max_taps() const;
   virtual const Psana::Camera::FrameCoord& roi_lo() const;
   virtual const Psana::Camera::FrameCoord& roi_hi() const;
   virtual uint32_t number_of_defect_pixels() const;

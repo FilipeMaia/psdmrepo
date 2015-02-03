@@ -318,6 +318,8 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("output_lookup_table_enabled", offsetof(DsType, output_lookup_table_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("use_hardware_roi", offsetof(DsType, use_hardware_roi), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("use_test_pattern", offsetof(DsType, use_test_pattern), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("max_taps", offsetof(DsType, max_taps), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("roi_lo", offsetof(DsType, roi_lo), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
   type.insert("roi_hi", offsetof(DsType, roi_hi), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
   type.insert("number_of_defect_pixels", offsetof(DsType, number_of_defect_pixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -361,6 +363,8 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("output_lookup_table_enabled", offsetof(DsType, output_lookup_table_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("use_hardware_roi", offsetof(DsType, use_hardware_roi), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("use_test_pattern", offsetof(DsType, use_test_pattern), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("max_taps", offsetof(DsType, max_taps), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("roi_lo", offsetof(DsType, roi_lo), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
   type.insert("roi_hi", offsetof(DsType, roi_hi), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
   type.insert("number_of_defect_pixels", offsetof(DsType, number_of_defect_pixels), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -389,6 +393,8 @@ ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::Quartz::ConfigV2& ps
   , output_lookup_table_enabled(psanaobj.output_lookup_table_enabled())
   , defect_pixel_correction_enabled(psanaobj.defect_pixel_correction_enabled())
   , use_hardware_roi(psanaobj.use_hardware_roi())
+  , use_test_pattern(psanaobj.use_test_pattern())
+  , max_taps(psanaobj.max_taps())
   , roi_lo(psanaobj.roi_lo())
   , roi_hi(psanaobj.roi_hi())
   , number_of_defect_pixels(psanaobj.number_of_defect_pixels())
@@ -435,6 +441,14 @@ uint8_t ConfigV2_v0::defect_pixel_correction_enabled() const {
 uint8_t ConfigV2_v0::use_hardware_roi() const {
   if (not m_ds_config) read_ds_config();
   return uint8_t(m_ds_config->use_hardware_roi);
+}
+uint8_t ConfigV2_v0::use_test_pattern() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->use_test_pattern);
+}
+uint8_t ConfigV2_v0::max_taps() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->max_taps);
 }
 const Psana::Camera::FrameCoord& ConfigV2_v0::roi_lo() const {
   if (not m_ds_config) read_ds_config();
