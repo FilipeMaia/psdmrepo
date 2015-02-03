@@ -1,27 +1,65 @@
-#!/bin/sh
+#!@PYTHON@
 
-set -e
+import os
+import sys
+import argparse
+import subprocess
+import psddl.WrapperScriptCommon as wsc
 
-if [ ! -d psddldata/data/ ]; then
-    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
-    exit 1
-fi
+programDescription = '''
+script to run the hdf5 and hdf5-dispatch DDL back end to produce the DDL generated 
+for the psddl_hdf2psanaTranslator package.
+'''
 
-packages=`(cd psddldata/data; ls -1 *.ddl | cut -d. -f1 | grep -v xtc)`
+programDescriptionEpilog = '''
+Note, do not use the --devel switch to generate code for production releases.
+'''
 
-for pkg in $packages; do 
-    f="psddldata/data/$pkg.ddl" 
-    h5schema="psddl_hdf2psana/data/$pkg-h5.ddl"
-    test -f "$h5schema" || h5schema=
-    psddlc -b hdf5 -I data -E psddl_hdf2psana/include -O psddl_hdf2psana/src -i psddl_hdf2psana -t psddl_hdf2psana \
-        -B psana-inc:psddl_psana -B psana-ns:Psana "$@" $f $h5schema
-done
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description=programDescription,
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-d','--devel', action='store_true', help="include DDL types with the DEVEL tag", default=False)
+    parser.add_argument('-v','--verbose', action='store_true', help="verbose output for script (not backend)", default=False)
+    parser.add_argument('-e','--extra', type=str, help="extra parameters to pass to psddlc -b hdf5, before file input", default='')
+    args = parser.parse_args()
 
-files=""
-for pkg in $packages; do 
-    files="$files psddldata/data/$pkg.ddl"
-    h5schema="psddl_hdf2psana/data/$pkg-h5.ddl"
-    test -f "$h5schema" && files="$files $h5schema" 
-done
-psddlc -b hdf5-dispatch -I data -e psddl_hdf2psana/include/dispatch.h -o psddl_hdf2psana/src/dispatch.cpp \
-            -i psddl_hdf2psana -t psddl_hdf2psana -B psana-ns:Psana $files
+    wsc.checkForDataDirWithOnlyDDL('psddldata')
+    wsc.checkForDataDirWithOnlyDDL('psddl_hdf2psana')
+
+    packagesToExclude = ['xtc','smldata']
+    ddlFiles = wsc.getDDLfilenames('psddldata', exclude=packagesToExclude, verbose=args.verbose)
+
+    develSwitch = ''
+    if args.devel:
+        develSwitch = ' -D'
+
+    filesForDispatch = []
+    for ddlFile in ddlFiles:
+        filesForDispatch.append(ddlFile)
+        pkg = os.path.splitext(os.path.basename(ddlFile))[0]
+        h5schema = os.path.join('data', 'psddl_hdf2psana', '%s-h5.ddl' % pkg)
+        if not os.path.exists(h5schema):
+            h5schema = ''
+        else:
+            filesForDispatch.append(h5schema)
+        cmd = 'psddlc -b hdf5' + develSwitch
+        cmd += ' -I data -E psddl_hdf2psana/include -O psddl_hdf2psana/src'
+        cmd += ' -i psddl_hdf2psana -t psddl_hdf2psana'
+        cmd += (' -B psana-inc:psddl_psana -B psana-ns:Psana %s %s %s' % (args.extra, ddlFile, h5schema))
+        if args.verbose:
+            sys.stdout.write("executing:\n%s\n" % cmd)
+        res = subprocess.call(cmd,shell=True)
+        if res != 0:
+            sys.stderr.write("error with call: %s, res=%s\n" % (cmd, res))
+            sys.exit(res)
+            
+    dispatchCmd = 'psddlc -b hdf5-dispatch ' + develSwitch
+    dispatchCmd += ' -I data -e psddl_hdf2psana/include/dispatch.h -o psddl_hdf2psana/src/dispatch.cpp'
+    dispatchCmd += ' -i psddl_hdf2psana -t psddl_hdf2psana -B psana-ns:Psana '
+    dispatchCmd += ' '.join(filesForDispatch)
+    
+    if args.verbose:
+        sys.stdout.write("executing:\n%s\n" % dispatchCmd)
+        sys.stdout.flush()
+    sys.exit(subprocess.call(dispatchCmd, shell=True))
