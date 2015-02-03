@@ -4,6 +4,8 @@ Edit the template which resides in
 psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 */
 
+// TODO: I have editied the file, taken out small data
+
 #include "PSEvt/EventKey.h"
 #include "PSEvt/TypeInfoUtils.h"
 #include "Translator/HdfWriterFromEvent.h"
@@ -165,6 +167,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV4) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV4> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV5) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV5> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV6) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV6> >();
+  m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV7) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV7> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataFEEGasDetEnergy) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataFEEGasDetEnergy> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataFEEGasDetEnergyV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataFEEGasDetEnergyV1> >();
   m_mainMap[ & typeid(Psana::Bld::BldDataGMDV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV0> >();
@@ -243,6 +246,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::OceanOptics::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::ConfigV2> >();
   m_mainMap[ & typeid(Psana::OceanOptics::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::DataV1> >();
   m_mainMap[ & typeid(Psana::OceanOptics::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::DataV2> >();
+  m_mainMap[ & typeid(Psana::OceanOptics::DataV3) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::DataV3> >();
   m_mainMap[ & typeid(Psana::Opal1k::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Opal1k::ConfigV1> >();
   m_mainMap[ & typeid(Psana::Orca::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Orca::ConfigV1> >();
   m_mainMap[ & typeid(Psana::PNCCD::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV1> >();
