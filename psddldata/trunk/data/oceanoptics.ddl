@@ -17,11 +17,6 @@
 
   /* Construct from all attributes */
   @init()  [[auto, inline]];
-
-  int32_t deviceType()  [[inline]]
-  [[language("C++")]] @{
-    return 0;
-  @}
 }
 
 //------------------ ConfigV2 ------------------
@@ -90,7 +85,7 @@
 
   double nonlinerCorrected(uint32_t iPixel)
   [[language("C++")]] @{
-    double fRawValue = (double) (@config.deviceType() == 0 ? (@self.data()[iPixel] ^ 0x2000) : @self.data()[iPixel]);
+    double fRawValue = (double) (@self.data()[iPixel] ^ 0x2000);
     const ndarray<const double, 1>& corr = @config.nonlinCorrect();
     return fRawValue / (
   corr[0] + fRawValue *
@@ -136,6 +131,51 @@
   double nonlinerCorrected(uint32_t iPixel)
   [[language("C++")]] @{
     double fRawValue = (double) (@self.data()[iPixel]);
+    const ndarray<const double, 1>& corr = @config.nonlinCorrect();
+    return fRawValue / (
+  corr[0] + fRawValue *
+       (corr[1] + fRawValue *
+       (corr[2] + fRawValue *
+       (corr[3] + fRawValue *
+       (corr[4] + fRawValue *
+       (corr[5] + fRawValue *
+       (corr[6] + fRawValue *
+        corr[7])))))));
+  @}
+}
+
+//------------------ DataV3 ------------------
+@type DataV3
+  [[type_id(Id_OceanOpticsData, 3)]]
+  [[pack(4)]]
+  [[config(ConfigV2)]]
+{
+  @const int32_t iDataReadSize = 8192;
+  @const int32_t iNumPixels = 3840;
+  @const int32_t iActivePixelIndex = 22;
+
+  uint16_t lu16Spetra[iNumPixels] -> data;
+  uint64_t _u64FrameCounter -> frameCounter;
+  uint64_t _u64NumDelayedFrames -> numDelayedFrames;
+  uint64_t _u64NumDiscardFrames -> numDiscardFrames;
+  timespec64 _tsTimeFrameStart -> timeFrameStart;
+  timespec64 _tsTimeFrameFirstData -> timeFrameFirstData;
+  timespec64 _tsTimeFrameEnd -> timeFrameEnd;
+  int32_t _i32Version;
+  int8_t _i8NumSpectraInData -> numSpectraInData;
+  int8_t _i8NumSpectraInQueue -> numSpectraInQueue;
+  int8_t _i8NumSpectraUnused -> numSpectraUnused;
+  int8_t _iReserved1;
+
+  double durationOfFrame()  [[inline]]
+  [[language("C++")]] @{
+    return @self.timeFrameEnd().tv_sec() - @self.timeFrameStart().tv_sec() +
+  (@self.timeFrameEnd().tv_nsec() - @self.timeFrameStart().tv_nsec()) * 1e-9;
+  @}
+
+  double nonlinerCorrected(uint32_t iPixel)
+  [[language("C++")]] @{
+    double fRawValue = (double) @self.data()[iPixel];
     const ndarray<const double, 1>& corr = @config.nonlinCorrect();
     return fRawValue / (
   corr[0] + fRawValue *
