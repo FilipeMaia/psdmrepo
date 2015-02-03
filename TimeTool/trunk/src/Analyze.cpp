@@ -153,6 +153,8 @@ Analyze::Analyze (const std::string& name)
 
   // get the values from configuration or use defaults
   m_get_key = configSrc("get_key","DetInfo(:Opal1000)");
+  m_beam_on_off_key = configStr("beam_on_off_key","");
+  m_laser_on_off_key = configStr("laser_on_off_key","");
   m_put_key = configStr("put_key","TTSPEC");
   m_put_ndarrays = config("put_ndarrays",false);
 
@@ -530,6 +532,23 @@ Analyze::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
+bool Analyze::getIsOffFromOnOffKey(const std::string & moduleParameter, const std::string & key, Event & evt) 
+{
+  boost::shared_ptr<std::string> onOff = evt.get(m_get_key, key);
+  if (not onOff) {
+    onOff = evt.get(key);
+    if (not onOff) MsgLog(name(), fatal, moduleParameter << "=" << key
+                          << " specified but not present for either the source specified with the get_key="
+                          << m_get_key << " nor no source. It must be present in all events ");
+  }
+  bool isOn = *onOff == "on";
+  bool isOff = *onOff == "off";
+  if ((not isOn) and (not isOff)) MsgLog(name(), fatal, key
+                                         << " found but value must be on of 'on' or 'off', "
+                                         << "all lowercase. However it is: " << *onOff);
+  return isOff;
+}
+
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
@@ -541,10 +560,25 @@ Analyze::event(Event& evt, Env& env)
     return;
   }
 
-  bool nobeam  = !calculate_logic(m_beam_logic,
+  bool nobeam;
+  bool nolaser;
+  
+  if (m_beam_on_off_key.length()>0) {
+    nobeam = getIsOffFromOnOffKey("beam_on_off_key", 
+                                  m_beam_on_off_key, evt);
+  } else {
+    nobeam  = !calculate_logic(m_beam_logic,
                                   evr.get()->fifoEvents());
-  bool nolaser = !calculate_logic(m_laser_logic, 
-                                  evr.get()->fifoEvents());
+  }
+  
+
+  if (m_laser_on_off_key.length()>0) {
+    nolaser = getIsOffFromOnOffKey("laser_on_off_key",
+                                   m_laser_on_off_key, evt);
+  } else {
+    nolaser = !calculate_logic(m_laser_logic, 
+                               evr.get()->fifoEvents());
+  }
 
   bool use_sb_roi  = (m_sb_roi_lo [0]!=m_sb_roi_hi [0]);
   bool use_ref_roi = (m_ref_roi_lo[0]!=m_ref_roi_hi[0]);

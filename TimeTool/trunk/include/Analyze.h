@@ -86,6 +86,11 @@ public:
 
 protected:
 
+  /// helper function returns true if 'key' have value 'off'. Checks m_get_key source
+  /// first, then no source. Throws fatal error if key is not found or doesn't have value
+  /// 'on' or 'off'. Users moduleParameter to report errors
+  bool getIsOffFromOnOffKey(const std::string & moduleParameter, const std::string & key, Event & evt);
+
 private:
   ndarray<unsigned,1> project(const ndarray<const uint16_t,2>&) const;
 
@@ -93,6 +98,8 @@ private:
 
   Source      m_get_key;  // Key for retrieving camera image
   std::string m_put_key;  // Key for inserting results into Event
+  std::string m_beam_on_off_key; // Key for user to override beam logic
+  std::string m_laser_on_off_key; // Key for user to override laser logic
   bool        m_put_ndarrays; // put size 1 ndarray's into Event rather than doubles
 
   std::string m_ipm_get_key;  // use this ipm threshold for detecting no beam

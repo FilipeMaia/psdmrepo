@@ -11,6 +11,12 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2015-2-3 David Schneider
+- add options to Analyze module allow user to control beam and laser logic.
+  Tracks JIRA issue PSAS-102. 
+
+	
 Tag: V00-01-04
 2014-12-11 David Schneider
 - restore adding results into the psana Event. Note, results are now added
