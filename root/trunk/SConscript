@@ -19,7 +19,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-root_ver = "5.30.06"
+root_ver = "5.34.25"
 PREFIX = pjoin('$SIT_EXTERNAL_SW', "root", root_ver + "-$PYTHON")
 INCDIR = "include/root"
 LIBDIR = "lib"
