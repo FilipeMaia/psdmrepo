@@ -362,6 +362,15 @@ def Pds_ClockTime_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Pds_TypeId_to_str(obj, indent, lvl, methodSep):
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'value: %s' % uint32_to_str( obj.value() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Alias_SrcAlias_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
@@ -1364,6 +1373,77 @@ def Bld_BldDataEBeamV5_to_str(obj, indent, lvl, methodSep):
 def Bld_BldDataEBeamV6_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Bld.BldDataEBeamV6.TypeId
     assert obj.Version == psana.Bld.BldDataEBeamV6.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'damageMask: %s' % uint32_to_str( obj.damageMask() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamCharge: %s' % double_to_str( obj.ebeamCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamL3Energy: %s' % double_to_str( obj.ebeamL3Energy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosX: %s' % double_to_str( obj.ebeamLTUPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUPosY: %s' % double_to_str( obj.ebeamLTUPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngX: %s' % double_to_str( obj.ebeamLTUAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTUAngY: %s' % double_to_str( obj.ebeamLTUAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC2: %s' % double_to_str( obj.ebeamPkCurrBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC2: %s' % double_to_str( obj.ebeamEnergyBC2() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPkCurrBC1: %s' % double_to_str( obj.ebeamPkCurrBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamEnergyBC1: %s' % double_to_str( obj.ebeamEnergyBC1() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosX: %s' % double_to_str( obj.ebeamUndPosX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndPosY: %s' % double_to_str( obj.ebeamUndPosY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngX: %s' % double_to_str( obj.ebeamUndAngX() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamUndAngY: %s' % double_to_str( obj.ebeamUndAngY() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVAmpl: %s' % double_to_str( obj.ebeamXTCAVAmpl() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamXTCAVPhase: %s' % double_to_str( obj.ebeamXTCAVPhase() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamDumpCharge: %s' % double_to_str( obj.ebeamDumpCharge() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamPhotonEnergy: %s' % double_to_str( obj.ebeamPhotonEnergy() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTU250: %s' % double_to_str( obj.ebeamLTU250() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'ebeamLTU450: %s' % double_to_str( obj.ebeamLTU450() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def Bld_BldDataEBeamV7_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataEBeamV7.TypeId
+    assert obj.Version == psana.Bld.BldDataEBeamV7.Version
     methodStrings = []
     # one_line_methods
     methodStr = doIndent(indent, lvl)
@@ -5851,6 +5931,52 @@ def OceanOptics_DataV2_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def OceanOptics_DataV3_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.OceanOptics.DataV3.TypeId
+    assert obj.Version == psana.OceanOptics.DataV3.Version
+    methodStrings = []
+    methodStrings.append(OceanOptics_nonLinearCorrected(obj, indent, lvl))
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'data: %s' % ndarray_to_str( obj.data() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'frameCounter: %s' % uint64_to_str( obj.frameCounter() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDelayedFrames: %s' % uint64_to_str( obj.numDelayedFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numDiscardFrames: %s' % uint64_to_str( obj.numDiscardFrames() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInData: %s' % int8_to_str( obj.numSpectraInData() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraInQueue: %s' % int8_to_str( obj.numSpectraInQueue() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numSpectraUnused: %s' % int8_to_str( obj.numSpectraUnused() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'durationOfFrame: %s' % double_to_str( obj.durationOfFrame() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameStart:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameStart(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameFirstData:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameFirstData(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'timeFrameEnd:\n'
+    methodStr += OceanOptics_timespec64_to_str(obj.timeFrameEnd(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Opal1k_ConfigV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Opal1k.ConfigV1.TypeId
     assert obj.Version == psana.Opal1k.ConfigV1.Version
@@ -6614,6 +6740,12 @@ def Quartz_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr += 'use_hardware_roi: %s' % uint8_to_str( obj.use_hardware_roi() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
+    methodStr += 'use_test_pattern: %s' % uint8_to_str( obj.use_test_pattern() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'max_taps: %s' % uint8_to_str( obj.max_taps() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
     methodStr += 'output_offset: %s' % uint16_to_str( obj.output_offset() )
     methodStrings.append(methodStr)                                 
     methodStr = doIndent(indent, lvl)
@@ -6723,6 +6855,50 @@ def Rayonix_ConfigV2_to_str(obj, indent, lvl, methodSep):
     methodStr = doIndent(indent, lvl)
     methodStr += 'readoutMode:\n'
     methodStr += enum_to_str(obj.readoutMode(), indent, lvl+1, methodSep)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def SmlData_ConfigV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.SmlData.ConfigV1.TypeId
+    assert obj.Version == psana.SmlData.ConfigV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'sizeThreshold: %s' % uint32_to_str( obj.sizeThreshold() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def SmlData_OrigDgramOffsetV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.SmlData.OrigDgramOffsetV1.TypeId
+    assert obj.Version == psana.SmlData.OrigDgramOffsetV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fileOffset: %s' % int64_to_str( obj.fileOffset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'extent: %s' % uint32_to_str( obj.extent() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
+def SmlData_ProxyV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.SmlData.ProxyV1.TypeId
+    assert obj.Version == psana.SmlData.ProxyV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'fileOffset: %s' % int64_to_str( obj.fileOffset() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'extent: %s' % uint32_to_str( obj.extent() )
+    methodStrings.append(methodStr)                                 
+    # multi_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'type:\n'
+    methodStr += Pds_TypeId_to_str(obj.type(), indent, lvl+1, methodSep)
     methodStrings.append(methodStr)
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
@@ -7812,6 +7988,7 @@ objFunctionTable = {
     (psana.Bld.BldDataEBeamV4.TypeId,4) : Bld_BldDataEBeamV4_to_str,
     (psana.Bld.BldDataEBeamV5.TypeId,5) : Bld_BldDataEBeamV5_to_str,
     (psana.Bld.BldDataEBeamV6.TypeId,6) : Bld_BldDataEBeamV6_to_str,
+    (psana.Bld.BldDataEBeamV7.TypeId,7) : Bld_BldDataEBeamV7_to_str,
     (psana.Bld.BldDataFEEGasDetEnergy.TypeId,0) : Bld_BldDataFEEGasDetEnergy_to_str,
     (psana.Bld.BldDataFEEGasDetEnergyV1.TypeId,1) : Bld_BldDataFEEGasDetEnergyV1_to_str,
     (psana.Bld.BldDataGMDV0.TypeId,0) : Bld_BldDataGMDV0_to_str,
@@ -7889,6 +8066,7 @@ objFunctionTable = {
     (psana.OceanOptics.ConfigV2.TypeId,2) : OceanOptics_ConfigV2_to_str,
     (psana.OceanOptics.DataV1.TypeId,1) : OceanOptics_DataV1_to_str,
     (psana.OceanOptics.DataV2.TypeId,2) : OceanOptics_DataV2_to_str,
+    (psana.OceanOptics.DataV3.TypeId,3) : OceanOptics_DataV3_to_str,
     (psana.Opal1k.ConfigV1.TypeId,1) : Opal1k_ConfigV1_to_str,
     (psana.Orca.ConfigV1.TypeId,1) : Orca_ConfigV1_to_str,
     (psana.PNCCD.ConfigV1.TypeId,1) : PNCCD_ConfigV1_to_str,
@@ -7911,6 +8089,9 @@ objFunctionTable = {
     (psana.Quartz.ConfigV2.TypeId,2) : Quartz_ConfigV2_to_str,
     (psana.Rayonix.ConfigV1.TypeId,1) : Rayonix_ConfigV1_to_str,
     (psana.Rayonix.ConfigV2.TypeId,2) : Rayonix_ConfigV2_to_str,
+    (psana.SmlData.ConfigV1.TypeId,1) : SmlData_ConfigV1_to_str,
+    (psana.SmlData.OrigDgramOffsetV1.TypeId,1) : SmlData_OrigDgramOffsetV1_to_str,
+    (psana.SmlData.ProxyV1.TypeId,1) : SmlData_ProxyV1_to_str,
     (psana.TimeTool.ConfigV1.TypeId,1) : TimeTool_ConfigV1_to_str,
     (psana.TimeTool.ConfigV2.TypeId,2) : TimeTool_ConfigV2_to_str,
     (psana.TimeTool.DataV1.TypeId,1) : TimeTool_DataV1_to_str,

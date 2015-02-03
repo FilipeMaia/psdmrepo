@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-43
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103.
+
 Tag: V00-00-42
 2015-01-08 David Schneider
 - add library code and unit test for live mode test. 
