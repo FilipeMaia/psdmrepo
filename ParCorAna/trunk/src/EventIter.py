@@ -9,11 +9,12 @@ class EventData(object):
     sec        - seconds of event from which data was retrieved
     nsec       - nanoseconds of event from which data was retrieved
     dataArray  -  a numpy data array from a detector in the event
+                  dataArray is guaranteed to be contiguous C ordered array
     '''
     def __init__(self,sec, nsec, dataArray):
         self.sec=sec
         self.nsec=nsec
-        self.dataArray = dataArray
+        self.dataArray = np.ascontiguousarray(dataArray)
 
     def time(self):
         '''returns tuple (sec, nsec) for this event data'''

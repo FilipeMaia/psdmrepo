@@ -48,7 +48,7 @@ class XCorrWorkerBase(object):
         if self.wrapped:
             # allow user object to subtract the effects of the column we are going to overwrite
             # in any accumulated state
-            userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, self.T, self.X)
+            userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, self.nextTimeIdx, self.numTimesFilled(), self.T, self.X)
             
         self.logger.debug('XCorrWorkerBase.updateData evtTime=%.4f next120hz=%d' % (evtTime, next120hz))
 
@@ -66,7 +66,7 @@ class XCorrWorkerBase(object):
         firstUpdate = (not self.wrapped) and self.nextTimeIdx==0
         if not firstUpdate:
             # now add in
-            userObj.adjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, self.T, self.X)
+            userObj.adjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, self.nextTimeIdx, self.numTimesFilled(), self.T, self.X)
             
         if self.nextTimeIdx == self.maxTimes - 1:
             self.wrapped = True

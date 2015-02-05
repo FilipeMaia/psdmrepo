@@ -256,7 +256,9 @@ Here is a summary of the callbacks:
 ** eventOk(self, evt): look at the event, decide whether or not workers should process it.
    The intention is that the user only look at small things before the framework takes the
    time to extract the detector data.
-* adjustData(self, data): allows workers to adjust the data, for example remove true zero's
+* adjustData(self, data): allows workers to adjust the data that the framework will store,
+   on a per event basis. Examples might be removing true zero's, or identifying saturated 
+   pixels based on a threshold.
 * initViewer(self, mask_ndarrayCoords, h5GroupUser): allows viewer to initialize. Viewer is passed in 
   loaded mask array, as a logical index array - True for elements of the ndarray to include.
   Viewer also receives h5py group to write to. This group will be passed in the publish function as well.
