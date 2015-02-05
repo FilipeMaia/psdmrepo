@@ -1,22 +1,36 @@
-#!/bin/sh
+#!@PYTHON@
 
-set -e
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
 
-if [ ! -d psddldata/data/ ]; then
-    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
-    exit 1
-fi
+programDescription = '''
+script to run the python backend to produce the DDL generated 
+for the psana_test package. Also creates WrapperList.txt.
+'''
 
-files=`ls -1 psddldata/data/*.ddl | grep -v xtc.ddl`
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc'],
+                                                          includeHdf=False,
+                                                          includeDecl=True)
 
-echo "" > psddl_python/src/WrapperList.txt
-for f in $files ; do
-  module=`basename $f .ddl`
-  package=`gawk '/^ *@package/{print $2}' $f`
-  echo "DECL($package)" >> psddl_python/src/WrapperList.txt
-  echo "module $module, package $package"
-  psddlc -b python -I data -I psddl_psana -t psddl_python -B dev-types=$devtypes \
-    -e psddl_python/include/$module.ddl.h \
-    -o psddl_python/src/$module.ddl.cpp \
-    psddldata/data/$module.ddl
-done
+    if verbose: sys.stdout.write("Creating Wrappers.txt from %d package files\n" % len(pkgdict))
+    fout = file('psddl_python/src/WrapperList.txt','w')
+    fout.write('\n')
+    packageNames = [subdict['decl'] for subdict in pkgdict.values()]
+    declareMacros = ['DECL(%s)' % pkg for pkg in packageNames]
+    fout.write('\n'.join(declareMacros) + '\n')
+    fout.close()
+
+    for pkg, subdict in pkgdict.iteritems():
+        cmd = psddlCmdStart + ' -b python -I data -I psddl_psana -t psddl_python ' + \
+              '-e psddl_python/include/' + pkg + '.ddl.h ' + \
+              '-o psddl_python/src/' + pkg + '.ddl.cpp ' + subdict['ddlfile']
+
+        if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+        sys.stdout.flush()
+        res = subprocess.call(cmd, shell=True)
+        assert res == 0, "error with cmd: %s" % cmd
+
