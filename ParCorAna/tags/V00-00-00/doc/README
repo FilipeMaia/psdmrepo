@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package ParCorAna
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Brief description:
+==================
+
+Goal is to develop a Python based framework to use MPI in a hub/viewer/workers architechture 
+to process large detector data for a correlation calculation that users implement. The 
+calculation does correlations across time for each pixel of a detector. Calculations on one
+pixel are indepenet of calculations on another. This overlaps somewhat with the CorAna package.
+
+See documenation in src/__init__.py
