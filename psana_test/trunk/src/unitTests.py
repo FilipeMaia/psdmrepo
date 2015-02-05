@@ -655,7 +655,6 @@ class Psana( unittest.TestCase ) :
         testStr = evt.get(str,'testkey')
         self.assertEqual(testStr,'testing string', msg="testStr does not have expected value")
         
-    @unittest.skip("now that small data is in the release, this test data may need to be modified")
     def testLiveMode(self):
         '''Test that live mode works works. In particular, we are concerned about 
         merging with control streams. Tests:

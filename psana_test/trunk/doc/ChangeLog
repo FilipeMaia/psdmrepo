@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-18
+2015-2-5 David Schneider
+- reenable livemod test
+	
 Tag: V00-08-17
 2015-2-4 David Schneider
 - I messed up the tag in the last commit and it is hard to undo that, so
