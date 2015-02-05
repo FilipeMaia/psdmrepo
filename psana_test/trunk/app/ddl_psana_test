@@ -1,16 +1,25 @@
-#!/bin/sh
+#!@PYTHON@
 
-set -e
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
 
-if [ ! -d psddldata/data/ ]; then
-    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
-    exit 1
-fi
+programDescription = '''
+script to run the psana_test DDL back end to produce the DDL generated 
+for the psana_test package.
+'''
 
-if [ ! -d psana_test/ ]; then
-    echo "The psana_test directory was not found. Try doing 'addpkg psana_test' first."
-    exit 1
-fi
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc'],
+                                                          includeHdf=False,
+                                                          includeDecl=False)
 
-psddlc -I data -B package_dir:psana_test -b psana_test data/psddldata/*.ddl
+    ddlFilesArg = ' '.join([subdict['ddlfile'] for subdict in pkgdict.values()])
 
+    cmd = psddlCmdStart + ' -I data -B package_dir:psana_test -b psana_test ' + ddlFilesArg
+
+    if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+    sys.stdout.flush()
+    sys.exit(subprocess.call(cmd, shell=True))
