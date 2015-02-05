@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-17
+2015-2-4 David Schneider
+- I messed up the tag in the last commit and it is hard to undo that, so
+  psana_test is now at tag V00-08-17 - but this is not a major change.
+	
 Tag: V00-00-44
 2015-2-4 David Schneider
 - update psddlc wrapper, JIRA PSAS-103
