@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-12
+1015-2-5 David Schneider
+- incorporate fastindex_02 tag from fastindex branch into trunk. 
+- tracks JIRA PSAS-98 to get fast translation in live/online mode. fastindex is
+  a temporary, less robust solution until small data PSAS-85 makes more progress.
+  At that point we should remove fastindex.
+	
 Tag: V00-02-11
 2015-2-4 David Schneider
 - update psddlc wrapper, JIRA PSAS-103

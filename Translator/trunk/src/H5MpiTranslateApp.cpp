@@ -22,9 +22,11 @@
 #include <iomanip>
 #include <fstream>
 #include <unistd.h>
+#include <memory>
+#include <math.h>
+#include <sys/stat.h>
 #include <boost/make_shared.hpp>
 #include <boost/lexical_cast.hpp>
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -40,6 +42,12 @@
 #include "XtcInput/XtcFilesPosition.h"
 #include "Translator/LoggerNameWithMpiRank.h"
 #include "Translator/H5MpiSplitScanDefaults.h"
+#include "XtcInput/SharedFile.h"
+#include "XtcInput/DgHeader.h"
+#include "XtcInput/XtcChunkDgIter.h"
+
+#define MSGLOGLVL info
+#define FASTLOGLVL info
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -69,9 +77,290 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
     return res;
   }
 
-}; // local namespace
+  //----------- fastindex begin ----------------
 
-#define MSGLOGLVL trace
+  // called in the beginning to to identify the DAQ and control streams in the dataset
+  void getStreams(PSAna &fwk, const std::vector<std::string> &input, std::vector<int> & daqStreams, std::vector<int> &ctrlStreams) {
+    DataSource dataSource = fwk.dataSource(input);
+    if (dataSource.empty()) {
+      MsgLog(loggerMaster, fatal, "fastindex - datasource is empty");
+    }
+    Run run;
+    RunIter runIter = dataSource.runs();
+    std::pair<psana::Run, boost::shared_ptr<PSEvt::Event> > runEvt = runIter.nextWithEvent();
+    run = runEvt.first;
+    if (not run) MsgLog(loggerMaster, fatal, "fastindex - getStreams - no run in dset:" << input.at(0));
+    boost::shared_ptr<PSEvt::Event> evt = runEvt.second;
+    if (not evt) MsgLog(loggerMaster, fatal, "fastindex - getStreams - no event in run" << input.at(0));
+    boost::shared_ptr<XtcInput::XtcFilesPosition> runPos = XtcInput::XtcFilesPosition::makeSharedPtrFromEvent(*evt);
+    std::vector<std::string> fileNames = runPos->fileNames();
+    for (unsigned idx = 0; idx < fileNames.size(); ++idx) {
+      XtcInput::XtcFileName fname(fileNames.at(idx));
+      if (fname.stream() < 0) MsgLog(loggerMaster, fatal, "fastindex - getStreams - there is a stream < 0 for file " << fname.basename());
+      unsigned firstControlStream = 80; // TOTO: get from psana parameter
+      if (fname.stream() < firstControlStream) daqStreams.push_back(fname.stream());
+      else ctrlStreams.push_back(fname.stream());
+    }
+    if (daqStreams.size()==0) MsgLog(loggerMaster, fatal, "fastindex - getStreams - no DAQ streams in dset: " << input.at(0));
+  }
+
+  boost::shared_ptr<XtcInput::DgHeader> readDgHeader(int64_t knownOffset, const std::string & knownPath) {
+    unsigned liveTimeout = 120; // we really don't need live time out here, this is only called when psana has already read in the datagram
+    XtcInput::XtcChunkDgIter chunkDgIter(XtcInput::XtcFileName(knownPath), liveTimeout);
+    return chunkDgIter.nextAtOffset(knownOffset);
+  }
+
+  bool dgHeaderMatch(Pds::Dgram & pdsDg, uint32_t * buffer) {
+    Pds::Dgram & candidateDg = *(Pds::Dgram *)buffer;
+    if (pdsDg.seq.clock().nanoseconds() != candidateDg.seq.clock().nanoseconds()) return false;
+    if (pdsDg.seq.clock().seconds() != candidateDg.seq.clock().seconds()) return false;
+    if (pdsDg.seq.stamp().fiducials() != candidateDg.seq.stamp().fiducials()) return false;
+    if (pdsDg.seq.stamp().ticks() != candidateDg.seq.stamp().ticks()) return false;
+    if (pdsDg.seq.service() != candidateDg.seq.service()) return false;
+    if (pdsDg.seq.type() != candidateDg.seq.type()) return false;
+    if (pdsDg.seq.isExtended() != candidateDg.seq.isExtended()) return false;
+    if (pdsDg.seq.isEvent() != candidateDg.seq.isEvent()) return false;
+    if (pdsDg.env.value() != candidateDg.env.value()) return false;
+    return true;
+  }
+
+  bool endsWith(const std::string &a, const std::string &ending) {
+    if (a.length() < ending.length()) return false;
+    return (0 == a.compare(a.length()-ending.length(), ending.length(), ending));
+  }
+
+  std::string streamMarker(int stream) {
+    if (stream < 0) MsgLog(loggerMaster, fatal, "streamMarker got negative value");
+    // we should only call this for a DAQ stream, not a control stream:
+    if (stream >= 80) MsgLog(loggerMaster, fatal, "streamMarker got value >= 80");
+    if (stream < 10) return "-s0" + boost::lexical_cast<std::string>(stream);
+    std::string marker = "-s" + boost::lexical_cast<std::string>(stream);
+    return marker;
+  }
+
+  bool fileExists(const std::string & filename) {
+    struct stat buffer;
+    return (stat (filename.c_str(), &buffer) == 0); 
+  }
+
+  typedef enum {BLOCKBEFOREFILE, FILEDOESNTEXIST, FOUND, NOTFOUND, BLOCKPASTFILE} FindDgStatus;
+  typedef std::pair<FindDgStatus, int64_t> FindDgResult;
+  
+  FindDgResult findDg(boost::shared_ptr<XtcInput::DgHeader> knownDg, int64_t candidateOffset, 
+         std::string otherPath, int64_t halfRange, int stepIdx) {
+    XtcInput::Dgram::ptr pdsDgPtr = knownDg->dgram();
+    if (not pdsDgPtr) throw std::runtime_error("findDg: knownDg is null");
+    if ((std::abs(candidateOffset) % 4) != 0) throw std::runtime_error("findDg: known offset is not a multiple of 4");
+    Pds::Dgram &pdsDg = *pdsDgPtr;
+
+    // identify a region to look at in otherFile, around candidateOffset
+    XtcInput::XtcFileName otherXtc(otherPath);
+    int64_t startOffset = std::max(int64_t(0), candidateOffset - halfRange);
+    int64_t endOffset = std::max(int64_t(0), candidateOffset + halfRange);
+    int64_t bytesToRead = endOffset - startOffset + 1;
+    if (bytesToRead < int64_t(sizeof(Pds::Dgram))) return FindDgResult(BLOCKBEFOREFILE, -1);
+    const int64_t cutOffForFirst = 0x200000;
+    if ((candidateOffset < cutOffForFirst) and (otherXtc.chunk()==0)) {
+      endOffset = cutOffForFirst + 0x1000;
+    }
+
+    const std::string INPROGRESS = ".inprogress";
+    bool isInProgress = endsWith(otherPath,INPROGRESS);
+    std::string otherPathNotInProgress(otherPath);
+    if (isInProgress) {
+      otherPathNotInProgress.erase(otherPath.size()-INPROGRESS.length());
+    }
+        
+    const unsigned liveTimeout = 300;
+    unsigned timeWaited = 0;
+    const unsigned sleepTime = 1;
+    
+    bool neitherFileExists = not (fileExists(otherPath) or fileExists(otherPathNotInProgress));
+    // open other file. We may have to wait until it appears
+    while (neitherFileExists and (timeWaited < liveTimeout)) {
+      sleep(sleepTime);
+      timeWaited += sleepTime;
+      neitherFileExists = not (fileExists(otherPath) or fileExists(otherPathNotInProgress));
+    }
+
+    if (neitherFileExists) {
+      MsgLog(loggerMaster, FASTLOGLVL, "findDg: timeout waiting for one of " << otherPath << " or " << otherPathNotInProgress
+             << " to exist");
+      return FindDgResult(FILEDOESNTEXIST, -1);
+    }
+
+    timeWaited = 0;
+
+    XtcInput::SharedFile otherSharedFile(otherXtc, liveTimeout);
+    struct stat fileStat;
+    otherSharedFile.stat(&fileStat);
+    bool changedFromInProgressToNot = false;
+
+    while ((fileStat.st_size < off_t(startOffset)) and (timeWaited < liveTimeout) and isInProgress) {
+      sleep(sleepTime);
+      timeWaited += sleepTime;
+      if (isInProgress) {
+        int fd = open(otherPathNotInProgress.c_str(), O_RDONLY|O_LARGEFILE);
+        if (fd >= 0) {
+          isInProgress = false;
+          changedFromInProgressToNot= true;
+          close(fd);
+          otherPath = otherPathNotInProgress;
+          otherXtc = XtcInput::XtcFileName(otherPath);
+          otherSharedFile = XtcInput::SharedFile(otherXtc,0);
+        }
+      }
+      otherSharedFile.stat(&fileStat);
+    }
+    if (fileStat.st_size < off_t(startOffset)) {
+      if (isInProgress) {
+        if (not (timeWaited >= liveTimeout)) MsgLog(loggerMaster, error, "unexpected: findDg, isInProgress=True, file is smaller than start, BUT liveTimeOut did not occur, how'd we exit loop?");
+        MsgLog(loggerMaster, error, "timeout of " << timeWaited 
+               << " sec waiting for file " << otherXtc << " to reach len=" << startOffset);
+        throw std::runtime_error("findDg: live timeout");
+      } else {
+        MsgLog(loggerMaster, FASTLOGLVL, "findDg: unable to search region because file ends before starting guess. Dg should be earlier in file."
+               << "changedFromInProgressToNot=" << changedFromInProgressToNot);
+      }
+      return FindDgResult(BLOCKPASTFILE,-1);
+    }
+    otherSharedFile.seek(startOffset, SEEK_SET);
+
+    // read in the region, or until end of file
+    std::auto_ptr<std::vector<uint8_t> > bufferVec( new std::vector<uint8_t>(bytesToRead) );
+    uint8_t *buffer = &(bufferVec->at(0));
+    ssize_t bytesRead = otherSharedFile.read((char *)buffer, bytesToRead);
+    if (bytesRead < bytesToRead) {
+      MsgLog(loggerMaster, FASTLOGLVL, "findDg: read " << bytesToRead - bytesRead << " fewer bytes than requested. Shortening search space (file was not as long, must be towards the end of a file)");
+    }
+    // search through the region
+    uint32_t * curr = (uint32_t *)buffer;
+    uint32_t * last = (uint32_t *)(buffer + bytesRead - 4);
+    int64_t foundOffset = -1;
+
+    unsigned spots = 0;
+    std::string foundString = "*NOT FOUND*";
+    while (curr < last) {
+      if (dgHeaderMatch(pdsDg, curr)) {
+        foundOffset = startOffset + int64_t((curr - ((uint32_t*)buffer))*4);
+        foundString = "*found*";
+        break;
+      }
+      spots++;
+      curr++;
+    }
+
+    MsgLog(loggerMaster, FASTLOGLVL, "findDg: stepIdx=" << stepIdx << " Dgram: service=" << pdsDg.seq.service() 
+           << " type=" << pdsDg.seq.type()
+           << " isExtended=" << pdsDg.seq.isExtended()
+           << " isEvent=" << pdsDg.seq.isEvent()
+           << " nano=0x" << std::hex << pdsDg.seq.clock().nanoseconds() 
+           << " sec=0x" << std::hex << pdsDg.seq.clock().seconds()
+           << " fid=0x" << std::hex << pdsDg.seq.stamp().fiducials()
+           << " ticks=0x" << std::hex << pdsDg.seq.stamp().ticks()
+           << " looked at " << spots << " spots around offset 0x" << std::hex << candidateOffset
+           << " using interval [" << startOffset << ","  << endOffset << "] "
+           << " in " << otherPath << "  " << foundString
+           << " inProgress->not: " << changedFromInProgressToNot);
+
+    // return result, -1 or the found offset
+    if (foundOffset >=0) return FindDgResult(FOUND, foundOffset);
+    return FindDgResult(NOTFOUND, -1);
+  }
+
+  boost::shared_ptr<XtcInput::XtcFilesPosition> fastIndexFindOtherStreamStarts(int masterStream, 
+                                                                               boost::shared_ptr<XtcInput::XtcFilesPosition>beginStepPos, 
+                                                                               const std::vector<int> & fastIndexOtherStreams,
+                                                                               int stepIdx,
+                                                                               double MBforHalfRangeBlock,
+                                                                               int numBlocksToTry) {
+    // identify the known offset for masterStream
+    XtcInput::XtcFilesPosition & filesPos = *beginStepPos;
+    std::pair<XtcInput::XtcFileName, int64_t> chunkFileOffset = filesPos.getChunkFileOffset(masterStream);
+    XtcInput::XtcFileName knownXtcFile = chunkFileOffset.first;
+    int64_t knownOffset = chunkFileOffset.second;
+    std::string knownPath = knownXtcFile.path();
+
+    // read the dg from this known offset in the masterStream
+    boost::shared_ptr<XtcInput::DgHeader> knownDg = readDgHeader(knownOffset, knownPath);
+
+    // set up parameters to produce the other stream filenames based on this known file, and the search space
+    
+    const std::string marker = streamMarker(masterStream);
+    int whereStreamInPath = knownPath.find(marker);
+    if (whereStreamInPath < 1) MsgLog(loggerMaster, fatal, "fastIndex failure, couldn't find marker for stream, " << marker << " in path " << knownPath);
+
+    // start lists for returned object.
+    std::list<std::string> newFilenames;
+    std::list<off_t> newOffsets;
+
+    std::vector<std::string> currentFilenames = beginStepPos->fileNames();
+    std::vector<off64_t> currentOffsets = beginStepPos->offsets();
+    
+    for (unsigned idx = 0; idx < currentFilenames.size(); ++idx) {
+      newFilenames.push_back(currentFilenames.at(idx));
+      newOffsets.push_back(currentOffsets.at(idx));
+    }
+                             
+    const double MB = double(1 << 20);
+    int64_t halfRangeTmp = int64_t(MBforHalfRangeBlock * MB);
+    int64_t remainder = (halfRangeTmp % 4);
+    halfRangeTmp -= remainder;
+    const int64_t halfRange = halfRangeTmp;
+    
+    if ((halfRange % 4) != 0) throw std::runtime_error("halfRange must be word aligned, 4 byte boundary");
+    std::vector<int64_t> candidateOffsets;
+    candidateOffsets.push_back(knownOffset);
+    int64_t nextLower = knownOffset;
+    int64_t nextHigher = knownOffset;
+    for (int blockIdx = 0; blockIdx < numBlocksToTry; ++blockIdx) {
+      nextLower -= (2*halfRange - 16);
+      nextHigher += (2*halfRange - 16);
+      candidateOffsets.push_back(nextLower);
+      candidateOffsets.push_back(nextHigher);
+    }
+
+    for (unsigned streamIdx = 0; streamIdx < fastIndexOtherStreams.size(); ++streamIdx) {
+      int otherStream = fastIndexOtherStreams.at(streamIdx);
+      if ((otherStream < 0) or (otherStream == masterStream) or (otherStream >= 80)) {
+        MsgLog(loggerMaster, fatal, "fastIndex failure, otherstream is " << otherStream 
+               << " must be in [0,80) and not equal to masterStream=" << masterStream);
+      }
+      std::string otherPath = knownPath.substr(0,whereStreamInPath) + streamMarker(otherStream) + \
+        knownPath.substr(whereStreamInPath + 4);
+      int64_t otherOffset = -1;
+      bool blockAfter = false;
+      for (unsigned candIdx = 0; candIdx < candidateOffsets.size(); ++candIdx) {
+        int64_t candOffset = candidateOffsets.at(candIdx);
+        FindDgResult otherResult = findDg(knownDg, candOffset, otherPath, halfRange, stepIdx);
+        otherOffset = otherResult.second;
+        if (otherOffset >=0) break;
+        FindDgStatus otherSearchStatus = otherResult.first;
+        if (otherSearchStatus == BLOCKPASTFILE) blockAfter = true;
+      }
+      if (otherOffset < 0) {
+        // see if we are at a boundary, 
+        bool fileStart = false;
+        for (unsigned candIdx = 0; candIdx < candidateOffsets.size(); ++candIdx) {
+          if (candidateOffsets.at(candIdx)  < (int64_t(numBlocksToTry + 1) )*2*halfRange) {
+            fileStart = true;
+          }
+        }
+        // TODO: search neighbor chunk files if at a boundary
+        MsgLog(loggerMaster, error, "fastIndexFindOtherStreamStarts: failed to find calib cycle after trying " 
+               << candidateOffsets.size());
+        throw std::runtime_error("fastIndex failure. Could not find calib cycle.");
+      }
+      newFilenames.push_back(otherPath);
+      newOffsets.push_back(off64_t(otherOffset));
+    }
+
+    return boost::make_shared<XtcInput::XtcFilesPosition>(newFilenames, newOffsets);
+  }
+
+  // ---------- fastindex end ---------
+
+}; // local namespace
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -90,7 +379,7 @@ int
 H5MpiTranslateApp::preRunApp ()
 {
   // add logger to error/warning/fatal formatters
-  const char* fmt = "[%(level):%(logger)] %(message)" ;
+  const char* fmt = "[%(level):%(time):%(logger)] %(message)" ;
   const char* errfmt = "[%(level):%(time):%(file):%(line):%(logger)] %(message)" ;
   const char* trcfmt = "[%(level):%(time):%(logger)] %(message)" ;
   const char* dbgfmt = errfmt ;
@@ -192,6 +481,14 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
                                                 "num_events_check_done_calib_file",
                                                 NUM_EVENTS_CHECK_DONE_CALIB_FILE_DEFAULT);
 
+  m_fastIndex = cfgSvc.get("Translator.H5Output", "fast_index", false);
+  m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12.0);
+  m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks",3);
+  std::vector<int> otherStreamsDefault;
+  for (int i = 1; i < 6; ++i) {
+    otherStreamsDefault.push_back(i);
+  }
+
   if (cfgSvc.get("Translator.H5Output","printenv",false)) {
     WithMsgLog(loggerMaster, info, str) {
       str << "------ Begin Environment -------" << std::endl;
@@ -211,8 +508,40 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
     return 2;
   }
   
-  // set the input, construct dataSource
+  // set the input
   std::vector<std::string> input = inputDataSets();
+
+  // if fastindex, adjust the dataset for the master
+  if (m_fastIndex) {
+    if (input.size() != 1) MsgLog(loggerMaster, fatal, "input size is not one for fastIndex. Specify a single dataset, not a list of files.");
+    std::vector<int> daqStreams, controlStreams;
+    MsgLog(loggerMaster, FASTLOGLVL, "fastindex - calling getStreams to figure out what streams are in the dataset");
+    getStreams(fwk, input, daqStreams, controlStreams);  // creates a separate dataSource to figure out the streams (live mode makes it complicated, just wait until they first arrive)
+    m_fastIndexMasterStream = *std::min_element(daqStreams.begin(), daqStreams.end());
+    for (unsigned idx = 0; idx < daqStreams.size(); ++idx) {
+      if (daqStreams.at(idx) != m_fastIndexMasterStream) {
+        m_fastIndexOtherStreams.push_back(daqStreams.at(idx));
+      }
+    }
+    std::string & dset = input.at(0);
+    dset += ":stream=" + boost::lexical_cast<std::string>(m_fastIndexMasterStream);  // a little sloppy to append a :stream if the datset already has one, but psana uses the last one it finds
+    for (unsigned idx = 0; idx < controlStreams.size(); ++idx) {
+      dset +=  ("," + boost::lexical_cast<std::string>(controlStreams.at(idx)));
+    }
+
+    int numberOfDAQStreams = 1 + m_fastIndexOtherStreams.size();
+    m_minEventsPerWorker = std::max(1,int(round(m_minEventsPerWorker/float(numberOfDAQStreams))));
+    m_numEventsToCheckForDoneWorkers = std::max(1,int(round(m_numEventsToCheckForDoneWorkers/2.0)));
+
+    MsgLog(loggerMaster,info, "fast_index is true. "
+           << " master is using dastsource=" << dset << ". to find calib cycles. " << std::endl 
+           << " There are " << m_fastIndexOtherStreams.size() 
+           << " other DAQ streams that will be included in the calib cycle translation." << std::endl
+           << " master will use numEventsToCheckForDoneWorkers=" << m_numEventsToCheckForDoneWorkers
+           << " and fi_mb_half_block=" << m_fastIndexMBhalfBlock 
+           << " fi_num_blocks=" << m_fastIndexNumberBlocksToTry);
+  } // fastindex
+
   DataSource dataSource = fwk.dataSource(input);
   if (dataSource.empty()) {
     return 2;
@@ -224,7 +553,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
     m_workerJobInProgress.at(worker)=boost::make_shared<MPIWorkerJob>(m_worldRank, m_numWorkers);
   }
   
-  // initialize/declare book-keeping variables to be sued when we go through the data
+  // initialize/declare book-keeping variables to be ued when we go through the data
   // and index where the calib cycles are
   int runIdx = -1;
   int stepIdx = -1;
@@ -250,6 +579,9 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
 
   MsgLog(loggerMaster,MSGLOGLVL, "starting event loop");
   LusiTime::Time eventStartTime = LusiTime::Time::now();
+  LusiTime::Time stepStartTime = LusiTime::Time::now();
+  LusiTime::Time stepEndTime = LusiTime::Time::now();
+  int64_t stepNumberOfEvents = 0;
   double messagingTimeDuringEventLoop = 0.0;
   bool doBeginJob = true;
   while (true) {
@@ -289,6 +621,33 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
           MsgLog(loggerMaster, error,"no step position found for step " << stepIdx);
           return -1;
         }
+        std::string fastMsg = "";
+        if (m_fastIndex) {
+          // check that we are only reading one DAQ stream
+          if ( not beginStepPos->hasStream(m_fastIndexMasterStream)) MsgLog(loggerMaster, fatal, "master stream: " 
+                                                                            << m_fastIndexMasterStream 
+                                                                            << " is not present in beginStep info.");
+          for (std::vector<int>::iterator otherStream = m_fastIndexOtherStreams.begin();
+               otherStream != m_fastIndexOtherStreams.end(); ++otherStream) {
+            if (beginStepPos->hasStream(*otherStream)) MsgLog(loggerMaster, fatal, "master stream contains stream "
+                                                              << *otherStream << " which is from the other DAQ streams list");
+          }
+          beginStepPos = fastIndexFindOtherStreamStarts(m_fastIndexMasterStream, beginStepPos, 
+                                                        m_fastIndexOtherStreams, 
+                                                        stepIdx, m_fastIndexMBhalfBlock, 
+                                                        m_fastIndexNumberBlocksToTry);
+          fastMsg = " (but fast_index=True, so we are reading only one stream, only need 20hz for real time)";
+        }
+        if (stepIdx > 0) {
+          stepEndTime = LusiTime::Time::now();
+          double timeThisStep = timeDiffSeconds(stepEndTime, stepStartTime);
+          stepNumberOfEvents = totalEvents - lastCalibEventStart;
+          stepStartTime = stepEndTime;
+          double eventsPerSec = stepNumberOfEvents/timeThisStep;
+          MsgLog(loggerMaster, info, "starting step: " << stepIdx << 
+                 " rate=" << eventsPerSec << " evts/sec" << fastMsg << 
+                 " num_events=" << stepNumberOfEvents << " seconds=" << timeThisStep);
+        }
       }	// destroy the step event
       if (calibStartsNewJob) {
         LusiTime::Time messagingTimeStart = LusiTime::Time::now();        
@@ -296,11 +655,14 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
         m_jobsToDo.push(boost::make_shared<MPIWorkerJob>(m_worldRank, m_numWorkers, stepIdx, pos));
         m_numCalibJobs += 1;
         StartWorkerRes_t startWorkerResult;
+        int numWorkerJobsStarted = 0;
         do {
           startWorkerResult  = tryToStartWorker();
+          if (startWorkerResult == StartedWorker) numWorkerJobsStarted++;
           checkOnLinksToWrite(h5OutputModule);
         } while (startWorkerResult == StartedWorker);
-        
+        MsgLog(loggerMaster, FASTLOGLVL, "Tried to start a new worker for step=" << stepIdx
+               << " started " << numWorkerJobsStarted << " worker jobs");
         calibStartsNewJob = false;
         lastCalibEventStart = totalEvents;
         LusiTime::Time messagingTimeEnd = LusiTime::Time::now();
@@ -308,7 +670,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
       }
       EventIter eventIter = step.events();
       while (boost::shared_ptr<PSEvt::Event> evt = eventIter.next()) {
-        totalEvents += 1;
+        totalEvents += 1;        
         if ((not calibStartsNewJob) and (totalEvents - lastCalibEventStart >= m_minEventsPerWorker)) {
           calibStartsNewJob = true;
         }
@@ -373,7 +735,7 @@ bool H5MpiTranslateApp::freeWorkerExists(int *workerPtr) const {
 H5MpiTranslateApp::StartWorkerRes_t H5MpiTranslateApp::tryToStartWorker() {
   // look at queue of calib cycles to do
   if (m_jobsToDo.size() == 0) {
-    MsgLog(loggerMaster,MSGLOGLVL,"tryToStartWorker: no jobs to do");
+    MsgLog(loggerMaster,trace,"tryToStartWorker: no jobs to do");
     return NoJobsToDo;
   }
   int worker = -1;
@@ -388,6 +750,7 @@ H5MpiTranslateApp::StartWorkerRes_t H5MpiTranslateApp::tryToStartWorker() {
     // record that worker is working on job
     m_workerJobInProgress.at(worker) = wjob;
     MsgLog(loggerMaster,debug,"tryToStartWorker: after iSend worker " << worker << " -> " << wjob->startCalibNumber());
+    MsgLog(loggerMaster, MSGLOGLVL, "started worker on calib cycle: " << wjob->startCalibNumber());
     return StartedWorker;
   } else {
     MsgLog(loggerMaster,debug,"tryToStartWorker: jobs to do but no available worker");
@@ -521,9 +884,12 @@ void H5MpiTranslateApp::addLinksToMasterFile(int worker,
 void H5MpiTranslateApp::masterPostIndexing(Translator::H5Output &h5output) {
   while ((m_jobsToDo.size()>0) or (validJobExists())) {
     
-    // first get all idle workers an any remaining jobs
+    // first get all idle workers and any remaining jobs
     StartWorkerRes_t startRes = tryToStartWorker();
-    if (startRes == StartedWorker) continue;
+    if (startRes == StartedWorker) {
+      
+      continue;
+    }
     
     if ((startRes == NoJobsToDo) and (not validJobExists())) {
       // the while loop should prevent us from getting here, we shouldn't get here, 
