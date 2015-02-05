@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-21
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+	
 Tag: V00-09-20
 2015-2-3 David Schneider
 - rewrite ddl_hdf2psana wrapper script to exclude smalldata and take 
