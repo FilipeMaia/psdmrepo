@@ -48,7 +48,10 @@ class XCorrWorkerBase(object):
         if self.wrapped:
             # allow user object to subtract the effects of the column we are going to overwrite
             # in any accumulated state
-            userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, self.nextTimeIdx, self.numTimesFilled(), self.T, self.X)
+
+            # assume ciruclarly sorted, so the smallest time is the one we are going to overwrite
+            pivotIndex = self.nextTimeIdx
+            userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         self.logger.debug('XCorrWorkerBase.updateData evtTime=%.4f next120hz=%d' % (evtTime, next120hz))
 
@@ -64,9 +67,13 @@ class XCorrWorkerBase(object):
         self.currentTimesStored.add(next120hz)
 
         firstUpdate = (not self.wrapped) and self.nextTimeIdx==0
-        if not firstUpdate:
-            # now add in
-            userObj.adjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, self.nextTimeIdx, self.numTimesFilled(), self.T, self.X)
+        # now add in, now that we have added this in, the smallest element will be one past this if we have wrapped, 
+        # or 0 if we haven't wrapped, or are at the end
+        if (not self.wrapped) or self.nextTimeIdx == self.maxTimes-1:
+            pivotIndex = 0
+        else:
+            pivotIndex = self.nextTimeIdx+1
+        userObj.adjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         if self.nextTimeIdx == self.maxTimes - 1:
             self.wrapped = True
