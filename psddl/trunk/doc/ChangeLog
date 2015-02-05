@@ -11,10 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-13-14
+Tag: V00-13-17
 2015-2-4 David Schneider
 - update ddl wrapper common code. No need to update DAQ. JIRA issue PSAS-103
-
+- fix this changelog, somehow tags are out of sync
+	
 Tag: V00-13-14
 2015-2-03 David Schneider
 - add Python library to use for analysis release wrapper scripts.
