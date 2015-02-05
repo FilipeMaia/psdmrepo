@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-11
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+	
 Tag: V00-02-10
 2015-2-3 David Schneider
 - clean up issue with modifiying generated code to exclude small data.
