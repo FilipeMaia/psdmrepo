@@ -194,6 +194,8 @@ private:
   bool m_fastIndex;
   double m_fastIndexMBhalfBlock;
   int m_fastIndexNumberBlocksToTry;
+  int m_fastIndexMasterStream;
+  std::vector<int> m_fastIndexOtherStreams;
 
   LusiTime::Time m_startTime, m_endTime;
   double m_eventTime;  // time iterating through events, as opposed to idle time when waiting for
