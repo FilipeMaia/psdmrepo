@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+1015-02-06 David Schneider
+- during EndCalibCycle, create EndData subgroup to CalibCycle:xxxx groups when new 
+  data is present in the configStore. 
+- add parameter split_cc_subdir to put split scan calib cycles in a subdirectory (feature not working yet).
+- Track JIRA PSAS-101.
+- bump schema version from 4 to 5 for this new group (there may be other changes before tagging).
+
 Tag: V00-02-12
 1015-2-5 David Schneider
 - incorporate fastindex_02 tag from fastindex branch into trunk. 

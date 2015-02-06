@@ -50,12 +50,14 @@ namespace {
 using namespace Translator;
 
 SplitScanMgr::SplitScanMgr(const std::string &h5filePath, 
-			   SplitMode splitScanMode,
-			   int jobNumber, int jobTotal, 
-			   int mpiWorkerStartCalibCycle,
-			   bool overwrite, 
-			   int fileSchemaVersion)  :  
+                           const std::string &ccSubDir,
+                           SplitMode splitScanMode,
+                           int jobNumber, int jobTotal, 
+                           int mpiWorkerStartCalibCycle,
+                           bool overwrite, 
+                           int fileSchemaVersion)  :  
   m_h5filePath(h5filePath) 
+  , m_ccSubDir(ccSubDir)
   , m_splitScanMode(splitScanMode)
   , m_jobNumber(jobNumber)
   , m_jobTotal(jobTotal)
@@ -319,6 +321,9 @@ bool SplitScanMgr::createExtLink(const char *linkName,
 std::string SplitScanMgr::getExtCalibCycleFilePath(size_t calibCycle) {
   boost::filesystem::path h5path(m_h5filePath);
   boost::filesystem::path newh5path = h5path.parent_path();
+  if (m_ccSubDir.length()>0) {
+    newh5path /= m_ccSubDir; // not sure if this works for a relative path, but it might
+  }
   newh5path /= getExtCalibCycleFileBaseName(calibCycle);
   return newh5path.string();
 }

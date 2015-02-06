@@ -97,7 +97,7 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
     for (unsigned idx = 0; idx < fileNames.size(); ++idx) {
       XtcInput::XtcFileName fname(fileNames.at(idx));
       if (fname.stream() < 0) MsgLog(loggerMaster, fatal, "fastindex - getStreams - there is a stream < 0 for file " << fname.basename());
-      unsigned firstControlStream = 80; // TOTO: get from psana parameter
+      unsigned firstControlStream = 80; // TODO: get from psana parameter
       if (fname.stream() < firstControlStream) daqStreams.push_back(fname.stream());
       else ctrlStreams.push_back(fname.stream());
     }
@@ -484,10 +484,6 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   m_fastIndex = cfgSvc.get("Translator.H5Output", "fast_index", false);
   m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12.0);
   m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks",3);
-  std::vector<int> otherStreamsDefault;
-  for (int i = 1; i < 6; ++i) {
-    otherStreamsDefault.push_back(i);
-  }
 
   if (cfgSvc.get("Translator.H5Output","printenv",false)) {
     WithMsgLog(loggerMaster, info, str) {
@@ -513,7 +509,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
 
   // if fastindex, adjust the dataset for the master
   if (m_fastIndex) {
-    if (input.size() != 1) MsgLog(loggerMaster, fatal, "input size is not one for fastIndex. Specify a single dataset, not a list of files.");
+    if (input.size() != 1) MsgLog(loggerMaster, fatal, "input size is not one for fastIndex. Specify a single datasource, not a list of files.");
     std::vector<int> daqStreams, controlStreams;
     MsgLog(loggerMaster, FASTLOGLVL, "fastindex - calling getStreams to figure out what streams are in the dataset");
     getStreams(fwk, input, daqStreams, controlStreams);  // creates a separate dataSource to figure out the streams (live mode makes it complicated, just wait until they first arrive)
@@ -553,7 +549,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
     m_workerJobInProgress.at(worker)=boost::make_shared<MPIWorkerJob>(m_worldRank, m_numWorkers);
   }
   
-  // initialize/declare book-keeping variables to be ued when we go through the data
+  // initialize/declare book-keeping variables to be used when we go through the data
   // and index where the calib cycles are
   int runIdx = -1;
   int stepIdx = -1;
@@ -571,7 +567,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   PSEnv::Env & env = dataSource.env();
   
   // to call H5Output endCalibCycle, endRun, and endJob methods, we need an empty event
-  // since the actual event the module methods would receive is not available throuth 
+  // since the actual event the module methods would receive is not available through
   // runIter and stepIter
   boost::shared_ptr<AliasMap> amap = env.aliasMap();
   boost::shared_ptr<PSEvt::Event> emptyEvent = 

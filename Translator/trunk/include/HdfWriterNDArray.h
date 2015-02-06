@@ -114,8 +114,8 @@ getNDArrayPtr(const PSEvt::EventKey &eventKey, const DataTypeLoc dataTypeLoc,
   checkType<ndarray<ElemType,NDim> >(eventKey, "HdfWriterNDArray");
   boost::shared_ptr< ndarray< ElemType, NDim> > ndarrayPtr;
   if (dataTypeLoc == inEvent) ndarrayPtr = evt.get(eventKey.src(), eventKey.key()); 
-  else if (dataTypeLoc == inConfigStore) ndarrayPtr = env.configStore().get(eventKey.src());
-  else if (dataTypeLoc == inCalibStore) ndarrayPtr = env.calibStore().get(eventKey.src());
+  else if (dataTypeLoc == inConfigStore) ndarrayPtr = env.configStore().get(eventKey.src(), eventKey.key());
+  else if (dataTypeLoc == inCalibStore) ndarrayPtr = env.calibStore().get(eventKey.src(), eventKey.key());
   return ndarrayPtr;
 }
 

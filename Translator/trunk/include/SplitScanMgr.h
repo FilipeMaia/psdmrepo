@@ -86,11 +86,12 @@ namespace Translator {
      *  current directory.
      */
     SplitScanMgr(const std::string &h5filePath, 
-		 SplitMode splitScanMode,
-		 int jobNumber, int jobTotal, 
-		 int mpiWorkerStartCalibCycle,
-		 bool overwrite,
-		 int fileSchemaVersion);
+                 const std::string &ccSubDir,
+                 SplitMode splitScanMode,
+                 int jobNumber, int jobTotal, 
+                 int mpiWorkerStartCalibCycle,
+                 bool overwrite,
+                 int fileSchemaVersion);
 
     /// return true if responsible for main h5 file
     bool thisJobWritesMainOutputFile() const;
@@ -260,6 +261,7 @@ namespace Translator {
 
   private:
     std::string m_h5filePath;
+    std::string m_ccSubDir;
     SplitMode  m_splitScanMode;
     int m_jobNumber;
     int m_jobTotal;

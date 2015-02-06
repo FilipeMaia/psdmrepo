@@ -104,6 +104,7 @@ protected:
   void createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId);
   void createNextCalibCycleExtLink(const char *linkName, hdf5pp::Group &runGroup);
   void lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup);
+  void lookForAndStoreEndCalibCycleData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup);
   void eventImpl(PSEvt::Event &evt, PSEnv::Env &env);
   Pds::Damage getDamageForEventKey(const EventKey &eventKey, 
 				   boost::shared_ptr<PSEvt::DamageMap> damageMap);
@@ -149,10 +150,12 @@ private:
   hdf5pp::Group m_currentConfigureGroup;
   hdf5pp::Group m_currentRunGroup;
   hdf5pp::Group m_currentCalibCycleGroup;
+  hdf5pp::Group m_currentCalibCycleEndGroup;
   hdf5pp::Group m_currentFilteredGroup;
 
   TypeSrcKeyH5GroupDirectory m_configureGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleGroupDir;
+  TypeSrcKeyH5GroupDirectory m_calibCycleEndGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibStoreGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;
@@ -196,6 +199,7 @@ private:
   bool m_overwrite;
 
   SplitScanMgr::SplitMode m_split;
+  std::string m_splitCCSubDir;
   int m_jobNumber, m_jobTotal;
   int m_mpiWorkerStartCalibCycle;
   hsize_t m_splitSize;  
