@@ -598,7 +598,8 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
         // available so we use the event associated with the first run.
         h5OutputModule.beginJob(*evt, env);
         doBeginJob = false;
-      }
+        h5OutputModule.splitScanMgr()->createCCSubDirIfNeeded();
+      }      
       h5OutputModule.beginRun(*evt, env);
     } // end scope - destroy beginRun event
     stepIdx = -1;
@@ -831,7 +832,7 @@ void H5MpiTranslateApp::addLinksToMasterFile(int worker,
   // get expected name of file produced for this starting calib number
   int calibNumber = wjob->startCalibNumber();
   std::string ccFilePath = h5Output.splitScanMgr()->getExtCalibCycleFilePath(calibNumber);
-  std::string ccFileBaseName = h5Output.splitScanMgr()->getExtCalibCycleFileBaseName(calibNumber);
+  std::string ccFileBaseName = h5Output.splitScanMgr()->getExtCalibCycleFileForLink(calibNumber);
   MsgLog(loggerMaster, MSGLOGLVL, "addLinksToMasterFile from cc file: " << ccFilePath);
   // open it and go thorugh all CalibCycle:xxxx groups
   hdf5pp::File ccFile = hdf5pp::File::open(ccFilePath, hdf5pp::File::Read);

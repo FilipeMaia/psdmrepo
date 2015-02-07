@@ -235,7 +235,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName,
 void H5Output::init() {
   readConfigParameters();
   m_splitScanMgr = boost::make_shared<SplitScanMgr>(m_h5fileName, 
-                                                    m_splitCCSubDir,
+                                                    m_splitCCInSubDir,
                                                     m_split,
                                                     m_jobNumber,
                                                     m_jobTotal,
@@ -322,7 +322,7 @@ void H5Output::readConfigParameters() {
 
   // check for SplitScan before reporting on epics, we may override it
   string splitStr = configReportIfNotDefault(string("split"),string("NoSplit"));
-  m_splitCCSubDir = configReportIfNotDefault(string("split_cc_relpath"),string(""));
+  m_splitCCInSubDir = configReportIfNotDefault(string("split_cc_in_subdir"),false);
   if (splitStr == "NoSplit") m_split = SplitScanMgr::NoSplit;
   else if (splitStr == "SplitScan") m_split = SplitScanMgr::SplitScan;
   else if (splitStr == "MPIWorker") m_split = SplitScanMgr::MPIWorker;
@@ -921,8 +921,7 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
     }
   }
 
-  //  WithMsgLog(logger,TRACELVL,str) {
-  WithMsgLog(logger,info,str) {
+  WithMsgLog(logger,TRACELVL,str) {
     str << " EventKeyTranslation list: ";
     list<EventKeyTranslation>::iterator pos;
     for (pos = toTranslate.begin(); pos != toTranslate.end(); ++pos) {

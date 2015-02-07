@@ -86,7 +86,7 @@ namespace Translator {
      *  current directory.
      */
     SplitScanMgr(const std::string &h5filePath, 
-                 const std::string &ccSubDir,
+                 bool ccInSubDir,
                  SplitMode splitScanMode,
                  int jobNumber, int jobTotal, 
                  int mpiWorkerStartCalibCycle,
@@ -117,6 +117,11 @@ namespace Translator {
 
     /// hdf5 file schema version
     int fileSchemaVersion() const { return m_fileSchemaVersion; }
+
+    /// creates the calib cycle files subdirectory if it does not exist and is specified in the 
+    /// ccInSubDir option. Best to only call this function once from the master process to avoid any
+    /// possible race condition with creating a directory.
+    void createCCSubDirIfNeeded() const;
 
     /**
      *  @brief returns true if this job writes this calib cycle
@@ -236,10 +241,13 @@ namespace Translator {
      * @param[in] calibCycle   - the calib cycle number
      * @return the filename, using the full path based on h5filePath
      */
-    std::string getExtCalibCycleFilePath(size_t calibCycle);
+    std::string getExtCalibCycleFilePath(size_t calibCycle) const;
+
+    /// the relative link for the master file
+    std::string getExtCalibCycleFileForLink(size_t calibCycle) const;
 
     /// just base name
-    std::string getExtCalibCycleFileBaseName(size_t calibCycle);
+    std::string getExtCalibCycleFileBaseName(size_t calibCycle) const;
 
     /**
      * @brief returns true if the given calib cycle is finished.
@@ -259,9 +267,13 @@ namespace Translator {
     bool calibFileIsFinished(size_t calibCycle);
 
 
+    // return cc subdir basename, if h5filePath is mydir/myfile.h5 or mydir/myfile then this 
+    // return s myfile_ccfiles
+    std::string getCCSubDirBaseName() const;
+
   private:
     std::string m_h5filePath;
-    std::string m_ccSubDir;
+    bool m_ccInSubDir;
     SplitMode  m_splitScanMode;
     int m_jobNumber;
     int m_jobTotal;

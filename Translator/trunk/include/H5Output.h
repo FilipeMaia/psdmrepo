@@ -199,7 +199,7 @@ private:
   bool m_overwrite;
 
   SplitScanMgr::SplitMode m_split;
-  std::string m_splitCCSubDir;
+  bool m_splitCCInSubDir;
   int m_jobNumber, m_jobTotal;
   int m_mpiWorkerStartCalibCycle;
   hsize_t m_splitSize;  

@@ -1728,6 +1728,22 @@ class H5Output( unittest.TestCase ) :
                               u'pdscalibdata::CsPad2x2PixelGainV1']),
                          msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1, pdscalibdata::CsPad2x2PixelGainV1")
 
+    @unittest.skip("test not ready")
+    def test_mpiSplitScan_endData(self):
+        '''Test that end data is written during mpi split scan
+        '''
+        mpiTest = MpiTestHelper('mpiSplitScan_endData',
+                                min_events_per_calib_file=1,
+                                num_events_check_done_calib_file=1,
+                                dataSourceString = 'exp=xppd7114:run=130:dir=%s' % SPLITSCANDATADIRBUG,
+                                njobs=3,
+                                verbose=True,
+                                cleanUp = False,
+                                downstreamModules = ["cspad_mod.CsPadCalib,Translator.TestEndDataPsanaMod"],
+                                extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])
+        
+        
+
     def test_epics(self):
         '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.
         '''

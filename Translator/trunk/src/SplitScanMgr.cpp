@@ -50,14 +50,14 @@ namespace {
 using namespace Translator;
 
 SplitScanMgr::SplitScanMgr(const std::string &h5filePath, 
-                           const std::string &ccSubDir,
+                           bool ccInSubDir,
                            SplitMode splitScanMode,
                            int jobNumber, int jobTotal, 
                            int mpiWorkerStartCalibCycle,
                            bool overwrite, 
                            int fileSchemaVersion)  :  
   m_h5filePath(h5filePath) 
-  , m_ccSubDir(ccSubDir)
+  , m_ccInSubDir(ccInSubDir)
   , m_splitScanMode(splitScanMode)
   , m_jobNumber(jobNumber)
   , m_jobTotal(jobTotal)
@@ -259,10 +259,10 @@ void SplitScanMgr::updateMasterLinks(enum UpdateExtLinksMode updateMode) {
     MasterLinkToWrite & masterLinkToWrite = lnks->second;
     if ((updateMode == writeAll) or 
         ((updateMode == writeFinishedOnly) and calibFileIsFinished(calibCycle))) {
-      std::string fullPath = getExtCalibCycleFilePath(calibCycle);
+      std::string relLinkPath = getExtCalibCycleFileForLink(calibCycle);
       createExtLink(masterLinkToWrite.linkName.c_str(), 
-		    getExtCalibCycleFileBaseName(calibCycle), 
-		    masterLinkToWrite.linkGroupLoc);
+                    relLinkPath,
+                    masterLinkToWrite.linkGroupLoc);
       calibsToErase.push_back(calibCycle);
     }
   }
@@ -318,17 +318,46 @@ bool SplitScanMgr::createExtLink(const char *linkName,
   return true;
 }
 
-std::string SplitScanMgr::getExtCalibCycleFilePath(size_t calibCycle) {
+void SplitScanMgr::createCCSubDirIfNeeded() const {
+  if (m_ccInSubDir) {
+    boost::filesystem::path h5path(m_h5filePath);
+    boost::filesystem::path CCSubDirPath = h5path.parent_path();
+    CCSubDirPath /= getCCSubDirBaseName();
+    if (not boost::filesystem::is_directory(CCSubDirPath)) {
+      bool success = boost::filesystem::create_directory(CCSubDirPath);
+      if (not success) {
+        MsgLog(logger, error, "createCCSubDirIfNeeded tried to create direcory: " << CCSubDirPath << " but failed");
+        throw std::runtime_error("createCCSubDirIfNeeded failed when creating directory");
+      }
+    }
+  }
+}
+
+std::string SplitScanMgr::getExtCalibCycleFilePath(size_t calibCycle) const {
   boost::filesystem::path h5path(m_h5filePath);
   boost::filesystem::path newh5path = h5path.parent_path();
-  if (m_ccSubDir.length()>0) {
-    newh5path /= m_ccSubDir; // not sure if this works for a relative path, but it might
+  if (m_ccInSubDir) {
+    newh5path /= getCCSubDirBaseName();
   }
   newh5path /= getExtCalibCycleFileBaseName(calibCycle);
   return newh5path.string();
 }
 
-std::string SplitScanMgr::getExtCalibCycleFileBaseName(size_t calibCycle) {
+std::string SplitScanMgr::getCCSubDirBaseName() const {
+  boost::filesystem::path h5path(m_h5filePath);
+  return h5path.stem().string() + std::string("_ccfiles");
+}
+
+std::string SplitScanMgr::getExtCalibCycleFileForLink(size_t calibCycle) const {
+  std::string relLinkPath;
+  if (m_ccInSubDir) {
+    relLinkPath = getCCSubDirBaseName() + "/";
+  }
+  relLinkPath += getExtCalibCycleFileBaseName(calibCycle);
+  return relLinkPath;
+}
+
+std::string SplitScanMgr::getExtCalibCycleFileBaseName(size_t calibCycle) const {
   boost::filesystem::path h5path(m_h5filePath);
   std::string newFileName = h5path.stem().string();
   char ccFileName[128];

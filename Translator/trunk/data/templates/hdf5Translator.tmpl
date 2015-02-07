@@ -327,36 +327,30 @@ split = NoSplit
 
 # that is, it defaults to check for a 'done' message from a worker every 120 events.
 
-# by default, the calib cycle files are written to the same directory as the master file. To put
-# the calib cycle files somewhere else, use the following option:
+# by default, the calib cycle files are written to the same directory as the master file. Optionally,
+# they can be placed into a subdirectory based on the master filename. The subdirectory name is the
+# master file basename, without the extension, with _ccfiles appended to it. This subdirectory will be
+# created if need be. To do this, set
 #
-# split_cc_relpath = ccfiles
+# split_cc_in_subdir = True
 #
-# this is a path relative to the location of the master file. i.e, if one does
+# then if one does something like
 #
-# output_file = masterFiles/xpptut13-r0179.h5
-# split_cc_relpath = ../calibFiles
+# output_file = mydir/xpptut13-r0179.h5
+# split_cc_in_subdir = True
 #
-# then one will get the output files
+# one will get
 # 
-# masterFiles/xpptut13-r0179.h5
-# calibFiles/xpptut13-r0179_cc0000.h5
+# mydir/xpptut13-r0179.h5
+# mydir/xpptut13-r0179_ccfiles/xpptut13-r0179_cc0000.h5
+# mydir/xpptut13-r0179_ccfiles/xpptut13-r0179_cc0001.h5
+# ...
 #
-# The Translator will create any directories neccessary to get to the calib cycle file location.
-# The Transltor will store relative paths in the master file to the calib files, using the exact path
-# in split_cc_relpath
-#
-# be careful about using this option with the overwrite option. When translating one run after
-# another, if the calib cycle files all go into the same directory, but the masters go in 
-# different directories, it is important that the basenames for the master file used for each run 
-# are distinct (i.e, have the run number in them). Otherwise if you do something like
-#
-# output_file=run_xxx/master.h5
-# split_cc_subdir=../cc_files
-#
-# Where you keep updateing run_xxx for each run, then the calib cycle files from later runs will
-#  overwrite cc files from earlier runs. Worse, the earlier run master.h5 will follow links into later run cc files.
-#
+# rather than 
+# mydir/xpptut13-r0179.h5
+# mydir/xpptut13-r0179_cc0000.h5
+# mydir/xpptut13-r0179_cc0001.h5
+##
 # When running the h5-mpi-translate and specifying user psana modules (perhaps to add ndarrays
 # into the translation or dynamically filter events) it is important to note that these modules
 # are restarted for each calib cycle file. That is these modules will have their beginJob/endJob

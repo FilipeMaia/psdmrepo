@@ -11,12 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-13
 1015-02-06 David Schneider
-- during EndCalibCycle, create EndData subgroup to CalibCycle:xxxx groups when new 
-  data is present in the configStore. 
-- add parameter split_cc_subdir to put split scan calib cycles in a subdirectory (feature not working yet).
-- Track JIRA PSAS-101.
-- bump schema version from 4 to 5 for this new group (there may be other changes before tagging).
+- create new groups CalibCycle:xxxx/EndData only if new data shows up in ConfigStore during endcalibcycle. Track JIRA PSAS-101.
+- add parameter split_cc_in_subdir to put split scan calib cycles in a subdirectory, JIRA PSAS-104 and JIRA PSWA-32
+- bump schema version from 4 to 5 due to possible new EndData group.
+- add file TestEndDataPsanaMod.py for future use with testing the EndData feature.
 
 Tag: V00-02-12
 1015-2-5 David Schneider
