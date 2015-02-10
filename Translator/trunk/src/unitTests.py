@@ -56,43 +56,18 @@ TESTDATA_TIMETOOL = os.path.join(DATADIR, "test_081_xpp_xppi0214_e439-r0054-s00-
 #------------------
 # Utility functions / classes
 #------------------
-def makeTempMpiLaunch():
-    '''Makes a temporary executable (for user) file in data/Translator/mpilaunch_xxx 
-    File will start as
-    
-    #!/bin/bash
-
-    . sit_setup.sh ana-current
-
-    with a full path to sit_setup.sh, it will then run all following arguments.
-
-    returns the filename,  user must delete file when done
-    '''
-    sitsetupScript = 'sit_setup.sh'
-    sitSetupCmd = sb.check_output(['which',sitsetupScript]).strip()
-    assert sitSetupCmd.endswith(sitsetupScript), "no sit_setup.sh script found"
-    (mpilaunchHandle, mpilaunchFileName) = tempfile.mkstemp(prefix='mpilaunch_', dir=OUTDIR )
-    
-    os.write(mpilaunchHandle,'#!/bin/bash\n\n. %s ana-current\n\n$@\n' % sitSetupCmd)
-    os.close(mpilaunchHandle)
-    st=os.stat(mpilaunchFileName)
-    os.chmod(mpilaunchFileName,st.st_mode | stat.S_IEXEC)
-    return mpilaunchFileName
-
 def makeMpiTransCmd(min_events_per_calib_file, 
                     num_events_check_done_calib_file,
                     output_h5, dsString, downstreamModules=None, extraOptions=None, njobs=2):
     '''Makes a command line that uses mpirun to launch h5-mpi-translate to produce
     the given output file from the given input source. Defaults to use 2 jobs.
 
-    returns the cmd, and mpilaunch filename - that filename should be deleted when done
+    returns the cmd
     '''
-    mpilaunchFileName = makeTempMpiLaunch()
-
     mpiRunCmd = sb.check_output(['which','mpirun']).strip()
     assert mpiRunCmd.endswith('mpirun'), "no mpirun command found"
 
-    transCmd = '%s -n %d %s h5-mpi-translate' % (mpiRunCmd, njobs, mpilaunchFileName)
+    transCmd = '%s -n %d h5-mpi-translate' % ('mpirun', njobs)
 
     transCmd += ' -m '
     if downstreamModules is not None:
@@ -110,7 +85,7 @@ def makeMpiTransCmd(min_events_per_calib_file,
             transCmd += ' -o %s' % opt
     transCmd += ' %s' % dsString
 
-    return transCmd, mpilaunchFileName
+    return transCmd
 
 class MpiTestHelper(object):
     '''Helper class that takes parameters for running mpi translate on input.
@@ -140,7 +115,7 @@ class MpiTestHelper(object):
             self.xtc_dump = os.path.join(OUTDIR,'unit-test-%s.xtc.dump' % testName)
             self.h5_dump = os.path.join(OUTDIR,'unit-test-%s.h5.dump' % testName)
         self.doCleanUp = cleanUp
-        self.transCmd, self.mpilaunchFileName = \
+        self.transCmd = \
             makeMpiTransCmd(min_events_per_calib_file = min_events_per_calib_file,
                             num_events_check_done_calib_file = num_events_check_done_calib_file,
                             output_h5 = self.output_h5,
@@ -179,15 +154,19 @@ class MpiTestHelper(object):
             self.cleanup()
 
     def cleanup(self):
-        toDelete = [self.mpilaunchFileName, self.output_h5]
+        toDelete = [self.output_h5]
         if hasattr(self,'xtc_dump'):
             toDelete.append(self.xtc_dump)
         if hasattr(self,'h5_dump'):
             toDelete.append(self.h5_dump)
-        ccPattern = self.output_h5.replace('.h5','_cc*.h5')
-        toDelete.extend(glob.glob(ccPattern))
+        ccPatternA = self.output_h5.replace('.h5','_cc*.h5')
+        toDelete.extend(glob.glob(ccPatternA))
+        ccFilesDir = self.output_h5.replace('.h5','_ccfiles')
+        ccPatternB = os.path.join(ccFilesDir, self.output_h5.replace('.h5','_cc*.h5'))
+        toDelete.extend(glob.glob(ccPatternB))
  
         for fname in toDelete:
+            if fname is None: continue
             if os.path.exists(fname):
                 os.unlink(fname)
 
@@ -1728,21 +1707,33 @@ class H5Output( unittest.TestCase ) :
                               u'pdscalibdata::CsPad2x2PixelGainV1']),
                          msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1, pdscalibdata::CsPad2x2PixelGainV1")
 
-    @unittest.skip("test not ready")
     def test_mpiSplitScan_endData(self):
         '''Test that end data is written during mpi split scan
         '''
-        mpiTest = MpiTestHelper('mpiSplitScan_endData',
+        mpiTest = MpiTestHelper(testName='mpiSplitScan_endData',
                                 min_events_per_calib_file=1,
                                 num_events_check_done_calib_file=1,
                                 dataSourceString = 'exp=xppd7114:run=130:dir=%s' % SPLITSCANDATADIRBUG,
                                 njobs=3,
-                                verbose=True,
+                                verbose=False,
                                 cleanUp = False,
+                                doDump = False,
                                 downstreamModules = ["cspad_mod.CsPadCalib,Translator.TestEndDataPsanaMod"],
                                 extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])
+        f=h5py.File(mpiTest.output_h5,'r')
+        # the testing module Translator.TestEndDataPsanaMod will put the below string, and an array of
+        # 3 zeros, into the config store on each endcalibcycle. We test that the data is written:
+        strAnswer = 'configuration: threshold=5.2'
+        arrAnswer = np.zeros(3)
+        for cc in range(15):
+            strDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/std::string/noSrc__endcalibcycle_str_cfgstore/data' % cc
+            strDset = f[strDsetName]
+            self.assertEqual(strDset.value, strAnswer, msg="endcalibcycle str=%r != expected=%r" % (strDset.value, strAnswer))
+            arrDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/ndarray_float64_1/noSrc__endcalibcycle_ndarray_cfgstore/data' % cc
+            arrDset = f[arrDsetName]
+            self.assertTrue(all(arrAnswer == arrDset.value), msg="endcalibcycle array=%r != expected=%r" % (arrDset.value, arrAnswer))
         
-        
+        mpiTest.cleanup()
 
     def test_epics(self):
         '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.

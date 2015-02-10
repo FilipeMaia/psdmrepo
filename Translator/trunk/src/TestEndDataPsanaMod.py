@@ -13,45 +13,45 @@ class TestEndDataPsanaMod(object):
         self.putstr = "configuration: threshold=5.2"
 
     def beginjob(self, evt, env):
-        print "beginjob"
+        print "HdfWriterStringFromEvent: beginjob"
 #        env.configStore().put(self.putstr, self.beginjob_str_cfgstore)
 #        evt.put(self.putstr, self.beginjob_str_event)
 #        env.configStore().put(self.putarray, self.beginjob_ndarray_cfgstore)
 #        evt.put(self.putarray, self.beginjob_ndarray_event)
         
     def beginrun(self, evt, env):
-        print "beginrun"
+        print "HdfWriterStringFromEvent: beginrun"
 #        env.configStore().put(self.putstr, self.beginrun_str_cfgstore)
 #        evt.put(self.putstr, self.beginrun_str_event)
 #        env.configStore().put(self.putarray, self.beginrun_ndarray_cfgstore)
 #        evt.put(self.putarray, self.beginrun_ndarray_event)
         
     def begincalibcycle(self, evt, env):
-        print "begincalibcycle"
-#        env.configStore().put(self.putstr, self.begincalibcycle_str_cfgstore)
+        print "HdfWriterStringFromEvent: begincalibcycle"
+        env.configStore().put(self.putstr, self.begincalibcycle_str_cfgstore)
         evt.put(self.putstr, self.begincalibcycle_str_event)
         env.configStore().put(self.putarray, self.begincalibcycle_ndarray_cfgstore)
         evt.put(self.putarray, self.begincalibcycle_ndarray_event)
 
     def event(self,evt,env):
-        print "event"
+        print "HdfWriterStringFromEvent: event"
 
     def endcalibcycle(self, evt, env):
-        print "end calib cycle"
-#        env.configStore().put(self.putstr, self.endcalibcycle_str_cfgstore)
+        print "Translator.TestEndDataPsanaMod: end calib cycle"
+        env.configStore().put(self.putstr, self.endcalibcycle_str_cfgstore)
         evt.put(self.putstr, self.endcalibcycle_str_event)
         env.configStore().put(self.putarray, self.endcalibcycle_ndarray_cfgstore)
         evt.put(self.putarray, self.endcalibcycle_ndarray_event)
 
     def endrun(self, evt, env):
-        print "end run"
+        print "HdfWriterStringFromEvent: end run"
 #        env.configStore().put(self.putstr, self.endrun_str_cfgstore)
 #        evt.put(self.putstr, self.endrun_str_event)
 #        env.configStore().put(self.putarray, self.endrun_ndarray_cfgstore)
 #        evt.put(self.putarray, self.endrun_ndarray_event)
 
     def endjob(self, evt, env):
-        print "end job"
+        print "HdfWriterStringFromEvent: end job"
 #        env.configStore().put(self.putstr, self.endjob_str_cfgstore)
 #        evt.put(self.putstr, self.endjob_str_event)
 #        env.configStore().put(self.putarray, self.endjob_ndarray_cfgstore)

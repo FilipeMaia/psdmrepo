@@ -151,11 +151,15 @@ private:
   hdf5pp::Group m_currentRunGroup;
   hdf5pp::Group m_currentCalibCycleGroup;
   hdf5pp::Group m_currentCalibCycleEndGroup;
+  hdf5pp::Group m_currentRunEndGroup;
+  hdf5pp::Group m_currentJobEndGroup;
   hdf5pp::Group m_currentFilteredGroup;
 
   TypeSrcKeyH5GroupDirectory m_configureGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleEndGroupDir;
+  TypeSrcKeyH5GroupDirectory m_runEndGroupDir;
+  TypeSrcKeyH5GroupDirectory m_jobEndGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibStoreGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;

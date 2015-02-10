@@ -356,6 +356,32 @@ split = NoSplit
 # are restarted for each calib cycle file. That is these modules will have their beginJob/endJob
 # and beginRun/endRun routines called for each calib file that a worker produces.
 #
+#### FAST INDEX ####
+#
+# For online analysis with live data, one of the impediments to keeping up with the data is the time 
+# it takes h5-mpi-translate's to read through the data to find the calib cycles. Typically the data is 
+# recorded in 6 or more separate files and each must be read through to identify the start of calib cycles. 
+# Unfortunately this read speed can be 30-40hz for a typical experiment - far short of the 120hz we'd like 
+# to obtain. A recent feature added to h5-mpi-translate takes advantage of the unique signature of each 
+# new calib cycle, combined with the regular structure of the separate data files in order to limit the 
+# reading to just one of the files. In this way, the h5-mpi-translate master rank need only get through the 
+# data it reads/searches at 20hz to keep up with the data. We have had good success with this feature 
+# recently, but it is not guaranteed to work. It is a temporary solution until a more robust way to do 
+# fast/live indexing is put in place. However in the meantime, the translator supports the following options 
+# to turn on fast indexing and controlling how much time is spent searching the other files
+#
+# fast_index=1                 # do the fast indexing, be default it is off
+# fi_mb_half_block=12          # when fast indexing is on, use 12MB on each side, or 24MB for each block that is searched
+# fi_num_blocks=3              # this it half the number of 'other' blocks to try. The translator will try 1 + 2*3 = 7 blocks if this is 3 
+#
+# Some details, If the Translator finds a calib cycle at offset N in DAQ stream 0, then the Translator 
+# will by default look in a 24MB block around offset N in stream 1, i.e., N -+ 12MB. It is looking for a 
+# match on about 52 bits, spread out among 20 bytes. If the Translator fails to find the calib cycle in 
+# those 24MB, then it tries the next 24MB below, then the next 24MB above, then below again, then above 
+# again, etc. In the end, the Translator will cover 7 of these blocks, or 7*24MB=168MB in stream 1. 
+# After it finds the calib cycle in stream 1, it repeats this process for stream 2,3,4 and 5. 
+# If the Translator fails with any of these streams, it throws an exception.
+#
 # If MPI is not available, the Translator supports an additional  split scan mode by setting the 
 # split option as follows:
 #

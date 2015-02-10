@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-14
+205-02-09 David Schneider	
+- translate strings from the config store
+- add unit test test_mpiSplitScan_endData
+- remove mpilaunch from unit tests, path is now set up correctly, not needed
+- add variables to H5Output for Run/Job endData, but not used yet
+	
 Tag: V00-02-13
 1015-02-06 David Schneider
 - create new groups CalibCycle:xxxx/EndData only if new data shows up in ConfigStore during endcalibcycle. Track JIRA PSAS-101.

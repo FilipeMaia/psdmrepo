@@ -36,10 +36,10 @@ boost::shared_ptr<T> getFromEventStore(const PSEvt::EventKey &eventKey,
     ptr = evt.get(eventKey.src(), eventKey.key()); 
     break;
   case inConfigStore:
-    ptr = env.configStore().get(eventKey.src());
+    ptr = env.configStore().get(eventKey.src(), eventKey.key());
     break;
   case inCalibStore:
-    ptr = env.calibStore().get(eventKey.src());
+    ptr = env.calibStore().get(eventKey.src(), eventKey.key());
     break;
   }
   return ptr;

@@ -48,6 +48,25 @@ void HdfWriterString::make_dataset(hid_t groupId)
 
 }
 
+void HdfWriterString::store(hid_t groupId, const std::string &msg)
+{
+  typedef const char *ConstCharPtr;
+  ConstCharPtr wdata[1];
+  wdata[0] = msg.c_str();
+  
+  try {
+    m_writer.createAndStoreDataset(groupId,
+                                   datasetName,
+                                   m_h5typeId, 
+                                   m_h5typeId,
+                                   wdata);
+  } catch (ErrSvc::Issue &issue) {
+    std::ostringstream msg;
+    msg << "HdfWriterString - storet failed. Generic writer failure: " << issue.what();
+    throw HdfWriterGeneric::DataSetException(ERR_LOC, msg.str());
+  }
+}
+
 void HdfWriterString::append(hid_t groupId, const std::string & msg) 
 {  
   typedef const char *ConstCharPtr;

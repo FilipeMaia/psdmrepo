@@ -36,6 +36,9 @@ class HdfWriterString {
   void append(hdf5pp::Group & group, const std::string & msg) { append(group.id(),msg); }
   void append(hid_t groupId, const std::string & msg);
 
+  void store(hdf5pp::Group & group, const std::string & msg) { store(group.id(),msg); }
+  void store(hid_t groupId, const std::string & msg);
+
   const DataSetCreationProperties & dataSetCreationProperties() 
   { return m_dataSetCreationProperties; }
   void setDatasetCreationProperties(const DataSetCreationProperties & dataSetCreationProperties) 

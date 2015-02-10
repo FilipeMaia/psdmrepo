@@ -56,8 +56,7 @@ using namespace std;
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 namespace {
-  // change from 4 to 5 - the EndData that can show up in CalibCycle groups
-  int _fileSchemaVersion = 5; 
+  int _fileSchemaVersion = 4; 
 
   LoggerNameWithMpiRank logger("Translator.H5Output");
   
@@ -605,6 +604,8 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_calibStoreGroupDir.setAliasMap(env.aliasMap());
   m_calibCycleGroupDir.setAliasMap(env.aliasMap());
   m_calibCycleEndGroupDir.setAliasMap(env.aliasMap());
+  m_runEndGroupDir.setAliasMap(env.aliasMap());
+  m_jobEndGroupDir.setAliasMap(env.aliasMap());
   m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
 
   // record some info from the env

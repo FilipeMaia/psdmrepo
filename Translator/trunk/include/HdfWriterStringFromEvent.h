@@ -38,7 +38,13 @@ class HdfWriterStringFromEvent : public HdfWriterFromEvent {
                      const PSEvt::EventKey & eventKey, 
                      PSEvt::Event & evt, 
                      PSEnv::Env & env) {
-    throw ErrSvc::Issue(ERR_LOC, "HdfWriterStringFromEvent::store()  not implemented");
+    boost::shared_ptr<std::string> ptr = 
+      getFromEventStore<std::string>(eventKey, dataTypeLoc, evt, env);
+    if (not ptr) {
+      MsgLog("HdfWriterStringFromEvent",error,"store: evenKey: " << eventKey << " not found");
+      throw std::runtime_error("HdfWriterStringFromEvent: event key not found");
+    }
+    m_writer.store(srcGroup, *ptr);
   }
 
   virtual void store_at(DataTypeLoc dataTypeLoc,

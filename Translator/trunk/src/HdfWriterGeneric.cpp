@@ -252,7 +252,6 @@ void HdfWriterGeneric::createAndStoreDataset(hid_t groupId,
     throw DataSetException(ERR_LOC,dbgMessage("error creating dataset", 
                                               groupId, dsetName, h5FileType, h5MemType));
   }
-
   // write the data
   herr_t err = H5Dwrite(dataset, typeForWrite, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
 
