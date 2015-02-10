@@ -1,58 +1,99 @@
 //--------------------------
 
 #include "PSQt/GUIMain.h"
+#include "PSQt/Logger.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
 //#include <iomanip>   // for setw, setfill
-//#include <sstream>   // for stringstream
 //#include <math.h>
 //#include <stdio.h>
 
+#include <sstream>   // for stringstream
 #include <iostream>    // cout
 #include <fstream>    // ifstream(fname), ofstream
 //using namespace std; // for cout without std::
-
-#include "MsgLogger/MsgLogger.h"
 
 namespace PSQt {
 
 //--------------------------
 
-GUIMain::GUIMain( QWidget *parent )
-    : QWidget(parent)
-{
-  const std::string base_dir = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/";
-  const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
-  const std::string fname_img = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
 
-  this -> setFrame();
+GUIMain::GUIMain( QWidget *parent )
+    : Frame(parent)
+//  : QWidget(parent)
+{
+  MsgInLog(_name_(), INFO, "Begin..."); 
+
+  const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
+  const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
+  const std::string fname_nda = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
+  const bool pbits = 0;
 
   m_but_exit = new QPushButton( "Exit", this );
-  m_but_test = new QPushButton( "Test", this );
-  m_file     = new PSQt::WdgFile(this);
+  m_but_save = new QPushButton( "Save", this );
+  m_file_geo = new PSQt::WdgFile(this, "Set geometry", fname_geo, "*.data \n *", false);
+  m_file_nda = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
 
-  m_image    = new PSQt::WdgImage(this, fname_geo, fname_img);
-  
-  connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()) );
-  connect(m_but_test, SIGNAL( clicked() ), m_image, SLOT(onTest()) );
-  connect(m_file, SIGNAL(fileNameIsChanged(const std::string&)), m_image, SLOT(onFileNameChanged(const std::string&)) ); 
+  m_guilogger = new PSQt::GUILogger(this, false);
 
-  QHBoxLayout *hbox = new QHBoxLayout();
-  hbox -> addWidget(m_but_exit);
-  hbox -> addWidget(m_but_test);
-  hbox -> addStretch(1);
+  m_wgt = new PSQt::WdgGeoTree(this, fname_geo, pbits);
+  m_wge = new PSQt::WdgGeo();
+ 
+  m_bbox = new QHBoxLayout();
+  m_bbox -> addWidget(m_but_save);
+  m_bbox -> addStretch(1);
+  m_bbox -> addWidget(m_but_exit);
 
-  QVBoxLayout *vbox = new QVBoxLayout();
-  vbox -> addWidget(m_file);
-  vbox -> addWidget(m_image);
-  vbox -> addLayout(hbox);
+  m_fbox = new QVBoxLayout();
+  m_fbox -> addWidget(m_file_geo);
+  m_fbox -> addWidget(m_file_nda);
 
-  this -> setLayout(vbox);
-  this -> setWindowTitle(tr("Basic Drawing"));
-  this -> move(100,50);  
+  m_rbox = new QVBoxLayout();
+  m_rbox -> addWidget(m_wge);
+  m_rbox -> addStretch(1);
+  m_rbox -> addLayout(m_bbox);
+
+  m_wrp = new QWidget();
+  m_wrp -> setLayout(m_rbox);
+  m_wrp -> setContentsMargins(-9,-9,-9,-9);
+
+  m_hsplit = new QSplitter(Qt::Horizontal);
+  m_hsplit -> addWidget(m_wgt); 
+  m_hsplit -> addWidget(m_wrp);
+
+  m_mbox = new QVBoxLayout();
+  m_mbox -> addLayout(m_fbox);
+  m_mbox -> addWidget(m_hsplit); 
+
+  m_wmbox = new QWidget();
+  m_wmbox -> setLayout(m_mbox);
+  m_wmbox -> setContentsMargins(-9,-9,-9,-9);
+
+  m_vsplit = new QSplitter(Qt::Vertical); 
+  m_vsplit -> addWidget(m_wmbox); 
+  m_vsplit -> addWidget(m_guilogger); 
+
+  m_vbox = new QVBoxLayout();
+  m_vbox -> addWidget(m_vsplit);
+
+  this -> setLayout(m_vbox);
 
   showTips();
+  setStyle();
+
+  m_geoimg = new PSQt::GeoImage();  
+  m_wimage = new PSQt::WdgImage(0);  
+  m_wimage -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
+  m_wimage -> show();
+
+  connect(Logger::getLogger(), SIGNAL(signal_new_record(Record&)), m_guilogger, SLOT(addNewRecord(Record&)));
+  connect(m_wgt->get_view(), SIGNAL(selectedGO(shpGO&)), m_wge, SLOT(setNewGO(shpGO&)));
+  connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()));
+  connect(m_but_save, SIGNAL( clicked() ), this, SLOT(onButSave()));
+  connect(m_file_geo, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
+  //connect(m_file_nda, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
+  //connect(m_file, SIGNAL(fileNameIsChanged(const std::string&)), m_wimage, SLOT(onFileNameChanged(const std::string&))); 
 }
 
 //--------------------------
@@ -60,33 +101,45 @@ GUIMain::GUIMain( QWidget *parent )
 void
 GUIMain::showTips() 
 {
+  m_file_geo  -> setToolTip("Select \"geometry\" file");
+  m_file_nda  -> setToolTip("Select ndarray with image file");
   m_but_exit  -> setToolTip("Exit application");
 }
 
 //--------------------------
 
 void
-GUIMain::setFrame() 
+GUIMain::setStyle()
 {
-  m_frame = new QFrame(this);
-  m_frame -> setFrameStyle ( QFrame::Box | QFrame::Sunken); // or
-  //m_frame -> setFrameStyle ( QFrame::Box );    // NoFrame, Box, Panel, WinPanel, ..., StyledPanel 
-  //m_frame -> setFrameShadow( QFrame::Sunken ); // Plain, Sunken, Raised 
-  m_frame -> setLineWidth(0);
-  m_frame -> setMidLineWidth(1);
-  m_frame -> setCursor(Qt::SizeAllCursor);     // Qt::WaitCursor, Qt::PointingHandCursor
-  //m_frame -> setStyleSheet("background-color: rgb(0, 255, 255); color: rgb(255, 255, 100)");
+  //m_file_geo->setFixedWidth(150);
+  //m_file_nda->setFixedWidth(150);
+
+  this -> setGeometry(0, 0, 500, 525);
+  this -> setWindowTitle(tr("Detector alignment"));
+  //this -> setContentsMargins(-9,-9,-9,-9);
+
+  //this -> move(0,0);  
+
+  //m_guilogger -> move(this->pos().x(), this->pos().y() + this->size().height());  
+
 }
 
-//--------------------------
 //--------------------------
 
 void 
 GUIMain::resizeEvent(QResizeEvent *event)
 {
-//m_frame->setGeometry(this->rect());
-  m_frame->setGeometry(0, 0, event->size().width(), event->size().height());
-  setWindowTitle("Window is resized");
+  stringstream ss; ss << "w:" << event->size().width() << " h:" <<  event->size().height();
+  setWindowTitle(ss.str().c_str());
+}
+
+//--------------------------
+
+void
+GUIMain::moveEvent(QMoveEvent *event)
+{
+  stringstream ss; ss << "x:" << event->pos().x() << " y:" << event->pos().y();
+  setWindowTitle(ss.str().c_str());
 }
 
 //--------------------------
@@ -96,17 +149,15 @@ GUIMain::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
   //std::cout << "GUIMain::closeEvent(...): type = " << event -> type() << std::endl;
-  MsgLog("GUIMain", info, "closeEvent(...): type = " << event -> type());
-}
+  //MsgLog("GUIMain", info, "closeEvent(...): type = " << event -> type());
+  MsgInLog(_name_(), INFO, "closeEvent(...)"); 
 
-//--------------------------
-void
-GUIMain::moveEvent(QMoveEvent *event)
-{
-  int x = event->pos().x();
-  int y = event->pos().y();
-  QString text = QString::number(x) + "," + QString::number(y);
-  setWindowTitle(text);
+  if(m_wimage)    m_wimage    -> close();
+  if(m_guilogger) m_guilogger -> close();
+  m_wimage    = 0;
+  m_guilogger = 0;
+
+  SaveLog();
 }
 
 //--------------------------
@@ -122,6 +173,14 @@ GUIMain::mousePressEvent(QMouseEvent *event)
 
 //--------------------------
 //--------------------------
+//--------------------------
+
+void 
+GUIMain::onButSave()
+{
+  std::cout << "GUIMain::onButSave() TBD\n";
+}
+
 //--------------------------
 
 void 

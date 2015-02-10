@@ -12,6 +12,8 @@
 #include <QtGui>
 #include <QtCore>
 
+#include "PSQt/Frame.h"
+
 namespace PSQt {
 
 class WdgFile : public QWidget
@@ -22,10 +24,10 @@ class WdgFile : public QWidget
     WdgFile( QWidget *parent = 0, 
              const std::string& but_title=std::string("File:"), 
              const std::string& path=std::string("/reg/neh/home1/dubrovin/LCLS/pubs/reflective-geometry.png"),
-             const std::string& search_fmt=std::string("*.data *.png \n *") );
-
-    //const std::string& path=std::string("/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-05-15/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data") );
-    //const std::string& path=std::string("/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data") );
+             const std::string& search_fmt=std::string("*.data *.png \n *"),
+             const bool& show_frame=true,
+             const unsigned& but_width=100);
+    //    ~WdgFile(){}
 
     void resizeEvent(QResizeEvent *event = 0) ;
     void closeEvent (QCloseEvent  *event = 0) ;
@@ -42,6 +44,7 @@ class WdgFile : public QWidget
  private :
     std::string  m_path;
     std::string  m_search_fmt;
+    bool         m_show_frame;
     //QLabel*      m_lab_fname;
     QFrame*      m_frame;
     QLineEdit*   m_edi_file;

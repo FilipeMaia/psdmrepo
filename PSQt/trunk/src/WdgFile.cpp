@@ -1,22 +1,25 @@
 //--------------------------
 
+#include "PSQt/WdgFile.h"
+
 #include <iostream>    // for std::cout
 #include <fstream>    // for std::ifstream(fname)
 //using namespace std; // for cout without std::
-
-#include "PSQt/WdgFile.h"
 
 namespace PSQt {
 
 //--------------------------
 
 WdgFile::WdgFile( QWidget *parent, 
-                        const std::string& but_title, 
-                        const std::string& path,
-                        const std::string& search_fmt )
+                  const std::string& but_title, 
+                  const std::string& path,
+                  const std::string& search_fmt,
+                  const bool& show_frame,
+                  const unsigned& but_width )
     : QWidget(parent)
     , m_path(path)
     , m_search_fmt(search_fmt)
+    , m_show_frame(show_frame)
 {
   this -> setFrame();
 
@@ -25,6 +28,8 @@ WdgFile::WdgFile( QWidget *parent,
 
   m_but_file = new QPushButton(but_title.c_str(), this);
   m_edi_file = new QLineEdit  (m_path.c_str());
+
+  m_but_file -> setFixedWidth(but_width);
 
   connect( m_but_file, SIGNAL( clicked() ),          this, SLOT( onButFile()) ); 
   connect( m_edi_file, SIGNAL( editingFinished() ),  this, SLOT( onEdiFile()) ); 
@@ -37,9 +42,12 @@ WdgFile::WdgFile( QWidget *parent,
   this -> setLayout(hbox);
 
   this -> setWindowTitle(tr("WdgFile"));
-  this -> setFixedHeight(50);
-  this -> setMinimumWidth(700);
-  this -> move(300,50); // open qt window in specified position
+  this -> setMinimumWidth(200);
+  this -> setFixedHeight( (m_show_frame)? 50 : 34);
+
+  if (! m_show_frame) this -> setContentsMargins(-9,-9,-9,-9);
+
+  //this -> move(300,50); // open qt window in specified position
 
   this -> showTips();
 }
@@ -66,15 +74,14 @@ WdgFile::setFrame()
   m_frame -> setMidLineWidth(1);
   m_frame -> setCursor(Qt::SizeAllCursor);     // Qt::WaitCursor, Qt::PointingHandCursor
   //m_frame -> setStyleSheet("background-color: rgb(0, 255, 255); color: rgb(255, 255, 100)");
+  m_frame -> setVisible(m_show_frame);
 }
 
-//--------------------------
 //--------------------------
 
 void 
 WdgFile::resizeEvent(QResizeEvent *event)
 {
-//m_frame->setGeometry(this->rect());
   m_frame->setGeometry(0, 0, event->size().width(), event->size().height());
   //std::cout << "WdgFile::resizeEvent(...): w=" << event->size().width() 
   //          << "  h=" << event->size().height() << '\n';

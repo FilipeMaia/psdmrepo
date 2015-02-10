@@ -15,19 +15,39 @@ namespace PSQt {
 
 //--------------------------
 
-WdgImage::WdgImage( QWidget *parent, const std::string& fname_geo, const std::string& fname_img )
+WdgImage::WdgImage( QWidget *parent, const std::string& ifname)
   : QLabel(parent)
 {
-  m_geo_img = new GeoImage(fname_geo, fname_img);
+  setWdgParams();
 
-  this -> setFrame();
+  const std::string fname = (ifname!=std::string()) ? ifname
+                          : "/reg/neh/home1/dubrovin/LCLS/pubs/galaxy.jpeg";
+  //                          : "/reg/neh/home1/dubrovin/LCLS/pubs/reflective-geometry.png";
+  loadImageFromFile(fname);
+}
+
+//--------------------------
+
+WdgImage::WdgImage( QWidget *parent, const QImage* image)
+  : QLabel(parent)
+{
+  setWdgParams();
+  setPixmapScailedImage(image);
+}
+
+//--------------------------
+
+void 
+WdgImage::setWdgParams()
+{
+  //this -> setFrame();
   //this -> setText("Test text for this QLabel");
   //this -> setGeometry(200, 100, 500, 500);
   //this -> setWindowTitle("Image For Geometry");
 
   //this -> setAutoFillBackground (true); // MUST BE TRUE TO DRAW THE BACKGROUND COLOR SET IN Palette
   //this -> setMinimumHeight(200);
-  this -> setMinimumSize(700,200);
+  this -> setMinimumSize(525,525);
   //this -> setPalette ( QPalette(QColor(255, 255, 255, 255)) );
 
   this -> setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -44,7 +64,6 @@ WdgImage::WdgImage( QWidget *parent, const std::string& fname_geo, const std::st
   this -> setMargin(0);
 
   //this -> installEventFilter(this);
-
 
   QVector<qreal> dashes;
   qreal space = 4;
@@ -65,8 +84,6 @@ WdgImage::WdgImage( QWidget *parent, const std::string& fname_geo, const std::st
   m_pixmap_scl = 0;
 
   m_painter = new QPainter(this);
-
-  loadImageFromFile("/reg/neh/home1/dubrovin/LCLS/pubs/reflective-geometry.png");
 }
 
 //--------------------------
@@ -177,8 +194,7 @@ WdgImage::setFrame()
 void 
 WdgImage::resizeEvent(QResizeEvent *event)
 {
-  //m_frame -> setFrameRect (this->rect());
-  m_frame->setGeometry(0, 0, event->size().width(), event->size().height());
+  //m_frame->setGeometry(0, 0, event->size().width(), event->size().height());
   
   //std::cout << "WdgImage::resizeEvent(...): w=" << event->size().width() 
   //	    << "  h=" << event->size().height() << '\n';
@@ -275,6 +291,19 @@ WdgImage::loadImageFromFile(const std::string& fname)
 //--------------------------
 
 void 
+WdgImage::onFileNameChanged(const std::string& fname)
+{
+  std::cout << "WdgImage::onFileNameChanged(string) - slot: fname = " << fname << '\n';  
+  loadImageFromFile(fname);
+}
+
+//--------------------------
+//--------------------------
+//----   Test images   -----
+//--------------------------
+//--------------------------
+
+void 
 WdgImage::setColorPixmap()
 {
   std::cout << "WdgImage::setColorPixmap()\n";
@@ -356,7 +385,7 @@ WdgImage::setColorWhellPixmap()
 
 //--------------------------
 
-void 
+void
 WdgImage::setColorBar( const unsigned& rows, 
                        const unsigned& cols,
                        const float&    hue1,
@@ -379,11 +408,19 @@ WdgImage::setColorBar( const unsigned& rows,
 //--------------------------
 
 void 
-WdgImage::setCameraImage()
+WdgImage::setCameraImage(const std::string& ifname_geo, const std::string& ifname_img)
 {
   typedef PSCalib::GeometryAccess::image_t image_t;
 
+  const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
+  const std::string fname_geo = (ifname_geo != std::string()) ? ifname_geo
+                              : base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
+  const std::string fname_img = (ifname_img != std::string()) ? ifname_img
+                              : base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
+
   std::cout << "WdgImage::setCameraImage()\n";
+
+  m_geo_img = new GeoImage(fname_geo, fname_img);
 
   const ndarray<const image_t, 2> dnda = m_geo_img->get_image();
 
@@ -421,15 +458,6 @@ WdgImage::setCameraImage()
 
   QImage image((const uchar*) &inda[0][0], inda.shape()[1], inda.shape()[0], QImage::Format_ARGB32);
   setPixmapScailedImage(&image);
-}
-
-//--------------------------
-
-void 
-WdgImage::onFileNameChanged(const std::string& fname)
-{
-  std::cout << "WdgImage::onFileNameChanged(string) - slot: fname = " << fname << '\n';  
-  loadImageFromFile(fname);
 }
 
 //--------------------------

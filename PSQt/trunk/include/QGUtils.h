@@ -7,10 +7,14 @@
 //#include "PSQt/GeoImage.h"
 //#include <QPainter>
 //#include <QPen>
+#include "PSQt/GUAxes.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
 
 #include <QLabel>
 #include <QPainter>
 #include <QPixmap>
+#include <QFont>
 
 namespace PSQt {
 //--------------------------
@@ -50,6 +54,10 @@ void
  int string_to_int(const std::string& str);
 
 //--------------------------
+
+ void print_font_status(const QFont& font);
+
+//--------------------------
 //--------------------------
 
 template<typename T>
@@ -59,6 +67,50 @@ template<typename T>
     return ss.str();
   }
 
+//--------------------------
+
+ void set_pen(QPen & pen, const std::string & opt);
+ void set_brush(QBrush & brush, const std::string & opt);
+ void set_pen_brush(QPen & pen, QBrush & brush, const std::string & opt);
+
+//--------------------------
+
+ void graph(QGraphicsScene* scene, const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+ void graph(QGraphicsView * view,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+ void graph(PSQt::GUAxes  * axes,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+
+//--------------------------
+ 
+ bool is_file(const std::string& path);
+ bool is_directory(const std::string& path);
+ bool is_link(const std::string& path);
+
+//--------------------------
+ 
+/**
+ * check if directory exists
+ */ 
+ bool dir_exists(const std::string& dir);
+
+//--------------------------
+ 
+/**
+ * check if file exists
+ */ 
+ bool file_exists (const std::string& fname);
+
+//--------------------------
+ 
+ bool path_exists (const std::string& path);
+
+//--------------------------
+ 
+ std::string basename(const std::string& path);
+ std::string dirname(const std::string& path);
+
+//--------------------------
+
+ std::string split_string_left(const std::string& s, size_t& pos, const char& sep);
 
 //--------------------------
 

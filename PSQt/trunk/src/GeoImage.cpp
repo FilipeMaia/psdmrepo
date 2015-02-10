@@ -14,6 +14,8 @@ GeoImage::GeoImage(const std::string& fname_geo, const std::string& fname_img)
   : m_fname_geo(fname_geo)
   , m_fname_img(fname_img)
 {
+  this -> check_fnames();
+
   std::cout << "GeoImage::GeoImage(string) :" 
             << "\n  fname_geo: " << m_fname_geo  
             << "\n  fname_img: " << m_fname_img  
@@ -31,10 +33,21 @@ GeoImage::GeoImage(const std::string& fname_geo, const std::string& fname_img)
 
   m_ndaio = new GeoImage::NDAIO(fname_img, shape, 1, 0);
   //m_ndaio->print_ndarray();
-  m_anda = m_ndaio->get_ndarray(); // or get_ndarray(fname);
-  
+  m_anda = m_ndaio->get_ndarray(); // or get_ndarray(fname);  
 }
 
+//--------------------------
+
+void
+GeoImage::check_fnames()
+{
+  const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
+  const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
+  const std::string fname_nda = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
+
+  if (m_fname_geo == std::string()) m_fname_geo = fname_geo;
+  if (m_fname_img == std::string()) m_fname_img = fname_nda;
+}
 
 //--------------------------
 

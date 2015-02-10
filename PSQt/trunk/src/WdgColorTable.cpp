@@ -6,6 +6,7 @@
 #include <string>
 
 #include <iostream>    // cout
+#include <cstring>  // for memcpy, placed in the std namespace
 
 //using namespace std; // for cout without std::
 
