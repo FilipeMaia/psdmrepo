@@ -1,0 +1,26 @@
+#!@PYTHON@
+
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
+
+programDescription = '''
+script to run the Translator DDL back end to produce the DDL generated 
+for the Translator package.
+'''
+
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc','smldata'],
+                                                          includeHdf=False,
+                                                          includeDecl=False)
+
+    ddlFilesArg = ' '.join([subdict['ddlfile'] for subdict in pkgdict.values()])
+
+    cmd = psddlCmdStart + '-I data -B package_dir:Translator -b hdf5Translator ' + ddlFilesArg
+    if verbose: sys.stdout.write("Running cmd:\n%s\n" % cmd)
+    sys.stdout.flush()
+    status = subprocess.call(cmd, shell=True)
+    sys.exit(status)
+
