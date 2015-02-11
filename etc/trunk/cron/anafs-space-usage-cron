@@ -50,7 +50,7 @@ for key in server database uid pwd ; do
 done
 conn_str="-h ${conn[server]} -u ${conn[uid]} --password=${conn[pwd]} ${conn[database]}"
 
-disks=( /reg/data/ana01/  /reg/data/ana02/  /reg/data/ana04/ 
+disks=( /reg/data/ana01/ /reg/data/ana04/ 
     /reg/data/ana11/  /reg/data/ana12/  /reg/data/ana14/ )
 
 treg=$(date +%s)
