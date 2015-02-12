@@ -49,13 +49,14 @@ namespace XtcInput {
 // Constructors --
 //----------------
 StreamFileIterLive::StreamFileIterLive (unsigned expNum, unsigned run, int stream, const IData::Dataset::Streams& ds_streams,
-    unsigned liveTimeout, const boost::shared_ptr<LiveFilesDB>& filesdb)
+                                        unsigned liveTimeout, unsigned runLiveTimeout, const boost::shared_ptr<LiveFilesDB>& filesdb)
   : StreamFileIterI()
   , m_expNum(expNum)
   , m_run(run)
   , m_stream(stream)
   , m_ds_streams(ds_streams)
   , m_liveTimeout(liveTimeout)
+  , m_runLiveTimeout(runLiveTimeout)
   , m_filesdb(filesdb)
   , m_initialized(false)
   , m_lastStream(0)
@@ -86,6 +87,15 @@ StreamFileIterLive::next()
     m_initialized = true;
 
     std::vector<XtcFileName> files = m_filesdb->files(m_expNum, m_run);
+    if (files.empty() and (m_runLiveTimeout>0)) {
+      MsgLog(logger, info, "database has no entry for run=" << m_run 
+             << " will wait for up to " << m_runLiveTimeout << " seconds.");
+      std::time_t t0 = std::time(0);
+      do {
+        sleep(1);
+        files = m_filesdb->files(m_expNum, m_run);
+      } while (files.empty() and std::time(0) < t0 + m_runLiveTimeout);
+    }
     if (files.empty()) {
       throw ErrDbRunLiveData(ERR_LOC, m_run);
     }

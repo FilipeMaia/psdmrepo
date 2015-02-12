@@ -263,28 +263,32 @@ try {
     if (not numbers.empty()) {
       // use default table name if none was given
       if (m_liveDbConn.empty()) m_liveDbConn = "Server=psdb.slac.stanford.edu;Database=regdb;Uid=regdb_reader";
-      runFileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, streams,
-          m_liveTimeout, m_liveDbConn, m_liveTable, liveDir);
+      // we would prefer to use boost::make_shared below, 
+      // but in C++ 03 it stops after 9 arguments (C++ 11 would variadic templates resolve this)
+      boost::shared_ptr<RunFileIterLive> temp( new RunFileIterLive(numbers.begin(), numbers.end(), expId, stream, streams,
+                                                                   m_liveTimeout, m_runLiveTimeout, m_liveDbConn, 
+                                                                   m_liveTable, liveDir));
+      runFileIter = temp;
     }
   }
-
+  
   if (runFileIter) {
 
     XtcMergeIterator iter(runFileIter, m_l1OffsetSec, m_firstControlStream, 
                           m_maxStreamClockDiffSec, m_thirdEvent);
     Dgram dg;
     while ( not boost::this_thread::interruption_requested() ) {
-
+      
       dg = iter.next();
-
+      
       // stop if no datagram
       if (dg.empty()) break;
-
+      
       // move it to the queue
       m_queue.push ( dg ) ;
-
+      
     }
-
+    
   } else {
 
     MsgLog(logger, warning, "no input data specified");

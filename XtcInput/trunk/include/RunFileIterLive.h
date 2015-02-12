@@ -67,12 +67,13 @@ public:
    *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one stream, -3 for ranges of streams
    *  @param[in] ds_streams Arnges of streams
    *  @param[in] liveTimeout Specifies timeout in second when reading live data
+   *  @param[in] runLiveTimeout Specifies timeout in second when waiting for a new run to show in the database when reading live data
    *  @param[in] dbConnStr Database connection string
    *  @param[in] table     Database table name
    *  @param[in] dir       Directory to look for live files
    */
   template <typename Iter>
-  RunFileIterLive (Iter begin, Iter end, unsigned expNum, int stream, const IData::Dataset::Streams& ds_streams, unsigned liveTimeout,
+    RunFileIterLive (Iter begin, Iter end, unsigned expNum, int stream, const IData::Dataset::Streams& ds_streams, unsigned liveTimeout, unsigned runLiveTimeout,
       const std::string& dbConnStr, const std::string& table, const std::string& dir)
     : RunFileIterI()
     , m_runs(begin, end)
@@ -80,6 +81,7 @@ public:
     , m_stream(stream)
     , m_ds_streams(ds_streams)
     , m_liveTimeout(liveTimeout)
+    , m_runLiveTimeout(runLiveTimeout)
     , m_run(0)
     , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dir))
   {
@@ -111,6 +113,7 @@ private:
   int m_stream;
   IData::Dataset::Streams m_ds_streams;
   unsigned m_liveTimeout;
+  unsigned m_runLiveTimeout;
   unsigned m_run;
   boost::shared_ptr<LiveFilesDB> m_filesdb;
 

@@ -53,7 +53,7 @@ RunFileIterLive::next()
   if (not m_runs.empty()) {
     Runs::iterator s = m_runs.begin();
     m_run = *s;
-    next = boost::make_shared<StreamFileIterLive>(m_expNum, m_run, m_stream, m_ds_streams, m_liveTimeout, m_filesdb);
+    next = boost::make_shared<StreamFileIterLive>(m_expNum, m_run, m_stream, m_ds_streams, m_liveTimeout, m_runLiveTimeout, m_filesdb);
     m_runs.erase(s);
   }
 

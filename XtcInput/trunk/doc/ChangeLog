@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-11
+2015-02-12 David Schneider
+- add parameter PSXtcInput.XtcInputModule.runLiveTimeout to get psana to wait for 
+  new runs in live mode. JRIA issue PSAS-108
+
 Tag: V00-10-10
 2014-11-24 David schneider
 - add check for corrupted xtc to address JIRA issue PSAS-71

@@ -65,6 +65,7 @@ public:
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
       const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
+              unsigned runLiveTimeout,
               double l1OffsetSec, int firstControlStream, unsigned maxStreamClockDiffSec,
               boost::shared_ptr<XtcFilesPosition> thirdEvent = 
 	                                          boost::shared_ptr<XtcFilesPosition>())
@@ -74,6 +75,7 @@ public:
     , m_liveDbConn(liveDbConn)
     , m_liveTable(liveTable)
     , m_liveTimeout(liveTimeout)
+    , m_runLiveTimeout(runLiveTimeout)
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(firstControlStream)
     , m_maxStreamClockDiffSec(maxStreamClockDiffSec)
@@ -83,14 +85,15 @@ public:
   // constructor with default parameters for parameters for handling control streams
   template <typename Iter>
   DgramReader(Iter begin, Iter end, DgramQueue& queue, MergeMode mode,
-      const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
-              double l1OffsetSec=0)
+              const std::string& liveDbConn, const std::string& liveTable, unsigned liveTimeout,
+              unsigned runLiveTimeout, double l1OffsetSec=0)
     : m_files(begin, end)
     , m_queue( queue )
     , m_mode( mode )
     , m_liveDbConn(liveDbConn)
     , m_liveTable(liveTable)
     , m_liveTimeout(liveTimeout)
+    , m_runLiveTimeout(runLiveTimeout)
     , m_l1OffsetSec(l1OffsetSec)
     , m_firstControlStream(80)
     , m_maxStreamClockDiffSec(85)
@@ -114,6 +117,7 @@ private:
   std::string m_liveDbConn;
   std::string m_liveTable;
   unsigned m_liveTimeout;
+  unsigned m_runLiveTimeout;
   double m_l1OffsetSec ;
   int m_firstControlStream;
   unsigned m_maxStreamClockDiffSec;
