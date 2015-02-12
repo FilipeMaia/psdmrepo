@@ -132,6 +132,7 @@ DgramSourceFile::init()
   std::string liveDbConn = configStr("liveDbConn", "");
   std::string liveTable = configStr("liveTable", "file");
   unsigned liveTimeout = config("liveTimeout", 120U);
+  unsigned runLiveTimeout = config("runLiveTimeout", 0U);
   double l1offset = config("l1offset", 0.0);
   MergeMode merge = mergeMode(configStr("mergeMode", "FileName"));
   m_firstControlStream = config("first_control_stream",80);
@@ -151,11 +152,19 @@ DgramSourceFile::init()
                                                          m_fileNames.end(),
                                                          *m_dgQueue, 
                                                          merge, liveDbConn, 
-                                                         liveTable, liveTimeout, 
+                                                         liveTable, liveTimeout, runLiveTimeout,
                                                          l1offset, 
                                                          m_firstControlStream,
                                                          m_maxStreamClockDiffSec,
                                                          firstEventAfterConfigure) ) );
+  MsgLog(name(), debug, "config params: liveDbConn=" << liveDbConn << ", " 
+         << "liveTable=" << liveTable << ", "
+         << "liveTimeout=" << liveTimeout << ", "
+         << "runLiveTimeout=" << runLiveTimeout << ", "
+         << "l1offset=" << l1offset << ", "
+         << "mergeMode=" << merge << ", "
+         << "first_control_stream=" << m_firstControlStream << ","
+         << "max_stream_clock_diff=" << m_maxStreamClockDiffSec);
 }
 
 
