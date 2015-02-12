@@ -1,5 +1,6 @@
 //--------------------------
 #include "PSQt/GeoImage.h"
+#include "PSQt/Logger.h"
 
 #include <iostream>    // for std::cout
 #include <fstream>     // for std::ifstream(fname)
@@ -16,18 +17,17 @@ GeoImage::GeoImage(const std::string& fname_geo, const std::string& fname_img)
 {
   this -> check_fnames();
 
-  std::cout << "GeoImage::GeoImage(string) :" 
-            << "\n  fname_geo: " << m_fname_geo  
-            << "\n  fname_img: " << m_fname_img  
-            << '\n';
+  MsgInLog(_name_(), INFO, "Use fname_geo: " + m_fname_geo); 
+  MsgInLog(_name_(), INFO, "Use fname_img: " + m_fname_img); 
 
   m_geometry = new PSCalib::GeometryAccess(m_fname_geo);
   m_pix_scale_size = m_geometry->get_pixel_scale_size();
   m_size = m_geometry->get_top_geo()->get_size_geo_array();
 
-  std::cout << "  pix_scale_size: " << m_pix_scale_size
-            << "  size          : " << m_size
-            << '\n';
+  stringstream ss; 
+  ss << "Image parameters: pix_scale_size[um] = " << m_pix_scale_size
+     << "  size = " << m_size;
+  MsgInLog(_name_(), INFO, ss.str()); 
 
   unsigned shape[] = {m_size};  
 

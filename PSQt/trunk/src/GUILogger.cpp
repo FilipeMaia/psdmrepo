@@ -55,7 +55,6 @@ GUILogger::GUILogger( QWidget *parent, const bool& showbuts)
 }
 
 //--------------------------
-
 void
 GUILogger::showTips() 
 {
@@ -63,7 +62,6 @@ GUILogger::showTips()
 }
 
 //--------------------------
-
 void
 GUILogger::setStyle() 
 {
@@ -72,8 +70,8 @@ GUILogger::setStyle()
   m_but_save->setVisible(m_showbuts);
   m_combo   ->setVisible(m_showbuts);
 
-  m_txt_edi -> setContentsMargins(-9,-9,-9,-9); 
-  this -> setContentsMargins(-9,-9,-9,-9);
+  //m_txt_edi -> setContentsMargins(-9,-9,-9,-9); 
+  //this -> setContentsMargins(-9,-9,-9,-9);
 
   //this -> setWindowTitle(tr("GUILogger"));
   //this -> setMinimumWidth(700);
@@ -91,7 +89,6 @@ GUILogger::setStyle()
 }
 
 //--------------------------
-
 void 
 GUILogger::resizeEvent(QResizeEvent *event)
 {
@@ -100,7 +97,6 @@ GUILogger::resizeEvent(QResizeEvent *event)
 }
 
 //--------------------------
-
 void
 GUILogger::moveEvent(QMoveEvent *event)
 {
@@ -109,42 +105,56 @@ GUILogger::moveEvent(QMoveEvent *event)
 }
 
 //--------------------------
-
 void 
 GUILogger::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  MsgInLog(_name_(), INFO, "GUILogger::closeEvent(...)"); 
+  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
-
 void  
 GUILogger::onCombo(int i)
 {
-  std::cout << " selected: " << m_list.at(i).toStdString() << '\n'; 
+  std::string str_level = m_list.at(i).toStdString();
+  MsgInLog(_name_(), INFO, "Selected level: " + str_level);
+
+  LEVEL level = levelFromString(str_level);
+  std::string recs = Logger::getLogger()->strRecordsForLevel(level);
+  m_txt_edi->clear();
+  m_txt_edi->append(recs.c_str());
+
+  SetMsgLevel(level);
+
+  scrollDown();
 }
 
 //--------------------------
-
 void  
 GUILogger::onSave()
 {
-  std::cout << " onSave\n"; 
+  MsgInLog(_name_(), INFO, "\"Save\" button is clicked");
   SaveLog();
+}
+
+//--------------------------
+void 
+GUILogger::scrollDown()
+{
+  m_txt_edi->moveCursor(QTextCursor::End);
+  m_txt_edi->repaint();
 }
 
 //--------------------------
 void 
 GUILogger::addNewRecord(Record& rec)
 {
-  //std::cout << _name_() << "=================  >>>> ::addNewRecord";
   //std::cout << rec.strRecordTotal() << '\n';  
-  m_txt_edi->append(rec.strRecordTotal().c_str());
+  //m_txt_edi->append(rec.strRecordTotal().c_str());
+  m_txt_edi->append(rec.strRecord().c_str());
 
-  // scroll down
-  m_txt_edi->moveCursor(QTextCursor::End);
-  m_txt_edi->repaint();
+  scrollDown();
 }
 
 
@@ -152,13 +162,12 @@ GUILogger::addNewRecord(Record& rec)
 void 
 GUILogger::addStartRecords()
 {
-  std::string start_recs =  
-  Logger::getLogger()->strRecordsForLevel(INFO);
+  std::string start_recs = Logger::getLogger()->strRecordsForLevel(Logger::getLogger()->getLevel());
   m_txt_edi->append(start_recs.c_str());
 
-  // scroll down
-  m_txt_edi->moveCursor(QTextCursor::End);
-  m_txt_edi->repaint();
+  //cout << _name_() << "addStartRecords():\n" << start_recs << '\n';
+
+  scrollDown();
 }
 
 //--------------------------

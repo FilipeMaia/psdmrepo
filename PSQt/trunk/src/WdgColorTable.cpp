@@ -1,12 +1,14 @@
 //--------------------------
 
 #include "PSQt/WdgColorTable.h"
+#include "PSQt/Logger.h"
 
 #include <QString>
 #include <string>
 
 #include <iostream>    // cout
 #include <cstring>  // for memcpy, placed in the std namespace
+#include <sstream>   // for stringstream
 
 //using namespace std; // for cout without std::
 
@@ -139,8 +141,8 @@ void
 WdgColorTable::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "WdgColorTable::closeEvent(...): type = " << event -> type() << std::endl;
-  //MsgLog("WdgColorTable", info, "closeEvent(...): type = " << event -> type());
+  std::stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------

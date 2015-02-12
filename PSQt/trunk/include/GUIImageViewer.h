@@ -44,6 +44,8 @@ class GUIImageViewer : public Frame
     QPushButton* m_but_test;
     WdgImage*    m_image;
     WdgFile*     m_file;
+
+    inline const char* _name_(){return "GUIImageViewer";}
 };
 
 } // namespace PSQt

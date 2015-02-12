@@ -1,6 +1,7 @@
 //--------------------------
 
 #include "PSQt/GUIImageViewer.h"
+#include "PSQt/Logger.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
@@ -12,8 +13,6 @@
 #include <iostream>    // cout
 #include <fstream>    // ifstream(fname), ofstream
 //using namespace std; // for cout without std::
-
-#include "MsgLogger/MsgLogger.h"
 
 namespace PSQt {
 
@@ -80,8 +79,8 @@ void
 GUIImageViewer::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "GUIImageViewer::closeEvent(...): type = " << event -> type() << std::endl;
-  MsgLog("GUIImageViewer", info, "closeEvent(...): type = " << event -> type());
+  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
@@ -112,7 +111,7 @@ GUIImageViewer::mousePressEvent(QMouseEvent *event)
 void 
 GUIImageViewer::onButExit()
 {
-  std::cout << "GUIImageViewer::onButExit()\n";
+  MsgInLog(_name_(), DEBUG, "onButExit");
   this->close(); // will call closeEvent(...)
 }
 

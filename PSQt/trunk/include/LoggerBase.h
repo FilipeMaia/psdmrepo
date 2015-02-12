@@ -13,16 +13,16 @@ namespace PSQt {
 /**
  *  @ingroup PSQt LEVEL
  *
- *  @brief LEVEL - enumerator of message types
+ *  @brief LEVEL - enumerator of message types/levels
  */ 
 
-enum LEVEL {DEBUG=0, INFO, WARNING, ERROR, CRITICAL};
+enum LEVEL {DEBUG=0, INFO, WARNING, CRITICAL, ERROR, NONE};
 
 //--------------------------
 /**
  *  @ingroup PSQt Record
  *
- *  @brief Record - structure for LoggerBase
+ *  @brief Record - struct for LoggerBase records
  */ 
 
 struct Record {
@@ -34,12 +34,14 @@ struct Record {
   std::string msg; 
 
   std::string strRecordTotal();
+  std::string strRecordBrief();
   std::string strRecord();
 };
 
 //--------------------------
 
 std::string strLevel(const LEVEL& level=INFO) ;
+LEVEL levelFromString(const std::string& str="INFO");
 std::string strTimeStamp(const std::string& format=std::string("%Y-%m-%d-%H:%M:%S"));
 double doubleTimeNow();
 
@@ -52,16 +54,16 @@ double doubleTimeNow();
  *
  *  @brief LoggerBase - base class for messaging system.
  *
- *  std::map<unsigned, Record> m_sslog; - accumulatior of records. 
+ *  Accumulates messages as records in std::map<unsigned, Record> m_sslog;
  *  new_record(Record& rec) - callback for re-implementation in subclass.
- *
+ *  This class enherited by Logger.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUIMain
+ *  @see Logger, GUILogger, GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  *
@@ -87,22 +89,27 @@ double doubleTimeNow();
 class LoggerBase
 {
  public:
-    LoggerBase(); 
+
+  /**
+   *  @brief Base class for message logger
+   *  
+   *  @param[in] level - threshold level for collected messages. Messages with level lover than threshold are ignored.
+   */ 
+    LoggerBase(const LEVEL& level=INFO); 
     virtual ~LoggerBase(){}; 
 
     void message(const std::string& name=std::string(), const LEVEL& level=INFO, const std::string& msg=std::string());
     void message(const std::string& name=std::string(), const LEVEL& level=INFO, const std::stringstream& ss=std::stringstream());
     void print(const std::string& str=std::string());
-    void setLevel(const LEVEL& level=INFO) { m_level=level; }
+    void setLevel(const LEVEL& level=INFO);
     LEVEL getLevel() { return m_level; }
-    void saveLogInFile(const std::string& fname=std::string()) ;
+    void saveLogInFile(const std::string& fname=std::string(), const bool& add_tstamp=true) ;
     std::string strRecordsForLevel(const LEVEL& thr=INFO);
 
  protected:
     virtual void new_record(Record& rec);
 
  private:
-    const std::string _name_(){return std::string("LoggerBase");}
 
     unsigned    m_recnum;
     LEVEL       m_level;
@@ -111,17 +118,17 @@ class LoggerBase
 
     std::map<unsigned, Record> m_sslog;
 
+    inline const char* _name_(){return "LoggerBase";}
     void startLoggerBase();
-    // Copy constructor and assignment are disabled by default
-    //LoggerBase ( const LoggerBase& ) ;
-    //LoggerBase& operator = ( const LoggerBase& ) ;
+    std::string getFileName(const std::string& fname=std::string(), const bool& add_tstamp=true);
 };
 
 //--------------------------
 
-//#define MsgInLog LoggerBase::getLoggerBase()->message
-//#define PrintMsg LoggerBase::getLoggerBase()->print
-//#define SaveLog  LoggerBase::getLoggerBase()->saveLogInFile
+//#define MsgInLog     LoggerBase::getLoggerBase()->message
+//#define PrintMsg     LoggerBase::getLoggerBase()->print
+//#define SetMsgLevel  Logger::getLogger()        ->setLevel
+//#define SaveLog      LoggerBase::getLoggerBase()->saveLogInFile
 
 //--------------------------
 

@@ -43,7 +43,7 @@ namespace PSQt {
  *
  *  @see GUView
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -103,7 +103,7 @@ class WdgImage : public QLabel
     QRect*       m_rect2;
     bool         m_is_pushed;
 
-
+    inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;
 };
 

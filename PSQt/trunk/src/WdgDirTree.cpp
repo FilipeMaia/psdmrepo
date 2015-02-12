@@ -2,6 +2,7 @@
 
 #include "PSQt/WdgDirTree.h"
 #include "PSQt/QGUtils.h"
+#include "PSQt/Logger.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
@@ -16,8 +17,6 @@
 #include <dirent.h> // for DIR, dirent
 
 //using namespace std; // for cout without std::
-
-#include "MsgLogger/MsgLogger.h"
 
 namespace PSQt {
 
@@ -190,8 +189,8 @@ void
 WdgDirTree::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "WdgDirTree::closeEvent(...): type = " << event -> type() << std::endl;
-  MsgLog("WdgDirTree", info, "closeEvent(...): type = " << event -> type());
+  std::stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------

@@ -1,6 +1,9 @@
 //--------------------------
 
 #include "PSQt/Frame.h"
+#include "PSQt/Logger.h"
+
+//#include "MsgLogger/MsgLogger.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
@@ -12,8 +15,6 @@
 #include <iostream>    // cout
 #include <fstream>    // ifstream(fname), ofstream
 //using namespace std; // for cout without std::
-
-#include "MsgLogger/MsgLogger.h"
 
 namespace PSQt {
 
@@ -64,8 +65,8 @@ Frame::setFrame()
 //Frame::closeEvent(QCloseEvent *event)
 //{
 //  QFrame::closeEvent(event);
-//  //std::cout << "Frame::closeEvent(...): type = " << event -> type() << std::endl;
-//  MsgLog("Frame", info, "closeEvent(...): type = " << event -> type());
+//  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+//  MsgInLog(_name_(), INFO, ss.str());
 //}
 
 //--------------------------

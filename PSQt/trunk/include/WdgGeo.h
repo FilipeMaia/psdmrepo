@@ -28,7 +28,7 @@ namespace PSQt {
  *
  *  @see GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -53,6 +53,7 @@ class WdgGeo : public Frame
     void onRadioGroup();
     void onButAddSub(QAbstractButton* but);
     void testSignalGeoIsChanged(shpGO&);
+    void onEdiStep();
 
  signals :
     void geoIsChanged(shpGO&);
@@ -97,7 +98,7 @@ class WdgGeo : public Frame
 
     std::map<QRadioButton*,QLineEdit*> map_radio_to_edit;
 
-    inline const std::string _name_(){return "WdgGeo";}
+    inline const char* _name_(){return "WdgGeo";}
     void setStyle() ;
     void showTips() ;
     void setGeoPars();

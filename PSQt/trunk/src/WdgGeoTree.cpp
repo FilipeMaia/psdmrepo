@@ -77,9 +77,8 @@ void
 WdgGeoTree::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "GeoTree::closeEvent(...): type = " << event -> type() << std::endl;
-  //MsgLog("GeoTree", info, "closeEvent(...): type = " << event -> type());
-  MsgInLog(_name_(), INFO, "closeEvent(...)"); 
+  std::stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
@@ -172,7 +171,7 @@ GeoTree::updateTreeModel(const std::string& gfname)
 {
   //if(m_pbits & 4) 
   //std::cout << "updateTreeModel for file: " << gfname << '\n';
-  MsgInLog(_name_(), INFO, std::string("updateTreeModel for file: ") + gfname); 
+  MsgInLog(_name_(), INFO, std::string("Update geometry-tree model for file: ") + gfname); 
 
   if(! loadGeometry(gfname)) return;
 
@@ -266,14 +265,15 @@ GeoTree::currentChanged(const QModelIndex & index, const QModelIndex & index_old
 
   std::string str(item->text().toStdString());
 
-  if(m_pbits & 4) {
-    stringstream ss; ss << "currentChanged::item"
-            << " r:" << item->row() 
-            << " c:" << item->column() 
-	    << " a:" << item->accessibleText().toStdString()
-	    << " t:" << str;
-    MsgInLog(_name_(), INFO, ss.str()); 
-  }
+  //if(m_pbits & 4) {
+  //  stringstream ss; ss << "currentChanged::item"
+  //          << " r:" << item->row() 
+  //          << " c:" << item->column() 
+  //	    << " a:" << item->accessibleText().toStdString()
+  //	    << " t:" << str; }
+
+  MsgInLog(_name_(), INFO, "Selected item: " + str + " emit signal"); 
+
   //emit selectedText(str);
   emit selectedGO(map_item_to_geo[item]);
 }

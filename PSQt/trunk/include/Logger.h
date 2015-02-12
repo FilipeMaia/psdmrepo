@@ -14,18 +14,18 @@ namespace PSQt {
 /**
  *  @ingroup PSQt Logger
  *
- *  @brief Logger - singleton for LoggerBase
+ *  @brief Logger - singleton for base class LoggerBase - messaging system
  *
  *  Connects LoggerBase with GUILogger using method
- *  new_record(Record& rec) - callback for re-implementation in subclass.
- *
+ *  new_record(Record& rec) - callback for re-implementation in subclass,
+ *  which emits signal with record for each new record above threshold level.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUIMain
+ *  @see LoggerBase, GUILogger, GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  *
@@ -49,11 +49,12 @@ namespace PSQt {
  *
  *  @li Methods with aliases
  *  @code
+ *  MsgInLog(_name_(), INFO, "some message is here"); // send message to the lagger
  *  Print("some message is here"); // just print, message is not saved in the logger
- *  MsgInLog(_name_(), INFO, "some message is here"); // regular message to the lagger
+ *  SetMsgLevel(DEBUG); // change the level of messages for output and saving in file.
  *  @endcode
  *  @code
- *  SaveLog(); // save log in default file with name like: "2015-02-09-10:49:36-log.txt"
+ *  SaveLog(); // save log in default file with name like: "log-2015-02-09-10:49:36.txt"
  *  // OR
  *  SaveLog("file-name.txt"); // save log in specified file
  *  @endcode
@@ -76,28 +77,28 @@ class Logger : public QObject, public LoggerBase
  Q_OBJECT // macro is needed for connection of signals and slots
 
  public:
-    static Logger* getLogger(); 
+    static Logger* getLogger(const LEVEL& level=INFO); 
  
  protected:
     virtual void new_record(Record& rec);
 
-signals:
+ signals:
     void signal_new_record(Record&);
 
  private:
     static Logger* p_Logger;
  
-    inline const std::string _name_(){return std::string("Logger");}
-
-    Logger(); // private constructor! - singleton trick
+    inline const char* _name_(){return "Logger";}
+    Logger(const LEVEL& level=INFO); // private constructor! - singleton trick
     virtual ~Logger(){}; 
 };
 
 //--------------------------
 
-#define MsgInLog  Logger::getLogger()->message
-#define PrintMsg  Logger::getLogger()->print
-#define SaveLog   Logger::getLogger()->saveLogInFile
+#define MsgInLog     Logger::getLogger()->message
+#define PrintMsg     Logger::getLogger()->print
+#define SetMsgLevel  Logger::getLogger()->setLevel
+#define SaveLog      Logger::getLogger()->saveLogInFile
 
 //--------------------------
 

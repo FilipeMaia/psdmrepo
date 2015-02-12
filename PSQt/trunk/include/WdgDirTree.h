@@ -45,6 +45,7 @@ class WdgDirTree : public Frame
     QStandardItemModel* m_model;
     unsigned            m_pbits;
 
+    inline const char* _name_(){return "WdgDirTree";}
     void makeTreeModel();
     void updateTreeModel(const std::string& dir_top = "./");
     void fillTreeModel(const std::string& dir_top = "./", QStandardItem* item=0, const unsigned& level=0, const unsigned& pbits=0);

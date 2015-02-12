@@ -19,11 +19,11 @@ namespace PSQt {
 //--------------------------
 
 
-GUIMain::GUIMain( QWidget *parent )
+GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
     : Frame(parent)
 //  : QWidget(parent)
 {
-  MsgInLog(_name_(), INFO, "Begin..."); 
+  MsgInLog(_name_(), INFO, "Create the main control window for this app."); 
 
   const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
   const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
@@ -34,8 +34,6 @@ GUIMain::GUIMain( QWidget *parent )
   m_but_save = new QPushButton( "Save", this );
   m_file_geo = new PSQt::WdgFile(this, "Set geometry", fname_geo, "*.data \n *", false);
   m_file_nda = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
-
-  m_guilogger = new PSQt::GUILogger(this, false);
 
   m_wgt = new PSQt::WdgGeoTree(this, fname_geo, pbits);
   m_wge = new PSQt::WdgGeo();
@@ -70,6 +68,9 @@ GUIMain::GUIMain( QWidget *parent )
   m_wmbox -> setLayout(m_mbox);
   m_wmbox -> setContentsMargins(-9,-9,-9,-9);
 
+  m_guilogger = new PSQt::GUILogger(this, false); // true/false - show/do not show buttons
+  m_guilogger -> setContentsMargins(-9,-9,-9,-9);
+
   m_vsplit = new QSplitter(Qt::Vertical); 
   m_vsplit -> addWidget(m_wmbox); 
   m_vsplit -> addWidget(m_guilogger); 
@@ -94,6 +95,8 @@ GUIMain::GUIMain( QWidget *parent )
   connect(m_file_geo, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
   //connect(m_file_nda, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
   //connect(m_file, SIGNAL(fileNameIsChanged(const std::string&)), m_wimage, SLOT(onFileNameChanged(const std::string&))); 
+
+  SetMsgLevel(level);
 }
 
 //--------------------------
@@ -148,16 +151,15 @@ void
 GUIMain::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "GUIMain::closeEvent(...): type = " << event -> type() << std::endl;
-  //MsgLog("GUIMain", info, "closeEvent(...): type = " << event -> type());
-  MsgInLog(_name_(), INFO, "closeEvent(...)"); 
+  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 
   if(m_wimage)    m_wimage    -> close();
   if(m_guilogger) m_guilogger -> close();
   m_wimage    = 0;
   m_guilogger = 0;
 
-  SaveLog();
+  SaveLog("work/z-log.txt", true);
 }
 
 //--------------------------
@@ -178,7 +180,7 @@ GUIMain::mousePressEvent(QMouseEvent *event)
 void 
 GUIMain::onButSave()
 {
-  std::cout << "GUIMain::onButSave() TBD\n";
+  MsgInLog(_name_(), INFO, "onButSave() TBD"); 
 }
 
 //--------------------------
@@ -186,7 +188,7 @@ GUIMain::onButSave()
 void 
 GUIMain::onButExit()
 {
-  std::cout << "GUIMain::onButExit()\n";
+  MsgInLog(_name_(), INFO, "onButExit"); 
   this->close(); // will call closeEvent(...)
 }
 

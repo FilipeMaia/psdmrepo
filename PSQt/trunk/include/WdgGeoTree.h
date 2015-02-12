@@ -32,7 +32,7 @@ namespace PSQt {
  *
  *  @see GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -64,7 +64,7 @@ class WdgGeoTree : public Frame
     unsigned    m_pbits;
     GeoTree*    m_geotree;
     QTreeView*  m_view;
-    inline char* _name_(){return "WdgGeoTree";};
+    inline const char* _name_(){return "WdgGeoTree";}
 };
 
 
@@ -103,7 +103,7 @@ class GeoTree : public QTreeView
     std::map<QStandardItem*,shpGO> map_item_to_geo;
     std::map<shpGO,QStandardItem*> map_geo_to_item;
 
-    inline char* _name_(){return "GeoTree";};
+    inline const char* _name_(){return "GeoTree";}
     bool loadGeometry(const std::string& gfname);
     void makeTreeModel();
     void fillTreeModel(shpGO geo=shpGO(), QStandardItem* item=0, const unsigned& level=0, const unsigned& pbits=0);

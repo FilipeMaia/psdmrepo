@@ -20,7 +20,7 @@ namespace PSQt {
  *
  *  @see GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -52,6 +52,7 @@ class GeoImage
     ndarray<const double, 1> m_anda;
 
     void check_fnames();
+    inline const char* _name_(){return "GeoImage";}
 };
 
 //--------------------------

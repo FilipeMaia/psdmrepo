@@ -288,6 +288,36 @@ std::string dirname(const std::string& path)
 }
 
 //--------------------------
+// for input path = "<path>/<fname>.<ext>" returns root="<path>/<fname>" and ext=".<ext>"
+void splitext(const std::string& path, std::string& root, std::string& ext)
+{
+  if (path.empty()) {
+    root = std::string();
+    ext  = std::string();
+    return;
+  }
+
+  if(path==std::string(".")) {
+    root = path;
+    ext  = std::string();
+    return;
+  }
+
+  size_t pos = path.find_last_of('.');
+
+  if (pos == std::string::npos) {
+    root = path;
+    ext  = std::string();
+    return;
+  }
+  else {
+    root = std::string(path,0,pos);
+    ext  = std::string(path,pos);
+    return;
+  }
+}
+
+//--------------------------
 
 } // namespace PSQt
 

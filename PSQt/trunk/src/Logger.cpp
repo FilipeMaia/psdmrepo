@@ -13,19 +13,19 @@ Logger* Logger::p_Logger = NULL; /// make global pointer !!!
 
 //--------------------------
 
-Logger::Logger()
+Logger::Logger(const LEVEL& level)
   : QObject(NULL)
-  , LoggerBase()
+  , LoggerBase(level)
 {
-  std::cout << "Logger::Logger() - singleton object is created\n";
+  message(_name_(), INFO, "Singleton object for logger is created.");
 }
 
 //--------------------------
 
 Logger*
-Logger::getLogger()
+Logger::getLogger(const LEVEL& level)
 {
-  if( !p_Logger ) p_Logger = new Logger();
+  if( !p_Logger ) p_Logger = new Logger(level);
   return p_Logger;
 }
 

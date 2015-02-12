@@ -113,6 +113,8 @@ template<typename T>
  std::string split_string_left(const std::string& s, size_t& pos, const char& sep);
 
 //--------------------------
+ void splitext(const std::string& path, std::string& root, std::string& ext);
+//--------------------------
 
 } // namespace PSQt
 

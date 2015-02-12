@@ -117,6 +117,7 @@ WdgGeo::WdgGeo( QWidget *parent, shpGO geo, const unsigned& pbits )
   connect(m_rad_gr, SIGNAL(buttonClicked(int)), this, SLOT(onRadioGroup()));
   connect(m_but_gr, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(onButAddSub(QAbstractButton*)));
   if(m_pbits & 255) connect(this, SIGNAL(geoIsChanged(shpGO&)), this, SLOT(testSignalGeoIsChanged(shpGO&)));
+  connect(m_edi_step, SIGNAL(editingFinished()),  this, SLOT(onEdiStep())); 
 
   m_rad_x0->setChecked(true);
   this -> onRadioGroup();
@@ -219,6 +220,13 @@ WdgGeo::closeEvent(QCloseEvent *event)
 //--------------------------
 //--------------------------
 //--------------------------
+void 
+WdgGeo::onEdiStep()
+{
+  MsgInLog(_name_(), INFO, "Step value is changed to " + (m_edi_step->displayText()).toStdString());
+}
+
+//--------------------------
 
 void
 WdgGeo::onRadioGroup()
@@ -227,6 +235,10 @@ WdgGeo::onRadioGroup()
 
   //std::cout << "onRadioGroup:  checked radio button:" << (but->text()).toStdString();
   //std::cout << " mapped edit field:" << (map_radio_to_edit[but]->text()).toStdString() << '\n';  
+
+  stringstream ss; ss << "Selected button: " << (but->text()).toStdString() 
+                      << " to edit field: " << (map_radio_to_edit[but]->text()).toStdString();
+  MsgInLog(_name_(), INFO, ss.str()); 
 
   if(but == m_rad_x0
   || but == m_rad_y0
@@ -263,18 +275,21 @@ WdgGeo::onButAddSub(QAbstractButton* button)
   if (but == m_but_sub) dval = -dval;
 
   double val = (edi->text()).toDouble();
-
-  //std::cout << "onButAddSub: add " << dval << " to the value " << val << '\n';
+  
+  //std::cout << "onButAddSub add/sub " << dval << " to the value " << val << '\n';
 
   val += dval;
 
-  stringstream ss;  
+  stringstream ss;
   if(but_radio == m_rad_tilt_x
   || but_radio == m_rad_tilt_y
   || but_radio == m_rad_tilt_z) ss << fixed << std::setprecision(3) << val;
   else                          ss << fixed << std::setprecision(0) << val;
 
   edi->setText(ss.str().c_str());
+
+  stringstream smsg; smsg << "Value of \"" << (but_radio->text()).toStdString() << "\" is changed to " << val << " -> set geo, emit signal";
+  MsgInLog(_name_(), INFO, smsg.str()); 
 
   this -> setGeoPars();
   //std::cout << "Do something here\n";
@@ -297,8 +312,9 @@ WdgGeo::setGeoPars()
 
   m_geo->set_geo_pars(x0, y0, z0, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x);
   //m_geo->print_geo();
+  
+  MsgInLog(_name_(), DEBUG, "Emit signal with changed geo"); 
   emit geoIsChanged(m_geo);
-
 }
 
 //--------------------------
@@ -361,7 +377,7 @@ WdgGeo::testSignalGeoIsChanged(shpGO& geo)
   //std::cout << "testSignalGeoIsChanged():\n";
   //geo->print_geo();
   //m_geo->print_geo();
-  MsgInLog(_name_(), INFO, "testSignalGeoIsChanged():\n" + geo->string_geo()); 
+  MsgInLog(_name_(), DEBUG, "testSignalGeoIsChanged(): " + geo->str_data()); // string_geo()); 
 }
 
 //--------------------------

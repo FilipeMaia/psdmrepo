@@ -1,6 +1,7 @@
 //--------------------------
 
 #include "PSQt/WdgFile.h"
+#include "PSQt/Logger.h"
 
 #include <iostream>    // for std::cout
 #include <fstream>    // for std::ifstream(fname)
@@ -94,7 +95,8 @@ void
 WdgFile::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  std::cout << "WdgFile::closeEvent(...): type = " << event -> type() << '\n';
+  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
@@ -105,9 +107,9 @@ WdgFile::closeEvent(QCloseEvent *event)
 void 
 WdgFile::onEdiFile()
 {
-  std::cout << "WdgFile::onButFile()\n";
+  MsgInLog(_name_(), DEBUG, "onEdiFile");
   std::string str_fname = (m_edi_file -> displayText()).toStdString();
-  std::cout << "Edited file name: " << str_fname << std::endl;
+  MsgInLog(_name_(), INFO, "Edited file name: " + str_fname );
 
   setNewFileName(str_fname);
 }
@@ -117,7 +119,7 @@ WdgFile::onEdiFile()
 void 
 WdgFile::onButFile()
 {
-  std::cout << "WdgFile::onButFile()\n";
+  MsgInLog(_name_(), DEBUG, "onButFile");
   //QString dirname = "./";
   //QString path_file; // = "/reg/d/psdm/CXI/cxi49012/xtc/e158-r0001-s02-c00.xtc";
 
@@ -131,8 +133,8 @@ WdgFile::onButFile()
   std::string dname(str_path_file_edi, 0, pos );
   std::string fname(str_path_file_edi, pos+1 );
 
-  std::cout << "dname: " << dname << std::endl;
-  std::cout << "fname: " << fname << std::endl;
+  MsgInLog(_name_(), DEBUG, "dname: " + dname );
+  MsgInLog(_name_(), DEBUG, "fname: " + fname );
   
   //dname =  "/reg/d/psdm/CXI/cxi49012/xtc/";
 
@@ -140,7 +142,13 @@ WdgFile::onButFile()
                                                    QString(dname.c_str()), tr(m_search_fmt.c_str()));
 
   std::string str_path_file = path_file.toStdString();
-  std::cout << "Selected file name: " << str_path_file << std::endl;
+
+  if(str_path_file.empty()) {
+    MsgInLog(_name_(), INFO, "Cancel file selection");
+    return;
+  }
+
+  MsgInLog(_name_(), INFO, "Selected file name: " + str_path_file);
 
   if(setNewFileName(str_path_file)) m_edi_file -> setText(path_file);
 }
@@ -150,9 +158,13 @@ WdgFile::onButFile()
 bool 
 WdgFile::setNewFileName(const std::string& fname)
 {
-  if(fname == m_path) return false; // if the file name has not been changed
+  if(fname == m_path) {
+    MsgInLog(_name_(), INFO, "File name has not been changed");
+    return false; // if the file name has not been changed
+  }
+
   if( fileExists(fname) ) {
-    std::cout << "emit signal fileNameIsChanged(fname)\n";
+    MsgInLog(_name_(), DEBUG, "Emit signal fileNameIsChanged(fname), fname: " + fname);
     emit fileNameIsChanged(fname);
     m_path = fname;
     return true;
@@ -165,13 +177,13 @@ WdgFile::setNewFileName(const std::string& fname)
 bool
 WdgFile::fileExists(const std::string& fname)
 {
-  std::ifstream xtc_file(fname.c_str());
-  if(xtc_file.good()) {
-    std::cout << "Selected file exists" << std::endl;
+  std::ifstream f(fname.c_str());
+  if(f.good()) {
+    MsgInLog(_name_(), DEBUG, "Selected file exists");
     return true;
   } 
 
-  std::cout << "WARNING: Selected file DOES NOT exists, try to select other file.";  
+  MsgInLog(_name_(), WARNING, "Selected file DOES NOT exists, try to select other file.");
   return false;
 }
 
@@ -180,7 +192,7 @@ WdgFile::fileExists(const std::string& fname)
 void 
 WdgFile::testSignalString(const std::string& fname)
 {
-  std::cout << "WdgFile::testSignalSlot(string): fname = " << fname << '\n';  
+  MsgInLog(_name_(), INFO, "Received signal in testSignalSlot(string), fname: " + fname);
 }
 
 //--------------------------

@@ -11,8 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2015-02-11 Mikhail S. Dubrovin
+- Fix minor problems for RHEL6 nightly broken
+- Adjust logging system using GUILogger, Logger, and LoggerBase for all classes of this project.
+
 Tag: V00-00-05
-2015-01-10 Mikhail S. Dubrovin
+2015-02-10 Mikhail S. Dubrovin
 - Add more modules for sensor alignment project
 
 Tag: V00-00-04

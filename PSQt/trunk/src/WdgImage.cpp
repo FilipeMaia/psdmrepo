@@ -1,5 +1,6 @@
 //--------------------------
 #include "PSQt/WdgImage.h"
+#include "PSQt/Logger.h"
 #include "PSCalib/GeometryAccess.h"
 #include "ndarray/ndarray.h" // for img_from_pixel_arrays(...)
 
@@ -83,7 +84,10 @@ WdgImage::setWdgParams()
   m_pixmap_raw = 0;
   m_pixmap_scl = 0;
 
-  m_painter = new QPainter(this);
+  //std::cout << "Point A\n";
+  m_painter = new QPainter();
+  //m_painter = new QPainter(this);
+  //std::cout << "Point B\n";
 }
 
 //--------------------------
@@ -95,6 +99,7 @@ WdgImage::paintEvent(QPaintEvent *event)
   QLabel::paintEvent(event);
 
   m_painter->begin(this);
+
   //-----------
   //drawLine();
   if(m_is_pushed) drawRect();
@@ -137,7 +142,7 @@ WdgImage::drawRect()
 void 
 WdgImage::zoomInImage()
 {
-  std::cout << "WdgImage::zoomInImage()\n";
+  MsgInLog(_name_(), INFO, "zoomInImage()");
 
   float sclx = float(m_pixmap_scl->size().width())  / this->size().width();  
   float scly = float(m_pixmap_scl->size().height()) / this->size().height();  
@@ -210,7 +215,8 @@ void
 WdgImage::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  std::cout << "WdgImage::closeEvent(...): type = " << event -> type() << std::endl;
+  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
@@ -281,7 +287,8 @@ WdgImage::mouseMoveEvent(QMouseEvent *e)
 void 
 WdgImage::loadImageFromFile(const std::string& fname)
 {
-  std::cout << "WdgImage::loadImageFromFile: " << fname << '\n';
+  MsgInLog(_name_(), INFO, "Load image from file " + fname);
+  //std::cout << "WdgImage::loadImageFromFile: " << fname << '\n';
   //clear();
 
   QImage image(fname.c_str());
@@ -293,7 +300,8 @@ WdgImage::loadImageFromFile(const std::string& fname)
 void 
 WdgImage::onFileNameChanged(const std::string& fname)
 {
-  std::cout << "WdgImage::onFileNameChanged(string) - slot: fname = " << fname << '\n';  
+  MsgInLog(_name_(), INFO, "onFileNameChanged: " + fname);
+  //std::cout << "WdgImage::onFileNameChanged(string) - slot: fname = " << fname << '\n';  
   loadImageFromFile(fname);
 }
 
@@ -306,7 +314,8 @@ WdgImage::onFileNameChanged(const std::string& fname)
 void 
 WdgImage::setColorPixmap()
 {
-  std::cout << "WdgImage::setColorPixmap()\n";
+  MsgInLog(_name_(), INFO, "setColorPixmap()");
+  //std::cout << "WdgImage::setColorPixmap()\n";
   //clear();
 
   const int ssize = 1024;
@@ -349,7 +358,8 @@ WdgImage::setColorPixmap()
 void 
 WdgImage::setColorWhellPixmap()
 {
-  std::cout << "WdgImage::setColorWhellPixmap()\n";
+  MsgInLog(_name_(), INFO, "setColorWhellPixmap()");
+  //std::cout << "WdgImage::setColorWhellPixmap()\n";
   //clear();
 
   const int ssize = 1024;
@@ -392,7 +402,8 @@ WdgImage::setColorBar( const unsigned& rows,
                        const float&    hue2
                       )
 {
-  std::cout << "WdgImage::setColorBar()\n";
+  MsgInLog(_name_(), INFO, "setColorBar()");
+  //std::cout << "WdgImage::setColorBar()\n";
   uint32_t* ctable = ColorTable(cols, hue1, hue2);
   uint32_t dimg[rows][cols]; 
 
@@ -418,7 +429,8 @@ WdgImage::setCameraImage(const std::string& ifname_geo, const std::string& ifnam
   const std::string fname_img = (ifname_img != std::string()) ? ifname_img
                               : base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
 
-  std::cout << "WdgImage::setCameraImage()\n";
+  MsgInLog(_name_(), INFO, "setCameraImage()");
+  //std::cout << "WdgImage::setCameraImage()\n";
 
   m_geo_img = new GeoImage(fname_geo, fname_img);
 
@@ -441,11 +453,12 @@ WdgImage::setCameraImage(const std::string& ifname_geo, const std::string& ifnam
   image_t k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
   //float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
 
-  std::cout << "     dnda: " << dnda
-            << "\n   dmin: " << dmin
-            << "\n   dmax: " << dmax
-            << "\n      k: " << k
-            << '\n';
+  stringstream ss; 
+  ss << "     dnda: " << dnda
+     << "\n   dmin: " << dmin
+     << "\n   dmax: " << dmax
+     << "\n      k: " << k;
+  MsgInLog(_name_(), INFO, ss.str());
 
   // Convert image_t to uint32_t Format_ARGB32
   ndarray<uint32_t, 2>::iterator iti;
@@ -465,7 +478,8 @@ WdgImage::setCameraImage(const std::string& ifname_geo, const std::string& ifnam
 void 
 WdgImage::onTest()
 {
-  std::cout << "WdgImage::onTest() - slot\n";  
+  MsgInLog(_name_(), INFO, "onTest() - slot");
+  //std::cout << "WdgImage::onTest() - slot\n";  
 
   static unsigned counter = 0; ++counter;
 

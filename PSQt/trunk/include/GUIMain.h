@@ -40,7 +40,7 @@ namespace PSQt {
  *
  *  @see WdgFile, WdgGeoTree, WdgGeo
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -52,7 +52,7 @@ class GUIMain : public Frame
 
  public:
 
-    GUIMain( QWidget *parent = 0 );
+    GUIMain(QWidget *parent=0, const LEVEL& level=DEBUG);
 
     void resizeEvent     (QResizeEvent *event = 0) ;
     void closeEvent      (QCloseEvent  *event = 0) ;
@@ -94,7 +94,7 @@ class GUIMain : public Frame
     QPushButton* m_but_exit;
     QPushButton* m_but_save;
 
-    const std::string _name_(){return "GUIMain";}
+    inline const char* _name_(){return "GUIMain";}
     void showTips() ;
     void setStyle() ;
 };

@@ -2,6 +2,7 @@
 
 #include "PSQt/LabColorRing.h"
 #include "PSQt/QGUtils.h"
+#include "PSQt/Logger.h"
 
 #include <math.h>    // atan2, abs, fmod
 #include <iostream>    // cout
@@ -205,8 +206,9 @@ void
 LabColorRing::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
-  //std::cout << "LabColorRing::closeEvent(...): type = " << event -> type() << std::endl;
-  //MsgLog("LabColorRing", info, "closeEvent(...): type = " << event -> type());
+
+  //stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  //MsgInLog("LabColorRing", INFO, ss.str());
 }
 
 //--------------------------

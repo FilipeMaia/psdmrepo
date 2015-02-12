@@ -21,7 +21,7 @@ namespace PSQt {
  *
  *  @see GUIMain
  *
- *  @version $Id:$
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
@@ -43,7 +43,6 @@ class GUILogger : public Frame // , Logger
     void addNewRecord(Record&);
     void onCombo(int);
     void onSave();
-
     //signals :
     //void geoIsChanged(shpGO&);
 
@@ -58,10 +57,12 @@ class GUILogger : public Frame // , Logger
     QComboBox*    m_combo;
     QStringList   m_list; 
 
-    inline const std::string _name_(){return "GUILogger";}
+    inline const char* _name_(){return "GUILogger";}
+
     void showTips();
     void setStyle();
     void addStartRecords();
+    void scrollDown();
 };
 
 } // namespace PSQt

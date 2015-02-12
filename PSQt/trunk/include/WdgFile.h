@@ -50,6 +50,7 @@ class WdgFile : public QWidget
     QLineEdit*   m_edi_file;
     QPushButton* m_but_file;
 
+    inline const char* _name_(){return "WdgFile";}
     void showTips() ;
     void setFrame() ;
     bool fileExists(const std::string& fname) ;

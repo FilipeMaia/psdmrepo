@@ -82,6 +82,7 @@ class WdgColorTable : public QWidget
     QLineEdit*    m_edi_h2;
 
     QPixmap*      m_pixmap_cbar;
+    inline const char* _name_(){return "WdgColorTable";}
 };
 
 } // namespace PSQt

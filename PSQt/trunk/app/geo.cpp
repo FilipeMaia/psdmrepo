@@ -18,22 +18,14 @@
 int main( int argc, char **argv )
 {
   QApplication app( argc, argv ); // SHOULD BE created before QThread object
-  
-  PSQt::ThreadTimer* t1 = new PSQt::ThreadTimer(0, 1);      t1 -> start();
-  PSQt::ThreadTimer* t2 = new PSQt::ThreadTimer(0, 60, 1);  t2 -> start();
 
-  cout << "argc = " << argc << endl;
-  for(int i = 0; i < argc; i++) cout << "argv[" << i << "] = " << argv[i] << endl;
+  const bool do_print = false;
+  PSQt::ThreadTimer* t1 = new PSQt::ThreadTimer(0,  5, do_print);  t1 -> start();
+  PSQt::ThreadTimer* t2 = new PSQt::ThreadTimer(0, 60, do_print);  t2 -> start();
 
-  //const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
-  //const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
-  //const std::string fname_img = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
-
-  //PSQt::GUIMain*       w1 = new PSQt::GUIMain();
-  //PSQt::MyWidget*      w2 = new PSQt::MyWidget();      
-  //PSQt::WdgFile*       w3 = new PSQt::WdgFile();       
-  //PSQt::WdgImage*      w4 = new PSQt::WdgImage(0, fname_geo, fname_img);      
-  //PSQt::WdgColorTable* w5 = new PSQt::WdgColorTable();                   
+  //cout << "argc = " << argc << endl;
+  cout << "Command line:";
+  for(int i = 0; i < argc; i++) cout << " " << argv[i]; cout << '\n';
 
   if(argc==1 || atoi(argv[1])==1) { PSQt::GUIMain*  w = new PSQt::GUIMain();        w->show(); }
   else if(atoi(argv[1])==2) { PSQt::MyWidget*       w = new PSQt::MyWidget();       w->show(); }
@@ -44,7 +36,8 @@ int main( int argc, char **argv )
   else if(atoi(argv[1])==7) { PSQt::WdgDirTree*     w = new PSQt::WdgDirTree();     w->show(); }
   else if(atoi(argv[1])==8) { PSQt::WdgGeoTree*     w = new PSQt::WdgGeoTree();     w->show(); }
   else if(atoi(argv[1])==9) { PSQt::WdgGeo*         w = new PSQt::WdgGeo();         w->show(); }
-  else if(atoi(argv[1])==10){ PSQt::GUILogger*      w = new PSQt::GUILogger();         w->show(); }
+  else if(atoi(argv[1])==10){ PSQt::GUILogger*      w = new PSQt::GUILogger();      w->show(); }
   else {cout << "Input argument: " << argv[1] << " is outside allowed range..."; return 0;}
+
   return app.exec(); // Begin to display qt4 GUI
 }
