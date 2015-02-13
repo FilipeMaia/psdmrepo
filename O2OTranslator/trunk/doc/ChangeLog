@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-30-08
+2015-02-13 David Schneider
+- adapt to another new interface for XtcInput::DgramReader
+
 Tag: V00-30-07
 2014-07-21 David Schneider
 - adapt to new interface for XtcInput::DgramReader
