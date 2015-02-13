@@ -348,6 +348,30 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
 
 //-------------------
 
+void GeometryObject::get_geo_pars( double& x0,
+                                   double& y0,
+                                   double& z0,
+                                   double& rot_z,
+                                   double& rot_y,
+                                   double& rot_x,                  
+                                   double& tilt_z,
+                                   double& tilt_y,
+                                   double& tilt_x 
+				  )
+{
+  x0     = m_x0;     
+  y0     = m_y0;     
+  z0     = m_z0;    
+  rot_z  = m_rot_z;  
+  rot_y  = m_rot_y; 
+  rot_x  = m_rot_x;  
+  tilt_z = m_tilt_z;
+  tilt_y = m_tilt_y;
+  tilt_x = m_tilt_x; 
+}
+
+//-------------------
+
 void GeometryObject::set_geo_pars( const double& x0,
                                    const double& y0,
                                    const double& z0,

@@ -119,6 +119,9 @@ namespace PSCalib {
  *    std::string pname  = geo->get_parent_name();
  *    unsigned    pindex = geo->get_parent_index();
  *    double      pixsize= geo->get_pixel_scale_size();
+ *
+ *    double x, y, z, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x;     
+ *    geo->get_geo_pars(x, y, z, rot_z, rot_y, rot_x, tilt_z, tilt_y, tilt_x);
  *  
  *    // Next methods are used in class GeometryAccess for building of hierarchial geometry structure.
  *    geo->set_parent(parent_geo);
@@ -262,6 +265,18 @@ public:
 
   /// Returns string of data for output file
   std::string str_data();
+
+  /// Gets self object geometry parameters
+  void get_geo_pars( double& x0,
+                     double& y0,
+                     double& z0,
+                     double& rot_z,
+                     double& rot_y,
+                     double& rot_x,                  
+                     double& tilt_z,
+                     double& tilt_y,
+                     double& tilt_x 
+		     );
 
   /// Sets self object geometry parameters
   void set_geo_pars( const double& x0 = 0,
