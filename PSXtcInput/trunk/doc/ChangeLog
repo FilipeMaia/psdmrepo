@@ -11,11 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-13
+2015-02-17 Christopher O'Grady
+- Fix bug where software was looking for a configure transition
+  in the second chunk of an ioc recorder stream.
+
 Tag: V00-15-12
 2015-02-12 David Schneider
 - add parameter PSXtcInput.XtcInputModule.runLiveTimeout to get psana to wait for 
   new runs in live mode. JRIA issue PSAS-108
-	
 
 Tag: V00-15-11
 2015-02-02 Christopher O'Grady

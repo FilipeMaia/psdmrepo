@@ -433,7 +433,7 @@ private:
     int file = 0;
     for (vector<XtcFileName>::const_iterator it = _xtc.files().begin();
          it != _xtc.files().end(); it++,file++) {
-      if ((*it).stream()>=80) {
+      if ((*it).stream()>=80 && (*it).chunk()==0) {
         dg = _xtc.jump(file, 0);
         if (dg->seq.service()!=Pds::TransitionId::Configure) {
           MsgLog(logger, fatal, "Configure transition not found at beginning of file" << (*it));
