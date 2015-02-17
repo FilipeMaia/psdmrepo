@@ -69,7 +69,7 @@ namespace Translator {
   class SplitScanMgr {
   public:
 
-    enum SplitMode { NoSplit, SplitScan, MPIWorker, MPIMaster };
+    enum SplitMode { NoSplit, MPIWorker, MPIMaster };
     static std::string splitModeStr(SplitMode splitMode);
 
     /**
@@ -88,35 +88,19 @@ namespace Translator {
     SplitScanMgr(const std::string &h5filePath, 
                  bool ccInSubDir,
                  SplitMode splitScanMode,
-                 int jobNumber, int jobTotal, 
-                 int mpiWorkerStartCalibCycle,
-                 bool overwrite,
-                 int fileSchemaVersion);
+                 int mpiWorkerStartCalibCycle);
 
     /// return true if responsible for main h5 file
     bool thisJobWritesMainOutputFile() const;
 
-    /// returns true if operating in split scan mode - MPI or otherwise
+    /// returns true if operating in split scan mode
     bool splitScanMode() const { return m_splitScanMode != NoSplit; }
 
     /// returns true if MPIWorker
     bool isMPIWorker() const { return m_splitScanMode == MPIWorker; }
 
-    /// returns true if master for splitScan - non MPI
-    bool isNonMPISplitMaster() const { return (m_splitScanMode == SplitScan) \
-                                     	       and (jobNumber()==0); }
-
     /// returns true if MPIMaster
     bool isMPIMaster() const { return m_splitScanMode == MPIMaster; }
-
-    /// this job number (0 if not split scan mode)
-    int jobNumber() const { return m_jobNumber; }
-
-    /// total number of jobs (1 if not split scan mode)
-    int jobTotal() const { return m_jobTotal; }
-
-    /// hdf5 file schema version
-    int fileSchemaVersion() const { return m_fileSchemaVersion; }
 
     /// creates the calib cycle files subdirectory if it does not exist and is specified in the 
     /// ccInSubDir option. Best to only call this function once from the master process to avoid any
@@ -124,189 +108,53 @@ namespace Translator {
     void createCCSubDirIfNeeded() const;
 
     /**
-     *  @brief returns true if this job writes this calib cycle
-     *
-     * always returns true if not split scan. For split scan, a job
-     * writes a calib cycle if
-     *
-     *         calibNumber % jobTotal == jobNumber
-     *  
-     * For example, if jobTotal = 3, and jobNumber = 1, then this job writes calib cycles
-     *  1, 4, 7, ...
-     *
-     *  @param[in] calibNumber   calib cycle number (0 up) to see if this job writes
-     */
-    bool thisJobWritesThisCalib(size_t calibNumber) const;
-
-    /**
-     *  @brief notifies SplitScanMgr of a new external link that will go in the master file.
-     *
-     *  Meant to by called by split mode master (job 0 not mpi mode). Adds link to write to master
-     *  list.
-     *
-     *  @param[in] linkName     - the group name for the link.
-     *  @param[in] calibNumber  - the calib cycle number that we link to
-     *  @param[in] linkGroupLoc - the group where the link is made.
-     *
-     *  Typically linkGroupLoc will be for Run:0000 in the master file, and if calibNumber is,
-     *  for example 3, linkName will be CalibCycle:0003. The filename linked to will be a
-     *  relative path to a file in the same directory as the master file.
-     */
-    void newExtLnkForMaster(const char *linkName,
-                              size_t calibCycle,
-                              hdf5pp::Group & linkGroupLoc);
-
-    /// enum for updateMasterLinks
-    enum UpdateExtLinksMode {writeAll,            /// add all links to the master file
-                             writeFinishedOnly};  /// only add links for finished files
-    static std::string updateModeToStr(enum UpdateExtLinksMode mode); /// dump function for enum
-
-    /**
-     *  @brief updates the external links in the master file.
-     *
-     *  Takes an enum to indicate whether or not to only add links to finished files,
-     *  or all remaining links. Only meant to be called for non mpi split scan master
-     */
-    void updateMasterLinks(enum UpdateExtLinksMode updateMode);
-
-    /**
-     *  @brief create the given calib cycle group in the calib file for the group.
-     *
-     * Meant to be called from both MPIWorker and Split mode.
-     *
-     *  @param[in]    calibCycle - calib cycle number
-     *  @return hdf5pp::Group to CalibCycle:000x within the external file.
-     */
-    hdf5pp::Group createCalibCycleGroupInExtCalibFile(size_t calibCycle);
-
-    /**
-     *  @brief create a configure group in the external calib file.
-     *
-     *  Creates the group /config in the file. Throws if file has not been created.
-     *
-     *  Meant to be called from MPIWorker only.
-     *
-     *  @param[in]    calibCycle - calib cycle number
-     *  @return hdf5pp::Group to /Config within the external file.
-     */
-    hdf5pp::Group createConfigureGroupInExtCalibFile(size_t calibCycle);
-
-    /**
-     * creates h5 file based on given calibCycle.
-     */
-    hdf5pp::File createCalibCycleFile(size_t calibCycle);
-
-    /**
-     * @brief creates calib file if needed.
-     *
-     * In MPI mode, there may be several calib cycles in the same file.
-     * SplitScanMgr will check if the given calib cycle is part of a larger file,
-     * and not create the file.
-     *
-     * In non MPI mode, with one calib cycle per file, this usually creates the file.
-     *
-     * @return true if created the file
-     */
-    bool createCalibFileIfNeeded(size_t calibCycle);
-
-    /// returns the group for the root entry in the external hdf5 file where this 
-    /// calib cycle is being written to
-    hdf5pp::Group extCalibFileRootGroup(size_t calibCycle);
-
-    /// close a calib cycle file corresponding to this calib cycle
-    void closeCalibCycleFile(size_t calibCycle);
-
-    /**
      * @brief makes an external link
      *
      * The filename linked to will be the 
      *
-     * @param[in]     linkName - the group name of the link, and the group name of the target
+     * @param[in]     linkName - the group name of the link
+     * @param[in]   targetName - the group name of the target in the external file, starting at /
      * @param[in]   calibCycle - which calib cycle this is, used to construct the target file name
-     * @param[in] linkGroupLoc - the parent to to make the link in
+     * @param[in] linkGroupLoc - the parent group to make the link in
      */
     bool createExtLink(const char *linkName,
-		       const std::string &extH5File,
-		       hdf5pp::Group & linkGroupLoc);
+                       const char *targetName,
+                       const std::string &extH5File,
+                       hdf5pp::Group & linkGroupLoc);
 
     /**
      * @brief returns the full target file path for the external calib cycle file.
      *
-     * This path will have the same parent directory as the h5filePath argument that
-     * SplitScanMgr was constructed with.
-     * If SplitScanMgr was constructed with h5filePath = writeDir/output.h5 
-     * then the filename returned will be writeDir/output_cc000x.h5 
-     * (where x is the calibCycle)
+     * This is the path that should be used to create the external calib cycle files.
      *
-     * @param[in] calibCycle   - the calib cycle number
+     * If SplitScanMgr was constructed with h5filePath = writeDir/output.h5 and mpiFirstCalibCycle=3
+     * this will return writeDir/output_cc0003.h5 or writeDir/output_ccfiles/output_cc0003.h5 depending
+     * on if ccInSubdir is true.
+     *
+     * @param[in]  calibNumber - the calib cycle number. Defaults to -1 which means to use the Mpi worker starting calib number.
+     * 
      * @return the filename, using the full path based on h5filePath
      */
-    std::string getExtCalibCycleFilePath(size_t calibCycle) const;
+    std::string getExtFilePath(int calibNumber = -1) const;
 
     /// the relative link for the master file
-    std::string getExtCalibCycleFileForLink(size_t calibCycle) const;
+    std::string getExtFileForLink(int calibNumber = -1) const;
 
-    /// just base name
-    std::string getExtCalibCycleFileBaseName(size_t calibCycle) const;
+  protected:
 
-    /**
-     * @brief returns true if the given calib cycle is finished.
-     *
-     * should only be called for non MPI split mode
-     *
-     * For example, if there are 3 jobs, and calibCycle is 2, 
-     * checks to see if calibcyle 5 exists on disk - as that is
-     * the next file that job 2 will make after finishing cc 2.
-     *
-     * If there is no 5th calib cycle to write, the routine will
-     * return false even though cc2 may be done.
-     *
-     * @param[in] calibCycle   - the calib cycle number
-     * @return true if file is ready
-     */
-    bool calibFileIsFinished(size_t calibCycle);
+    /// just base name. if the starting calib cycle is 3, and h5filePath is a/b/myout.h5
+    /// this returns myout_cc0003.h5
+    std::string getExtFileBaseName(int calibNumber = -1) const;
 
-
-    // return cc subdir basename, if h5filePath is mydir/myfile.h5 or mydir/myfile then this 
-    // return s myfile_ccfiles
+    // return cc subdir basename, if h5filePath is mydir/myfile.h5 then this 
+    // returns myfile_ccfiles
     std::string getCCSubDirBaseName() const;
 
   private:
     std::string m_h5filePath;
     bool m_ccInSubDir;
-    SplitMode  m_splitScanMode;
-    int m_jobNumber;
-    int m_jobTotal;
+    SplitMode m_splitScanMode;
     int m_mpiWorkerStartCalibCycle;
-    bool m_overwrite;
-    int m_fileSchemaVersion;
-
-    struct ExtCalib {
-      hdf5pp::File file;
-      hdf5pp::Group configGroup;
-      std::map<size_t, hdf5pp::Group> groups;
-      LusiTime::Time startTime;
-    };
-    // for splitMode - where the job writes many calib files, there
-    // will be many entries in m_extCalib (below). For an MPIWorker, 
-    // there will only be one - for the starting calib cycle
-    std::map<size_t, ExtCalib > m_extCalib;
-
-    /// helper function that deals with MPIWorker vs normal split scan mode
-    size_t getExtCalibIndex(size_t calibCycle);
-
-    /// gets ExtCalib for this cycle - must be present in map or exception
-    ExtCalib & getExtCalib(size_t calibCycle);
-
-    struct MasterLinkToWrite {
-      std::string linkName;
-      hdf5pp::Group linkGroupLoc;
-      MasterLinkToWrite()  {};
-      MasterLinkToWrite(const char *_linkName, hdf5pp::Group &_group) :
-        linkName(_linkName), linkGroupLoc(_group) {}
-    };
-
-    std::map< size_t, MasterLinkToWrite> m_masterLnksToWrite;
   };
 
 } // namespace

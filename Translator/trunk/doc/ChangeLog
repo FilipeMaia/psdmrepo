@@ -11,6 +11,21 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-15
+- Schema change - 4 to 5 (for EndData, no more Filtered:xxxx, and external cc file format)
+- deprecated: remove filtered group (list of events user filters). The translator will still 
+  filter events based on the special key string "do_not_translate", but no longer save event ids
+  of filtered events.
+- check for keys that are not expected from the config file and warn the user.
+- increase fastindex default search - Jira PSAS-110
+- deprecated: remove non MPI split scan, did not work as well as MPI version.
+- switch external calib cycle schema to be the same as regular files.
+- split scan: don't translate config from master. translate in all external cc files.
+  add link from master to first such translated data. 
+- due to change in where split scan config is translated, we get translation of Configure 
+  EBeam which we had lost. Change unit test to include it in psana_test.dump compare for
+  split scan.
+
 Tag: V00-02-14
 205-02-09 David Schneider	
 - translate strings from the config store

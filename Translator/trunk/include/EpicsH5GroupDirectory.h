@@ -13,7 +13,6 @@
 #include "Translator/HdfWriterEventId.h"
 #include "Translator/HdfWriterEpicsPv.h"
 #include "Translator/epics.ddl.h"
-#include "Translator/SplitScanMgr.h"
 
 namespace Translator {
 
@@ -48,8 +47,7 @@ class EpicsH5GroupDirectory {
   void initialize(EpicsStoreMode epicsStoreMode,
                   boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
                   const DataSetCreationProperties & oneElemEpicsPvHCreateDsetProp,
-                  const DataSetCreationProperties & manyElemEpicsPvHCreateDsetProp,
-                  boost::shared_ptr<SplitScanMgr> splitScanMgr);
+                  const DataSetCreationProperties & manyElemEpicsPvHCreateDsetProp);
   void processBeginJob(hid_t currentConfigGroup, 
                        PSEnv::EpicsStore &epicsStore,
                        boost::shared_ptr<PSEvt::EventId> eventId);
@@ -88,9 +86,6 @@ class EpicsH5GroupDirectory {
 
   bool m_epicsTypeAndSrcGroupsCreatedForThisCalibCycle;
   std::map<std::string, std::vector<std::string> > m_epicsPv2Aliases;
-
-  boost::shared_ptr<SplitScanMgr> m_splitScanMgr; 
-  
 };
 
 }

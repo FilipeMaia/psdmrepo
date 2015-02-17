@@ -133,17 +133,17 @@ class MpiTestHelper(object):
             print " ------- trans stderr ------"
             print e
         eLns = e.split('\n')
-        eLns = [ln for ln in eLns if ptl.filterPsanaStderr(ln)]
+        eLns = [ln for ln in eLns if not ptl.filterPsanaStderr(ln)]
         eLns = [ln for ln in eLns if len(ln.strip())>0]
         noWarningLns = []
         for ln in eLns:
-            if ln[0:10].lower().find('warning')>=0:
+            if ln[0:15].lower().find('warning')>=0:
                 continue
             noWarningLns.append(ln)
-        assert len(noWarningLns)==0, "error running mpi translation. stderr=%s" % e
+        assert len(noWarningLns)==0, "error running mpi translation. stderr=%s" % '\n'.join(noWarningLns)
 
         if doDump:
-            cmd,err = ptl.psanaDump(dataSourceString, self.xtc_dump, dumpBeginJobEvt=False, verbose=verbose)
+            cmd,err = ptl.psanaDump(dataSourceString, self.xtc_dump, dumpBeginJobEvt=True, verbose=verbose)
             assert err=='', "something wrong with cmd=%s\nerror:%s" % (cmd,err)
 
             cmd, err = ptl.psanaDump(self.output_h5, self.h5_dump, verbose=verbose)
@@ -712,29 +712,6 @@ class H5Output( unittest.TestCase ) :
         with self.assertRaises(KeyError):
             f['/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3']
             
-        # make sure data for filtered group is present
-        filteredEventIds = f['/Configure:0000/Run:0000/Filtered:0000/time']
-        self.assertTrue(len(filteredEventIds)==2 and
-                        filteredEventIds['seconds'][0]==1364147551 and
-                         filteredEventIds['seconds'][1]==1364147551 and
-                         filteredEventIds['nanoseconds'][0]==107587445 and
-                         filteredEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/time")
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/data'])
-        self.assertEqual(filteredMsgs[0],msg0)
-        self.assertEqual(filteredMsgs[1],msg1)
-        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/time']
-        self.assertTrue(len(filteredMsgsEventIds)==2 and
-                        filteredMsgsEventIds['seconds'][0]==1364147551 and
-                         filteredMsgsEventIds['seconds'][1]==1364147551 and
-                         filteredMsgsEventIds['nanoseconds'][0]==107587445 and
-                         filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/noSrc__mytest/time")
-        # we don't write damage to the filtered groups:
-        with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/_damage']
-        with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/_mask']
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -766,30 +743,9 @@ class H5Output( unittest.TestCase ) :
         with self.assertRaises(KeyError):
             f['/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3']
             
-        # make sure filtered data is present
-        filteredEventIds = f['/Configure:0000/Run:0000/Filtered:0000/time']
-        self.assertTrue(len(filteredEventIds)==2 and
-                        filteredEventIds['seconds'][0]==1364147551 and
-                         filteredEventIds['seconds'][1]==1364147551 and
-                         filteredEventIds['nanoseconds'][0]==107587445 and
-                         filteredEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/time")
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/data'])
-        self.assertEqual(filteredMsgs[0],msg0)
-        self.assertEqual(filteredMsgs[1],msg1)
-        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/time']
-        self.assertTrue(len(filteredMsgsEventIds)==2 and
-                        filteredMsgsEventIds['seconds'][0]==1364147551 and
-                         filteredMsgsEventIds['seconds'][1]==1364147551 and
-                         filteredMsgsEventIds['nanoseconds'][0]==107587445 and
-                         filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/noSrc/time")
-
-        # we don't write damage to the filtered groups:
+        # we no longer write Filtered groups:
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/_damage']
-        with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/_mask']
+            f['/Configure:0000/Run:0000/Filtered:0000']
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -1205,9 +1161,9 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(len(MyData),2)
         self.assertEqual(MyData['eventCounter'][0],1)
         self.assertEqual(MyData['eventCounter'][1],2)
-
-        if self.cleanUp:
-            os.unlink(output_h5)
+#
+#        if self.cleanUp:
+#            os.unlink(output_h5)
 
     def test_type_filter(self):
         '''check that the type_filter switch works
@@ -1493,86 +1449,6 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
-    def test_splitscan(self):
-        writeDir = "data/Translator"
-        nosplit_h5 = os.path.join(writeDir,"unit_test_splitscan_nosplit.h5")
-        split_h5   = os.path.join(writeDir,"unit_test_splitscan_split.h5")
-        input_ds = "exp=xppd9714:run=16:dir=%s" % SPLITSCANDATADIR
-        input_dir = input_ds.split(':dir=')[1]
-        nosplit_dump = os.path.join(writeDir,"unit_test_nosplit.dump")
-        split_dump   = os.path.join(writeDir,"unit_test_split.dump")
-        NUMBERCALIBCYCLES=7
-        assert os.path.exists(writeDir), "write directory=%s for h5 output doesn't exist" % writeDir
-        assert os.path.exists(input_dir), "input ds dir=%s doesn't exist" % input_dir
-
-        nosplit_cmd = 'psana -m cspad_mod.CsPadCalib,Translator.H5Output '
-        nosplit_cmd += '-o Translator.H5Output.overwrite=True -o '
-        nosplit_cmd += 'Translator.H5Output.output_file=%s %s' % (nosplit_h5, input_ds)
-
-        split_cmd_job0 = 'psana -m cspad_mod.CsPadCalib,Translator.H5Output '
-        split_cmd_job0 += '-o Translator.H5Output.overwrite=True -o '
-        split_cmd_job0 += 'Translator.H5Output.output_file=%s ' % split_h5
-        split_cmd_job0 += '-o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=0 '
-        split_cmd_job0 += '-o Translator.H5Output.jobTotal=2 %s' % input_ds
-
-        split_cmd_job1 = split_cmd_job0.replace('.jobNumber=0','.jobNumber=1')
-
-        for cmd in [nosplit_cmd, split_cmd_job0, split_cmd_job1]:
-            p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-            o,e=p.communicate()
-            self.checkOutputForErrors(o + '\n' + e)
-        self.assertTrue(os.path.exists(split_h5), msg="master split file output %s not found" % split_h5)
-        self.assertTrue(os.path.exists(nosplit_h5), msg="nosplit file %s not found" % nosplit_h5)
-        ccnames = []
-        for cc in range(NUMBERCALIBCYCLES):
-            ccname,ext = os.path.splitext(split_h5)
-            ccname += '_cc%4.4d' % cc
-            ccname += ext
-            ccnames.append(ccname)
-            self.assertTrue(os.path.exists(ccname), msg="cc file %s not found" % ccname)
-        # compare dumps from this directory and the directory where they are written
-        for whichDir in ['release', 'output-dir']:
-            if whichDir == 'release':
-                nosplit_input = nosplit_h5
-                split_input = split_h5
-                dump_cmd_nosplit = ''
-                dump_cmd_split = ''
-                nosplit_output = nosplit_dump
-                split_output = split_dump
-            elif whichDir == 'output-dir':
-                nosplit_input = os.path.split(nosplit_h5)[1]
-                split_input = os.path.split(split_h5)[1]
-                dump_cmd_nosplit = 'cd %s && ' % os.path.split(nosplit_h5)[0]
-                dump_cmd_split = 'cd %s && ' %  os.path.split(split_h5)[0]
-                nosplit_output = os.path.split(nosplit_dump)[1]
-                split_output = os.path.split(split_dump)[1]
-            dump_cmd_nosplit += "psana -m psana_test.dump %s > %s" % (nosplit_input, nosplit_output)
-            dump_cmd_split += "psana -m psana_test.dump %s > %s" % (split_input, split_output)
-            p = sb.Popen(dump_cmd_nosplit, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-            o,e=p.communicate()
-            self.checkOutputForErrors(e)
-            p = sb.Popen(dump_cmd_split, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-            o,e=p.communicate()
-            self.checkOutputForErrors(e)
-            diff_cmd = 'diff %s %s' % (nosplit_output, split_output)
-            p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-            diff_output,e = p.communicate()
-            if len(diff_output) != 0:
-                print "TEST FAILED: cmds"
-                print nosplit_cmd
-                print split_cmd_job0
-                print split_cmd_job1
-                print dump_cmd_nosplit
-                print dump_cmd_split
-                print diff_cmd
-                print "---- diff output -----"
-                print diff_output
-                self.assertTrue(False, msg="%s: split and nosplit dumps are NOT equal" % whichDir)
-        toDelete = ccnames + [nosplit_h5, split_h5, split_dump, nosplit_dump]
-        if self.cleanUp:
-            for fname in toDelete:
-                os.unlink(fname)
-
     def test_timetool(self):
         '''test_081 has three events with timetool data in all three.
         Check that all of the timetool data gets translated.
@@ -1621,6 +1497,26 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_mpisplitscan(self):
+        mpiTest = MpiTestHelper('mpiSplitScan',
+                                min_events_per_calib_file=1,
+                                num_events_check_done_calib_file=1,
+                                dataSourceString = 'exp=428:run=16:dir=%s' % SPLITSCANDATADIR,
+                                njobs=2,
+                                transCmdTimeOut = 5*60,
+                                cleanUp=self.cleanUp,
+                                verbose=False,
+                                doDump=True,
+                                downstreamModules=None,
+                                extraOptions=None)
+
+        diff_cmd = 'diff %s %s' % (mpiTest.xtc_dump, mpiTest.h5_dump)
+        p = sb.Popen(diff_cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(o,'',msg='diff of xtc and mpi-splitscan translate h5 not the same.\ncmd: %s\nhas stdout=%s' % (diff_cmd, o))
+        self.assertEqual(e,'',msg='diff of xtc and mpi-splitscan translate h5 not the same.\ncmd: %s\nhas stderr=%s' % (diff_cmd, e))
+        
+        
     def test_mpiSplitScan_droppedSrc(self):
         '''This is a regression test for a bug that cropped up. The issue was due to moving where
         the MPIworker's do their translation of the initial configure. Because it was initially moved
@@ -1716,23 +1612,53 @@ class H5Output( unittest.TestCase ) :
                                 dataSourceString = 'exp=xppd7114:run=130:dir=%s' % SPLITSCANDATADIRBUG,
                                 njobs=3,
                                 verbose=False,
-                                cleanUp = False,
+                                cleanUp = True,
                                 doDump = False,
                                 downstreamModules = ["cspad_mod.CsPadCalib,Translator.TestEndDataPsanaMod"],
                                 extraOptions=['psana.calib-dir=%s' % CALIBDATADIR])
         f=h5py.File(mpiTest.output_h5,'r')
-        # the testing module Translator.TestEndDataPsanaMod will put the below string, and an array of
-        # 3 zeros, into the config store on each endcalibcycle. We test that the data is written:
+        # the testing module Translator.TestEndDataPsanaMod will put the below string, and an array of 0.0, 1.0, 2.0
+        # into the config store during begin/end job, run, and each endcalibcycle. It only puts it into the
+        # first calib cycle it hits because psana won't let a python module replace keys visible to C++, 
+        # so you have to be careful with testing with this. We are doing an mpi translate where the module
+        # will run once per calib cycle, so it will in fact add a-new to the config store during each calib
+        # cycle - a little weird.
+
+        # We test that the data is written.
         strAnswer = 'configuration: threshold=5.2'
-        arrAnswer = np.zeros(3)
+        arrAnswer = np.array([0,1,2], np.float)
+        arrayDsets = []
+        strDsets = []
         for cc in range(15):
-            strDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/std::string/noSrc__endcalibcycle_str_cfgstore/data' % cc
-            strDset = f[strDsetName]
-            self.assertEqual(strDset.value, strAnswer, msg="endcalibcycle str=%r != expected=%r" % (strDset.value, strAnswer))
-            arrDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/ndarray_float64_1/noSrc__endcalibcycle_ndarray_cfgstore/data' % cc
-            arrDset = f[arrDsetName]
-            self.assertTrue(all(arrAnswer == arrDset.value), msg="endcalibcycle array=%r != expected=%r" % (arrDset.value, arrAnswer))
-        
+            strDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/std::string/noSrc__endcalibcycle_str_cfgstore/data' % (cc,)
+            arrDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/EndData/ndarray_float64_1/noSrc__endcalibcycle_ndarray_cfgstore/data' % (cc,)
+            arrayDsets.append(arrDsetName)
+            strDsets.append(strDsetName)
+            strDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/std::string/noSrc__begincalibcycle_str_cfgstore/data' % (cc,)
+            arrDsetName = '/Configure:0000/Run:0000/CalibCycle:%4.4d/ndarray_float64_1/noSrc__begincalibcycle_ndarray_cfgstore/data' % (cc,)
+            arrayDsets.append(arrDsetName)
+            strDsets.append(strDsetName)
+        arrayDsets.append('/Configure:0000/Run:0000/EndData/ndarray_float64_1/noSrc__endrun_ndarray_cfgstore/data')
+        arrayDsets.append('/Configure:0000/EndData/ndarray_float64_1/noSrc__endjob_ndarray_cfgstore/data')
+        strDsets.append('/Configure:0000/Run:0000/std::string/noSrc__beginrun_str_cfgstore/data')
+        strDsets.append('/Configure:0000/std::string/noSrc__beginjob_str_cfgstore/data')
+
+        for dsetName in arrayDsets:
+            try:
+                dset = f[dsetName]
+            except KeyError,e:
+                print "couldn't open %s" % dsetName
+                raise e
+            self.assertTrue(all(arrAnswer == dset.value), msg="dset=%s but array=%r != expected=%r" % (dsetName,dset.value, arrAnswer))
+
+        for dsetName in strDsets:
+            try:
+                dset = f[dsetName]
+            except KeyError,e:
+                print "couldn't open %s" % dsetName
+                raise e
+            self.assertEqual(dset.value, strAnswer, msg="dset=%s but str=%r != expected=%r" % (dsetName, dset.value, strAnswer))
+
         mpiTest.cleanup()
 
     def test_epics(self):

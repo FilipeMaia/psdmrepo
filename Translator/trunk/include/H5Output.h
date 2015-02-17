@@ -78,7 +78,9 @@ protected:
 
   void init();
   void createH5OutputFile();
-  void readConfigParameters();
+
+  /// returns output_file from config - may need to be changed if in split scan mode
+  std::string readConfigParameters();
 
   static const std::string & msgLoggerName();
 
@@ -104,7 +106,8 @@ protected:
   void createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId);
   void createNextCalibCycleExtLink(const char *linkName, hdf5pp::Group &runGroup);
   void lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup);
-  void lookForAndStoreEndCalibCycleData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup);
+  void lookForAndStoreEndData(PSEvt::Event &evt, PSEnv::Env &env, hdf5pp::Group &parentGroup, 
+                              TypeSrcKeyH5GroupDirectory & endDataGroupDir, hdf5pp::Group &endDataGroup);
   void eventImpl(PSEvt::Event &evt, PSEnv::Env &env);
   Pds::Damage getDamageForEventKey(const EventKey &eventKey, 
 				   boost::shared_ptr<PSEvt::DamageMap> damageMap);
@@ -114,10 +117,9 @@ protected:
 								bool checkForCalibratedKey);
   std::list<PSEvt::EventKey> getUpdatedConfigKeys(PSEnv::Env &env);
   void setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
-			       std::list<EventKeyTranslation> & toTranslate,
-                               std::list<PSEvt::EventKey> &filtered);
+                               std::list<EventKeyTranslation> & toTranslate,
+                               bool & eventIsFiltered);
   
-  void addToFilteredEventGroup(PSEvt::Event &evt, PSEnv::Env &env, const std::list<EventKey> &eventKeys, const PSEvt::EventId &eventId);
   void closeH5File();
 
   bool srcIsFiltered(const Pds::Src &);
@@ -145,22 +147,20 @@ private:
   size_t m_totalEventsProcessed;
   size_t m_totalCalibCyclesProcessed;
   size_t m_minEventsPerMPIWorker;
-  size_t m_filteredEventsThisCalibCycle;
   size_t m_maxSavedPreviousSplitEvents;
   hdf5pp::Group m_currentConfigureGroup;
   hdf5pp::Group m_currentRunGroup;
   hdf5pp::Group m_currentCalibCycleGroup;
   hdf5pp::Group m_currentCalibCycleEndGroup;
   hdf5pp::Group m_currentRunEndGroup;
-  hdf5pp::Group m_currentJobEndGroup;
-  hdf5pp::Group m_currentFilteredGroup;
+  hdf5pp::Group m_currentConfigureEndGroup;
 
   TypeSrcKeyH5GroupDirectory m_configureGroupDir;
+  TypeSrcKeyH5GroupDirectory m_runGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleEndGroupDir;
   TypeSrcKeyH5GroupDirectory m_runEndGroupDir;
-  TypeSrcKeyH5GroupDirectory m_jobEndGroupDir;
-  TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
+  TypeSrcKeyH5GroupDirectory m_configureEndGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibStoreGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;
 
@@ -199,12 +199,11 @@ private:
 
   /////////////////////////////////
   // parameters read in from config:
-  std::string m_h5fileName;
+  std::string m_h5fileName;  // this may be changed from the config parameter if this is a MPI worker
   bool m_overwrite;
 
   SplitScanMgr::SplitMode m_split;
   bool m_splitCCInSubDir;
-  int m_jobNumber, m_jobTotal;
   int m_mpiWorkerStartCalibCycle;
   hsize_t m_splitSize;  
 

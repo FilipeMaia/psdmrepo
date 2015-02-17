@@ -45,8 +45,9 @@
 #include "XtcInput/SharedFile.h"
 #include "XtcInput/DgHeader.h"
 #include "XtcInput/XtcChunkDgIter.h"
+#include "hdf5pp/GroupIter.h"
 
-#define MSGLOGLVL info
+#define MSGLOGLVL trace
 #define FASTLOGLVL info
 
 //-----------------------------------------------------------------------
@@ -480,11 +481,11 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   m_numEventsToCheckForDoneWorkers = cfgSvc.get("Translator.H5Output",
                                                 "num_events_check_done_calib_file",
                                                 NUM_EVENTS_CHECK_DONE_CALIB_FILE_DEFAULT);
-
+  
   m_fastIndex = cfgSvc.get("Translator.H5Output", "fast_index", false);
   m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12.0);
-  m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks",3);
-
+  m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks", 50);
+  
   if (cfgSvc.get("Translator.H5Output","printenv",false)) {
     WithMsgLog(loggerMaster, info, str) {
       str << "------ Begin Environment -------" << std::endl;
@@ -520,8 +521,10 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
       }
     }
     std::string & dset = input.at(0);
-    dset += ":stream=" + boost::lexical_cast<std::string>(m_fastIndexMasterStream);  // a little sloppy to append a :stream if the datset already has one, but psana uses the last one it finds
+    // below we append a :stream=x for the master stream x. If the dset already has a stream=..., this overrides it
+    dset += ":stream=" + boost::lexical_cast<std::string>(m_fastIndexMasterStream); 
     for (unsigned idx = 0; idx < controlStreams.size(); ++idx) {
+      // master needs to find calib cycle starts in s80+ streams
       dset +=  ("," + boost::lexical_cast<std::string>(controlStreams.at(idx)));
     }
 
@@ -629,7 +632,8 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
             if (beginStepPos->hasStream(*otherStream)) MsgLog(loggerMaster, fatal, "master stream contains stream "
                                                               << *otherStream << " which is from the other DAQ streams list");
           }
-          beginStepPos = fastIndexFindOtherStreamStarts(m_fastIndexMasterStream, beginStepPos, 
+          beginStepPos = fastIndexFindOtherStreamStarts(m_fastIndexMasterStream, 
+                                                        beginStepPos, 
                                                         m_fastIndexOtherStreams, 
                                                         stepIdx, m_fastIndexMBhalfBlock, 
                                                         m_fastIndexNumberBlocksToTry);
@@ -684,7 +688,7 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
       }
     } // finish steps in run
   } // finish runs
-  MsgLog(loggerMaster, info, "messaging time during event loop (sec): " << messagingTimeDuringEventLoop);
+  MsgLog(loggerMaster, MSGLOGLVL, "messaging time during event loop (sec): " << messagingTimeDuringEventLoop);
   LusiTime::Time eventEndTime = LusiTime::Time::now();
   m_eventTime += timeDiffSeconds(eventEndTime, eventStartTime);
   
@@ -715,7 +719,7 @@ bool H5MpiTranslateApp::validJobExists() const {
     }
   }
   return false;
-  }
+}
 
 bool H5MpiTranslateApp::freeWorkerExists(int *workerPtr) const {
   for (int worker = 0; worker < m_numWorkers; worker++) {
@@ -827,54 +831,87 @@ int H5MpiTranslateApp::waitForValidFinishedMPIWorkerJob() {
 void H5MpiTranslateApp::addLinksToMasterFile(int worker, 
                                              boost::shared_ptr<MPIWorkerJob> wjob, 
                                              H5Output &h5Output) {
-  MsgLog(loggerMaster, MSGLOGLVL, "master file link cc " 
-         << wjob->startCalibNumber() << " from worker: " << worker);
-  // get expected name of file produced for this starting calib number
+  MsgLog(loggerMaster, MSGLOGLVL, "addLinksToMasterFile: for cc= " 
+         << wjob->startCalibNumber() << " from worker=" << worker);
+  
+  // get expected name of full path for the file produced for this starting calib number, 
+  // as well as the relative link we will use from the master file 
   int calibNumber = wjob->startCalibNumber();
-  std::string ccFilePath = h5Output.splitScanMgr()->getExtCalibCycleFilePath(calibNumber);
-  std::string ccFileBaseName = h5Output.splitScanMgr()->getExtCalibCycleFileForLink(calibNumber);
-  MsgLog(loggerMaster, MSGLOGLVL, "addLinksToMasterFile from cc file: " << ccFilePath);
-  // open it and go thorugh all CalibCycle:xxxx groups
+  std::string ccFilePath = h5Output.splitScanMgr()->getExtFilePath(calibNumber);        // full path
+  std::string ccFileNameForLink = h5Output.splitScanMgr()->getExtFileForLink(calibNumber); // relative link
+  MsgLog(loggerMaster, MSGLOGLVL, "addLinksToMasterFile: path to file: " << ccFilePath
+         << " path for link: " << ccFileNameForLink);
+  // open it and go through all groups in Run:0000
   hdf5pp::File ccFile = hdf5pp::File::open(ccFilePath, hdf5pp::File::Read);
-  if (ccFile.valid()) {
-    hdf5pp::Group ccRootGroup = ccFile.openGroup("/");
-    if (ccRootGroup.valid()) {
-      hdf5pp::Group masterRunGroup = h5Output.currentRunGroup();
-      if (masterRunGroup.valid()) {
-        int linksCreated = 0;
-        char ccGroupName[128];
-        sprintf(ccGroupName,"CalibCycle:%4.4d", calibNumber);
-        while (ccRootGroup.hasChild(ccGroupName)) {
-          h5Output.splitScanMgr()->createExtLink(ccGroupName, ccFileBaseName, masterRunGroup);
-          ++linksCreated;
-          ++calibNumber;
-          sprintf(ccGroupName,"CalibCycle:%4.4d", calibNumber);
-        } 
-        if (linksCreated == 0) MsgLog(loggerMaster, error, "no calib cycles found in " << ccFilePath);  
-        // check for a CalibStore in the cc file
-        if (ccRootGroup.hasChild(H5Output::calibStoreGroupName)) {
-          // see if we've already added a CalibStore group to the master
-          hdf5pp::Group masterConfigureGroup = h5Output.currentConfigureGroup();
-          if (masterConfigureGroup.valid()) {
-            if (not masterConfigureGroup.hasChild(H5Output::calibStoreGroupName)) {
-              // add link
-              h5Output.splitScanMgr()->createExtLink(H5Output::calibStoreGroupName.c_str(),
-                                                     ccFileBaseName, masterConfigureGroup);
-            }
-          } else {
-            MsgLog(loggerMaster,error,"no valid configure group in master");
-          }
-        }
-      } else {
-        MsgLog(loggerMaster, error, "master file run group is not valid during addLinks");
-      }
-      ccRootGroup.close();
-    } else {
-      MsgLog(loggerMaster, error, "ccFile " << ccFilePath << " root group is invalid");
-    }
-    ccFile.close();
-  } else {
+  if (not ccFile.valid()) {
     MsgLog(loggerMaster, error, "ccFile " << ccFilePath << " is invalid");
+    return;
+  } else {
+    MsgLog(loggerMaster, MSGLOGLVL, "ccFile " << ccFilePath << " is valid");
+  }
+    
+  const std::string ccConfigureGroupName("/Configure:0000");
+  hdf5pp::Group ccConfigureGroup = ccFile.openGroup(ccConfigureGroupName);
+  if (not ccConfigureGroup.valid()) {
+    MsgLog(loggerMaster, error, "configure group " << ccConfigureGroupName << " in ccfile: " << ccFilePath << " is not invalid");
+    return;
+  }
+  const std::string ccRunGroupName("/Configure:0000/Run:0000");
+  hdf5pp::Group ccRunGroup = ccFile.openGroup(ccRunGroupName);
+  if (not ccRunGroup.valid()) {
+    MsgLog(loggerMaster, error, "run group " << ccRunGroupName << " in ccfile: " << ccFilePath << " is not invalid");
+    return;
+  }
+  hdf5pp::Group masterRunGroup = h5Output.currentRunGroup();
+  hdf5pp::Group masterConfigureGroup = h5Output.currentConfigureGroup();
+  if ((not masterRunGroup.valid()) or (not masterConfigureGroup.valid())) {
+    MsgLog(loggerMaster, error, "Configure:0000 or Configure:0000/Run:00000 groups in master file not invalid");
+    return;
+  }
+  // add links from external calib file Run:0000/* to master (this will include calib cycles
+  MsgLog(loggerMaster, MSGLOGLVL, "addLinksToMasterFile: groups valid, about to add links");
+  {
+    // scope to keep separate from similar code below
+    hdf5pp::GroupIter grIter(ccRunGroup, hdf5pp::GroupIter::HardLink);
+    hdf5pp::Group ccRunChildGroup = grIter.next();
+    int runLinksCreated = 0;
+    while (ccRunChildGroup.valid()) {
+      std::string childName = ccRunChildGroup.basename();
+      if (not masterRunGroup.hasChild(childName)) {
+        std::string targetName = ccRunGroupName + "/" + childName;
+        h5Output.splitScanMgr()->createExtLink(childName.c_str(),
+                                               targetName.c_str(), 
+                                               ccFileNameForLink, 
+                                               masterRunGroup);
+        runLinksCreated += 1;
+      } else {
+        // we already have a link to a group with this name.
+        // TODO: save some of these duplicate links somewhere? a "DupExtLinks" group in the master?
+        // a way to get all the EndData from the different MPI workers accessible from the master
+      }
+      ccRunChildGroup = grIter.next();
+    }
+    if (runLinksCreated == 0) {
+      MsgLog(loggerMaster, error, "no links added in master to subgroups of Run:0000 in " << ccFilePath);
+    } 
+  }
+
+  {
+    // add links from external calib file Configure:0000/* to master (this will include CalibStore, if present)
+    hdf5pp::GroupIter grIter(ccConfigureGroup, hdf5pp::GroupIter::HardLink);
+    hdf5pp::Group ccCfgChildGroup = grIter.next();
+    while (ccCfgChildGroup.valid()) {
+      std::string childName = ccCfgChildGroup.basename();
+      if (not masterConfigureGroup.hasChild(childName)) {
+        std::string targetName = ccConfigureGroupName + "/" + childName;
+        h5Output.splitScanMgr()->createExtLink(childName.c_str(),
+                                               targetName.c_str(), 
+                                               ccFileNameForLink, 
+                                               masterConfigureGroup);
+      } else {
+      }
+      ccCfgChildGroup = grIter.next();
+    }
   }
 }
 

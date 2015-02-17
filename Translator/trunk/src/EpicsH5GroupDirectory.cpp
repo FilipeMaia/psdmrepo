@@ -46,7 +46,8 @@ namespace {
 
     typeGroup = H5Gcreate(parentGroup, EPICS_TYPE_NAME, 
                           H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT);
-    if (typeGroup < 0) MsgLog(logger(),fatal,"unable to create epics " << msgLogType << " type group");
+    if (typeGroup < 0) MsgLog(logger(),fatal,"unable to create epics " 
+                              << msgLogType << " type group. parentGroup=" << parentGroup);
     MsgLog(logger(),debug,"Created group " << EPICS_TYPE_NAME << " with id=" << typeGroup 
            << " as child of group " << parentGroup);
     srcGroup = H5Gcreate(typeGroup, EPICS_SRC_NAME, 
@@ -236,15 +237,13 @@ EpicsH5GroupDirectory::EpicsH5GroupDirectory() :
 void EpicsH5GroupDirectory::initialize(EpicsStoreMode epicsStoreMode,
                                        boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
                                        const DataSetCreationProperties & oneElemEpicsPvCreateDsetProp,
-                                       const DataSetCreationProperties & manyElemEpicsPvCreateDsetProp,
-                                       boost::shared_ptr<SplitScanMgr> splitScanMgr) 
+                                       const DataSetCreationProperties & manyElemEpicsPvCreateDsetProp)
 {
   m_epicsStoreMode = epicsStoreMode;
   if (m_epicsStoreMode == Unknown) MsgLog(logger(), fatal, "epics store mode is unknown");
   m_hdfWriterEpicsPv = boost::make_shared<HdfWriterEpicsPv>(oneElemEpicsPvCreateDsetProp, 
                                                             manyElemEpicsPvCreateDsetProp, 
                                                             hdfWriterEventId);
-  m_splitScanMgr = splitScanMgr;
 }
 
 bool EpicsH5GroupDirectory::checkIfStoringEpics() {
@@ -258,18 +257,12 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
                                             boost::shared_ptr<PSEvt::EventId> eventId) 
 {
   if (not checkIfStoringEpics()) return;
-  if (m_splitScanMgr->thisJobWritesMainOutputFile()) {
-    if (currentConfigGroup<0) MsgLog(logger(), fatal, "processBeginJob passed invalid group");
-    m_configureGroup = currentConfigGroup;
-  } 
   if (not thereAreEpics(epicsStore)) {
     m_epicsStatus = noEpics;
     return;
   }
   m_epicsStatus = hasEpics;
-
-  if (not m_splitScanMgr->thisJobWritesMainOutputFile()) return;
-  
+  m_configureGroup = currentConfigGroup;
   createEpicsTypeAndSrcGroups(m_configureGroup, "config",  
                               m_configEpicsTypeGroup, m_configEpicsSrcGroup);
   WithMsgLog(logger(),debug,str) {
