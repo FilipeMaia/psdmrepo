@@ -71,6 +71,16 @@ SegGeometryMatrixV1::SegGeometryMatrixV1 ( const size_t& rows
   , ROWS(rows)
   , COLS(cols)
   , m_done_bits(0)
+  , m_x_arr_um(0)      
+  , m_y_arr_um(0)      
+  , m_x_pix_coord_um(0)
+  , m_y_pix_coord_um(0)
+  , m_z_pix_coord_um(0)
+  , m_x_pix_size_um(0)
+  , m_y_pix_size_um(0) 
+  , m_z_pix_size_um(0)
+  , m_pix_area_arr(0)
+  , m_pix_mask_arr(0)
 {
   //cout << "C-tor of SegGeometryMatrixV1" << endl;
 
@@ -104,6 +114,12 @@ SegGeometryMatrixV1::~SegGeometryMatrixV1 ()
 
 void SegGeometryMatrixV1::make_pixel_coord_arrs()
 {
+  if (m_x_arr_um)       delete [] m_x_arr_um;
+  if (m_y_arr_um)       delete [] m_y_arr_um;
+  if (m_x_pix_coord_um) delete [] m_x_pix_coord_um;
+  if (m_y_pix_coord_um) delete [] m_y_pix_coord_um;
+  if (m_z_pix_coord_um) delete [] m_z_pix_coord_um;
+
   m_x_arr_um       = new pixel_coord_t[ROWS];
   m_y_arr_um       = new pixel_coord_t[COLS];
   m_x_pix_coord_um = new pixel_coord_t[SIZE];
@@ -133,6 +149,11 @@ void SegGeometryMatrixV1::make_pixel_coord_arrs()
 void SegGeometryMatrixV1::make_pixel_size_arrs()
 {
   if (m_done_bits & 2) return;
+
+  if (m_x_pix_size_um) delete [] m_x_pix_size_um;
+  if (m_y_pix_size_um) delete [] m_y_pix_size_um;
+  if (m_z_pix_size_um) delete [] m_z_pix_size_um;
+  if (m_pix_area_arr ) delete [] m_pix_area_arr;
 
   m_x_pix_size_um = new pixel_coord_t[SIZE];
   m_y_pix_size_um = new pixel_coord_t[SIZE];
@@ -264,7 +285,10 @@ const SegGeometry::pixel_mask_t* SegGeometryMatrixV1::pixel_mask_array(const uns
 {
   //cout << "SegGeometryMatrixV1::pixel_mask_array(): mbits =" << mbits << '\n';   
 
-  if ( !(m_done_bits & 4)) m_pix_mask_arr = new pixel_mask_t[SIZE];
+  if ( !(m_done_bits & 4)) {
+     if (m_pix_mask_arr) delete [] m_pix_mask_arr;
+     m_pix_mask_arr = new pixel_mask_t[SIZE];
+  }
 
   std::fill_n(m_pix_mask_arr, int(SIZE), SegGeometry::pixel_mask_t(1));
 

@@ -203,7 +203,8 @@ public:
                          unsigned& size,
 			 const std::string& oname = std::string(), 
 			 const unsigned& oindex = 0,
-                         const bool do_tilt=true);
+                         const bool do_tilt=true,
+                         const bool do_eval=false);
 
   /// Returns pixel areas array A, of size for specified geometry object 
   /**

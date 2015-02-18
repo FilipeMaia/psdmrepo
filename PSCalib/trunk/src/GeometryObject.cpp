@@ -72,6 +72,12 @@ namespace PSCalib {
     , m_tilt_z (tilt_z)
     , m_tilt_y (tilt_y)
     , m_tilt_x (tilt_x) 
+    , m_seggeom(0)
+    , p_xarr(0)
+    , p_yarr(0)
+    , p_zarr(0)
+    , p_aarr(0)
+    , p_marr(0)
 {
 
   //if      ( m_oname == "SENS2X1:V1" ) { m_algo = SENS2X1V1; m_pix_coords_2x1 = new PC2X1(); }
@@ -98,6 +104,12 @@ namespace PSCalib {
 //--------------
 GeometryObject::~GeometryObject ()
 {
+  if (m_seggeom) delete m_seggeom;
+  if (p_xarr) delete [] p_xarr;
+  if (p_yarr) delete [] p_yarr;
+  if (p_zarr) delete [] p_zarr;
+  if (p_aarr) delete [] p_aarr;
+  if (p_marr) delete [] p_marr;
 }
 
 //-------------------
@@ -238,10 +250,11 @@ double GeometryObject::get_pixel_scale_size()
 }
 
 //-------------------
-void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt)
+void GeometryObject::get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, 
+                                      const bool do_tilt, const bool do_eval)
 {
   // std::cout << "  ============ do_tilt : " << do_tilt << '\n';
-  if(p_xarr==0 || do_tilt != m_do_tilt) evaluate_pixel_coords(do_tilt);
+  if(p_xarr==0 || do_tilt != m_do_tilt || do_eval) evaluate_pixel_coords(do_tilt, do_eval);
   X    = p_xarr;
   Y    = p_yarr;
   Z    = p_zarr;
@@ -265,17 +278,22 @@ void GeometryObject::get_pixel_mask(const int*& mask, unsigned& size, const unsi
 }
 
 //-------------------
-void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
+void GeometryObject::evaluate_pixel_coords(const bool do_tilt, const bool do_eval)
 {
   m_do_tilt = do_tilt; 
 
   // allocate memory for pixel coordinate arrays
   m_size = get_size_geo_array();
 
+  if (p_xarr) delete [] p_xarr;
+  if (p_yarr) delete [] p_yarr;
+  if (p_zarr) delete [] p_zarr;
+  if (p_aarr) delete [] p_aarr;
+  if (p_marr) delete [] p_marr;
+
   p_xarr = new double [m_size];
   p_yarr = new double [m_size];
   p_zarr = new double [m_size];
-
   p_aarr = new double [m_size];
   p_marr = new int    [m_size];
 
@@ -322,7 +340,7 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt)
     const int*    pMch; 
     unsigned      sizech;
 
-    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech, do_tilt);       
+    (*it)->get_pixel_coords(pXch, pYch, pZch, sizech, do_tilt, do_eval);       
     transform_geo_coord_arrays(pXch, pYch, pZch, sizech, &p_xarr[ibase], &p_yarr[ibase], &p_zarr[ibase], do_tilt);
 
     (*it)->get_pixel_areas(pAch, sizech);

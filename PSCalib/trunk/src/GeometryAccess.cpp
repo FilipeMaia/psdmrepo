@@ -47,6 +47,8 @@ namespace PSCalib {
 GeometryAccess::GeometryAccess (const std::string& path, unsigned pbits)
   : m_path(path)
   , m_pbits(pbits)
+  , p_iX(0)
+  , p_iY(0)
 {
   if(m_pbits & 1) MsgLog(name(), info, "m_pbits = " << m_pbits); 
 
@@ -292,14 +294,15 @@ GeometryAccess::get_pixel_coords( const double*& X,
 				  unsigned& size,
                                   const std::string& oname, 
                                   const unsigned& oindex,
-                                  const bool do_tilt)
+                                  const bool do_tilt,
+                                  const bool do_eval)
 {
   GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
   if(m_pbits & 32) {
     std::string msg = "get_pixel_coords(...) for geo:\n" + geo -> string_geo_children();
     MsgLog(name(), info, msg);
   }
-  geo -> get_pixel_coords(X, Y, Z, size, do_tilt);
+  geo -> get_pixel_coords(X, Y, Z, size, do_tilt, do_eval);
 }
 
 //-------------------
@@ -481,6 +484,9 @@ GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX,
   get_pixel_coords(X,Y,Z,size,oname,oindex,do_tilt);
   
   double pix_size = (pix_scale_size_um) ? pix_scale_size_um : get_pixel_scale_size(oname, oindex);
+
+  if (p_iX) delete [] p_iX;
+  if (p_iY) delete [] p_iY;
 
   p_iX = new unsigned[size];
   p_iY = new unsigned[size];

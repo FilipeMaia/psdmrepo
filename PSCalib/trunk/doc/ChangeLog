@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-32
+2015-02-17 Mikhail S. Dubrovin	
+- In GeometryAccess, GeometryObject, SegGeometryMatrixV1 - improve memory management (PSAS-34)
+- In GeometryObject add parameter do_eval in get_pixel_coords(...) and evaluate_pixel_coords(...)
+
 Tag: V00-02-31
 2015-02-12 Mikhail S. Dubrovin	
 - GeometryObject - add method get_geo_pars (PSAS-11)

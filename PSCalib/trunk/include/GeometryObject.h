@@ -229,14 +229,23 @@ public:
   unsigned    get_parent_index() { return m_pindex; }
 
   /**
+   *  @brief Re-evaluate pixel coordinates (useful if geo is changed)
+   *  @param[in]  do_tilt - on/off tilt angle correction
+   *  @param[in]  do_eval - enforce (re-)evaluation of pixel coordinates
+   */
+  void evaluate_pixel_coords(const bool do_tilt=true, const bool do_eval=false);
+
+  /**
    *  @brief Returns pointers to pixel coordinate arrays
    *  @param[out] X - pointer to x pixel coordinate array
    *  @param[out] Y - pointer to y pixel coordinate array
    *  @param[out] Z - pointer to z pixel coordinate array
    *  @param[out] size - size of the pixel coordinate array (number of pixels)
    *  @param[in]  do_tilt - on/off tilt angle correction
+   *  @param[in]  do_eval - enforce (re-)evaluation of pixel coordinates
    */
-  void get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, const bool do_tilt=true);
+  void get_pixel_coords(const double*& X, const double*& Y, const double*& Z, unsigned& size, 
+                        const bool do_tilt=true, const bool do_eval=false);
 
   /**
    *  @brief Returns pointers to pixel areas array
@@ -356,8 +365,6 @@ private:
                                    double*  Zt,
                                    const bool do_tilt=true
                                   );
-
-  void evaluate_pixel_coords(const bool do_tilt=true);
 
   const static double DEG_TO_RAD = 3.141592653589793238463 / 180; 
 
