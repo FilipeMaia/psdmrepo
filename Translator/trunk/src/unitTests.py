@@ -57,8 +57,8 @@ TESTDATA_TIMETOOL = os.path.join(DATADIR, "test_081_xpp_xppi0214_e439-r0054-s00-
 # Utility functions / classes
 #------------------
 def makeMpiTransCmd(min_events_per_calib_file, 
-                    num_events_check_done_calib_file,
-                    output_h5, dsString, downstreamModules=None, extraOptions=None, njobs=2):
+                    num_events_check_done_calib_file, output_h5, dsString, 
+                    downstreamModules=None, extraOptions=None, njobs=2, suppressWarnings=True):
     '''Makes a command line that uses mpirun to launch h5-mpi-translate to produce
     the given output file from the given input source. Defaults to use 2 jobs.
 
@@ -68,6 +68,9 @@ def makeMpiTransCmd(min_events_per_calib_file,
     assert mpiRunCmd.endswith('mpirun'), "no mpirun command found"
 
     transCmd = '%s -n %d h5-mpi-translate' % ('mpirun', njobs)
+    
+    if suppressWarnings:
+        transCmd += ' -q -q'
 
     transCmd += ' -m '
     if downstreamModules is not None:
@@ -89,11 +92,18 @@ def makeMpiTransCmd(min_events_per_calib_file,
 
 class MpiTestHelper(object):
     '''Helper class that takes parameters for running mpi translate on input.
-    It then translates the input and runs psana_test.dump on original xtc and 
-    translated.
+    It runs h5-mpi-translate on the input. Then it checks for errors in psana's output.
+    Finally it will optionally dump the h5 and compare it to the xtc.
 
     When the object is deleted, it removes files if required to. 
-    
+
+    When checking the stderr output of psana, we used to filter out warnings. They
+    were filtered out by parsing the stderr of the job, looking for the string 'warning'.
+    However when  running 3 jobs, one can have that string be overwritten by the different ranks.
+    Now we run with -q -q to suppress warnings. However if verbose=True is specified, you won't 
+    see much. So setting verbose=True turns off the -q -q and the stderr check. In short, 
+    don't check in a unit test with verbose=True as it won't test for errors.
+
     After initializing, one can look at:
     
     self.output_h5    # name of translated master h5 file
@@ -119,28 +129,31 @@ class MpiTestHelper(object):
             makeMpiTransCmd(min_events_per_calib_file = min_events_per_calib_file,
                             num_events_check_done_calib_file = num_events_check_done_calib_file,
                             output_h5 = self.output_h5,
-                            dsString=dataSourceString,
-                            downstreamModules=downstreamModules,
-                            extraOptions=extraOptions,
-                            njobs=njobs)
+                            dsString = dataSourceString,
+                            downstreamModules = downstreamModules,
+                            extraOptions = extraOptions,
+                            njobs=njobs, suppressWarnings = not verbose)
         if verbose:
             print "------- trans cmd -------"
             print self.transCmd
+
         o,e = ptl.cmdTimeOut(self.transCmd, transCmdTimeOut)
+
         if verbose:
             print " ------- trans stdout ------"
             print o
             print " ------- trans stderr ------"
             print e
-        eLns = e.split('\n')
-        eLns = [ln for ln in eLns if not ptl.filterPsanaStderr(ln)]
-        eLns = [ln for ln in eLns if len(ln.strip())>0]
-        noWarningLns = []
-        for ln in eLns:
-            if ln[0:15].lower().find('warning')>=0:
-                continue
-            noWarningLns.append(ln)
-        assert len(noWarningLns)==0, "error running mpi translation. stderr=%s" % '\n'.join(noWarningLns)
+        else:
+            eLns = e.split('\n')
+            eLns = [ln for ln in eLns if not ptl.filterPsanaStderr(ln)]
+            eLns = [ln for ln in eLns if len(ln.strip())>0]
+            noWarningLns = []
+            for ln in eLns:
+                if ln[0:15].lower().find('warning')>=0:
+                    continue
+                noWarningLns.append(ln)
+            assert len(noWarningLns)==0, "error running mpi translation. stderr=%s" % '\n'.join(noWarningLns)
 
         if doDump:
             cmd,err = ptl.psanaDump(dataSourceString, self.xtc_dump, dumpBeginJobEvt=True, verbose=verbose)

@@ -1306,9 +1306,9 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
         }
       } else if (dataLoc == inEvent) {
         if (not eventId) {
-          MsgLog(logger, warning, "not translating: " << eventKey 
-                 << " from event. eventId is 0, cannot write timestamp. This occurs for example "
-                 << " when psana fakes EndRun do to early stopping early");
+          MsgLog(logger, warning, "not translating eventkey: " << eventKey 
+                 << " eventId=0. Cannot write timestamp. This can occur"
+                 << " when modules end early, such as from mpi split scan");
         } else {
           srcKeyGroup.make_datasets(inEvent, evt, env, m_defaultCreateDsetProp);
           Pds::Damage damage = getDamageForEventKey(eventKey, damageMap);

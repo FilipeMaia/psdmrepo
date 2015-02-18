@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-16
+- change unit test for mpi split scan to suppress warnings in psana output before
+  checking for errrors. The last test had 3 ranks, and they were overwriting the
+  string 'warning' in the stderr.
+	
 Tag: V00-02-15
 - Schema change - 4 to 5 (for EndData, no more Filtered:xxxx, and external cc file format)
 - deprecated: remove filtered group (list of events user filters). The translator will still 
