@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2015-02-17 Mikhail S. Dubrovin
+- src/QGUtils.cpp - include <cstring> for memcpy to comply with RHEL6
+
 Tag: V00-00-07
 2015-02-17 Mikhail S. Dubrovin
 - The 1st working version of the app with control gui and image (PSAS-11, PSAS34)

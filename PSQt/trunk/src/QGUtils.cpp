@@ -1,16 +1,17 @@
 //--------------------------
 
 #include "PSQt/QGUtils.h"
-#include <math.h>    // atan2, abs, fmod
+#include <math.h>     // atan2, abs, fmod
 
 //#include "PSQt/WdgImage.h"
 //#include "ndarray/ndarray.h" // for img_from_pixel_arrays(...)
 
-#include <iostream>    // for std::cout
-#include <fstream>  // for ifstream
+#include <cstring>    // for memcpy
+#include <iostream>   // for std::cout
+#include <fstream>    // for ifstream
 #include <sys/stat.h>
 
-using namespace std; // for cout without std::
+using namespace std;  // for cout without std::
 
 namespace PSQt {
 
