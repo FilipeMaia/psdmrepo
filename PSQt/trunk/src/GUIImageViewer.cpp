@@ -32,6 +32,9 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   m_but_test = new QPushButton( "Test", this );
   m_file     = new PSQt::WdgFile(this);
 
+  m_but_exit -> setCursor(Qt::PointingHandCursor); 
+  m_but_test -> setCursor(Qt::PointingHandCursor); 
+
   m_image    = new PSQt::WdgImage(this);
   
   connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()) );

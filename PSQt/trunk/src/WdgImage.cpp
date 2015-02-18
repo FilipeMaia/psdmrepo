@@ -16,8 +16,19 @@ namespace PSQt {
 
 //--------------------------
 
-WdgImage::WdgImage( QWidget *parent, const std::string& ifname)
+WdgImage::WdgImage(QWidget *parent, const std::string& ifname)
   : QLabel(parent)
+  , m_frame(0)
+  , m_painter(0)
+  , m_geo_img(0)
+  , m_pixmap_raw(0)
+  , m_pixmap_scl(0)
+  , m_pen1(0)  
+  , m_pen2(0)  
+  , m_point1(0)
+  , m_point2(0)
+  , m_rect1(0) 
+  , m_rect2(0) 
 {
   setWdgParams();
 
@@ -31,9 +42,37 @@ WdgImage::WdgImage( QWidget *parent, const std::string& ifname)
 
 WdgImage::WdgImage( QWidget *parent, const QImage* image)
   : QLabel(parent)
+  , m_frame(0)
+  , m_painter(0)
+  , m_geo_img(0)
+  , m_pixmap_raw(0)
+  , m_pixmap_scl(0)
+  , m_pen1(0)  
+  , m_pen2(0)  
+  , m_point1(0)
+  , m_point2(0)
+  , m_rect1(0) 
+  , m_rect2(0) 
 {
   setWdgParams();
   setPixmapScailedImage(image);
+}
+
+//--------------------------
+
+WdgImage::~WdgImage()
+{
+  if (m_frame)      delete m_frame;  
+  if (m_painter)    delete m_painter;  
+  if (m_pen1)       delete m_pen1;  
+  if (m_pen2)       delete m_pen2;  
+  if (m_point1)     delete m_point1;  
+  if (m_point2)     delete m_point2;  
+  if (m_rect1)      delete m_rect1;  
+  if (m_rect2)      delete m_rect2;  
+  if (m_pixmap_raw) delete m_pixmap_raw;  
+  if (m_pixmap_scl) delete m_pixmap_scl;  
+  if (m_geo_img)    delete m_geo_img;  
 }
 
 //--------------------------
@@ -48,7 +87,7 @@ WdgImage::setWdgParams()
 
   //this -> setAutoFillBackground (true); // MUST BE TRUE TO DRAW THE BACKGROUND COLOR SET IN Palette
   //this -> setMinimumHeight(200);
-  this -> setMinimumSize(525,525);
+  this -> setMinimumSize(606,606);
   //this -> setPalette ( QPalette(QColor(255, 255, 255, 255)) );
 
   this -> setAlignment(Qt::AlignTop | Qt::AlignLeft);
@@ -60,6 +99,8 @@ WdgImage::setWdgParams()
   //this -> setScaledContents (false);
   this -> setScaledContents (true);
   //////////////////////////////////
+
+  this -> setCursor(Qt::PointingHandCursor); // Qt::SizeAllCursor, Qt::WaitCursor, Qt::PointingHandCursor
 
   //this -> setIndent(100);
   this -> setMargin(0);
@@ -175,6 +216,7 @@ WdgImage::setPixmapScailedImage(const QImage* image)
     m_pixmap_raw = new QPixmap(QPixmap::fromImage(*image));
   }
 
+  if (m_pixmap_scl) delete m_pixmap_scl;  
   m_pixmap_scl = new QPixmap(*m_pixmap_raw);
   setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
 }
@@ -188,7 +230,7 @@ WdgImage::setFrame()
   m_frame -> setFrameStyle ( QFrame::Box | QFrame::Sunken); // or
   m_frame -> setLineWidth(0);
   m_frame -> setMidLineWidth(1);
-  m_frame -> setCursor(Qt::SizeAllCursor); // Qt::WaitCursor, Qt::PointingHandCursor
+  //m_frame -> setCursor(Qt::OpenHandCursor); // Qt::SizeAllCursor, Qt::WaitCursor, Qt::PointingHandCursor
   //m_frame -> setStyleSheet("background-color: rgb(0, 255, 255); color: rgb(255, 255, 100)");
   m_frame -> setGeometry(this->rect());
   m_frame -> setVisible(true);
@@ -231,6 +273,8 @@ WdgImage::mousePressEvent(QMouseEvent *e)
             << "  isActiveWindow(): " << this->isActiveWindow()
             << '\n';
   */
+  this -> setCursor(Qt::ClosedHandCursor);
+
   m_point1->setX(e->x());
   m_point1->setY(e->y());
   m_point2->setX(e->x());
@@ -251,6 +295,9 @@ WdgImage::mouseReleaseEvent(QMouseEvent *e)
             << "  x(),y() = " << e->x() << ", " << e->y()
             << '\n';
   */
+
+  //this -> unsetCursor(); 
+  this -> setCursor(Qt::PointingHandCursor); // Qt::SizeAllCursor, Qt::WaitCursor, Qt::PointingHandCursor
 
   m_is_pushed = false;
 
@@ -301,8 +348,37 @@ void
 WdgImage::onFileNameChanged(const std::string& fname)
 {
   MsgInLog(_name_(), INFO, "onFileNameChanged: " + fname);
-  //std::cout << "WdgImage::onFileNameChanged(string) - slot: fname = " << fname << '\n';  
+  //std::cout << _name_() << "onFileNameChanged(string) - slot: fname = " << fname << '\n';  
   loadImageFromFile(fname);
+}
+
+//--------------------------
+void 
+WdgImage::onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
+{
+  stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
+  MsgInLog(_name_(), INFO, ss.str()); 
+
+  const ndarray<GeoImage::image_t,2> nda_norm = getUint32NormalizedImage<const GeoImage::raw_image_t>(nda); // from QGUtils
+  
+  onNormImageIsUpdated(nda_norm);
+}
+
+//--------------------------
+void 
+WdgImage::onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>& nda)
+{
+  const unsigned int rows = nda.shape()[0];
+  const unsigned int cols = nda.shape()[1];
+
+  stringstream ss; ss << "onNormImageIsUpdated::Receive and update normalized image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
+  MsgInLog(_name_(), DEBUG, ss.str()); 
+  
+  QImage image((const uchar*) nda.data(), cols, rows, QImage::Format_ARGB32);
+  setPixmapScailedImage(&image);
+  
+  static unsigned counter=0; stringstream sst; sst << "Image # " << ++counter;
+  setWindowTitle(sst.str().c_str());
 }
 
 //--------------------------
@@ -430,44 +506,11 @@ WdgImage::setCameraImage(const std::string& ifname_geo, const std::string& ifnam
                               : base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
 
   MsgInLog(_name_(), INFO, "setCameraImage()");
-  //std::cout << "WdgImage::setCameraImage()\n";
 
+  if (m_geo_img) delete m_geo_img;  
   m_geo_img = new GeoImage(fname_geo, fname_img);
 
-  const ndarray<const image_t, 2> dnda = m_geo_img->get_image();
-
-  ndarray<uint32_t, 2> inda(dnda.shape());
-
-  //const unsigned ncolors = 1024;
-
-  //uint32_t* ctable = ColorTable(ncolors); // , hue1, hue2);
-
-  // Define image_t to uint32_t conversion parameters
-  image_t dmin=dnda[0][0];
-  image_t dmax=dnda[0][0];
-  ndarray<const image_t, 2>::iterator itd;
-  for(itd=dnda.begin(); itd!=dnda.end(); ++itd) { 
-    if( *itd < dmin ) dmin = *itd;
-    if( *itd > dmax ) dmax = *itd;
-  }
-  image_t k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
-  //float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
-
-  stringstream ss; 
-  ss << "     dnda: " << dnda
-     << "\n   dmin: " << dmin
-     << "\n   dmax: " << dmax
-     << "\n      k: " << k;
-  MsgInLog(_name_(), INFO, ss.str());
-
-  // Convert image_t to uint32_t Format_ARGB32
-  ndarray<uint32_t, 2>::iterator iti;
-  for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
-    *iti = uint32_t( (*itd-dmin)*k ) + 0xFF000000; // converts to 24bits adds alpha layer
-    //unsigned cind = unsigned((*itd-dmin)*k);
-    //cind = (cind<ncolors) ? cind : ncolors-1;
-    //*iti = ctable[cind]; // converts to 24bits adds alpha layer
-  }
+  ndarray<uint32_t, 2> inda = m_geo_img->getNormalizedImage();
 
   QImage image((const uchar*) &inda[0][0], inda.shape()[1], inda.shape()[0], QImage::Format_ARGB32);
   setPixmapScailedImage(&image);

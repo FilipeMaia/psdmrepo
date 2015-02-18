@@ -13,6 +13,7 @@
 #include "PSQt/Frame.h"
 #include "PSQt/ThreadTimer.h"
 #include "PSQt/allinone.h"
+#include "PSQt/Logger.h" // for DEBUG, INFO, etc.
 #include "PSQt/GUILogger.h"
 
 int main( int argc, char **argv )
@@ -27,7 +28,7 @@ int main( int argc, char **argv )
   cout << "Command line:";
   for(int i = 0; i < argc; i++) cout << " " << argv[i]; cout << '\n';
 
-  if(argc==1 || atoi(argv[1])==1) { PSQt::GUIMain*  w = new PSQt::GUIMain();        w->show(); }
+  if(argc==1 || atoi(argv[1])==1) { PSQt::GUIMain*  w = new PSQt::GUIMain(0,PSQt::INFO);  w->show(); }
   else if(atoi(argv[1])==2) { PSQt::MyWidget*       w = new PSQt::MyWidget();       w->show(); }
   else if(atoi(argv[1])==3) { PSQt::WdgFile*        w = new PSQt::WdgFile();        w->show(); }
   else if(atoi(argv[1])==4) { PSQt::WdgImage*       w = new PSQt::WdgImage(0);      w->show(); }

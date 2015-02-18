@@ -57,6 +57,7 @@ class WdgGeoTree : public Frame
     void closeEvent      (QCloseEvent  *event = 0) ;
 
     QTreeView* get_view() { return m_view; };
+    GeoTree* get_geotree() { return m_geotree; };
     PSCalib::GeometryAccess* geoacc();
     void showTips() ;
 
@@ -80,8 +81,15 @@ class GeoTree : public QTreeView
 
     PSCalib::GeometryAccess* geoacc(){return m_geoacc;}
 
+    // Select item programatically
+    void setItemSelected(const QModelIndex& index);
+
+    // Select item programatically
+    void setItemSelected(const QStandardItem* item=0);
+
  public slots:
     void updateTreeModel(const std::string& gfname = "/reg/g/psdm/detector/alignment/cspad/geo-cspad-test-2-end.data");
+    void testSignalGeometryIsLoaded(PSCalib::GeometryAccess*);
     void testSignalString(const std::string& str);
     void testSignalGO(shpGO&);
     void testSignalCollapsed(const QModelIndex& index);
@@ -89,6 +97,7 @@ class GeoTree : public QTreeView
     void currentChanged(const QModelIndex & current, const QModelIndex & previous);
 
  signals:
+    void geometryIsLoaded(PSCalib::GeometryAccess*);
     void selectedText(const std::string& str);
     void selectedGO(shpGO&);
 

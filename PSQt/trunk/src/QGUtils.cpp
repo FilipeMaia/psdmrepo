@@ -72,6 +72,30 @@ ColorTable(const unsigned& NColors, const float& H1, const float& H2) // H1, H2=
 
 //--------------------------
 
+ndarray<uint32_t,2>
+getColorBarImage( const unsigned& rows, 
+                  const unsigned& cols,
+                  const float&    hue1,
+                  const float&    hue2
+                )
+{
+  MsgInLog("QGUtils", DEBUG, "getColorBarImage()");
+  uint32_t* colors = ColorTable(cols, hue1, hue2);
+
+  unsigned int shape[2] = {rows, cols};
+  ndarray<uint32_t,2> img_nda(shape);
+
+  for(unsigned r=0; r<rows; ++r) {
+    std::memcpy(&img_nda[r][0], &colors[0], cols*sizeof(uint32_t));
+  }
+
+  delete[] colors;
+
+  return img_nda;
+}
+
+//--------------------------
+
 void 
 setPixmapForLabel(const QImage& image, QPixmap*& pixmap, QLabel*& label)
 {

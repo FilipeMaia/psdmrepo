@@ -116,7 +116,7 @@ WdgGeo::WdgGeo( QWidget *parent, shpGO geo, const unsigned& pbits )
   //connect(m_but_add, SIGNAL( clicked() ), this, SLOT(onButAddSub()) );
   connect(m_rad_gr, SIGNAL(buttonClicked(int)), this, SLOT(onRadioGroup()));
   connect(m_but_gr, SIGNAL(buttonClicked(QAbstractButton*)), this, SLOT(onButAddSub(QAbstractButton*)));
-  if(m_pbits & 255) connect(this, SIGNAL(geoIsChanged(shpGO&)), this, SLOT(testSignalGeoIsChanged(shpGO&)));
+  connect(this, SIGNAL(geoIsChanged(shpGO&)), this, SLOT(testSignalGeoIsChanged(shpGO&)));
   connect(m_edi_step, SIGNAL(editingFinished()),  this, SLOT(onEdiStep())); 
 
   m_rad_x0->setChecked(true);
@@ -288,7 +288,7 @@ WdgGeo::onButAddSub(QAbstractButton* button)
 
   edi->setText(ss.str().c_str());
 
-  stringstream smsg; smsg << "Value of \"" << (but_radio->text()).toStdString() << "\" is changed to " << val << " -> set geo, emit signal";
+  stringstream smsg; smsg << "Value of \"" << (but_radio->text()).toStdString() << "\" is changed to " << val << " -> set geo, emit signal: geoIsChanged(m_geo)";
   MsgInLog(_name_(), INFO, smsg.str()); 
 
   this -> setGeoPars();

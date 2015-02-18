@@ -36,7 +36,7 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   m_file_nda = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
 
   m_wgt = new PSQt::WdgGeoTree(this, fname_geo, pbits);
-  m_wge = new PSQt::WdgGeo();
+  m_wge = new PSQt::WdgGeo(this);
  
   m_bbox = new QHBoxLayout();
   m_bbox -> addWidget(m_but_save);
@@ -83,18 +83,28 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   showTips();
   setStyle();
 
-  m_geoimg = new PSQt::GeoImage();  
+  m_geoimg = new PSQt::GeoImage(m_wgt->geoacc(), fname_nda);  
   m_wimage = new PSQt::WdgImage(0);  
   m_wimage -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
   m_wimage -> show();
 
   connect(Logger::getLogger(), SIGNAL(signal_new_record(Record&)), m_guilogger, SLOT(addNewRecord(Record&)));
+
   connect(m_wgt->get_view(), SIGNAL(selectedGO(shpGO&)), m_wge, SLOT(setNewGO(shpGO&)));
   connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()));
   connect(m_but_save, SIGNAL( clicked() ), this, SLOT(onButSave()));
   connect(m_file_geo, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
-  //connect(m_file_nda, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
-  //connect(m_file, SIGNAL(fileNameIsChanged(const std::string&)), m_wimage, SLOT(onFileNameChanged(const std::string&))); 
+
+  // connect signals for image update
+
+  connect(m_wgt->get_view(), SIGNAL(geometryIsLoaded(PSCalib::GeometryAccess*)), m_geoimg, SLOT(onGeometryIsLoaded(PSCalib::GeometryAccess*))); 
+  connect(m_file_nda, SIGNAL(fileNameIsChanged(const std::string&)), m_geoimg, SLOT(onImageFileNameIsChanged(const std::string&))); 
+  connect(m_wge,      SIGNAL(geoIsChanged(shpGO&)), m_geoimg, SLOT(onGeoIsChanged(shpGO&)));
+  //connect(m_geoimg, SIGNAL(normImageIsUpdated(const ndarray<GeoImage::image_t,2>&)), m_wimage, SLOT(onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&)));
+  connect(m_geoimg, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), m_wimage, SLOT(onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
+
+  m_wgt -> get_geotree() -> setItemSelected();
+  m_geoimg -> setFirstImage();
 
   SetMsgLevel(level);
 }

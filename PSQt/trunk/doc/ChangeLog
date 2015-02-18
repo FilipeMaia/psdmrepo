@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2015-02-17 Mikhail S. Dubrovin
+- The 1st working version of the app with control gui and image (PSAS-11, PSAS34)
+
 Tag: V00-00-06
 2015-02-11 Mikhail S. Dubrovin
 - Fix minor problems for RHEL6 nightly broken

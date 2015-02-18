@@ -54,12 +54,18 @@ class WdgImage : public QLabel
  Q_OBJECT // macro is needed for connection of signals and slots
 
  public:
+  typedef GeoImage::image_t image_t;
+
+
   WdgImage(QWidget *parent = 0, const std::string& fname=std::string()); 
   WdgImage(QWidget *parent, const QImage* image);
+  virtual ~WdgImage();
 
  public slots:
     void onFileNameChanged(const std::string& fname) ;
     void onTest() ;
+    void onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&) ;
+    void onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&) ;
 
  protected:
     void setFrame() ;
@@ -88,7 +94,6 @@ class WdgImage : public QLabel
  private:
     QFrame*      m_frame;
     QPainter*    m_painter;
-    QScrollArea* m_scroll_area;
 
     GeoImage*    m_geo_img;
 

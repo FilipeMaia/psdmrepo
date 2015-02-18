@@ -128,10 +128,14 @@ WdgGeoTree::mousePressEvent(QMouseEvent *event)
   //setLayout(vbox);
   //move(100,50);  
 
+
+  //if(m_pbits & 4) 
+
   //connect(this, SIGNAL(selectedText(const std::string&)), this, SLOT(testSignalString(const std::string&))); 
-  if(m_pbits & 4) connect(this, SIGNAL(selectedGO(shpGO&)), this, SLOT(testSignalGO(shpGO&))); 
-  if(m_pbits & 4) connect(this, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(testSignalCollapsed(const QModelIndex&)));
-  if(m_pbits & 4) connect(this, SIGNAL(expanded(const QModelIndex&)), this, SLOT(testSignalExpanded(const QModelIndex&)));
+  connect(this, SIGNAL(geometryIsLoaded(PSCalib::GeometryAccess*)), this, SLOT(testSignalGeometryIsLoaded(PSCalib::GeometryAccess*))); 
+  connect(this, SIGNAL(selectedGO(shpGO&)), this, SLOT(testSignalGO(shpGO&))); 
+  connect(this, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(testSignalCollapsed(const QModelIndex&)));
+  connect(this, SIGNAL(expanded(const QModelIndex&)), this, SLOT(testSignalExpanded(const QModelIndex&)));
 }
 
 //--------------------------
@@ -161,6 +165,8 @@ GeoTree::loadGeometry(const std::string& gfname)
   m_geoacc = new PSCalib::GeometryAccess(gfname);
   if (m_pbits & 2) m_geoacc->print_list_of_geos();
 
+  emit geometryIsLoaded(m_geoacc);
+  
   return true;
 }
 
@@ -184,6 +190,7 @@ GeoTree::updateTreeModel(const std::string& gfname)
 
   //m_view->expandAll();
   expandAll();
+
 }
 
 //--------------------------
@@ -195,6 +202,7 @@ GeoTree::fillTreeModel( shpGO geo_add
                       , const unsigned& pbits )
 {
    shpGO geo = (geo_add != shpGO()) ? geo_add : m_geoacc->get_top_geo();
+
    QStandardItem* item_parent = (parent) ? parent : m_model->invisibleRootItem();
 
    stringstream ss; ss << geo->get_geo_name() << "." << geo->get_geo_index();
@@ -204,7 +212,7 @@ GeoTree::fillTreeModel( shpGO geo_add
    item_parent->appendRow(item_add);
 
    map_item_to_geo[item_add] = geo;
-   map_geo_to_item[shpGO()] = item_add;
+   map_geo_to_item[geo_add] = item_add;
 
    std::vector<shpGO> list = geo->get_list_of_children();
 
@@ -281,9 +289,38 @@ GeoTree::currentChanged(const QModelIndex & index, const QModelIndex & index_old
 //--------------------------
 
 void 
+GeoTree::setItemSelected(const QModelIndex& index)
+{
+  this->selectionModel()->select(index, QItemSelectionModel::Select);
+  currentChanged(index,index);
+}
+
+//--------------------------
+
+void 
+GeoTree::setItemSelected(const QStandardItem* item)
+{
+  std::map<shpGO,QStandardItem*>::iterator it=map_geo_to_item.begin();
+  const QStandardItem* item_sel = (item) ? item : it->second;
+  this->setItemSelected(m_model->indexFromItem(item_sel));
+}
+
+//--------------------------
+//--------------------------
+//--------------------------
+//--------------------------
+void 
+GeoTree::testSignalGeometryIsLoaded(PSCalib::GeometryAccess*)
+{
+  MsgInLog(_name_(), DEBUG, "testSignalGeometryIsLoaded"); 
+}
+
+//--------------------------
+
+void 
 GeoTree::testSignalString(const std::string& str)
 {
-  MsgInLog(_name_(), INFO, std::string("GeoTree::testSignalString(string): str = ") + str); 
+  MsgInLog(_name_(), DEBUG, "GeoTree::testSignalString(string): str = " + str); 
 }
 
 //--------------------------
@@ -293,7 +330,7 @@ GeoTree::testSignalGO(shpGO& geo)
 {
   stringstream ss; ss << "GeoTree::testSignalGO(shpGO): "; // << geo.get()->get_geo_name() << ' ' << geo.get()->get_geo_index() << '\n';   // geo.get()->print_geo();
   ss << geo->string_geo();
-  MsgInLog(_name_(), INFO, ss.str()); 
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 }
 
 //--------------------------
@@ -302,7 +339,7 @@ void
 GeoTree::testSignalCollapsed(const QModelIndex& index)
 {
   stringstream ss; ss << "GeoTree::testSignalCollapsed(shpGO): row:" << index.row() << " col:" << index.column();
-  MsgInLog(_name_(), INFO, ss.str()); 
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 }
 
 //--------------------------
@@ -311,7 +348,7 @@ void
 GeoTree::testSignalExpanded(const QModelIndex& index)
 {
   stringstream ss; ss << "GeoTree::testSignalExpanded(shpGO): row:" << index.row() << " col:" << index.column();
-  MsgInLog(_name_(), INFO, ss.str()); 
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 }
 
 //--------------------------

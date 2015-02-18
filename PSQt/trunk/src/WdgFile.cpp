@@ -31,6 +31,7 @@ WdgFile::WdgFile( QWidget *parent,
   m_edi_file = new QLineEdit  (m_path.c_str());
 
   m_but_file -> setFixedWidth(but_width);
+  m_but_file -> setCursor(Qt::PointingHandCursor); 
 
   connect( m_but_file, SIGNAL( clicked() ),          this, SLOT( onButFile()) ); 
   connect( m_edi_file, SIGNAL( editingFinished() ),  this, SLOT( onEdiFile()) ); 

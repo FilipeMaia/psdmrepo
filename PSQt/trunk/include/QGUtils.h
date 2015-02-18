@@ -1,15 +1,19 @@
 #ifndef QGUTILS_H
 #define QGUTILS_H
 
+#include "ndarray/ndarray.h"
+#include "PSQt/Logger.h"
+
+#include "PSQt/GUAxes.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
+
 #include <string> 
 #include <sstream> // for stringstream
 #include <stdint.h> // uint8_t, uint32_t, etc.
 //#include "PSQt/GeoImage.h"
 //#include <QPainter>
 //#include <QPen>
-#include "PSQt/GUAxes.h"
-#include <QGraphicsScene>
-#include <QGraphicsView>
 
 #include <QLabel>
 #include <QPainter>
@@ -42,6 +46,19 @@ uint32_t HSV2RGBA(const float H, const float S, const float V);
  */ 
 uint32_t*
   ColorTable(const unsigned& NColors=1024, const float& H1=-120, const float& H2=-360);
+
+/**
+ * Returns 2-d ndarray with colorbar image
+ * @param[in] rows - number of rows in the color bar image
+ * @param[in] cols - number of columns and colors in the color bar image *
+ * @param[in] hue1 - first limit of the hue angle [0,360]
+ * @param[in] hue2 - second limit of the hue angle [0,360]
+ */ 
+ndarray<uint32_t, 2> 
+getColorBarImage(const unsigned& rows =   20, 
+                 const unsigned& cols = 1024,
+                 const float&    hue1 = -120,
+                 const float&    hue2 =   60) ;
 
 /**
  * Sets image as a pixmap for label
@@ -114,6 +131,55 @@ template<typename T>
 
 //--------------------------
  void splitext(const std::string& path, std::string& root, std::string& ext);
+
+//--------------------------
+
+template <typename T>
+ndarray<uint32_t, 2> 
+getUint32NormalizedImage (const ndarray<T, 2>& dnda)
+{
+  typedef uint32_t image_t;
+
+  MsgInLog("QGUtils", DEBUG, "getUint32NormalizedImage(): convert raw ndarray to colored uint32_t");
+
+  ndarray<image_t, 2> inda(dnda.shape());
+
+  //const unsigned ncolors = 1024;
+
+  //image_t* ctable = ColorTable(ncolors); // , hue1, hue2);
+
+  // Define image of type T to uint32_t conversion parameters
+  double dmin = dnda[0][0];
+  double dmax = dnda[0][0];
+
+  typename ndarray<T, 2>::iterator itd = dnda.begin();
+
+  for(; itd!=dnda.end(); ++itd) { 
+    if( *itd < dmin ) dmin = *itd;
+    if( *itd > dmax ) dmax = *itd;
+  }
+  T k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
+  //float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
+
+  std::stringstream ssd; 
+  //ssd << " dnda: " << dnda
+  ssd << "getUint32NormalizedImage(): dmin: "
+      << " dmin: " << dmin
+      << " dmax: " << dmax
+      << " k: " << k;
+  MsgInLog("QGUtils", DEBUG, ssd.str());
+
+  // Convert image of type T to uint32_t Format_ARGB32
+  ndarray<image_t, 2>::iterator iti;
+  for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
+    *iti = image_t( (*itd-dmin)*k ) + 0xFF000000; // converts to 24bits adds alpha layer
+    //unsigned cind = unsigned((*itd-dmin)*k);
+    //cind = (cind<ncolors) ? cind : ncolors-1;
+    //*iti = ctable[cind]; // converts to 24bits adds alpha layer
+  }
+  return inda;
+}
+
 //--------------------------
 
 } // namespace PSQt
