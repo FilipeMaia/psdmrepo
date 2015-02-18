@@ -8,9 +8,9 @@
 #      -s: set the acls as sudo. Without this option it will only print the 
 #          command. 
 #      -u: show disk usage and #files of /u2/
-#      -d: check and corrent the instr directory acl's
-#      -e: check and corrent the experiment directories acl's
-#      -f: check and corrent the xtc and idx file acls.
+#      -d: check and correct the instr directory acl's
+#      -e: check and correct the experiment directories acl's
+#      -f: check and correct the xtc and idx file acls.
 #   Default: -d -e -u
 #
 # Examples:
@@ -21,6 +21,62 @@
 # If the command is run via ssh and -s is used specify the ssh -t option to get a pseudo tty:
 # % ssh -t <host>  dss_instr_acls -s -d -u -f      
 #
+#
+#
+
+instr_acl=(
+    user::rwx
+    group::r-x
+    other::r-x
+    default:user::rwx
+    default:user:psdatmgr:rwx
+    default:group::r-x
+    default:mask::rwx
+    default:other::r-x
+)
+
+exp_acl=(
+    user::rwx
+    user:psdatmgr:rwx
+    group::r-x
+    mask::rwx
+    other::r-x
+    default:user::rwx
+    default:user:psdatmgr:rwx
+    default:group::r-x
+    default:mask::rwx
+    default:other::r-x
+)
+ 
+
+comp_acl() {
+    local path="$1"
+    local acl_type="$2"
+
+    acls=($(getfacl --omit-header  --absolute-names --no-effective "$1" ))
+    if [[ ${acl_type:-instr} == 'instr' ]] ; then 
+        ref_acl=(${instr_acl[@]}) 
+    else 
+        ref_acl=(${exp_acl[@]})
+    fi
+    let miss_ref=0
+    for ref in ${ref_acl[@]} ; do
+        f=1
+        for found in ${acls[@]} ; do
+            [[ "${found}" == "${ref}" ]] && f=0
+        done
+        let miss_ref=${miss_ref}+${f}
+    done
+    if [[ ${miss_ref} -gt 0 ]] ; then    
+        echo "Failed acls $1 $2 ${miss_ref}"
+        return 1
+    else
+        return 0
+    fi
+}
+
+
+
 
 function debug() {
 
@@ -76,18 +132,26 @@ function acls_experdir() {
     let ndirs=0
     let nerror=0
     for exp in ${path}/e* ${path}/e*/index ; do
+        comp_acl $exp 'exp'
+
         let def_user_ok=0
         let user_ok=0
+        let def_mask_ok=0
+        let mask_ok=0
         acls=$(getfacl --absolute-names $exp | egrep -v '^#')
         for acl in ${acls} ; do
             [[ "${acl}" = "default:user:psdatmgr:rwx" ]] && def_user_ok=1
             [[ "${acl}" = "user:psdatmgr:rwx" ]] && user_ok=1 
+            [[ "${acl}" = "default:mask::rwx" ]] && def_mask_ok=1
+            [[ "${acl}" = "mask::rwx" ]] && mask_ok=1 
         done
 
         let ndirs=${ndirs}+1
         #echo ${exp} ${user_ok} ${def_user_ok}       
         [[ ${def_user_ok} -eq 0 ]] && set_acl -d -m user:psdatmgr:rwx ${exp} && let nerror=${nerror}+1
         [[ ${user_ok} -eq 0 ]] && set_acl -m user:psdatmgr:rwx ${exp} && let nerror=${nerror}+1
+        [[ ${def_mask_ok} -eq 0 ]] && set_acl -d -m mask::rwx ${exp} && let nerror=${nerror}+1
+        [[ ${mask_ok} -eq 0 ]] && set_acl -m mask::rwx ${exp} && let nerror=${nerror}+1
     done
     echo "Checked ${ndirs} exper dirs error ${nerror}"
 }
@@ -139,6 +203,7 @@ if has_mode "space" ; then
 fi
 
 if has_mode "instrdir" ; then
+    comp_acl ${instrdir} 'instr'
     acls_instrdir ${instrdir}
 fi
 
