@@ -11,6 +11,9 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-02-19 Chris Ford
+- evr.ddl: add DataV4 data type with devel tag
+
 Tag V01-00-23
 2015-01-08 Matt Weaver
 - quartz.ddl: add taps,testpattern to ConfigV2 

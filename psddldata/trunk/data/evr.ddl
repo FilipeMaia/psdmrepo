@@ -551,6 +551,34 @@
 }
 
 
+//------------------ DataV4 ------------------
+@type DataV4
+  [[devel]] [[type_id(Id_EvrData, 4)]]
+{
+  uint32_t _u32NumFifoEvents -> numFifoEvents;
+  FIFOEvent _fifoEvents[@self._u32NumFifoEvents] -> fifoEvents;
+
+  /* Returns 1 if the opcode is present in the EVR FIFO, otherwise 0. */
+  uint8_t present(uint8_t opcode)
+  [[language("C++")]] @{
+    uint32_t size = @self.numFifoEvents();
+    for (uint32_t ii = 0; ii < size; ii++) {
+      if (@self.fifoEvents()[ii].eventCode() == opcode) {
+        return 1;
+      }
+    }
+    return 0;
+  @}
+
+  /* Standard constructor */
+  @init()  [[auto, inline]];
+
+  /* Constructor writing numFifoEvents only. */
+  @init(u32NumFifoEvents -> _u32NumFifoEvents)  [[inline]];
+
+}
+
+
 //------------------ IOChannel ------------------
 @type IOChannel
   [[value_type]]
