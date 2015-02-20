@@ -11,7 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-08
+Tag: V00-00-10
+2015-02-20 Mikhail S. Dubrovin
+- Add to svn directories and files under PSQt/data
+
+Tag: V00-00-09
 2015-02-20 Mikhail S. Dubrovin
 - Multiple changes in many classes (PSAS34);
 	- evaluate zoom relative to full size image,
