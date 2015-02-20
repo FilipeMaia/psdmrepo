@@ -525,9 +525,9 @@
 @type FIFOEvent
   [[value_type]]
 {
-  uint32_t _timestampHigh -> timestampHigh;
-  uint32_t _timestampLow -> timestampLow;
-  uint32_t _eventCode -> eventCode;
+  uint32_t _timestampHigh -> timestampHigh; /* 119 MHz timestamp (fiducial) */
+  uint32_t _timestampLow -> timestampLow;   /* 360 Hz timestamp */
+  uint32_t _eventCode -> eventCode;         /* event code (range 0-255) */
 
   /* Constructor which takes values for every attribute */
   @init()  [[auto, inline]];
@@ -539,8 +539,8 @@
 @type DataV3
   [[type_id(Id_EvrData, 3)]]
 {
-  uint32_t _u32NumFifoEvents -> numFifoEvents;
-  FIFOEvent _fifoEvents[@self._u32NumFifoEvents] -> fifoEvents;
+  uint32_t _u32NumFifoEvents -> numFifoEvents;  /* length of FIFOEvent list */
+  FIFOEvent _fifoEvents[@self._u32NumFifoEvents] -> fifoEvents;  /* FIFOEvent list */
 
   /* Standard constructor */
   @init()  [[auto, inline]];
@@ -553,10 +553,10 @@
 
 //------------------ DataV4 ------------------
 @type DataV4
-  [[devel]] [[type_id(Id_EvrData, 4)]]
+  [[type_id(Id_EvrData, 4)]]
 {
-  uint32_t _u32NumFifoEvents -> numFifoEvents;
-  FIFOEvent _fifoEvents[@self._u32NumFifoEvents] -> fifoEvents;
+  uint32_t _u32NumFifoEvents -> numFifoEvents;  /* length of FIFOEvent list */
+  FIFOEvent _fifoEvents[@self._u32NumFifoEvents] -> fifoEvents; /* FIFOEvent list */
 
   /* Returns 1 if the opcode is present in the EVR FIFO, otherwise 0. */
   uint8_t present(uint8_t opcode)
