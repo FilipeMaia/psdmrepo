@@ -23,14 +23,15 @@ class WdgFile : public QWidget
  public:
     WdgFile( QWidget *parent = 0, 
              const std::string& but_title=std::string("File:"), 
-             const std::string& path=std::string("/reg/neh/home1/dubrovin/LCLS/pubs/reflective-geometry.png"),
-             const std::string& search_fmt=std::string("*.data *.png \n *"),
+             const std::string& path=std::string(),
+             const std::string& search_fmt=std::string("*.data *.png *.gif *.jpg *.jpeg\n *"),
              const bool& show_frame=true,
              const unsigned& but_width=100);
     //    ~WdgFile(){}
 
     void resizeEvent(QResizeEvent *event = 0) ;
     void closeEvent (QCloseEvent  *event = 0) ;
+    std::string& fileName() { return m_path; };
 
  public slots:
     void onButFile() ;
@@ -38,7 +39,7 @@ class WdgFile : public QWidget
     void testSignalString(const std::string& fname) ;
 
  signals :
-    void fileNameIsChanged(const std::string&  fname) ;
+    void fileNameIsChanged(const std::string& fname) ;
     void valueChanged(int value) ;
 
  private :

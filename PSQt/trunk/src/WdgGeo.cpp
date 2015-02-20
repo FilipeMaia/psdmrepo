@@ -2,6 +2,8 @@
 
 #include "PSQt/WdgGeo.h"
 #include "PSQt/Logger.h"
+#include "AppUtils/AppDataPath.h"
+
 
 #include <iostream>  // std::cout
 #include <sstream>   // std::stringstream
@@ -22,8 +24,14 @@ WdgGeo::WdgGeo( QWidget *parent, shpGO geo, const unsigned& pbits )
   m_lab_geo    = new QLabel();
   m_lab_par    = new QLabel();
 
-  m_but_add    = new QPushButton("Add");
-  m_but_sub    = new QPushButton("Sub");
+  AppUtils::AppDataPath adp_icon_add("PSQt/icons/list-add.png");
+  AppUtils::AppDataPath adp_icon_sub("PSQt/icons/list-remove.png");
+
+  m_but_add    = new QPushButton(); // "Add");
+  m_but_sub    = new QPushButton(); // "Sub");
+  m_but_add -> setIcon(QIcon(QString(adp_icon_add.path().c_str())));
+  m_but_sub -> setIcon(QIcon(QString(adp_icon_sub.path().c_str())));
+
   m_but_gr     = new QButtonGroup();
   m_but_gr -> addButton(m_but_add);
   m_but_gr -> addButton(m_but_sub);
@@ -173,8 +181,8 @@ WdgGeo::setStyle()
   m_edi_tilt_z-> setFixedWidth(width);
 
   m_edi_step  -> setFixedWidth(width);
-  m_but_add   -> setFixedWidth(50);
-  m_but_sub   -> setFixedWidth(50);
+  m_but_add   -> setFixedWidth(35);
+  m_but_sub   -> setFixedWidth(35);
 
   m_edi_x0    -> setReadOnly(true);
   m_edi_y0    -> setReadOnly(true);
@@ -243,7 +251,7 @@ WdgGeo::onRadioGroup()
   if(but == m_rad_x0
   || but == m_rad_y0
   || but == m_rad_z0) {
-      m_edi_step -> setText("100");
+      m_edi_step -> setText("1000");
       m_edi_step -> setValidator(new QIntValidator(0,1000000,this));
   }
 

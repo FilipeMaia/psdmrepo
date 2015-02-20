@@ -2,6 +2,7 @@
 
 #include "PSQt/GUIImageViewer.h"
 #include "PSQt/Logger.h"
+#include "AppUtils/AppDataPath.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
@@ -18,8 +19,6 @@ namespace PSQt {
 
 //--------------------------
 
-
-
 GUIImageViewer::GUIImageViewer( QWidget *parent )
     : Frame(parent)
 //  : QWidget(parent)
@@ -28,14 +27,16 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   //const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
   //const std::string fname_img = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
 
+  AppUtils::AppDataPath adp_fname_def("PSQt/images/2011-08-10-Tiled-XPP.jpg"); //galaxy.jpeg"); 
+
   m_but_exit = new QPushButton( "Exit", this );
   m_but_test = new QPushButton( "Test", this );
-  m_file     = new PSQt::WdgFile(this);
+  m_file     = new PSQt::WdgFile(this, "Image:", adp_fname_def.path());
 
   m_but_exit -> setCursor(Qt::PointingHandCursor); 
   m_but_test -> setCursor(Qt::PointingHandCursor); 
 
-  m_image    = new PSQt::WdgImage(this);
+  m_image    = new PSQt::WdgImage(this, m_file->fileName());
   
   connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()) );
   connect(m_but_test, SIGNAL( clicked() ), m_image, SLOT(onTest()) );

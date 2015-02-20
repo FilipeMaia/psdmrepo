@@ -2,6 +2,8 @@
 
 #include "PSQt/GUIMain.h"
 #include "PSQt/Logger.h"
+#include "PSQt/QGUtils.h"
+#include "AppUtils/AppDataPath.h"
 
 //#include <string>
 //#include <fstream>   // ofstream
@@ -30,8 +32,15 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   const std::string fname_nda = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
   const bool pbits = 0;
 
+  AppUtils::AppDataPath adp_icon_exit("PSQt/icons/exit.png");
+  AppUtils::AppDataPath adp_icon_save("PSQt/icons/save.png");
+
   m_but_exit = new QPushButton( "Exit", this );
   m_but_save = new QPushButton( "Save", this );
+
+  m_but_exit -> setIcon(QIcon(QString(adp_icon_exit.path().c_str())));
+  m_but_save -> setIcon(QIcon(QString(adp_icon_save.path().c_str()))); 
+
   m_file_geo = new PSQt::WdgFile(this, "Set geometry", fname_geo, "*.data \n *", false);
   m_file_nda = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
 
@@ -186,11 +195,29 @@ GUIMain::mousePressEvent(QMouseEvent *event)
 //--------------------------
 //--------------------------
 //--------------------------
+//--------------------------
+//--------------------------
+//--------------------------
 
 void 
 GUIMain::onButSave()
 {
-  MsgInLog(_name_(), INFO, "onButSave() TBD"); 
+  MsgInLog(_name_(), DEBUG, "onButSave()");
+
+  char* search_fmt = "*.data *.txt \n *"; 
+  std::string path = getGeometryFileName(); // from QGUtils
+
+  QString path_file = QFileDialog::getSaveFileName(this, tr("Select input file"), 
+                                                   QString(path.c_str()), tr(search_fmt));
+  std::string str_path_file = path_file.toStdString();
+
+  if(str_path_file.empty()) {
+    MsgInLog(_name_(), INFO, "Cancel file selection");
+    return;
+  }
+
+  MsgInLog(_name_(), INFO, "Selected file name: " + str_path_file);
+  m_wgt -> get_geotree() -> saveGeometryInFile(str_path_file);
 }
 
 //--------------------------

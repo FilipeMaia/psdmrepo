@@ -86,6 +86,7 @@ class GeoTree : public QTreeView
 
     // Select item programatically
     void setItemSelected(const QStandardItem* item=0);
+    void saveGeometryInFile(const std::string& ofname="./geometry.txt");
 
  public slots:
     void updateTreeModel(const std::string& gfname = "/reg/g/psdm/detector/alignment/cspad/geo-cspad-test-2-end.data");

@@ -1,7 +1,6 @@
 //--------------------------
 
 #include "PSQt/QGUtils.h"
-#include <math.h>     // atan2, abs, fmod
 
 //#include "PSQt/WdgImage.h"
 //#include "ndarray/ndarray.h" // for img_from_pixel_arrays(...)
@@ -340,6 +339,36 @@ void splitext(const std::string& path, std::string& root, std::string& ext)
     ext  = std::string(path,pos);
     return;
   }
+}
+
+//--------------------------
+
+std::string stringTimeStamp(const std::string& format)
+{
+  time_t  time_sec;
+  time ( &time_sec );
+  struct tm* timeinfo; timeinfo = localtime ( &time_sec );
+  char c_time_buf[32]; strftime(c_time_buf, 32, format.c_str(), timeinfo);
+  return std::string (c_time_buf);
+}
+
+//--------------------------
+
+std::string
+getFileNameWithTStamp(const std::string& fname)
+{
+  std::string ofname = (fname==std::string()) ? "file.txt" : fname;
+  std::string root, ext;
+  splitext(ofname, root, ext);
+  return root + '-' + strTimeStamp() + ext; 
+}
+
+//--------------------------
+
+std::string
+getGeometryFileName(const std::string& fname, const bool& add_tstamp)
+{
+  return (add_tstamp) ? getFileNameWithTStamp(fname) : fname;  
 }
 
 //--------------------------

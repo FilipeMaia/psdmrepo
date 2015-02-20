@@ -8,8 +8,9 @@
 #include <QGraphicsScene>
 #include <QGraphicsView>
 
+#include <math.h>   // atan2, abs, fmod
 #include <string> 
-#include <sstream> // for stringstream
+#include <sstream>  // for stringstream
 #include <stdint.h> // uint8_t, uint32_t, etc.
 //#include "PSQt/GeoImage.h"
 //#include <QPainter>
@@ -133,10 +134,64 @@ template<typename T>
  void splitext(const std::string& path, std::string& root, std::string& ext);
 
 //--------------------------
+ std::string stringTimeStamp(const std::string& format=std::string("%Y-%m-%d-%H:%M:%S"));
+
+//--------------------------
+ std::string getFileNameWithTStamp(const std::string& fname);
+
+//--------------------------
+ std::string getGeometryFileName(const std::string& fname="geometry.txt", const bool& add_tstamp=true);
+
+//--------------------------
 
 template <typename T>
-ndarray<uint32_t, 2> 
-getUint32NormalizedImage (const ndarray<T, 2>& dnda)
+void
+  getMinMax(const ndarray<T,2>& nda, double& vmin, double& vmax)
+  {
+    double val = 0;
+    vmin = nda[0][0];
+    vmax = nda[0][0];
+    typename ndarray<T, 2>::iterator itd = nda.begin();
+    for(; itd!=nda.end(); ++itd) { 
+      val = *itd;
+      if( val < vmin ) vmin = val;
+      if( val > vmax ) vmax = val;
+    }
+  }
+
+//--------------------------
+
+template <typename T>
+void
+  getAveRms(const ndarray<T,2>& nda, double& ave, double& rms)
+  {
+    double val = 0;
+    double s0 = 0;
+    double s1 = 0;
+    double s2 = 0;
+
+    typename ndarray<T, 2>::iterator itd = nda.begin();
+    for(; itd!=nda.end(); ++itd) { 
+      val = *itd;
+      s0 += 1;
+      s1 += val;
+      s2 += val*val;
+    }
+    
+    if(s0) {
+      s1 /= s0;
+      s2 /= s0;
+    }
+
+    ave = s1;
+    rms = sqrt(s2-s1*s1);
+  }
+
+//--------------------------
+
+template <typename T>
+ndarray<uint32_t,2> 
+  getUint32NormalizedImage (const ndarray<T,2>& dnda, const unsigned& ncolors=0, const float& hue1=-120, const float& hue2=-360)
 {
   typedef uint32_t image_t;
 
@@ -144,39 +199,47 @@ getUint32NormalizedImage (const ndarray<T, 2>& dnda)
 
   ndarray<image_t, 2> inda(dnda.shape());
 
-  //const unsigned ncolors = 1024;
+  double dmin, dmax, dave, drms;
+  //getMinMax(dnda, dmin, dmax);
 
-  //image_t* ctable = ColorTable(ncolors); // , hue1, hue2);
-
-  // Define image of type T to uint32_t conversion parameters
-  double dmin = dnda[0][0];
-  double dmax = dnda[0][0];
+  getAveRms(dnda, dave, drms);
+  dmin = dave - 1*drms;
+  dmax = dave + 10*drms;
 
   typename ndarray<T, 2>::iterator itd = dnda.begin();
 
-  for(; itd!=dnda.end(); ++itd) { 
-    if( *itd < dmin ) dmin = *itd;
-    if( *itd > dmax ) dmax = *itd;
-  }
-  T k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
-  //float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
+  //double dmin = dnda[0][0];
+  //double dmax = dnda[0][0];
 
-  std::stringstream ssd; 
-  //ssd << " dnda: " << dnda
-  ssd << "getUint32NormalizedImage(): dmin: "
-      << " dmin: " << dmin
-      << " dmax: " << dmax
-      << " k: " << k;
-  MsgInLog("QGUtils", DEBUG, ssd.str());
+  //for(; itd!=dnda.end(); ++itd) { 
+  //  if( *itd < dmin ) dmin = *itd;
+  //  if( *itd > dmax ) dmax = *itd;
+  //}
+
+  //std::stringstream ssd; ssd << "getUint32NormalizedImage(): dmin: " << dmin << " dmax: " << dmax;
+  //MsgInLog("QGUtils", DEBUG, ssd.str());
 
   // Convert image of type T to uint32_t Format_ARGB32
-  ndarray<image_t, 2>::iterator iti;
-  for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
-    *iti = image_t( (*itd-dmin)*k ) + 0xFF000000; // converts to 24bits adds alpha layer
-    //unsigned cind = unsigned((*itd-dmin)*k);
-    //cind = (cind<ncolors) ? cind : ncolors-1;
-    //*iti = ctable[cind]; // converts to 24bits adds alpha layer
+  if (ncolors) {
+    //const unsigned ncolors = 1024;
+    float k = (dmax-dmin) ? ncolors/(dmax-dmin) : 1; 
+    image_t* ctable = ColorTable(ncolors, hue1, hue2);
+    ndarray<image_t, 2>::iterator iti;
+    for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
+      unsigned cind = unsigned((*itd-dmin)*k);
+      cind = (cind<ncolors) ? cind : ncolors-1;
+      *iti = ctable[cind]; // converts to 24bits adds alpha layer
+    }
+    delete [] ctable;
   }
+  else {
+    T k = (dmax-dmin) ? 0xFFFFFF/(dmax-dmin) : 1; 
+    ndarray<image_t, 2>::iterator iti;
+    for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
+      *iti = image_t( (*itd-dmin)*k ) + 0xFF000000; // converts to 24bits adds alpha layer
+    }
+  }    
+
   return inda;
 }
 

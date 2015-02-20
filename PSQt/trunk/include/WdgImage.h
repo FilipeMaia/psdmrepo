@@ -87,9 +87,9 @@ class WdgImage : public QLabel
     void setColorPixmap() ;
     void setColorWhellPixmap() ;
     void setColorBar(const unsigned& rows =   20, 
-                        const unsigned& cols = 1024,
-                        const float&    hue1 = -120,
-                        const float&    hue2 =   60) ;
+                     const unsigned& cols = 1024,
+                     const float&    hue1 = -120,
+                     const float&    hue2 =   60) ;
 
  private:
     QFrame*      m_frame;
@@ -107,9 +107,20 @@ class WdgImage : public QLabel
     QRect*       m_rect1;
     QRect*       m_rect2;
     bool         m_is_pushed;
+    bool         m_zoom_is_on;
+
+    unsigned     m_ncolors;
+    float        m_hue1;
+    float        m_hue2;
+
+    int          m_xmin_raw;
+    int          m_xmax_raw; 
+    int          m_ymin_raw;
+    int          m_ymax_raw;
 
     inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;
+    void resetZoom() ;
 };
 
 } // namespace PSQt

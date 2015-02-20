@@ -304,6 +304,19 @@ GeoTree::setItemSelected(const QStandardItem* item)
   const QStandardItem* item_sel = (item) ? item : it->second;
   this->setItemSelected(m_model->indexFromItem(item_sel));
 }
+//--------------------------
+
+void
+GeoTree::saveGeometryInFile(const std::string& ofname)
+{
+  if (! m_geoacc) {
+    MsgInLog(_name_(), WARNING, "Geometry object does not exist and can't be saved");
+    return;
+  }
+
+  MsgInLog(_name_(), INFO, "Save geometry in file " + ofname);
+  m_geoacc->save_pars_in_file(ofname);
+}
 
 //--------------------------
 //--------------------------

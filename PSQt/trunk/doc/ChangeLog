@@ -12,8 +12,18 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-08
+2015-02-20 Mikhail S. Dubrovin
+- Multiple changes in many classes (PSAS34);
+	- evaluate zoom relative to full size image,
+	- apply color table in stead of direct intensity to color conversion
+	- add icones for buttons
+	- load test files and icons from the PSQt/data directory
+	- implement saving of the corrected geometry file with auto-generated name
+	- add new methods in QGUtils
+
+Tag: V00-00-08
 2015-02-17 Mikhail S. Dubrovin
-- src/QGUtils.cpp - include <cstring> for memcpy to comply with RHEL6
+- QGUtils.cpp - include <cstring> for memcpy to comply with RHEL6
 
 Tag: V00-00-07
 2015-02-17 Mikhail S. Dubrovin

@@ -122,13 +122,16 @@ WdgImage::setWdgParams()
   m_rect2  = new QRect();
   m_is_pushed = false;
 
-  m_pixmap_raw = 0;
-  m_pixmap_scl = 0;
-
   //std::cout << "Point A\n";
   m_painter = new QPainter();
   //m_painter = new QPainter(this);
   //std::cout << "Point B\n";
+
+  m_ncolors = 1024; // =0 - color table is not used
+  m_hue1    = -120;
+  m_hue2    = -360;
+
+  this->resetZoom();
 }
 
 //--------------------------
@@ -181,28 +184,55 @@ WdgImage::drawRect()
 //--------------------------
 
 void 
+WdgImage::resetZoom()
+{
+  m_point1->setX(0);
+  m_point1->setY(0);
+  m_xmin_raw = 0;
+  m_ymin_raw = 0;
+  m_zoom_is_on = false;
+}
+
+//--------------------------
+
+void 
 WdgImage::zoomInImage()
 {
   MsgInLog(_name_(), INFO, "zoomInImage()");
 
-  float sclx = float(m_pixmap_scl->size().width())  / this->size().width();  
-  float scly = float(m_pixmap_scl->size().height()) / this->size().height();  
+  //std::cout << "  x1:" << m_point1->x() << "  y1:" << m_point1->y() 
+  //          << "  x2:" << m_point2->x() << "  y2:" << m_point2->y()<< '\n'; 
 
-  //std::cout << "scale x:" << sclx << " y:"      << scly << '\n'; 
+  if(m_point1->x() != 0 and m_point1->y() != 0) {
 
-  int p1x = int( m_point1->x()*sclx );
-  int p1y = int( m_point1->y()*scly );
-  int p2x = int( m_point2->x()*sclx );
-  int p2y = int( m_point2->y()*scly );
+    float sclx = float(m_pixmap_scl->size().width())  / this->size().width();  
+    float scly = float(m_pixmap_scl->size().height()) / this->size().height();  
+    
+    int p1x = int( m_point1->x()*sclx );
+    int p1y = int( m_point1->y()*scly );
+    int p2x = int( m_point2->x()*sclx );
+    int p2y = int( m_point2->y()*scly );
+    
+    int xmin = min(p1x, p2x);
+    int xmax = max(p1x, p2x); 
+    int ymin = min(p1y, p2y);
+    int ymax = max(p1y, p2y);
+    
+    m_xmin_raw += xmin;
+    m_ymin_raw += ymin;
+    m_xmax_raw = m_xmin_raw + xmax-xmin;
+    m_ymax_raw = m_ymin_raw + ymax-ymin;
+    
+    m_point1->setX(0);
+    m_point1->setY(0);
 
-  int xmin =min(p1x, p2x);
-  int xmax =max(p1x, p2x); 
-  int ymin =min(p1y, p2y);
-  int ymax =max(p1y, p2y);
+    m_zoom_is_on = true;
+  }
 
-  *m_pixmap_scl = m_pixmap_scl->copy(xmin, ymin, xmax-xmin, ymax-ymin);
-  setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
-  //setPixmap(*m_pixmap_scl);
+  if (m_zoom_is_on) {
+     *m_pixmap_scl = m_pixmap_raw->copy(m_xmin_raw, m_ymin_raw, m_xmax_raw-m_xmin_raw, m_ymax_raw-m_ymin_raw);
+     setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+  }
 }
 
 //--------------------------
@@ -212,13 +242,18 @@ WdgImage::setPixmapScailedImage(const QImage* image)
 {  
   //if image is available - reset m_pixmap_raw
   if(image) {
-    if(m_pixmap_raw) {delete m_pixmap_raw; m_pixmap_raw=0;}
+    if(m_pixmap_raw) delete m_pixmap_raw;
     m_pixmap_raw = new QPixmap(QPixmap::fromImage(*image));
   }
 
-  if (m_pixmap_scl) delete m_pixmap_scl;  
-  m_pixmap_scl = new QPixmap(*m_pixmap_raw);
-  setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+  if (m_zoom_is_on) 
+    zoomInImage();
+
+  else {
+    if (m_pixmap_scl) delete m_pixmap_scl;
+    m_pixmap_scl = new QPixmap(*m_pixmap_raw);
+    setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+  }
 }
 
 //--------------------------
@@ -302,6 +337,8 @@ WdgImage::mouseReleaseEvent(QMouseEvent *e)
   m_is_pushed = false;
 
   if(e->button() == 4) { // for middle button
+
+    this->resetZoom();
     setPixmapScailedImage();
     update();
     return;
@@ -339,6 +376,8 @@ WdgImage::loadImageFromFile(const std::string& fname)
   //clear();
 
   QImage image(fname.c_str());
+
+  this->resetZoom();
   setPixmapScailedImage(&image);
 }
 
@@ -359,9 +398,11 @@ WdgImage::onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
   stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
   MsgInLog(_name_(), INFO, ss.str()); 
 
-  const ndarray<GeoImage::image_t,2> nda_norm = getUint32NormalizedImage<const GeoImage::raw_image_t>(nda); // from QGUtils
+  const ndarray<GeoImage::image_t,2> nda_norm = 
+        getUint32NormalizedImage<const GeoImage::raw_image_t>(nda, m_ncolors, m_hue1, m_hue2); // from QGUtils
   
   onNormImageIsUpdated(nda_norm);
+  update();
 }
 
 //--------------------------

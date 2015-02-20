@@ -121,14 +121,12 @@ void
 WdgFile::onButFile()
 {
   MsgInLog(_name_(), DEBUG, "onButFile");
-  //QString dirname = "./";
-  //QString path_file; // = "/reg/d/psdm/CXI/cxi49012/xtc/e158-r0001-s02-c00.xtc";
 
-  const char* sep = "/";
   std::string str_path_file_edi = (m_edi_file -> displayText()).toStdString();
+  //dname =  "/reg/d/psdm/CXI/cxi49012/xtc/";
+  if (str_path_file_edi.empty()) str_path_file_edi = "./";
 
-  size_t pos = str_path_file_edi.rfind(sep);
-
+  size_t pos = str_path_file_edi.rfind('/');
   pos = (pos != std::string::npos) ? pos : str_path_file_edi.size();
 
   std::string dname(str_path_file_edi, 0, pos );
@@ -137,8 +135,6 @@ WdgFile::onButFile()
   MsgInLog(_name_(), DEBUG, "dname: " + dname );
   MsgInLog(_name_(), DEBUG, "fname: " + fname );
   
-  //dname =  "/reg/d/psdm/CXI/cxi49012/xtc/";
-
   QString path_file = QFileDialog::getOpenFileName(this, tr("Select input file"), 
                                                    QString(dname.c_str()), tr(m_search_fmt.c_str()));
 
