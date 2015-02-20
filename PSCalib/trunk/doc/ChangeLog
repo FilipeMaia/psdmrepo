@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-33
+2015-02-20 Mikhail S. Dubrovin	
+- CalibFileFinder.py - in method findCalibFileadd add protection for run numbers > 9999 (PSAS-111)
+	
 Tag: V00-02-32
 2015-02-17 Mikhail S. Dubrovin	
 - In GeometryAccess, GeometryObject, SegGeometryMatrixV1 - improve memory management (PSAS-34)

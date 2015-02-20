@@ -86,9 +86,11 @@ class CalibFileFinder :
         self.pbits = pbits
 
 
-    def findCalibFile(self, src, type, rnum) :
+    def findCalibFile(self, src, type, rnum0) :
         """Find calibration file
         """
+        rnum = rnum0 if rnum0 <= CalibFile.rnum_max else CalibFile.rnum_max
+
         if self.cdir == '' :
             if self.pbits & 1 : print 'WARNING! CALIBRATION DIRECTORY IS EMPTY'
             return ''
@@ -151,7 +153,11 @@ if __name__ == "__main__" :
     group = 'CsPad::CalibV1'
     src   = 'CxiDs1.0:Cspad.0'
     type  = 'pedestals'
-    rnum  = 137
+    #rnum  = 137
+    rnum  = 123456789
+
+    print 'Finding calib file for\n  dir = %s\n  grp = %s\n  src = %s\n  type= %s\n  run = %d' % \
+          (cdir, group, src, type, rnum)
 
     cff = CalibFileFinder(cdir, group, 0377) # 0377)
     fname = cff.findCalibFile(src, type, rnum)
