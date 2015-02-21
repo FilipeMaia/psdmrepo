@@ -11,12 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag V01-00-24
+Tag V01-00-25
 2015-02-20 Chris Ford
 - evr.ddl: remove devel tag from DataV4 data type
 
 2015-02-19 Chris Ford
 - evr.ddl: add DataV4 data type with devel tag
+
+Tag V01-00-24
+2015-02-02 Jana Thayer
 
 Tag V01-00-23
 2015-01-08 Matt Weaver
