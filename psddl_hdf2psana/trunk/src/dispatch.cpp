@@ -635,6 +635,10 @@ try {
     // EvrData::DataV3
     evt.putProxy(psddl_hdf2psana::EvrData::make_DataV3(schema_version, group, idx), src);
     break;
+  case 3654144454:
+    // EvrData::DataV4
+    evt.putProxy(psddl_hdf2psana::EvrData::make_DataV4(schema_version, group, idx), src);
+    break;
   case 3682217189:
     // PNCCD::FrameV1
     evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx), src);

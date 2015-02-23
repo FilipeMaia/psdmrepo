@@ -77,6 +77,53 @@ void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_DataV3_v0(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, bool append);
 
+///  --------- begin Data V4
+namespace ns_DataV4_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::EvrData::DataV4& psanaobj);
+  ~dataset_data();
+
+  size_t vlen_fifoEvents;
+  EvrData::ns_FIFOEvent_v0::dataset_data* fifoEvents;
+
+private:
+  dataset_data(const dataset_data& ds);
+  dataset_data& operator=(const dataset_data& ds);
+};
+}
+
+
+class DataV4_v0 : public Psana::EvrData::DataV4 {
+public:
+  typedef Psana::EvrData::DataV4 PsanaType;
+  DataV4_v0() {}
+  DataV4_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  DataV4_v0(const boost::shared_ptr<EvrData::ns_DataV4_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~DataV4_v0() {}
+    uint32_t numFifoEvents() const;
+
+  virtual ndarray<const Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
+
+  virtual uint8_t present(uint8_t) const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<EvrData::ns_DataV4_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_data_fifoEvents;
+};
+
+
+void make_datasets_DataV4_v0(const Psana::EvrData::DataV4& obj,
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
+void store_DataV4_v0(const Psana::EvrData::DataV4* obj, hdf5pp::Group group, long index, bool append);
+
+//// --- end Data V4
 
 namespace ns_IOChannel_v0 {
 struct dataset_data {

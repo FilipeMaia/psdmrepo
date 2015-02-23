@@ -33,6 +33,10 @@
 //              -- Public Function Member Definitions --
 //              ----------------------------------------
 
+namespace {
+  const int EvrDataPresentTableSize = 256;
+} // local namespace
+
 namespace psddl_hdf2psana {
 namespace EvrData {
 
@@ -137,6 +141,131 @@ void store_DataV3_v0(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, lon
   }
 }
 
+/// begin DataV4
+
+hdf5pp::Type ns_DataV4_v0_dataset_data_stored_type()
+{
+  typedef ns_DataV4_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::stored_type());
+  type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
+  return type;
+}
+
+hdf5pp::Type ns_DataV4_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_DataV4_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_DataV4_v0_dataset_data_native_type()
+{
+  typedef ns_DataV4_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::native_type());
+  type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
+  return type;
+}
+
+hdf5pp::Type ns_DataV4_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_DataV4_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_DataV4_v0::dataset_data::dataset_data()
+{
+  this->vlen_fifoEvents = 0;
+  this->fifoEvents = 0;
+}
+
+ns_DataV4_v0::dataset_data::dataset_data(const Psana::EvrData::DataV4& psanaobj)
+{
+  ndarray<const Psana::EvrData::FIFOEvent, 1> fifos = psanaobj.fifoEvents();
+  vlen_fifoEvents = fifos.shape()[0];
+  fifoEvents = (ns_FIFOEvent_v0::dataset_data*)malloc(sizeof(ns_FIFOEvent_v0::dataset_data)*vlen_fifoEvents);
+  for(unsigned i = 0; i != vlen_fifoEvents; ++ i) {
+    new (fifoEvents+i) ns_FIFOEvent_v0::dataset_data(fifos[i]);
+  }
+}
+
+ns_DataV4_v0::dataset_data::~dataset_data()
+{
+  free(this->fifoEvents);
+}
+
+ndarray<const Psana::EvrData::FIFOEvent, 1> DataV4_v0::fifoEvents() const {
+  if (not m_ds_data) read_ds_data();
+  if (m_ds_storage_data_fifoEvents.empty()) {
+    unsigned shape[] = {m_ds_data->vlen_fifoEvents};
+    ndarray<Psana::EvrData::FIFOEvent, 1> tmparr(shape);
+    std::copy(m_ds_data->fifoEvents, m_ds_data->fifoEvents+m_ds_data->vlen_fifoEvents, tmparr.begin());
+    m_ds_storage_data_fifoEvents = tmparr;
+  }
+  return m_ds_storage_data_fifoEvents;
+}
+
+uint8_t DataV4_v0::present(uint8_t opcode) const {
+  ndarray<const Psana::EvrData::FIFOEvent, 1> fifoEvents = this->fifoEvents();
+  for (unsigned idx = 0; idx < this->numFifoEvents(); idx++) {
+    if (fifoEvents[idx].eventCode() == opcode) return 1;
+  }
+  return 0;
+}
+
+void DataV4_v0::read_ds_data() const {
+  std::string dsname = "data";
+  m_ds_data = hdf5pp::Utils::readGroup<EvrData::ns_DataV4_v0::dataset_data>(m_group, dsname, m_idx);
+}
+
+
+uint32_t DataV4_v0::numFifoEvents() const
+{
+  if (not m_ds_data) read_ds_data();
+  return m_ds_data->vlen_fifoEvents;
+}
+
+void make_datasets_DataV4_v0(const Psana::EvrData::DataV4& obj,
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_DataV4_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
+
+    // special dataset for present table
+    hsize_t dim = EvrDataPresentTableSize;
+    hdf5pp::Type dstype2 = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), dim);
+    hdf5pp::Utils::createDataset(group, "present", dstype2, 
+                                 chunkPolicy.chunkSize(dstype2), 
+                                 chunkPolicy.chunkCacheSize(dstype2), deflate, shuffle);
+  }
+}
+
+void store_DataV4_v0(const Psana::EvrData::DataV4* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    ns_DataV4_v0::dataset_data ds_data(*obj);
+    // make present table
+    ndarray<uint8_t, 1> presentData = make_ndarray<uint8_t>(EvrDataPresentTableSize);
+    for (uint16_t opcode16 = 0; opcode16 < EvrDataPresentTableSize; ++opcode16) {
+      uint8_t opcode = uint8_t(opcode16);
+      presentData[opcode]=obj->present(opcode);
+    }
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+      hdf5pp::Utils::storeNDArrayAt(group, "present", presentData, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    hdf5pp::Utils::storeNDArray(group, "present", presentData);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+    hdf5pp::Utils::resizeDataset(group, "present", index < 0 ? index : index + 1);
+  }
+}
+
+
+/// end DataV4
 
 hdf5pp::Type ns_IOChannel_v0_dataset_data_stored_type()
 {

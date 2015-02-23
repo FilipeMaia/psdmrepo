@@ -174,6 +174,13 @@
 {
 }
 
+//------------------ DataV4 ------------------
+@h5schema DataV4
+  [[version(0)]]
+  [[external("psddl_hdf2psana/evr.h")]]
+{
+}
+
 
 //------------------ IOChannel ------------------
 @h5schema IOChannel
