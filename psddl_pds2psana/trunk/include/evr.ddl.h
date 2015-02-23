@@ -236,6 +236,22 @@ private:
   ndarray<Psana::EvrData::FIFOEvent, 1> _fifoEvents_ndarray_storage_;
 };
 
+
+class DataV4 : public Psana::EvrData::DataV4 {
+public:
+  typedef Pds::EvrData::DataV4 XtcType;
+  typedef Psana::EvrData::DataV4 PsanaType;
+  DataV4(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~DataV4();
+  virtual uint32_t numFifoEvents() const;
+  virtual ndarray<const Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
+  virtual uint8_t present(uint8_t opcode) const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  ndarray<Psana::EvrData::FIFOEvent, 1> _fifoEvents_ndarray_storage_;
+};
+
 Psana::EvrData::IOChannel pds_to_psana(Pds::EvrData::IOChannel pds);
 
 

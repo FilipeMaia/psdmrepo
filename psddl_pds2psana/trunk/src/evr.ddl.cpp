@@ -609,6 +609,36 @@ uint32_t DataV3::numFifoEvents() const {
 }
 
 ndarray<const Psana::EvrData::FIFOEvent, 1> DataV3::fifoEvents() const { return _fifoEvents_ndarray_storage_; }
+DataV4::DataV4(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::EvrData::DataV4()
+  , m_xtcObj(xtcPtr)
+{
+  {
+    typedef ndarray<Psana::EvrData::FIFOEvent, 1> NDArray;
+    typedef ndarray<const Pds::EvrData::FIFOEvent, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->fifoEvents();
+    _fifoEvents_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _fifoEvents_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::EvrData::pds_to_psana(*it);
+    }
+  }
+}
+DataV4::~DataV4()
+{
+}
+
+
+uint32_t DataV4::numFifoEvents() const {
+  return m_xtcObj->numFifoEvents();
+}
+
+ndarray<const Psana::EvrData::FIFOEvent, 1> DataV4::fifoEvents() const { return _fifoEvents_ndarray_storage_; }
+
+uint8_t DataV4::present(uint8_t opcode) const {
+  return m_xtcObj->present(opcode);
+}
+
 Psana::EvrData::IOChannel pds_to_psana(Pds::EvrData::IOChannel pds)
 {
   return Psana::EvrData::IOChannel(pds.name(), pds.ninfo(), pds.infos().data());

@@ -986,11 +986,25 @@ try {
           if (evt) evt->putProxy<Psana::EvrData::DataV3>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
+      case 4:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::EvrData::DataV4, psddl_pds2psana::EvrData::DataV4, Pds::EvrData::DataV4> ProxyType;
+          if (evt) evt->putProxy<Psana::EvrData::DataV4>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
       case 32771:
         {
           // store proxy
           typedef EvtProxy<Psana::EvrData::DataV3, psddl_pds2psana::EvrData::DataV3, Pds::EvrData::DataV3> ProxyType;
           if (evt) evt->putProxy<Psana::EvrData::DataV3>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32772:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::EvrData::DataV4, psddl_pds2psana::EvrData::DataV4, Pds::EvrData::DataV4> ProxyType;
+          if (evt) evt->putProxy<Psana::EvrData::DataV4>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -2784,8 +2798,14 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     case 3:
       typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV3) );
       break;
+    case 4:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV4) );
+      break;
     case 32771:
       typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV3) );
+      break;
+    case 32772:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV4) );
       break;
     } // end version switch
     break;
