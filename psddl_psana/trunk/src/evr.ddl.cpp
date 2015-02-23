@@ -254,6 +254,9 @@ SrcConfigV1::~SrcConfigV1() {}
 
 DataV3::~DataV3() {}
 
+
+DataV4::~DataV4() {}
+
 std::vector<int>
 IOChannel::name_shape() const {
   std::vector<int> shape;

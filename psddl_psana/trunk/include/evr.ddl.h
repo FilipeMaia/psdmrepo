@@ -600,14 +600,17 @@ public:
   {
   }
   FIFOEvent() {}
+  /** 119 MHz timestamp (fiducial) */
   uint32_t timestampHigh() const { return _timestampHigh; }
+  /** 360 Hz timestamp */
   uint32_t timestampLow() const { return _timestampLow; }
+  /** event code (range 0-255) */
   uint32_t eventCode() const { return _eventCode; }
   static uint32_t _sizeof() { return 12; }
 private:
-  uint32_t	_timestampHigh;
-  uint32_t	_timestampLow;
-  uint32_t	_eventCode;
+  uint32_t	_timestampHigh;	/**< 119 MHz timestamp (fiducial) */
+  uint32_t	_timestampLow;	/**< 360 Hz timestamp */
+  uint32_t	_eventCode;	/**< event code (range 0-255) */
 };
 
 /** @class DataV3
@@ -621,8 +624,29 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   virtual ~DataV3();
+  /** length of FIFOEvent list */
   virtual uint32_t numFifoEvents() const = 0;
+  /** FIFOEvent list */
   virtual ndarray<const EvrData::FIFOEvent, 1> fifoEvents() const = 0;
+};
+
+/** @class DataV4
+
+  
+*/
+
+
+class DataV4 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 4 /**< XTC type version number */ };
+  virtual ~DataV4();
+  /** length of FIFOEvent list */
+  virtual uint32_t numFifoEvents() const = 0;
+  /** FIFOEvent list */
+  virtual ndarray<const EvrData::FIFOEvent, 1> fifoEvents() const = 0;
+  /** Returns 1 if the opcode is present in the EVR FIFO, otherwise 0. */
+  virtual uint8_t present(uint8_t opcode) const = 0;
 };
 
 /** @class IOChannel

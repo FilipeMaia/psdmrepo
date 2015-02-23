@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-18
+2015-2-23 David Schneider
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+
 Tag: V00-06-17
 2015-2-4 David Schneider
 - update psddlc wrapper, JIRA PSAS-103
