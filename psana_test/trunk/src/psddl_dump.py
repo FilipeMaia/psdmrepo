@@ -7854,6 +7854,26 @@ def EvrData_DataV3_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def EvrData_DataV4_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.EvrData.DataV4.TypeId
+    assert obj.Version == psana.EvrData.DataV4.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numFifoEvents: %s' % uint32_to_str( obj.numFifoEvents() )
+    methodStrings.append(methodStr)                                 
+    # list_multi_line_methods
+    subMethodStrs = []
+    for idx, subObj in enumerate( obj.fifoEvents() ):
+        subMethodStr = doIndent(indent, lvl)
+        subMethodStr += 'fifoEvents[%d]:\n' % idx
+        subMethodStr += EvrData_FIFOEvent_to_str(subObj, indent, lvl+1, methodSep)
+        subMethodStrs.append(subMethodStr)
+    methodStr = '\n'.join(subMethodStrs)
+    methodStrings.append(methodStr)
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def EvrData_IOChannel_to_str(obj, indent, lvl, methodSep):
     methodStrings = []
     # one_line_methods
@@ -8036,6 +8056,7 @@ objFunctionTable = {
     (psana.EvrData.ConfigV6.TypeId,6) : EvrData_ConfigV6_to_str,
     (psana.EvrData.ConfigV7.TypeId,7) : EvrData_ConfigV7_to_str,
     (psana.EvrData.DataV3.TypeId,3) : EvrData_DataV3_to_str,
+    (psana.EvrData.DataV4.TypeId,4) : EvrData_DataV4_to_str,
     (psana.EvrData.IOConfigV1.TypeId,1) : EvrData_IOConfigV1_to_str,
     (psana.EvrData.IOConfigV2.TypeId,2) : EvrData_IOConfigV2_to_str,
     (psana.EvrData.SrcConfigV1.TypeId,1) : EvrData_SrcConfigV1_to_str,
