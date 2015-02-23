@@ -380,22 +380,34 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::SrcConfigV1> >(Pds::TypeId::Id_EvsConfig));
 
   class_<Psana::EvrData::FIFOEvent >("FIFOEvent", no_init)
-    .def("timestampHigh", &Psana::EvrData::FIFOEvent::timestampHigh)
-    .def("timestampLow", &Psana::EvrData::FIFOEvent::timestampLow)
-    .def("eventCode", &Psana::EvrData::FIFOEvent::eventCode)
+    .def("timestampHigh", &Psana::EvrData::FIFOEvent::timestampHigh,"119 MHz timestamp (fiducial)")
+    .def("timestampLow", &Psana::EvrData::FIFOEvent::timestampLow,"360 Hz timestamp")
+    .def("eventCode", &Psana::EvrData::FIFOEvent::eventCode,"event code (range 0-255)")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::FIFOEvent> >(-1));
 
   {
   scope outer = 
   class_<Psana::EvrData::DataV3, boost::shared_ptr<Psana::EvrData::DataV3>, boost::noncopyable >("DataV3", no_init)
-    .def("numFifoEvents", &Psana::EvrData::DataV3::numFifoEvents)
-    .def("fifoEvents", &Psana::EvrData::DataV3::fifoEvents)
+    .def("numFifoEvents", &Psana::EvrData::DataV3::numFifoEvents,"length of FIFOEvent list")
+    .def("fifoEvents", &Psana::EvrData::DataV3::fifoEvents,"FIFOEvent list")
   ;
   scope().attr("Version")=3;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EvrData);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::DataV3> >(Pds::TypeId::Id_EvrData));
+
+  {
+  scope outer = 
+  class_<Psana::EvrData::DataV4, boost::shared_ptr<Psana::EvrData::DataV4>, boost::noncopyable >("DataV4", no_init)
+    .def("numFifoEvents", &Psana::EvrData::DataV4::numFifoEvents,"length of FIFOEvent list")
+    .def("fifoEvents", &Psana::EvrData::DataV4::fifoEvents,"FIFOEvent list")
+    .def("present", &Psana::EvrData::DataV4::present,"Returns 1 if the opcode is present in the EVR FIFO, otherwise 0.")
+  ;
+  scope().attr("Version")=4;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrData);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::DataV4> >(Pds::TypeId::Id_EvrData));
 
   {
   scope outer = 
@@ -473,8 +485,9 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(1);
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV3"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "DataV4"));
     PyObject_SetAttrString(submodule, "Data", unvlist);
     Py_CLEAR(unvlist);
   }
