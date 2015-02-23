@@ -144,6 +144,7 @@ TypeAliases::TypeAliases() {
   Evr.insert( & typeid(Psana::EvrData::ConfigV6));
   Evr.insert( & typeid(Psana::EvrData::ConfigV7));
   Evr.insert( & typeid(Psana::EvrData::DataV3));
+  Evr.insert( & typeid(Psana::EvrData::DataV4));
   m_alias2TypesMap["Evr"] = Evr;
 
   TypeInfoSet EvrIO;
