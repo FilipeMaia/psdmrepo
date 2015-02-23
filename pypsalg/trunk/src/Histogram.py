@@ -15,6 +15,8 @@ class histaxis:
         self.binsize = (high-low)/float(nbin)
     def bin(self,val):
         return int(math.floor((val-self.low)/self.binsize))
+    def values(self):
+        return np.linspace(self.low+0.5*self.binsize,self.high-0.5*self.binsize,self.nbin)
 
 class hist1d:
     def __init__(self,nbinx,xlow,xhigh):
