@@ -1,0 +1,72 @@
+psana:
+- EvrData DataV4: this new type provides the convenience function
+  present(evrcode) which returns 1 if an evr code is present. Users
+  need not search through the FIFOEvents list. A 'present' table
+  will be translated to hdf5 as well. Matlab Hdf5 users need to be
+  careful about 1-up vs 0-up indexing and lookup evrcode+1 in
+  the present table. EvrData DataV4 may replace DataV3 in new data
+  as soon as Feb 25/2015. 
+- TimeTool: added options "beam_on_off_key" and "laser_on_off_key"
+  to allow a Psana module to override TimeTool logic that categorizes events.
+  See documentation at psana Module Catalog - TimeTool.Analyze. (PSAS-102)
+- xtcav: Improve island separation and delay calculation for 2-bunch
+  mode. Fix bug where inter bunch delay function would fail for vectors
+  with an odd number of elements.
+- live mode: add parameter to have psana wait for new runs in live
+  mode (PSAS-108)
+
+pypsalg:
+- add "values" method to histogram axis class (useful for plotting).
+
+Translator: 
+- fastindex feature added to MPI Split-scan Translator for purposes of
+  online analysis (PSAS-98)
+- look for and translate data that user Psana Modules produce during
+  BeginJob/BeginRun/BeginCalibCycle as well as EndJob/EndRun/EndCalibCycle.
+  If found during the End* methods, create subgroup EndData to standard
+  groups for this data. (PSAS-101)
+- add "split_cc_in_subdir" option to write cc files in a separate
+  subdirectory. (PSAS-104, PSWA-32)
+- Bump overall hdf5 schema version from 4 to 5.
+- Previously, setting the option type_filter=exclude psana did not
+  exclude epics. Now it will exclude epics. 
+
+DDL:
+- Rewrite DDL compiler wrappers to: (follow up to PSAS-103)
+- exclude smalldata from Translator and hdf2psana backends
+- optionally support DEVEL switch
+
+PSCalib:  
+- GeometryObject: add method get_geo_pars (PSAS-11).
+- GeometryAccess, GeometryObject, SegGeometryMatrixV1: improve memory
+  management (PSAS-34).
+- GeometryObject: add parameter do_eval in get_pixel_coords(...) and
+  evaluate_pixel_coords(...).
+- CalibFileFinder.py: in method findCalibFileadd add protection for
+  run numbers > 9999 (PSAS-111).
+
+PSQt: 
+- Add many classes for GUI and logger (PSAS-34).
+- Implement signal and slot methods for communication between project
+  objects, connect all parts of app in GUIMain.
+- Improve memory management in GeometryAccess, GeometryObject,
+  SegGeometryMatrixV1 by deleting old objects before updates.
+
+Bugs fixed:
+- PSXtcInput: Do not look for configure transition in second chunk of an ioc
+  recorder stream when in Index mode
+
+Deprecated Features:
+- o2o-translate has been removed from the release. Users needing
+  to re-translate old data should use an old release. o2o-translate
+  has hot been able to translate new DAQ types for a while.
+- psana-translate non MPI split scan has been removed. It is no longer
+  useful now that the MPI spilt scan translator has matured.
+- psana-translate filtered groups have been removed. These groups kept
+  track of events filtered from translation using the "do_not_translate"
+  keyword that the Translator picks up. The feature was not required.
+
+External Packages:
+- update to pdsdata 8.2.4 for EvrData DataV4
+- updated ROOT to version 5.34.25 (PSAS-96)
+
