@@ -1183,7 +1183,6 @@ class H5Output( unittest.TestCase ) :
         '''
         output_file = os.path.join(OUTDIR,"unit-test-type_filter.h5")
         cfgfile = writeCfgFile(TESTDATA_T1, output_file)
-        cfgfile.write("store_epics = no\n")
         cfgfile.write("type_filter = exclude psana\n")
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_file)

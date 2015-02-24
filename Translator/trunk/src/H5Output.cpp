@@ -356,7 +356,13 @@ void H5Output::init() {
   if (not m_quiet) MsgLog(logger, info, "output file: " << m_h5fileName);
 
   m_hdfWriters.initialize();
-  filterHdfWriterMap();
+  bool excludePsana = filterHdfWriterMap();
+  if (excludePsana) {
+    if (m_storeEpics != EpicsH5GroupDirectory::DoNotStoreEpics) {
+      MsgLog(logger, info, "setting store_epics to 'no' as type filter is 'exclude psana'");
+    }
+    m_storeEpics = EpicsH5GroupDirectory::DoNotStoreEpics;
+  }
   m_hdfWriterEventId = boost::make_shared<HdfWriterEventId>();
   m_hdfWriterDamage = boost::make_shared<HdfWriterDamage>();
   m_hdfWriterEventId->setDatasetCreationProperties(m_eventIdCreateDsetProp);
@@ -560,9 +566,10 @@ std::string H5Output::readConfigParameters() {
   return output_file;
 }
 
-void H5Output::filterHdfWriterMap() {
+bool H5Output::filterHdfWriterMap() {
   bool isExclude, includeAll;
   set<string> filterSet;
+  bool isPsanaExclude = false;
   parseFilterConfigString("type_filter", m_type_filter, isExclude, includeAll, filterSet);
   if (not includeAll) {
     bool hasPsana = false;
@@ -570,9 +577,10 @@ void H5Output::filterHdfWriterMap() {
       if (filterSet.size() != 1) MsgLog(logger,fatal, "type_filter has 'psana' "
                                  " and other entries. If psana is in type_filter list, it must be the only entry.");
       hasPsana = true;
-    }
+    }    
     map<string, bool>::iterator typeAliasIter;
     if (hasPsana) {
+      isPsanaExclude = isExclude;
       for (typeAliasIter = m_typeInclude.begin(); typeAliasIter != m_typeInclude.end(); ++typeAliasIter) {
         const string &typeAlias = typeAliasIter->first;
         bool &includeFlag = typeAliasIter->second;
@@ -604,6 +612,7 @@ void H5Output::filterHdfWriterMap() {
       removeTypes(m_hdfWriters, typeInfoSet);
     }
   }
+  return isPsanaExclude;
 }
 
 void H5Output::initializeSrcAndKeyFilters(PSEnv::Env &env) {

@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-19
+- setting option type_filter to exclude psana did not turn off epics. It seems
+  that it should. It now turns off epics. If for some reason someone only wants to
+  translate EPICS, it will be a hassle to configure, but I don't think anyone is 
+  doing that.
+	
 Tag: V00-02-18
 - update to pdsdata 8.2.4 with EvrDataV4 and present function
 	

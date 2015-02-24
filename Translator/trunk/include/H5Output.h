@@ -125,7 +125,8 @@ protected:
   bool srcIsFiltered(const Pds::Src &);
   bool keyIsFiltered(const std::string &key);
 
-  void filterHdfWriterMap();
+  // returns true is type filter is exclude psana - caller should set epics to no if so
+  bool filterHdfWriterMap();
   void initializeSrcAndKeyFilters(PSEnv::Env &env);
   std::string eventPosition();
 
