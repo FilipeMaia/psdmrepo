@@ -14,6 +14,7 @@
 #include "psana_test/xtciter.h"
 #include "psana_test/printxtc.h"
 #include "psana_test/epics2str.h"
+#include "psana_test/smldata.h"
 
 const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
   dumps xtc files based on first argument:\n\
@@ -25,12 +26,13 @@ const char * usage = "%s dg|xtc1|xtc xtcfile [--payload=n] [--dgrams=n]\n \
     The optional last arguments:\n\
       --payload=n    how many bytes of the payload to print for xtc\n\
       --dgrams=n     how many dgrams to print\n\
+      --sml          parse out the small data proxies instead of printing the payload\n\
       --epics        print extra lines with details on epics, both epicsConfigV1 and the pv's\n";
 
 void dgramHeaderIterator_nextAndOffset(int fd, long maxDgrams);           // dg
 void dgramAndItsXtcIterator(int fd, long maxDgrams);                      // xtc1
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint,
-                                                       bool printEpicsConfig); // xtc
+                                                       bool printEpicsConfig, bool parseSml); // xtc
 
 const int DEFAULT_MAX_PAYLOAD_PRINT = 1;
 
@@ -40,27 +42,34 @@ int main(int argc, char *argv[]) {
   size_t maxPayloadPrint = DEFAULT_MAX_PAYLOAD_PRINT;
   long maxDgrams = -1;
   bool printEpics = false;
+  bool parseSml = false;
   if (argc > 1) dumpArg = argv[1];
   if (argc > 2)  xtcFileName = argv[2];
   if ((NULL == dumpArg) or (xtcFileName=="")) {
     printf(usage,argv[0]);
     return -1;
   }
-  // check for --payload=n , --dgrams=n and --epics
+  // check for --payload=n , --dgrams=n, --epics and --sml
   static const char *payload = "--payload=";
   static const char *dgrams = "--dgrams=";
   static const char *epics = "--epics";
+  static const char *sml = "--sml";
   for (int ii = 3; ii < argc; ii++) {
     bool isPayload = (0 == strncmp(argv[ii], payload, strlen(payload)));
     bool isDgrams = (0 == strncmp(argv[ii], dgrams, strlen(dgrams)));
     bool isEpics = (0 == strncmp(argv[ii], epics, strlen(epics)));
-    if (not isPayload and not isDgrams and not isEpics) {
-      fprintf(stderr,"Error: argument %s starts out with neither %s , %s nor %s\n",
-              argv[ii], payload, dgrams, epics);
+    bool isSml = (0 == strncmp(argv[ii], sml, strlen(sml)));
+    if (not isPayload and not isDgrams and not isEpics and not isSml) {
+      fprintf(stderr,"Error: argument %s starts out with neither %s , %s,  %s nor %s\n",
+              argv[ii], payload, dgrams, epics, sml);
       return -1;
     }
     if (isEpics) {
       printEpics = true;
+      continue;
+    }
+    if (isSml) {
+      parseSml = true;
       continue;
     }
     char * intVal = argv[ii];
@@ -90,7 +99,7 @@ int main(int argc, char *argv[]) {
   } else if (strcmp(dumpArg,"xtc1")==0) {
     dgramAndItsXtcIterator(fd, maxDgrams);
   } else if (strcmp(dumpArg,"xtc")==0) {
-    dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(fd, maxDgrams, maxPayloadPrint, printEpics);
+    dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(fd, maxDgrams, maxPayloadPrint, printEpics, parseSml);
   } else {
     fprintf(stderr, "ERROR: unexpected, dumpArg=%s not recognized, must be one of 'dg', 'xtc1', 'xtc', 'xtcp'\n",dumpArg);
     fprintf(stderr,usage,argv[0]);
@@ -146,7 +155,7 @@ bool validPayload(const Pds::Damage &damage, enum Pds::TypeId::Type id) {
 }
 
 void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, size_t maxPayloadPrint, 
-                                                       bool printEpics) {
+                                                       bool printEpics, bool parseSml) {
   psana_test::DgramWithXtcPayloadIterator dgIter(fd);
   std::pair<Pds::Dgram *,size_t> dgramOffset = dgIter.nextAndOffsetFromStart();
   int dgNumber = 0;
@@ -185,8 +194,12 @@ void dgramAndXtcChildrenIteratorPrintXtcOffsetAndBytes(int fd, long maxDgrams, s
               fprintf(stdout," pvName=%s", ctrlPv->pvName());
             }
           }
-          fprintf(stdout," payload=");
-          psana_test::printBytes(xtc->payload(), xtc->sizeofPayload(), maxPayloadPrint);
+          if (parseSml and isSmallData(xtc->contains)) {
+            parseSmallData(stdout, xtc->contains, xtc->payload());
+          } else {
+            fprintf(stdout," payload=");
+            psana_test::printBytes(xtc->payload(), xtc->sizeofPayload(), maxPayloadPrint);
+          }
         } else {
           fprintf(stdout," payload=**damaged**");
         }
