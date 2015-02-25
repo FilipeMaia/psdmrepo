@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-20
+- add option to ignore unknown src in src_filter list. JIRA issue PSAS-114
+- restore cleanup of newwriter unit test
+	
 Tag: V00-02-19
 - setting option type_filter to exclude psana did not turn off epics. It seems
   that it should. It now turns off epics. If for some reason someone only wants to

@@ -1174,9 +1174,9 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(len(MyData),2)
         self.assertEqual(MyData['eventCounter'][0],1)
         self.assertEqual(MyData['eventCounter'][1],2)
-#
-#        if self.cleanUp:
-#            os.unlink(output_h5)
+
+        if self.cleanUp:
+            os.unlink(output_h5)
 
     def test_type_filter(self):
         '''check that the type_filter switch works

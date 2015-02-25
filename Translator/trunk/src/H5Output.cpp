@@ -41,6 +41,7 @@
 #include "Translator/HdfWriterNewDataFromEvent.h"
 #include "Translator/LoggerNameWithMpiRank.h"
 #include "Translator/H5MpiSplitScanDefaults.h"
+#include "PSEvt/Exceptions.h"
 
 // headers for problem with translating alias list from both DAQ and Control streams
 #include "pdsdata/xtc/ProcInfo.hh"
@@ -478,6 +479,9 @@ std::string H5Output::readConfigParameters() {
   // src filter parameters
   m_src_filter = configListReportIfNotDefault("src_filter", include_all);
   remainingConfigKeys.remove("src_filter");
+  
+  m_unknown_src_ok = configReportIfNotDefault("unknown_src_ok",false);
+  remainingConfigKeys.remove("unknown_src_ok");
 
   // key filter parameters
   m_key_filter = configListReportIfNotDefault("key_filter", include_all);
@@ -621,8 +625,17 @@ void H5Output::initializeSrcAndKeyFilters(PSEnv::Env &env) {
   m_psevtSourceFilterList.clear();
   for (set<string>::iterator pos = srcNameFilterSet.begin(); pos != srcNameFilterSet.end(); ++pos) {
     PSEvt::Source source(*pos);
-    PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(env.aliasMap()));
-    m_psevtSourceFilterList.push_back(srcMatch);
+    try {
+      PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(env.aliasMap()));
+      m_psevtSourceFilterList.push_back(srcMatch);
+    } catch (PSEvt::Exception &) {
+      if (m_unknown_src_ok) {
+        MsgLog(logger, warning, "unknown src " << *pos << " in src_filter set - ignoring");
+      } else {
+        MsgLog(logger, fatal, "unknown src " << *pos << " in src_filter set. " << std::endl
+               << " To proceed anyways, add the option 'unknown_src_ok=True' to the Translator configuration");
+      }
+    }
   }
   MsgLog(logger,TRACELVL, name() << "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
   parseFilterConfigString("key_filter", m_key_filter, m_keyFilterIsExclude,   m_includeAllKey,   m_keyFilterSet, true);
