@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-04
+2014-02-25 David Schneider
+- fix typo in comments
+	
 Tag: V00-08-03
 2014-04-29 David Schneider
 - specialize Event::get for ndarrays.

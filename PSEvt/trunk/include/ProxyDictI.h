@@ -50,7 +50,7 @@ namespace PSEvt {
  *  
  *  The client-side interface of this class is non-virtual and it 
  *  forwards every class to virtual methods which define customization
- *  oints to be implemented in subclasses.
+ *  points to be implemented in subclasses.
  *  
  *  Proxy dictionary stores proxy objects of type ProxyI which represent
  *  actual objects and know how to create or retrieve an object when
