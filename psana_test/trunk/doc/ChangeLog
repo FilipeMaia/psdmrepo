@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-21
+2015-2-24 David Schneider
+- fix rel6 build
+
 Tag: V00-08-20
 2015-2-24 David Schneider
 - add option --sml to xtclinedump to parse smlDataProxy payload

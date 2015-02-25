@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "psana_test/smldata.h"
 #include <stdexcept>
 
