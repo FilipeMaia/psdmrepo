@@ -6,15 +6,24 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Attachments.js</file>
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Post.js</file>
         </group>
-        <group name="PCDS Web Apps">
-            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_search.php</file>
-        </group>
         <group name="PCDS Web App">
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_delete.php</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/RestoreOneFile.php</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_move.php</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/filemgr_files_restore.php</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Filemanager_Files.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/Experiment_ELogAccess.css</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_ELogAccess.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/Experiment_Info.css</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/Experiment_Group.css</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_Info.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/Experiment_Group.js</file>
+        </group>
+        <group name="PCDS Web Apps">
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/HDF5_Translator.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/hdf5_requests_get.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/index_new.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/hdf5_request_delete.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/EscalateRequestPriority.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/hdf5_request_escalate.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/new.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/hdf5_config_get.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/lib/dataportal/translator1.class.php</file>
         </group>
     </open-files>
 </project-private>

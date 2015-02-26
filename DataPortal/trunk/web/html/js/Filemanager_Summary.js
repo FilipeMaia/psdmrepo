@@ -77,50 +77,52 @@ function (
             }
 
             var html =
-'<div id="ctrl">' +
-'  <div style="float:right;"><button class="control-button" name="refresh" title="click to refresh the summary information">Refresh</button></div>' +
-'  <div style="clear:both;"></div>' +
-'</div>' +
-'<div>' +
-'  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
-'  <div style="clear:both;"></div>' +
-'  <table><tbody>' +
-'    <tr><td class="table_cell table_cell_left"># of runs</td>' +
-'        <td class="table_cell table_cell_right" id="runs">Loading...</td></tr>' +
-'    <tr><td class="table_cell table_cell_left">First run #</td>' +
-'        <td class="table_cell table_cell_right" id="firstrun">Loading...</td></tr>' +
-'    <tr><td class="table_cell table_cell_left">Last run #</td>' +
-'        <td class="table_cell table_cell_right" id="lastrun">Loading...</td></tr>' +
-'    <tr><td class="table_cell table_cell_left" valign="center">XTC</td>' +
-'        <td class="table_cell table_cell_right">' +
-'          <table cellspacing=0 cellpadding=0><tbody>' +
-'            <tr><td class="table_cell table_cell_left">Size [GB]</td>' +
-'                <td class="table_cell table_cell_right" id="xtc-size">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left"># of files</td>' +
-'                <td class="table_cell table_cell_right" id="xtc-files">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>' +
-'                <td class="table_cell table_cell_right" id="xtc-archived">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>' +
-'                <td class="table_cell table_cell_right table_cell_bottom" id="xtc-disk">Loading...</td></tr>' +
-'            </tbody></table>' +
-'        </td></tr>' +
-'    <tr><td class="table_cell table_cell_left table_cell_bottom" valign="center">HDF5</td>' +
-'        <td class="table_cell table_cell_right table_cell_bottom">' +
-'          <table cellspacing=0 cellpadding=0><tbody>' +
-'            <tr><td class="table_cell table_cell_left">Size [GB]</td>' +
-'                <td class="table_cell table_cell_right" id="hdf5-size">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left"># of files</td>' +
-'                <td class="table_cell table_cell_right" id="hdf5-files">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left">Archived to HPSS</td>' +
-'                <td class="table_cell table_cell_right" id="hdf5-archived">Loading...</td></tr>' +
-'            <tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td>' +
-'                <td class="table_cell table_cell_right table_cell_bottom" id="hdf5-disk">Loading...</td></tr>' +
-'            </tbody></table>' +
-'        </td></tr>' +
-'  </tbody></table>' +
-'</div>' ;
+'<div id="ctrl" > ' +
+  '<div class="info" id="updated" style="float:right;" ></div> ' +
+  '<div style="clear:both;" ></div> ' +
+'</div> ' +
+'<div id="table" style="float:left;" > ' +
+  '<table><tbody> ' +
+    '<tr><td class="table_cell table_cell_left"># of runs</td> ' +
+        '<td class="table_cell table_cell_right" id="runs">Loading...</td></tr> ' +
+    '<tr><td class="table_cell table_cell_left">First run #</td> ' +
+        '<td class="table_cell table_cell_right" id="firstrun">Loading...</td></tr> ' +
+    '<tr><td class="table_cell table_cell_left">Last run #</td> ' +
+        '<td class="table_cell table_cell_right" id="lastrun">Loading...</td></tr> ' +
+    '<tr><td class="table_cell table_cell_left" valign="center">XTC</td> ' +
+        '<td class="table_cell table_cell_right"> ' +
+          '<table cellspacing=0 cellpadding=0><tbody> ' +
+            '<tr><td class="table_cell table_cell_left">Size [GB]</td> ' +
+                '<td class="table_cell table_cell_right" id="xtc-size">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left"># of files</td> ' +
+                '<td class="table_cell table_cell_right" id="xtc-files">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left">Archived to HPSS</td> ' +
+                '<td class="table_cell table_cell_right" id="xtc-archived">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td> ' +
+                '<td class="table_cell table_cell_right table_cell_bottom" id="xtc-disk">Loading...</td></tr> ' +
+            '</tbody></table> ' +
+        '</td></tr> ' +
+    '<tr><td class="table_cell table_cell_left table_cell_bottom" valign="center">HDF5</td> ' +
+        '<td class="table_cell table_cell_right table_cell_bottom"> ' +
+          '<table cellspacing=0 cellpadding=0><tbody> ' +
+            '<tr><td class="table_cell table_cell_left">Size [GB]</td> ' +
+                '<td class="table_cell table_cell_right" id="hdf5-size">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left"># of files</td> ' +
+                '<td class="table_cell table_cell_right" id="hdf5-files">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left">Archived to HPSS</td> ' +
+                '<td class="table_cell table_cell_right" id="hdf5-archived">Loading...</td></tr> ' +
+            '<tr><td class="table_cell table_cell_left  table_cell_bottom">Available on disk</td> ' +
+                '<td class="table_cell table_cell_right table_cell_bottom" id="hdf5-disk">Loading...</td></tr> ' +
+            '</tbody></table> ' +
+        '</td></tr> ' +
+  '</tbody></table> ' +
+'</div> ' +
+'<div id="buttons" style="float:left;" > ' +
+  '<button class="control-button" name="update" title="click to update the summary information"><img src="../webfwk/img/Update.png" /></button> ' +
+'</div> ' +
+'<div style="clear:both;" ></div> ' ;
             this._wa.html(html) ;
-            this._wa.find('button[name="refresh"]').button().click(function () { _that._load() ; }) ;
+            this._wa.find('button[name="update"]').button().click(function () { _that._load() ; }) ;
             this._updated = this._wa.find('#updated') ;
             this._load() ;
         } ;
@@ -134,7 +136,7 @@ function (
                 {exper_id: this.experiment.id} ,
                 function (data) {
 
-                    _that._updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    _that._updated.html('Updated: <b>'+data.updated+'</b>') ;
 
                     _that._wa.find('#runs'         ).html(data.summary.runs) ;
                     _that._wa.find('#firstrun'     ).html(data.summary.runs ? data.summary.min_run : 'n/a') ;

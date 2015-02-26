@@ -4,7 +4,7 @@ define ([
 
 function (
     cssloader, PropList ,
-    Class, FwkApplication, Fwk) {
+    Class,     FwkApplication, Fwk) {
 
     cssloader.load('../portal/css/HDF5_Config.css') ;
 

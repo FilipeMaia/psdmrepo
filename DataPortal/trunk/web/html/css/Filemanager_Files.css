@@ -9,7 +9,7 @@
 }
 
 #datafiles-xtchdf5 > #ctrl {
-  margin-bottom: 10px;
+  margin-bottom: 15px;
   font-size: 12px;
 }
 
@@ -38,9 +38,16 @@
   margin-left: 20px;
   padding-top: 17px;
 }
+#datafiles-xtchdf5 > #ctrl .buttons button[name="update"] img {
+    width:          11px;
+}
 
 #datafiles-xtchdf5 > #body {
   margin-left: 20px;
+}
+
+#datafiles-xtchdf5 > #body > #info {
+    font-size:  18px;
 }
 
 #datafiles-xtchdf5 > #body > #ctrl {

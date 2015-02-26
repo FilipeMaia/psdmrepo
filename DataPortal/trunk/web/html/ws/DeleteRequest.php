@@ -5,9 +5,7 @@ require_once( 'filemgr/filemgr.inc.php' );
 use FileMgr\FileMgrIfaceCtrlWs;
 use FileMgr\FileMgrException;
 
-/* This script will delete a pending translation request for the specified
- * identifier and, if successfull, return a JSON object describing the deleted
- * request. Otherwise another JSON object with an explanation of the problem will be returned.
+/* This script will delete a pending translation request for the specified identifier
  */
 
 /**
@@ -39,10 +37,8 @@ if( $id <= 0 ) report_error( 'invalid request identifier' );
 /**
  * Produce a document with JSON representation of successfully
  * deleted requests.
- *
- * @param $result - an array of requests
  */	
-function return_result( $request ) {
+function return_result( ) {
 
 	header( 'Content-type: application/json' );
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
@@ -51,19 +47,15 @@ function return_result( $request ) {
 	echo
 '{'.
 '  "Status": "success",'.
-'  "status": "success",'.
-'  "Result": '.json_encode( $request ).
+'  "status": "success"'.
 '}';
 	exit;
 }
 
 try {
-	$request = null;
-	FileMgrIfaceCtrlWs::delete_request(
-		$request,
-		$id );
+	FileMgrIfaceCtrlWs::delete_request($id);
 
-	return_result( $request );
+	return_result();
 
 } catch( FileMgrException $e ) { report_error( $e->toHtml()); }
 

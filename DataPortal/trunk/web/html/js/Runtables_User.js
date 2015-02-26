@@ -192,13 +192,13 @@ function (
 '        <input class="update-trigger" type="text" name="last"  value="" size=8 disabled />' +
 '      </div>' +
 '      <div class="buttons">' +
-'        <button class="control-button" name="search" title="search and display results" >Search</button>' +
-'        <button class="control-button" name="reset"  title="reset the form"             >Reset</button>' +
+'        <button class="control-button"               name="reset"  title="reset the form"             >RESET FORM</button>' +
+'        <button class="control-button update-button" name="update" title="update and display results" ><img src="../webfwk/img/Update.png" /></button>' +
 '      </div>' ;
             if (this._parent.access_list.runtables.edit) html +=
 '      <div class="buttons">' +
-'        <button class="control-button owner-restricted edit"   name="edit"   title="edit table configuration: add/remove/remove/rearrange columns, rename the table, etc." >Reconfigure</button>' +
-'        <button class="control-button owner-restricted delete" name="delete" title="delete the table" >Delete</button>' +
+'        <button class="control-button owner-restricted edit"   name="edit"   title="edit table configuration: add/remove/remove/rearrange columns, rename the table, etc." >RE-CONFIGURE</button>' +
+'        <button class="control-button owner-restricted delete" name="delete" title="delete the table" >DELETE</button>' +
 '      </div>' ;
             html +=
 '      <div style="clear:both;"></div>' +
@@ -230,7 +230,7 @@ function (
             this._get_cont().find('button.control-button').button().click(function () {
                 var op = this.name ;
                 switch (op) {
-                    case 'search' : _that._load() ; break ;
+                    case 'update' : _that._load() ; break ;
                     case 'reset'  : _that._reset() ; break ;
                     case 'edit'   : _that._parent._edit_table(_that._table_data.config.id) ; break ;
                     case 'delete' : _that._delete() ; break ;
@@ -278,7 +278,7 @@ function (
             for (var run in this._table_data.runs) {
                 var row = [] ;
                 row.push(
-                    '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+                    '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="link">'+run+'</a>'
                 ) ;
                 var param2value = this._table_data.runs[run] ;
                 var coldef = this._table_data.config.coldef ;
@@ -322,8 +322,8 @@ function (
                         elem.removeClass('modified') ;
                         _that._table_data.config.modified_time = data.info.modified_time ;
                         _that._table_data.config.modified_uid  = data.info.modified_uid ;
-                        _that._set_info   ('Modified: <b>'+data.info.modified_time+'</b> by: <b>'+data.info.modified_uid+'</b>') ;
-                        _that._set_updated('[ Last load: <b>'+data.updated+'</b> ]') ;
+                        _that._set_info   ('Re-configured: <b>'+data.info.modified_time+'</b> by: <b>'+data.info.modified_uid+'</b>') ;
+                        _that._set_updated('Updated: <b>'+data.updated+'</b>') ;
                     }
                 ) ;
             }) ;
@@ -384,8 +384,8 @@ function (
                     _that._table_data.run2id = data.run2id ;
                     _that._table_data.config.modified_time = data.info.modified_time ;
                     _that._table_data.config.modified_uid  = data.info.modified_uid ;
-                    _that._set_info   ('Modified: <b>'+data.info.modified_time+'</b> by: <b>'+data.info.modified_uid+'</b>') ;
-                    _that._set_updated('[ Last load: <b>'+data.updated+'</b> ]') ;
+                    _that._set_info   ('Re-configured: <b>'+data.info.modified_time+'</b> by: <b>'+data.info.modified_uid+'</b>') ;
+                    _that._set_updated('Updated: <b>'+data.updated+'</b>') ;
                     _that._display() ;
                 }
             ) ;
@@ -497,7 +497,7 @@ function (
 
             this._get_cont_hdr().html (
                 this._new_table_mode ? 
-                '<span class="ui-icon ui-icon-plus"></span>' : 
+                '<span style="color:red;">CREATE NEW TABLE</span>' : 
                 this._table_data.config.name+': <span style="color:red;">editing</span>'
             ) ;
 
@@ -507,7 +507,7 @@ function (
 '<div id="ctrl">' +
 '  <div class="group">'+(this._new_table_mode ?
 '    <p><b>INSTRUCTIONS:</b> Fill in a desired table name and configure the initial columns before hitting' +
-'       the <b>Save</b> button. Note that more columns can be added later using the table manager' +
+'       the <b>SAVE</b> button. Note that more columns can be added later using the table manager' +
 '       dialog when viewing the table. If no columns are provided when creating the table then the table' +
 '       will initially have just one - for run numbers. Columns can also be removed later.' +
 '       Note that the EPICS selector' +
@@ -529,10 +529,10 @@ function (
 '    </div>' +
 '  </div>' +
 '  <div class="buttons">'+(this._new_table_mode ?
-'    <button name="create" class="control-button" title="create the table" >Create</button>' +
-'    <button name="reset"  class="control-button" title="reset the table creation form" >Reset</button>' :
-'    <button name="save"   class="control-button" title="permanently save the modifications \nand switch to the viewing mode" >Save</button>' +
-'    <button name="cancel" class="control-button" title="cancel the table editing dialog \nand switch to the viewing mode" >Cancel</button>') +
+'    <button name="reset"  class="control-button" title="reset the table creation form" >RESET FORM</button>' +
+'    <button name="create" class="control-button important-button" title="create the table" >CREATE</button>' :
+'    <button name="save"   class="control-button" title="permanently save the modifications \nand switch to the viewing mode" >SAVE</button>' +
+'    <button name="cancel" class="control-button" title="cancel the table editing dialog \nand switch to the viewing mode" >CANCEL</button>') +
 '  </div>' +
 '  <div style="clear:both;"></div>' +
 '</div>' +

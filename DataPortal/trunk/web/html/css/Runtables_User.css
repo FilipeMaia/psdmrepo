@@ -26,11 +26,15 @@
   margin-left: 20px;
   margin-right: 20px;
 }
+#runtables-user > #tabs .update-button img {
+    width:          11px;
+}
 #runtables-user > #tabs button {
   color: #000000;
   font-size: 11px;
 }
-#runtables-user > #tabs button.delete {
+#runtables-user > #tabs button.delete span,
+#runtables-user > #tabs button[name="create"] span {
   color: red;
 }
 
@@ -193,4 +197,10 @@
 
 #runtables-user .info {
   color: maroon;
+}
+
+#runtables-user a.link {
+    text-decoration:    none !important;
+    font-weight:        bold !important;
+    color:              #0071bc !important;
 }

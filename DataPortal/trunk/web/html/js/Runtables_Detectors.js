@@ -58,7 +58,7 @@ function (
 
         this.runs = null ;
 
-        this.refresh_button = null ;
+        this.update_button = null ;
         this.reset_button = null ;
         this.from_run = null ;
         this.through_run = null ;
@@ -80,6 +80,8 @@ function (
 
             var html =
 '<div class="runtables-detectors-ctrl">' +
+'  <div class="runtables-detectors-info" id="updated" style="float:right;"></div>' +
+'  <div style="clear:both;"></div> ' +
 '  <table><tbody>' +
 '    <tr style="font-size:12px;">' +
 '      <td valign="center">' +
@@ -91,26 +93,23 @@ function (
 '      <td valign="center">' +
 '        <input name="through" type="text" size="2" title="The last run of the interval. If no input is provided then the very last known run will be assumed"/ ></td>' +
 '      <td valign="center">' +
-'        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">Reset Form</button></td>' +
+'        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">RESET FORM</button></td>' +
 '      <td valign="center">' +
-'        <button class="control-button" name="refresh" title="check if there were any updates on this page">Refresh</button></td>' +
+'        <button class="control-button update-button" name="update" title="check if there were any updates on this page"><img src="../webfwk/img/Update.png" /></button></td>' +
 '    </tr>' +
 '  </tbody></table>' +
 '</div>' +
 '<div class="runtables-detectors-wa">' +
-'  <div class="runtables-detectors-info" id="info"    style="float:left;" >&nbsp;</div>' +
-'  <div class="runtables-detectors-info" id="updated" style="float:right;">&nbsp;</div>' +
-'  <div style="clear:both;"></div> ' +
 '  <div class="runtables-detectors-body">' +
 '    <div id="table-controls" style="margin-bottom:10px;">' +
 '      <table><tbody>' +
 '        <tr style="font-size:12px;">' +
 '          <td valign="center">' +
-'            <button class="control-button" name="show_all" title="show all columns">Show all</button></td>' +
+'            <button class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">SELECT DETECTORS</td>' +
 '          <td valign="center">' +
-'            <button class="control-button" name="hide_all" title="hide all columns">Hide all</button></td>' +
+'            <button class="control-button" name="show_all" title="show all columns">SHOW ALL</button></td>' +
 '          <td valign="center">' +
-'            <button class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">Select detectors</td>' +
+'            <button class="control-button" name="hide_all" title="hide all columns">HIDE ALL</button></td>' +
 '        </tr>' +
 '      </tbody></table>' +
 '    </div>' +
@@ -119,14 +118,14 @@ function (
 '</div>' ;
             this.wa.html(html) ;
 
-            this.refresh_button = this.wa.find('button[name="refresh"]').button() ;
-            this.reset_button   = this.wa.find('button[name="reset"]')  .button() ;
-            this.from_run       = this.wa.find('input[name="from"]') ;
-            this.through_run    = this.wa.find('input[name="through"]') ;
+            this.update_button = this.wa.find('button[name="update"]').button() ;
+            this.reset_button  = this.wa.find('button[name="reset"]')  .button() ;
+            this.from_run      = this.wa.find('input[name="from"]') ;
+            this.through_run   = this.wa.find('input[name="through"]') ;
 
-            this.refresh_button.click (function () { that.load() ;  }) ;
-            this.from_run      .change(function () { that.load() ;  }) ;
-            this.through_run   .change(function () { that.load() ;  }) ;
+            this.update_button.click (function () { that.load() ;  }) ;
+            this.from_run     .change(function () { that.load() ;  }) ;
+            this.through_run  .change(function () { that.load() ;  }) ;
 
             this.reset_button.click (function () {
                 that.from_run.val('') ;
@@ -229,7 +228,7 @@ function (
                 var row = [] ;
                 row.push(
                     {   number: run ,
-                        html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+                        html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="link">'+run+'</a>'
                     }
                 ) ;
                 var run_detectors = this.runs[run] ;
@@ -257,7 +256,7 @@ function (
                     that.detectors      = data.detectors ;
                     that.runs = data.runs ;
                     that.display() ;
-                    that.wa.find('.runtables-detectors-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    that.wa.find('.runtables-detectors-info#updated').html('Updated: <b>'+data.updated+'</b>') ;
                     that.show_all_button.button('enable') ;
                     that.hide_all_button.button('enable') ;
                     that.advanced_button.button('enable') ;

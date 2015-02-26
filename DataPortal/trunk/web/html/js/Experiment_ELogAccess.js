@@ -35,10 +35,17 @@ function (
             this._init() ;
         } ;
 
+        this._update_interval_sec = 30 ;
+        this._prev_update_sec = null ;
+
         this.on_update = function () {
             if (this.active) {
                 this._init() ;
-                this._update() ;
+                var now_sec = Fwk.now().sec ;
+                if (!this._prev_update_sec || (now_sec - this._prev_update_sec) > this._update_interval_sec) {
+                    this._prev_update_sec = now_sec ;
+                    this._load() ;
+                }
             }
         } ;
 
@@ -65,18 +72,10 @@ function (
                 this._wa_elem = this.container.find('div#exp-elog') ;
                 if (html === undefined) {
                     html =
-'<div id="ctrl">' +
-'  <div style="float:right;" >' +
-'    <button class="control-button"' +
-'            name="refresh"' +
-'            title="refresh the page" >Refresh</button>' +
-'  </div>' +
-'  <div style="clear:both;" ></div>' +
-'</div>' +
-'<div id="body">' +
-'  <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
-'  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
-'  <div style="clear:both;"></div>' +
+'<div class="info" id="updated" style="float:right;">&nbsp;</div>' +
+'<div style="clear:both;"></div>' +
+
+'<div id="body" style="float:left;">' +
 '  <div id="operator">' +
 '    <h2>Access privileges for the operator account \''+this.experiment.operator_uid+'\': </h2>' +
 '    <div>' +
@@ -90,17 +89,19 @@ function (
 '         is not allowed because this will prevent e-Log <b>Grabber</b> from posting images into e-Log.</p>' +
 '    </div>' +
 '  </div>' +
-'</div>' ;
+'</div>' +
+
+'<div id="buttons" style="float:left;" >' +
+'  <button class="control-button"' +
+'          name="update"' +
+'          title="update the page" ><img src="../webfwk/img/Update.png" /></button>' +
+'</div>' +
+
+'<div style="clear:both;" ></div>' ;
                 }
                 this._wa_elem.html(html) ;
             }
             return this._wa_elem ;
-        } ;
-        this._ctrl = function () {
-            if (!this._ctrl_elem) {
-                this._ctrl_elem = this._wa().children('#ctrl') ;
-            }
-            return this._ctrl_elem ;
         } ;
         this._body = function () {
             if (!this._body_elem) {
@@ -108,15 +109,9 @@ function (
             }
             return this._body_elem ;
         } ;
-        this._set_info = function (html) {
-            if (!this._info_elem) {
-                this._info_elem = this._body().children('#info') ;
-            }
-            this._info_elem.html(html) ;
-        } ;
         this._set_updated = function (html) {
             if (!this._updated_elem) {
-                this._updated_elem = this._body().children('#updated') ;
+                this._updated_elem = this._wa().children('#updated') ;
             }
             this._updated_elem.html(html) ;
         } ;
@@ -153,20 +148,14 @@ function (
 
             // -- set up event handlers
 
-            this._ctrl().find('button.control-button').button().click(function () {
-                switch (this.name) {
-                    case 'refresh':
-                        _that._update() ;
-                        break ;
-                }
-            }) ;
+            this._wa().find('button[name="update"]').button().click(function () { _that._load() ; }) ;
 
             this._operator_access().activate('NoAccess') ;
 
-            this._update() ;
+            this._load() ;
         } ;
 
-        this._update = function () {
+        this._load = function () {
             if (!this.access_list.experiment.view_info) return ;
             this._load() ;
         } ;
@@ -177,7 +166,7 @@ function (
                 {   exper_id: this.experiment.id ,
                     uid:      this.experiment.operator_uid} ,
                 function (data) {
-                    _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    _that._set_updated('Updated: <b>'+data.updated+'</b>') ;
                     _that._display(data) ;
                 }
             ) ;
@@ -193,7 +182,7 @@ function (
                     role:     role
                 } ,
                 function (data) {
-                    _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    _that._set_updated('Updated: <b>'+data.updated+'</b>') ;
                     _that._display(data) ;
                 } ,
                 function (msg) {

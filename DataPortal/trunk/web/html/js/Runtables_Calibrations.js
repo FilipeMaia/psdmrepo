@@ -58,7 +58,7 @@ function (
 
         this.runs = null ;
 
-        this.refresh_button = null ;
+        this.update_button = null ;
         this.reset_button = null ;
         this.from_run = null ;
         this.through_run = null ;
@@ -79,42 +79,55 @@ function (
             }
 
             var html =
-'<div class="runtables-calib-ctrl">' +
-'  <table><tbody>' +
-'    <tr style="font-size:12px;">' +
-'      <td valign="center">' +
-'        <span style="font-weight:bold;">Select runs from</span></td>' +
-'      <td valign="center">' +
-'        <input type="text" name="from" size="2" title="The first run of the interval. If no input is provided then the very first known run will be assumed." /></td>' +
-'      <td valign="center">' +
-'        <span style="font-weight:bold; margin-left:0px;">through</span></td>' +
-'      <td valign="center">' +
-'        <input name="through" type="text" size="2" title="The last run of the interval. If no input is provided then the very last known run will be assumed"/ ></td>' +
-'      <td valign="center">' +
-'        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">Reset Form</button></td>' +
-'      <td valign="center">' +
-'        <button class="control-button" name="refresh" title="check if there were any updates on this page">Refresh</button></td>' +
-'    </tr>' +
-'  </tbody></table>' +
-'</div>' +
-'<div class="runtables-calib-wa">' +
-'  <div class="runtables-calib-info" id="info"    style="float:left;" >&nbsp;</div>' +
-'  <div class="runtables-calib-info" id="updated" style="float:right;">&nbsp;</div>' +
-'  <div style="clear:both;"></div> ' +
-'  <div class="runtables-calib-body">' +
-'    <div id="table"></div>' +
-'  </div>' +
-'</div>' ;
+'<div class="runtables-calib-ctrl"> ' +
+  '<div class="runtables-calib-info" id="updated" style="float:right;" ></div> ' +
+  '<div style="clear:both;" ></div> ' +
+  '<table><tbody> ' +
+    '<tr style="font-size:12px;" > ' +
+      '<td valign="center"> ' +
+        '<span style="font-weight:bold;">Select runs from</span> ' +
+      '</td> ' +
+      '<td valign="center"> ' +
+        '<input type="text" name="from" size="2" title="' +
+          'The first run of the interval. If no input is provided then ' +
+          'the very first known run will be assumed." ' +
+        '/> ' +
+      '</td> ' +
+      '<td valign="center" > ' +
+        '<span style="font-weight:bold; margin-left:0px;" >through</span> ' +
+      '</td>' +
+      '<td valign="center" > ' +
+        '<input name="through" type="text" size="2" title="' +
+          'The last run of the interval. If no input is provided then the very ' +
+          'last known run will be assumed" ' +
+        '/ > ' +
+      '</td>' +
+      '<td valign="center" > ' +
+        '<button class="control-button" style="margin-left:20px;" name="reset" title="reset the form" >RESET FORM</button> ' +
+      '</td>' +
+      '<td valign="center" > ' +
+        '<button class="control-button update-button" name="update" title="check if there were any updates on this page" > ' +
+          '<img src="../webfwk/img/Update.png" /> ' +
+        '</button> ' +
+      '</td> ' +
+    '</tr> ' +
+  '</tbody></table> ' +
+'</div> ' +
+'<div class="runtables-calib-wa" > ' +
+'  <div class="runtables-calib-body" > ' +
+'    <div id="table"></div> ' +
+'  </div> ' +
+'</div> ' ;
             this.wa.html(html) ;
 
-            this.refresh_button = this.wa.find('button[name="refresh"]').button() ;
-            this.reset_button   = this.wa.find('button[name="reset"]')  .button() ;
-            this.from_run       = this.wa.find('input[name="from"]') ;
-            this.through_run    = this.wa.find('input[name="through"]') ;
+            this.update_button = this.wa.find('button[name="update"]').button() ;
+            this.reset_button  = this.wa.find('button[name="reset"]')  .button() ;
+            this.from_run      = this.wa.find('input[name="from"]') ;
+            this.through_run   = this.wa.find('input[name="through"]') ;
 
-            this.refresh_button.click (function () { that.load() ;  }) ;
-            this.from_run      .change(function () { that.load() ;  }) ;
-            this.through_run   .change(function () { that.load() ;  }) ;
+            this.update_button.click (function () { that.load() ;  }) ;
+            this.from_run     .change(function () { that.load() ;  }) ;
+            this.through_run  .change(function () { that.load() ;  }) ;
 
             this.reset_button.click (function () {
                 that.from_run.val('') ;
@@ -254,13 +267,13 @@ function (
             var rows = [] ;
             for (var run in this.runs)
                 rows.push(this.access_list.runtables.edit_calibrations ?
-                    [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'} ,
+                    [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="link">'+run+'</a>'} ,
                         '<div class="runtables-calib-dark-cont"    ><input    class="runtables-calib-dark edit"    id="'+run+'" type="checkbox" /></div>' ,
                         '<div class="runtables-calib-flat-cont"    ><input    class="runtables-calib-flat edit"    id="'+run+'" type="checkbox" /></div>' ,
                         '<div class="runtables-calib-geom-cont"    ><input    class="runtables-calib-geom edit"    id="'+run+'" type="checkbox" /></div>' ,
                         '<div class="runtables-calib-comment-cont" ><textarea class="runtables-calib-comment edit" id="'+run+'" rows="2" cols="56" ></textarea></div>' ,
                         '<button class="save_run"   id="'+run+'" title="save modifications to the database" >Save</>'] :
-                    [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'} ,
+                    [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="link">'+run+'</a>'} ,
                         '<div class="runtables-calib-dark-cont"    ><div      class="runtables-calib-dark"    id="'+run+'" ></div></div>' ,
                         '<div class="runtables-calib-flat-cont"    ><div      class="runtables-calib-flat"    id="'+run+'" ></div></div>' ,
                         '<div class="runtables-calib-geom-cont"    ><div      class="runtables-calib-geom"    id="'+run+'" ></div></div>' ,
@@ -281,7 +294,7 @@ function (
                 function (data) {
                     that.runs = data.runs ;
                     that.display() ;
-                    that.wa.find('.runtables-calib-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    that.wa.find('.runtables-calib-info#updated').html('Updated: <b>'+data.updated+'</b>') ;
                 }
             ) ;
         } ;

@@ -586,13 +586,13 @@ function (
         this._is_initialized = false ;
 
         this._wa = null ;
+        this._updated = null ;
         this._runs = null ;
         this._types = null ;
         this._checksum = null ;
         this._archived = null ;
         this._local = null ;
         this._info = null ;
-        this._updated = null ;
         this._quota = null ;
         this._body_ctrl = null ;
         this._viewer = null ;
@@ -624,6 +624,8 @@ function (
             }
             var html =
 '<div id="ctrl">' +
+'  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
+'  <div style="clear:both;"></div>' +
 '  <div class="group" title=' +
 '"Put a run number or a range of runs to activate the filter. \n' +
 'Range can be specified like this: \n' +
@@ -671,13 +673,12 @@ function (
 '  </div>' +
 '  <div class="buttons" style="float:left;" >' +
 '    <button class="control-button" name="reset"   title="reset the form">RESET FORM</button>' +
-'    <button class="control-button" name="refresh" title="click to refresh the list of files">SEARCH</button>' +
+'    <button class="control-button" name="update" title="click to update the list of files"><img src="../webfwk/img/Update.png" /></button>' +
 '  </div>' +
 '  <div style="clear:both;"></div>' +
 '</div>' +
 '<div id="body" >' +
 '  <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
-'  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '  <div style="clear:both;"></div>' +
 '  <div id="ctrl" >' +
 '    <div>' +
@@ -707,6 +708,7 @@ function (
 
             var ctrl = this._wa.find('#ctrl') ;
 
+            this._updated  = ctrl.find('#updated') ;
             this._runs     = ctrl.find('input[name="runs"]') ;
             this._types    = ctrl.find('select[name="types"]') ;
             this._checksum = ctrl.find('select[name="checksum"]') ;
@@ -717,15 +719,14 @@ function (
             ctrl.find('.control-button').button().click(function () {
                 var op = this.name ;
                 switch (op) {
-                    case 'reset'   : _that._reset() ; break ;
-                    case 'refresh' : _that._load() ; break ;
+                    case 'reset'  : _that._reset() ; break ;
+                    case 'update' : _that._load() ; break ;
                 }
             }) ;
 
             var body = this._wa.find('#body') ;
 
             this._info    = body.find('#info') ;
-            this._updated = body.find('#updated') ;
 
             this._body_ctrl = body.find('#ctrl') ;
             this._body_ctrl.find('.display-trigger').change(function () {
@@ -781,7 +782,7 @@ function (
 
                     if (!_that._reverse_order) _that._files_last_request.runs.reverse() ;
 
-                    _that._updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    _that._updated.html('Updated: <b>'+data.updated+'</b>') ;
                     _that._display() ;
                 } ,
                 function (msg) {
@@ -792,25 +793,29 @@ function (
 
         this._table_hdr = [
             {id: 'runs_begin',      title: 'RUNS',        width:  40} ,
-            {id: 'runs_end',        title: '&nbsp;',      width:  60} ,
+            {id: 'runs_end',        title: '&nbsp;',      width:  55} ,
             {id: '|'} ,
-            {id: 'total',           title: 'TOTAL',       width:  70} ,
-            {id: 'total_files',     title: 'files',       width:  60} ,
-            {id: 'total_gb',        title: 'GB',          width:  60} ,
+            {id: 'total',           title: '&Sum;',       width:  10} ,
+            {id: 'total_files',     title: 'files',       width:  40, align: "right"} ,
+            {id: 'total_gb',        title: 'GB',          width:  60, align: "right"} ,
+            {id: '_',                                     width:  10} ,
             {id: '|'} ,
-            {id: 'short',           title: 'SHORT-TERM',  width: 115} ,
-            {id: 'short_overstay',  title: '&nbsp',       width:  35} ,
-            {id: 'short_files',     title: 'files',       width:  60} ,
-            {id: 'short_gb',        title: 'GB',          width:  60} ,
+            {id: 'short',           title: 'SHORT-TERM',  width: 100} ,
+            {id: 'short_overstay',  title: '&nbsp',       width:  20, align: "right"} ,
+            {id: 'short_files',     title: 'files',       width:  40, align: "right"} ,
+            {id: 'short_gb',        title: 'GB',          width:  60, align: "right"} ,
+            {id: '_',                                     width:  10} ,
             {id: '|'} ,
-            {id: 'medium',          title: 'MEDIUM-TERM', width: 115} ,
-            {id: 'medium_overstay', title: '&nbsp',       width:  35} ,
-            {id: 'medium_files',    title: 'files',       width:  60} ,
-            {id: 'medium_gb',       title: 'GB',          width:  60} ,
+            {id: 'medium',          title: 'MEDIUM-TERM', width: 100} ,
+            {id: 'medium_overstay', title: '&nbsp',       width:  20, align: "right"} ,
+            {id: 'medium_files',    title: 'files',       width:  40, align: "right"} ,
+            {id: 'medium_gb',       title: 'GB',          width:  60, align: "right"} ,
+            {id: '_',                                     width:  10} ,
             {id: '|'} ,
-            {id: 'long',            title: 'LONG-TERM',   width: 115} ,
-            {id: 'long_files',      title: 'files',       width:  60} ,
-            {id: 'long_gb',         title: 'GB',          width:  60}
+            {id: 'long',            title: 'LONG-TERM',   width: 100} ,
+            {id: 'long_files',      title: 'files',       width:  40, align: "right"} ,
+            {id: 'long_gb',         title: 'GB',          width:  60, align: "right"} ,
+            {id: '_',                                     width:  10}
         ] ;
 
         this._display = function () {
@@ -922,15 +927,15 @@ function (
                     total:           '&nbsp;' ,
                     total_files:     '&nbsp;' ,
                     total_gb:        '&nbsp;' ,
-                    short:           '<b>'+this._files_last_request.policies['SHORT-TERM'].retention_months+' months, disk</b>' ,
+                    short:           '<b>'+this._files_last_request.policies['SHORT-TERM'].retention_months+'mo @disk</b>' ,
                     short_overstay:  '&nbsp;' ,
                     short_files:     '&nbsp;' ,
                     short_gb:        '&nbsp;' ,
-                    medium:          '<b>'+this._files_last_request.policies['MEDIUM-TERM'].retention_months+' months, disk</b>' ,
+                    medium:          '<b>'+this._files_last_request.policies['MEDIUM-TERM'].retention_months+'mo @disk</b>' ,
                     medium_overstay: '&nbsp;' ,
                     medium_files:    '&nbsp;' ,
                     medium_gb:       '&nbsp;' ,
-                    long:            '<b>10 years, tape</b>' ,
+                    long:            '<b>10yrs @tape</b>' ,
                     long_files:      '&nbsp;' ,
                     long_gb:         '&nbsp;'
                 } ,

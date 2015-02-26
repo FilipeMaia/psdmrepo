@@ -31,10 +31,14 @@ define('SECONDS_IN_WEEK',    7 * SECONDS_IN_DAY) ;
 define('SECONDS_IN_MONTH',  31 * SECONDS_IN_DAY) ;
 
 function autoformat_size ($bytes) {
-    if      ($bytes < KB) return sprintf(                              "%d   ", $bytes) ;
-    else if ($bytes < MB) return sprintf($bytes < 10 * KB ? "%.1f KB" : "%d KB", $bytes / KB) ;
-    else if ($bytes < GB) return sprintf($bytes < 10 * MB ? "%.1f MB" : "%d MB", $bytes / MB) ;
-    else                  return sprintf($bytes < 10 * GB ? "%.1f GB" : "%d GB", $bytes / GB) ;
+    $normalized = $bytes;
+    $format     = '%d';
+    $units      = '';
+    if      ($bytes < KB) {}
+    else if ($bytes < MB) { $normalized = $bytes / KB; $format = $bytes < 10 * KB ? '%.1f' : '%d'; $units = 'KB'; }
+    else if ($bytes < GB) { $normalized = $bytes / MB; $format = $bytes < 10 * MB ? '%.1f' : '%d'; $units = 'MB'; }
+    else                  { $normalized = $bytes / GB; $format = $bytes < 10 * GB ? '%.1f' : '%d'; $units = 'GB'; }
+    return sprintf($format, $normalized).' <span style="font-weight:bold; font-size:9px;">'.$units.'</span>';
 }
 
 function add_files (&$files, $infiles, $type, $file2run, $checksum, $archived, $local) {
@@ -539,7 +543,7 @@ function handler ($SVC) {
                     'size_mb'                => sprintf($bytes < 10 * MB ? "%.1f" : "%d", $bytes / MB) ,
                     'size_gb'                => sprintf($bytes < 10 * GB ? "%.1f" : "%d", $bytes / GB) ,
                     'size'                   => number_format($bytes) ,
-                    'created'                => date("Y-m-d H:i:s", $file['created']) ,
+                    'created'                => date("Y-m-d", $file['created']).'&nbsp;&nbsp;&nbsp;'.date("H:i:s", $file['created']) ,
                     'created_seconds'        => $file['created'] ,
                     'archived'               => $file['archived'] ,
                     'archived_flag'          => $file['archived_flag'] ,

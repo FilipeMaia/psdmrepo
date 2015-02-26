@@ -42,7 +42,8 @@ class ServiceJSON {
     private $exptimemon  = null ;
     private $sysmon      = null ;
     private $shiftmgr    = null ;
-    private $ifacectrldb = null ;
+    private $ifacectrldb = null ;   // multiple controllers in the dictonary
+    private $ifacectrlws = null ;   // multiple controllers in the dictonary
 
     public function __construct ($method, $options=array()) {
         $this->method = strtoupper(trim($method)) ;
@@ -609,13 +610,26 @@ class ServiceJSON {
         }
         return $this->shiftmgr ;
     }
-    public function ifacectrldb () {
+    public function ifacectrldb ($service_name='STANDARD') {
         if (is_null($this->ifacectrldb)) {
             require_once 'filemgr/filemgr.inc.php' ;
-            $this->ifacectrldb = \FileMgr\IfaceCtrlDb::instance() ;
-            $this->ifacectrldb->begin() ;
+            $this->ifacectrldb = array() ;
         }
-        return $this->ifacectrldb ;
+        if (!array_key_exists($service_name, $this->ifacectrldb)) {
+            $this->ifacectrldb[$service_name] = \FileMgr\IfaceCtrlDb::instance($service_name) ;
+            $this->ifacectrldb[$service_name]->begin() ;
+        }
+        return $this->ifacectrldb[$service_name] ;
+    }
+    public function ifacectrlws ($service_name='STANDARD') {
+        if (is_null($this->ifacectrlws)) {
+            require_once 'filemgr/filemgr.inc.php' ;
+            $this->ifacectrlws = array() ;
+        }
+        if (!array_key_exists($service_name, $this->ifacectrlws)) {
+            $this->ifacectrlws[$service_name] = \FileMgr\FileMgrIfaceCtrlWs1::instance($service_name) ;
+        }
+        return $this->ifacectrlws[$service_name] ;
     }
         
     // -----------------------
@@ -652,7 +666,8 @@ class ServiceJSON {
         if (!is_null($this->exptimemon )) $this->exptimemon ->commit() ;
         if (!is_null($this->sysmon     )) $this->sysmon     ->commit() ;
         if (!is_null($this->shiftmgr   )) $this->shiftmgr   ->commit() ;
-        if (!is_null($this->ifacectrldb)) $this->ifacectrldb->commit() ;
+        if (!is_null($this->ifacectrldb)) foreach ($this->ifacectrldb as $service_name => $ctrl) $ctrl->commit() ;
+        if (!is_null($this->ifacectrlws)) ;
         ServiceJSON::report_success ($parameters, $this->options) ;
     }
 

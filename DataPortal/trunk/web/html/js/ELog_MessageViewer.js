@@ -1305,9 +1305,9 @@ function ELog_MessageViewerNoGroupping (parent, options) {
         {id: 'attach',   title: '&nbsp',     width:  16} ,
         {id: 'tag',      title: '&nbsp;',    width:  16} ,
         {id: 'child',    title: '&nbsp;',    width:  20} ,
-        {id: 'subj',     title: 'Subject',   width: 520} ,
+        {id: 'subj',     title: 'Subject',   width:   0} ,
         {id: '>'} ,
-        {id: 'id',       title: 'MessageId', width:  70} ,
+//        {id: 'id',       title: 'MessageId', width:  70} ,
         {id: 'author',   title: 'Author',    width:  90}
     ) ;
     this._table = new StackOfRows.StackOfRows (

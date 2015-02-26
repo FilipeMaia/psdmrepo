@@ -100,6 +100,8 @@ function (
                         html +=
 '  <div id="'+s_name+'">' +
 '    <div id="ctrl">' +
+'      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
+'      <div style="clear:both;"></div>' +
 '      <div class="group">' +
 '        <span class="label">Runs</span>' +
 '        <select class="update-trigger" name="'+s_name+':runs" >' +
@@ -117,15 +119,12 @@ function (
 '        <input class="update-trigger" type="text" name="'+s_name+':last"  value="" size=8 disabled />' +
 '      </div>' +
 '      <div class="buttons">' +
-'        <button class="control-button" name="'+s_name+':search" title="search and display results" >Search</button>' +
-'        <button class="control-button" name="'+s_name+':reset"  title="reset the form"             >Reset</button>' +
+'        <button class="control-button"               name="'+s_name+':reset"  title="reset the form"             >RESET FORM</button>' +
+'        <button class="control-button update-button" name="'+s_name+':update" title="update and display results" ><img src="../webfwk/img/Update.png" /></button>' +
 '      </div>' +
 '      <div style="clear:both;"></div>' +
 '    </div>' +
 '    <div id="body">' +
-'      <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
-'      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
-'      <div style="clear:both;"></div>' +
 '      <div id="table_ctrl">' +
 '        <span>Display EPICS columns</span>' +
 '        <select class="display-trigger" name="'+s_name+':column_mode">' +
@@ -148,7 +147,7 @@ function (
                         var s_name = s2[0] ;
                         var op = s2[1] ;
                         switch (op) {
-                            case 'search'   : _that._load (s_name) ; break ;
+                            case 'update'   : _that._load (s_name) ; break ;
                             case 'reset'    : _that._reset(s_name) ; break ;
                         }
                     }) ;
@@ -252,7 +251,7 @@ function (
             for (var run in section.runs) {
                 var row = [] ;
                 row.push(
-                    '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+                    '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="link">'+run+'</a>'
                 ) ;
                 var param2value = section.runs[run] ;
                 for (var i in section.parameters) {
@@ -300,7 +299,7 @@ function (
                 function (data) {
                     _that._sections[s_name].runs = data.runs ;
                     _that._display(s_name) ;
-                    updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+                    updated.html('Updated: <b>'+data.updated+'</b>') ;
                 }
             ) ;
         } ;

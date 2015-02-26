@@ -15,6 +15,8 @@ function (
      */
     function Experiment_Group (experiment, access_list) {
 
+        var _that = this ;
+
         // -----------------------------------------
         // Allways call the base class's constructor
         // -----------------------------------------
@@ -30,12 +32,20 @@ function (
         } ;
 
         this.on_deactivate = function() {
-            this.init() ;
+            this._init() ;
         } ;
+
+        this._update_interval_sec = 30 ;
+        this._prev_update_sec = null ;
 
         this.on_update = function () {
             if (this.active) {
-                this.init() ;
+                this._init() ;
+                var now_sec = Fwk.now().sec ;
+                if (!this._prev_update_sec || (now_sec - this._prev_update_sec) > this._update_interval_sec) {
+                    this._prev_update_sec = now_sec ;
+                    this._load() ;
+                }
             }
         } ;
 
@@ -50,73 +60,102 @@ function (
         // Own data and methods
         // --------------------
 
-        this.wa = null ;    // work area container
+        this._is_initialized = false ;
 
-        this.is_initialized = false ;
+        this._wa = function (html) {
+            if (!this._wa_elem) {
+                var this_html = html ||
+'<div id="exp-group" >' +
 
-        this.init = function () {
+  '<div class="info" id="updated" style="float:right;" ></div> ' +
+  '<div style="clear:both;" ></div> ' +
 
-            var that = this ;
+  '<div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;" > ' +
+  '  <div style="height:55px;" >' +
+  '    <div style="float:left; font-size: 28px;" ><b>'+this.experiment.posix_group+'</b></div> ' +
+      '<div style="float:left; margin-left:10px; padding-top:4px;" > ' +
+        '<button class="control-button" name="update" ><img src="../webfwk/img/Update.png" /></button> ' +
+       '</div>' +
+  '    <div style="clear:both;"></div>' +
+  '  </div>' +
+  '  <div class="info" id="group-status"></div>' +
+  '  <div              id="members" style="margin-top:4px;"></div>' +
+  '</div>' +
+  '<div style="float:left; padding-left:10px;">' +
+  '  <div style="height:50px; padding-top:5px;">' +
+  '    <div style="float:left; font-weight:bold; padding-top:9px;">Search users:</div>' +
+  '    <div style="float:left; margin-left:5px;">' +
+  '      <input type="text" style="margin-top:4px; padding:2px; background-color:#ffeeee;" id="string2search" value="" size=16 title="enter the pattern to search then press RETURN" />' +
+  '    </div>' +
+  '    <div style="float:left; margin-left:10px; font-weight:bold; padding-top:9px;">by:</div>' +
+  '    <div style="float:left; margin-left:5px; padding-top:3px;" id="scope">' +
+  '      <input type="radio" id="uid"   name="scope" value="uid"                         /><label for="uid"   class="control-label" >UID</label>' +
+  '      <input type="radio" id="gecos" name="scope" value="gecos"                       /><label for="gecos" class="control-label" >name</label>' +
+  '      <input type="radio" id="both"  name="scope" value="uid_gecos" checked="checked" /><label for="both"  class="control-label" >both</label>' +
+  '    </div>' +
+  '    <div style="clear:both;"></div>' +
+  '  </div>' +
+  '  <div class="info" id="user-status"></div>' +
+  '  <div              id="users" style="margin-top:4px;"></div>' +
+  '</div>' +
+  '<div style="clear:both;"></div>' +
 
-            if (this.is_initialized) return ;
-            this.is_initialized = true ;
+'</div>' ;
+                this.container.html(this_html) ;
+                this._wa_elem = this.container.children('#exp-group') ;
+            }
+            return this._wa_elem ;
+        } ;
+        this._set_updated = function (html) {
+            if (!this._updated_elem) this._updated_elem = this._wa().find('#updated') ;
+            this._updated_elem.html(html) ;
+        } ;
+        this._button_update = function () {
+            if (!this._button_update_elem) {
+                this._button_update_elem = this._wa().find('button[name="update"]').button() ;
+            }
+            return this._button_update_elem ;
+        } ;
 
-            this.container.html('<div id="exp-group"></div>') ;
-            this.wa = this.container.find('div#exp-group') ;
+        this._scope = function () {
+            if (!this._scope_elem) this._scope_elem = this._wa().find('#scope').buttonset() ;
+            return this._scope_elem ;
+        } ;
+        this._string2search = function () {
+            if (!this._string2search_elem) this._string2search_elem = this._wa().find('#string2search') ;
+            return this._string2search_elem ;
+        } ;
+        this._group_status = function () {
+            if (!this._group_status_elem) this._group_status_elem = this._wa().find('#group-status') ;
+            return this._group_status_elem ;
+        } ;
+        this._user_status = function () {
+            if (!this._user_status_elem) this._user_status_elem = this._wa().find('#user-status') ;
+            return this._user_status_elem ;
+        } ;
+
+        this._init = function () {
+
+            if (this._is_initialized) return ;
+            this._is_initialized = true ;
 
             if (!this.access_list.experiment.manage_group) {
-                this.wa.html(this.access_list.no_page_access_html) ;
+                this._wa(this.access_list.no_page_access_html) ;
                 return ;
             }
 
-            var html =
-'<div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">' +
-'  <div style="height:55px;">' +
-'    <div style="float:left; font-size: 28px;"><b>'+this.experiment.posix_group+'</b></div>' +
-'    <div style="float:left; margin-left:10px; padding-top:4px;"><button class="control-button" id="refresh">Refresh</button></div>' +
-'    <div style="clear:both;"></div>' +
-'  </div>' +
-'  <div id="group-status"></div>' +
-'  <div id="members" style="margin-top:4px;"></div>' +
-'</div>' +
-'<div style="float:left; padding-left:10px;">' +
-'  <div style="height:55px;">' +
-'    <div style="float:left; font-weight:bold; padding-top:8px;">Search users:</div>' +
-'    <div style="float:left; margin-left:5px;">' +
-'      <input type="text" style="padding:2px; background-color:#ffeeee;" id="string2search" value="" size=16 title="enter the pattern to search then press RETURN" />' +
-'    </div>' +
-'    <div style="float:left; margin-left:10px; font-weight:bold; padding-top:6px;">by:</div>' +
-'    <div style="float:left; margin-left:5px; padding-top:3px;" id="scope">' +
-'      <input type="radio" id="uid"   name="scope" value="uid"                         /><label for="uid"   class="control-label" >UID</label>' +
-'      <input type="radio" id="gecos" name="scope" value="gecos"                       /><label for="gecos" class="control-label" >name</label>' +
-'      <input type="radio" id="both"  name="scope" value="uid_gecos" checked="checked" /><label for="both"  class="control-label" >both</label>' +
-'    </div>' +
-'    <div style="clear:both;"></div>' +
-'  </div>' +
-'  <div id="group-status"></div>' +
-'  <div id="users" style="margin-top:4px;"></div>' +
-'</div>' +
-'<div style="clear:both;"></div>' ;
-            this.wa.html(html) ;
+            this._scope().change(function() { _that._do_search_users() ; }) ;
 
-            this.scope = this.wa.find('#scope').buttonset().change(function() { that.do_search_users() ; }) ;
-
-            this.string2search = this.wa.find('#string2search') ;
-            this.string2search.keyup(function (e) {
-                that.string2search.css('background-color', that.string2search.val() === '' ? '#ffeeee' : '') ;
-                if (e.keyCode === 13) that.do_search_users() ;
+            this._string2search().keyup(function (e) {
+                _that._string2search().css('background-color', _that._string2search().val() === '' ? '#ffeeee' : '') ;
+                if (e.keyCode === 13) _that._do_search_users() ;
             }) ;
-            this.wa.find('#refresh').button().click(function() { that.do_refresh_members() ; }) ;
+            this._button_update().click(function() { _that._load() ; }) ;
 
-            this.group_status = this.wa.find('#group-status') ;
-            this.user_status  = this.wa.find('#user-status') ;
-
-            this.do_refresh_members() ;
+            this._load() ;
         } ;
 
-        this.do_manage_user = function (action, uid) {
-
-            var that = this ;
+        this._do_manage_user = function (action, uid) {
 
             Fwk.web_service_GET (
 
@@ -127,41 +166,39 @@ function (
 
                 function (data) {
                     if (data.ResultSet.Status !== 'success') {
-                        that.group_status.html(data.ResultSet.Message) ;
+                        _that._group_status().html(data.ResultSet.Message) ;
                         return ;
                     }
-                    that.do_refresh_members() ;
+                    _that._load() ;
                 } ,
 
                 function () {
-                    that.group_status.html('<span style="color:red;">Failed to '+action+' user '+uid+' from/to group '+this.experiment.posix_group+'</span>') ;
+                    _that._group_status().html('<span style="color:red;">Failed to '+action+' user '+uid+' from/to group '+this.experiment.posix_group+'</span>') ;
                 }
             ) ;
         } ;
 
-        this.do_search_users = function () {
+        this._do_search_users = function () {
 
-            var that = this ;
-
-            if (this.string2search.val() === '') {
-                this.string2search.css('background-color', '#ffeeee') ;
+            if (this._string2search().val() === '') {
+                this._string2search().css('background-color', '#ffeeee') ;
                 Fwk.report_error('Please, enter a string to search for!') ;
                 return ;
             }
-            this.user_status.html('<span style="color:maroon;">Searching...</span>') ;
+            this._user_status().html('<span style="color:maroon;">Searching...</span>') ;
 
             Fwk.web_service_GET (
 
                 '../regdb/ws/RequestUserAccounts.php' ,
 
-                {   simple: '' ,
-                    string2search: this.string2search.val() ,
-                    scope: this.scope.find('input:checked').val()
+                {   simple:        '' ,
+                    string2search: this._string2search().val() ,
+                    scope:         this._scope().find('input:checked').val()
                 } ,
 
                 function (data) {
                     var users = data.ResultSet.Result ;
-                    that.user_status.html('<span style="color:maroon;">Found <b>'+users.length+'</b> users</span>') ;
+                    _that._user_status().html('<span style="color:maroon;">Found <b>'+users.length+'</b> users</span>') ;
                     var html =
 '<table><tbody>' +
 '  <tr><td class="table_hdr" ></td>' +
@@ -174,21 +211,19 @@ function (
 '      <td class="table_cell table_cell_right" >'+users[i].name+'</td></tr>' ;
                     }
                     html += '</tbody></table>' ;
-                    that.wa.find('#users').html(html) ;
-                    that.wa.find('button.add').button().click(function () { that.do_manage_user('include', this.id) ; }) ;
+                    _that._wa().find('#users').html(html) ;
+                    _that._wa().find('button.add').button().click(function () { _that._do_manage_user('include', this.id) ; }) ;
                 } ,
 
                 function () {
-                    that.user_status.html('<span style="color:red;">Failed to get the information from the Web server</span>') ;
+                    _that._user_status().html('<span style="color:red;">Failed to get the information from the Web server</span>') ;
                 }
             ) ;
         } ;
 
-        this.do_refresh_members = function () {
+        this._load = function () {
 
-            var that = this ;
-
-            this.group_status.html('<span style="color:maroon;">Fetching...</span>') ;
+            this._set_updated('Updating...') ;
 
             Fwk.web_service_GET (
 
@@ -198,12 +233,10 @@ function (
                 } ,
 
                 function (data) {
-                    if (data.ResultSet.Status !== 'success') {
-                        that.group_status.html(result.ResultSet.Message) ;
-                        return ;
-                    }
+
                     var users = data.ResultSet.Result ;
-                    that.group_status.html('<span style="color:maroon;">Has <b>'+users.length+'</b> members</span>') ;
+                    _that._set_updated('Updated: <b>'+data.updated+'</b>') ;
+                    _that._group_status().html('<span style="color:maroon;">Has <b>'+users.length+'</b> members</span>') ;
                     var html =
 '<table><tbody>' +
 '  <tr><td class="table_hdr" >UID</td>' +
@@ -217,12 +250,12 @@ function (
                     }
                     html +=
 '</tbody></table>' ;
-                    that.wa.find('#members').html(html) ;
-                    that.wa.find('button.delete').button().click(function () { that.do_manage_user('exclude', this.id) ; }) ;
+                    _that._wa().find('#members').html(html) ;
+                    _that._wa().find('button.delete').button().click(function () { _that._do_manage_user('exclude', this.id) ; }) ;
                 } ,
 
                 function () {
-                    that.group_status.html('<span style="color:red;">Failed to get the information from the Web server</span>') ;
+                    _that._group_status().html('<span style="color:red;">Failed to get the information from the Web server</span>') ;
                 }
             );
         } ;
