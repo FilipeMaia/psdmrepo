@@ -147,7 +147,14 @@ type_filter = include all
 # The syntax for specifying a srcname follows that of the Psana Source (discussed in 
 # the Psana Users Guide). The Psana Source recognizes DAQ alias names (if present
 # in the xtc files), several styles for specifying a Pds Src, as well as detector matches 
-# where the detector number, or device number is not known.
+# where the detector number, or device number is not known. 
+#
+# Unknown sources generate exceptions that by default stop the Translator. This can be 
+# inconvenient for users that reuse one configuration across many runs in an experiment, 
+# where some runs includes certain sources and some runs don't. You can tell the Translator
+# to ignore unknown sources by setting the option
+#
+# unknown_src_ok=0   # to 1, by default it is False, which means stop.
 # 
 # Specifically, format of the match string can be:
 #
@@ -271,31 +278,23 @@ key_filter = include all
 
 split = NoSplit
 
-# however the Translator also supports SplitScan mode. The best way to invoke this is to
-# run the separate driver program
+# however the Translator also supports SplitScan mode. This can only be invoked by running
+# the separate driver program
 #
 #  h5-mpi-translate
 #
-# which requires MPI to be available in the environment, but see below for the non-MPI 
-# based split scan mode. In SplitScan mode, in addition to the output File, separate files will 
-# be made for the calib cycles. The output file (the master file) will include external links 
-# to the other files. Several mpi jobs are run simultaneously to divide the work of creating the 
-# calib cycle files. For example, running six jobs to produce out.h5 might look like:
+# which requires MPI to be available in the environment. Under the hood, it will use the two other
+# values for the split parameter - MPIWorker and MPIMaster - but users should not set these directly.
+
+# In SplitScan mode, in addition to the output File, separate files will be made for the calib cycles. 
+# The output file (the master file) will include external links to the other files. Several mpi jobs are 
+# run simultaneously to divide the work of creating the calib cycle files. For example, running six jobs 
+# to produce out.h5 might look like:
 #
 #   mpirun -n 6 h5-mpi-translate -m Translator.H5Output -o Translator.H5Output.output_file=out.h5 exp=xppd9714:run=16
 #
 # The driver program, h5-mpi-translate, takes all arguments that psana takes.
-# Presently with our implementation, one must give the full path to mpirun, and run
-# a driver program that sets up the analysis environment. For example, 
-#
-#   /reg/g/psdm/sw/releases/ana-current/arch/x86_64-rhel6-gcc44-opt/bin/mpirun -n 6 mpilaunch h5-mpi-translate -m Translator.H5Output -o Translator.H5Output.output_file=out.h5 exp=xppd9714:run=16
-#
-# where mpilaunch is
-#
-#  #!/bin/bash
-#  . /reg/g/psdm/bin/sit_setup.sh ana-current
-#  $@
-#
+
 # If six jobs were used, one becomes the master process and the other five are the workers.
 # The master process does two things. First it writes the file out.h5 with the external links 
 # to the calib files. Second it reads through all the data and finds the calib cycles. When it
@@ -370,69 +369,25 @@ split = NoSplit
 # fast/live indexing is put in place. However in the meantime, the translator supports the following options 
 # to turn on fast indexing and controlling how much time is spent searching the other files
 #
-# fast_index=1                 # do the fast indexing, be default it is off
+# fast_index=0                 # set to 1 to turn fast indexing on
 # fi_mb_half_block=12          # when fast indexing is on, use 12MB on each side, or 24MB for each block that is searched
-# fi_num_blocks=3              # this it half the number of 'other' blocks to try. The translator will try 1 + 2*3 = 7 blocks if this is 3 
+# fi_num_blocks=50             # this it half the number of 'other' blocks to try. The translator will try 1 + 2*50 = 101 blocks if this is 50
 #
 # Some details, If the Translator finds a calib cycle at offset N in DAQ stream 0, then the Translator 
 # will by default look in a 24MB block around offset N in stream 1, i.e., N -+ 12MB. It is looking for a 
 # match on about 52 bits, spread out among 20 bytes. If the Translator fails to find the calib cycle in 
 # those 24MB, then it tries the next 24MB below, then the next 24MB above, then below again, then above 
-# again, etc. In the end, the Translator will cover 7 of these blocks, or 7*24MB=168MB in stream 1. 
+# again, etc. In the end, the Translator will cover 5` of these blocks, or 51*24MB=1.2GB in stream 1. 
 # After it finds the calib cycle in stream 1, it repeats this process for stream 2,3,4 and 5. 
 # If the Translator fails with any of these streams, it throws an exception.
 #
-# If MPI is not available, the Translator supports an additional  split scan mode by setting the 
-# split option as follows:
-#
-# split=SplitScan
-#
-# In this mode, there is no communication between jobs, and each Translator job reads through all 
-# the input, so launching too many jobs will significantly increase the amount of input processing. 
-# Dividing the work of this SplitScan mode is done with the parameters
-
-# jobTotal = 1
-# jobNumber = 0
-
-# which default to 1 job that is numbered 0. However if jobTotal=3 and jobNumber=1, this 
-# Translator will process calibCycle 1, 4, 7, etc. If jobTotal is 3, the user MUST
-# make sure to launch 3 Translator jobs with jobNumber being 0,1 and 2 to get all the calib cycle
-# files written. jobNumber=0 will write the master file with the external links to the calib
-# cycle files. 
-#
-# For example, the following two command lines:
-#
-# psana -m Translator.H5Output -o Translator.H5Output.output_file=mydir/split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=0 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
-# psana -m Translator.H5Output -o Translator.H5Output.output_file=mydir/split.h5 -o Translator.H5Output.split=SplitScan -o Translator.H5Output.jobNumber=1 -o Translator.H5Output.jobTotal=2 exp=xpp123:run=10
-#
-# will divide the work into two translator jobs. When they finish, the output will be
-# 
-# mydir/split.h5
-# mydir/split_cc0000.h5
-# mydir/split_cc0001.h5
-# ...
-#
-# note, this split scan mode, unlike the MPI version, does not put multiple calib cycles in
-# one file. One can get a large number of files if calib cycles only contain a few events.
-
-# The remaining values for split are
-#
-# split=MPIWorker
-# split=MPIMaster
-#
-# These values are meant to be set by h5-mpi-translate. Generally users should not set
-# these values. The h5-mpi-translate driver will set additional options that we 
-# document here (again, users should not need to set these options). These options include the
-# two discussed above:
-#
-#   num_events_check_done_calib_file 
-#   min_events_per_calib_file
-#
-# as well as the option
+# Another option related to split scan is
 #
 # first_calib_cycle_number
 #
-# which is a 0-up counter for the first calib cycle that the MPIWorker will see.
+# which is a 0-up counter for the first calib cycle that the MPIWorker will see. However users should not set
+# this option - it is set by the Translator.
+#
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # COMPRESSION 

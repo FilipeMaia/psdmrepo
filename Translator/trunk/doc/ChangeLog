@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-21
+- updated data/automatic_translation.cfg file for both the online monitoring
+  split scan translator, and the normal translator
+- updated data/default_psana.cfg - document the unknown_src_ok option
+  remove old documentation about batch based split scan
+
 Tag: V00-02-20
 - add option to ignore unknown src in src_filter list. JIRA issue PSAS-114
 - restore cleanup of newwriter unit test
