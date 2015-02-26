@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>An example of the Stack widget</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+}
+.test {
+    padding: 0px 20px 20px 20px;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.stack {
+    padding-left: 10px;
+}
+button {
+    background: rgba(240, 248, 255, 0.39) !important;
+    border-radius: 2px !important;
+}
+button > span {
+    color: black;
+    font-size: 10px;
+}
+</style>
+
+<script data-main="../webfwk/js/test_stackofrows2_main.js" src="/require/require.js"></script>
+
+</head>
+<body>
+
+    <div class="test" id="test1" style="float:left;" >
+      <h2>Stack of rows (1 level)</h2>
+      <div id="stack1" class="stack" ></div>
+    </div>
+    <div class="test" id="test2" style="float:left;" >
+      <h2>The nested Stack of rows (2 levels)</h2>
+      <div id="stack2" class="stack" ></div>
+    </div>
+    <div class="test" id="test3" style="float:left;" >
+      <h2>The nested Stack of rows (3 levels)</h2>
+      <div id="stack3" class="stack" ></div>
+    </div>
+    <div style="clear:both;"></div>
+
+    <div class="test" id="test4" style="float:left;" >
+      <h2>Stack of rows with the header</h2>
+      <div id="stack4" class="stack" ></div>
+    </div>
+    <div class="test" id="test5" style="float:left;" >
+      <h2>1-layer Stack with customized theme 'large'</h2>
+      <div id="stack5" class="stack" ></div>
+    </div>
+    <div style="clear:both;"></div>
+
+    <div class="test" id="test6" style="float:left;" >
+      <h2>3-layered Stack with different themes</h2>
+      <div id="stack6" class="stack" ></div>
+    </div>
+    <div class="test" id="test7" style="float:left;" >
+      <h2>'stack-theme-large16' + 'stack-theme-aliceblue'</h2>
+      <div id="stack7" class="stack" ></div>
+    </div>
+    <div style="clear:both;"></div>
+
+    <div class="test" id="test8" style="float:left;" >
+      <h2>Non-trivial body and hidden header</h2>
+      <div id="stack8" class="stack" ></div>
+    </div>
+    <div style="clear:both;"></div>
+
+    <div class="test" id="test9" style="float:left;" >
+      <h2>'stack-theme-mustard'</h2>
+      <div id="stack9" class="stack" ></div>
+    </div>
+    <div class="test" id="test10" style="float:left;" >
+      <h2>'stack-theme-green'</h2>
+      <div id="stack10" class="stack" ></div>
+    </div>
+    <div class="test" id="test11" style="float:left;" >
+      <h2>'stack-theme-brown'</h2>
+      <div id="stack11" class="stack" ></div>
+    </div>
+    <div class="test" id="test12" style="float:left;" >
+      <h2>'Variable color themes for rows'</h2>
+      <div id="stack12" class="stack" ></div>
+    </div>
+    <div style="clear:both;"></div>
+
+</body>
+</html>
