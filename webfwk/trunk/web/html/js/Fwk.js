@@ -1039,8 +1039,8 @@ function (
 '<div id="fwk-top">' +
 '  <div id="fwk-top-header">' +
 '    <div id="fwk-top-title">' +
-'      <div style="float:left; padding-left:15px; padding-top:10px;">' +
-'          <a href="../../" title="Go back to the applicaton selector"><img style="height:42px;" src="../webfwk/img/home_icon.png" /></a>' +
+'      <div id="fwk-top-home" style="float:left;">' +
+'          <a href="../../" title="Go back to the applicaton selector"><img src="../webfwk/img/home_icon.png" /></a>' +
 '      </div>' +
 '      <div style="float:left; padding-left:15px; padding-top:10px;">' +
 '        <span id="fwk-title">'+this.title+' : </span>' +
@@ -1079,7 +1079,7 @@ function (
             if (this.on_quick_search) {
                 html +=
 '         <div style="float:left;" ><input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press ENTER to proceed" /></div>' +
-'         <div style="float:left; margin-left:5px; padding-top:4px;" ><img style="height:24px;" src="../webfwk/img/View.png" /></div>' +
+'         <div style="float:left; margin-left:5px; padding-top:4px;" ><img src="../webfwk/img/View.png" /></div>' +
 '         <div style="clear:both;" ></div>' ;
             }
             html +=
