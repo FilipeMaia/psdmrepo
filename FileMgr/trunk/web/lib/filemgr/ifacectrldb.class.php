@@ -30,26 +30,44 @@ class IfaceCtrlDb extends DbConnection {
     // --- STATIC INTERFACE ---
     // ------------------------
 
+    private static $CONN_PARAMS = array (
+        'STANDARD' => array (
+            'HOST'     => IFACECTRL_STANDARD_DEFAULT_HOST ,
+            'USER'     => IFACECTRL_STANDARD_DEFAULT_USER ,
+            'PASSWORD' => IFACECTRL_STANDARD_DEFAULT_PASSWORD ,
+            'DATABASE' => IFACECTRL_STANDARD_DEFAULT_DATABASE
+        ) ,
+        'MONITORING' => array (
+            'HOST'     => IFACECTRL_MONITORING_DEFAULT_HOST ,
+            'USER'     => IFACECTRL_MONITORING_DEFAULT_USER ,
+            'PASSWORD' => IFACECTRL_MONITORING_DEFAULT_PASSWORD ,
+            'DATABASE' => IFACECTRL_MONITORING_DEFAULT_DATABASE
+        )
+    ) ;
     private static $instance = null ;
 
-    public static $AUTO_TRANSLATE_HDF5 =  'AUTO_TRANSLATE_HDF5' ;
-    public static $DATASET_FFB         =  'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/ffb/%(instrument_lower)s/%(experiment)s/xtc' ;
-    public static $DATASET_PSDM        =   'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/psdm/%(instrument_lower)s/%(experiment)s/xtc' ;
+    public static $AUTO_TRANSLATE_HDF5 = array (
+        'STANDARD'   => 'AUTO_TRANSLATE_HDF5' ,
+        'MONITORING' => 'FFB_AUTO_TRANSLATE_HDF5'
+    ) ;
+    public static $DATASET_FFB             = 'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/ffb/%(instrument_lower)s/%(experiment)s/xtc' ;
+    public static $DATASET_PSDM            = 'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/psdm/%(instrument_lower)s/%(experiment)s/xtc' ;
 
     /**
      * Singleton to simplify certain operations.
      *
      * @return IfaceCtrlDb
      */
-    public static function instance () {
-        if (is_null(IfaceCtrlDb::$instance))
-            IfaceCtrlDb::$instance =
+    public static function instance ($service_name='STANDARD') {
+        if (is_null(IfaceCtrlDb::$instance)) IfaceCtrlDb::$instance = array() ;
+        if (!array_key_exists($service_name, IfaceCtrlDb::$instance))
+            IfaceCtrlDb::$instance[$service_name] =
                 new IfaceCtrlDb (
-                    IFACECTRL_DEFAULT_HOST ,
-                    IFACECTRL_DEFAULT_USER ,
-                    IFACECTRL_DEFAULT_PASSWORD ,
-                    IFACECTRL_DEFAULT_DATABASE) ;
-        return IfaceCtrlDb::$instance ;
+                    IfaceCtrlDb::$CONN_PARAMS[$service_name]['HOST'] ,
+                    IfaceCtrlDb::$CONN_PARAMS[$service_name]['USER'] ,
+                    IfaceCtrlDb::$CONN_PARAMS[$service_name]['PASSWORD'] ,
+                    IfaceCtrlDb::$CONN_PARAMS[$service_name]['DATABASE']) ;
+        return IfaceCtrlDb::$instance[$service_name] ;
     }
 
     /**

@@ -173,7 +173,7 @@ class FileMgrIfaceCtrlWs {
         $result = json_decode( $str );
     }
 
-    public static function delete_request( &$result, $id ) {
+    public static function delete_request( $id ) {
 
     	$uri = FileMgrIfaceCtrlWs::build_uri( '/request/'.$id, false );
 
@@ -189,10 +189,6 @@ class FileMgrIfaceCtrlWs {
                 __METHOD__,
                 "Web service request failed: {$uri}, eror code: ".$info['response_code'] );
         }
-        $response_parsed = http_parse_message( $response );
-        $str = ''.$response_parsed->body;  // This is needed because the body is returned
-                                           // as stdClass which can't be JSON decoded.
-        $result = json_decode( $str );
     }
 
     public static function set_request_priority( &$result, $id, $priority ) {
