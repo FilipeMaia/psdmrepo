@@ -1,0 +1,49 @@
+.dmmon-live {
+    padding:        0;
+}
+.dmmon-live > #controls {
+    background:     #f5f8f9;
+    padding:        10px;
+    padding-top:    20px;
+}
+.dmmon-live > #update_info {
+    margin-top:     10px;
+    padding-right:  10px;
+}
+.dmmon-live > #update_info > .info {
+    color:          maroon;
+}
+.dmmon-live > #tabs  {
+    font-size:      12px;
+}
+.dmmon-live > #tabs > ul > li {
+    -webkit-border-radius:  0;
+    -moz-border-radius:     0;
+    -khtml-border-radius:   0;
+    border-radius:          0;
+}
+.dmmon-live > #tabs .tab-cont {
+    border:         solid 1px #b0b0b0;
+    padding:        25px;
+}
+
+.dmmon-live > #tabs .tab-cont .control-group {
+    float:          left;
+    margin-right:   20px;
+}
+.dmmon-live > #tabs .tab-cont .control-group span.control-group-title {
+    font-size:      12px;
+    font-weight:    bold;
+}
+.dmmon-live > #tabs .tab-cont .control-group-end {
+    clear:          both;
+}
+.dmmon-live .presentation {
+    margin-top:     10px;
+}
+.dmmon-live .presentation.view-visible {
+    display:        block;
+}
+.dmmon-live .presentation.view-hidden {
+    display:        none;
+}
