@@ -723,7 +723,7 @@ HERE;
 
         /* Add groups which aren't really experiment or instrument specific.
          */
-        $groups['ps-data'] = True;
+        //$groups['ps-data'] = True;
 
         return $groups;
     }

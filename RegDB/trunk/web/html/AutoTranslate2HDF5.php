@@ -67,7 +67,8 @@ HERE;
                 else
                     $experiments2load .= ",{$experiment->id()}" ;
             }
-            $auto    = $experiment->regdb_experiment()->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5) ? true : false ;
+            $service = 'STANDARD' ;
+            $auto    = $experiment->regdb_experiment()->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5[$service]) ? true : false ;
             $dataset = $ifacectrl->get_config_param_val_r('live-mode', 'dataset', $instrument->name(), $experiment->name()) ;
             if (is_null($dataset)) {
                 print "ERROR: Interface Controller database has invalid content" ;

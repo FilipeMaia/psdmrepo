@@ -1,10 +1,12 @@
 <?php
 
 require_once( 'regdb/regdb.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use RegDB\RegDB;
 use RegDB\RegDBAuth;
 use RegDB\RegDBException;
+use LusiTime\LusiTime;
 
 /*
  * This script will process requests for managing members of POSIX groups.
@@ -133,10 +135,12 @@ try {
     }
     $members = RegDB::instance()->posix_group_members( $groupname );
 
-    $status_encoded = json_encode( "success" );
+    $status_encoded  = json_encode( "success" );
+    $updated_encoded = json_encode( LusiTime::now()->toStringShort());
     print <<< HERE
 {
-  "status": {$status_encoded},
+  "status":  {$status_encoded},
+  "updated": {$updated_encoded},
   "ResultSet": {
     "Status": {$status_encoded},
     "Result": [

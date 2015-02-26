@@ -79,6 +79,7 @@ class RegDBAuth {
         if( !$this->isAuthenticated()) return false;
 
         AuthDb::instance()->begin();
+    	RegDB::instance()->begin();
 
         /* Check if a user is allowed to manage any groups.
          * If so then unconditionally proceed with the authorization.
@@ -88,6 +89,28 @@ class RegDBAuth {
             null, /* exper_id */
             'LDAP',
             'manage_groups' )) return true;
+
+        /* Check if the user is able to manage instrument-specific groups
+         * following these rules:
+         * 
+         *   members of ps-<instr>-sci can manager groups:
+         *     ps-<instr>
+         *     ps-<instr>-elog
+         */
+        if(substr($name, 0, 3) === 'ps-') {
+            $instr_name_lc = strtolower(substr($name, 3, 3));
+            foreach( RegDB::instance()->instrument_names() as $instr_name ) {
+                $science_group = "ps-{$instr_name_lc}-sci";
+                if( RegDB::instance()->is_known_posix_group($science_group)) {
+                    if( RegDB::instance()->is_member_of_posix_group( $science_group, RegDBAuth::instance()->authName())) {
+                        if( strtolower($instr_name) === $instr_name_lc ) {
+                            if( $name === "ps-{$instr_name_lc}")      return true ;
+                            if( $name === "ps-{$instr_name_lc}-elog") return true ;
+                        }
+                    }
+                }
+            }
+        }
 
         /* Go through all experiments.
     	 */

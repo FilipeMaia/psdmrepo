@@ -11,6 +11,17 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-06
+2015-02-26 Igor Gaponenko
+- disable POSIX group management for 'ps-data'
+- fixed a bug preventing members of  members of instrument-specific
+super-groups 'ps-<instr>-sci' from managing groups: 'ps-<instr>'
+and 'ps-<instr>-elog'
+- upgraded Web service ws/ManageGroupMembers.php to report 'status'
+and 'update' time in low case. This is for the sake of compatibility
+with new Web apps.
+- updated application AutoTranslate2HDF5.php as per JIRA PSWA-32
+
 Tag: V00-02-05
 2014-12-19 Igor Gaponenko
 - following a migration of Web services as per JIRA issue PSDH-20
