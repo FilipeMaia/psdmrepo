@@ -450,7 +450,7 @@ class SysMon extends DbConnection {
             $sql = "SELECT used, available FROM {$this->database}.fs_mon_stat WHERE fs_id={$fs_id} ORDER BY insert_time DESC LIMIT 1" ;
             $result = $this->query($sql) ;
             $nrows = mysql_numrows($result) ;
-            if ($nrows == 0) return null ;
+            if ($nrows == 0) continue;
             if ($nrows != 1) throw new SysMonException (
                 __class__.'::'.__METHOD__ ,
                 'inconsistent result returned from the database. Wrong schema?') ;
