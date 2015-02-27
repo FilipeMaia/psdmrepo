@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2015-02-27 Mikhail S. Dubrovin
+- add DragStore, WdgImageFigs, DragBase, DragCenter, DragCircle - layer of draggable figures (PSAS-11, PSAS34)
+
 Tag: V00-00-10
 2015-02-20 Mikhail S. Dubrovin
 - Add to svn directories and files under PSQt/data

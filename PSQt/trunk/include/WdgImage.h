@@ -1,5 +1,5 @@
-#ifndef WDGIMAGE_H
-#define WDGIMAGE_H
+#ifndef PSQT_WDGIMAGE_H
+#define PSQT_WDGIMAGE_H
 
 #include "PSQt/GeoImage.h"
 
@@ -21,7 +21,7 @@
 #include <QMouseEvent>
 
 //#include <QScrollBar>
-#include <QScrollArea>
+//#include <QScrollArea>
 
 //#include <Qt>
 //#include <QtGui>
@@ -61,6 +61,12 @@ class WdgImage : public QLabel
   WdgImage(QWidget *parent, const QImage* image);
   virtual ~WdgImage();
 
+  inline QPainter* getPainter(){ return m_painter; }
+  //inline WdgImage* getThis(){ return this; }
+
+  QPointF pointInImage(const QPointF& point_raw);
+  QPointF pointInRaw(const QPointF& point_raw);
+
  public slots:
     void onFileNameChanged(const std::string& fname) ;
     void onTest() ;
@@ -68,6 +74,15 @@ class WdgImage : public QLabel
     void onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&) ;
 
  protected:
+
+    int          m_xmin_raw;
+    int          m_xmax_raw; 
+    int          m_ymin_raw;
+    int          m_ymax_raw;
+
+    QPixmap*     m_pixmap_raw;
+    QPixmap*     m_pixmap_scl;
+
     void setFrame() ;
     void paintEvent(QPaintEvent *event = 0) ;
     void closeEvent(QCloseEvent *event = 0) ;
@@ -77,7 +92,6 @@ class WdgImage : public QLabel
     void mouseMoveEvent(QMouseEvent *event = 0) ;
     void loadImageFromFile(const std::string& fname=std::string()) ;
 
-    void drawLine() ;
     void drawRect() ;
     void zoomInImage() ;
     void setPixmapScailedImage(const QImage* = 0) ;
@@ -97,9 +111,6 @@ class WdgImage : public QLabel
 
     GeoImage*    m_geo_img;
 
-    QPixmap*     m_pixmap_raw;
-    QPixmap*     m_pixmap_scl;
-
     QPen*        m_pen1;
     QPen*        m_pen2;
     QPoint*      m_point1;
@@ -113,11 +124,6 @@ class WdgImage : public QLabel
     float        m_hue1;
     float        m_hue2;
 
-    int          m_xmin_raw;
-    int          m_xmax_raw; 
-    int          m_ymin_raw;
-    int          m_ymax_raw;
-
     inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;
     void resetZoom() ;
@@ -125,4 +131,4 @@ class WdgImage : public QLabel
 
 } // namespace PSQt
 
-#endif // WDGIMAGE_H
+#endif // PSQT_WDGIMAGE_H

@@ -9,6 +9,7 @@
 #include "PSQt/WdgFile.h"
 #include "PSQt/GeoImage.h"
 #include "PSQt/GUILogger.h"
+#include "PSQt/GUIImageViewer.h"
 
 //#include <QVBox>
 //#include <QWidget>
@@ -77,8 +78,9 @@ class GUIMain : public Frame
     WdgFile*     m_file_geo;
     WdgFile*     m_file_nda;
 
-    WdgImage*    m_wimage;
-    GeoImage*    m_geoimg;
+    GUIImageViewer* m_guiimv;
+    WdgImage*       m_wimage;
+    GeoImage*       m_geoimg;
 
     GUILogger*   m_guilogger;
 

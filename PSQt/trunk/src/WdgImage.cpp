@@ -18,11 +18,11 @@ namespace PSQt {
 
 WdgImage::WdgImage(QWidget *parent, const std::string& ifname)
   : QLabel(parent)
+  , m_pixmap_raw(0)
+  , m_pixmap_scl(0)
   , m_frame(0)
   , m_painter(0)
   , m_geo_img(0)
-  , m_pixmap_raw(0)
-  , m_pixmap_scl(0)
   , m_pen1(0)  
   , m_pen2(0)  
   , m_point1(0)
@@ -42,11 +42,11 @@ WdgImage::WdgImage(QWidget *parent, const std::string& ifname)
 
 WdgImage::WdgImage( QWidget *parent, const QImage* image)
   : QLabel(parent)
+  , m_pixmap_raw(0)
+  , m_pixmap_scl(0)
   , m_frame(0)
   , m_painter(0)
   , m_geo_img(0)
-  , m_pixmap_raw(0)
-  , m_pixmap_scl(0)
   , m_pen1(0)  
   , m_pen2(0)  
   , m_point1(0)
@@ -145,27 +145,12 @@ WdgImage::paintEvent(QPaintEvent *event)
   m_painter->begin(this);
 
   //-----------
-  //drawLine();
   if(m_is_pushed) drawRect();
   //-----------
 
   m_painter->end();
 
   //std::cout << "WdgImage::paintEvent counter = " << count << '\n';
-}
-
-//--------------------------
-
-void 
-WdgImage::drawLine()
-{
-  QPen pen(Qt::black, 2, Qt::SolidLine);
-  m_painter->setPen(pen);
-  m_painter->drawLine(20, 20, 250, 20);
-
-  pen.setStyle(Qt::DashLine);
-  m_painter->setPen(pen);
-  m_painter->drawLine(20, 40, 250, 40);
 }
 
 //--------------------------
@@ -190,6 +175,8 @@ WdgImage::resetZoom()
   m_point1->setY(0);
   m_xmin_raw = 0;
   m_ymin_raw = 0;
+  //m_xmax_raw = 0;
+  //m_ymax_raw = 0;
   m_zoom_is_on = false;
 }
 
@@ -233,6 +220,34 @@ WdgImage::zoomInImage()
      *m_pixmap_scl = m_pixmap_raw->copy(m_xmin_raw, m_ymin_raw, m_xmax_raw-m_xmin_raw, m_ymax_raw-m_ymin_raw);
      setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
   }
+}
+
+//--------------------------
+
+QPointF
+WdgImage::pointInRaw(const QPointF& point_img)
+{
+  float sclx = float(m_pixmap_scl->size().width())  / this->size().width();  
+  float scly = float(m_pixmap_scl->size().height()) / this->size().height();  
+
+  float x = point_img.x()*sclx + m_xmin_raw;
+  float y = point_img.y()*scly + m_ymin_raw;  
+
+  return QPointF(x,y);
+}
+
+//--------------------------
+
+QPointF
+WdgImage::pointInImage(const QPointF& point_raw)
+{
+  float sclx = WdgImage::size().width()  / float((m_zoom_is_on)? (m_xmax_raw-m_xmin_raw) : m_pixmap_scl->size().width());  
+  float scly = WdgImage::size().height() / float((m_zoom_is_on)? (m_ymax_raw-m_ymin_raw) : m_pixmap_scl->size().height());  
+
+  float x = (point_raw.x()-m_xmin_raw)*sclx;
+  float y = (point_raw.y()-m_ymin_raw)*scly;  
+
+  return QPointF(x,y);
 }
 
 //--------------------------
@@ -348,7 +363,8 @@ WdgImage::mouseReleaseEvent(QMouseEvent *e)
   m_point2->setY(e->y());
 
   QPoint dist = *m_point2 - *m_point1;
-  if(this->rect().contains(*m_point2) && dist.manhattanLength() > 5) zoomInImage();
+  //if(this->rect().contains(*m_point2) && dist.manhattanLength() > 5) zoomInImage();
+  if(this->rect().contains(*m_point2) && abs(dist.x()) > 5 && abs(dist.y()) > 5) zoomInImage();
 
   update();
 }

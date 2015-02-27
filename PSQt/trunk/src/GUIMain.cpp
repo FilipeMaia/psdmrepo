@@ -93,9 +93,15 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   setStyle();
 
   m_geoimg = new PSQt::GeoImage(m_wgt->geoacc(), fname_nda);  
-  m_wimage = new PSQt::WdgImage(0);  
-  m_wimage -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
-  m_wimage -> show();
+
+  m_guiimv = new PSQt::GUIImageViewer(0);
+  m_guiimv -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
+  m_guiimv -> show();
+  m_wimage = m_guiimv->wdgImage();
+
+  //  m_wimage = new PSQt::WdgImage(0);  
+  //  m_wimage -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
+  //  m_wimage -> show();
 
   connect(Logger::getLogger(), SIGNAL(signal_new_record(Record&)), m_guilogger, SLOT(addNewRecord(Record&)));
 
@@ -173,9 +179,9 @@ GUIMain::closeEvent(QCloseEvent *event)
   stringstream ss; ss << "closeEvent(...): type = " << event -> type();
   MsgInLog(_name_(), INFO, ss.str());
 
-  if(m_wimage)    m_wimage    -> close();
+  if(m_guiimv) m_guiimv -> close();
   if(m_guilogger) m_guilogger -> close();
-  m_wimage    = 0;
+  m_guiimv   = 0;
   m_guilogger = 0;
 
   SaveLog("work/z-log.txt", true);
