@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-23
+- fix bugs in automatic translation files, can't have a # comment character
+  on a line with an integer parameter.
+
 Tag: V00-02-22
 - make two psana config files for automatic translation, one for standard,
   and one for monitoring (new file is monitoring_translation.cfg). Although 
