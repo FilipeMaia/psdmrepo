@@ -69,6 +69,9 @@ public:
 
   hdf5pp::Group currentConfigureGroup() { return m_currentConfigureGroup; }
 
+  // returns call to H5Fflush if file is valid, -1 if it is not. Calls MsgLog with error if problem
+  herr_t flushOutputFile();
+
   /// name for the CalibStore in the hdf5 file
   static const std::string calibStoreGroupName; 
 
@@ -120,7 +123,8 @@ protected:
                                std::list<EventKeyTranslation> & toTranslate,
                                bool & eventIsFiltered);
   
-  void closeH5File();
+  // this is for closing the file during an Event exception
+  void closeH5FileDueToEventException();
 
   bool srcIsFiltered(const Pds::Src &);
   bool keyIsFiltered(const std::string &key);

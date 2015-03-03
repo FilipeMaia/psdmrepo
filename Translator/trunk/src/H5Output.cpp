@@ -672,11 +672,12 @@ void H5Output::createH5OutputFile() {
   hdf5pp::PListFileAccess fapl ;
   if (m_splitScanMgr->isMPIMaster()) {
     // h5py and matlab should be able to read from the master file if we 
-    // use CloseWeak. Using CloseWeak may pose some risk to integrity of master file.
+    // use CloseWeak. We prefer close strong to make sure all datasets/groups etc are closed.
+    // Presently, I believe some h5 objects are not closed properly in psddl_hdf2psana
     fapl.set_fclose_degree(hdf5pp::PListFileAccess::CloseWeak);
   }
   m_h5file = hdf5pp::File::create(m_h5fileName, mode, fcpl, fapl);
-
+  
   // store schema version for this file
   m_h5file.createAttr<uint32_t>(":schema:version").store(::_fileSchemaVersion);
 
@@ -700,6 +701,7 @@ void H5Output::createH5OutputFile() {
   m_h5file.createAttr<const char*> ("split_mode").store ( SplitScanMgr::splitModeStr(m_split).c_str());
   if (m_splitScanMgr->isMPIMaster()) {
     // close and reopen the file, this seems to allow multiple readers to work better
+    flushOutputFile();
     m_h5file.close();
     m_h5file = hdf5pp::File::open(m_h5fileName, hdf5pp::File::Update, fapl);
     if (not m_h5file.valid()) {
@@ -848,7 +850,7 @@ void H5Output::event(Event& evt, Env& env)
       MsgLog(logger,error,name() << " event: error, closing file: " << m_h5fileName 
              << " calibCycle=" << m_currentCalibCycleCounter
              << " evts (this cc)=" << m_currentEventCounter << " evts(total)=" << m_totalEventsProcessed);
-      closeH5File();
+      closeH5FileDueToEventException();
       throw;
     }
   }
@@ -1372,6 +1374,7 @@ void H5Output::endRun(Event& evt, Env& env)
                            m_runEndGroupDir, m_currentRunEndGroup);
   } 
   if (eventId) ::storeClock ( m_currentRunGroup, eventId->time(), "end" ) ;
+  m_runGroupDir.closeGroups();
   m_currentRunGroup.close();
   ++m_currentRunCounter;
 }
@@ -1533,9 +1536,9 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
           }
         }
       } else {
-	MsgLog(logger, DBGLVL, " DID NOT get calib store data for type " 
-	       << TypeInfoUtils::typeInfoRealName(calibStoreType) 
-	       << " for " << calibEventKey);
+        MsgLog(logger, DBGLVL, " DID NOT get calib store data for type " 
+               << TypeInfoUtils::typeInfoRealName(calibStoreType) 
+               << " for " << calibEventKey);
       }
     }
   }
@@ -1545,6 +1548,18 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
   removeCalibStoreHdfWriters(m_hdfWriters);
 }
 
+herr_t H5Output::flushOutputFile() {
+  if (m_h5file.valid()) {
+    herr_t err = H5Fflush(m_h5file.id(), H5F_SCOPE_LOCAL);
+    if (err < 0) MsgLog(logger, error, "error calling H5Fflush on outputfile: " << m_h5fileName
+                        << " with id=" << m_h5file.id() << " err=" << err);
+    return err;
+  }
+  MsgLog(logger, error, "flushOutputFile called but file is not valid");
+  return -1;
+}
+
+  
 void H5Output::endJob(Event& evt, Env& env) 
 {
   boost::shared_ptr<EventId> eventId = evt.get();
@@ -1563,12 +1578,13 @@ void H5Output::endJob(Event& evt, Env& env)
   m_chunkManager.endJob();
   ++m_currentConfigureCounter;
 
+  flushOutputFile();
   H5OpenObjects fileOpenObjects(m_h5file);
   if (fileOpenObjects.ALL - fileOpenObjects.FILE > 0) {
     bool detailedMsg = false;
-    MsgLog(logger, DBGLVL, "endjob() about to close hdf5 file:  " << m_h5fileName 
+    MsgLog(logger, trace, "endjob(). flushed output file. About to close :  " << m_h5fileName 
            << " but it has open objects: " << fileOpenObjects.dumpStr(detailedMsg));
-    MsgLog(logger, DBGLVL, "Will reopen and close again to try to flush");
+    MsgLog(logger, trace, "Will close, and reopen before final close - this tends to clear open objects.");
     m_h5file.close();
     m_h5file = hdf5pp::File::open(m_h5fileName, hdf5pp::File::Read);
     H5OpenObjects fileReOpenObjects(m_h5file);
@@ -1580,6 +1596,7 @@ void H5Output::endJob(Event& evt, Env& env)
       MsgLog(logger, info, "Will manually close open objects. " 
              << " may generate noisy error messages when Translator shuts down");
       fileReOpenObjects.closeOpenNonFileIds();
+      flushOutputFile();
     }
   }
   // final close
@@ -1669,12 +1686,15 @@ void H5Output::createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId) {
 }
 
 
-void H5Output::closeH5File() {
+void H5Output::closeH5FileDueToEventException() {
   m_calibCycleGroupDir.closeGroups();
+  m_runGroupDir.closeGroups();
   m_configureGroupDir.closeGroups();
   m_currentCalibCycleGroup.close();
   m_currentRunGroup.close();
   m_currentConfigureGroup.close();
+  // flush everything for this file to disk - this is mostly for split scan mode - reading while writing
+  flushOutputFile();
   m_h5file.close();
 }
 

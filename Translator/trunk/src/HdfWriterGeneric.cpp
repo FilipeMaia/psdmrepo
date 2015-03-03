@@ -409,22 +409,31 @@ void HdfWriterGeneric::closeDatasets(hid_t groupId)
         << " " << hdf5util::objectName(groupId) << " not in map";
     throw GroupMapException(ERR_LOC,msg.str());  
   }
+  if (not (true == H5Iis_valid(groupId))) {
+    MsgLog(logger(), warning, "HdfWriterGeneric::closeDatasets - groupId " 
+           << groupId << " is in map, but is not valid");
+    return;
+  }
   vector<DataSetMeta> & dsetList = pos->second;
   for (size_t idx = 0; idx < dsetList.size(); ++idx) {
     DataSetMeta & dsetMeta = dsetList[idx];
     hid_t datasetId = dsetMeta.dsetId();
-    herr_t err = H5Dclose(datasetId);
-    if (err < 0) {
-      ostringstream msg;
-      msg << "problem closing dataset: " << datasetId 
-          << " name: " << dsetMeta.name() << " for group " << groupId
-          << " " << hdf5util::objectName(groupId);
-      throw DataSetException(ERR_LOC, msg.str());
+    if (true == H5Iis_valid(datasetId)) {
+      herr_t err = H5Dclose(datasetId);
+      if (err < 0) {
+        ostringstream msg;
+        msg << "problem closing dataset: " << datasetId 
+            << " name: " << dsetMeta.name() << " for group " << groupId
+            << " " << hdf5util::objectName(groupId);
+        throw DataSetException(ERR_LOC, msg.str());
+      }
+    } else {
+      MsgLog(logger(), warning, "HdfWriterGeneric::closeDatasets dset id: " << datasetId << " is not valid");
     }
+    dsetList.clear();
+    MsgLog(logger(), debug, "HdfWriterGeneric::closeDatasets (" << m_debugName << ") closed group " 
+           << groupId << " " << hdf5util::objectName(groupId));
   }
-  dsetList.clear();
-  MsgLog(logger(), debug, "HdfWriterGeneric::closeDatasets (" << m_debugName << ") closed group " 
-         << groupId << " " << hdf5util::objectName(groupId));
   m_datasetMap.erase(pos);
 }
 

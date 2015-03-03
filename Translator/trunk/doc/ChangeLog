@@ -12,6 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-02-23
+- attempt to address problems with runs from xppf7815 - JIRA issue PSAS-117
+  call H5Fflush on master file after external links added and file created.
+  call H5Fflush on generally translated files before being closed.
+- check for valid dataset id's and group id's before closing.
+- close runGroupDir at appropriate point
+	
+Tag: V00-02-23
 - fix bugs in automatic translation files, can't have a # comment character
   on a line with an integer parameter.
 

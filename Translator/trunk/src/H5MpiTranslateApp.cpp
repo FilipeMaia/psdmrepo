@@ -845,7 +845,7 @@ bool H5MpiTranslateApp::freeWorkerExists(int *workerPtr) const {
 H5MpiTranslateApp::StartWorkerRes_t H5MpiTranslateApp::tryToStartWorker() {
   // look at queue of calib cycles to do
   if (m_jobsToDo.size() == 0) {
-    MsgLog(loggerMaster,trace,"tryToStartWorker: no jobs to do");
+    MsgLog(loggerMaster,MSGLOGLVL,"tryToStartWorker: no jobs to do");
     return NoJobsToDo;
   }
   int worker = -1;
@@ -1002,7 +1002,9 @@ void H5MpiTranslateApp::addLinksToMasterFile(int worker,
     }
     if (runLinksCreated == 0) {
       MsgLog(loggerMaster, error, "no links added in master to subgroups of Run:0000 in " << ccFilePath);
-    } 
+    } else {
+      h5Output.flushOutputFile();
+    }
   }
 
   {
