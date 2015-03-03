@@ -251,7 +251,7 @@ WdgGeo::onRadioGroup()
   if(but == m_rad_x0
   || but == m_rad_y0
   || but == m_rad_z0) {
-      m_edi_step -> setText("1000");
+      m_edi_step -> setText("100");
       m_edi_step -> setValidator(new QIntValidator(0,1000000,this));
   }
 
@@ -265,7 +265,7 @@ WdgGeo::onRadioGroup()
   if(but == m_rad_tilt_x
   || but == m_rad_tilt_y
   || but == m_rad_tilt_z) {
-      m_edi_step -> setText("1");
+      m_edi_step -> setText("0.15");
       m_edi_step -> setValidator(new QDoubleValidator(0,10000,3,this));
   }
 }

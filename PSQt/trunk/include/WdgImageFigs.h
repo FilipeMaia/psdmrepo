@@ -58,9 +58,11 @@ class WdgImageFigs : public WdgImage
     const QPointF& getCenter(); //{ return m_dragstore->getCenter(); }
 
     void addCircle(const float& rad_raw=100);
+    DragStore* getDragStore(){return m_dragstore;}
 
  public slots:
     void onTest() ;
+    void forceUpdate() ;
 
  protected:
     void setFrame() ;

@@ -260,6 +260,14 @@ WdgImageFigs::mouseReleaseEvent(QMouseEvent *e)
 //--------------------------
 
 void 
+WdgImageFigs::forceUpdate()
+{
+  update();
+}
+
+//--------------------------
+
+void 
 WdgImageFigs::mouseMoveEvent(QMouseEvent *e)
 {
   if(m_dragmode == ZOOM) WdgImage::mouseMoveEvent(e);

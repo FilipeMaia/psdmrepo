@@ -9,7 +9,8 @@ namespace PSQt {
 //--------------------------
 
 DragBase::DragBase(WdgImage* wimg, const QPointF* points, const int& npoints)
-  : m_wimg(wimg)
+  : QObject(NULL)
+  , m_wimg(wimg)
   , m_npoints(npoints)
   , m_pen_draw(Qt::white, 1, Qt::SolidLine)
   , m_pen_move(Qt::red,   2, Qt::SolidLine) // Qt::DashLine)

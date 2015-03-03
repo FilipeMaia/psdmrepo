@@ -103,7 +103,7 @@ class DragStore {
   bool containFigs(const QPointF& p);
   void moveFigs(const QPointF& p);
   void moveFigsIsCompleted(const QPointF& p);
-  void addCircle(const float& rad_raw=100);
+  void addCircle(const float& rad_raw=100, const QPen* pen=0); // QPen(Qt::white, 1, Qt::SolidLine));
   void deleteFig();
 
   /**
@@ -119,6 +119,7 @@ class DragStore {
   static inline const char* _name_(){return "DragStore";} 
 
   const QPointF& getCenter(){ return v_dragfigs[0].ptr_obj->getCenter(); }
+  const DragBase* getDragCenter(){ return v_dragfigs[0].ptr_obj; }
 
 
  private:

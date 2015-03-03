@@ -22,20 +22,22 @@ DragStore::DragStore(WdgImage* wimg)
   v_dragfigs.clear();
   v_dragfigs.push_back((DragFig){DragStore::Create(m_wimg, DRAGCENTER, &center_raw), DRAGCENTER, 0});
 
-  this -> addCircle(100);
-  this -> addCircle(300);
+  QPen pen_boarder(Qt::white, 1, Qt::DashLine); // Qt::SolidLine
+  this -> addCircle(100, &pen_boarder);
+  this -> addCircle(300, &pen_boarder);
 }
 
 //--------------------------
 
 void
-DragStore::addCircle(const float& rad_raw)
+DragStore::addCircle(const float& rad_raw, const QPen* pen)
 {
   QPointF pc = this -> getCenter();
   QPointF points_raw[2] = { pc,
                             pc + QPointF(rad_raw,rad_raw) };
   v_dragfigs.push_back((DragFig){DragStore::Create(m_wimg, DRAGCIRCLE, &points_raw[0]), DRAGCIRCLE, 0});
 
+  if(pen) v_dragfigs.back().ptr_obj->setPenDraw(*pen);
   //cout << "DragStore::addCircle center x:" << pc.x() << " x:" << pc.y() << '\n';  
 }
 
@@ -80,7 +82,7 @@ void
 DragStore::moveFigsIsCompleted(const QPointF& p)
 {
   //std::cout << "DragStore::moveFigsIsCompleted(p)  x:" << p.x() << "  y:" << p.y() << '\n';
-  p_dragfig_sel -> ptr_obj -> move_is_completed(p);
+  p_dragfig_sel -> ptr_obj -> moveIsCompleted(p);
 }
 
 //--------------------------
@@ -89,7 +91,7 @@ void
 DragStore::deleteFig()
 {
   //std::cout << "DragStore::deleteFig()\n";
-  if(v_dragfigs.size()<3) { MsgInLog(_name_(), WARNING, "Last circle can't be removed" ); return; }
+  if(v_dragfigs.size()<4) { MsgInLog(_name_(), WARNING, "Last two circles can't be removed" ); return; }
 
   if(p_dragfig_sel->type == DRAGCENTER) { MsgInLog(_name_(), WARNING, "Center can't be removed" ); return; }
 

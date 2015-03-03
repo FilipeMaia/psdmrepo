@@ -64,7 +64,7 @@ class DragCircle : public DragBase
     virtual void draw(const DRAGMODE& mode=DRAW);
     virtual bool contains(const QPointF& p);
     virtual void move(const QPointF& p);
-    virtual void move_is_completed(const QPointF& p);
+    virtual void moveIsCompleted(const QPointF& p);
     virtual void create();
 
     virtual const QPointF& getCenter();

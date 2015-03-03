@@ -1,19 +1,9 @@
 //--------------------------
 
 #include "PSQt/Frame.h"
-#include "PSQt/Logger.h"
+//#include "PSQt/Logger.h"
 
-//#include "MsgLogger/MsgLogger.h"
-
-//#include <string>
-//#include <fstream>   // ofstream
-//#include <iomanip>   // for setw, setfill
-//#include <sstream>   // for stringstream
-//#include <math.h>
-//#include <stdio.h>
-
-#include <iostream>    // cout
-#include <fstream>    // ifstream(fname), ofstream
+//#include <iostream>    // cout
 //using namespace std; // for cout without std::
 
 namespace PSQt {
@@ -48,6 +38,7 @@ Frame::setFrame()
   setCursor(Qt::SizeAllCursor);     // Qt::WaitCursor, Qt::PointingHandCursor
   //setStyleSheet("color: rgb(255, 255, 100)");
   //setStyleSheet("background-color: rgb(0, 255, 255); color: rgb(255, 255, 100)");
+  //setVisible(false);
 }
 
 //--------------------------

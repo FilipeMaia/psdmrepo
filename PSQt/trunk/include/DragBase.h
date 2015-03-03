@@ -64,8 +64,10 @@ namespace PSQt {
 
 //--------------------------
 
-class DragBase
+class DragBase : public QObject
 {
+  // Q_OBJECT // macro is needed for connection of signals and slots
+
  public:
 
   /**
@@ -82,7 +84,7 @@ class DragBase
     virtual void draw(const DRAGMODE& mode=DRAW) = 0;
     virtual bool contains(const QPointF& p) = 0;
     virtual void move(const QPointF& p) = 0;
-    virtual void move_is_completed(const QPointF& p) = 0;
+    virtual void moveIsCompleted(const QPointF& p) = 0;
     virtual void create() = 0;
 
     virtual const QPointF& getCenter() { return m_center_def; };
@@ -109,7 +111,8 @@ class DragBase
     virtual  const char* _name_(){return "DragBase";}
     void copyRawPoints(const QPointF* points=0);
     QPointF         m_center_def; 
-};
+
+ };
 
 //--------------------------
 

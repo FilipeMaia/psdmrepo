@@ -8,7 +8,7 @@
 #include <iostream>    // std::cout
 #include <fstream>     // std::ifstream(fname)
 #include <sstream>     // stringstream
- 
+
 namespace PSQt {
 
 //--------------------------
@@ -50,6 +50,8 @@ namespace PSQt {
 
 class DragCenter : public DragBase
 {
+ Q_OBJECT // macro is needed for connection of signals and slots
+
  public:
 
   /**
@@ -64,12 +66,20 @@ class DragCenter : public DragBase
     virtual void draw(const DRAGMODE& mode=DRAW);
     virtual bool contains(const QPointF& p);
     virtual void move(const QPointF& p);
-    virtual void move_is_completed(const QPointF& p);
+    virtual void moveIsCompleted(const QPointF& p);
     virtual void create();
 
     virtual void print();
 
     virtual const QPointF& getCenter(){ return m_points_raw[0]; };
+    //virtual void setCenter(const QPointF& p) { moveToRaw(p); };
+
+ signals:
+    void centerIsMoved(const QPointF&);
+
+ public slots:
+    void testSignalCenterIsMoved(const QPointF&);
+    void moveToRaw(const QPointF&);
 
  protected:
 

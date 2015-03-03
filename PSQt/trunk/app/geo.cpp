@@ -10,6 +10,7 @@
 #include "PSQt/WdgColorTable.h"
 #include "PSQt/WdgGeoTree.h"
 #include "PSQt/WdgGeo.h"
+#include "PSQt/WdgPointPos.h"
 #include "PSQt/Frame.h"
 #include "PSQt/ThreadTimer.h"
 #include "PSQt/allinone.h"
@@ -39,6 +40,7 @@ int main( int argc, char **argv )
   else if(atoi(argv[1])==8) { PSQt::WdgGeoTree*     w = new PSQt::WdgGeoTree();     w->show(); }
   else if(atoi(argv[1])==9) { PSQt::WdgGeo*         w = new PSQt::WdgGeo();         w->show(); }
   else if(atoi(argv[1])==10){ PSQt::GUILogger*      w = new PSQt::GUILogger();      w->show(); }
+  else if(atoi(argv[1])==11){ PSQt::WdgPointPos*    w = new PSQt::WdgPointPos();    w->show(); }
   else {cout << "Input argument: " << argv[1] << " is outside allowed range..."; return 0;}
 
   return app.exec(); // Begin to display qt4 GUI

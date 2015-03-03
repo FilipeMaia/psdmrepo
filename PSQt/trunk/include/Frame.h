@@ -1,16 +1,9 @@
 #ifndef FRAME_H
 #define FRAME_H
 
-//#include <QVBox>
-//#include <QWidget>
-//#include <QFrame>
-//#include <QLabel>
-//#include <QSlider>
-//#include <QPushButton>
-
-#include <Qt>
 #include <QtGui>
-#include <QtCore>
+//#include <QtCore>
+//#include <Qt>
 
 #include "PSQt/WdgImage.h"
 #include "PSQt/WdgFile.h"

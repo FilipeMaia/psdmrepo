@@ -33,6 +33,7 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   m_but_exit = new QPushButton( "Exit", this );
   m_but_add  = new QPushButton( "Add circle", this );
   m_file     = new PSQt::WdgFile(this, "Image:", adp_fname_def.path());
+  m_pointpos = new PSQt::WdgPointPos(this, "Center x:", " y:", 0, 0, false, 60, 2);
 
   m_but_exit -> setCursor(Qt::PointingHandCursor); 
   m_but_add  -> setCursor(Qt::PointingHandCursor); 
@@ -42,12 +43,18 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   
   connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()) );
   connect(m_but_add,  SIGNAL( clicked() ), this, SLOT(onButAdd()) );
-  //connect(m_but_test, SIGNAL( clicked() ), m_image, SLOT(onTest()) );
   connect(m_file, SIGNAL(fileNameIsChanged(const std::string&)), m_image, SLOT(onFileNameChanged(const std::string&)) ); 
+
+  const DragBase* p_drag_center = m_image->getDragStore()->getDragCenter();
+  connect(p_drag_center, SIGNAL(centerIsMoved(const QPointF&)), m_pointpos, SLOT(setPointPos(const QPointF&))); 
+  connect(m_pointpos, SIGNAL(posIsChanged(const QPointF&)), p_drag_center, SLOT(moveToRaw(const QPointF&))); 
+  connect(m_pointpos, SIGNAL(posIsChanged(const QPointF&)), m_image, SLOT(forceUpdate())); 
+  m_pointpos->setPointPos(m_image->getDragStore()->getCenter());
 
   QHBoxLayout *hbox = new QHBoxLayout();
   hbox -> addWidget(m_but_exit);
   hbox -> addWidget(m_but_add);
+  hbox -> addWidget(m_pointpos);
   hbox -> addStretch(1);
 
   QVBoxLayout *vbox = new QVBoxLayout();

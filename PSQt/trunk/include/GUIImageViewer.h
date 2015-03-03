@@ -15,6 +15,7 @@
 //#include "PSQt/WdgImage.h"
 #include "PSQt/WdgImageFigs.h"
 #include "PSQt/WdgFile.h"
+#include "PSQt/WdgPointPos.h"
 
 namespace PSQt {
 class GUIImageViewer : public Frame
@@ -47,6 +48,7 @@ class GUIImageViewer : public Frame
     //WdgImage*      m_image;
     WdgImageFigs*  m_image;
     WdgFile*       m_file;
+    WdgPointPos*   m_pointpos;
 
     inline const char* _name_(){ return "GUIImageViewer"; }
     void showTips() ;

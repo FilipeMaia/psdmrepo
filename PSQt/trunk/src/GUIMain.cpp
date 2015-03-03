@@ -210,11 +210,11 @@ GUIMain::onButSave()
 {
   MsgInLog(_name_(), DEBUG, "onButSave()");
 
-  char* search_fmt = "*.data *.txt \n *"; 
+  //char* search_fmt="*.data *.txt \n *"; 
   std::string path = getGeometryFileName(); // from QGUtils
 
   QString path_file = QFileDialog::getSaveFileName(this, tr("Select input file"), 
-                                                   QString(path.c_str()), tr(search_fmt));
+                                                   QString(path.c_str()), tr("*.data *.txt \n *"));
   std::string str_path_file = path_file.toStdString();
 
   if(str_path_file.empty()) {

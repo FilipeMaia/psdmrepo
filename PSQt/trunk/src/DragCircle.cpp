@@ -79,7 +79,7 @@ DragCircle::move(const QPointF& p)
 
 //--------------------------
 void
-DragCircle::move_is_completed(const QPointF& p)
+DragCircle::moveIsCompleted(const QPointF& p)
 {
   this->move(p); // last move
 
