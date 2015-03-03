@@ -41,11 +41,11 @@ import logging
 import types
 import time
 import signal
+import subprocess
 
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-
 
 #-----------------------------
 # Imports for other modules --
@@ -248,6 +248,45 @@ class Job ( object ) :
         self._durationMinutes = data.duration
         self._cpuTime = data.cpuTime
         self._name = data.jName
+
+def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
+                resource=None):
+    bsub_opt = ["-q %s" % queue]
+    bsub_opt.append("-n %d" % numProc)
+    if jobName:
+        bsub_opt.append("-J %s" % jobName)
+    if log:
+        bsub_opt.append("-o %s" % log)
+    if resource:
+        bsub_opt.append("-R \"%s\"" % resource)
+    bsub_opt.append("-a mympi")
+    bsub_cmd = "bsub " + " ".join(bsub_opt)
+                        
+    cmd = bsub_cmd.split()
+    cmd.extend(command.split())
+    print cmd
+    #sys.exit(2)
+    #return 
+    res = subprocess.check_output(cmd)
+    for line in res.split('\n'):
+        if line.startswith('Job <'):
+            jobid = int(line[5:].split('>')[0])
+    print jobid, type(jobid)
+
+    time.sleep(2)
+    while False:
+        job = LSF.Job(jobid)
+        job.update()
+        stat = job.status()
+        if stat == None:
+            print "wait"
+            time.sleep(4)
+        else:
+            print "found job", stat
+            break
+
+    return Job(jobid)
+
 
 def submit(command, queue = None, jobName = None, 
            log = None, priority = None, 

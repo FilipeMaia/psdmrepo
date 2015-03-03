@@ -1,0 +1,32 @@
+#!/bin/bash 
+
+# Run h5-mpi-translate 
+#
+# Usage:
+#    h5-mpi-trans-runner <release> <options-h5-mpi-translate>
+
+
+# first argument is the release to run the translator from  
+rel=$1
+shift 1 
+. /reg/g/psdm/bin/sit_setup.sh $rel 
+
+opt=$(echo $@ | tr -d "'") 
+echo "Rank: ${OMPI_COMM_WORLD_RANK} Options: $opt"
+
+if [[ "${OMPI_COMM_WORLD_RANK}" -eq 0 ]] ; then  
+    cfgfile=$(echo ${opt} | sed -e 's/.*-c[ ]\+\([^ ]\+\).*/\1/')
+    echo "CAT ${cfgfile}"
+    if [[ -n ${cfgfile} ]] ; then
+        [[ -e ${cfgfile} ]] && cat ${cfgfile}
+    fi
+fi
+opt=$(echo ${opt} | sed -e 's/-o[ ]\+psana.dump_config_file//')
+
+
+# env variables
+export LD_PRELOAD=libpazlib.so
+export PAZLIB_MAX_THREADS=8
+export MSGLOGCONFIG="CalibDataProxy=trace"
+
+exec h5-mpi-translate ${opt}

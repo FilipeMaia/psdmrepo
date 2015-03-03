@@ -252,6 +252,7 @@ class IcAutoTranslate ( AppBase ) :
                     continue
 
     def _processFFBExperiment(self, instr, exper, expid, icdb):
+        """Add Runs to the queue that are in the logbook but not yet in the queue """
     
         # get the list of runs from existing requests 
         old_runs = icdb.translated_runs(instr, exper)
@@ -264,8 +265,6 @@ class IcAutoTranslate ( AppBase ) :
         # runs that have not been requested yet
         new_runs = all_runs - old_runs
         for run in new_runs :
-            
-            # submit a request
             try:
                 if not self._options.dry_run: icdb.new_fileset(instr, exper, run, 'DATA', [], status = 'WAIT_FILES')
                 self.info('Submitted %s %s %d to FFB translator', instr, exper, run)
