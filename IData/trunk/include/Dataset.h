@@ -78,13 +78,15 @@ namespace IData {
  *  @li @b run - specifies set of runs belonging to dataset which is a
  *      comma-separated list of run ranges, range can be a single run number
  *      or two number separated by dash (run=12,15-18,25)
- *  @li @b xtc - selects XTC files as input (which is default), no value for this key
+ *  @li @b xtc - selects XTC files as input  no value for this key
+ *  @li @b smd - selects small XTC files as input (which is default), no value for this key
+ *  @li @b idx - selects index files as input,  no value for this key
  *  @li @b h5 - selects HDF5 files as input, no value for this key
  *  @li @b live - selects live XTC files as input, no value for this key
  *  @li @b dir - specifies directory containing input files, by default
  *      files are located in the standard experiment directories under
  *      /reg/d/psdm directory
- *  @li @b one-stream - this option works with XTC input only, if the option
+ *  @li @b one-stream - this option works with XTC or sml input only, if the option
  *      is given a value (number) then it specifies stream number to read,
  *      without value arbitrary single stream will be selected. If option
  *      is not specified then data from all stream are read.

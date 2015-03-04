@@ -288,9 +288,14 @@ Dataset::files() const
   if (not m_files.empty()) return m_files;
 
   bool hdf5 = this->exists("h5");
-  
+
+  bool smd = this->exists("smd");
+
   // get directory name where to look for files
   std::string dir = this->dirName();
+  if (smd) {
+    dir += "/smalldata";
+  }
   if (not fs::is_directory(dir)) {
     throw DatasetDirError(ERR_LOC, dir);
   }
@@ -309,6 +314,8 @@ Dataset::files() const
         std::string reStr;
         if (hdf5) {
           reStr = boost::str(boost::format("%1%-r0*%2%(-.*)?[.]h5") % experiment() % run);
+        } else if (smd) {
+          reStr = boost::str(boost::format("e%1%-r0*%2%-s[0-9]+-c[0-9]+[.]smd[.]xtc") % expID() % run);          
         } else {
           reStr = boost::str(boost::format("e%1%-r0*%2%-s[0-9]+-c[0-9]+[.]xtc") % expID() % run);          
         }
