@@ -10,6 +10,7 @@ class dump(object):
         self.epicsParam = self.configBool('epics', True)        
         self.aliasesParam  = self.configBool('aliases', True)
         self.followEpicsAliases = self.configBool('dump_aliases',False)
+        self.dumpSml = self.configBool('dump_sml',False)
         self.epicsPrintForRegressionTests = self.configBool('regress_dump',False)
         self.beginJobEvt = self.configBool('dump_beginjob_evt',True)
         # if outputFile is set, all output will be written to that file, if 
@@ -151,6 +152,9 @@ class dump(object):
         self.fout.flush()
 
     def filterKey(self, keyStr):
+        if not self.dumpSml:
+            if keyStr.find('SmlData.')>=0:
+                return True
         if len(self.exclude)>0:
 	    for term in self.exclude:
                 if keyStr.find(term)>=0:

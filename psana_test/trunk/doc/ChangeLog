@@ -11,6 +11,16 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-22
+2015-3-3 David Schneider
+- small data JIRA issue PSAS-85
+- add option dump_sml to psana_test.dump which is false by default (means do not
+  dump small data types). This means be default we can compare dump of .smd.xtc and .xtc
+  and expect same thing, but put on option to see those types.
+- fix liveModeTest to ignore warnings in dump. Since psana now understands small data,
+  and I created that test data using a beta version of the small data tool, psana 
+  complains about finding small data in a .xtc file (but just as warnings).
+
 Tag: V00-08-21
 2015-2-24 David Schneider
 - fix rel6 build

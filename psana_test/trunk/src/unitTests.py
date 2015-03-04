@@ -690,8 +690,9 @@ class Psana( unittest.TestCase ) :
         # get ground truth for what we should see:
         os.system(offlineCmd)
         
-        # make sure no errors
+        # make sure no errors (strip out warnings, we expect the warning: PSXtcInput.XtcInputModule smallDataProxy typeid found but smallDataProxy is null.
         offlineStderr = file(offlineStderrFilename,'r').read().strip()
+        offlineStderr = '\n'.join([ln for ln in offlineStderr.split('\n') if not ln.startswith('[warning')])
         self.assertEqual(offlineStderr,'',msg="There were errors in offline cmd=%s\nstderr=\n%s" % (offlineCmd, offlineStderr))
 
         # below is the md5sum of what we expect above
@@ -733,9 +734,11 @@ class Psana( unittest.TestCase ) :
             os.system(dumpCmd)
             liveModeProcess.join()
         
-            # we're done. Check for unexpected error output:
-
+            # we're done. 
+            # we expect warnings about finding the smallDataProxy typeid, but not having a small data proxy
+            # object. Remove all warnings and Check for unexpected error output:
             liveDumpStderr = file(dumpStdErrFile,'r').read().strip()
+            liveDumpStderr  = '\n'.join([ln for ln in liveDumpStderr.split('\n') if not ln.startswith('[warning')])
             self.assertEqual(liveDumpStderr, '', msg="%s: There were errors in the live mode DumpDgram\ncmd=%s" % (testlabel, dumpCmd))
 
             # The only difference between the DumpDgram output on
