@@ -42,6 +42,9 @@
 #include "XtcInput/DgramList.h"
 #include "XtcInput/DgramUtil.h"
 #include "PSEvt/DamageMap.h"
+#include "IData/Dataset.h"
+#include "psddl_pds2psana/SmallDataProxy.h"
+#include "PSEvt/Exceptions.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -88,6 +91,21 @@ namespace {
     return false;
   }
 
+  // returns true if typeId is for Xtc Any
+  inline bool checkForAndRecordSrcDamage(const Pds::TypeId& typeId, Pds::Xtc *xtc, 
+                                         const Pds::Damage &damage, boost::shared_ptr<PSEvt::DamageMap> &damageMap, 
+                                         const char *loggerName) {
+    if (typeId.id() == Pds::TypeId::Any) {
+      if (damage.value()) {
+        damageMap->addSrcDamage(xtc->src,damage);
+      } else {
+        MsgLog(loggerName, warning, loggerName << ": unexpected - xtc type id is 'Any' but its damage=0");
+      }
+      return true;
+    }
+    return false;
+  }
+
 }
 
 
@@ -117,6 +135,7 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
   , m_eventTagEpicsStore(0)
   , m_simulateEOR(0)
   , m_run(-1)
+  , m_liveMode(false)
 {
   std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
 
@@ -128,7 +147,33 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
     m_maxEvents = cfg.get("psana", "events", 0UL);
     m_skipEpics = cfg.get("psana", "skip-epics", true);
     m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
-  }  
+  }
+  try {
+    std::list<std::string> files = configList("files");
+    
+    // The DgramReader does a more thorough job of checking the files input, throwing errors
+    // if live is mixed with dead mode, etc, here if we find "live" in one of the files, we assume
+    // live mode 
+
+    // TODO: Presently - LiveFilesDB does not know how to get small data filenames - so if live mode is 
+    // present, and smd is as well, we'd like to warn the user
+    bool smallData = false;
+    for (std::list<std::string>::iterator file = files.begin(); file != files.end(); ++file) {
+      IData::Dataset ds(*file);
+      if (ds.exists("live")) {
+        m_liveMode = true;
+      }
+      if (ds.exists("smd")) {
+        smallData = true;
+      }
+    }
+    if (m_liveMode and smallData) {
+      MsgLog(name, error, " " << name << ": **NOT IMPLEMENTED** live mode and smd not implemented yet");
+    }
+  } catch (ConfigSvc::Exception &) {
+    MsgLog(name, error, " " << name << ": unable to read 'files' parameters, assuming non-live mode");
+  }
+  m_liveTimeOut = config("liveTimeout", 120U);
 }
 
 //--------------
@@ -177,7 +222,7 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
     // push non-event stuff to environment. 
     fillEnv(nonEventDg, env);
 
-    MsgLog(name(),trace,"beginJob datagrams: ");
+    MsgLog(name(),trace," beginJob datagrams: ");
     int idx=0;
     BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
       MsgLog(name(),debug,"  dg " << idx << ": " << Dgram::dumpStr(dg));
@@ -185,7 +230,7 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
     }
 
     if (not allDgsHaveSameTransition(eventDg)) {
-      MsgLog(name(), warning, name() << "first datagrams do not have same transition.");
+      MsgLog(name(), warning, name() << ": first datagrams do not have same transition.");
     }
 
     Pds::TransitionId::Value transition = Pds::TransitionId::Map;
@@ -203,7 +248,7 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
     // If this is not Map then we expect Configure here, anything else must be handled in event()
     if (transition != Pds::TransitionId::Configure) {
       // Something else than Configure, store if for event()
-      MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
+      MsgLog(name(), warning, ": Expected Configure transition for first datagram, received "
              << Pds::TransitionId::name(transition) );
       m_putBack = eventDg;
       break;
@@ -270,7 +315,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
       if (not m_dgsource->next(eventDg, nonEventDg)) {
         // finita
-        MsgLog(name(), debug, "EOF seen");
+        MsgLog(name(), debug, ": EOF seen");
         return Stop;
       }
       // sort by stream number to get DAQ streams in front.
@@ -456,31 +501,30 @@ void
 XtcInputModuleBase::fillEvent(const std::vector<XtcInput::Dgram>& dgList, Event& evt, Env& env)
 {
   // If the same EventKey is in both the DAQ and Control stream,
-  // we want the DAQ stream to take precedence.
-  // we process the DAQ stream first, then an error will
-  // be generated when processing the Control stream. If the calling routine has sorted
-  // the dgList by stream number, then DAQ dgrams are in the front.
+  // we want the DAQ stream to take precedence so that the DAQ data gets stored.
+  // Below we go through all datagrams in order, assuming they have been sorted by 
+  // stream number, we will get the DAQ streams first.
+
+  // The Duplicate key exception is currently caught by the dispatch code.
 
   // if this is a Configure or BeginCalibCycle, then all DAQ dgrams are 
   // duplicates of one another. We need only store one of the DAQ dgrams. 
-  // It is cleaner and less error prone to just store one DAQ dgram in this case.
+  // It seems cleaner and less error prone to just store one DAQ dgram in this case.
   int numDaqStored = 0;
+  int numControlStored = 0;
   bool storedDaq = false;
   BOOST_FOREACH(const XtcInput::Dgram& dg, dgList) {
     bool isDaq = int(dg.file().stream()) < m_firstControlStream;
-    if (storedDaq and isDaq and ::isConfigOrBeginCalib(dg)) continue;
+    if (isDaq and storedDaq and ::isConfigOrBeginCalib(dg)) continue;
     fillEvent(dg, evt, env);
-    ++numDaqStored;
-    if (isDaq) storedDaq = true;
+    if (isDaq) {
+      ++numDaqStored;
+      storedDaq = true;
+    } else {
+      ++numControlStored;
+    }
   }
-  // store control streams
-  int numControlStored = 0;
-  BOOST_REVERSE_FOREACH(const XtcInput::Dgram& dg, dgList) {
-    bool isDaq = int(dg.file().stream()) < m_firstControlStream;
-    if (isDaq) break;
-    fillEvent(dg, evt, env);
-    ++numControlStored;
-  }
+
   MsgLog(name(), debug, name() << ": in fillEvent() from dgList of " 
          << dgList.size() << " dgrams. Stored "
          << numControlStored << " control dgrams and "
@@ -493,37 +537,61 @@ XtcInputModuleBase::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in fillEvent()");
 
+  boost::shared_ptr<psddl_pds2psana::SmallDataProxy> smallDataProxy = \
+    psddl_pds2psana::SmallDataProxy::makeSmallDataProxy(dg.file(), m_liveMode, m_liveTimeOut, m_cvt,  &evt, env);
+
   Dgram::ptr dgptr = dg.dg();
-  
+
   boost::shared_ptr<PSEvt::DamageMap> damageMap = evt.get();
   // Loop over all XTC contained in the datagram
   XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
     const Pds::TypeId& typeId = xtc->contains;
     const Pds::Damage damage = xtc->damage;
-    if (typeId.id() == Pds::TypeId::Any) {
-      if (damage.value()) {
-        damageMap->addSrcDamage(xtc->src,damage);
-      } else {
-        MsgLog(name(), warning, name() << ": unexpected - xtc type id is 'Any' but its damage=0");
+    bool isXtcAny = checkForAndRecordSrcDamage(typeId, xtc, damage, damageMap, name().c_str());
+    if (isXtcAny) continue;
+    bool isSmallDataProxy = psddl_pds2psana::SmallDataProxy::isSmallDataProxy(typeId);
+    std::vector<const std::type_info *> convertTypeInfoPtrs;
+    bool storeObject;
+
+    if (isSmallDataProxy) {
+      convertTypeInfoPtrs = psddl_pds2psana::SmallDataProxy::getSmallConvertTypeInfoPtrs(xtc, m_cvt);
+      const Pds::TypeId proxiedTypeId = psddl_pds2psana::SmallDataProxy::getSmallDataProxiedType(xtc);
+      if (proxiedTypeId.id() == Pds::TypeId::Id_Epics) {
+        MsgLog(name(), error, " epics has been proxied in small data - skipping");
+        continue;
       }
-      continue;
-    }
-    std::vector<const std::type_info *> convertTypeInfoPtrs = m_cvt.getConvertTypeInfoPtrs(typeId);
+      storeObject = m_damagePolicy.eventDamagePolicy(damage, proxiedTypeId.id());
+    } else {
+      convertTypeInfoPtrs = m_cvt.getConvertTypeInfoPtrs(typeId);
+      storeObject = m_damagePolicy.eventDamagePolicy(damage, typeId.id());
+    }        
+
     for (unsigned idx=0; idx < convertTypeInfoPtrs.size(); ++idx) {
       (*damageMap)[PSEvt::EventKey( convertTypeInfoPtrs[idx], xtc->src, "") ] = damage;
     }
-    bool storeObject = m_damagePolicy.eventDamagePolicy(damage, typeId.id());
+
     if (not storeObject) {
-      MsgLog(name(),debug,name() << "damage = " << damage.value() << " typeId=" 
-             << typeId.id() << " src=" << xtc->src << " not storing in Event");
+      MsgLog(name(),debug, name() << " damage = " << damage.value() 
+             << " src=" << xtc->src << " not storing in Event. SmallDataProxy=" << isSmallDataProxy);
       continue;
     }
 
     boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);   
-    m_cvt.convert(xptr, evt, env.configStore());
+    if (isSmallDataProxy) {
+      if (not smallDataProxy) {
+        MsgLog(name(), warning, name() << " smallDataProxy typeid found but smallDataProxy is null. Skiping (is this a .smd.xtc file?).");
+      } else {
+        smallDataProxy->addEventProxy(xptr, convertTypeInfoPtrs);
+      }
+    } else {
+      m_cvt.convert(xptr, evt, env.configStore());
+    }
     
   }
+
+  if (smallDataProxy) smallDataProxy->finalize();
+
 }
 
 void
@@ -595,7 +663,8 @@ XtcInputModuleBase::fillEnv(const std::vector<XtcInput::Dgram> & dgList, Env& en
   bool storedDaq = false;
   BOOST_FOREACH(const XtcInput::Dgram& dg, dgList) {
     bool isDaq = int(dg.file().stream()) < m_firstControlStream;
-    if (storedDaq and isDaq and ::isConfigOrBeginCalib(dg)) continue;
+    if (isDaq and storedDaq and ::isConfigOrBeginCalib(dg)) break;
+    if (not isDaq) break; // we already stored control streams
     fillEnv(dg, env);
     ++numDaqStored;
     if (isDaq) storedDaq = true;
@@ -619,6 +688,10 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
 
   Dgram::ptr dgptr = dg.dg();
 
+  boost::shared_ptr<psddl_pds2psana::SmallDataProxy> smallDataProxy = \
+    psddl_pds2psana::SmallDataProxy::makeSmallDataProxy(dg.file(), m_liveMode, 
+                                                        m_liveTimeOut, m_cvt, 0, env);
+
   if (::isConfigOrBeginCalib(dg)) {
 
     // before we start adding all config types we need to update alias map so
@@ -627,9 +700,9 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
       XtcInput::XtcIterator iter1(&dgptr->xtc);
       while (Pds::Xtc* xtc = iter1.next()) {
         if (xtc->contains.id() == Pds::TypeId::Id_AliasConfig) {
-
+          
           boost::shared_ptr<PSEvt::AliasMap> amap = env.aliasMap();
-
+          
           if (xtc->contains.version() == 1) {
             const Pds::Alias::ConfigV1* cfgV1 = (const Pds::Alias::ConfigV1*)xtc->payload();
             const ndarray<const Pds::Alias::SrcAlias, 1>& aliases = cfgV1->srcAlias();
@@ -638,22 +711,31 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
               amap->add(alias.aliasName(), alias.src());
             }
           } else {
-            MsgLog(name(), warning, name() << "failed to find Alias::ConfigV1 in config store");
+            MsgLog(name(), warning, name() << ": failed to find Alias::ConfigV1 in config store");
           }
         }
       }
     }
     
+ 
     // Loop over all XTC contained in the datagram
     XtcInput::XtcIterator iter(&dgptr->xtc);
     while (Pds::Xtc* xtc = iter.next()) {
-
       if (xtc->contains.id() != Pds::TypeId::Id_Epics) {
         boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
-        // call the converter which will fill config store
-        m_cvt.convertConfig(xptr, env.configStore());
+        if (psddl_pds2psana::SmallDataProxy::isSmallDataProxy(xtc->contains)) {
+          if (smallDataProxy) {
+            // not checking if epics as already checked above
+            smallDataProxy->addEnvProxy(xptr, psddl_pds2psana::SmallDataProxy::getSmallConvertTypeInfoPtrs(xtc, m_cvt));
+          } else {
+            MsgLog(name(), warning, name() << ": smallDataProxy typeid found but smallDataProxy is null. Skiping (is this a .smd.xtc file?).");
+          }
+        } else {
+          // call the converter which will fill config store
+          m_cvt.convertConfig(xptr, env.configStore());
+        }
       }
-
+      
       if (xtc->contains.id() == Pds::TypeId::Id_EpicsConfig) {
         // need to tell Epics store about aliases
         boost::shared_ptr<Psana::Epics::ConfigV1> cfgV1 = env.configStore().get(xtc->src);
@@ -682,6 +764,7 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
     }
     
   }
+  if (smallDataProxy) smallDataProxy->finalize();
 
 }
 
