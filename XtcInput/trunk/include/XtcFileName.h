@@ -59,8 +59,8 @@ public:
   // Construct from a full path name
   explicit XtcFileName( const std::string& path ) ;
 
-  // Construct from dir name, experiment id, run number, stream and chunk
-  XtcFileName(const std::string& dir, unsigned expNum, unsigned run, unsigned stream, unsigned chunk) ;
+  // Construct from dir name, experiment id, run number, stream, chunk, and if small
+  XtcFileName(const std::string& dir, unsigned expNum, unsigned run, unsigned stream, unsigned chunk, bool small) ;
 
   // Destructor
   ~XtcFileName () {}
@@ -68,11 +68,17 @@ public:
   // returns true if file name is not defined
   bool empty() const { return m_path.empty(); }
 
+  // returns true if small data file
+  bool small() const { return m_small; }
+
   // get full name
   const std::string& path() const { return m_path ; }
 
   // get base name
   std::string basename() const ;
+
+  // get base name for large xtc version of file (will be the same if not small)
+  std::string largeBasename() const ;
 
   // get file extension, anything that appears after last '.' in file name including '.' itself
   std::string extension() const ;
@@ -102,7 +108,7 @@ private:
   unsigned m_run ;
   unsigned m_stream ;
   unsigned m_chunk ;
-
+  bool m_small ;
 };
 
 std::ostream&

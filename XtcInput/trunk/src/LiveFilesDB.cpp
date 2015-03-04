@@ -96,8 +96,11 @@ LiveFilesDB::files(unsigned expId, unsigned run)
     row.at(1, chunk);
     row.at(2, dssPath);
 
+    bool small = false; // TODO: there is currently no code in place to support getting 
+                        // small data files  in live mode
+
     if (dssPath.empty()) {
-      XtcFileName fname(m_dir, expId, run, stream, chunk);
+      XtcFileName fname(m_dir, expId, run, stream, chunk, small);
       MsgLog(logger, debug, "LiveFilesDB::files - found file " << fname.path());
       result.push_back(fname);
     } else{

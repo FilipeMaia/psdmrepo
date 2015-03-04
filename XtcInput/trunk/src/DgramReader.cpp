@@ -75,14 +75,16 @@ try {
   // specify live mode, other datasets do not matter.
 
   enum {Unknown, Live, Dead} liveMode = Unknown;
-  enum {AllStreams=-1, AnyOneStream=-2, RangeOfStreams=-3};
+  const int AllStreams=-1;
+  const int AnyOneStream=-2;
+  const int RangeOfStreams=-3;
+  int  stream = AllStreams;
 
   std::vector<XtcFileName> files;  // file names for "dead" mode
   IData::Dataset::Runs runs;  // run numbers for live mode
   IData::Dataset::Streams streams;  // stream ranges for live mode
   unsigned expId = 0;
   std::string liveDir;
-  int stream = AllStreams;
 
   // guess whether we have datasets or pure file names (or mixture)
   for (FileList::const_iterator it = m_files.begin(); it != m_files.end(); ++ it) {
@@ -263,8 +265,8 @@ try {
     if (not numbers.empty()) {
       // use default table name if none was given
       if (m_liveDbConn.empty()) m_liveDbConn = "Server=psdb.slac.stanford.edu;Database=regdb;Uid=regdb_reader";
-      // we would prefer to use boost::make_shared below, 
-      // but in C++ 03 it stops after 9 arguments (C++ 11 would variadic templates resolve this)
+      // we would prefer to use boost::make_shared below, but in C++ 03 it stops 
+      // after 9 arguments (C++ 11 variadic templates would resolve this)
       boost::shared_ptr<RunFileIterLive> temp( new RunFileIterLive(numbers.begin(), numbers.end(), expId, stream, streams,
                                                                    m_liveTimeout, m_runLiveTimeout, m_liveDbConn, 
                                                                    m_liveTable, liveDir));

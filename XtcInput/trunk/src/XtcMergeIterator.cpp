@@ -100,7 +100,7 @@ XtcMergeIterator::next()
       m_dgiter = boost::make_shared<XtcStreamMerger>(fileNameIter, m_l1OffsetSec, 
                                                      m_firstControlStream,
                                                      m_maxStreamClockDiffSec,
-						     xtcFilesPos);
+                                                     xtcFilesPos);
     }
 
     // try to read next datagram from it

@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-12
+2015-03-03 David Schneider
+- small data JIRA issue PSAS-85
+- update XtcFileName with boolean flag for small data. 
+  some constructors take additional parameter about small
+  contains logic for distinguishing small data file (ends with .smd.xtc)
+  contains logic to return large xtc filename from small (strip out .smd)	
+  change sort order so all small xtc come before large xtc
+- Note: live mode not implemented yet - LiveFilesDB only looks for large xtc files
+
 Tag: V00-10-11
 2015-02-12 David Schneider
 - add parameter PSXtcInput.XtcInputModule.runLiveTimeout to get psana to wait for 
