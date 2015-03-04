@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-18
+2015-3-3 David Schneider
+- small data JIRA issue PSAS-85
+- make XtcConverter splitTypes public so that smallDataProxy can check for this
+- add class SmallDataProxy to handle all proxied items in a datagram
+
 Tag: V00-09-17
 2015-2-23 David Schneider
 - update to pdsdata 8.2.4 with EvrDataV4 and present function

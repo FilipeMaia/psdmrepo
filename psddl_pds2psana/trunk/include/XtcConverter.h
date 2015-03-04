@@ -28,6 +28,7 @@
 #include "PSEvt/Event.h"
 #include "PSEnv/EnvObjectStore.h"
 #include "PSEnv/EpicsStore.h"
+#include "XtcInput/XtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -67,6 +68,7 @@ public:
    */
   void convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
   
+
   /**
    *  @brief Returns list of type_info pointers for types that convert puts in event/config store
    */
@@ -82,8 +84,6 @@ public:
    */
   void convertEpics(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EpicsStore& eStore, long epicsStoreTag=-1);
 
-protected:
-  
   /**
    *  @brief returns true if typeId is a special xtc that is split into several different xtcs during convert
    */
@@ -94,6 +94,8 @@ protected:
    *  Returns an empty list if typeId is not special.
    */
   std::vector<Pds::TypeId> splitTypes(const Pds::TypeId &typeId);
+  
+protected:
   
 private:
 
