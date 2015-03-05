@@ -295,6 +295,8 @@ class TranslatorJob(object) :
         h5name = pjoin(outputDirTmp, self._get_config('hdf5-file-name', _defHdf5FileName, True))
         cmd.extend(("-o", "Translator.H5Output.output_file=" + h5name))
         
+        self.__link_hdf5_canonical(h5name, outputDir)
+        
         to_subdir = self._get_config('output-cc-subdir', False)
         cmd.extend(("-o", "Translator.H5Output.split_cc_in_subdir=" + str(to_subdir)))
 
@@ -367,24 +369,32 @@ class TranslatorJob(object) :
         return job
 
 
-
     # ===============================
     # make directory for output files
     # ===============================
 
     def __make_hdf5_dir(self, dirname) :
 
-        #return 
         # output directory must be empty or non-existent
         if os.path.exists(dirname) :
             if not os.path.isdir(dirname) :
                 msg = '[%s] output directory exist but is not a directory: %s' % ( self._name, dirname )
-                self.warning ( msg )
-                raise IOError( msg )
+                self.warning(msg)
+                raise IOError(msg)
         else :
             # create output directory
             self.trace ( '[%s] create directory for output files: %s', self._name, dirname )
             os.makedirs(dirname)
+
+    def __link_hdf5_canonical(self,h5name, outputDir):
+        link_name = pjoin(outputDir, os.path.basename(h5name))
+        rel_target = os.path.relpath(h5name, os.path.commonprefix((link_name,h5name)))
+        try:
+            if os.path.islink(link_name):
+                os.remove(link_name)            
+            os.symlink(rel_target, link_name)
+        except Exception as msg:
+            self.warning("Failed to create link %s", link_name)
 
     # =================================================
     # Store HDF5 files in both dataset and file manager
