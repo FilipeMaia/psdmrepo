@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-25
+- add diagnostic about how long fastindex search for other stream calib
+  cycles takes.
+- attempt to make fastindex a little faster by decreasing block size while
+  increasing the number of blocks searched. Notes in JIRA issue PSAS-118
+	
 Tag: V00-02-24
 - attempt to address problems with runs from xppf7815 - JIRA issue PSAS-117
   call H5Fflush on master file after external links added and file created.

@@ -21,6 +21,7 @@
 #include <iostream>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <memory>
 #include <math.h>
@@ -466,7 +467,7 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
         double rangeTriedMB = ((1+candIdx) * 2 * m_halfRangeBytes)/double(1<<20);
         double MBfromMaster = std::abs(bytesFromMaster / double(1<<20));
         MsgLog(loggerMaster, FASTLOGLVL, "fastIndex: found calib cycle " << stepIdx << " for "
-               << otherPath << ". Tried " << candIdx + 1 << " spots, covering at most" << rangeTriedMB
+               << otherPath << ". Tried " << candIdx + 1 << " spots, covering at most " << rangeTriedMB
                << " MB. starting search position was " << MBfromMaster << " MB from master position.");
       }
       newFilenames.push_back(otherPath);
@@ -615,8 +616,8 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
                                                 NUM_EVENTS_CHECK_DONE_CALIB_FILE_DEFAULT);
   
   m_fastIndex = cfgSvc.get("Translator.H5Output", "fast_index", false);
-  m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 12.0);
-  m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks", 50);
+  m_fastIndexMBhalfBlock = cfgSvc.get("Translator.H5Output", "fi_mb_half_block", 4.0);
+  m_fastIndexNumberBlocksToTry = cfgSvc.get("Translator.H5Output", "fi_num_blocks", 150);
   
   if (cfgSvc.get("Translator.H5Output","printenv",false)) {
     WithMsgLog(loggerMaster, info, str) {
@@ -689,9 +690,9 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   // to call H5Output methods directly, we need the environment
   PSEnv::Env & env = dataSource.env();
   
-  // to call H5Output endCalibCycle, endRun, and endJob methods, we need an empty event
-  // since the actual event the module methods would receive is not available through
-  // runIter and stepIter
+  // to call H5Output endCalibCycle, endRun, and endJob methods, we need an event.
+  // We do not always have the event from the data below, so we create a dummy one
+  // to call certain functions
   boost::shared_ptr<AliasMap> amap = env.aliasMap();
   boost::shared_ptr<PSEvt::Event> emptyEvent = 
     boost::make_shared<PSEvt::Event>(boost::make_shared<PSEvt::ProxyDict>(amap));
@@ -701,7 +702,8 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
   LusiTime::Time stepStartTime = LusiTime::Time::now();
   LusiTime::Time stepEndTime = LusiTime::Time::now();
   int64_t stepNumberOfEvents = 0;
-  double messagingTimeDuringEventLoop = 0.0;
+  double messagingAndMasterLinkTimeDuringEventLoop = 0.0;
+  double messagingAndMasterLinkTimeThisStep = 0.0;
   bool doBeginJob = true;
   while (true) {
     // loop through runs
@@ -741,12 +743,16 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
           MsgLog(loggerMaster, error,"no step position found for step " << stepIdx);
           return -1;
         }
-        std::string fastMsg = "";
+        std::string fastMsgRate = "";
         if (m_fastIndex) {
+          LusiTime::Time fastIndexStartTime = LusiTime::Time::now();
           fastIndex.checkMasterStepPos(beginStepPos);
-
           beginStepPos = fastIndex.addOtherStreamStarts(beginStepPos, stepIdx);
-          fastMsg = " (but fast_index=True, so we are reading only one of the DAQ streams. Need 20hz for real time)";
+          LusiTime::Time fastIndexEndTime = LusiTime::Time::now();
+          double fastIndexTotalTime = timeDiffSeconds(fastIndexEndTime, fastIndexStartTime);
+          std::ostringstream fastMsg;
+          fastMsg << " (fast_index=True, need 20hz for real time. find_calib_start_other_streams=" << fastIndexTotalTime << " sec)";
+          fastMsgRate = fastMsg.str();
         }
         if (stepIdx > 0) {
           stepEndTime = LusiTime::Time::now();
@@ -755,8 +761,11 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
           stepStartTime = stepEndTime;
           double eventsPerSec = stepNumberOfEvents/timeThisStep;
           MsgLog(loggerMaster, info, "starting step: " << stepIdx << 
-                 " rate=" << eventsPerSec << " evts/sec" << fastMsg << 
-                 " num_events=" << stepNumberOfEvents << " seconds=" << timeThisStep);
+                 " rate=" << eventsPerSec << " evts/sec" << fastMsgRate << 
+                 " num_events=" << stepNumberOfEvents << " seconds=" << timeThisStep <<
+                 " messaging & masterLink time=" << messagingAndMasterLinkTimeThisStep
+                 );
+          messagingAndMasterLinkTimeThisStep = 0.0;
         }
       }	// destroy the step event
       if (calibStartsNewJob) {
@@ -776,7 +785,9 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
         calibStartsNewJob = false;
         lastCalibEventStart = totalEvents;
         LusiTime::Time messagingTimeEnd = LusiTime::Time::now();
-        messagingTimeDuringEventLoop += timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
+        double timeDiff = timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
+        messagingAndMasterLinkTimeDuringEventLoop += timeDiff;
+        messagingAndMasterLinkTimeThisStep += timeDiff;
       }
       EventIter eventIter = step.events();
       while (boost::shared_ptr<PSEvt::Event> evt = eventIter.next()) {
@@ -792,12 +803,14 @@ int H5MpiTranslateApp::runAppMaster(std::string cfgFile, std::map<std::string, s
             checkOnLinksToWrite(h5OutputModule);
           } while (startWorkerResult == StartedWorker);
           LusiTime::Time messagingTimeEnd = LusiTime::Time::now();
-          messagingTimeDuringEventLoop += timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
+          double timeDiff = timeDiffSeconds(messagingTimeEnd, messagingTimeStart);
+          messagingAndMasterLinkTimeDuringEventLoop += timeDiff;
+          messagingAndMasterLinkTimeThisStep += timeDiff;
         }
       }
     } // finish steps in run
   } // finish runs
-  MsgLog(loggerMaster, MSGLOGLVL, "messaging time during event loop (sec): " << messagingTimeDuringEventLoop);
+  MsgLog(loggerMaster, MSGLOGLVL, "messaging time during event loop (sec): " << messagingAndMasterLinkTimeDuringEventLoop);
   LusiTime::Time eventEndTime = LusiTime::Time::now();
   m_eventTime += timeDiffSeconds(eventEndTime, eventStartTime);
   
