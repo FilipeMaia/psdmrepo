@@ -264,28 +264,29 @@ def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
                         
     cmd = bsub_cmd.split()
     cmd.extend(command.split())
-    print cmd
+    #print cmd
     #sys.exit(2)
     #return 
     res = subprocess.check_output(cmd)
     for line in res.split('\n'):
         if line.startswith('Job <'):
             jobid = int(line[5:].split('>')[0])
-    print jobid, type(jobid)
-
+    
     time.sleep(2)
-    while False:
-        job = LSF.Job(jobid)
+    maxLoops = 10
+    for i in xrange(maxLoops):
+        job = Job(jobid)
         job.update()
         stat = job.status()
         if stat == None:
-            print "wait"
+            print "Could not get job id, wait 4s count", i
             time.sleep(4)
         else:
-            print "found job", stat
-            break
+            return Job(jobid)
 
-    return Job(jobid)
+    # Could not get job id
+    raise LSBError()
+
 
 
 def submit(command, queue = None, jobName = None, 

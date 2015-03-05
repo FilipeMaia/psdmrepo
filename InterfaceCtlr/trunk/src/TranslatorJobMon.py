@@ -117,20 +117,21 @@ class TranslatorJob(object) :
         self._log = logger
         # name will be LSF job name, try to limit it to 10 chars
         self._name = "%s-%03d" % (fs.experiment[:6], fs.run_number)
+        self._read_from_ffb = False
 
+        self._outputDir = self._get_config('output-dir', _defOutputDir, True)
+        if not os.path.isabs(self._outputDir):
+            self._outputDir = pjoin(_exper_dir(self._fs), self._outputDir)
+            
         if translator is None:
             self._id = None
-            self._outputDir = self._get_config('output-dir', _defOutputDir, True)
-            if not self._outputDir.startswith('/'):
-                self._outputDir = pjoin(exper_dir(self._fs), self._outputDir)
-            self._outputDirTmp = self._outputDir
+            self._outputDirTmp = pjoin(self._outputDir, Time.now().toString("%Y%m%dT%H%M%S"))
             self._job = self._startJob()
         else:
             self._id = translator.id
-            self._outputDir = translator.outputDir
-            self._outputDirTmp = self._outputDir
+            self._outputDirTmp = translator.outputDir
             self._job = LSF.Job(translator.jobid)
-            
+        
         self._status = None  # None means running, 0 - finished OK; non-zero - error
         
 
@@ -278,7 +279,7 @@ class TranslatorJob(object) :
     # Build a list that has the command to execute the translator
     # ===========================================================
 
-    def __build_translate_cmd ( self, fs, outputDir, outputDirTmp ) :
+    def __build_translate_cmd(self, fs, outputDir, outputDirTmp ) :
         """Build the arg list to pass to the translator from the files in fileset
         and the translate_uri destination for the translator output"""
         
@@ -303,8 +304,11 @@ class TranslatorJob(object) :
             cmd.append("PSXtcInput.XtcInputModule.liveTimeout=%d" % live_timeout)
             
         for xtc in fs.xtc_files:
+            if xtc.find('/reg/d/ffb/') >= 0:
+                self._read_from_ffb = True
             cmd.append(xtc)
-        
+        self.trace("ffb status %s", self._read_from_ffb)
+
         return cmd
 
     # ========================
@@ -434,20 +438,19 @@ class TranslatorJob(object) :
         regdb use high-priority queue."""
         
         queue_param = 'lsf-queue'
-        conn_str = self._get_config("regdb-conn")
-        if conn_str:
-            
-            try:
-                regdb = RegDb(DbConnection(conn_string=conn_str))
-                exp = regdb.last_experiment_switch(self._fs.instrument)
-                if exp and exp[0][0] == self._fs.experiment:
-                    self.trace("use high-priority queue for active experiment %s", self._fs.experiment)
-                    queue_param = 'lsf-queue-active'
-            except Exception, ex:
-                self.warning("exception while accessing regdb: %s", str(ex))
-            
-        else:
-            self.warning("cannot locate regdb connection string in configuration")
+        if self._read_from_ffb:
+            conn_str = self._get_config("regdb-conn")
+            if conn_str:
+                try:
+                    regdb = RegDb(DbConnection(conn_string=conn_str))
+                    exp = regdb.last_experiment_switch(self._fs.instrument)
+                    if exp and exp[0][0] == self._fs.experiment:
+                        self.trace("use high-priority queue for active experiment %s", self._fs.experiment)
+                        queue_param = 'lsf-queue-active'
+                except Exception, ex:
+                    self.warning("exception while accessing regdb: %s", str(ex))
+            else:
+                self.warning("cannot locate regdb connection string in configuration")
 
         return self._get_config(queue_param, 'lclsq', True)
     
