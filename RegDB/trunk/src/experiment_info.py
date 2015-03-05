@@ -344,7 +344,7 @@ def unique_detector_names():
     accross all known experiments and runs
     """
 
-    query = "SELECT DISTINCT name FROM logbook.run_attr WHERE class='DAQ_Detectors' ORDER BY name"
+    query = "SELECT DISTINCT name FROM logbook.run_attr WHERE class IN ('DAQ_Detectors','DAQ Detectors') ORDER BY name"
     return [row['name'] for row in __do_select_many(query)]
 
 
@@ -366,7 +366,7 @@ def detectors(instr, exper, run):
     run_id = run2id(exper,run)
     if run_id is None: raise ValueError('wrong experiment name or run number')
 
-    query = "SELECT name FROM logbook.run_attr WHERE run_id=%d AND class='DAQ_Detectors' ORDER BY name" % run_id
+    query = "SELECT name FROM logbook.run_attr WHERE run_id=%d AND class IN ('DAQ_Detectors','DAQ Detectors') ORDER BY name" % run_id
     return [row['name'] for row in __do_select_many(query)]
 
 

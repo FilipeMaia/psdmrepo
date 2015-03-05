@@ -13,8 +13,21 @@ use LogBook\LogBookAuth ;
 use RegDB\RegDB ;
 use RegDB\RegDBAuth ;
 
+
+$service = 'STANDARD' ;
+if (isset($_GET['service'])) {
+    $service = strtoupper(trim($_GET['service'])) ;
+    switch ($service) {
+        case 'STANDARD' :
+        case 'MONITORING' : break ;
+        default :
+            echo "illegal value of the 'service' parameter" ;
+            exit(1) ;
+    }
+}
+
 $tables_html      = '' ;
-$experiments2load = '' ;
+$experiments2load = array() ;
 
 try {
     
@@ -45,6 +58,14 @@ try {
     <td class="table_hdr">FFB</td>
     <td class="table_hdr">release</td>
     <td class="table_hdr">config</td>
+HERE;
+        if ($service === 'MONITORING') $tables_html .= <<<HERE
+    <td class="table_hdr">#jobs</td>
+    <td class="table_hdr">Output folder</td>
+    <td class="table_hdr">CC in subdir</td>
+    <td class="table_hdr">live timeout</td>
+HERE;
+        $tables_html .= <<<HERE
     <td class="table_hdr">Actions</td>
     <td class="table_hdr">Comments</td>
   </tr>
@@ -54,68 +75,50 @@ HERE;
 
             if ($experiment->is_facility()) continue ;
 
-            $is_authorized = $can_modify || LogBookAuth::instance()->canPostNewMessages($experiment->id()) ;
+            $exper_id      = $experiment->id() ;
+            $is_authorized = $can_modify || LogBookAuth::instance()->canPostNewMessages($exper_id) ;
 
-            $num_runs = $experiment->num_runs() ;
-            $num_runs_str = '' ;
-            $loading_comment = '' ;
-            if ($num_runs) {
-                $num_runs_str = $num_runs ;
-                $loading_comment = 'Loading...' ;
-                if ($experiments2load == '')
-                    $experiments2load = "var experiments2load=[{$experiment->id()}" ;
-                else
-                    $experiments2load .= ",{$experiment->id()}" ;
-            }
-            $service = 'STANDARD' ;
-            $auto    = $experiment->regdb_experiment()->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5[$service]) ? true : false ;
-            $dataset = $ifacectrl->get_config_param_val_r('live-mode', 'dataset', $instrument->name(), $experiment->name()) ;
-            if (is_null($dataset)) {
-                print "ERROR: Interface Controller database has invalid content" ;
-                exit (1) ;
-            }
-            $ffb = $dataset === IfaceCtrlDb::$DATASET_FFB ? true : false ;
+            array_push (
+                $experiments2load ,
+                array (
+                    'id'            => $exper_id ,
+                    'is_authorized' => $is_authorized ? 1 : 0)) ;
 
-            $release_dir = $ifacectrl->get_config_param_val_r('', 'release', $instrument->name(), $experiment->name()) ;
-            if (is_null($release_dir)) {
-                print "ERROR: Interface Controller database has invalid content" ;
-                exit (1) ;
-            }
-            $config_file = $ifacectrl->get_config_param_val_r('', 'config', $instrument->name(), $experiment->name()) ;
-            if (is_null($config_file)) {
-                print "ERROR: Interface Controller database has invalid content" ;
-                exit (1) ;
-            }
+            $num_runs     = $experiment->num_runs() ;
+            $num_runs_str = $num_runs ? $num_runs : '' ;
 
             $tables_html .= <<<HERE
   <tr>
     <td class="table_cell">{$experiment->instrument()->name()}</td>
-    <td class="table_cell"><a target="_blank" href="../portal/index.php?exper_id={$experiment->id()}&app=hdf:manage" title="open Web Portal of the Experiment in new window/tab">{$experiment->name()}</a></td>
-    <td class="table_cell">{$experiment->id()}</td>
+    <td class="table_cell"><a target="_blank" href="../portal/index.php?exper_id={$exper_id}&app=hdf:manage" title="open Web Portal of the Experiment in new window/tab">{$experiment->name()}</a></td>
+    <td class="table_cell">{$exper_id}</td>
     <td class="table_cell">{$num_runs_str}</td>
-    <td class="table_cell"><span id="num_translated_{$experiment->id()}"}>{$loading_comment}</td>
+    <td class="table_cell"><span id="num_translated_{$exper_id}"}>Loading...</td>
 HERE;
             if ($is_authorized) {
-                $auto_str = $auto ? 'checked="checked"' : '' ;
-                $ffb_str  = $ffb  ? 'checked="checked"' : '' ;
                 $tables_html .= <<<HERE
-    <td class="table_cell"><input type="checkbox" class="params auto"        name="{$experiment->id()}" value=1 {$auto_str} /></td>
-    <td class="table_cell"><input type="checkbox" class="params ffb"         name="{$experiment->id()}" value=1 {$ffb_str}  /></td>
-    <td class="table_cell"><input type="text"     class="params release_dir" name="{$experiment->id()}" value="{$release_dir}" size="42" /></td></td>
-    <td class="table_cell"><input type="text"     class="params config_file" name="{$experiment->id()}" value="{$config_file}" size="36" /></td></td>
-    <td class="table_cell">{$config}</td>
-    <td class="table_cell"><button id="{$experiment->id()}" disabled="disabled">Save</button></td>
-    <td class="table_cell table_cell_right"><span id="comment_{$experiment->id()}"}></span></td>
+    <td class="table_cell"><input type="checkbox" class="params auto"        name="{$exper_id}" /></td>
+    <td class="table_cell"><input type="checkbox" class="params ffb"         name="{$exper_id}" /></td>
+    <td class="table_cell"><input type="text"     class="params release_dir" name="{$exper_id}" value="Loading..." size="32" /></td></td>
+    <td class="table_cell"><input type="text"     class="params config_file" name="{$exper_id}" value="Loading..." size="32" /></td></td>
+    <td class="table_cell"><input type="text"     class="params njobs"       name="{$exper_id}" value="Loading..." size="2" /></td></td>
+    <td class="table_cell"><input type="text"     class="params outdir"      name="{$exper_id}" value="Loading..." size="32" /></td></td>
+    <td class="table_cell"><input type="checkbox" class="params ccinsubdir"  name="{$exper_id}" /></td>
+    <td class="table_cell"><input type="text"     class="params livetimeout" name="{$exper_id}" value="Loading..." size="4" /></td></td>
+    <td class="table_cell"><button id="{$exper_id}" disabled="disabled">SAVE</button></td>
+    <td class="table_cell table_cell_right"><span id="comment_{$exper_id}"}></span></td>
 HERE;
             } else {
-                $auto_str = '<div style="height:8px; width:8px; '.($auto ? 'background-color:red;' : '').'" >&nbsp;</div>' ;
-                $ffb_str  = '<div style="height:8px; width:8px; '.($ffb  ? 'background-color:red;' : '').'" >&nbsp;</div>' ;
                 $tables_html .= <<<HERE
-    <td class="table_cell">{$auto_str}</td>
-    <td class="table_cell">{$ffb_str}</td>
-    <td class="table_cell">{$release_dir}</td>
-    <td class="table_cell">{$config_file}</td>
-    <td class="table_cell">&nbsp;</td>
+    <td class="table_cell" ><div class="params auto"        name="{$exper_id}" style="height:8px; width:8px;" >&nbsp;</div></td>
+    <td class="table_cell" ><div class="params ffb"         name="{$exper_id}" style="height:8px; width:8px;" >&nbsp;</div></td>
+    <td class="table_cell" ><div class="params release_dir" name="{$exper_id}"                                >Loading...</div></td>
+    <td class="table_cell" ><div class="params config_file" name="{$exper_id}"                                >Loading...</div></td>
+    <td class="table_cell" ><div class="params njobs"       name="{$exper_id}"                                >Loading...</div></td>
+    <td class="table_cell" ><div class="params outdir"      name="{$exper_id}"                                >Loading...</div></td>
+    <td class="table_cell" ><div class="params ccinsubdir"  name="{$exper_id}" style="height:8px; width:8px;" >&nbsp;</div></td>
+    <td class="table_cell" ><div class="params livetimeout" name="{$exper_id}"                                >Loading...</div></td>
+    <td class="table_cell" >&nbsp;</td>
     <td class="table_cell table_cell_right">&nbsp;</td>
 HERE;
             }
@@ -127,8 +130,6 @@ HERE;
 </tbody><table>
 HERE;
     }
-    if ($experiments2load == '') $experiments2load = "var experiments2load=[];\n" ;
-    else                         $experiments2load .= "];\n" ;
 
 } catch (Exception $e) { print '<pre>'.print_r($e, true).'</pre>' ; }
 
@@ -238,37 +239,39 @@ input[type="text"]:hover {
 
 <script type="text/javascript">
 
-<?php echo $experiments2load ; ?>
+<?php echo 'var service=\''.$service.'\';' ; ?>
+<?php echo 'var experiments2load='.json_encode($experiments2load).';' ; ?>
 
-function load_hdf5_files (exper_id) {
+function load_hdf5_requests (exper_id) {
     $.ajax ({
         type: 'GET' ,
-        url: '../portal/ws/filemgr_files_search.php' ,
+        url: '../portal/ws/hdf5_requests_get.php' ,
         data: {
+            service:  service ,
             exper_id: exper_id ,
-            types: 'hdf5'
+            status:   'FINISHED'
         } ,
         success: function (data) {
             if (data.Status != 'success') {
                 alert(data.Message) ;
                 return ;
             }
-            var num_files = 0;
-            for( var i in data.runs ) {
-                num_files += data.runs[i].files.length;
-            }
-            $('#num_translated_'+exper_id).html(num_files?num_files:'');
-        },
-        error: function() { alert('The request can not go through due a failure to contact the server.'); },
+            var num_finished_requests = data.requests.length ;
+            $('#num_translated_'+exper_id).html(num_finished_requests ? num_finished_requests : '') ;
+        } ,
+        error: function () {
+            $('span#comment_'+exper_id).html('The request can not go through due a failure to contact the server.') ;
+        } , 
         dataType: 'json'
     }) ;
 }
 
-function load_translation_config (exper_id) {
+function load_translation_config (exper_id, is_authorized) {
     $.ajax ({
         type: 'GET' ,
         url: '../portal/ws/hdf5_config_get.php' ,
         data: {
+            service:  service ,
             exper_id: exper_id
         } ,
         success: function (data) {
@@ -276,10 +279,47 @@ function load_translation_config (exper_id) {
                 alert(data.message) ;
                 return ;
             }
+            if (is_authorized) {
+                var auto = $('input.auto[name="'+exper_id+'"]') ;
+                if (data.config.auto) auto.attr('checked', 'checked') ;
+                else                  auto.removeAttr('checked') ;
 
-            $('#num_translated_'+exper_id).html(num_files?num_files:'');
-        },
-        error: function() { alert('The request can not go through due a failure to contact the server.'); },
+                var ffb = $('input.ffb[name="'+exper_id+'"]') ;
+                if (data.config.ffb) ffb.attr('checked', 'checked') ;
+                else                 ffb.removeAttr('checked') ;
+
+                $('input.release_dir[name="'+exper_id+'"]').val(data.config.release_dir) ;
+                $('input.config_file[name="'+exper_id+'"]').val(data.config.config_file) ;
+
+                switch (service) {
+                    case 'MONITORING' :
+
+                        $('input.njobs[name="'+exper_id+'"]').val(data.config.njobs) ;
+                        $('input.outdir[name="'+exper_id+'"]').val(data.config.outdir) ;
+
+                        var ccinsubdir = $('input.ccinsubdir[name="'+exper_id+'"]') ;
+                        if (data.config.ccinsubdir) ccinsubdir.attr('checked', 'checked') ;
+                        else                        ccinsubdir.removeAttr('checked') ;
+
+                        $('input.livetimeout[name="'+exper_id+'"]').val(data.config.livetimeout) ;
+                        
+                        break ;
+                }
+
+            } else {
+                if (data.config.auto) $('div.auto[name="'+exper_id+'"]').css('background-color', 'red') ;
+                if (data.config.ffb)  $('div.ffb[name="'+exper_id+'"]').css('background-color', 'red') ;
+                $('div.release_dir[name="'+exper_id+'"]').html(data.config.release_dir) ;
+                $('div.config_file[name="'+exper_id+'"]').html(data.config.config_file) ;
+                $('div.njobs[name="'+exper_id+'"]').html(data.config.njobs) ;
+                $('div.outdir[name="'+exper_id+'"]').html(data.config.outdir) ;
+                if (data.config.ccinsubdir)  $('div.ccinsubdir[name="'+exper_id+'"]').css('background-color', 'red') ;
+                $('div.livetimeout[name="'+exper_id+'"]').html(data.config.livetimeout) ;
+            }
+        } ,
+        error: function () {
+            $('span#comment_'+exper_id).html('The request can not go through due a failure to contact the server.') ;
+        } ,
         dataType: 'json'
     }) ;
 }
@@ -287,11 +327,24 @@ $(function () {
 
     $('button').button().click(function () {
 
-        var exper_id    = this.id ;
-        var auto        = $('input.auto[name="'+exper_id+'"]').is(':checked') ;
-        var ffb         = $('input.ffb[name="'+exper_id+'"]').is(':checked') ;
-        var release_dir = $('input.release_dir[name="'+exper_id+'"]').val() ;
-        var config_file = $('input.config_file[name="'+exper_id+'"]').val() ;
+        var exper_id = this.id ;
+
+        var params = {
+            service :     service ,
+            exper_id :    exper_id ,
+            auto :        $('input.auto[name="'+exper_id+'"]').is(':checked') ? 1 : 0 ,
+            ffb  :        $('input.ffb[name="'+exper_id+'"]').is(':checked') ? 1 : 0 ,
+            release_dir : $('input.release_dir[name="'+exper_id+'"]').val() ,
+            config_file : $('input.config_file[name="'+exper_id+'"]').val()
+        } ;
+        switch (service) {
+            case 'MONITORING' :
+                params.njobs       = $('input.njobs[name="'+exper_id+'"]').val() ;
+                params.outdir      = $('input.outdir[name="'+exper_id+'"]').val() ;
+                params.ccinsubdir  = $('input.ccinsubdir[name="'+exper_id+'"]').is(':checked') ? 1 : 0 ;
+                params.livetimeout = $('input.livetimeout[name="'+exper_id+'"]').val() ;
+                break ;
+        }
 
         $('button#'+exper_id).button('disable') ;
         $('#comment_'+exper_id).text('saving...') ;
@@ -299,13 +352,7 @@ $(function () {
         $.ajax ({
             type : 'POST' ,
             url  : '../portal/ws/hdf5_config_set.php' ,
-            data : {
-                exper_id:    exper_id ,
-                auto:        auto ? 1 : 0 ,
-                ffb:         ffb  ? 1 : 0 ,
-                release_dir: release_dir ,
-                config_file: config_file
-            } ,
+            data : params ,
             success: function (data) {
                 if (data.Status != 'success') {
                     $('#comment_'+exper_id).text(data.Message) ;
@@ -330,9 +377,9 @@ $(function () {
     // experiment which had at least one run taken.
     //
     for (var i in experiments2load) {
-       var exper_id = experiments2load[i] ;
-       load_hdf5_files        (exper_id) ;
-       load_translation_config(exper_id) ;
+        var exper = experiments2load[i] ;
+        load_hdf5_requests     (exper.id) ;
+        load_translation_config(exper.id, exper.is_authorized) ;
     }
 }) ;
 
