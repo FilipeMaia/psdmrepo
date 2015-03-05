@@ -322,12 +322,9 @@ class Controller ( AppBase ) :
         exper = fs.experiment
         
         if self._config.get('live-mode', instr, exper, 0):
-            
             #in live mode use dataset name as input to translator
-
             ds = self._config.get('dataset', instr, exper, "exp=%(experiment)s:run=%(run_number)d:live", fs.__dict__)
             return [ds]
-            q
         else:
             
             xtc_root = self._config.get( 'xtc-location-root', instr, exper )
