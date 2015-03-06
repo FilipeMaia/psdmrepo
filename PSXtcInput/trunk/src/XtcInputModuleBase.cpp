@@ -167,9 +167,6 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
         smallData = true;
       }
     }
-    if (m_liveMode and smallData) {
-      MsgLog(name, error, " " << name << ": **NOT IMPLEMENTED** live mode and smd not implemented yet");
-    }
   } catch (ConfigSvc::Exception &) {
     MsgLog(name, error, " " << name << ": unable to read 'files' parameters, assuming non-live mode");
   }
