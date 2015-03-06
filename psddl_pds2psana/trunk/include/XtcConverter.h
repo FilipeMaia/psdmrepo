@@ -72,7 +72,7 @@ public:
   /**
    *  @brief Returns list of type_info pointers for types that convert puts in event/config store
    */
-  std::vector<const std::type_info *> getConvertTypeInfoPtrs(const Pds::TypeId &);
+  std::vector<const std::type_info *> getConvertTypeInfoPtrs(const Pds::TypeId &) const;
 
   /**
    *  @brief Convert one object and store it in the config store.
@@ -87,13 +87,13 @@ public:
   /**
    *  @brief returns true if typeId is a special xtc that is split into several different xtcs during convert
    */
-  bool isSplitType(const Pds::TypeId &typeId) { return m_sharedSplit.isSplitType(typeId); }
+  bool isSplitType(const Pds::TypeId &typeId) const { return m_sharedSplit.isSplitType(typeId); };
 
   /**
    *  @brief returns the typeId's of the xtc's that a special shared xtc is split into.
    *  Returns an empty list if typeId is not special.
    */
-  std::vector<Pds::TypeId> splitTypes(const Pds::TypeId &typeId);
+  std::vector<Pds::TypeId> splitTypes(const Pds::TypeId &typeId) const;
   
 protected:
   
@@ -106,7 +106,7 @@ private:
    */
   class LessTypeId {
   public:
-    bool operator()(const Pds::TypeId &a, const Pds::TypeId &b) {
+    bool operator()(const Pds::TypeId &a, const Pds::TypeId &b) const {
       if (a.id()==b.id()) return (a.version()<b.version());
       return a.id()<b.id();
     }
@@ -135,7 +135,7 @@ private:
     /**
      * @brief returns True if typeid is for a special shared type to be split
      */
-    bool isSplitType(const Pds::TypeId &typeId);
+    bool isSplitType(const Pds::TypeId &typeId) const;
 
     typedef std::pair<Pds::TypeId,StoreTo> SplitEntry;
     
@@ -143,7 +143,7 @@ private:
      * @brief returns split types and where to store for special shared type id.
      * Returns empty list if not special shared type id.
      */
-    const std::vector<SplitEntry> & splitTypes(const Pds::TypeId &typeId);
+    const std::vector<SplitEntry> & splitTypes(const Pds::TypeId &typeId) const;
 
     /**
      * @brief checks if a type id and storeTo value is correct

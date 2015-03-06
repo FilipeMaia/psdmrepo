@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-19
+2015-3-5 David Schneider
+- small data JIRA issue PSAS-85
+  uncompress small data proxy payload if need be
+  cache pointer from big event for efficiency
+  have largeObjectProxy protect itself from destruction by incrementing shared pointer ref count to self
+- add some const corretness to XtcConverter
+
 Tag: V00-09-18
 2015-3-3 David Schneider
 - small data JIRA issue PSAS-85

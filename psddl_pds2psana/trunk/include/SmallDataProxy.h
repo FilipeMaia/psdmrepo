@@ -128,13 +128,13 @@ public:
   /**
    * @brief return typeid of proxied type
    */
-  static const Pds::TypeId & getSmallDataProxiedType(const Pds::Xtc *xtc);
+  static const Pds::TypeId getSmallDataProxiedType(const Pds::Xtc *xtc);
 
   /**
    *  @brief Returns list of type_info pointers that a proxy type proxies
    */
-  static std::vector<const std::type_info *> getSmallConvertTypeInfoPtrs(Pds::Xtc * xtc,
-                                                                         psddl_pds2psana::XtcConverter &cvt);
+  static std::vector<const std::type_info *> getSmallConvertTypeInfoPtrs(const Pds::Xtc * xtc,
+                                                                         const psddl_pds2psana::XtcConverter &cvt);
 
   // Destructor
   ~SmallDataProxy();

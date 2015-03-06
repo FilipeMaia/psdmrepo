@@ -39,6 +39,7 @@
 #include "PSEvt/Exceptions.h"
 #include "psddl_pds2psana/smldata.ddl.h"
 #include "psddl_pds2psana/dispatch.h"
+#include "pdsdata/compress/CompressedXtc.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -57,7 +58,14 @@ namespace {
   
   const char * logger = "SmallDataProxy";
 
-class LargeObjectProxy : public PSEvt::ProxyI {
+  boost::shared_ptr<Pds::Xtc> uncompressIfNeeded(boost::shared_ptr<Pds::Xtc> xtc) {
+    if (xtc->contains.compressed()) {
+      return Pds::CompressedXtc::uncompress(*xtc);
+    }
+    return xtc;
+  }
+
+class LargeObjectProxy : public PSEvt::ProxyI, public boost::enable_shared_from_this<LargeObjectProxy> {
   public:
   LargeObjectProxy(const std::type_info *evKeyType,
                    SmallDataProxy::ObjId objId,
@@ -79,16 +87,25 @@ class LargeObjectProxy : public PSEvt::ProxyI {
       MsgLog(logger, error, "parentProxy for event is not finalized");
       return boost::shared_ptr<void>();
     }
+    if (m_cachedPointerToReturn) return m_cachedPointerToReturn;
+
     PSEvt::EventKey evKey(m_evKeyType, source, key);
     MsgLog(logger, DEBUGMSG, "LargeObjectProxy calling parentProxy.get for " 
            << evKey << " objId=" << m_objId);
-    return m_parentProxy->get(m_objId, evKey);
+    // we save a reference to ourselves before calling parent proxy because there
+    // is a small change the last reference to this proxy gets deleted before we
+    // return. This is because for items proxied in the configStore, the parentProxy
+    // will replace this objects entry in the configStore.
+    boost::shared_ptr<LargeObjectProxy> referenceToPreventDeleteBeforeReturn = this->shared_from_this();
+    m_cachedPointerToReturn = m_parentProxy->get(m_objId, evKey);
+    return m_cachedPointerToReturn;
   }
 
   private:
   const std::type_info *m_evKeyType;
   SmallDataProxy::ObjId m_objId;
   boost::shared_ptr<SmallDataProxy> m_parentProxy;
+  boost::shared_ptr<void>  m_cachedPointerToReturn;
 };
 
 }; // local namespace
@@ -183,44 +200,34 @@ bool SmallDataProxy::isSmallDataProxy(const Pds::TypeId &typeId) {
   return (typeId.id() == Pds::TypeId::Id_SmlDataProxy);
 }
 
-const Pds::TypeId & SmallDataProxy::getSmallDataProxiedType(const Pds::Xtc * xtc) {
-  if (not xtc) MsgLog(logger, fatal, "getSmallDataProxiedType passed NULL pointer");
-  const Pds::TypeId& smallDataProxyTypeId = xtc->contains;
-  if (smallDataProxyTypeId.id() != Pds::TypeId::Id_SmlDataProxy) {
+const Pds::TypeId SmallDataProxy::getSmallDataProxiedType(const Pds::Xtc * origXtc) {
+  if (not origXtc) MsgLog(logger, fatal, "getSmallDataProxiedType passed NULL pointer");
+  if (not isSmallDataProxy(origXtc->contains)) {
     MsgLog(logger, fatal, "Internal error: xtc typeid is not SmlDataProxy");
   }
-  int smallDataProxyVersion = smallDataProxyTypeId.version();
-  switch (smallDataProxyVersion) {
-  case 1:
-    const Pds::SmlData::ProxyV1 * smlDataProxy = 
-      static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
-    return smlDataProxy->type();
+  if (1 != origXtc->contains.compressed_version()) {
+    MsgLog(logger, fatal, "version is not 1 for smallDataProxy. Version=" << origXtc->contains.compressed_version());
   }
-  MsgLog(logger, error, "unknown version for smallDataProxy: " << smallDataProxyVersion
-         << " (compressed proxies not supported)");
-  throw std::runtime_error("getSmallDataProxiedType - unepected version"); // TODO: introduce exception
+    
+  // deal with uncompressing from a raw pointer
+  boost::shared_ptr<Pds::Xtc> uXtc;  // make sure uXtc is around 
+  const Pds::Xtc *xtc = 0;           // as long as xtc is
+  if (origXtc->contains.compressed()) {
+    uXtc = Pds::CompressedXtc::uncompress(*origXtc);
+    xtc = uXtc.get();
+  } else {
+    xtc = origXtc;
+  }
+  
+  const Pds::SmlData::ProxyV1 * smlDataProxy = static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
+  return smlDataProxy->type();
 }
 
 std::vector<const std::type_info *> 
-SmallDataProxy::getSmallConvertTypeInfoPtrs(Pds::Xtc * xtc, 
-                                            XtcConverter &cvt) {
-  const Pds::TypeId& typeId = xtc->contains;
-  if (typeId.id() == Pds::TypeId::Id_SmlDataProxy) {
-    int version = typeId.version();
-    switch (version) {
-    case 1:
-      Pds::SmlData::ProxyV1 *proxy = 
-        static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
-      const Pds::TypeId proxiedTypeId = proxy->type();
-      return cvt.getConvertTypeInfoPtrs(proxiedTypeId);
-    }
-    MsgLog(logger, error, "unknown version for smallDataProxy: " << version
-           << " (compressed proxies not supported)");
-    throw std::runtime_error("getSmallDataProxiedType - unepected version"); // TODO: introduce exception
-  } else {
-    MsgLog(logger, error, "getSmallConvertTypeInfoPtrs called on non small data proxy");
-  }
-  return std::vector<const std::type_info *>();
+SmallDataProxy::getSmallConvertTypeInfoPtrs(const Pds::Xtc * xtc, 
+                                            const XtcConverter &cvt) {
+  const Pds::TypeId proxiedTypeId = getSmallDataProxiedType(xtc);
+  return cvt.getConvertTypeInfoPtrs(proxiedTypeId);
 }
 
 bool 
@@ -259,9 +266,10 @@ SmallDataProxy::addProxyChecksFailed(const boost::shared_ptr<Pds::Xtc>& xtc,
   return false;
 }
   
-void SmallDataProxy::addEventProxy(const boost::shared_ptr<Pds::Xtc>& xtc,
+void SmallDataProxy::addEventProxy(const boost::shared_ptr<Pds::Xtc>& origXtc,
                                    std::vector<const std::type_info *> typeInfoPtrs)
 {
+  boost::shared_ptr<Pds::Xtc> xtc = uncompressIfNeeded(origXtc);
   if (addProxyChecksFailed(xtc, m_cvt)) return;
   if (not m_evtForProxies) {
     MsgLog(logger, error, "addEventProxy called for null event");
@@ -270,76 +278,74 @@ void SmallDataProxy::addEventProxy(const boost::shared_ptr<Pds::Xtc>& xtc,
   
   MsgLog(logger, DEBUGMSG, "addEventProxy called. First type: " 
          << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtrs.at(0)));
-
-  const Pds::TypeId& typeId = xtc->contains;
-  int version = typeId.version();
+  
+  if (1 != xtc->contains.compressed_version()) {
+    MsgLog(logger, error, "addEventProxy called on version that is not 1, version is " << xtc->contains.compressed_version());
+    return;
+  }
   Pds::Src src = xtc->src;
   Pds::Damage damage = xtc->damage;
-  switch (version) {
-  case 1:
-    Pds::SmlData::ProxyV1 * smlDataProxy = 
-      static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
-    int64_t fileOffset = smlDataProxy->fileOffset();
-    uint32_t extent = smlDataProxy->extent();
-    Pds::TypeId typeId = smlDataProxy->type();
+  Pds::SmlData::ProxyV1 * smlDataProxy = static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
+  int64_t fileOffset = smlDataProxy->fileOffset();
+  uint32_t extent = smlDataProxy->extent();
+  Pds::TypeId typeId = smlDataProxy->type();
 
-    ObjId objId = getNextObjId();
-    m_ids[objId] = ObjData(objId, fileOffset, extent, typeId, src, damage);
-    MsgLog(logger, DEBUGMSG, "  addEventProxy - assigned objId=" << objId);
-    std::vector<const std::type_info *>::iterator curType;
+  ObjId objId = getNextObjId();
+  m_ids[objId] = ObjData(objId, fileOffset, extent, typeId, src, damage);
+  MsgLog(logger, DEBUGMSG, "  addEventProxy - assigned objId=" << objId);
+  std::vector<const std::type_info *>::iterator curType;
 
-    for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
-      PSEvt::EventKey curEventKey(*curType, src, "");
-      boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
-        boost::make_shared<LargeObjectProxy>(*curType,
-                                             objId,
-                                             this->shared_from_this());
-      try {
-        m_evtForProxies->proxyDict()->put(largeObjProxy, curEventKey);
-      } catch (PSEvt::ExceptionDuplicateKey &) {
-        MsgLog(logger, warning, "smallData duplicate Exception while adding " << curEventKey 
-               << " to the user event for proxies - ignoring.");
-      }
+  for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
+    PSEvt::EventKey curEventKey(*curType, src, "");
+    boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
+      boost::make_shared<LargeObjectProxy>(*curType,
+                                           objId,
+                                           this->shared_from_this());
+    try {
+      m_evtForProxies->proxyDict()->put(largeObjProxy, curEventKey);
+    } catch (PSEvt::ExceptionDuplicateKey &) {
+      MsgLog(logger, warning, "smallData duplicate Exception while adding " << curEventKey 
+             << " to the user event for proxies - ignoring.");
     }
-    break;
   }
 }
+  
 
-void SmallDataProxy::addEnvProxy(const boost::shared_ptr<Pds::Xtc>& xtc,
-                                   std::vector<const std::type_info *> typeInfoPtrs)
+void SmallDataProxy::addEnvProxy(const boost::shared_ptr<Pds::Xtc>& origXtc,
+                                 std::vector<const std::type_info *> typeInfoPtrs)
 {
+  boost::shared_ptr<Pds::Xtc> xtc = uncompressIfNeeded(origXtc);
   if (addProxyChecksFailed(xtc, m_cvt)) return;
   
   MsgLog(logger, DEBUGMSG, "addEnvProxy called. First type: " 
          << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtrs.at(0)));
 
-  const Pds::TypeId& typeId = xtc->contains;
-  int version = typeId.version();
+  if (1 != xtc->contains.compressed_version()) {
+    MsgLog(logger, error, "addEnvProxy called on version that is not 1, version is " << xtc->contains.compressed_version());
+    return;
+  }
+
   Pds::Src src = xtc->src;
   Pds::Damage damage = xtc->damage;
-  switch (version) {
-  case 1:
-    Pds::SmlData::ProxyV1 * smlDataProxy = 
-      static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
-    int64_t fileOffset = smlDataProxy->fileOffset();
-    uint32_t extent = smlDataProxy->extent();
-    Pds::TypeId typeId = smlDataProxy->type();
 
-    ObjId objId = getNextObjId();
-    m_ids[objId] = ObjData(objId, fileOffset, extent, typeId, src, damage);
-    MsgLog(logger, DEBUGMSG, "  addEnvProxy - assigned objId=" << objId);
+  Pds::SmlData::ProxyV1 * smlDataProxy = static_cast<Pds::SmlData::ProxyV1 *>(static_cast<void *>(xtc->payload()));
+  int64_t fileOffset = smlDataProxy->fileOffset();
+  uint32_t extent = smlDataProxy->extent();
+  Pds::TypeId typeId = smlDataProxy->type();
 
-    std::vector<const std::type_info *>::iterator curType;
+  ObjId objId = getNextObjId();
+  m_ids[objId] = ObjData(objId, fileOffset, extent, typeId, src, damage);
+  MsgLog(logger, DEBUGMSG, "  addEnvProxy - assigned objId=" << objId);
 
-    for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
-      PSEvt::EventKey curEventKey(*curType, src, "");
-      boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
-        boost::make_shared<LargeObjectProxy>(*curType,
-                                             objId,
-                                             this->shared_from_this());
-        m_configStoreForProxies->proxyDict()->put(largeObjProxy, curEventKey);
-    }
-    break;
+  std::vector<const std::type_info *>::iterator curType;
+
+  for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
+    PSEvt::EventKey curEventKey(*curType, src, "");
+    boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
+      boost::make_shared<LargeObjectProxy>(*curType,
+                                           objId,
+                                           this->shared_from_this());
+    m_configStoreForProxies->proxyDict()->put(largeObjProxy, curEventKey);
   }
 }
 

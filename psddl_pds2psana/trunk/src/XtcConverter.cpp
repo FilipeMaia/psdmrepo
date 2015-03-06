@@ -126,21 +126,21 @@ XtcConverter::SharedSplitXtcs::SharedSplitXtcs() {
   m_sharedSplitMap[Pds::TypeId(Pds::TypeId::Id_SharedPim,1)] = sharedIpimbVer1;
 }
 
-bool XtcConverter::SharedSplitXtcs::isSplitType(const Pds::TypeId &typeId) {
+bool XtcConverter::SharedSplitXtcs::isSplitType(const Pds::TypeId &typeId) const {
   return (m_sharedSplitMap.find(typeId) != m_sharedSplitMap.end());
 }
 
 const std::vector<XtcConverter::SharedSplitXtcs::SplitEntry> &
-XtcConverter::SharedSplitXtcs::splitTypes(const Pds::TypeId &typeId) {
+XtcConverter::SharedSplitXtcs::splitTypes(const Pds::TypeId &typeId) const {
   std::map<Pds::TypeId, 
            std::vector<XtcConverter::SharedSplitXtcs::SplitEntry>,
-           XtcConverter::LessTypeId>::iterator pos;
+           XtcConverter::LessTypeId>::const_iterator pos;
   pos = m_sharedSplitMap.find(typeId);
   if (pos == m_sharedSplitMap.end()) return emptyList;
   return pos->second;
 }
 
-std::vector<Pds::TypeId> XtcConverter::splitTypes(const Pds::TypeId &typeId) {
+std::vector<Pds::TypeId> XtcConverter::splitTypes(const Pds::TypeId &typeId) const {
   std::vector<Pds::TypeId> results;
   const std::vector<SharedSplitXtcs::SplitEntry> &splitEntries = m_sharedSplit.splitTypes(typeId);
   for (unsigned idx = 0; idx < splitEntries.size(); ++idx) {
@@ -272,7 +272,7 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
 }
 
 std::vector<const std::type_info *> 
-XtcConverter::getConvertTypeInfoPtrs(const Pds::TypeId & typeId) {
+XtcConverter::getConvertTypeInfoPtrs(const Pds::TypeId & typeId) const {
   if (not isSplitType(typeId)) return getXtcConvertTypeInfoPtrs(typeId);
 
   std::vector<const std::type_info *> typeInfoPtrs;
