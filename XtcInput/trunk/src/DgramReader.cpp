@@ -85,12 +85,21 @@ try {
   IData::Dataset::Streams streams;  // stream ranges for live mode
   unsigned expId = 0;
   std::string liveDir;
+  bool smallData = false;
 
   // guess whether we have datasets or pure file names (or mixture)
   for (FileList::const_iterator it = m_files.begin(); it != m_files.end(); ++ it) {
     
     IData::Dataset ds(*it);
-    
+
+    if (ds.exists("smd")) {
+      smallData = true;
+    } else {
+      if (smallData == true) {
+        MsgLog(logger, warning, "smalldata has been identified earlier in files argument, "
+               << "but it is not present with this arg - will assume small data for live mode");
+      }
+    }
     // make sure the stream number and range filters are not used together
     if (ds.exists("one-stream") && ds.exists("stream")) throw DatasetSpecError(ERR_LOC, "cannot specify both 'one-stream' and 'stream'");
 
@@ -269,7 +278,7 @@ try {
       // after 9 arguments (C++ 11 variadic templates would resolve this)
       boost::shared_ptr<RunFileIterLive> temp( new RunFileIterLive(numbers.begin(), numbers.end(), expId, stream, streams,
                                                                    m_liveTimeout, m_runLiveTimeout, m_liveDbConn, 
-                                                                   m_liveTable, liveDir));
+                                                                   m_liveTable, liveDir, smallData));
       runFileIter = temp;
     }
   }

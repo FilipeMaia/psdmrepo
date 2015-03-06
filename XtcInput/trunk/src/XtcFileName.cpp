@@ -23,6 +23,7 @@
 #include <sstream>
 #include <stdio.h>
 #include "boost/algorithm/string/predicate.hpp"
+#include <stdexcept>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -173,6 +174,22 @@ XtcFileName::basename() const
   if ( n != std::string::npos ) name.erase ( 0, n+1 ) ;
 
   return name ;
+}
+
+// get base name for smalldata version of the xtc file (will be the same if small)
+std::string XtcFileName::smallBasename() const 
+{
+  std::string name = basename();
+
+  if (this->small()) return name;
+
+  if (this->extension() != ".xtc") {
+    MsgLog(logger, error, "smallBasename - extension is not .xtc. How to Transform? File is: " << m_path);
+    throw std::runtime_error("XtcFileName::smallBasename");
+  }
+  size_t n = name.length();
+  n -= 4;
+  return name.substr(0,n) + ".smd.xtc";
 }
 
 // get large base name

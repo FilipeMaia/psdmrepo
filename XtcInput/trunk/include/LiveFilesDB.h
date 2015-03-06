@@ -60,15 +60,16 @@ public:
    *
    *  @param[in] connStr  Connection string.
    *  @param[in] table    Table name
-   *  @param[in] dir      Directory to look for live files
+   *  @param[in] dir      Directory to look for live large xtc files
+   *  @param[in] small    return filepaths for small xtc files: add 'smalldata' to dir, and use suffix .smd.xtc
    */
-  LiveFilesDB(const std::string& connStr, const std::string& table, const std::string& dir);
+  LiveFilesDB(const std::string& connStr, const std::string& table, const std::string& dir, bool small);
 
   // Destructor
   ~LiveFilesDB () ;
 
   /**
-   *  @brief Returns the list of files for given run
+   *  @brief Returns the list of files for given run. Constructor arguments dir and small affect paths returned
    *
    *  @param[in] expId    Experiment id
    *  @param[in] run      Run number
@@ -81,7 +82,8 @@ private:
 
   RdbMySQL::Conn m_conn;      ///< Connection to mysql database
   const std::string m_table;  ///< Name of the table containing file list
-  const std::string m_dir;    ///< Directory to look for live files
+  std::string m_dir;          ///< Directory to look for live large files
+  bool m_small;               ///< return filepaths for small xtc files: add 'smalldata' to dir, and use suffix .smd.xtc
 
 };
 

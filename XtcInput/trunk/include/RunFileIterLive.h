@@ -71,10 +71,11 @@ public:
    *  @param[in] dbConnStr Database connection string
    *  @param[in] table     Database table name
    *  @param[in] dir       Directory to look for live files
+   *  @param[in] small     look for small data files
    */
   template <typename Iter>
     RunFileIterLive (Iter begin, Iter end, unsigned expNum, int stream, const IData::Dataset::Streams& ds_streams, unsigned liveTimeout, unsigned runLiveTimeout,
-      const std::string& dbConnStr, const std::string& table, const std::string& dir)
+                     const std::string& dbConnStr, const std::string& table, const std::string& dir, bool small)
     : RunFileIterI()
     , m_runs(begin, end)
     , m_expNum(expNum)
@@ -83,7 +84,7 @@ public:
     , m_liveTimeout(liveTimeout)
     , m_runLiveTimeout(runLiveTimeout)
     , m_run(0)
-    , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dir))
+    , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dir, small))
   {
   }
 
