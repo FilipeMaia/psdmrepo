@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-08
+2015-03-05 Igor Gaponenko
+- extended Python API to allow fetching attribute class names for
+a run (PSDH-25)
+
 Tag: V00-02-07
 2015-03-05 Igor Gaponenko
 - DAQ detectors migration (PSDH-25)

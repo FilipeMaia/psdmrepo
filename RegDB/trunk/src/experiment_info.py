@@ -421,6 +421,28 @@ def run_attributes(instr, exper, run, attr_class=None):
 
     return result
 
+def run_attribute_classes(instr, exper, run):
+
+    """
+    Return a list with names of attrubute classes for the specified run of
+    an experiment.
+
+    PARAMETERS:
+
+      @param instr: the name of the instrument
+      @param exper: the name of the experiment
+      @param run: the run number
+      @return: the list of class names
+
+    """
+
+    run_id = run2id(exper,run)
+    if run_id is None: raise ValueError('wrong experiment name or run number')
+
+    sql = "SELECT DISTINCT class FROM logbook.run_attr WHERE run_id=%d ORDER BY class" % (run_id,)
+
+    return [attr['class'] for attr in __do_select_many(sql)]
+
 def calibration_runs(instr, exper, runnum=None):
 
     """
