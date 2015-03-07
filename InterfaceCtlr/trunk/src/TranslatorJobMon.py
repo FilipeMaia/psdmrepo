@@ -355,15 +355,19 @@ class TranslatorJob(object) :
             
         # LSF parameter
         queue = self._get_queue_name()
-        resource = self._get_config('lsf-resource', None, True)
         numproc = self._get_config('lsf-numproc', 1)
+        resource = extra_opt = None 
+        if self._read_from_ffb:
+            ptile = self._get_config('lsf-ptile', 0)
+            resource="span[ptile=%d]" % ptile if ptile > 0 else None
+            extra_opt = "-x" if self._get_config('lsf-exclusive', 0) == 1 else None
 
         # submit a job
         self.info('submitting new job, command: %s\n  queue=%s, jobName=%s, log=%s, numProc=%s, resource=%s', \
                   cmd, queue, self._name, logname, numproc, resource)
         self._checkDbPriority()
         job = LSF.submit_bsub(cmd, queue=queue, jobName=self._name, log=logname, numProc=numproc,\
-                              resource=resource)
+                              resource=resource, extraOpt=extra_opt)
         self.trace('new job: %s', job)
         
         return job
@@ -462,7 +466,7 @@ class TranslatorJob(object) :
             else:
                 self.warning("cannot locate regdb connection string in configuration")
 
-        return self._get_config(queue_param, 'lclsq', True)
+        return self._get_config(queue_param, 'psanaq', True)
     
     
     def _update_fs_status(self, status):

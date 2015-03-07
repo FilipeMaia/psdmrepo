@@ -250,7 +250,7 @@ class Job ( object ) :
         self._name = data.jName
 
 def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
-                resource=None):
+                resource=None, extraOpt=None):
     bsub_opt = ["-q %s" % queue]
     bsub_opt.append("-n %d" % numProc)
     if jobName:
@@ -259,6 +259,9 @@ def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
         bsub_opt.append("-o %s" % log)
     if resource:
         bsub_opt.append("-R \"%s\"" % resource)
+    if extraOpt:
+        bsub_opt.append(extraOpt)
+        
     bsub_opt.append("-a mympi")
     bsub_cmd = "bsub " + " ".join(bsub_opt)
                         
@@ -286,7 +289,6 @@ def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
 
     # Could not get job id
     raise LSBError()
-
 
 
 def submit(command, queue = None, jobName = None, 
