@@ -12,6 +12,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-03-09 Mikhail S. Dubrovin
+Tag: V00-00-82
+- Add dark rate calibration support for Andor camera (PSAS-6, PSAS-121)
+	- modify ConfigParametersForApp, ConfigFileGenerator, RegDBUtils
+	- add data/scripts/psana-module-peds-aver-andor.cfg
+	
 2015-01-22 Mikhail S. Dubrovin
 Tag: V00-00-81
 - ConfigParametersForApp.py - get default example files from /reg/g/psdm/detector/alignment/cspad/... (PSAS-10)

@@ -145,17 +145,18 @@ class OpticAlignmentCspadV1 (OpticAlignmentCspadMethods) :
                 if self.print_bits & 256 : print 'RECORD IS IGNORED due to unexpected format of the line:',line
                 continue              
 
-            point = int(list_of_fields[0])
-            X = int(list_of_fields[1])
-            Y = int(list_of_fields[2])
-            Z = int(list_of_fields[3])
+            #point = int(list_of_fields[0])
+            #X = int(list_of_fields[1])
+            #Y = int(list_of_fields[2])
+            #Z = int(list_of_fields[3])
             #Title = list_of_fields[4]
             
+            factor = 1
             #factor = 1000
-            #point = int(list_of_fields[0])
-            #X = int(float(list_of_fields[1]) * factor)
-            #Y = int(float(list_of_fields[2]) * factor)
-            #Z = int(float(list_of_fields[3]) * factor)
+            point = int(list_of_fields[0])
+            X = int(float(list_of_fields[1]) * factor)
+            Y = int(float(list_of_fields[2]) * factor)
+            Z = int(float(list_of_fields[3]) * factor)
             ##Title = list_of_fields[4]
             
             #record = [point, X, Y, Z, Title]

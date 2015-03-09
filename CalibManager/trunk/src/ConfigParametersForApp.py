@@ -361,7 +361,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     
         self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', \
                                'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', \
-                               'OrcaFl40', 'Epix', 'Epix10k', 'Epix100a', 'Fccd960', 'Acqiris']
+                               'OrcaFl40', 'Epix', 'Epix10k', 'Epix100a', 'Fccd960', 'Andor', 'Acqiris']
 
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
@@ -379,6 +379,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Epix::ElementV',
                                     'Epix::ElementV',
                                     'Camera::FrameV',
+                                    'Andor::FrameV',
                                     'Acqiris::DataDesc']
         self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_data_types) )
         #self.print_dict_of_det_data_types()
@@ -397,6 +398,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                     'Epix10k::CalibV1',
                                     'Epix100a::CalibV1',
                                     'Camera::CalibV1',
+                                    'Andor::CalibV1',
                                     'Acqiris::CalibV1']
         self.dict_of_det_calib_types = dict( zip(self.list_of_dets, self.list_of_calib_types) )
         #self.print_dict_of_det_calib_types()
@@ -404,6 +406,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
 
         det_cbx_states = [ (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
@@ -503,6 +507,14 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'common_mode'
             ]
 
+        self.const_types_andor = [
+            'pedestals'
+           ,'pixel_status'
+           ,'pixel_gain'
+           ,'pixel_rms'
+           ,'common_mode'
+            ]
+
         self.const_types_acqiris = [
             'pedestals'
             ]
@@ -521,6 +533,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                      ,self.const_types_epix
                                                                      ,self.const_types_epix
                                                                      ,self.const_types_fccd960
+                                                                     ,self.const_types_andor
                                                                      ,self.const_types_acqiris
                                                                       ]) )
      
@@ -671,6 +684,15 @@ class ConfigParametersForApp ( ConfigParameters ) :
             'XcsEndstation.0:Fccd960.0'
            ]
 
+        self.srcs_andor = [ 
+            'AmoEndstation.0:Andor.0'
+            'MecTargetChamber.0:Andor.1'
+            'MecTargetChamber.0:Andor.2'
+            'SxrEndstation.0:Andor.0'
+            'SxrEndstation.0:Andor.1'
+           ,'SxrEndstation.0:Andor.2'
+           ]
+
         self.srcs_acqiris = [ 
             'AmoETOF.0:Acqiris.0'
            ,'AmoITOF.0:Acqiris.0'
@@ -701,6 +723,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                  ,self.srcs_epix10k
                                                                  ,self.srcs_epix100a
                                                                  ,self.srcs_fccd960
+                                                                 ,self.srcs_andor
                                                                  ,self.srcs_acqiris
                                                                   ]) )
 
@@ -719,6 +742,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                        ,['EPIX10KV1']
                                                                        ,['EPIX100AV1']
                                                                        ,['FCCD960V1']
+                                                                       ,['ANDOR']
                                                                        ,['ACQIRISV1']
                                                                         ]) )
 
