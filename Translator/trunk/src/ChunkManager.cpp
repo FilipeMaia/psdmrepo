@@ -62,37 +62,52 @@ ChunkManager::~ChunkManager()
 {
 }
 
-void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output) {
+void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output, std::list<std::string> &remainingConfigKeys) {
   // chunk parameters
   m_chunkSizeTargetInBytes = h5Output.configReportIfNotDefault("chunkSizeTargetInBytes",_16MB);  // default - 16 MB chunks
+  remainingConfigKeys.remove("chunkSizeTargetInBytes");
   m_chunkSizeTargetObjects = h5Output.configReportIfNotDefault("chunkSizeTargetObjects", 0);      // a non-zero value overrides 
+  remainingConfigKeys.remove("chunkSizeTargetInObjects");
   m_chunkSizeTargetObjectsOrig = m_chunkSizeTargetObjects;
   
                                                                  // default chunk size calculation
   m_maxChunkSizeInBytes = h5Output.configReportIfNotDefault("maxChunkSizeInBytes",_100MB); // max chunk size is 100 MB
+  remainingConfigKeys.remove("maxChunkSizeInBytes");
   m_minObjectsPerChunk = h5Output.configReportIfNotDefault("minObjectsPerChunk",50);              
+  remainingConfigKeys.remove("minObjectsPerChunk");
   m_maxObjectsPerChunk = h5Output.configReportIfNotDefault("maxObjectsPerChunk",2048);
+  remainingConfigKeys.remove("maxObjectsPerChunk");
 
   // the chunk cache needs to be big enough for at least one chunk, otherwise the chunk gets
   // brought back and forth from disk when writting each element.  Ideally the chunk cache holds
   // all the chunks that we are working with for a dataset.
   m_chunkCacheSizeTargetInChunks = h5Output.configReportIfNotDefault("chunkCacheSizeTargetInChunks",3);
+  remainingConfigKeys.remove("chunkCacheSizeTargetInChunks");
   m_maxChunkCacheSizeInBytes = h5Output.configReportIfNotDefault("maxChunkCacheSizeInBytes",_100MB);
+  remainingConfigKeys.remove("maxChunkCacheSizeInBytes");
 
   m_eventIdChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("eventIdChunkSizeTargetInBytes",_16KB); // 16 KB
+  remainingConfigKeys.remove("eventIdChunkSizeTargetInBytes");
   m_eventIdChunkSizeTargetObjects = h5Output.configReportIfNotDefault("eventIdChunkSizeTargetObjects", m_chunkSizeTargetObjects);
+  remainingConfigKeys.remove("eventIdChunkSizeTargetObjects");
   m_eventIdChunkSizeTargetObjectsOrig = m_eventIdChunkSizeTargetObjects;
 
   m_damageChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("damageChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  remainingConfigKeys.remove("damageChunkSizeTargetInBytes");
   m_damageChunkSizeTargetObjects = h5Output.configReportIfNotDefault("damageChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  remainingConfigKeys.remove("damageChunkSizeTargetObjects");
   m_damageChunkSizeTargetObjectsOrig = m_damageChunkSizeTargetObjects;
 
   m_stringChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("stringChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  remainingConfigKeys.remove("stringChunkSizeTargetInBytes");
   m_stringChunkSizeTargetObjects = h5Output.configReportIfNotDefault("stringChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  remainingConfigKeys.remove("stringChunkSizeTargetObjects");
   m_stringChunkSizeTargetObjectsOrig = m_stringChunkSizeTargetObjects;
 
   m_ndarrayChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("ndarrayChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  remainingConfigKeys.remove("ndarrayChunkSizeTargetInBytes");
   m_ndarrayChunkSizeTargetObjects = h5Output.configReportIfNotDefault("ndarrayChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  remainingConfigKeys.remove("ndarrayChunkSizeTargetObjects");
   m_ndarrayChunkSizeTargetObjectsOrig = m_ndarrayChunkSizeTargetObjects;
 
   // there will be a lot of epics datasets, and an epics entry tends to be only 30 bytes or so.
@@ -101,7 +116,9 @@ void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output) {
   // We set the epics pv chunk size in bytes to 16 kilobytes.  This is not the right thing to do for 
   // epics pv's that contain projections or image data. Below is just for pv's with a few values.
   m_epicsPvChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetInBytes",_16KB); 
+  remainingConfigKeys.remove("epicsPvChunkSizeTargetInBytes");
   m_epicsPvChunkSizeTargetObjects = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  remainingConfigKeys.remove("epicsPvChunkSizeTargetObjects");
   m_epicsPvChunkSizeTargetObjectsOrig = m_epicsPvChunkSizeTargetObjects;
 
   m_defaultChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_chunkSizeTargetInBytes,

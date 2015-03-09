@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-26
+- extend reporting on unused parameters to cover chunk parameters
+	
 Tag: V00-02-25
 - add diagnostic about how long fastindex search for other stream calib
   cycles takes.

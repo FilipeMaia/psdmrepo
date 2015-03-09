@@ -502,7 +502,7 @@ std::string H5Output::readConfigParameters() {
 						     MIN_EVENTS_PER_CALIB_FILE_DEFAULT);
   remainingConfigKeys.remove("min_events_per_calib_file");
 
-  m_chunkManager.readConfigParameters(*this);
+  m_chunkManager.readConfigParameters(*this, remainingConfigKeys);
 
   m_defaultShuffle = configReportIfNotDefault("shuffle",true);
   m_defaultDeflate = configReportIfNotDefault("deflate",1);

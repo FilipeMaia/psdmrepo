@@ -23,7 +23,7 @@ class ChunkManager {
  public:
   ChunkManager();
   ~ChunkManager();
-  void readConfigParameters(const Translator::H5Output &);
+  void readConfigParameters(const Translator::H5Output &, std::list<std::string> &);
   void beginJob(PSEnv::Env &env);
   void beginCalibCycle(PSEnv::Env &env);
   void endCalibCycle(size_t numberEventsInCalibCycle);
