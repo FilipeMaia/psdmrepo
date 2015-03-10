@@ -1487,8 +1487,9 @@ class LogBookUtils {
      *
      * The result is returned into the following data structure:
      * 
-     *   {  'runs'       : { <run-num>  : { <detector> : 1 } } ,
-     *      'detecttors' :                { <detector> : 1 }
+     *   {  'runs'           : { <run-num>  : { <detector> : 1 } } ,
+     *      'detectors'      :                { <detector> : 1 } ,
+     *      'detector_names' : [ <detector> , ... ]
      *   }
      * 
      * Note that the first dictionary will tell a caller all detectors used
@@ -1511,10 +1512,16 @@ class LogBookUtils {
 
             $runs[$runnum] = array() ;
 
-            foreach ($run->attributes('DAQ_Detectors') as $attr) {
-                $detector = $attr->name() ;
-                $runs[$runnum][$detector] = 1 ;
-                $detectors[$detector] = 1 ;
+            // ATTENTION: Scan the legacy class 'DAQ_Detectors' for experiments
+            //            taken prior Feb 2015 when a transition of the class
+            //            name to 'DAQ Detectors' happened.
+            //
+            foreach (array('DAQ_Detectors', 'DAQ Detectors') as $class) {
+                foreach ($run->attributes($class) as $attr) {
+                    $detector = $attr->name() ;
+                    $runs[$runnum][$detector] = 1 ;
+                    $detectors[$detector] = 1 ;
+                }
             }
         }
         $detector_names = array() ;
@@ -1522,5 +1529,119 @@ class LogBookUtils {
         sort($detector_names) ;
         return array('runs' => $runs, 'detectors' => $detectors, 'detector_names' => $detector_names) ;
     }
+
+    /**
+     * Return total counters for the DAQ data recording at a specific range
+     * of runs of an experiment
+     *
+     * The result is returned into the following data structure:
+     * 
+     *   {  'runs'          : { <run-num>  : { <counter> : <value> } } ,
+     *      'counters'      :                { <counter> : <descr> } ,
+     *      'counter_names' : [ <counter> , ... ]
+     *   }
+     * 
+     * Note that the first dictionary will tell a caller all counters used
+     * for a particular run. Meanwhile the second one - all counters which
+     * have ever been used in any run of the specified range (of runs) AS WELL AS
+     * description of the counters.
+     *
+     * @param LogBookExperiment $experiment
+     * @param integer $from_runnum
+     * @param integer $through_runnum
+     * @return array()
+     */
+    public static function get_daq_counters ($experiment, $from_runnum=null, $through_runnum=null) {
+        $runs = array() ;
+        $counters = array() ;
+        foreach ($experiment->runs() as $run) {
+
+            $runnum = $run->num() ;
+            if ($from_runnum    && ($runnum < $from_runnum))    continue ;
+            if ($through_runnum && ($runnum > $through_runnum)) continue ;
+
+            $runs[$runnum] = array() ;
+
+            foreach ($run->attributes('DAQ Detector Totals') as $attr) {
+                $counter = $attr->name() ;
+                $runs[$runnum][$counter] = $attr->val() ;
+                $counters[$counter] = $attr->description() ;
+            }
+        }
+        $counter_names = array() ;
+        foreach ($counters as $counter_name => $val) array_push($counter_names, $counter_name) ;
+        sort($counter_names) ;
+        return array('runs' => $runs, 'counters' => $counters, 'counter_names' => $counter_names) ;
+    }
+    
+    public static function get_daq_detectors_new ($experiment, $from_runnum=null, $through_runnum=null) {
+
+        $runs      = array() ;
+        $detectors = array () ;
+
+        foreach ($experiment->runs() as $run) {
+
+            $runnum = $run->num() ;
+            if ($from_runnum    && ($runnum < $from_runnum))    continue ;
+            if ($through_runnum && ($runnum > $through_runnum)) continue ;
+
+            $runs[$runnum] = array() ;
+
+            // ATTENTION: Scan the legacy class 'DAQ_Detectors' for experiments
+            //            taken prior Feb 2015 when a transition of the class
+            //            name to 'DAQ Detectors' happened.
+            //
+            foreach (array('DAQ_Detectors', 'DAQ Detectors') as $class) {
+                foreach ($run->attributes($class) as $attr) {
+                    $detector = $attr->name() ;
+                    $runs[$runnum][$detector] = 1 ;
+                    $detectors    [$detector] = 1 ;
+                }
+            }
+        }
+        $names        = array() ;
+        $descriptions = array() ;
+        foreach ($detectors as $detector => $val) {
+            array_push($names, $detector) ;
+            $descriptions[$detector] = $detector ;
+        }
+        return array (
+            'runs'         => $runs ,
+            'names'        => $names ,
+            'descriptions' => $descriptions
+        ) ;
+    }
+
+    public static function get_daq_detector_totals ($experiment, $from_runnum=null, $through_runnum=null) {
+
+        $runs      = array() ;
+        $detectors = array () ;
+
+        foreach ($experiment->runs() as $run) {
+
+            $runnum = $run->num() ;
+            if ($from_runnum    && ($runnum < $from_runnum))    continue ;
+            if ($through_runnum && ($runnum > $through_runnum)) continue ;
+
+            $runs[$runnum] = array() ;
+
+            foreach ($run->attributes('DAQ Detector Totals') as $attr) {
+                $detector = $attr->name() ;
+                $runs[$runnum][$detector] = $attr->val() ;
+                $detectors    [$detector] = $attr->description() ;
+            }
+        }
+        $names        = array() ;
+        $descriptions = array() ;
+        foreach ($detectors as $detector => $descr) {
+            array_push($names, $detector) ;
+            $descriptions[$detector] = $descr ;
+        }
+        return array (
+            'runs'         => $runs ,
+            'names'        => $names ,
+            'descriptions' => $descriptions
+        ) ;
+    }    
 }
 ?>

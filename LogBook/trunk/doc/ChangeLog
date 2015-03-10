@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V01-00-04
+2015-03-10 Igor Gaponenko
+- added support for new class of run attributes 'DAQ Detetector Status',
+migration of the 'DAQ_Detectors' class to 'DAQ Detectors' (PSWA-37)
+
 Tag: V01-00-03
 2014-12-08 Igor Gaponenko
 - server-side implementation for e-Log message forwarding
