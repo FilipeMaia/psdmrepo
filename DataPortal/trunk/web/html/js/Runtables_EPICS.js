@@ -35,9 +35,17 @@ function (
             this._init() ;
         } ;
 
+        this._update_interval_sec = 30 ;
+        this._prev_update_sec = null ;
+
         this.on_update = function () {
             if (this.active) {
                 this._init() ;
+                var now_sec = Fwk.now().sec ;
+                if (!this._prev_update_sec || (now_sec - this._prev_update_sec) > this._update_interval_sec) {
+                    this._prev_update_sec = now_sec ;
+                    this._load_all() ;
+                }
             }
         } ;
 
@@ -265,6 +273,13 @@ function (
             table.load(rows) ;
         } ;
 
+        this._load_all = function () {
+            if (this._section_names)
+                for (var i in this._section_names) {
+                    var s_name = _that._section_names[i] ;
+                    this._load(s_name) ;
+                }
+        } ;
         this._load = function (s_name) {
 
             var updated = this._tabs.find('div#'+s_name).find('#updated') ;

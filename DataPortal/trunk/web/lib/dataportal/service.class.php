@@ -89,6 +89,7 @@ class Service {
     private $method_var  = null ;
     private $authdb      = null ;
     private $regdb       = null ;
+    private $regdbauth   = null ;
     private $logbook     = null ;
     private $logbookauth = null ;
     private $configdb    = null ;
@@ -98,6 +99,8 @@ class Service {
     private $exptimemon  = null ;
     private $sysmon      = null ;
     private $shiftmgr    = null ;
+    private $ifacectrldb = null ;   // multiple controllers in the dictonary
+    private $ifacectrlws = null ;   // multiple controllers in the dictonary
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -123,6 +126,23 @@ class Service {
     // ----------------------
     //   Parameters parsers
     // ----------------------
+
+    /**
+     * Case-controlled version of the standard 'in_array()'
+     *
+     * @param  string  $needle      - a string value to search in the array
+     * @param  array   $haystack    - an input array of strings where to search
+     * @param  boolean $ignore_case - set to 'true' for case-insensitive comparision
+     * @return boolean
+     */
+    private static function _in_array_case ($needle, $haystack, $ignore_case=false) {
+        foreach ($haystack as $v) {
+            if ($ignore_case ?
+                strtolower($needle) === strtolower($v) :
+                $needle             === $v) return true ;
+        }
+        return false ;
+    }
 
     private function parse ($name, $required=true, $has_value=true, $allow_empty_value=false) {
         $name = trim($name) ;
@@ -222,6 +242,71 @@ class Service {
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
 
+    public static $_ENUM_OPTIONS = array (
+        'ignore_case'     => false ,
+        'convert'         => 'none'
+    ) ;
+    public function required_enum (
+        $name ,
+        $allowed_values ,
+        $options = null) {
+
+        return $this->_parse_enum (
+            $this->required_str($name) ,
+            $name ,
+            $allowed_values ,
+            $options
+        ) ;
+    }
+    public function optional_enum (
+        $name ,
+        $allowed_values ,
+        $default ,
+        $options = null) {
+
+        $str = $this->optional_str($name, null) ;
+        if (is_null($str)) return $default ;
+
+        return $this->_parse_enum (
+            $this->required_str($name) ,
+            $name ,
+            $allowed_values ,
+            $options
+        ) ;
+    }
+    private function _parse_enum (
+        $str ,
+        $name ,
+        $allowed_values ,
+        $options) {
+
+        $options = is_null($options) ? self::$_ENUM_OPTIONS : $options ;
+
+        $ignore_case = array_key_exists('ignore_case', $options) && $options['ignore_case'] ;
+
+        $convert = array_key_exists('convert', $options) ?  $options['convert'] : 'none' ;
+        if (!in_array($convert, array('none', 'toupper', 'tolower')))
+            throw new DataPortalException (
+                    __CLASS__.'::'.__METHOD__, "invalid value of the string case conversion option: {$convert}'") ;
+
+        // Note that we this check has to be done first before applying
+        // the optional case conversion rule
+
+        if (!Service::_in_array_case($str, $allowed_values, $ignore_case))
+            throw new DataPortalException (
+                __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+
+        // (Optional) case conversion has to be made before placing result
+        // in case if duplicates aren't allowed.
+
+        switch ($convert) {
+            case 'none'    : break ;
+            case 'toupper' : $str = strtoupper($str) ; break ;
+            case 'tolower' : $str = strtolower($str) ; break ;
+        }
+        return $str ;
+    }
+
     // ------------------------
     //   Database connections
     // ------------------------
@@ -241,6 +326,13 @@ class Service {
             $this->regdb->begin() ;
         }
         return $this->regdb ;
+    }
+    public function regdbauth () {
+        if (is_null($this->regdbauth)) {
+            require_once 'regdb/regdb.inc.php' ;
+            $this->regdbauth = \RegDB\RegDBAuth::instance() ;
+        }
+        return $this->regdbauth ;
     }
     public function logbook () {
         if (is_null($this->logbook)) {
@@ -313,6 +405,40 @@ class Service {
         }
         return $this->shiftmgr ;
     }
+    public function ifacectrldb ($service_name='STANDARD') {
+        if (is_null($this->ifacectrldb)) {
+            require_once 'filemgr/filemgr.inc.php' ;
+            $this->ifacectrldb = array() ;
+        }
+        if (!array_key_exists($service_name, $this->ifacectrldb)) {
+            $this->ifacectrldb[$service_name] = \FileMgr\IfaceCtrlDb::instance($service_name) ;
+            $this->ifacectrldb[$service_name]->begin() ;
+        }
+        return $this->ifacectrldb[$service_name] ;
+    }
+    public function ifacectrlws ($service_name='STANDARD') {
+        if (is_null($this->ifacectrlws)) {
+            require_once 'filemgr/filemgr.inc.php' ;
+            $this->ifacectrlws = array() ;
+        }
+        if (!array_key_exists($service_name, $this->ifacectrlws)) {
+            $this->ifacectrlws[$service_name] = \FileMgr\FileMgrIfaceCtrlWs1::instance($service_name) ;
+        }
+        return $this->ifacectrlws[$service_name] ;
+    }
+
+    // -----------------------
+    //  Convenience functions
+    // -----------------------
+
+    public function safe_assign ($in, $msg, $http_code=null) {
+        if (!$in) $this->abort($msg ? $msg : 'Web service failed', $http_code) ;
+        return $in ;
+    }
+
+    public function assert ($condition, $msg, $http_code=null) {
+        if (!$condition) $this->abort($msg ? $msg : 'Web service failed', $http_code) ;
+    }
 
     // -------------
     //  Finalizers
@@ -326,17 +452,20 @@ class Service {
         Service::report_success() ;
     }
     protected function commit_transactions () {
-        if (!is_null($this->authdb     )) $this->authdb    ->commit() ;
-        if (!is_null($this->regdb      )) $this->regdb     ->commit() ;
-        if (!is_null($this->logbook    )) $this->logbook   ->commit() ;
-        if (!is_null($this->logbookauth)) ;
-        if (!is_null($this->configdb   )) $this->configdb  ->commit() ;
-        if (!is_null($this->irodsdb    )) $this->irodsdb   ->commit() ;
-        if (!is_null($this->neocaptar  )) $this->neocaptar ->commit() ;
-        if (!is_null($this->irep       )) $this->irep      ->commit() ;
-        if (!is_null($this->exptimemon )) $this->exptimemon->commit() ;
-        if (!is_null($this->sysmon     )) $this->sysmon    ->commit() ;
-        if (!is_null($this->shiftmgr   )) $this->shiftmgr  ->commit() ;
+        if (!is_null($this->authdb     )) { $this->authdb    ->commit() ; }
+        if (!is_null($this->regdb      )) { $this->regdb     ->commit() ; }
+        if (!is_null($this->regdbauth  )) { }
+        if (!is_null($this->logbook    )) { $this->logbook   ->commit() ; }
+        if (!is_null($this->logbookauth)) { }
+        if (!is_null($this->configdb   )) { $this->configdb  ->commit() ; }
+        if (!is_null($this->irodsdb    )) { $this->irodsdb   ->commit() ; }
+        if (!is_null($this->neocaptar  )) { $this->neocaptar ->commit() ; }
+        if (!is_null($this->irep       )) { $this->irep      ->commit() ; }
+        if (!is_null($this->exptimemon )) { $this->exptimemon->commit() ; }
+        if (!is_null($this->sysmon     )) { $this->sysmon    ->commit() ; }
+        if (!is_null($this->shiftmgr   )) { $this->shiftmgr  ->commit() ; }
+        if (!is_null($this->ifacectrldb)) { foreach ($this->ifacectrldb as $ctrl) { $ctrl->commit() ; }}
+        if (!is_null($this->ifacectrlws)) { }
     }
     // -------------------
     //   Rests reporting

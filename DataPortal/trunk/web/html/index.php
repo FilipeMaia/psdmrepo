@@ -39,7 +39,7 @@ $known_apps = array (
         'context1_default' => 'Calibrations' ,
         'context1'         => array (
             'calibrations'     => 'Calibrations' ,
-            'detectors'        => 'DAQ Detectors' ,
+            'daq'              => 'DAQ' ,
             'epics'            => 'EPICS' ,
             'user'             => 'User' )) ,
 
@@ -52,10 +52,10 @@ $known_apps = array (
 
     'hdf' => array (
         'name'             => 'HDF5 Translation' ,
-        'context1_default' => 'Manage' ,
+        'context1_default' => 'Standard' ,
         'context1'         => array (
-            'manage'           => 'Manage' ,
-            'config'           => 'Configuration' )) ,
+            'standard'         => 'Standard' ,
+            'config'           => 'Monitoring' )) ,
 
     'shiftmgr' => array (
         'name'             => 'Hutch Manager' ,
@@ -126,7 +126,7 @@ try {
 
     $title        = $experiment->is_facility() ? 'E-Log of Facility:' : 'Data Manager of Experiment' ;
     $subtitle     = $experiment->instrument()->name().'/'.$experiment->name() ;
-    $subtitle_url = '<a href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>' ;
+    $subtitle_url = '<a class="link" href="select_experiment.php" title="Switch to another experiment">'.$experiment->instrument()->name().'&nbsp;/&nbsp;'.$experiment->name().'</a>' ;
 
     $user = RegDB::instance()->find_user_account(AuthDb::instance()->authName()) ;
     if (!$user) die("Sorry, can't safely run this application due to a broken authentication system.") ;

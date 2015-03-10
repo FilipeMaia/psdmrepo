@@ -156,7 +156,7 @@ function (
          * @returns {undefined}
          */
         this.on_update = function () {
-            if (!this._is_shown) return ;
+            //if (!this._is_shown) return ;
             this._load() ;
         } ;
 
@@ -1119,6 +1119,8 @@ function (
 
         this._table_dialog = [] ;     // table dialogs indexed by table identifiers
 
+        this._last_runnum = 0 ;
+
         this._init = function () {
 
             if (this._is_initialized) return ;
@@ -1226,20 +1228,30 @@ function (
                         if (modified_conf) {
                             _that._table_dialog[id] = new Runtable_DialogView(_that, data.table_data[id]) ;
                             _that._table_dialog[id].show() ;
-                            continue ;
                         }
 
-                        // -- modified payload --
-
-                        // For now just let the table to update its cells.
-                        //
-                        // TODO: the tricky stuff of checking of the run number has modified, or
-                        //       something else. Perhaps we just need to trigger on_update() signal
-                        //       on that table and let it figure out what's new?
-
                         dialog.on_update() ;
+
+                    } else {
+
+                        // --  check if the payload has been modified --
+
+                        // TODO: In theory it would be nice to let the table to decide
+                        //       if it needs to update itself by forwarding the update signal
+                        //       to the table. But for now let's disable this and only track
+                        //       differences in run numbers.
+                        // 
+                        // dialog.on_update() ;
+
+
+                        if (_that._last_runnum != data.last_runnum) {
+                            _that._table_dialog[id] = new Runtable_DialogView(_that, data.table_data[id]) ;
+                            _that._table_dialog[id].show() ;
+                        }
+
                     }
                 }
+                _that._last_runnum = data.last_runnum ;
             }) ;
         } ;
 

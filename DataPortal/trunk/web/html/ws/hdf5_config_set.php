@@ -7,6 +7,9 @@
  * PARAMETERS:
  * 
  *   <exper_id> [<service>] [<auto>] [<ffb>] [<release_dir>] [<config_file>]
+ *              [<outdir>] [<ccinsubdir>]
+ *              [<exclusive>] [<njobs>] [<ptile>]
+ *              [<livetimeout>]
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'filemgr/filemgr.inc.php' ;
@@ -34,7 +37,8 @@ function update_config_param (
     $sect ,
     $param ,
     $descr ,
-    $val)
+    $val ,
+    $type='String')
 {
     $val_current = $SVC->ifacectrldb($service)->get_config_param_val_r (
         $sect ,
@@ -44,7 +48,9 @@ function update_config_param (
 
     if (is_null($val)) return $val_current ;
 
-    $val = trim("{$val}") ;     // always turn it into the string
+    $val = trim("{$val}") ;     // always turn it into the string even if it's a number
+                                // to allow detecting '' which means a command to remove
+                                // the parameter from the database.
 
     if ($val_current !== $val) {
         if ($val === '') {
@@ -60,7 +66,8 @@ function update_config_param (
                 $exper->instrument()->name() ,
                 $exper->name() ,
                 $val ,
-                $descr) ;
+                $descr ,
+                $type) ;
         }
     }
     return $val ;
@@ -77,11 +84,15 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
     $ffb         = $SVC->optional_int ('ffb',  null) ;
     $release_dir = $SVC->optional_str ('release_dir', null) ;
     $config_file = $SVC->optional_str ('config_file', null) ;
-    $njobs       = $SVC->optional_str ('njobs', null) ;
+
     $outdir      = $SVC->optional_str ('outdir', null) ;
-    $ccinsubdir  = $SVC->optional_enum('ccinsubdir' ,
-                                       array('0', '1') ,
-                                       null) ;
+    $ccinsubdir  = $SVC->optional_str('ccinsubdir', null) ;         // accepting String to allow removel when '' is provided
+
+    $exclusive   = $SVC->optional_int ('exclusive', null) ;
+    $njobs       = $SVC->optional_str ('njobs',     null) ;         // accepting String to allow removel when '' is provided
+    $ptile       = $SVC->optional_str ('ptile',     null) ;         // accepting String to allow removel when '' is provided
+
+    $livetimeout = $SVC->optional_str ('livetimeout', null) ;       // accepting String to allow removel when '' is provided
 
     $exper = $SVC->safe_assign ($SVC->regdb()->find_experiment_by_id($exper_id) ,
                                 "no experiment found for id={$exper_id}") ;
@@ -131,15 +142,6 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
     switch ($service) {
         case 'MONITORING' :
 
-            $config['njobs'] = update_config_param (
-                $exper ,
-                $SVC ,
-                $service ,
-                'pazlib' ,
-                'lsf-numproc' ,
-                'the number of paralell MPI jobs used by the translation service' ,
-                $njobs) ;
-
             $config['outdir'] = update_config_param (
                 $exper ,
                 $SVC ,
@@ -155,8 +157,49 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
                 $service ,
                 '' ,
                 'output-cc-subdir' ,
-                'place Calib Cycle files at a separate subfolder of the output directory' ,
-                $ccinsubdir) ? 1 : 0 ;
+                'Place Calib Cycle files at a separate subfolder of the output directory' ,
+                $ccinsubdir ,
+                'Integer') ? 1 : 0 ;
+
+            $config['exclusive'] = update_config_param (
+                $exper ,
+                $SVC ,
+                $service ,
+                'lsf' ,
+                'lsf-exclusive' ,
+                'Request exclusive use of batch nodes (dangerous!)' ,
+                $exclusive ,
+                'Integer') ? 1 : 0 ;
+
+            $config['njobs'] = update_config_param (
+                $exper ,
+                $SVC ,
+                $service ,
+                'lsf' ,
+                'lsf-numproc' ,
+                'The number of paralell MPI jobs used by the translation service' ,
+                $njobs ,
+                'Integer') ;
+
+            $config['ptile'] = update_config_param (
+                $exper ,
+                $SVC ,
+                $service ,
+                'lsf' ,
+                'lsf-ptile' ,
+                'Maximum number of processes per node. Set to 0 to not use this option.' ,
+                $ptile ,
+                'Integer') ;
+
+            $config['livetimeout'] = update_config_param (
+                $exper ,
+                $SVC ,
+                $service ,
+                'live-mode' ,
+                'live-timeout' ,
+                'The number of seconds to wait in the live mode translation' ,
+                $livetimeout ,
+                'Integer') ;
 
             break ;
     }

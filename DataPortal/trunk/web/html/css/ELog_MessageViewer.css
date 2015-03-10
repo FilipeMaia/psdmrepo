@@ -80,7 +80,8 @@
   border: 1px solid #ffffff;
 }
 .elog-msg-viewer .m-cont > .attachments > .attach:hover {
-  border: 1px dashed maroon;
+/*  border: 1px dashed maroon;*/
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
 }
 
 .elog-msg-viewer .m-cont > .attachments > .attach-last {

@@ -135,6 +135,8 @@ function (
           'This application presents configuration parameters of the translation service. ' +
           'Please, be aware that any changes made to the values of the parameter would ' +
           'be applied to all future requests. ' +
+          'The detailed description of various parameters of the service in this document: ' +
+          '"<a class="link" stype="white-space:nowrap;" target="_blank" href="https://confluence.slac.stanford.edu/display/PSDM/The+XTC-to-HDF5+Translator" >The XTC-to-HDF5 Translator</a>". ' +
         '</div> ' +
         '<div style="float:left;" class="buttons" > ' +
           '<button name="edit"    class="control-button control-button-important" title="edit configuration options"         >EDIT  </button> ' +
@@ -305,27 +307,97 @@ function (
         } ;
         this._config_editor = function () {
             if (!this._config_editor_obj) {
+                var propdef = [{
+
+                    group:     'STANDARD OPTIONS'} , {
+
+                    name:      'release_dir' ,
+                    text:      'Release directory' ,
+                    title:     'An absolute path to a release directory from which \n' +
+                               'to run the Translator application.' ,
+                    edit_mode: true, editor: 'text', edit_size: 64} , {
+
+                    name:      'config_file' ,
+                    text:      'Configuration file' ,
+                    title:     'An absolute or a relative path to a psana configuration file \n' +
+                               'which will be used by the Translator. Note that a relative path \n' +
+                               'will be atatched to the release directory' ,
+                    edit_mode: true, editor: 'text', edit_size: 64} , {
+
+                    name:      'auto' ,
+                    text:      'Enable Auto-Translation' ,
+                    title:     'If this mode is turned on then the translations ervice will automatically \n' +
+                               'detect new runs and initiate the translation for teh runs. \n' +
+                               'to run the Translator application.' ,
+                    edit_mode: true, editor: 'checkbox'} , {
+
+                    name:      'ffb' ,
+                    text:      'Input from FFB' ,
+                    title:     'The FFB mode allows to begin translating runs while the data \n' +
+                               'are still located on the FFB file system of the corresponding instrument. \n' +
+                               'Usually this would result in a shorted ratency before one could see \n' +
+                               'the HDF5 files. Note that one possible donwside of teh mode is that it may \n' +
+                               'potentially put too much load onto the FFB file system which may negatively \n' +
+                               'affect data migration processes.' ,
+                    edit_mode: true, editor: 'checkbox'}
+                ] ;
                 switch (this.service) {
-                    case 'Standard':
-                        this._config_editor_obj = new PropList ([
-                            {name: "release_dir", text: "Release directory",       edit_mode: true, editor: 'text' ,   edit_size: 64} ,
-                            {name: "config_file", text: "Configuration file",      edit_mode: true, editor: 'text',    edit_size: 64} ,
-                            {name: "auto",        text: "Enable Auto-Translation", edit_mode: true, editor: 'checkbox'} ,
-                            {name: "ffb",         text: "Input from FFB",          edit_mode: true, editor: 'checkbox'}
-                        ]) ;
-                        break ;
                     case 'Monitoring':
-                        this._config_editor_obj = new PropList ([
-                            {name: "release_dir", text: "Release directory",       edit_mode: true, editor: 'text' ,   edit_size: 64} ,
-                            {name: "config_file", text: "Configuration file",      edit_mode: true, editor: 'text',    edit_size: 64} ,
-                            {name: "auto",        text: "Enable Auto-Translation", edit_mode: true, editor: 'checkbox'} ,
-                            {name: "ffb",         text: "Input from FFB",          edit_mode: true, editor: 'checkbox'} ,
-                            {name: "njobs",       text: "#jobs",                   edit_mode: true, editor: 'text',    edit_size: 6} ,
-                            {name: "outdir",      text: "Output directory",        edit_mode: true, editor: 'text',    edit_size: 64} ,
-                            {name: "ccinsubdir",  text: "CC files in a subdir",    edit_mode: true, editor: 'checkbox'}
-                        ]) ;
+                        propdef.push({
+
+                            name:      'outdir' ,
+                            text:      'Output directory' ,
+                            title:     'An absolute or a relative path to a folder where to place \n' +
+                                       'translated HDF5 files. Note that a relative path will be attached \n' +
+                                       'to the base data directory of the experiment' ,
+                            edit_mode: true, editor: 'text', edit_size: 64} , {
+
+                            name:      'ccinsubdir' ,
+                            text:      'CC files in a subdir' ,
+                            title:     'Place Calib Cycle files at a separate subfolder of the output directory' ,
+                            edit_mode: true, editor: 'checkbox'} , {
+
+                            group:     'ADVANCED OPTIONS'} , {
+
+                            name:      'exclusive' ,
+                            text:      'Exclusive use of nodes (MPI)' ,
+                            title:     'Request that each of the experiments runs will be translated \n' +
+                                       'with exclusive use of its nodes (batch system -x option). May help \n' +
+                                       'achieve fastest per-run translation at the expense of overall queue \n' +
+                                       'utilization. For example, translation of subsequent runs may start \n' +
+                                       'later while waiting for sufficient system resources. \n' +
+                                       'RESTRICTIONS: this parameter will only be used in the FFB mode.' ,
+                            edit_mode: true, editor: 'checkbox'} , {
+
+                            name:      'njobs' ,
+                            text:      '# parallel processes (MPI)' ,
+                            title:     'The number of paralell MPI processes used by the translation service. \n' +
+                                       'Remove any number from the cell to assume the default value of \n' +
+                                       'the parameter.' ,
+                            edit_mode: true, editor: 'text',    edit_size: 6} , {
+
+                            name:      'ptile' ,
+                            text:      '# processes per node (MPI)' ,
+                            title:     'The maximum number of paralell MPI processes per node. \n' +
+                                       'Smaller values (1,2,3) may help achieve fastest per-run translation, but \n' +
+                                       'at the expense of overall queue utilization. For example, translation of \n' +
+                                       'subsequent runs may start later while waiting for sufficient system resources. \n' +
+                                       'Remove any number from the cell to assume the default value of \n' +
+                                       'the parameter. \n' +
+                                       'RESTRICTIONS: this parameter will only be used in the FFB mode.' ,
+                            edit_mode: true, editor: 'text',    edit_size: 6} , {
+
+                            name:      'livetimeout' ,
+                            text:      'Live Mode Timeout [s]' ,
+                            title:     'The number of seconds to wait for migrating files in the live \n' +
+                                       'mode before to give up and abort the translation. \n' +
+                                       'Remove any number from the cell to assume the default value of \n' +
+                                       'the parameter.' ,
+                            edit_mode: true, editor: 'text', edit_size: 6}
+                        ) ;
                         break ;
                 }
+                this._config_editor_obj = new PropList(propdef) ;
                 this._config_editor_obj.display(this._config_body().children('#editor')) ;
             }
             return this._config_editor_obj ;
@@ -419,9 +491,12 @@ function (
                 case 'Standard':
                     break ;
                 case 'Monitoring':
-                    this._config_editor().set_value('njobs',      'Loading...') ;
-                    this._config_editor().set_value('outdir',     'Loading...') ;
-                    this._config_editor().set_value('ccinsubdir', 'Loading...') ;
+                    this._config_editor().set_value('outdir',      'Loading...') ;
+                    this._config_editor().set_value('ccinsubdir',  'Loading...') ;
+                    this._config_editor().set_value('exclusive',   'Loading...') ;
+                    this._config_editor().set_value('njobs',       'Loading...') ;
+                    this._config_editor().set_value('ptile',       'Loading...') ;
+                    this._config_editor().set_value('livetimeout', 'Loading...') ;
                     break ;
             }
 
@@ -477,11 +552,9 @@ function (
 '    <tr align="left" >' +
 '      <td >Run</td>' +
 '      <td >End of Run</td>' +
-'      <td align="right" >XTC Size</td>' +
-'      <td align="right">HDF5 Size</td>' +
 '      <td >State</td>' +
-'      <td >Changed</td>' +
-'      <td >Log</td>' +
+'      <td >Last Change</td>' +
+'      <td >Log File</td>' +
 '      <td >Priority</td>' +
 '      <td >Actions</td>' +
 '      <td >Comments</td>' +
@@ -501,7 +574,7 @@ function (
                 var state = request.state ;
                 summary[state.status]++ ;
                 var run_url = '<a class="link" href="javascript:global_elog_search_run_by_num('+state.run_number+',true)" title="click to see a LogBook record for this run" >'+state.run_number+'</a>' ;
-                var log_url = state.log_available ? '<a class="link" href="translate/'+state.id+'/'+state.id+'.log" target="_blank" title="click to see the log file for the last translation attempt">log</a>' : '' ;
+                var log_url = state.log_available ? '<a class="link" href="translate/'+this.service+'/'+state.id+'/'+state.id+'.log" target="_blank" title="click to see the log file for the last translation attempt">log</a>' : '' ;
                 var state_color = 'black' ;
                 switch (state.status) {
                     case 'FAILED'         : state_color = 'red'   ; break ;
@@ -509,11 +582,9 @@ function (
                 }
                 var decorated_state = '<span style="font-weight:normal; color:'+state_color+';">'+state.status+'</span>' ;
                 html +=
-'  <tr class="run-header" id="'+state.run_number+'" >'+
-'    <td >'                   +run_url+         '</td>'+
-'    <td >'                   +state.end_of_run+'</td>'+
-'    <td align="right" valign="center" >&nbsp;'+request.dataset.xtc.size_auto+'</td>'+
-'    <td align="right" valign="center" >&nbsp;'+request.dataset.hdf5.size_auto+'</td>'+
+'  <tr class="run-header" id="'+state.run_number+'" >' +
+'    <td >'                   +run_url+         '</td>' +
+'    <td >'                   +state.end_of_run+'</td>' +
 '    <td >'                   +decorated_state   +'</td>' +
 '    <td >'                   +state.changed      +'</td>' +
 '    <td >'                   +log_url            +'</td>' +
@@ -534,7 +605,7 @@ function (
                     switch (this.name) {
                         case 'translate' :
                             var runnum = val ;
-                            _that._status_translate(runnum) ;
+                            _that._status_translate(runnum, $(this)) ;
                             break ;
                         case 'escalate' :
                             var run_icws_id = val ;
@@ -578,30 +649,32 @@ function (
                 'This may take a while. Are you sure you want to proceed with this operation?' ,
                 function() {
                     _that._status_viewer().find('button[name="translate"]').each(function () {
-                        $(this).button('disable') ;
                         var runnum = parseInt($(this).val()) ;
-                        _that._status_translate(runnum) ;
+                        _that._status_translate(runnum, $(this)) ;
                     }) ;
                 }
             );
         } ;
-        this._status_translate = function (runnum) {
+        this._status_translate = function (runnum, button_translate) {
 
             var tr = this._status_viewer().find('tr.run-header#'+runnum) ;
             var comment  = tr.find('td.comment') ;
 
             comment.html('<span style="color:red;">Processing...</span>') ;
 
+            button_translate.button('disable') ;
+
             Fwk.web_service_GET (
-                '../portal/ws/NewRequest.php' ,
+                '../portal/ws/hdf5_request_new.php' ,
                 {   service: this.service ,
                     exper_id: this.experiment.id ,
                     runnum: runnum
                 } ,
-                function (data) {
+                function () {
                     comment.html('<span style="color:green;">Translation request was queued</span>') ;
                 } ,
                 function (msg) {
+                    button_translate.button('enable') ;
                     comment.html('<span style="color:red;">Translation request was rejected</span>') ;
                     Fwk.report_error(msg) ;
                 }
@@ -737,12 +810,13 @@ function (
             this._config_editor().edit_value('auto') ;
             this._config_editor().edit_value('ffb') ;
             switch (this.service) {
-                case 'Standard':
-                    break ;
                 case 'Monitoring':
-                    this._config_editor().edit_value('njobs') ;
                     this._config_editor().edit_value('outdir') ;
                     this._config_editor().edit_value('ccinsubdir') ;
+                    this._config_editor().edit_value('exclusive') ;
+                    this._config_editor().edit_value('njobs') ;
+                    this._config_editor().edit_value('ptile') ;
+                    this._config_editor().edit_value('livetimeout') ;
                     break ;
             } ;
         } ;
@@ -758,9 +832,12 @@ function (
             } ;
             switch (this.service) {
                 case 'Monitoring':
-                    params.njobs      = this._config_editor().get_value('njobs') ;
-                    params.outdir     = this._config_editor().get_value('outdir') ;
-                    params.ccinsubdir = this._config_editor().get_value('ccinsubdir') ? 1 : 0 ;
+                    params.outdir      = this._config_editor().get_value('outdir') ;
+                    params.ccinsubdir  = this._config_editor().get_value('ccinsubdir') ? 1 : 0 ;
+                    params.exclusive   = this._config_editor().get_value('exclusive') ? 1 : 0 ;
+                    params.njobs       = this._config_editor().get_value('njobs') ;
+                    params.ptile       = this._config_editor().get_value('ptile') ;
+                    params.livetimeout = this._config_editor().get_value('livetimeout') ;
                     break ;
             } ;
             this._config_set_updated('Saving...') ;
@@ -780,6 +857,10 @@ function (
                             _that._config_editor().view_value('njobs') ;
                             _that._config_editor().view_value('outdir') ;
                             _that._config_editor().view_value('ccinsubdir') ;
+                            _that._config_editor().view_value('exclusive') ;
+                            _that._config_editor().view_value('njobs') ;
+                            _that._config_editor().view_value('ptile') ;
+                            _that._config_editor().view_value('livetimeout') ;
                             break;
                     }
                     _that._config_display() ;
@@ -794,9 +875,12 @@ function (
             this._config_editor().view_value('ffb') ;
             switch (this.service) {
                 case 'Monitoring':
-                    this._config_editor().view_value('njobs') ;
                     this._config_editor().view_value('outdir') ;
                     this._config_editor().view_value('ccinsubdir') ;
+                    this._config_editor().view_value('exclusive') ;
+                    this._config_editor().view_value('njobs') ;
+                    this._config_editor().view_value('ptile') ;
+                    this._config_editor().view_value('livetimeout') ;
                     break ;
             } ;
             this._config_display() ;
@@ -808,9 +892,12 @@ function (
             this._config_editor().set_value('ffb',         this._config.ffb) ;
             switch (this.service) {
                 case 'Monitoring':
-                    this._config_editor().set_value('njobs',      this._config.njobs) ;
-                    this._config_editor().set_value('outdir',     this._config.outdir) ;
-                    this._config_editor().set_value('ccinsubdir', this._config.ccinsubdir) ;
+                    this._config_editor().set_value('outdir',      this._config.outdir) ;
+                    this._config_editor().set_value('ccinsubdir',  this._config.ccinsubdir) ;
+                    this._config_editor().set_value('exclusive',   this._config.exclusive) ;
+                    this._config_editor().set_value('njobs',       this._config.njobs) ;
+                    this._config_editor().set_value('ptile',       this._config.ptile) ;
+                    this._config_editor().set_value('livetimeout', this._config.livetimeout) ;
                     break ;
             } ;
         } ;

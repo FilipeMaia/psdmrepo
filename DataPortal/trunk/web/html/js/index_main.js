@@ -48,14 +48,14 @@ require.config ({
 require ([
     'webfwk/CSSLoader', 'webfwk/Fwk' ,
 
-    'portal/Experiment_Info',        'portal/Experiment_Group',   'portal/Experiment_ELogAccess' ,
-    'portal/ELog_Live',              'portal/ELog_Post',          'portal/ELog_Search' ,
-    'portal/ELog_Shifts',            'portal/ELog_Runs',          'portal/ELog_Attachments' ,
+    'portal/Experiment_Info',        'portal/Experiment_Group',    'portal/Experiment_ELogAccess' ,
+    'portal/ELog_Live',              'portal/ELog_Post',           'portal/ELog_Search' ,
+    'portal/ELog_Shifts',            'portal/ELog_Runs',           'portal/ELog_Attachments' ,
     'portal/ELog_Subscribe',
-    'portal/Runtables_Calibrations', 'portal/Runtables_Detectors',
+    'portal/Runtables_Calibrations', 'portal/Runtables_DAQ',
     'portal/Runtables_EPICS',        'portal/Runtables_User',
-    'portal/Filemanager_Summary',    'portal/Filemanager_Files',  'portal/Filemanager_Files_USR' ,
-    'portal/HDF5_Manage',            'portal/HDF5_Config' ,
+    'portal/Filemanager_Summary',    'portal/Filemanager_Files',   'portal/Filemanager_Files_USR' ,
+    'portal/HDF5_Translator' ,
 
     'shiftmgr/Reports', 'shiftmgr/History', 'shiftmgr/Notifications' ,
    
@@ -72,10 +72,10 @@ function (
     ELog_Live,              ELog_Post,           ELog_Search ,
     ELog_Shifts,            ELog_Runs,           ELog_Attachments ,
     ELog_Subscribe,
-    Runtables_Calibrations, Runtables_Detectors, Runtables_EPICS ,
-    Runtables_User,
+    Runtables_Calibrations, Runtables_DAQ ,
+    Runtables_EPICS,        Runtables_User ,
     Filemanager_Summary,    Filemanager_Files,   Filemanager_Files_USR ,
-    HDF5_Manage,            HDF5_Config ,
+    HDF5_Translator ,
     Reports,                History,             Notifications) {
 
     cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
@@ -113,7 +113,7 @@ function (
                 name: 'Subscribe',              application: new ELog_Subscribe   (experiment, access_list)}]}, {
             name: 'Run Tables',         menu: [{
                 name: 'Calibrations',           application: new Runtables_Calibrations (experiment, access_list)}, {
-                name: 'DAQ Detectors',          application: new Runtables_Detectors    (experiment, access_list)}, {
+                name: 'DAQ',                    application: new Runtables_DAQ          (experiment, access_list)}, {
                 name: 'EPICS',                  application: new Runtables_EPICS        (experiment, access_list)}, {
                 name: 'User',                   application: new Runtables_User         (experiment, access_list)}]}, {
             name: 'File Manager',       menu: [{
@@ -121,8 +121,8 @@ function (
                 name: 'XTC HDF5',               application: new Filemanager_Files     (experiment, access_list)}, {
                 name: 'USR',                    application: new Filemanager_Files_USR (experiment, access_list)}]}, {
             name: 'HDF5 Translation',   menu: [{
-                name: 'Manage',                 application: new HDF5_Manage(experiment, access_list)}, {
-                name: 'Configuration',          application: new HDF5_Config(experiment, access_list)}]}) ;
+                name: 'Standard',               application: new HDF5_Translator('Standard',   experiment, access_list)}, {
+                name: 'Monitoring',             application: new HDF5_Translator('Monitoring', experiment, access_list)}]}) ;
         
         if (access_list.shiftmgr.can_edit) menus.push ({
             name: 'Hutch Manager',      menu: [{

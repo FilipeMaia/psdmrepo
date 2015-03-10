@@ -36,9 +36,12 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     ) ;
     switch ($service) {
         case 'MONITORING' :
-            $config['njobs']      = $SVC->ifacectrldb($service)->get_config_param_val_r('pazlib', 'lsf-numproc',      $instr_name, $exp_name) ;
-            $config['outdir']     = $SVC->ifacectrldb($service)->get_config_param_val_r('',       'output-dir',       $instr_name, $exp_name) ;
-            $config['ccinsubdir'] = $SVC->ifacectrldb($service)->get_config_param_val_r('',       'output-cc-subdir', $instr_name, $exp_name) ? 1 : 0 ;
+            $config['outdir']      =        $SVC->ifacectrldb($service)->get_config_param_val_r('',          'output-dir',       $instr_name, $exp_name) ;
+            $config['ccinsubdir']  = intval($SVC->ifacectrldb($service)->get_config_param_val_r('',          'output-cc-subdir', $instr_name, $exp_name));
+            $config['exclusive']   = intval($SVC->ifacectrldb($service)->get_config_param_val_r('lsf',       'lsf-exclusive',    $instr_name, $exp_name)) ;
+            $config['njobs']       = intval($SVC->ifacectrldb($service)->get_config_param_val_r('lsf',       'lsf-numproc',      $instr_name, $exp_name)) ;
+            $config['ptile']       = intval($SVC->ifacectrldb($service)->get_config_param_val_r('lsf',       'lsf-ptile',        $instr_name, $exp_name)) ;
+            $config['livetimeout'] = intval($SVC->ifacectrldb($service)->get_config_param_val_r('live-mode', 'live-timeout',     $instr_name, $exp_name)) ;
             break ;
     }
     return array('config' => $config) ;

@@ -8,12 +8,12 @@ require_once 'logbook/logbook.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
 require_once 'filemgr/filemgr.inc.php' ;
 
-use DataPortal\DataPortalexception;
+use DataPortal\DataPortalexception ;
 
-use LogBook\LogBook;
-use LusiTime\LusiTime;
+use LogBook\LogBook ;
+use LusiTime\LusiTime ;
 
-use FileMgr\FileMgrIrodsWs;
+use FileMgr\FileMgrIrodsDb ;
 
 define('KB', 1024.0) ;
 define('MB', 1024.0 * KB) ;
@@ -30,16 +30,19 @@ function autoformat_size ($bytes) {
     return sprintf($format, $normalized).' <span style="font-weight:bold; font-size:9px;">'.$units.'</span>' ;
 }
 
+function time2string ($t) {
+    return is_null($t) ? '' : $t->toStringDay().'&nbsp;&nbsp;&nbsp;'.$t->toStringHMS() ;
+}
+
 /** The utility class to encapsulate services for implementing
  *  HDF5 translation applications.
  */
 class Translator1 {
 
-    static $types = array('xtc', 'hdf5') ;
-
     static function get_requests ($ifacectrlws, $exper_id, $range_of_runs, $status) {
 
         LogBook::instance()->begin() ;
+        FileMgrIrodsDb::instance()->begin() ;
 
         $experiment = LogBook::instance()->find_experiment_by_id($exper_id) ;
         if (is_null($experiment))
@@ -51,23 +54,19 @@ class Translator1 {
 
            Translator1::requests2dict (
                 $ifacectrlws->experiment_requests (
-                    $instrument->name(),
-                    $experiment->name(),
-                    true    /* one request per run, latest requests only */)),
+                    $instrument->name() ,
+                    $experiment->name() ,
+                    true    /* one request per run, latest requests only */)) ,
 
            Translator1::array2dict_and_merge (
-                FileMgrIrodsWs::all_runs (
-                    $instrument->name(),
-                    $experiment->name(),
-                    'xtc'),
-                FileMgrIrodsWs::all_runs (
-                    $instrument->name(),
-                    $experiment->name(),
-                    'hdf5')),
+                FileMgrIrodsDb::instance()->runs (
+                    $instrument->name() ,
+                    $experiment->name() ,
+                    'xtc')) ,
 
-            array_reverse($experiment->runs()),
+            array_reverse($experiment->runs()) ,
 
-            $range_of_runs,
+            $range_of_runs ,
             $status
         ) ;
 
@@ -75,42 +74,33 @@ class Translator1 {
 
         foreach ($runs as $run) {
 
-            $run_logbook = $run['logbook'];
-            $run_irodsws = $run['irodsws'];
-            $run_icws    = $run['icws'];
+            $run_logbook = $run['logbook'] ;
+            $run_irodsws = $run['irodsws'] ;
+            $run_icws    = $run['icws'] ;
 
-            $status = Translator1::simple_request_status(is_null($run_icws) ? '' : $run_icws->status) ;
-            $actions = '';
-            $comments = '';
-            $ready4translation = false;
+            $status   = Translator1::simple_request_status(is_null($run_icws) ? '' : $run_icws->status) ;
+            $actions  = '' ;
+            $comments = '' ;
+            $ready4translation = false ;
 
-            /* The 'Translate' command will be enabled only for the runs for which File Manager
-             * has HDF5 files while XTC files are already present.
-             *
-             *   TODO: For now do not separate disk resident versus tape resident files!
-             *   Just cyheck if any replica of those files is available. Later we can
-             *   implement a smarter logic on how to display a status of files which
-             *   only exist on tape.
-             */
-            $xtc_files_found  = !is_null($run_irodsws) && !is_null($run_irodsws['xtc' ]) && count($run_irodsws['xtc' ]) ;
-            $hdf5_files_found = !is_null($run_irodsws) && !is_null($run_irodsws['hdf5']) && count($run_irodsws['hdf5']) ;
-
-            if ($xtc_files_found && !$hdf5_files_found &&
-                !in_array($status, array('FINISHED', 'TRANSLATING', 'QUEUED'))) {
-                $actions = '<button class="control-button translate not4print" name="translate" value="'.$run_logbook->num().'">TRANSLATE</button>';
-                $ready4translation = true;
-            } elseif ($xtc_files_found && $hdf5_files_found &&
-                in_array($status, array('FINISHED', 'FAILED'))) {
-                $actions = '<button class="control-button translate retranslate not4print" name="translate" value="'.$run_logbook->num().'">RE-TRANSLATE</button>';
-                $ready4translation = true;
+            switch ($status) {
+                case 'NOT-TRANSLATED' :
+                case 'FAILED' :
+                    $actions = '<button class="control-button translate" name="translate" value="'.$run_logbook->num().'">TRANSLATE</button>' ;
+                    $ready4translation = true ;
+                    break ;
+                case 'FINISHED' :
+                    $actions = '<button class="control-button translate retranslate" name="translate" value="'.$run_logbook->num().'">RE-TRANSLATE</button>' ;
+                    $ready4translation = true ;
+                    break ;
+                case 'QUEUED' :
+                    $actions .= '<button class="control-button escalate" name="escalate" style="font-size:12px;" value="'.$run_icws->id.'">ESCALATE</button>' ;
+                    $actions .= '<button class="control-button stop"     name="stop"     style="font-size:12px;" value="'.$run_icws->id.'">STOP</button>' ;
+                    break ;
             }
 
-            /* Make sure disk-resident replicas for all XTC files are available (as reported
-             * by IRODS) before allowing translation. This step relies on optional "open file"
-             * records posted by the DAQ system immediattely after creating the data files.
-             *
-             * TODO: this information may not exist for older experiments. Consider
-             * fixing the data base by populating it with file creation timestamps.
+            /* Warn a user if not XTC files created by the DAQ are available
+             * on disk as reported iRODS.
              */
             $files_open_by_DAQ = $experiment->regdb_experiment()->files($run_logbook->num()) ;
             if (count($files_open_by_DAQ)) {
@@ -118,146 +108,92 @@ class Translator1 {
                 $files_irodsws_num = 0;
 
                 $files_irodsws = $run_irodsws['xtc'];
-                if (!is_null($files_irodsws))
-                    foreach ($files_irodsws as $f)
+                if (!is_null($files_irodsws)) {
+                    foreach ($files_irodsws as $f) {
                         if ($f->resource == 'lustre-resc') $files_irodsws_num++;
+                    }
+                }
+                if ($files_irodsws_num != count($files_open_by_DAQ)) {
+                    $comments = $files_irodsws_num.' / '.count($files_open_by_DAQ).' XTC files on disk';
+                }
+            }
 
-                        if ($files_irodsws_num != count($files_open_by_DAQ)) {
-                            $actions = '';
-                            $comments = 'only '.$files_irodsws_num.' out of '.count($files_open_by_DAQ).' XTC files available';
-                            $ready4translation = false;
-                       }
-               }
-
-            /* The 'Elevate Priority' and 'Delete' commands are only available
-             * for existing translation requests waiting in a queue. Also note,
-             * that the priority number is also available for this type of requests.
+            /* The status change timestamp depends on on the status.
              */
-            if ($status == 'QUEUED') {
-                $actions =
-                    '<button class="control-button escalate not4print" name="escalate" style="font-size:12px;" value="'.$run_icws->id.'">ESCALATE</button>'.
-                    '<button class="control-button stop not4print"     name="stop"     style="font-size:12px;" value="'.$run_icws->id.'">STOP</button>';
-            }
-
-            /* Note that the translation completion status for those runs for which
-             * we do not have any data from the translation service is pre-determined
-             * by a presence of HDF5 files. Moreover, of those files are present then
-             * we _always_ assume that the translation succeeded regardeless of what
-             * the translation service says (we're still going to show that info if available).
-             * In case of a possible conflict when HDF5 are present but the translation service
-             * record (if present) says something else, we just do not all any actions
-             * on that file.
-             */
-//            if ($hdf5_files_found && !is_null($run_icws) && ($status == 'FAILED')) {
-            if ($hdf5_files_found && !is_null($run_icws) && ($status == 'DONE')) {
-                $status = 'FINISHED';
-            }
-            if ($hdf5_files_found && !is_null($run_icws) && ($status == 'FAILED')) {
-                $comments .= ($comments == '' ? '' : '; ')."The HDF file from the previous successful translation<br>is still available.";
-            }
-            if (!$hdf5_files_found && ($status == 'FINISHED')) {
-                $comments .= ($comments == '' ? '' : '; ')."If the translation just finished then HDF files<br>will appear shortly after they'll be archived to tape.";
-            }
-
-            /* The status change timestamp is calculated based on the status.
-             */
-            $changed = '';
+            $changed = null ;
             switch ($status) {
-                case 'QUEUED':
-                    $changed = !is_null($run_icws) && $run_icws->created ? $run_icws->created : '';
-                    break;
+                case 'QUEUED' :
+                    $changed = !is_null($run_icws) && $run_icws->created ? $run_icws->created : '' ;
+                    break ;
                 case 'TRANSLATING':
-                    $changed = !is_null($run_icws) && $run_icws->started ? $run_icws->started : '';
+                    $changed = !is_null($run_icws) && $run_icws->started ? $run_icws->started : '' ;
                     break;
-                case 'FAILED':
-                case 'FINISHED':
-                    $changed =  !is_null($run_icws) && $run_icws->stopped ? $run_icws->stopped : '';
-                    break;
+                case 'FAILED' :
+                case 'FINISHED' :
+                    $changed =  !is_null($run_icws) && $run_icws->stopped ? $run_icws->stopped : '' ;
+                    break ;
             }
-            $changed_as_time = $changed ? LusiTime::parse($changed) : null;
-            $request = array(
-                'state' => array(
-                    'id'                => !is_null($run_icws) ? $run_icws->id : 0,
-                    'run_number'        => $run_logbook->num(),
-                    'run_id'            => $run_logbook->id(),
-                    'end_of_run'        => is_null($run_logbook->end_time()) ? '' : $run_logbook->end_time()->toStringDay().'&nbsp;&nbsp;&nbsp;'.$run_logbook->end_time()->toStringHMS(),
-                    'status'            => $status,
-                    'changed'           => $changed_as_time ? $changed_as_time->toStringDay().'&nbsp;&nbsp;&nbsp;'.$changed_as_time->toStringHMS() : '',
-                    'log_available'     => (!is_null($run_icws) && ($run_icws->log_url != '')) ? 1 : 0,
-                    'priority'          => $status == 'QUEUED' ? $run_icws->priority : '',
-                    'actions'           => $actions,
-                    'comments'          => $comments,
+            $request = array (
+                'state' => array (
+                    'id'                => !is_null($run_icws) ? $run_icws->id : 0 ,
+                    'run_number'        => $run_logbook->num() ,
+                    'run_id'            => $run_logbook->id() ,
+                    'end_of_run'        => time2string($run_logbook->end_time()) ,
+                    'status'            => $status ,
+                    'changed'           => time2string($changed ? LusiTime::parse($changed) : null) ,
+                    'log_available'     => (!is_null($run_icws) && (isset($run_icws->log_url) && ($run_icws->log_url != ''))) ? 1 : 0 ,
+                    'priority'          => $status == 'QUEUED' ? $run_icws->priority : '' ,
+                    'actions'           => $actions ,
+                    'comments'          => $comments ,
                     'ready4translation' => $ready4translation ? 1 : 0
-                ),
-
-                /* File sizes for individual files*/
-
-                'xtc'  => array(),
-                'hdf5' => array(),
+                ) ,
                 
-                /* Total sizes for each data set type */
+                /* Total size for the XTC files */
 
-                'dataset' => array(
-                    'xtc'  => array(
+                'dataset' => array (
+                    'xtc'  => array (
                         'num_files'  => 0,
-                        'size_auto'  => '', // using the most appropriate scale
-                        'size_bytes' => 0 , // as a number of bytes
-                        'size_kb'    => '',
-                        'size_mb'    => '',
-                        'size_gb'    => '',
-                        'size'       => ''  // comma separated by three decimals
-                    ),
-                    'hdf5' => array(
-                        'num_files'  => 0,
-                        'size_auto'  => '', // using the most appropriate scale
-                        'size_bytes' => 0 , // as a number of bytes
-                        'size_kb'    => '',
-                        'size_mb'    => '',
-                        'size_gb'    => '',
+                        'size_auto'  => '' ,    // using the most appropriate scale
+                        'size_bytes' => 0  ,    // as a number of bytes
+                        'size_kb'    => '' ,
+                        'size_mb'    => '' ,
+                        'size_gb'    => '' ,
                         'size'       => ''      // comma separated by three decimals
                     )
                 )
 
             ) ;
 
-            if ($xtc_files_found || $hdf5_files_found) {
+            $xtc_files_found = !is_null($run_irodsws) && !is_null($run_irodsws['xtc' ]) && count($run_irodsws['xtc' ]) ;
+            if ($xtc_files_found) {
 
-                /* Separate production of rows from displaying them because we
-                 * don't want to have two passes through the lists of files to
-                 * calculate the 'end-of-group' requirement for the last row.
-                 */
-                foreach (Translator1::$types as $type) {
+                $files = $run_irodsws['xtc'] ;
+                if (is_null($files)) continue ;
 
-                    $files = $run_irodsws[$type];
-                    if (is_null($files)) continue;
+                $num_files = 0 ;
+                $bytes     = 0 ;
 
-                    $num_files = 0;
-                    $bytes = 0;
+                foreach ($files as $f) {
 
-                    foreach ($files as $f) {
+                    /* TODO: For now consider disk resident files only! Implement a smarter
+                     * logic for files which only exist on HPSS. Probably show their status.
+                     */
+                    if ($f->resource != 'lustre-resc') continue ;
 
-                        /* TODO: For now consider disk resident files only! Implement a smarter
-                         * logic for files which only exist on HPSS. Probably show their status.
-                         */
-                        if ($f->resource != 'lustre-resc') continue;
-
-                        $num_files++ ;
-                        $bytes = $bytes + intval($f->size) ;
-
-                        array_push($request[$type], array('name' => $f->name, 'size' => autoformat_size($f->size))) ;
-                    }
-                    $request['dataset'][$type]['num_files']  = $num_files;
-                    $request['dataset'][$type]['size_auto']  = autoformat_size($bytes) ;
-                    $request['dataset'][$type]['size_bytes'] = $bytes;
-                    $request['dataset'][$type]['size_kb']    = sprintf($bytes < 10 * KB ? "%.1f" : "%d", $bytes / KB) ;
-                    $request['dataset'][$type]['size_mb']    = sprintf($bytes < 10 * MB ? "%.1f" : "%d", $bytes / MB) ;
-                    $request['dataset'][$type]['size_gb']    = sprintf($bytes < 10 * GB ? "%.1f" : "%d", $bytes / GB) ;
-                    $request['dataset'][$type]['size']       = number_format($bytes) ;    
+                    $num_files++ ;
+                    $bytes = $bytes + intval($f->size) ;
                 }
+                $request['dataset']['xtc']['num_files']  = $num_files ;
+                $request['dataset']['xtc']['size_auto']  = autoformat_size($bytes) ;
+                $request['dataset']['xtc']['size_bytes'] = $bytes ;
+                $request['dataset']['xtc']['size_kb']    = sprintf($bytes < 10 * KB ? "%.1f" : "%d", $bytes / KB) ;
+                $request['dataset']['xtc']['size_mb']    = sprintf($bytes < 10 * MB ? "%.1f" : "%d", $bytes / MB) ;
+                $request['dataset']['xtc']['size_gb']    = sprintf($bytes < 10 * GB ? "%.1f" : "%d", $bytes / GB) ;
+                $request['dataset']['xtc']['size']       = number_format($bytes) ;
             }
             array_push($requests, $request) ;
         }
-        return $requests;
+        return $requests ;
     }
 
     /**
@@ -314,9 +250,9 @@ class Translator1 {
                             $end_run = intval($pair[1]) ;
                             if (!$end_run) throw new DataPortalexception(__METHOD__, "illegal run '".$pair[1]."' subrange: '".$subrange."'") ;
                         }
-                        if ($begin_run >= $end_run) throw new DataPortalexception(__METHOD__, "illegal subrange: '".$subrange."'") ;
-                        if ($begin_run < $min_runnum) throw new DataPortalexception(__METHOD__, "non-existing begin run in subrange: '".$subrange."'") ;
-                        if ($end_run   > $max_runnum) throw new DataPortalexception(__METHOD__, "non-existing end run in subrange: '".$subrange."'") ;
+                        if ($begin_run >= $end_run)    throw new DataPortalexception(__METHOD__, "illegal subrange: '".$subrange."'") ;
+                        if ($begin_run <  $min_runnum) throw new DataPortalexception(__METHOD__, "non-existing begin run in subrange: '".$subrange."'") ;
+                        if ($end_run   >  $max_runnum) throw new DataPortalexception(__METHOD__, "non-existing end run in subrange: '".$subrange."'") ;
 
                         for ($run = $begin_run; $run <= $end_run; $run++)
                             $runs2allow[$run] = True;
@@ -359,26 +295,13 @@ class Translator1 {
      *         run   - the run number
      *         files - an array if files of the corresponding type
      */
-    function array2dict_and_merge ($in_xtc, $in_hdf5) {
+    function array2dict_and_merge ($in_xtc) {
 
         $out = array() ;
         if ($in_xtc) {
             foreach ($in_xtc as $i) {
                 $out[$i->run]['xtc']  = $i->files;
                 $out[$i->run]['hdf5'] = null;
-            }
-        }
-
-        /* Note that not having XTC for a run is rathen unusual situation. But let's handle
-         * it at a higher level logic, not here. For now just put null to where the list
-         * of XTC files is expected.
-         */
-        if ($in_hdf5) {
-            foreach ($in_hdf5 as $i) {
-                if (!array_key_exists($i->run, $out)) {
-                    $out[$i->run]['xtc'] = null;
-                }
-                $out[$i->run]['hdf5'] = $i->files;
             }
         }
         return $out;

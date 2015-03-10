@@ -11,6 +11,16 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-00
+2015-03-10 Igor Gaponenko
+- Re-factoring HDF5 translation ordering application (PSWA-35)
+- Web application to configure the Monitoring Interface Controller (PSWA-32)
+- Automated update of run tables when new runs reported by the DAQ (PSWA-31)
+- DAQ detectors run table migration (PSWA-37)
+- minor changes to the UI design of some applications: unified page refresh
+button, unified location of the page update timestamp
+- updated base class for Web services Service to match the API of ServiceJSON
+
 Tag: V00-08-08
 2014-12-19 Igor Gaponenko
 - finished refactoring Web services as per JIRA ticket PSDH-20

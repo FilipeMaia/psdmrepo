@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Return the information about DAQ detectors configured for runs of the experiment.
+ * Return the information about DAQ counters for runs of the experiment.
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'logbook/logbook.inc.php' ;
@@ -12,17 +12,13 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     $from_runnum    = $SVC->optional_int('from_run', 0) ;
     $through_runnum = $SVC->optional_int('through_run', 0) ;
 
-    $SVC->assert (!(($from_runnum && $through_runnum) &&
-                    ($from_runnum >  $through_runnum)) ,
-                  "illegal range of runs: {$from_runnum}-{$through_runnum}") ;
+    if (($from_runnum && $through_runnum) && ($from_runnum > $through_runnum))
+        $SVC->abort("illegal range of runs: last run must be equal or greater then the first one") ;
 
     $experiment = $SVC->safe_assign ($SVC->logbook()->find_experiment_by_id($exper_id) ,
                                      "no experiment found for id={$exper_id}") ;
-    
-    return LogBook\LogBookUtils::get_daq_detectors (
-        $experiment ,
-        $from_runnum ,
-        $through_runnum) ;
+
+    $SVC->finish (LogBook\LogBookUtils::get_daq_counters($experiment, $from_runnum, $through_runnum)) ;
 }) ;
 
 ?>
