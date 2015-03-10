@@ -45,10 +45,12 @@ public:
   typedef double  	cmod_t;
 
   const static size_t   Ndim = 2; 
-  const static size_t   Rows = 2048; 
-  const static size_t   Cols = 2048; 
+  //const static size_t   Rows = 2048; 
+  //const static size_t   Cols = 2048; 
+  const static size_t   Rows = 512; 
+  const static size_t   Cols = 512; 
   const static size_t   Size = Rows*Cols; 
-  const static size_t   SizeCM = 7; 
+  const static size_t   SizeCM = 16; 
 
   const shape_t* shape_base() { return &m_shape[0]; }
   const cmod_t*  cmod_base()  { return &m_cmod[0]; }
@@ -60,7 +62,7 @@ protected:
 
   AndorBaseV1 (){ 
     shape_t shape[Ndim]={Rows,Cols};            
-    cmod_t cmod[SizeCM]={1,50,50,100,1,Size,1}; // use algorithm 1 to entire image
+    cmod_t cmod[SizeCM]={2,10,10,Cols,0,0,0,0,0,0,0,0,0,0,0,0}; // use algorithm 2 to one row
     std::memcpy(m_shape, &shape[0], sizeof(shape_t)*Ndim);
     std::memcpy(m_cmod,  &cmod[0],  sizeof(cmod_t)*SizeCM);
   };
