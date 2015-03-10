@@ -280,7 +280,7 @@ public:
                                 const int* xy0_off_pix = 0,
                                 const bool do_tilt=true );
 
-  /// Returns image as ndarray<image_t, 2> object
+  /// Static method returns image as ndarray<image_t, 2> object
  /**
    *  @param[in] iX - pointer to x pixel index coordinate array
    *  @param[in] iY - pointer to y pixel index coordinate array
@@ -292,6 +292,13 @@ public:
                         const unsigned*& iY, 
                         const double*    W = 0,
                         const unsigned&  size = 0);
+
+  /// Returns pointer to the data member ndarray<image_t, 2> image object
+  ndarray<image_t, 2>&
+  ref_img_from_pixel_arrays(const unsigned*& iX, 
+                            const unsigned*& iY, 
+                            const double*    W = 0,
+                            const unsigned&  size = 0);
 
   /// Loads calibration file
  /**
@@ -357,6 +364,9 @@ private:
   /// pointer to x pixel coordinate index array
   unsigned* p_iY;
  
+  /// Pointer to image, which is created as a member data of GeometryAccess object
+  ndarray<image_t, 2>* p_image;
+
   /// vector/list of shared pointers to geometry objects
   std::vector<shpGO> v_list_of_geos;
 

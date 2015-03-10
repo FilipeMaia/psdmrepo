@@ -49,6 +49,7 @@ GeometryAccess::GeometryAccess (const std::string& path, unsigned pbits)
   , m_pbits(pbits)
   , p_iX(0)
   , p_iY(0)
+  , p_image(0)
 {
   if(m_pbits & 1) MsgLog(name(), info, "m_pbits = " << m_pbits); 
 
@@ -65,6 +66,9 @@ GeometryAccess::GeometryAccess (const std::string& path, unsigned pbits)
 
 GeometryAccess::~GeometryAccess ()
 {
+  delete [] p_iX;
+  delete [] p_iY;
+  delete p_image;
 }
 
 //-------------------
@@ -516,6 +520,30 @@ GeometryAccess::get_pixel_coord_indexes( const unsigned *& iX,
 
   iX = p_iX;
   iY = p_iY;
+}
+
+//-------------------
+
+ndarray<GeometryAccess::image_t, 2> &
+GeometryAccess::ref_img_from_pixel_arrays( const unsigned*& iX, 
+                                           const unsigned*& iY, 
+                                           const double*    W,
+                                           const unsigned&  size)
+{
+    unsigned ix_max=iX[0]; for(unsigned i=0; i<size; ++i) { if (iX[i] > ix_max) ix_max = iX[i]; } ix_max++;
+    unsigned iy_max=iY[0]; for(unsigned i=0; i<size; ++i) { if (iY[i] > iy_max) iy_max = iY[i]; } iy_max++;
+
+    if(p_image) delete p_image;
+
+    unsigned shape[2] = {ix_max, iy_max};
+    p_image = new ndarray<GeometryAccess::image_t, 2> (shape);
+    ndarray<GeometryAccess::image_t, 2> img = *p_image;
+    // std::fill_n(img, int(img.size()), GeometryAccess::image_t(0));
+    for(ndarray<GeometryAccess::image_t, 2>::iterator it=img.begin(); it!=img.end(); it++) { *it = 0; }
+
+    if (W) for(unsigned i=0; i<size; ++i) img[iX[i]][iY[i]] = (GeometryAccess::image_t) W[i];
+    else   for(unsigned i=0; i<size; ++i) img[iX[i]][iY[i]] = 1;
+    return *p_image;
 }
 
 //-------------------

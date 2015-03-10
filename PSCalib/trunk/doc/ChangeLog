@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-34
+2015-03-10 Mikhail S. Dubrovin	
+- GeometryAccess - add ref_img_from_pixel_arrays method which returns image as a reference to memeber data (PSAS-11)
+
 Tag: V00-02-33
 2015-02-20 Mikhail S. Dubrovin	
 - CalibFileFinder.py - in method findCalibFileadd add protection for run numbers > 9999 (PSAS-111)
