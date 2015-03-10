@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-03-10 Mikhail S. Dubrovin
+Tag: V00-00-83
+- app/calibrun, CommandLineCalib - add optional parameter -m - number of events to scan data and search for selected detector(s) (PSAS-6)
+
 2015-03-09 Mikhail S. Dubrovin
 Tag: V00-00-82
 - Add dark rate calibration support for Andor camera (PSAS-6, PSAS-121)

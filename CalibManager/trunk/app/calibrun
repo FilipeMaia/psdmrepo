@@ -44,6 +44,7 @@ def input_options_parser() :
     parser.add_option('-r', '--run',         dest='runnum',       default=None,  action='store', type='int',    help='run number')
     parser.add_option('-n', '--num_events',  dest='num_events',   default=None,  action='store', type='int',    help='number of events to process')
     parser.add_option('-s', '--skip_events', dest='skip_events',  default=None,  action='store', type='int',    help='number of events to skip before processing')
+    parser.add_option('-m', '--scan_events', dest='scan_events',  default=None,  action='store', type='int',    help='number of events to scan data and search for selected detector(s)')
     parser.add_option('-t', '--thr_rms',     dest='thr_rms',      default=None,  action='store', type='float',  help='threshold on rms for hot pixel mask evaluation')
     parser.add_option('-v', '--runrange',    dest='runrange',     default=None,  action='store', type='string', help='validity run range, ex.: 123-567 or 123-end')
     parser.add_option('-q', '--queue',       dest='queue',        default=None,  action='store', type='string', help='queue name, ex: psnehq, psfehq, psanacsq. If specified - run in batch')
