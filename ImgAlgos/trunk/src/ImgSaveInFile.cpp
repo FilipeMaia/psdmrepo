@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 // #include <time.h>
+#include <sstream> // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -59,6 +60,7 @@ ImgSaveInFile::ImgSaveInFile (const std::string& name)
   , m_file_type()
   , m_print_bits()
   , m_count(0)
+  , m_count_msg(0)
 {
   // get the values from configuration or use defaults
   m_str_src       = configSrc("source",   "CxiDs1.0:Cspad.0");
@@ -215,10 +217,12 @@ ImgSaveInFile::saveImageInFile(Event& evt)
   if ( saveImage2DInFileForType <uint8_t>         (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
   if ( saveImage2DInFileForType <unsigned short>  (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
 
-  const std::string msg = "Image is not defined in the event(...) for source:" 
-                          + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
-  MsgLogRoot(warning, msg);
+  if (++m_count_msg < 11 && m_print_bits) {
+    std::stringstream ss; ss << "Image is not defined in the event(...) for source:" << m_str_src << " key:" << m_key;
+    MsgLogRoot(warning, ss.str());
+    if (m_count_msg == 10) MsgLog(name(), warning, "STOP WARNINGS for source:" << m_str_src << " key:" << m_key);    
   //throw std::runtime_error(msg);
+  }
 }
 
 //--------------------

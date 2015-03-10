@@ -123,6 +123,9 @@ private:
   /// Event counter
   long        m_count;
 
+  /// Message counter to constrain printout
+  long        m_count_msg;
+
   /// Enumerated file type for "txt", "bin", etc. 
   FILE_MODE   m_file_mode;
 
