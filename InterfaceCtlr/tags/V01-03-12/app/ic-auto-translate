@@ -1,0 +1,309 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-auto-translate...
+#
+#------------------------------------------------------------------------
+
+"""Script which automatically submits translation requests.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import time
+import fractions
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from RegDB.RegDb import RegDb
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_icdb_conn_str     = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+_icdb_ffb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn"
+_regdb_conn_str    = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
+_logbook_conn_str  = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
+
+_xtc_path = "/reg/d/psdm/%(instr)s/%(exper)s/xtc/e%(expid)d-r%(run)04d-s%(stream)02d-c%(chunk)02d.xtc"
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class IcAutoTranslate ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        # add application options, see optparse module for details
+        self._parser.set_defaults(icdb_conn=_icdb_conn_str,
+                                  icdb_ffb_conn=_icdb_ffb_conn_str,
+                                  regdb_conn=_regdb_conn_str,
+                                  logbook_conn=_logbook_conn_str,
+                                  check_ffb=True,
+                                  check_reg=True,
+                                  interval=60,
+                                  interval_ffb=10,
+                                  old_instr=[],
+                                  dry_run=False)
+        self._parser.add_option ( '-d', "--icdb-conn", metavar="CONN_STR", help="specify controller database connection string" )
+        self._parser.add_option ( '-f', "--icdb-ffb-conn", metavar="CONN_STR", help="specify FFB controller database connection string" )
+        self._parser.add_option ( '-r', "--regdb-conn", metavar="CONN_STR", help="specify regdb connection string" )
+        self._parser.add_option ( '-l', "--logbook-conn", metavar="CONN_STR", help="specify logbook connection string" )
+        self._parser.add_option ( '-F', "--no-ffb", action="store_false", dest='check_ffb', help="do not do anything for FFB controller" )
+        self._parser.add_option ( '-R', "--no-regular", action="store_false", dest='check_reg', help="do not do anything for regular controller" )
+        self._parser.add_option ( '-i', "--interval", type="int", help="interval in seconds for checking new runs, def: 60" )
+        self._parser.add_option ( '-I', "--interval-ffb", type="int", help="interval in seconds for checking new runs for FFB, def: 10" )
+        self._parser.add_option ( '-n', "--dry-run", action="store_true", help="do not submit any jobs" )
+        self._parser.add_option ( '-O', "--old-instr", action="append", 
+                                  help="instruments without FFB setup, use multiple options for multiple instruments" )
+     
+        self.n_old = 5  # number of latest experiments to keep AUTO flag
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # Connect to databases
+        self.icdb = None
+        if self._options.check_reg:
+            conn = DbConnection(conn_string=self._options.icdb_conn)
+            self.icdb = InterfaceDb( conn, self )
+        self.icdb_ffb = None
+        if self._options.check_ffb:
+            conn = DbConnection(conn_string=self._options.icdb_ffb_conn)
+            self.icdb_ffb = InterfaceDb( conn, self )
+        self.regdb_conn = DbConnection(conn_string=self._options.regdb_conn)
+        self.logbook_conn = DbConnection(conn_string=self._options.logbook_conn)
+        self.regdb = RegDb( self.regdb_conn, self )
+
+        # intervals
+        min_interval = fractions.gcd(self._options.interval, self._options.interval_ffb)
+        reg_count = 1
+        ffb_count = 1
+
+    	# run in a loop forever
+        delay = 0
+        while True:
+
+            # if nothing happened then sleep for a while
+            time.sleep(delay)
+            delay = min_interval
+
+            # count down, sleep until one counter reaches 0
+            reg_count -= 1
+            ffb_count -= 1
+            if reg_count > 0 and ffb_count > 0: continue
+            if reg_count < 0:
+                reg_count = 0
+            if ffb_count < 0:
+                ffb_count = 0
+
+            self.trace('Starting next round')
+            
+            try :
+
+                # mapping instr -> set(exper) flag set
+                auto_exp = dict()
+                auto_exp_ffb = dict()
+
+                # loop over active experiments
+                for exp_dict in self.regdb.get_experiments():
+    
+                    instr = exp_dict['instr_name']
+                    exper = exp_dict['name']
+                    expid = exp_dict['id']
+
+                    if reg_count == 0 and self._options.check_reg:
+                        # do regular controller
+
+                        # check AUTO flag
+                        auto = self.regdb.get_experiment_param(instr, exper, 'AUTO_TRANSLATE_HDF5')
+                        if auto is not None:
+                            auto_exp.setdefault(instr, set()).add(exper)
+                            # process a single experiment
+                            self.trace('processing experiment: %s %s', instr, exper)
+                            if instr in self._options.old_instr:
+                                self._processOldRegExperiment(instr, exper, expid)
+                            else:
+                                self._processFFBExperiment(instr, exper, expid, self.icdb)
+    
+                    if ffb_count == 0 and self._options.check_ffb:
+                        # do FFB controller
+
+                        # check AUTO flag
+                        auto = self.regdb.get_experiment_param(instr, exper, 'FFB_AUTO_TRANSLATE_HDF5')
+                        if auto is not None:
+                            auto_exp_ffb.setdefault(instr, set()).add(exper)
+                            # process a single experiment
+                            self.trace('processing FFB experiment: %s %s', instr, exper)
+                            self._processFFBExperiment(instr, exper, expid, self.icdb_ffb)
+    
+                # reset AUTO flags for old experiments
+                if auto_exp or auto_exp_ffb:
+
+                    instruments = set(auto_exp.keys() + auto_exp_ffb.keys())
+                    for instr in instruments:
+                        
+                        # get the list of N latest experiments for a given instrument
+                        lastN = set(e[0] for e in self.regdb.last_experiment_switch(instr, self.n_old))
+        
+                        # reset AUTO flag for older experiments
+                        for exper in auto_exp.get(instr, set()) - lastN:
+                            self.info('clearing AUTO flag for %s %s', instr, exper)
+                            if not self._options.dry_run: self.regdb.delete_experiment_param(instr, exper, 'AUTO_TRANSLATE_HDF5')
+                        # reset FFB AUTO flag for older experiments
+                        for exper in auto_exp_ffb.get(instr, set()) - lastN:
+                            self.info('clearing FFB_AUTO flag for %s %s', instr, exper)
+                            if not self._options.dry_run: self.regdb.delete_experiment_param(instr, exper, 'FFB_AUTO_TRANSLATE_HDF5')
+                            
+                    self.regdb.commit()
+
+                # commit all transaction
+                self.regdb.commit()
+                self.logbook_conn.cursor().execute('COMMIT')
+            
+            except Exception, ex:
+                
+                self.warning('Error while processing next round: %s, wait 3 minutes', ex)
+                delay = 180
+                continue
+
+            # wrap counters
+            if reg_count == 0: reg_count = self._options.interval // min_interval
+            if ffb_count == 0: ffb_count = self._options.interval_ffb // min_interval
+
+
+    def _processOldRegExperiment(self, instr, exper, expid):
+    
+        # get the list of runs from existing requests 
+        old_runs = self.icdb.translated_runs(instr, exper)
+        self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
+    
+        # get the list of all finished runs from logbook
+        all_runs = self._finishedRuns(expid)
+        self.trace('found %d finished runs: %s %s', len(all_runs), instr, exper)
+    
+        # runs that have not been requested yet
+        new_runs = all_runs - old_runs
+        for run in new_runs :
+            
+            # get all files for this run
+            files = self._getFiles(expid, run)
+            if not files:
+                self.trace('No files for %s %s %d', instr, exper, run)
+                continue
+    
+            # build the file names
+            paths = [_xtc_path % locals() for stream, chunk in files]
+    
+            # check that all files exists
+            all_files = True
+            for path in paths:
+                if not os.path.exists(path) : 
+                    self.trace('No file %s', path)
+                    all_files = False
+                    break
+                else :
+                    self.debug('Found file %s', path)
+    
+            if all_files:
+                
+                # submit a request
+                try:
+                    if not self._options.dry_run: self.icdb.new_fileset(instr, exper, run, 'DATA', paths)
+                    self.info('Submitted %s %s %d (file-based mode)', instr, exper, run)
+                except Exception, ex:
+                    self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
+                    continue
+
+    def _processFFBExperiment(self, instr, exper, expid, icdb):
+        """Add Runs to the queue that are in the logbook but not yet in the queue """
+    
+        # get the list of runs from existing requests 
+        old_runs = icdb.translated_runs(instr, exper)
+        self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
+    
+        # get the list of all started runs from logbook
+        all_runs = self._startedRuns(expid)
+        self.trace('found %d started runs: %s %s', len(all_runs), instr, exper)
+    
+        # runs that have not been requested yet
+        new_runs = all_runs - old_runs
+        for run in new_runs :
+            try:
+                if not self._options.dry_run: icdb.new_fileset(instr, exper, run, 'DATA', [], status = 'WAIT_FILES')
+                self.info('Submitted %s %s %d to FFB translator', instr, exper, run)
+            except Exception, ex:
+                self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
+                continue
+
+    def _getFiles(self, expid, run):
+        """
+        Get the list of liles for given experiment id and run.
+        returns list of tuples (stream, chunk). 
+        """
+        
+        cursor = self.regdb_conn.cursor()
+        cursor.execute("select stream, chunk from file where exper_id = %s and run = %s", (expid, run))
+        return map(tuple, cursor.fetchall())
+
+    def _finishedRuns(self, expid):
+        """
+        Get the set of runs which have finished. Returns set of integer numbers
+        """ 
+        q = """select num from run where exper_id = %s and end_time is not NULL"""
+        cursor = self.logbook_conn.cursor()
+        cursor.execute( q, (expid,) )
+        return set(row[0] for row in cursor.fetchall())
+
+    def _startedRuns(self, expid):
+        """
+        Get the set of runs which have started. Returns set of integer numbers.
+        """ 
+        q = """select num from run where exper_id = %s"""
+        cursor = self.logbook_conn.cursor()
+        cursor.execute( q, (expid,) )
+        return set(row[0] for row in cursor.fetchall())
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = IcAutoTranslate()
+    rc = app.run()
+    sys.exit(rc)
