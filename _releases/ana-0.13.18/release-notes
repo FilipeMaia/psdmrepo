@@ -1,0 +1,39 @@
+psana
+- support for small data files (xtc files ending with .smd.xtc that
+  point to detector data in large files). (PSAS-85)
+- psana_test: add --sml option to xtclinedump to parse payload
+  of smlDataProxy
+
+Algorithms:
+- xtcav: support EbeamV7
+
+Graphics & Imaging:
+- PSQt: add DragStore, WdgImageFigs, DragBase, DragCenter,
+  DragCircle - layer of drag-able figures (PSAS-11, PSAS-34)
+- ImgAlgos: ImgSaveInFile - constrain the number of messages
+  about missing data
+
+CalibManager: 
+- Add dark rate calibration support for Andor camera (PSAS-6, PSAS-121)
+- in calibrun add optional parameter -m - number of events to scan
+  data and search for selected detector(s)
+- pdscalibdata:  AndorBaseV1 - set Rows=512, Cols=512 for
+  SxrEndstation.0:Andor.1/2 in sxrg3715-r0046, use cmod
+  pars 2,10,10,Cols (PSAS-6, PSAS-121)
+- PSCalib: GeometryAccess - add ref_img_from_pixel_arrays method
+  which returns image as a reference to memeber data (PSAS-11)
+ 
+
+HDF5 Translator
+- Add configuration parameter unknown_src_ok. Setting to 1 means
+  the translator will not stop when an unknown source is listed
+  in the src_filter option (PSAS-114). 
+- Add data/monitoring_translation.cfg file for data management
+  system and for users to use as a starting point.
+- report more timing with fast index. Improve fast index
+  performance by reading more blocks, where each block is
+  smaller (usually don't need  big block for a hit) (PSAS-118)
+
+Electornic Logbook:
+- runtables: fixed a problem with the DAQ detector names
+  migration in the Python API.
