@@ -9,7 +9,7 @@ $groups = array (
         'links' => array (
             array (
                 'name'  => '<b>Data Manager</b> (formerly: <b>Web Portal</b>)' ,
-                'href'  => '/apps-dev/portal' ,
+                'href'  => '/apps/portal' ,
                 'title' =>
                     "This experiment-centric application provides a collection \n" .
                     "of tools for viewing/managing data and metadata of an experiment. \n" .
@@ -101,8 +101,17 @@ $groups = array (
                 'login' => True
             ) ,
             array (
-                'name'  => 'Manage <b>Auto-Translation</b> option for <b>HDF5</b> files' ,
-                'href'  => '/apps-dev/regdb/AutoTranslate2HDF5' ,
+                'name'  => 'Manage <b>Auto-Translation</b> option for <b>HDF5</b> files (<b>STANDARD</b> translation)' ,
+                'href'  => '/apps-dev/regdb/AutoTranslate2HDF5?service=STANDARD' ,
+                'title' =>
+                    "View/Modify HDF5 translation options across all experiments. \n" .
+                    "The management operations are available to the authorized \n" .
+                    "personnel only." ,
+                'login' => True
+            ) ,
+            array (
+                'name'  => 'Manage <b>Auto-Translation</b> option for <b>HDF5</b> files (<b>MONITORING</b> translation)' ,
+                'href'  => '/apps-dev/regdb/AutoTranslate2HDF5?service=MONITORING' ,
                 'title' =>
                     "View/Modify HDF5 translation options across all experiments. \n" .
                     "The management operations are available to the authorized \n" .
@@ -221,7 +230,7 @@ $groups = array (
         'links' => array (
             array (
                 'name'  => '<b>PCDS</b> Computing Documentation in Confluence' ,
-                'href'  => 'https://confluence.slac.stanford.edu/display/PCDS' ,
+                'href'  => 'https://confluence.slac.stanford.edu/display/PCDS/Computing' ,
                 'title' =>
                     "Computing and storage resources for LCLS users, computer \n" .
                     "accounts, Data Retention Policy, data management operations." ,
