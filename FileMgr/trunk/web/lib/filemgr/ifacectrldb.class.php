@@ -90,10 +90,28 @@ class IfaceCtrlDb extends DbConnection {
         if (is_null($param) || trim($param) === '') return "{$default}" ;
         return "'{$this->escape_string(trim($param))}'" ;
     }
+    private function prepare_INSERT_option_Integer ($param, $default) {
+        if (is_null($param)) return $default ;
+        return $param ;
+    }
+    private function prepare_INSERT_option_Float ($param, $default) {
+        if (is_null($param)) return $default ;
+        return $param ;
+    }
     private function prepare_UPDATE_option ($param, $name) {
         if (is_null($param) || trim($param) === '')
             throw new FileMgrException(__METHOD__, "the value of parameter '{$name}' can't be empty") ;
         return "{$name} = '{$this->escape_string(trim($param))}'" ;
+    }
+    private function prepare_UPDATE_option_Integer ($param, $name) {
+        if (is_null($param))
+            throw new FileMgrException(__METHOD__, "the value of parameter '{$name}' can't be empty") ;
+        return "{$name} = {$param}" ;
+    }
+    private function prepare_UPDATE_option_Float ($param, $name) {
+        if (is_null($param))
+            throw new FileMgrException(__METHOD__, "the value of parameter '{$name}' can't be empty") ;
+        return "{$name} = {$param}" ;
     }
 
     /**
@@ -145,35 +163,51 @@ class IfaceCtrlDb extends DbConnection {
         $instrument ,
         $experiment ,
         $value ,
-        $description)
+        $description ,
+        $type = 'String')
     {
-        $sql =
-            is_null (
-                $this->get_config_param_val (
-                    $section ,
-                    $param ,
-                    $instrument ,
-                    $experiment)) ?
+        if (is_null (
+            $this->get_config_param_val (
+                $section ,
+                $param ,
+                $instrument ,
+                $experiment))) {
 
-            "INSERT INTO {$this->database}.config_def ".
-               "VALUES (".
-               " ".$this->prepare_INSERT_option($section,     "''"  ).", ".
-               " ".$this->prepare_INSERT_option($param,       "''"  ).", ".
-               " ".$this->prepare_INSERT_option($value,       "''"  ).", ".
-               " 'String', ".
-               " ".$this->prepare_INSERT_option($description, "''"  ).", ".
-               " ".$this->prepare_INSERT_option($instrument,  'NULL').", ".
-               " ".$this->prepare_INSERT_option($experiment,  'NULL').")" :
+            switch ($type) {
+                case 'Integer': $value_option = $this->prepare_INSERT_option_Integer($value, 0) ;    break ;
+                case 'Float':   $value_option = $this->prepare_INSERT_option_Float  ($value, 0.0) ;  break ;
+                case 'String':  $value_option = $this->prepare_INSERT_option        ($value, "''") ; break ;
+                default:        throw new FileMgrException(__METHOD__, "unsupported type: '{$type}'") ;
+            }
+            $sql =
+                "INSERT INTO {$this->database}.config_def ".
+                   "VALUES (".
+                   " ".$this->prepare_INSERT_option($section,     "''"  ).", ".
+                   " ".$this->prepare_INSERT_option($param,       "''"  ).", ".
+                   " {$value_option}, ".
+                   " '{$type}', ".
+                   " ".$this->prepare_INSERT_option($description, "''"  ).", ".
+                   " ".$this->prepare_INSERT_option($instrument,  'NULL').", ".
+                   " ".$this->prepare_INSERT_option($experiment,  'NULL').")" ;
 
-            "UPDATE {$this->database}.config_def ".
-                "SET ".
-                " ".$this->prepare_UPDATE_option($value, 'value')." ".
-                "WHERE ".
-                " ".$this->prepare_SELECT_option($section,    'section',    " = ''"   )." AND ".
-                " ".$this->prepare_SELECT_option($param,      'param',      " = ''"   )." AND ".
-                " ".$this->prepare_SELECT_option($instrument, 'instrument', " IS NULL")." AND ".
-                " ".$this->prepare_SELECT_option($experiment, 'experiment', " IS NULL") ;
+        } else {
 
+            switch ($type) {
+                case 'Integer': $value_option = $this->prepare_UPDATE_option_Integer($value, 'value') ; break ;
+                case 'Float':   $value_option = $this->prepare_UPDATE_option_Float  ($value, 'value') ; break ;
+                case 'String':  $value_option = $this->prepare_UPDATE_option        ($value, 'value') ; break ;
+                default:        throw new FileMgrException(__METHOD__, "unsupported type: '{$type}'") ;
+            }
+            $sql =
+                "UPDATE {$this->database}.config_def ".
+                    "SET ".
+                    " {$value_option} ".
+                    "WHERE ".
+                    " ".$this->prepare_SELECT_option($section,    'section',    " = ''"   )." AND ".
+                    " ".$this->prepare_SELECT_option($param,      'param',      " = ''"   )." AND ".
+                    " ".$this->prepare_SELECT_option($instrument, 'instrument', " IS NULL")." AND ".
+                    " ".$this->prepare_SELECT_option($experiment, 'experiment', " IS NULL") ;
+        }
         $this->query($sql) ;
     }
     

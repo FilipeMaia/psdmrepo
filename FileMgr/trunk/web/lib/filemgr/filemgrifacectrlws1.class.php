@@ -141,8 +141,8 @@ class FileMgrIfaceCtrlWs1 {
         }
 
         function latest_timestamp ($req) {
-            if ($req->stopped != '') return $req->stopped ;
-            if ($req->started != '') return $req->started ;
+            if (isset($req->stopped) && ($req->stopped != '')) return $req->stopped ;
+            if (isset($req->started) && ($req->started != '')) return $req->started ;
             return $req->created ;
         }
         $out = array() ;
@@ -264,7 +264,7 @@ class FileMgrIfaceCtrlWs1 {
     // --------------------------------
 
     private function build_uri ($uri_or_service, $is_uri) {
-        return $is_uri ? $uri_or_service : $this->host.$this->path.$uri_or_service ;
+        return $is_uri ? $this->host.$uri_or_service : $this->host.$this->path.$uri_or_service ;
     }
 
     private function opts () {

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2015-03-10 Igor Gaponenko
+- add support for numeric types in the Interface Controller
+Database API
+- fixed two bugs in the implementation of the Interface Controller
+Web Service client
+
 Tag: V00-02-01
 2014-10-10 Igor Gaponenko
 - added two Web services for the NERSC data management folks: placed, runstat
