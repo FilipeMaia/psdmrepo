@@ -60,28 +60,58 @@ function (
         this._propnames = [] ;      // -- names of properties given in the original order
         this._propdefs = {} ;       // -- property definitions
 
+        this._groups = 0 ;          // -- group number generator
+
         _.each(propdefs, function (propdef) {
             _ASSERT (
                 _.isObject(propdef) &&
-                _.has(propdef, 'name') && _.isString(propdef.name) && propdef.name !== '' &&
-                _.has(propdef, 'text') && _.isString(propdef.text) && propdef.text !== '') ;
+                ((_.has(propdef, 'group') && _.isString(propdef.group) && propdef.group !== '') ||
+                 (_.has(propdef, 'name')  && _.isString(propdef.name)  && propdef.name  !== '' &&
+                  _.has(propdef, 'text')  && _.isString(propdef.text)  && propdef.text  !== '')
+                )
+            ) ;
 
-            var name = get_prop_string(propdef, 'name') ;
-            _ASSERT(name !== '') ;
+            // Make sure either the group or name is provided
 
-            _that._propnames.push(name) ;
-            _that._propdefs[name]  = {
-                text:      _.escape(get_prop_string(propdef, 'text', name)) ,   // -- use the name if no text is provide
-                value:     get_prop_string(propdef, 'value', '') ,
-                type:      get_prop_string(propdef, 'type',  'text') ,
-                class:     get_prop_string(propdef, 'class', '') ,
-                style:     get_prop_string(propdef, 'style', '') ,
-                edit_mode: get_prop_bool  (propdef, 'edit_mode', false) ,
-                editing:   false
-            } ;
-            if (_that._propdefs[name].edit_mode) {
-                _that._propdefs[name].edit_size = get_prop_int (propdef, 'edit_size', 4) ;
-                _that._propdefs[name].editor    = get_prop_enum(propdef, 'editor', ['text', 'checkbox']) ;
+            var group = get_prop_string(propdef, 'group', null) ;
+            var name  = get_prop_string(propdef, 'name',  null) ;
+
+            if (group) {
+                
+                // Generate a unique name which should not interfere with
+                // the names of user-supplied properties.
+                // 
+                // TODO: evaluate user-supplied property names to prevent using
+                //       reserved names.
+                
+                name = '__group:'+_that._groups ;
+                _that._groups++ ;
+
+                _that._propnames.push(name) ;
+                _that._propdefs[name]  = {
+                    is_group: true ,
+                    value:    group ,
+                    class:    get_prop_string(propdef, 'class', '') ,
+                    style:    get_prop_string(propdef, 'style', '') ,
+                    title:    get_prop_string(propdef, 'title', null)
+                } ;
+            } else {
+                _that._propnames.push(name) ;
+                _that._propdefs[name]  = {
+                    is_group:  false ,
+                    text:      _.escape(get_prop_string(propdef, 'text', name)) ,   // -- use the name if no text is provide
+                    value:     get_prop_string(propdef, 'value', '') ,
+                    type:      get_prop_string(propdef, 'type',  'text') ,
+                    class:     get_prop_string(propdef, 'class', '') ,
+                    style:     get_prop_string(propdef, 'style', '') ,
+                    edit_mode: get_prop_bool  (propdef, 'edit_mode', false) ,
+                    title:     get_prop_string(propdef, 'title', null) ,
+                    editing:   false
+                } ;
+                if (_that._propdefs[name].edit_mode) {
+                    _that._propdefs[name].edit_size = get_prop_int (propdef, 'edit_size', 4) ;
+                    _that._propdefs[name].editor    = get_prop_enum(propdef, 'editor', ['text', 'checkbox']) ;
+                }
             }
         }) ;
 
@@ -105,11 +135,19 @@ function (
 '    <tbody>' +
             _.reduce(this._propnames , function (html, name) {
                 var propdef = _that._propdefs[name] ;
-                html +=
-'      <tr name="'+name+'">' +
-'        <td class="prop-list-name" >'+propdef.text+'</td>' +
-'        <td class="prop-list-value '+propdef.class+'" style="'+propdef.style+'"></td>' +
+                var data_opt = _.isNull(propdef.title) ? '' : 'data="'+propdef.title+'"' ;
+                if (propdef.is_group) {
+                    html +=
+'      <tr name="'+name+'" '+data_opt+' >' +
+'        <td class="prop-list-value prop-list-group '+propdef.class+'" style="'+propdef.style+'" colspan="2" ></td>' +
 '      </tr>' ;
+                } else {
+                    html +=
+'      <tr name="'+name+'" '+data_opt+' >' +
+'        <td class="prop-list-name" >'+propdef.text+'</td>' +
+'        <td class="prop-list-value  '+propdef.class+'" style="'+propdef.style+'" ></td>' +
+'      </tr>' ;
+                }
                 return html ;
             }, '') +
 '    </tbody>' +

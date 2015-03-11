@@ -38,7 +38,8 @@ function (
         var proplist = new PropList ([{
             name:       "first",    text:   "First" ,
             edit_mode:  true,       editor: "text" ,
-            value:      "",        style:  "color:red;"
+            value:      "",         style:  "color:red;" ,
+            title:      "this is my first row with the inline suggestion"
         } , {
             name:       "second",   text:   "Second" ,
             value:      "The default value"
