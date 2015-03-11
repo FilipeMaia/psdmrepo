@@ -70,7 +70,7 @@ class WdgImage : public QLabel
  public slots:
     void onFileNameChanged(const std::string& fname) ;
     void onTest() ;
-    void onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&) ;
+    void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&) ;
     void onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&) ;
     void onHueAnglesUpdated(const float&, const float&);
 
@@ -133,7 +133,7 @@ class WdgImage : public QLabel
     float        m_hue2;
 
     //const ndarray<const GeoImage::raw_image_t,2>& nda
-    const ndarray<const GeoImage::raw_image_t,2>* p_nda_img_raw;
+    ndarray<GeoImage::raw_image_t,2>* p_nda_img_raw;
 
     inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;

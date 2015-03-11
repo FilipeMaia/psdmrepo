@@ -51,8 +51,8 @@ ImageProc::~ImageProc()
 void
 ImageProc::connectSignalsAndSlots()
 {
-  connect(xxxx, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), 
-          this, SLOT(onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
+  connect(xxxx, SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
+          this, SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
 
   connect(xxxx, SIGNAL(centerIsChanged(const QPointF&)), 
           this, SLOT(onCenterIsChanged(const QPointF&)));
@@ -69,7 +69,7 @@ ImageProc::connectSignalsAndSlots()
 //--------------------------
 
 void 
-ImageProc::onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
+ImageProc::onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 { 
   m_nda_image = nda.copy();
   m_image_is_set = true;

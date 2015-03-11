@@ -47,7 +47,8 @@ GeoImage::GeoImage(const std::string& fname_geo, const std::string& fname_img)
 void
 GeoImage::connectTestSignalsSlots()
 {
-  connect(this, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), this, SLOT(testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
+  connect(this, SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
+          this, SLOT(testSignalImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
 }
 
 //--------------------------
@@ -160,7 +161,7 @@ GeoImage::updateImage()
   //emit normImageIsUpdated(nda);
 
   //ndarray<const GeoImage::raw_image_t, 2> nda = getImage();
-  ndarray<raw_image_t, 2>& nda = getImage();
+  ndarray<GeoImage::raw_image_t, 2>& nda = getImage();
   emit imageIsUpdated(nda);
 }
 
@@ -198,10 +199,10 @@ GeoImage::getImage()
 //--------------------------
 //--------------------------
 void 
-GeoImage::testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
+GeoImage::testSignalImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 {  
   stringstream ss; ss << "testSignalImageIsUpdated(), size = " << nda.size();
-  MsgInLog(_name_(), DEBUG, ss.str()); 
+  MsgInLog(_name_(), INFO, ss.str()); 
 }
 
 //--------------------------

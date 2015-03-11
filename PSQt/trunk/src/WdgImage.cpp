@@ -408,7 +408,7 @@ WdgImage::onFileNameChanged(const std::string& fname)
 
 //--------------------------
 void 
-WdgImage::onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
+WdgImage::onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 {
   p_nda_img_raw = &nda;
 
@@ -445,7 +445,9 @@ WdgImage::onHueAnglesUpdated(const float& h1, const float& h2)
 {
   m_hue1 = h1;
   m_hue2 = h2;
-  //if(p_nda_img_raw) this->onImageIsUpdated(*p_nda_img_raw);
+
+  if(p_nda_img_raw) this->onImageIsUpdated(*p_nda_img_raw);
+
   update();
   std::stringstream ss; ss << ":onHueAnglesUpdated h1:" << m_hue1 << " h2:" << m_hue2;
   MsgInLog(_name_(), INFO, ss.str());  

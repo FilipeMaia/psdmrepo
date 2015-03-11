@@ -14,9 +14,10 @@ namespace PSQt {
 
 //--------------------------
 
-GUILogger::GUILogger( QWidget *parent, const bool& showbuts)
+GUILogger::GUILogger( QWidget *parent, const bool& showbuts, const bool& showframe)
   : Frame(parent) //  , Logger()
   , m_showbuts(showbuts)
+  , m_showframe(showframe)
 {
   m_txt_edi  = new QTextEdit();
   m_but_save = new QPushButton("Save");
@@ -46,19 +47,18 @@ GUILogger::GUILogger( QWidget *parent, const bool& showbuts)
   this -> setStyle();
   this -> addStartRecords();
 
-  //connect(m_rad_x0,  SIGNAL( clicked() ), this, SLOT( onRadioX()) );
-  //connect(m_but_add, SIGNAL( clicked() ), this, SLOT(onButAddSub()) );
+  connect(Logger::getLogger(), SIGNAL(signal_new_record(Record&)), this, SLOT(addNewRecord(Record&)));
   connect(m_combo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCombo(int)) );
   connect(m_but_save, SIGNAL(clicked()), this, SLOT(onSave()) );
-
-  //this -> move(300,50);
 }
 
 //--------------------------
 void
 GUILogger::showTips() 
 {
-  //m_rad_x0     -> setToolTip((std::string("x")+orig).c_str());
+  m_combo->setToolTip("Select the level of messages to show");
+  m_txt_edi->setToolTip("Log messages");
+  m_but_save->setToolTip("Save log in file");
 }
 
 //--------------------------
@@ -70,22 +70,16 @@ GUILogger::setStyle()
   m_but_save->setVisible(m_showbuts);
   m_combo   ->setVisible(m_showbuts);
 
-  //m_txt_edi -> setContentsMargins(-9,-9,-9,-9); 
-  //this -> setContentsMargins(-9,-9,-9,-9);
+  Frame::setBoarderVisible(m_showframe);
+  if (! m_showframe) this -> setContentsMargins(-9,-9,-9,-9);
 
   //this -> setWindowTitle(tr("GUILogger"));
   //this -> setMinimumWidth(700);
+  //this -> setFixedWidth(220);
   //this -> setFixedHeight(50);
   //this -> setFixedHeight( (m_show_frame)? 50 : 34);
 
-  //if (! m_show_frame) this -> setContentsMargins(-9,-9,-9,-9);
-
-  //this -> setContentsMargins(-9,-9,-9,-9);
-  //this -> setContentsMargins(-5,-5,-5,-5);
-
-  //this -> setFixedWidth(220);
-  //m_edi_x0    -> setFixedWidth(width);
-  //m_edi_x0    -> setReadOnly(true);
+  //this -> move(300,50);
 }
 
 //--------------------------

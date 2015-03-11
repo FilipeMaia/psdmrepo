@@ -44,7 +44,7 @@ class ImageProc : public QObject
     //const ndarray<const raw_image_t, 2> getImage();
 
  public slots:
-    void onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&);
+    void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&);
     void onZoomIsChanged(int&, int&, int&, int&);
     void onCenterIsChanged(const QPointF&);
     //void onCenterIsMoved(const QPointF&); // signal on each motion of coursor

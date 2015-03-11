@@ -33,7 +33,7 @@ class GUILogger : public Frame // , Logger
  Q_OBJECT // macro is needed for connection of signals and slots
 
  public:
-  GUILogger(QWidget *parent=0, const bool& showbuts=true);
+  GUILogger(QWidget *parent=0, const bool& showbuts=true, const bool& showframe=true);
     //    ~GUILogger(){}
     void resizeEvent(QResizeEvent *event = 0) ;
     void moveEvent  (QMoveEvent   *event = 0) ;
@@ -49,6 +49,7 @@ class GUILogger : public Frame // , Logger
  private :
 
     bool          m_showbuts;
+    bool          m_showframe;
 
     QTextEdit*    m_txt_edi;
     QPushButton*  m_but_save;

@@ -60,10 +60,10 @@ class GeoImage : public QObject
     void onGeometryIsLoaded(PSCalib::GeometryAccess*);
     void onGeoIsChanged(shpGO& geo);
     void onImageFileNameIsChanged(const std::string& str);
-    void testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&);
+    void testSignalImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&);
 
  signals :
-    void imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>);
+    void imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&);
 
  private:
     std::string m_fname_geo;

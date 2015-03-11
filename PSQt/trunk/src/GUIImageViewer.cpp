@@ -185,7 +185,7 @@ void
 GUIImageViewer::onButAdd()
 {
   MsgInLog(_name_(), DEBUG, "onButAdd");
-  float rad_raw = 100+rand()%100;
+  float rad_raw = 110+rand()%180;
   this -> m_image -> addCircle(rad_raw);
 }
 
