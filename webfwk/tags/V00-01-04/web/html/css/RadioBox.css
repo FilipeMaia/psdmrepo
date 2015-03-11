@@ -1,0 +1,18 @@
+.radio-box {
+  padding: 2px;
+}
+
+.radio-box-button {
+}
+
+.radio-box-active {
+}
+
+.radio-box-hint {
+  margin: 4px 20% 0px 20%;
+  height:1px;
+  border-top: 2px solid transparent;
+}
+.radio-box-hint-active {
+  border-top-color: #2e6e9e !important;
+}
