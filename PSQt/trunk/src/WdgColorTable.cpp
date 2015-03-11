@@ -30,7 +30,7 @@ WdgColorTable::WdgColorTable( QWidget *parent, const float& h1, const float& h2,
 
   m_edi_h1 = new QLineEdit( val_to_string<float>(m_h1).c_str(), this );
   m_edi_h2 = new QLineEdit( val_to_string<float>(m_h2).c_str(), this );
-
+  m_but_apply = new QPushButton("Apply");
   m_lab_cring = new PSQt::LabColorRing(this, m_figsize, m_h1, m_h2);
 
   QChar chars1[] = {0x03B1, '1', ':'};
@@ -41,11 +41,19 @@ WdgColorTable::WdgColorTable( QWidget *parent, const float& h1, const float& h2,
 
   connect( m_edi_h1, SIGNAL( editingFinished() ), this, SLOT(onEdiH1()) );
   connect( m_edi_h2, SIGNAL( editingFinished() ), this, SLOT(onEdiH2()) );
+  connect( m_but_apply, SIGNAL( clicked() ), this, SLOT(onButApply()) );
   //connect( m_lab_cring, SIGNAL( mouseReleaseEvent(QMouseEvent*) ), this, SLOT(onSetH()) );
-  connect( m_lab_cring, SIGNAL( hueAngleIsChanged(const unsigned&) ), 
+  connect( m_lab_cring, SIGNAL( hueAngleIsMoving(const unsigned&) ), 
            this, SLOT(onSetH(const unsigned&)) );
+ 
+  connect( m_lab_cring, SIGNAL( hueAngleIsMoved() ), 
+           this, SLOT(onHueAngleIsChanged()) );
+
   connect( this, SIGNAL( hueAngleIsEdited(const unsigned&) ), 
            m_lab_cring, SLOT(onSetShifter(const unsigned&)) );
+
+  connect( this, SIGNAL( hueAnglesUpdated(const float&, const float&) ), 
+           this, SLOT(testSignalHueAnglesUpdated(const float&, const float&)) );
   
   QHBoxLayout *hbox1 = new QHBoxLayout();
   hbox1 -> addWidget(m_lab_h1);
@@ -53,6 +61,8 @@ WdgColorTable::WdgColorTable( QWidget *parent, const float& h1, const float& h2,
   hbox1 -> addStretch(1);
   hbox1 -> addWidget(m_lab_h2);
   hbox1 -> addWidget(m_edi_h2);
+  hbox1 -> addStretch(1);
+  hbox1 -> addWidget(m_but_apply);
 
   QVBoxLayout *vbox = new QVBoxLayout();
   vbox -> addWidget(m_lab_cring);
@@ -109,10 +119,11 @@ WdgColorTable::setFrame()
 void
 WdgColorTable::setStyle() 
 {
-  m_edi_h1   -> setFixedSize(80,30);
-  m_edi_h2   -> setFixedSize(80,30);
+  m_edi_h1   -> setFixedSize(50,30);
+  m_edi_h2   -> setFixedSize(50,30);
   m_lab_cbar -> setMargin(0);
   m_lab_cbar -> setFixedSize(m_figsize, m_cbar_width);
+  m_but_apply-> setFixedSize(60,30);
   this       -> setFixedWidth(m_figsize+22);
 
   //m_edi_h1    -> setMinimumSize(80,30);
@@ -193,8 +204,9 @@ WdgColorTable::onEdiH1()
   //std::cout << "WdgColorTable::onEdiH1()  H1: " << str << " i=" << string_to_int(str) << std::endl;
   
   m_h1 = (float)string_to_int(str);
-  emit hueAngleIsEdited(1);
+  emit hueAngleIsEdited(1);    
   setColorBar(m_h1, m_h2, m_cbar_width, m_figsize);
+  this->onHueAngleIsChanged();
 }
 
 //--------------------------
@@ -208,6 +220,7 @@ WdgColorTable::onEdiH2()
   m_h2 = (float)string_to_int(str);
   emit hueAngleIsEdited(2);
   setColorBar(m_h1, m_h2, m_cbar_width, m_figsize);
+  this->onHueAngleIsChanged();
 }
 
 //--------------------------
@@ -222,6 +235,25 @@ WdgColorTable::onSetH(const unsigned& selected)
   if(selected == 2) m_edi_h2 -> setText(QString(val_to_string<int>(int(m_h2)).c_str()));
 
   setColorBar(m_h1, m_h2, m_cbar_width, m_figsize);
+}
+//--------------------------
+
+void 
+WdgColorTable::onButApply()
+{
+  std::stringstream ss; ss << "Emit signal with Hue angles h1:" << m_h1 << " h2:" << m_h2;
+  MsgInLog(_name_(), INFO, ss.str());  
+  emit hueAnglesUpdated(m_h1, m_h2);
+}
+
+//--------------------------
+
+void 
+WdgColorTable::onHueAngleIsChanged()
+{
+  //std::stringstream ss; ss << "Emit signal with Hue angles h1:" << m_h1 << " h2:" << m_h2;
+  //MsgInLog(_name_(), DEBUG, ss.str());  
+  //emit hueAnglesUpdated(m_h1, m_h2);
 }
 
 //--------------------------
@@ -252,6 +284,7 @@ WdgColorTable::setColorBar( const float&    hue1,
 
   QImage image((const uchar*) &dimg[0], cols, rows, QImage::Format_ARGB32);
   setPixmapForLabel(image, m_pixmap_cbar, m_lab_cbar);
+
 }
 
 //--------------------------
@@ -268,6 +301,13 @@ WdgColorTable::getColorTableAsNDArray(const unsigned& colors)
 }
 
 //--------------------------
+void 
+WdgColorTable::testSignalHueAnglesUpdated(const float& h1, const float& h2)
+{
+  std::stringstream ss; ss << ":testSignalHueAnglesUpdated h1:" << m_h1 << " h2:" << m_h2;
+  MsgInLog(_name_(), INFO, ss.str());  
+}
+
 //--------------------------
 
 } // namespace PSQt

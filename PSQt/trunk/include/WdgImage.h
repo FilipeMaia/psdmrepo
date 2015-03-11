@@ -72,7 +72,13 @@ class WdgImage : public QLabel
     void onTest() ;
     void onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&) ;
     void onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&) ;
+    void onHueAnglesUpdated(const float&, const float&);
 
+    void testSignalZoomIsChanged(int&, int&, int&, int&);
+
+ signals :
+    void zoomIsChanged(int&, int&, int&, int&);
+					 
  protected:
 
     int          m_xmin_raw;
@@ -120,9 +126,14 @@ class WdgImage : public QLabel
     bool         m_is_pushed;
     bool         m_zoom_is_on;
 
+    float        m_amin;
+    float        m_amax;
     unsigned     m_ncolors;
     float        m_hue1;
     float        m_hue2;
+
+    //const ndarray<const GeoImage::raw_image_t,2>& nda
+    const ndarray<const GeoImage::raw_image_t,2>* p_nda_img_raw;
 
     inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;

@@ -50,7 +50,9 @@ class GeoImage : public QObject
 
     void setFirstImage();
 
-    const ndarray<const raw_image_t, 2> getImage();
+    //const ndarray<const raw_image_t, 2> getImage();
+    ndarray<raw_image_t, 2>& getImage();
+
     ndarray<image_t,2> getNormalizedImage();
     ndarray<image_t,2> getRandomImage();
 
@@ -59,11 +61,9 @@ class GeoImage : public QObject
     void onGeoIsChanged(shpGO& geo);
     void onImageFileNameIsChanged(const std::string& str);
     void testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&);
-    void testSignalNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&);
 
  signals :
     void imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>);
-    void normImageIsUpdated(const ndarray<GeoImage::image_t,2>);
 
  private:
     std::string m_fname_geo;
@@ -77,6 +77,7 @@ class GeoImage : public QObject
 
     //uint32_t*   m_img;
     //ndarray<uint32_t, 2> m_nda_img;
+    //ndarray<const raw_image_t, 2>& p_nda_img;
 
     inline const char* _name_(){return "GeoImage";}
     void connectTestSignalsSlots();

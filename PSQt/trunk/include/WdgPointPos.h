@@ -19,7 +19,7 @@ public:
 	    , const std::string& label2=std::string("Y:") 
 	    , const float& val1=0
 	    , const float& val2=0
-	    , const bool& show_frame=true
+	    , const bool& show_boarder=true
 	    , const unsigned& fld_width=100
 	    , const unsigned& precision=2);
 
@@ -37,7 +37,7 @@ public:
     void posIsChanged(const QPointF&);
 
  private :
-    bool         m_show_frame;
+    bool         m_show_boarder;
     unsigned     m_fld_width;
     unsigned     m_precision;
 

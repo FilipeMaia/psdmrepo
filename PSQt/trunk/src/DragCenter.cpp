@@ -14,6 +14,8 @@ DragCenter::DragCenter(WdgImage* wimg, const QPointF* points)
 
   connect(this, SIGNAL(centerIsMoved(const QPointF&)), 
           this, SLOT(testSignalCenterIsMoved(const QPointF&)));
+  connect(this, SIGNAL(centerIsChanged(const QPointF&)), 
+          this, SLOT(testSignalCenterIsChanged(const QPointF&)));
 }
 
 //--------------------------
@@ -73,6 +75,7 @@ DragCenter::moveToRaw(const QPointF& p)
   m_points_raw[0].setY(p.y());
 
   setImagePointsFromRaw();
+  emit centerIsChanged(m_points_raw[0]);
 }
 
 //--------------------------
@@ -98,7 +101,15 @@ DragCenter::moveIsCompleted(const QPointF& p)
                                                             << "  y: " << m_points_raw[0].y();
   MsgInLog(_name_(), INFO, ss.str() );  
 
-  //emit centerIsMoved(m_points_raw[0]);
+  emit centerIsChanged(m_points_raw[0]);
+}
+
+
+//--------------------------
+void 
+DragCenter::forceToEmitSignal()
+{
+  emit centerIsChanged(m_points_raw[0]);
 }
 
 //--------------------------
@@ -120,9 +131,16 @@ DragCenter::print()
 void
 DragCenter::testSignalCenterIsMoved(const QPointF& pc)
 {
-  stringstream ss; ss << "::testSignalCenterIsMoved() x: " << fixed << std::setprecision(1) << pc.x()
-                      << "  y: " << pc.y();  
+  stringstream ss; ss << "::testSignalCenterIsMoved() x: " << fixed << std::setprecision(1) << pc.x() << "  y: " << pc.y();  
   MsgInLog(_name_(), DEBUG, ss.str());
+}
+
+//--------------------------
+void
+DragCenter::testSignalCenterIsChanged(const QPointF& pc)
+{
+  stringstream ss; ss << "::testSignalCenterIsChanged() x: " << fixed << std::setprecision(1) << pc.x() << "  y: " << pc.y();  
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------

@@ -48,7 +48,6 @@ void
 GeoImage::connectTestSignalsSlots()
 {
   connect(this, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), this, SLOT(testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
-  connect(this, SIGNAL(normImageIsUpdated(const ndarray<GeoImage::image_t,2>&)), this, SLOT(testSignalNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&)));
 }
 
 //--------------------------
@@ -160,7 +159,8 @@ GeoImage::updateImage()
   //const ndarray<GeoImage::image_t, 2> nda = getNormalizedImage();
   //emit normImageIsUpdated(nda);
 
-  const ndarray<const GeoImage::raw_image_t, 2> nda = getImage();
+  //ndarray<const GeoImage::raw_image_t, 2> nda = getImage();
+  ndarray<raw_image_t, 2>& nda = getImage();
   emit imageIsUpdated(nda);
 }
 
@@ -172,29 +172,9 @@ GeoImage::setFirstImage()
 }
 
 //--------------------------
-//--------------------------
-//------ For tests ---------
-//--------------------------
-//--------------------------
-void 
-GeoImage::testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
-{  
-  stringstream ss; ss << "testSignalImageIsUpdated(), size = " << nda.size();
-  MsgInLog(_name_(), DEBUG, ss.str()); 
-}
 
-//--------------------------
-
-void 
-GeoImage::testSignalNormImageIsUpdated(const ndarray<GeoImage::image_t,2>& nda)
-{  
-  stringstream ss; ss << "testSignalNormImageIsUpdated(), size = " << nda.size();
-  MsgInLog(_name_(), DEBUG, ss.str()); 
-}
-
-//--------------------------
-
-const ndarray<const GeoImage::raw_image_t,2>
+//const ndarray<const GeoImage::raw_image_t,2>
+ndarray<GeoImage::raw_image_t,2> &
 GeoImage::getImage()
 {
   const unsigned* iX;
@@ -208,7 +188,20 @@ GeoImage::getImage()
   //m_geometry->get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix);
   m_geometry->get_pixel_coord_indexes(iX, iY, isize, std::string(), 0, pix_scale_size, xy0_off_pix);
 
-  return PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, &m_anda[0], isize);
+  //return PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, &m_anda[0], isize);
+  return m_geometry->ref_img_from_pixel_arrays(iX, iY, &m_anda[0], isize);
+}
+
+//--------------------------
+//--------------------------
+//------ For tests ---------
+//--------------------------
+//--------------------------
+void 
+GeoImage::testSignalImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
+{  
+  stringstream ss; ss << "testSignalImageIsUpdated(), size = " << nda.size();
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 }
 
 //--------------------------

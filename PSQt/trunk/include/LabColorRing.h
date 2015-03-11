@@ -62,7 +62,8 @@ class LabColorRing : public QLabel
     void onSetShifter(const unsigned& selected) ;
 
  signals :
-    void hueAngleIsChanged(const unsigned& selected) ;
+    void hueAngleIsMoving(const unsigned& selected) ;
+    void hueAngleIsMoved() ;
 
  private:
 

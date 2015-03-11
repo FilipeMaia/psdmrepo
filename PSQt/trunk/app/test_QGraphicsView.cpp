@@ -1,25 +1,14 @@
-#include <QtGui/QApplication>
+//=======================
 
-//#include <QGraphicsView>
-//#include <QGraphicsScene>
-//#include <QPointF>
-//#include <QRectF>
-//#include <QPolygonF>
-//#include <QVector>
-//#include <QString>
-
-//#include <QPainterPath>
-//#include <QGraphicsPathItem>
-//#include <QGraphicsTextItem>
-#include <cmath>
-
-#include <PSQt/QGUtils.h>
+#include <PSQt/GUAxes.h>
+#include <PSQt/QGUtils.h> // for PSQt::graph
 //#include <PSQt/GURuler.h>
 //#include <PSQt/GUView.h>
-#include <PSQt/GUAxes.h>
+
+#include <QtGui/QApplication>
+
+#include <cmath>     // for sin, cos
 #include <iostream>  // for std::cout
-
-
 
 int main(int argc, char *argv[])
 {

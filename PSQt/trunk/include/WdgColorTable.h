@@ -56,6 +56,7 @@ class WdgColorTable : public QWidget
 
  signals :
 
+    void hueAnglesUpdated(const float&, const float&) ;
     void hueAngleIsEdited(const unsigned& edited) ;
 
  public slots:
@@ -63,7 +64,10 @@ class WdgColorTable : public QWidget
     void onButExit() ;
     void onEdiH1() ;
     void onEdiH2() ;
+    void onButApply() ;
     void onSetH(const unsigned& selected) ;
+    void onHueAngleIsChanged() ;
+    void testSignalHueAnglesUpdated(const float&, const float&) ;
 
  private:
 
@@ -80,6 +84,7 @@ class WdgColorTable : public QWidget
     QLabel*       m_lab_h2;
     QLineEdit*    m_edi_h1;
     QLineEdit*    m_edi_h2;
+    QPushButton*  m_but_apply;
 
     QPixmap*      m_pixmap_cbar;
     inline const char* _name_(){return "WdgColorTable";}

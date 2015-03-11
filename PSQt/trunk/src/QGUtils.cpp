@@ -203,7 +203,7 @@ void graph(QGraphicsScene* scene, const float* x, const float* y, const int n, c
 
 //--------------------------
 
-void graph(QGraphicsView * view, const float* x, const float* y, const int n, const std::string& opt)
+void graph(QGraphicsView* view, const float* x, const float* y, const int n, const std::string& opt)
 {
   //std::cout << "QGraphicsView\n";
   graph(view->scene(), x, y, n, opt);
@@ -211,7 +211,7 @@ void graph(QGraphicsView * view, const float* x, const float* y, const int n, co
 
 //--------------------------
 
-void graph(PSQt::GUAxes * axes, const float* x, const float* y, const int n, const std::string& opt)
+void graph(PSQt::GUAxes* axes, const float* x, const float* y, const int n, const std::string& opt)
 {
   //std::cout << "PSQt::GUAxes\n";
   graph(axes->pview()->scene(), x, y, n, opt);

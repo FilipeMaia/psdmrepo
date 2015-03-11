@@ -40,6 +40,14 @@ Frame::setFrame()
   //setStyleSheet("background-color: rgb(0, 255, 255); color: rgb(255, 255, 100)");
   //setVisible(false);
 }
+//--------------------------
+
+void
+Frame::setBoarderVisible(const bool isVisible) 
+{
+  if(isVisible) QFrame::setFrameShape(QFrame::Box);
+  else          QFrame::setFrameShape(QFrame::NoFrame);
+}
 
 //--------------------------
 

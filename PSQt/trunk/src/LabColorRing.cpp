@@ -292,7 +292,8 @@ LabColorRing::mouseReleaseEvent(QMouseEvent *e)
   this->setCursor(Qt::ArrowCursor);
 
   setHueAngle(e);
-
+  
+  emit hueAngleIsMoved();
   m_selected = 0;
 }
 
@@ -342,8 +343,8 @@ LabColorRing::setHueAngle(QMouseEvent *e)
   if(m_ang_old>330 && m_ang<30)  m_n360 += 360;
   if(m_ang_old<30  && m_ang>330) m_n360 -= 360;
 
-  if     ( m_selected == 1 ) m_h1 = m_ang + m_n360;
-  else if( m_selected == 2 ) m_h2 = m_ang + m_n360;
+  if     ( m_selected == 1 ) m_h1 = roundf(m_ang + m_n360);
+  else if( m_selected == 2 ) m_h2 = roundf(m_ang + m_n360);
   else return;    
 
   m_ang_old = m_ang;
@@ -351,8 +352,8 @@ LabColorRing::setHueAngle(QMouseEvent *e)
   update();
 
   if(m_selected) {
-    //std::cout << "LabColorRing::mouseReleaseEvent: emit signal hueAngleIsChanged()\n";
-    emit hueAngleIsChanged(m_selected);
+    //std::cout << "LabColorRing::mouseReleaseEvent: emit signal hueAngleIsMoving()\n";
+    emit hueAngleIsMoving(m_selected);
   }
 
 }

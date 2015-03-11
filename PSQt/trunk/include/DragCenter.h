@@ -74,12 +74,16 @@ class DragCenter : public DragBase
     virtual const QPointF& getCenter(){ return m_points_raw[0]; };
     //virtual void setCenter(const QPointF& p) { moveToRaw(p); };
 
+    void forceToEmitSignal();
+
  signals:
     void centerIsMoved(const QPointF&);
+    void centerIsChanged(const QPointF&);
 
  public slots:
-    void testSignalCenterIsMoved(const QPointF&);
     void moveToRaw(const QPointF&);
+    void testSignalCenterIsChanged(const QPointF&);
+    void testSignalCenterIsMoved(const QPointF&);
 
  protected:
 

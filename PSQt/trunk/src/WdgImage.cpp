@@ -28,7 +28,8 @@ WdgImage::WdgImage(QWidget *parent, const std::string& ifname)
   , m_point1(0)
   , m_point2(0)
   , m_rect1(0) 
-  , m_rect2(0) 
+  , m_rect2(0)
+  , p_nda_img_raw(0)
 {
   setWdgParams();
 
@@ -53,6 +54,7 @@ WdgImage::WdgImage( QWidget *parent, const QImage* image)
   , m_point2(0)
   , m_rect1(0) 
   , m_rect2(0) 
+  , p_nda_img_raw(0)
 {
   setWdgParams();
   setPixmapScailedImage(image);
@@ -72,7 +74,6 @@ WdgImage::~WdgImage()
   if (m_rect2)      delete m_rect2;  
   if (m_pixmap_raw) delete m_pixmap_raw;  
   if (m_pixmap_scl) delete m_pixmap_scl;  
-  if (m_geo_img)    delete m_geo_img;  
 }
 
 //--------------------------
@@ -80,18 +81,8 @@ WdgImage::~WdgImage()
 void 
 WdgImage::setWdgParams()
 {
-  //this -> setFrame();
-  //this -> setText("Test text for this QLabel");
-  //this -> setGeometry(200, 100, 500, 500);
-  //this -> setWindowTitle("Image For Geometry");
-
-  //this -> setAutoFillBackground (true); // MUST BE TRUE TO DRAW THE BACKGROUND COLOR SET IN Palette
-  //this -> setMinimumHeight(200);
   this -> setMinimumSize(606,606);
-  //this -> setPalette ( QPalette(QColor(255, 255, 255, 255)) );
-
   this -> setAlignment(Qt::AlignTop | Qt::AlignLeft);
-
 
   this -> setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
@@ -102,10 +93,7 @@ WdgImage::setWdgParams()
 
   this -> setCursor(Qt::PointingHandCursor); // Qt::SizeAllCursor, Qt::WaitCursor, Qt::PointingHandCursor
 
-  //this -> setIndent(100);
   this -> setMargin(0);
-
-  //this -> installEventFilter(this);
 
   QVector<qreal> dashes;
   qreal space = 4;
@@ -122,16 +110,18 @@ WdgImage::setWdgParams()
   m_rect2  = new QRect();
   m_is_pushed = false;
 
-  //std::cout << "Point A\n";
-  m_painter = new QPainter();
-  //m_painter = new QPainter(this);
-  //std::cout << "Point B\n";
+  m_painter = new QPainter(); // (this)
 
+  m_amin    = 0; // - for auto-definition of the intensity range
+  m_amax    = 0;
   m_ncolors = 1024; // =0 - color table is not used
   m_hue1    = -120;
   m_hue2    = -360;
 
   this->resetZoom();
+
+  connect(this, SIGNAL(zoomIsChanged(int&, int&, int&, int&)), 
+          this, SLOT(testSignalZoomIsChanged(int&, int&, int&, int&)));
 }
 
 //--------------------------
@@ -219,6 +209,8 @@ WdgImage::zoomInImage()
   if (m_zoom_is_on) {
      *m_pixmap_scl = m_pixmap_raw->copy(m_xmin_raw, m_ymin_raw, m_xmax_raw-m_xmin_raw, m_ymax_raw-m_ymin_raw);
      setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+
+     emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw);
   }
 }
 
@@ -268,6 +260,12 @@ WdgImage::setPixmapScailedImage(const QImage* image)
     if (m_pixmap_scl) delete m_pixmap_scl;
     m_pixmap_scl = new QPixmap(*m_pixmap_raw);
     setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
+    m_xmin_raw = 0;
+    m_ymin_raw = 0;
+    m_xmax_raw = m_pixmap_raw->size().width();
+    m_ymax_raw = m_pixmap_raw->size().height();
+
+    emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw);
   }
 }
 
@@ -363,10 +361,11 @@ WdgImage::mouseReleaseEvent(QMouseEvent *e)
   m_point2->setY(e->y());
 
   QPoint dist = *m_point2 - *m_point1;
-  //if(this->rect().contains(*m_point2) && dist.manhattanLength() > 5) zoomInImage();
-  if(this->rect().contains(*m_point2) && abs(dist.x()) > 5 && abs(dist.y()) > 5) zoomInImage();
 
-  update();
+  if(this->rect().contains(*m_point2) && abs(dist.x()) > 5 && abs(dist.y()) > 5) {
+    zoomInImage();
+    update();
+  }
 }
 
 //--------------------------
@@ -411,11 +410,13 @@ WdgImage::onFileNameChanged(const std::string& fname)
 void 
 WdgImage::onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>& nda)
 {
+  p_nda_img_raw = &nda;
+
   stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
   MsgInLog(_name_(), INFO, ss.str()); 
 
   const ndarray<GeoImage::image_t,2> nda_norm = 
-        getUint32NormalizedImage<const GeoImage::raw_image_t>(nda, m_ncolors, m_hue1, m_hue2); // from QGUtils
+    getUint32NormalizedImage<const GeoImage::raw_image_t>(nda, m_amin, m_amax, m_ncolors, m_hue1, m_hue2); // from QGUtils
   
   onNormImageIsUpdated(nda_norm);
   update();
@@ -436,6 +437,31 @@ WdgImage::onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>& nda)
   
   static unsigned counter=0; stringstream sst; sst << "Image # " << ++counter;
   setWindowTitle(sst.str().c_str());
+}
+
+//--------------------------
+void 
+WdgImage::onHueAnglesUpdated(const float& h1, const float& h2)
+{
+  m_hue1 = h1;
+  m_hue2 = h2;
+  //if(p_nda_img_raw) this->onImageIsUpdated(*p_nda_img_raw);
+  update();
+  std::stringstream ss; ss << ":onHueAnglesUpdated h1:" << m_hue1 << " h2:" << m_hue2;
+  MsgInLog(_name_(), INFO, ss.str());  
+}
+
+//--------------------------
+void 
+WdgImage::testSignalZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax)
+{
+  stringstream ss;
+  ss << "testSignalZoomIsChanged(...): zoom is changed to"
+     << "  xmin=" << xmin 
+     << "  ymin=" << ymin
+     << "  xmax=" << xmax 
+     << "  ymax=" << ymax;
+  MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------

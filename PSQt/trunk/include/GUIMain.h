@@ -53,7 +53,10 @@ class GUIMain : public Frame
 
  public:
 
-    GUIMain(QWidget *parent=0, const LEVEL& level=DEBUG);
+    GUIMain( QWidget *parent=0 
+           , const LEVEL& level=DEBUG
+	   , const std::string& fgeo=std::string()
+	   , const std::string& fnda=std::string());
 
     void resizeEvent     (QResizeEvent *event = 0) ;
     void closeEvent      (QCloseEvent  *event = 0) ;
@@ -65,8 +68,9 @@ class GUIMain : public Frame
 
  public slots:
 
-    void onButExit() ;
-    void onButSave() ;
+    void onButExit();
+    void onButSave();
+    void onButImage();
 
  private:
 
@@ -93,7 +97,7 @@ class GUIMain : public Frame
     QSplitter*   m_hsplit;
     QSplitter*   m_vsplit;
 
-    QPushButton* m_but_exit;
+    QPushButton* m_but_image;
     QPushButton* m_but_save;
 
     inline const char* _name_(){return "GUIMain";}

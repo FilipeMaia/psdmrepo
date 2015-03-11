@@ -21,25 +21,33 @@ namespace PSQt {
 //--------------------------
 
 
-GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
-    : Frame(parent)
+GUIMain::GUIMain( QWidget *parent
+                , const LEVEL& level
+		, const std::string& gfname
+		, const std::string& ifname
+   ): Frame(parent)
 //  : QWidget(parent)
 {
   MsgInLog(_name_(), INFO, "Create the main control window for this app."); 
 
   const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
-  const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data"; 
-  const std::string fname_nda = base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt"; 
+  const std::string fname_geo = (gfname.empty()) ? (base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data") : gfname; 
+  const std::string fname_nda = (ifname.empty()) ? (base_dir + "cspad-arr-cxid2714-r0023-lysozyme-rings.txt") : ifname; 
+
+  //const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds2-2015-01-20/";
+  //const std::string fname_geo = base_dir + "calib/CsPad::CalibV1/CxiDs2.0:Cspad.0/geometry/0-end.data"; 
+  //const std::string fname_nda = base_dir + "cspad-ndarr-max-cxig0715-r0023-lysozyme-rings.txt"; 
   const bool pbits = 0;
 
+  AppUtils::AppDataPath adp_icon_image("PSQt/icons/icon-monitor.png");
   AppUtils::AppDataPath adp_icon_exit("PSQt/icons/exit.png");
   AppUtils::AppDataPath adp_icon_save("PSQt/icons/save.png");
 
-  m_but_exit = new QPushButton( "Exit", this );
+  m_but_image = new QPushButton( "Image", this );
   m_but_save = new QPushButton( "Save", this );
 
-  m_but_exit -> setIcon(QIcon(QString(adp_icon_exit.path().c_str())));
-  m_but_save -> setIcon(QIcon(QString(adp_icon_save.path().c_str()))); 
+  m_but_image -> setIcon(QIcon(QString(adp_icon_image.path().c_str())));
+  m_but_save  -> setIcon(QIcon(QString(adp_icon_save.path().c_str()))); 
 
   m_file_geo = new PSQt::WdgFile(this, "Set geometry", fname_geo, "*.data \n *", false);
   m_file_nda = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
@@ -50,7 +58,7 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   m_bbox = new QHBoxLayout();
   m_bbox -> addWidget(m_but_save);
   m_bbox -> addStretch(1);
-  m_bbox -> addWidget(m_but_exit);
+  m_bbox -> addWidget(m_but_image);
 
   m_fbox = new QVBoxLayout();
   m_fbox -> addWidget(m_file_geo);
@@ -104,11 +112,10 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   //  m_wimage -> show();
 
   connect(Logger::getLogger(), SIGNAL(signal_new_record(Record&)), m_guilogger, SLOT(addNewRecord(Record&)));
-
   connect(m_wgt->get_view(), SIGNAL(selectedGO(shpGO&)), m_wge, SLOT(setNewGO(shpGO&)));
-  connect(m_but_exit, SIGNAL( clicked() ), this, SLOT(onButExit()));
-  connect(m_but_save, SIGNAL( clicked() ), this, SLOT(onButSave()));
-  connect(m_file_geo, SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
+  connect(m_but_image, SIGNAL(clicked()), this, SLOT(onButImage()));
+  connect(m_but_save,  SIGNAL(clicked()), this, SLOT(onButSave()));
+  connect(m_file_geo,  SIGNAL(fileNameIsChanged(const std::string&)), m_wgt->get_view(), SLOT(updateTreeModel(const std::string&))); 
 
   // connect signals for image update
 
@@ -117,6 +124,9 @@ GUIMain::GUIMain(QWidget *parent, const LEVEL& level)
   connect(m_wge,      SIGNAL(geoIsChanged(shpGO&)), m_geoimg, SLOT(onGeoIsChanged(shpGO&)));
   //connect(m_geoimg, SIGNAL(normImageIsUpdated(const ndarray<GeoImage::image_t,2>&)), m_wimage, SLOT(onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&)));
   connect(m_geoimg, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), m_wimage, SLOT(onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
+
+  connect(m_geoimg, SIGNAL(imageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)), 
+          m_guiimv->getImageProc(), SLOT(onImageIsUpdated(const ndarray<const GeoImage::raw_image_t,2>&)));
 
   m_wgt -> get_geotree() -> setItemSelected();
   m_geoimg -> setFirstImage();
@@ -131,7 +141,7 @@ GUIMain::showTips()
 {
   m_file_geo  -> setToolTip("Select \"geometry\" file");
   m_file_nda  -> setToolTip("Select ndarray with image file");
-  m_but_exit  -> setToolTip("Exit application");
+  m_but_image -> setToolTip("Open/close image window");
 }
 
 //--------------------------
@@ -142,7 +152,8 @@ GUIMain::setStyle()
   //m_file_geo->setFixedWidth(150);
   //m_file_nda->setFixedWidth(150);
 
-  this -> setGeometry(0, 0, 500, 525);
+  //this -> setGeometry(0, 0, 500, 525);
+  this -> setGeometry(0, 0, 700, 726);
   this -> setWindowTitle(tr("Detector alignment"));
   //this -> setContentsMargins(-9,-9,-9,-9);
 
@@ -234,6 +245,18 @@ GUIMain::onButExit()
   MsgInLog(_name_(), INFO, "onButExit"); 
   this->close(); // will call closeEvent(...)
 }
+
+//--------------------------
+
+void 
+GUIMain::onButImage()
+{
+  m_guiimv -> setVisible(! (m_guiimv->isVisible()));
+  m_guiimv -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
+  stringstream ss; ss << "Image window " << ((m_guiimv->isVisible()) ? "is open" : "closed");
+  MsgInLog(_name_(), INFO, ss.str());
+}
+
 
 //--------------------------
 

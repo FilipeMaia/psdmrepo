@@ -19,6 +19,7 @@ class Frame : public QFrame
 
     void setFrame() ;
     void showTips() ;
+    void setBoarderVisible(const bool isVisible) ;
 
     //void resizeEvent     (QResizeEvent *event = 0) ;
     //void closeEvent      (QCloseEvent  *event = 0) ;

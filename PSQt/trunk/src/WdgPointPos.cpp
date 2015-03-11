@@ -16,17 +16,17 @@ WdgPointPos::WdgPointPos( QWidget *parent
 			, const std::string& label2 
 	                , const float& val1
 	                , const float& val2
-			, const bool& show_frame
+			, const bool& show_boarder
 			, const unsigned& fld_width
 			, const unsigned& precision
 			  )
 //    : QWidget(parent)
-    : Frame(parent)
-    , m_show_frame(show_frame)
-    , m_fld_width(fld_width)
-    , m_precision(precision)
+  : Frame(parent)
+  , m_show_boarder(show_boarder)
+  , m_fld_width(fld_width)
+  , m_precision(precision)
 {
-  //Frame::setVisible(show_frame);
+  Frame::setBoarderVisible(show_boarder);
 
   m_lab1    = new QLabel(label1.c_str());
   m_lab2    = new QLabel(label2.c_str());
@@ -54,9 +54,9 @@ WdgPointPos::WdgPointPos( QWidget *parent
   this -> setLayout(hbox);
 
   this -> setWindowTitle(tr("WdgPointPos"));
-  this -> setFixedHeight( (m_show_frame)? 50 : 36);
-  if (! m_show_frame) this -> setContentsMargins(-9,-9,-9,-9);
-  //if (! m_show_frame) this -> setContentsMargins(-5,-5,-5,-5);
+  this -> setFixedHeight( (m_show_boarder)? 50 : 36);
+  if (! m_show_boarder) this -> setContentsMargins(-9,-9,-9,-9);
+  //if (! m_show_boarder) this -> setContentsMargins(-5,-5,-5,-5);
   //this -> setMinimumWidth(200);
 
   this -> showTips();
@@ -108,6 +108,8 @@ WdgPointPos::setPointPos(const QPointF& pos)
   stringstream ss; ss << "Center position is set to x: " << pos.x() << "  y: " << pos.y(); 
   MsgInLog(_name_(), DEBUG, ss.str());
   //std::cout << ss.str() << '\n'; 
+
+  //emit posIsChanged(pos);
 }
 
 //--------------------------

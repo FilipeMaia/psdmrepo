@@ -191,7 +191,7 @@ void
 
 template <typename T>
 ndarray<uint32_t,2> 
-  getUint32NormalizedImage (const ndarray<T,2>& dnda, const unsigned& ncolors=0, const float& hue1=-120, const float& hue2=-360)
+  getUint32NormalizedImage (const ndarray<T,2>& dnda, const float& amin=0, const float& amax=0, const unsigned& ncolors=0, const float& hue1=-120, const float& hue2=-360)
 {
   typedef uint32_t image_t;
 
@@ -202,9 +202,20 @@ ndarray<uint32_t,2>
   double dmin, dmax, dave, drms;
   //getMinMax(dnda, dmin, dmax);
 
-  getAveRms(dnda, dave, drms);
-  dmin = dave - 1*drms;
-  dmax = dave + 10*drms;
+  if (amin || amax) {
+    dmin = amin;
+    dmax = amax;
+  }
+  else {
+    getAveRms(dnda, dave, drms);
+    dmin = dave - 1*drms;
+    dmax = dave + 10*drms;
+  //dmin = 1300;
+  //dmax = 1700;
+  }
+
+  std::stringstream ssd; ssd << "getUint32NormalizedImage(): dmin: " << dmin << " dmax: " << dmax;
+  MsgInLog("QGUtils", DEBUG, ssd.str());
 
   typename ndarray<T, 2>::iterator itd = dnda.begin();
 

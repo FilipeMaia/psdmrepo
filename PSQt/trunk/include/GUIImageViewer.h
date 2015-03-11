@@ -16,6 +16,8 @@
 #include "PSQt/WdgImageFigs.h"
 #include "PSQt/WdgFile.h"
 #include "PSQt/WdgPointPos.h"
+#include "PSQt/WdgColorTable.h"
+#include "PSQt/ImageProc.h"
 
 namespace PSQt {
 class GUIImageViewer : public Frame
@@ -33,22 +35,29 @@ class GUIImageViewer : public Frame
     //inline WdgImageFigs* wdgImageFigs(){ return m_image; }
     inline WdgImage* wdgImage(){ return (WdgImage*)m_image; }
     inline WdgFile*  wdgFile() { return m_file; }
+    inline ImageProc* getImageProc() { return m_imageproc; }
 
  public slots:
-
-    void onButExit() ;
-    void onButAdd() ;
+    void onButExit(); // is not used
+    void onButSpec();
+    void onButRHis();
+    void onButAdd();
+    void onButColorTab();
 
  private:
-
     //QLabel*      m_lab_fname;
     //QLineEdit*   m_edi_fncfg;
-    QPushButton*   m_but_exit;
+    QPushButton*   m_but_spec;
+    QPushButton*   m_but_rhis;
     QPushButton*   m_but_add;
+    QPushButton*   m_but_cols;
+
     //WdgImage*      m_image;
     WdgImageFigs*  m_image;
     WdgFile*       m_file;
     WdgPointPos*   m_pointpos;
+    WdgColorTable* m_colortab;
+    ImageProc*     m_imageproc;
 
     inline const char* _name_(){ return "GUIImageViewer"; }
     void showTips() ;

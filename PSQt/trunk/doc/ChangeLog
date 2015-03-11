@@ -11,6 +11,22 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-03-10 Mikhail S. Dubrovin
+- Multiple changes in modules:
+M       app/geo.cpp - add input parameter parsing
+M       app/test_QGraphicsView.cpp - remove unused includes
+M       GUIImageViewer - add buttons to open/close colors, radial histogram, spectral windows
+M       GeoImage - some improvement in transfer of the raw image ndarray as a reference
+M       DragCenter - add signal centerIsChanged(const QPointF&), forceToEmitSignal() and testing methods.
+M       WdgImage - add slot onHueAnglesUpdated(const float&, const float&), some reservation for intensity range pars.
+M       WdgColorTable - add button "Apply" and emit hueAnglesUpdated(const float&, const float&) ;
+M       QGUtils - add parameter/auto-range in getUint32NormalizedImage
+M       GUIMain - add button to open/close Image, add/change connections between signals and slots
+M       Frame - add void setBoarderVisible(const bool isVisible) 
+A       ImageProc - add class for image processing at zoom time, accumulation of spectrum and radial histogram
+M       LabColorRing - add/change emitting signals
+M       WdgPointPos - show/not-show frame boarder
+
 Tag: V00-00-12
 2015-03-02 Mikhail S. Dubrovin
 - add WdgPointPos, use it in GUIImageViewer, improve vizualization of drag-able figures (PSAS-11)
