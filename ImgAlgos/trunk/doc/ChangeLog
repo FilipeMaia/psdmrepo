@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-81
+2015-03-12 Mikhail S. Dubrovin
+- add module EventCodeFilter (PSAS-122)
+
 Tag: V00-03-80
 2015-03-10 Mikhail S. Dubrovin
 - ImgSaveInFile - constrain the number of messages about missing data
