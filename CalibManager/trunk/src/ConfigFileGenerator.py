@@ -109,6 +109,7 @@ class ConfigFileGenerator :
         self.txt_cfg_body   = '\n'
 
         self.add_cfg_module_tahometer()
+        if cp.bat_dark_sele.value() : self.add_cfg_module_event_code_filter()
         status = self.cfg_file_body_for_peds_aver()
         self.cfg_file_header()
 
@@ -127,6 +128,26 @@ class ConfigFileGenerator :
                          }
 
         self.txt_cfg_header += self.text_for_section ()
+
+#-----------------------------
+
+    def add_cfg_module_event_code_filter (self) :
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-event-code-filter.cfg').path()
+        module = 'ImgAlgos.EventCodeFilter'
+
+        evcode = cp.bat_dark_sele.value()
+        mode = 0
+        if   evcode>0: mode=1
+        elif evcode<0: mode=-1
+
+        self.d_subs   = {
+                         'MODULE'     : module,
+                         'EVENTCODE'  : str(evcode),
+                         'MODE'       : str(mode),
+                         'PRINT_BITS' : '5',
+                        }
+
+        self.add_module_in_cfg ('%s' % (module))
 
 #-----------------------------
 

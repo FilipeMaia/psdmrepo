@@ -71,6 +71,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_rms_thr    = QtGui.QLabel('Threshold RMS, ADU:') 
         self.lab_min_thr    = QtGui.QLabel('Threshold MIN, ADU:') 
         self.lab_max_thr    = QtGui.QLabel('MAX:') 
+        self.lab_dark_sele  = QtGui.QLabel('Selector evt code:') 
 
         self.but_show_vers  = QtGui.QPushButton('Soft Vers')
         self.but_lsf_status = QtGui.QPushButton('LSF status')
@@ -78,6 +79,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_dark_start = QtGui.QLineEdit( str( cp.bat_dark_start.value() ) )
         self.edi_dark_end   = QtGui.QLineEdit( str( cp.bat_dark_end.value()) )
         self.edi_dark_scan  = QtGui.QLineEdit( str( cp.bat_dark_scan.value()) )
+        self.edi_dark_sele  = QtGui.QLineEdit( str( cp.bat_dark_sele.value()) )
         self.edi_rms_thr    = QtGui.QLineEdit( str( cp.mask_rms_thr.value()) )
         self.edi_min_thr    = QtGui.QLineEdit( str( cp.mask_min_thr.value()) )
         self.edi_max_thr    = QtGui.QLineEdit( str( cp.mask_max_thr.value()) )
@@ -85,6 +87,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_dark_start.setValidator(QtGui.QIntValidator(0,9999999,self))
         self.edi_dark_end  .setValidator(QtGui.QIntValidator(1,9999999,self))
         self.edi_dark_scan .setValidator(QtGui.QIntValidator(1,9999999,self))
+        self.edi_dark_sele .setValidator(QtGui.QIntValidator(-256,256,self))
         self.edi_rms_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
         self.edi_min_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
         self.edi_max_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
@@ -120,6 +123,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_max_thr,       self.grid_row+7, 3)
         self.grid.addWidget(self.edi_max_thr,       self.grid_row+7, 4, 1, 2)
 
+        self.grid.addWidget(self.lab_dark_sele,     self.grid_row+7, 5)
+        self.grid.addWidget(self.edi_dark_sele,     self.grid_row+7, 6)
+
         #self.setLayout(self.grid)
 
         self.vbox = QtGui.QVBoxLayout() 
@@ -134,6 +140,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.connect( self.edi_dark_start,   QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkStart )
         self.connect( self.edi_dark_end,     QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkEnd )
         self.connect( self.edi_dark_scan,    QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkScan )
+        self.connect( self.edi_dark_sele,    QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkSele )
         self.connect( self.edi_rms_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiRmsThr )
         self.connect( self.edi_min_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMinThr )
         self.connect( self.edi_max_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMaxThr )
@@ -156,7 +163,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_fname_prefix.setToolTip('Edit the common file prefix in this field')
         self.but_show_vers   .setToolTip('Show current package tags')
         self.but_lsf_status  .setToolTip('Show LSF status')
-
+        self.edi_dark_sele   .setToolTip('Selector event code;\n0=off, +N=select, -N=discard')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -183,6 +190,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_dark_start   .setStyleSheet (cp.styleLabel)
         self.lab_dark_end     .setStyleSheet (cp.styleLabel)
         self.lab_dark_scan    .setStyleSheet (cp.styleLabel)
+        self.lab_dark_sele    .setStyleSheet (cp.styleLabel)
         self.lab_rms_thr      .setStyleSheet (cp.styleLabel)
         self.lab_min_thr      .setStyleSheet (cp.styleLabel)
         self.lab_max_thr      .setStyleSheet (cp.styleLabel)
@@ -198,6 +206,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_dark_start  .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_end    .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_scan   .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_dark_sele   .setAlignment (QtCore.Qt.AlignRight)
         self.lab_rms_thr     .setAlignment (QtCore.Qt.AlignRight)
         self.lab_min_thr     .setAlignment (QtCore.Qt.AlignRight)
         self.lab_max_thr     .setAlignment (QtCore.Qt.AlignRight)
@@ -210,6 +219,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_dark_start  .setFixedWidth(80)
         self.edi_dark_end    .setFixedWidth(80)
         self.edi_dark_scan   .setFixedWidth(80)
+        self.edi_dark_sele   .setFixedWidth(80)
         self.edi_rms_thr     .setFixedWidth(80)
         self.edi_min_thr     .setFixedWidth(80)
         self.edi_max_thr     .setFixedWidth(80)
@@ -317,6 +327,12 @@ class GUIConfigPars ( QtGui.QWidget ) :
         str_value = str( self.edi_dark_scan.displayText() )
         cp.bat_dark_scan.setValue(int(str_value))      
         logger.info('Set the number of events to scan: %s' % str_value, __name__ )
+
+
+    def onEdiDarkSele(self):
+        str_value = str( self.edi_dark_sele.displayText() )
+        cp.bat_dark_sele.setValue(int(str_value))      
+        logger.info('Set the event code for selector: %s' % str_value, __name__ )
 
 
     def onEdiRmsThr(self):

@@ -140,6 +140,7 @@ class CommandLineCalib () :
                      + '\nAdd optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc',4)
 	    return False
 
+        self.event_code  = cp.bat_dark_sele.value()  if self.opts['event_code']  is None else self.opts['event_code']
         self.scan_events = cp.bat_dark_scan.value()  if self.opts['scan_events'] is None else self.opts['scan_events']
         self.skip_events = cp.bat_dark_start.value() if self.opts['skip_events'] is None else self.opts['skip_events']
         self.num_events  = cp.bat_dark_end.value() - cp.bat_dark_start.value() if self.opts['num_events'] is None else self.opts['num_events']
@@ -167,6 +168,7 @@ class CommandLineCalib () :
         cp.calib_dir      .setValue(self.calibdir)
         cp.dir_work       .setValue(self.workdir)
         cp.bat_queue      .setValue(self.queue)
+        cp.bat_dark_sele  .setValue(self.event_code)
         cp.bat_dark_scan  .setValue(self.scan_events)
         cp.bat_dark_start .setValue(self.skip_events)
         cp.bat_dark_end   .setValue(self.num_events+self.skip_events)

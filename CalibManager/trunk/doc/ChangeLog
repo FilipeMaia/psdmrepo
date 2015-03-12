@@ -12,6 +12,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-03-12 Mikhail S. Dubrovin
+Tag: V00-00-84
+- add option to select dark events in any run using event code filter (PSAS-122)
+    - add data/scripts/psana-module-event-code-filter.cfg
+    - app/calibrun - add option -f
+    - CommandLineCalib - add parameter event_code
+    - ConfigParametersForApp - add parameter bat_dark_sele
+    - GUIConfigPars - add editable field for cp.bat_dark_sele
+    - ConfigFileGenerator - add filling of the cfg file for module ImgAlgos.EventCodeFilter
+	
 2015-03-10 Mikhail S. Dubrovin
 Tag: V00-00-83
 - app/calibrun, CommandLineCalib - add optional parameter -m - number of events to scan data and search for selected detector(s) (PSAS-6)
