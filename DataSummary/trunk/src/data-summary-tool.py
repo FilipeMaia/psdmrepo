@@ -2,7 +2,6 @@ import argparse
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot
-import jutils
 import data_summary
 import os
 
@@ -16,7 +15,7 @@ ps.add_argument("exp",
 ps.add_argument("run",type=int,
         help="run to process, e.g. 111")
 
-ps.add_argument("--max-events-per-node","-M",type=int,default=500,dest='max_events',
+ps.add_argument("--max-events-per-node","-M",type=int,default=5000,dest='max_events',
         help="maximum events to process per node")
 
 ps.add_argument("--plot-vs","-X",action='append',default=['time',], dest="x_axes",
@@ -26,7 +25,7 @@ ps.add_argument("--verbose", '-v', action='count', default=4, dest="verbosity",
         help="verbosity level of logging, default is 4 (INFO), choices are 1-5 (CRITICAL, ERROR, WARNING, INFO, DEBUG), can pass -v multiple times")
 
 ps.add_argument("--xkcd", "-x", action="store_true", default=False, dest="xkcd",
-        help="use XKCD plot sytle")
+        help="use XKCD plot style")
 
 ps.add_argument("--base-output-dir", "-O", default=os.path.expanduser('~/data-summary/'), dest="baseoutputdir",
         help="set output folder for reports")

@@ -101,7 +101,7 @@ class report:
         self.page.div(class_='jumbotron')
         self.page.h1(args[0],style='font-family:monospace;')
         self.page.p('Run {:0.0f}'.format(args[1]),class_='lead')
-        self.page.p('Other Information Goes Here. Take advantage of tool tips.',style='font-size: 14px;')
+        #self.page.p('Other Information Goes Here. Take advantage of tool tips.',style='font-size: 14px;')
         self.page.div.close()
 
     def start_block(self,title,id=None,class_=""):
