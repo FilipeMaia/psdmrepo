@@ -1,0 +1,33 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  ChangeLog file for package DataSummary
+#------------------------------------------------------------------------
+
+Package author: Justin Garofoli
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2015-03-13 Igor Gaponenko
+- the initial source code of the package commited by Justin Garofoli
+- substantial modifications were made later as a part of this tag
+- flattened Python package directory to comply with the SIT build
+system's requirements
+- moved folder html/ and the dictionary file device_config.dict
+into folder data/
+- modified source code to locate html/ files and the dictionary file
+in the data/ folder
+- eliminated file extention and moved executable data-summary-tool
+into folder app/
+- eliminated file extention and moved test executable myDS
+folder test/
+- addded documentation folder doc/ and two files into it
+- consolidated documentation spread in files README.md into a single
+file README located in folder src/
+- see JIRA ticket PSDH-29
+
+
