@@ -1,8 +1,30 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  Script myDS
+#
+#------------------------------------------------------------------------
+
+"""Script that scans XTC files of a run and extracts the summary information
+
+This software was developed for the LCLS project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see data_summary
+
+@version $Id: $
+
+@author Garofoli, Justin
+"""
+
 import matplotlib
 matplotlib.use('Agg')
 
 import jutils
-import data_summary
+ifrom DataSummary import data_summary
 import psana
 
 """

@@ -5,7 +5,7 @@ import sys
 import psana
 import time
 import math
-import evplib.packunpack as pup
+import packunpack as pup
 import hashlib
 import pprint
 

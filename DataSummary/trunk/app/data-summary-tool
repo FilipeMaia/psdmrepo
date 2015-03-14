@@ -1,8 +1,30 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  Script data-summary-tool
+#
+#------------------------------------------------------------------------
+
+"""Script that scans XTC files of a run and extracts the summary information
+
+This software was developed for the LCLS project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see DataSummary
+
+@version $Id: $
+
+@author Garofoli, Justin
+"""
+
 import argparse
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot
-import data_summary
+import DataSummary as data_summary
 import os
 
 # just some comment

@@ -4,17 +4,10 @@ import os, sys
 import shutil
 import logging
 
+from AppUtils.AppDataPath import AppDataPath
 
-html_ref_dir = os.path.abspath( 
-        os.path.join( 
-            os.path.dirname( 
-                os.path.abspath( 
-                    unicode( __file__ , sys.getfilesystemencoding() ) 
-                    ) 
-                ),
-            "../../html/"
-            )
-        )
+html_dir_finder = AppDataPath('DataSummary/html')
+html_ref_dir = html_dir_finder.path()
 
 hutchcolor = {
         'AMO': 'blue',
