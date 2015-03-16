@@ -24,7 +24,7 @@ import logging
 #from output_html import *
 from device_config import *
 
-logger = logging.getLogger('data_summary')
+logger = logging.getLogger('DataSummary')
 logger.setLevel(logging.DEBUG)
 
 #fh = logging.FileHandler('data_summary.log')
