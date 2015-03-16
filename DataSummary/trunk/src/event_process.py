@@ -75,8 +75,5 @@ class event_process_output(object):
         self.__dict__[key] = val
         return
 
-    #def __repr__(self):
-        #out =[]
-        #for k in self.__dict__:
-            #out.append( "{:} = {:}".format( k, self.__dict__[k] ) )
-        #return '\n'.join(out)
+    def __repr__(self):
+        return repr(self.__dict__)
