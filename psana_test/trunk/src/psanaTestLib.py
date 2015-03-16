@@ -1212,7 +1212,7 @@ def updateTestData(xtc, newTypeVers, dgrams):
     copyBytes(xtc, bytesToCopy, newTestFilePath)
 
 def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibCycle, 
-                       destDir, fiducialList=None):
+                       destDir, fiducialList=None, index=True):
     '''copies specified number of events/calib cycles from regular data to 
     destination directory. Optionally copies datagrams matching the given fidicuals as well.
     only copies the first occurence of any fiducial.
@@ -1221,12 +1221,14 @@ def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibC
                         all streams and chunks of those xtc files in 
                         /reg/g/psdm/data will be examined.
     numberCalibCycles - how many calib cycles to copy events from
-    numberEventsPerCalibCycle - how many events per calib cycle to copy out
+    numberEventsPerCalibCycle - how many events per calib cycle *FOR EACH STREAM * to copy out
+                                that is this is not a total for the calib cycle
     destDir  - the destination directory for the output
     fiducialList - for example [34263, 34266, 35436, 36009, 44559, 54090, 54696, 54699]
                    means that datagrams with those fiducials will be copies out as well
                    (when they first occur) however if they occur past the last calib cycle
                    they will not be copied
+    index - make the index files afterwards
     '''
     def getEndOffset(lns, lnIdx, xtc):
         '''helper function.
@@ -1309,6 +1311,20 @@ def copyToMultiTestDir(experiment, run, numberCalibCycles, numberEventsPerCalibC
                 copyBytes(xtc,bytesToCopy,outFile,'append')
             if done:
                 break
+    if index:
+        indexDir = os.path.join(destDir, 'index')
+        if not os.path.exists(indexDir):
+            print "Creating index dir: %s" % indexDir
+            os.mkdir(indexDir)
+        xtcFiles = glob.glob(os.path.join(destDir,'*.xtc'))
+        print "------------"
+        for xtcFile in xtcFiles:
+            outputFile = os.path.join(indexDir, os.path.basename(xtcFile) + '.idx')
+            cmd = 'xtcindex -f %s -o %s' % (xtcFile, outputFile)
+            print "running command: %s" % cmd
+            o,e = cmdTimeOut(cmd)
+            print "--output--\n%s\n--error--%s\n-------" % (o,e)
+       
         
 def copyBytes(src, n, dest, mode='truncate'):
     '''copies the fist n bytes, or a set of invervals, the intervals are 

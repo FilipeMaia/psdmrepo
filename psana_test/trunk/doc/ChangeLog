@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-23
+2015-3-16 David Schneider
+- update psanaTestLib function copyToMultiTestDir to also create index files
+
 Tag: V00-08-22
 2015-3-3 David Schneider
 - small data JIRA issue PSAS-85
