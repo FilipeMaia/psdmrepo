@@ -11,6 +11,11 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2015-03-16 Justin Garofoli
+- correctly produce report.py with changes in event_process.py
+- fix logging bug introduced by package name change
+
 Tag: V00-00-01
 2015-03-13 Igor Gaponenko
 - the initial source code of the package commited by Justin Garofoli
