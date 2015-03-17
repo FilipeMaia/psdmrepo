@@ -22,6 +22,8 @@ mkdir = os.mkdir
 
 
 def check_all_destpath(exper, seldirs=None):
+    """ Create all the experiments subdirectories (in the offline files system) and 
+    create the links in the experiment directory """
     
     datapath = exper.datapath
     print  exper.name, exper.instr_lower, exper.posix_gid, datapath
@@ -42,7 +44,8 @@ def check_all_destpath(exper, seldirs=None):
         
 
 def check_destpath(exper, instr=None):
-    """ Create experiment subdirectories by a mover """
+    """ Create the experiment subdirectories (in the offline files system) that are needed for the mover
+    (xtc,hdf5,usr) and create the links in the experiment directory """
 
     if instr:
         instrument = instr.lower()
@@ -53,6 +56,13 @@ def check_destpath(exper, instr=None):
     for folder in ('xtc', 'hdf5', 'usr'):
         create_exp_path(folder, exper.name, instrument, exper.posix_gid, exper.datapath)
         create_link(folder, exper.name, instrument, exper.datapath)
+
+
+def check_xtc_path(exper, no_instr_path=False):
+    """ Create only the xtc path. On a FFB node call with no_instr_path=True
+    as the instr is not part of the path.
+    """
+    create_exp_path('xtc', exper.name, exper.instr_lower, exper.posix_gid, exper.datapath, no_instr_path)
 
 
 def check_existing_link(src, name, do_update=False):
@@ -69,7 +79,7 @@ def check_existing_link(src, name, do_update=False):
             tmp_name = "%s.tmp" % name
             os.symlink(src, tmp_name) 
             os.rename(tmp_name, name)
-            
+
 
 def create_link(datatype, exp, instr, physpath, do_run=True, force=False):
     """ Create a link in the canonical experiment folder (/reg/d/psdm/<instr>/<exp>)
@@ -102,17 +112,24 @@ def create_link(datatype, exp, instr, physpath, do_run=True, force=False):
             print "Testonly: Create link", link_name, "->", link_src
 
 
-def create_exp_path(datatype, exp, instr, posix_grp, physpath):
-    """ creates an experiment data folder and subfolder on the offline file-system 
+def create_exp_path(datatype, exp, instr, posix_grp, physpath, no_instr_path=False):
+    """ Create an experiments directory and its sub directory for a datatype.
+    
+    The datatype = (xtc,hdf5,usr,scratch,ftc,res,calib)
+    with no_instr_path the instr name is not used for the experiments directory.
     """
     
-    instr = instr.lower()
     group = posix_grp
+    instr = instr.lower()
+
+    if no_instr_path:
+        exppath = pjoin(physpath, exp)
+    else:
+        exppath = pjoin(physpath, instr, exp)
 
     # create the experiment path and set the proper acls that get
     # inherited by a sub folder
     
-    exppath = pjoin(physpath, instr, exp)
     if not os.path.exists(exppath):
         print "Create %s" %(exppath)
         mkdir(exppath, 02750)

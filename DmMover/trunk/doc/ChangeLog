@@ -11,6 +11,14 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2015-03-17
+- Imported data-mover code from git repo (PsdmTools)
+- added features to the experiment path creation to handle creating xtc files on the ffb 
+  for recorder transfers.
+
+
+	
 Tag: V00-00-06
 2015-01-21
 - Changed the interface to dm_create_folders. Allow to create path for single experiments and
@@ -49,4 +57,3 @@ Tag: V00-00-01
 - keep it brief and easy to read
 - always include author name and date of the change, provide CVS tag when 
   appropriate
-

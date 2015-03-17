@@ -42,6 +42,8 @@ class Experiment(object):
     def __getattr__(self, attr):
         if attr in self.info:
             return self.info[attr]
+        elif attr == 'eid' and 'id' in self.info:
+            return self.info['id']
         else:
             raise AttributeError(attr)
 
@@ -68,7 +70,8 @@ class Experiment(object):
         
 
 class ExperimentInfo(object):
-    """ Names and path-names for an experiment 
+    """ Names and path-names for an experiment
+ 
     >>> exp = ExperimentInfo(....)
     >>> print(exper.name, exper.instr)
     >>> print(eper.xtcpath, exper.hdf5path)
@@ -78,6 +81,7 @@ class ExperimentInfo(object):
         """ instrument should be upper case name """
         self.info = info
         self.instr = instrument
+        self.instr_lower = instrument.lower()
 
         self.datapath = datapath
         if no_instr_path:
