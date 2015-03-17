@@ -8,6 +8,8 @@ import math
 import packunpack as pup
 import hashlib
 import pprint
+import tarfile
+import glob
 
 __version__ = 0.2
 
@@ -95,6 +97,8 @@ class job(object):
         self.logger.addHandler( self.logger_fh )
         self.logger.info( "output directory is "+self.output_dir )
         self.version_info()
+        if self.rank==0:
+            self.package_python()
         return
 
     def version_info(self):
@@ -116,21 +120,39 @@ class job(object):
 
         return
 
+    def package_python(self):
+        self.logger.info("opening tar file for datasummary code")
+        thisdir = os.path.dirname( os.path.abspath( unicode( __file__,sys.getfilesystemencoding() ) ) )
+        tar = tarfile.open(name="datasummary.tgz",mode="w:gz",dereference=True)
+        for f in glob.glob(os.path.join(thisdir,"*.py")):
+            self.logger.info("taring file: {:}".format(f))
+            tar.add(f)
+        self.logger.info("closing tar file")
+        tar.close()
+        return
+
     def set_maxEventsPerNode(self,n):
         self.maxEventsPerNode = n
         return
 
-    def set_datasource(self,exp=None,run=None):
+    def set_datasource(self,exp=None,run=None,srcdir=None):
         self.exp = exp
         self.run = run
+        self.srcdir = srcdir
         instr, thisexp = exp.split('/')
         self.set_outputdir(os.path.join( self.baseoutputdir ,'{:}_run{:0.0f}'.format(thisexp,run)))
 
         self.logger.info('connecting to data source')
-        self.ds = psana.DataSource('exp={:}:run={:0.0f}:idx'.format(exp,run))
+        if srcdir is not None :
+            self.ds = psana.DataSource('exp={:}:run={:0.0f}:dir={:}:idx'.format(exp,run,srcdir))
+        else :
+            self.ds = psana.DataSource('exp={:}:run={:0.0f}:idx'.format(exp,run))
         if self.ds.empty():
             self.logger.error('data source is EMPTY!')
-        self.logger.info('preparing to analyze {:} run {:}'.format(exp,run))
+        if srcdir is not None :
+            self.logger.info('preparing to analyze {:} run {:} dir {:}'.format(exp,run,srcdir))
+        else :
+            self.logger.info('preparing to analyze {:} run {:}'.format(exp,run))
         return
 
     def set_x_axes(self,xaxes):

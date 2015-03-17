@@ -11,6 +11,13 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2015-03-17 Justin Garofoli
+Tag: V00-00-04
+- add unit test
+- add option to pass data directory to job
+
+
 Tag: V00-00-03 Igor Gaponenko
 - remove an obsolete test application test/myDS
 
