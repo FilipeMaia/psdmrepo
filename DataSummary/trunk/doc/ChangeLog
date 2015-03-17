@@ -11,6 +11,9 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03 Igor Gaponenko
+- remove an obsolete test application test/myDS
+
 Tag: V00-00-02
 2015-03-16 Justin Garofoli
 - correctly produce report.py with changes in event_process.py
