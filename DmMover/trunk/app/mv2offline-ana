@@ -10,7 +10,8 @@ import traceback
 from socket import gethostname
 from optparse import OptionParser
 
-import DmMover.mysqldb_access as db
+
+import DmMover.db_access as db
 from DmMover.exper_folders import check_destpath, check_xtc_path
 from DmMover.experiment import ExperimentInfo
 from DmMover.irodsreg import IrodsRegisterFile
@@ -22,7 +23,6 @@ from DmMover.iocntrl import StdinCtrl
 db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
 test_db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
 
-dbaccess = db
 pjoin = os.path.join
 
 irods = IrodsRegisterFile()

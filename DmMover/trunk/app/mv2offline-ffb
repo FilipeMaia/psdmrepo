@@ -9,14 +9,14 @@ import traceback
 from socket import gethostname
 from optparse import OptionParser
 
-
-import DmMover.mysqldb_access as db
+import DmMover.db_access as db
 from DmMover.check_dest import check_destpath  
 from DmMover.mvrutils import network_name
 
 from DmMover.iocntrl import StdinCtrl
-dbaccess = db
 
+db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
+test_db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
 
 pjoin = os.path.join
 
@@ -387,7 +387,8 @@ def main(argv=None):
                       help="remove file on the src host")
     parser.add_option("--ctrl", action="store_true", default=False, 
                       help="Use stdin for control")
-    parser.add_option("--testdb", metavar="PWDFILE",help="use testdb")
+   
+    parser.add_option("--testdb", metavar="PWDFILE", action="store_true", default=False, help="use testdb")
     parser.add_option("--querywait", type='int', default=3, 
                       help="wait between query for new transfers")
     parser.add_option("--idle", default='1h', 
@@ -408,9 +409,11 @@ def main(argv=None):
     logging.basicConfig(level=log_levels[options.verbose], format='%(levelname)-8s %(message)s')
 
     if options.testdb:
-        # Use the test data and read paswd fron file options.testdb
-        db.select_testdb(open(options.testdb).readline().strip())
+        db.select_db(test_db_conn)
         logging.warning("use test db")
+    else:
+        db.select_db(db_conn)
+        logging.warning("use production db")
 
     logging.info("Use database %s %s %s", db.__user, db.__host, db.__dmtable)
     logging.info("rm script %s", __rmcmd)
