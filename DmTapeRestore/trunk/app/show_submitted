@@ -6,8 +6,8 @@ import sys
 import argparse
 from datetime import datetime
 
-import FileRestore.trgdir as trgdir
-import FileRestore.dbrestore as db
+import DmTapeRestore.trgdir as trgdir
+import DmTapeRestore.dbrestore as db
 
 import RegDB.experiment_info as regdb
 

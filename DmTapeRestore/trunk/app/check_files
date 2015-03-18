@@ -6,7 +6,7 @@ import sys
 import argparse
 import subprocess
 
-import FileRestore.dbrestore as db
+import DmTapeRestore.dbrestore as db
 
 
 psdm_prefix = len("/psdm-zone/psdm/")
