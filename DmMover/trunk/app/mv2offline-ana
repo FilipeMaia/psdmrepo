@@ -17,6 +17,8 @@ from DmMover.experiment import ExperimentInfo
 from DmMover.irodsreg import IrodsRegisterFile
 from DmMover.bbcp_mvr import BbcpCmd
 from DmMover.iocntrl import StdinCtrl
+from DmMover.mvrutils import network_name, trgpath_param
+
 
 # -----------------------------------------------------
 
@@ -30,26 +32,6 @@ mover = BbcpCmd()
 mover.user = 'wilko'
 trg_path = None    # function that returns the trgpath for instrument
 
-# ============================================================================
-
-def trgpath_fn(mode, path=None):
-    """ Return a function that returns the mover-mode and rootpath for and 
-    instrument. The root path is used to write files e.g.: <rootpath>/<instr>/....
-    The rootpath is None if the path (datapath) from the DB should be used.
-    The mover-mode is either 'reg_ana' or 'noreg' depending if the file transfer 
-    needs to be registered to the data_migration_ana table. 
-    """
-    
-    def rootpath(instr):
-        if mode == "ioc-ffb":
-            if instr.upper() in ('AMO', 'CXI', 'MEC', 'SXR', 'XCS', 'XPP'):
-                return ('reg_ana', path)
-            else:
-                return ('noreg', None)
-
-        return ('noreg',path)
-    
-    return rootpath
 
 # ============================================================================
     
@@ -95,15 +77,6 @@ def add4offline_migr(expid, trgfile, filetype):
     logging.debug("add to ana table %d %s %s %s %s", expid, localhost, filetype, fname, dirpath)
     db.file4offline(expid, localhost, filetype, fname, dirpath)
 
-# ======================================================================
-
-def network_name(hostname):
-    """ Translate the daq name to the psana network name e.g.: daq-cxi -> psana-cxi """
-    if hostname.startswith('daq'):
-        return "psana%s" % hostname[3:]
-    else:
-        return hostname
-    
 # ======================================================================
 
 def do_copy_xtc(transfer, exper, file_type=None):
@@ -410,19 +383,23 @@ def main(argv=None):
     if options.mode == 'ffb-offline':
         db.table_dm_ana()
         mover.config_ffb_offline()
-        trg_path = trgpath_fn(options.mode)
+        trg_path = trgpath_param(options.mode)
     elif options.mode == 'ffb-local':
         db.table_dm_ana()
         mover.config_local_offline()
-        trg_path = trgpath_fn(options.mode)
+        trg_path = trgpath_param(options.mode)
     elif options.mode == 'ioc-ffb':
         db.table_dm()
         mover.config_local_offline()
-        trg_path = trgpath_fn(options.mode, "/reg/d/ffb")
+        trg_path = trgpath_param(options.mode, "/reg/d/ffb")
+    elif options.mode == 'dss-ffb':
+        db.table_dm()
+        mover.config_dss_ffb()
+        trg_path = trgpath_param(options.mode, "/brick1")
     elif options.mode == 'local':
         db.table_dm()
         mover.config_local_offline()
-        trg_path = trgpath_fn(options.mode)
+        trg_path = trgpath_param(options.mode)
     else:
         logging.error("Wrong mode %s -> exit", options.mode)
         sys.exit(1)

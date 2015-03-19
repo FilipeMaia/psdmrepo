@@ -29,6 +29,11 @@ class BbcpCmd(object):
         # transfer from ffb to offline. No realtime as the file is complete 
         self.local_transfer = False
         self.bbcpcmd = "%s -S \"%s\"  -z -v -s 1 -p -P 15" % (self.bbcp, self.bbcp_remote)
+
+    def config_dss_ffb(self):
+        # transfer dss to ffb
+        self.local_transfer = False
+        self.bbcpcmd = "%s -S \"%s\"  -z -v -s 1 -R c=2 -P 15" % (self.bbcp, self.bbcp_remote)
         
     def print_config(self):
         print "Local-trans:", self.local_transfer, "bbcp-user:", self.user, " key:", self.ssh_key

@@ -11,7 +11,7 @@ from optparse import OptionParser
 
 import DmMover.db_access as db
 from DmMover.check_dest import check_destpath  
-from DmMover.mvrutils import network_name
+from DmMover.mvrutils import network_name, rm_remote_file
 
 from DmMover.iocntrl import StdinCtrl
 
@@ -49,27 +49,6 @@ def bbcp_cmd(srchost, src, trg, options=""):
         
     return "%s %s %s %s" % (__bbcpcmd, extra_options, srcurl, trg)
     
-
-def rm_remote_file(rhost, rfile, lfile):
-    """ remove rfile on rhost checking that the file sizes
-    of rfile and lfile match. Execute shell command on rhost
-    with ssh.
-    """
-    
-    try:
-        size = os.path.getsize(lfile)
-    except OSError:
-        logging.error("rm-file no local file %s", lfile)
-        return False
-    
-    cmd = "ssh -x %s %s %s %d %s" % (rhost, __rmcmd, rfile, size, gethostname())
-    print cmd
-    rc = os.system(cmd)
-    if rc != 0:
-        logging.error("remove failed %s", lfile)
-        return False
-    return True
-
 
 class ExperimentInfo:
     """ Parameters for an experiment """ 
@@ -164,7 +143,7 @@ def do_copy_xtc(transfer, exper, file_type=None, do_rm=False):
         db.file_migration_stop(exper.id, basefilename)
         add4offline_migr(exper.id, trgfile, file_type)
         if do_rm:
-            rm_remote_file(srchost, srcfile, trgfile)
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
     else:
         db.file_migration_stop(exper.id, basefilename, "b%d" % status)
         logging.error('Copy failed rc=%d', status)
@@ -208,7 +187,7 @@ def do_copy_index(transfer, exper, file_type=None, do_rm=False, mark_lost=False)
         db.file_migration_stop(exper.id, basefilename)
         add4offline_migr(exper.id, trgfile, file_type)
         if do_rm:
-            rm_remote_file(srchost, srcfile, trgfile)
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
     else:
         # else mark as failed
         db_status = "" if  mark_lost else  "i%d" % status

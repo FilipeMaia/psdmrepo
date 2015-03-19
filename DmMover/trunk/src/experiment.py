@@ -70,7 +70,7 @@ class Experiment(object):
         
 
 class ExperimentInfo(object):
-    """ Names and path-names for an experiment
+    """ Parameters and path-names for an experiment
  
     >>> exp = ExperimentInfo(....)
     >>> print(exper.name, exper.instr)
