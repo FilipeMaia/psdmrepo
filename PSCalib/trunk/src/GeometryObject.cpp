@@ -72,31 +72,19 @@ namespace PSCalib {
     , m_tilt_z (tilt_z)
     , m_tilt_y (tilt_y)
     , m_tilt_x (tilt_x) 
-    , m_seggeom(0)
+    , m_do_tilt(true)
+    , m_mbits(0377)
+    , m_size(0)
     , p_xarr(0)
     , p_yarr(0)
     , p_zarr(0)
     , p_aarr(0)
     , p_marr(0)
 {
-
-  //if      ( m_oname == "SENS2X1:V1" ) { m_algo = SENS2X1V1; m_pix_coords_2x1 = new PC2X1(); }
-  //else if ( m_oname == "SENS2X1:V2" ) { m_algo = SENS2X1V2; }
-  //else                                { m_algo = NONDEF; }
-
   const unsigned print_bits=0; // 0377;
   m_seggeom = PSCalib::SegGeometryStore::Create(m_oname, print_bits);
-
   m_parent = shpGO();
   v_list_of_children.clear();
-  p_xarr = 0;
-  p_yarr = 0;
-  p_zarr = 0;
-  p_aarr = 0;
-  p_marr = 0;
-  m_size = 0;
-  m_mbits = 0377;
-  m_do_tilt = true;
 }
 
 //--------------
@@ -223,7 +211,6 @@ void GeometryObject::transform_geo_coord_arrays(const double* X,
 //-------------------
 unsigned GeometryObject::get_size_geo_array()
 {
-  // if(m_algo == SENS2X1V1) return m_pix_coords_2x1 -> get_size();
   if(m_seggeom) return m_seggeom -> size();
 
   unsigned size=0;  
@@ -282,29 +269,24 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt, const bool do_eva
 {
   m_do_tilt = do_tilt; 
 
-  // allocate memory for pixel coordinate arrays
-  m_size = get_size_geo_array();
+  unsigned size = get_size_geo_array();
 
-  if (p_xarr) delete [] p_xarr;
-  if (p_yarr) delete [] p_yarr;
-  if (p_zarr) delete [] p_zarr;
-  if (p_aarr) delete [] p_aarr;
-  if (p_marr) delete [] p_marr;
-
-  p_xarr = new double [m_size];
-  p_yarr = new double [m_size];
-  p_zarr = new double [m_size];
-  p_aarr = new double [m_size];
-  p_marr = new int    [m_size];
-
-  //  if(m_algo == SENS2X1V1) {
-  //       const double* x_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM);
-  //       const double* y_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM);
-  //       const double* z_arr = m_pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Z, PC2X1::UM);
-  //
-  //       transform_geo_coord_arrays(x_arr, y_arr, z_arr, m_size, p_xarr, p_yarr, p_zarr, do_tilt);
-  //       return;
-  //  }
+  if(size != m_size) {
+    // allocate memory for pixel coordinate arrays
+    m_size = size;
+    
+    if (p_xarr) delete [] p_xarr;
+    if (p_yarr) delete [] p_yarr;
+    if (p_zarr) delete [] p_zarr;
+    if (p_aarr) delete [] p_aarr;
+    if (p_marr) delete [] p_marr;
+    
+    p_xarr = new double [m_size];
+    p_yarr = new double [m_size];
+    p_zarr = new double [m_size];
+    p_aarr = new double [m_size];
+    p_marr = new int    [m_size];
+  }
 
   if(m_seggeom) {
 

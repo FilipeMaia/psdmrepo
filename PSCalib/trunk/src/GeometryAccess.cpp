@@ -303,8 +303,9 @@ GeometryAccess::get_pixel_coords( const double*& X,
 {
   GeometryAccess::shpGO geo = (oname.empty()) ? get_top_geo() : get_geo(oname, oindex);
   if(m_pbits & 32) {
-    std::string msg = "get_pixel_coords(...) for geo:\n" + geo -> string_geo_children();
-    MsgLog(name(), info, msg);
+    std::stringstream ss; ss << "get_pixel_coords(...) for geo:\n" << geo -> string_geo_children()
+                             << "  do_tilt: " << do_tilt << "  do_eval: " << do_eval; 
+    MsgLog(name(), info, ss.str());
   }
   geo -> get_pixel_coords(X, Y, Z, size, do_tilt, do_eval);
 }

@@ -19,18 +19,9 @@
 #include <boost/shared_ptr.hpp>
 #include <math.h>      // sin, cos
 
-//----------------------
-// Base Class Headers --
-//----------------------
-
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-//#include "ndarray/ndarray.h"
-//#include "CSPadPixCoords/PixCoords2x1V2.h"
-//#include "PSCalib/PixCoords2x1V2.h"
-//#include "PSCalib/SegGeometry.h"
 #include "PSCalib/SegGeometryStore.h"
 
 //------------------------------------
@@ -157,8 +148,6 @@ public:
 
   //typedef GeometryObject* shpGO;
   typedef boost::shared_ptr<GeometryObject> shpGO;
-
-  //enum ALGO_TYPE  {NONDEF, SENS2X1V1, SENS2X1V2};
 
   /**
    *  @brief Class constructor accepts path to the calibration "geometry" file and verbosity control bit-word 
@@ -335,15 +324,15 @@ private:
   double      m_tilt_x;
 
   bool        m_do_tilt;
+  unsigned    m_mbits; // mask control bits
+
+  SG* m_seggeom;
 
   shpGO m_parent;
   std::vector<shpGO> v_list_of_children;
 
-  unsigned m_mbits; // mask control bits
-
   //ALGO_TYPE m_algo;
   //PC2X1* m_pix_coords_2x1;
-  SG* m_seggeom;
 
   unsigned m_size;
   double*  p_xarr;
@@ -351,10 +340,6 @@ private:
   double*  p_zarr;
   double*  p_aarr; // pixel area array
   int*     p_marr; // pixel mask array
-
-  //  NDA  m_X;
-  //  NDA  m_Y;
-  //  NDA  m_Z;
 
   void transform_geo_coord_arrays( const double* X, 
                                    const double* Y,  
