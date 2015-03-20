@@ -144,7 +144,6 @@ PixCoordsProducer::beginRun(Event& evt, Env& env)
   m_count_clb = 0;
 
   checkCalibPars(evt, env);
-  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -153,7 +152,6 @@ PixCoordsProducer::beginCalibCycle(Event& evt, Env& env)
 {
   ++ m_count_calibcycle;
   checkCalibPars(evt, env);
-  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
 
 /// Method which is called with event data, this is the only required 
@@ -166,7 +164,6 @@ PixCoordsProducer::event(Event& evt, Env& env)
 
   checkCalibPars(evt, env);
   //if( m_count_clb ) savePixCoordsInEvent(evt);
-  if( m_count_clb ) savePixCoordsInCalibStore(env);
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -200,6 +197,7 @@ PixCoordsProducer::checkCalibPars(Event& evt, Env& env)
   if( ! getConfigPars(env) ) return;
   if( ! getCalibPars(evt, env) ) return;
 
+  savePixCoordsInCalibStore(env);
   ++ m_count_clb;
 }
 
@@ -209,8 +207,6 @@ PixCoordsProducer::checkCalibPars(Event& evt, Env& env)
 bool
 PixCoordsProducer::getConfigPars(Env& env)
 {
-  m_count_cfg = 0;
-
   // check for CSPAD
   if ( getConfigParsForType<Psana::CsPad::ConfigV2>(env) ) { m_config_vers = "CsPad::ConfigV2"; return true; }
   if ( getConfigParsForType<Psana::CsPad::ConfigV3>(env) ) { m_config_vers = "CsPad::ConfigV3"; return true; }
@@ -227,9 +223,11 @@ PixCoordsProducer::getConfigPars(Env& env)
   if ( getConfigParsForType<Psana::Epix::Config100aV1>(env) ) { m_config_vers = "Epix::Config100aV1"; return true; }
 
   m_count_warnings++;
-  if (m_count_warnings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-5, CsPad2x2::ConfigV1,2, Epix::ConfigV1,10KV1,100aV1"
+  if (m_count_warnings < 11) {
+     MsgLog(name(), warning, "CsPad::ConfigV2-5, CsPad2x2::ConfigV1,2, Epix::ConfigV1,10KV1,100aV1"
 				                     << " is not available in this event...")
-  if (m_count_warnings ==20) MsgLog(name(), warning, "STOP PRINT WARNINGS !!!")
+     if (m_count_warnings==10) MsgLog(name(), warning, "STOP WARNINGS !!!")
+  }
   return false;
 }
 
@@ -244,7 +242,7 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
   PSCalib::CalibFileFinder cff(calib_dir, group, 0);
   std::string fname = cff.findCalibFile(m_src, "geometry", runnum);
 
-  if( m_print_bits &  2 ) {
+  if( m_print_bits & 2 ) {
      std::stringstream ss;
      ss << "Calibration directory: " << calib_dir   
         << "\n  source     : " << m_str_src
@@ -262,10 +260,10 @@ PixCoordsProducer::getCalibPars(Event& evt, Env& env)
   m_geometry = new PSCalib::GeometryAccess(fname, 0);
   if(! m_key_out_x.empty()
   or ! m_key_out_y.empty()
-  or ! m_key_out_z.empty())  m_geometry -> get_pixel_coords(m_pixX, m_pixY, m_pixZ, m_size);
+  or ! m_key_out_z.empty()) m_geometry -> get_pixel_coords(m_pixX, m_pixY, m_pixZ, m_size);
 
-  if(! m_key_out_a .empty()) m_geometry -> get_pixel_areas(m_pixA, m_size_a);
-  if(! m_key_out_m .empty()) m_geometry -> get_pixel_mask(m_pixM, m_size_m, std::string(), 0, m_mask_bits);
+  if(! m_key_out_a.empty()) m_geometry -> get_pixel_areas(m_pixA, m_size_a);
+  if(! m_key_out_m.empty()) m_geometry -> get_pixel_mask(m_pixM, m_size_m, std::string(), 0, m_mask_bits);
 
   if(! m_key_out_ix.empty()
   or ! m_key_out_iy.empty()) {
@@ -331,7 +329,6 @@ PixCoordsProducer::savePixCoordsInCalibStore(Env& env)
     boost::shared_ptr< std::string > shp( new std::string(m_fname) );
     env.calibStore().put(shp, m_src, m_key_gfname);
   }
-
 }
 
 //--------------------
