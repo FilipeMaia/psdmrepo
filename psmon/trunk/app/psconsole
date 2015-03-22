@@ -1,0 +1,2 @@
+#!/bin/bash
+ipython --no-banner --no-confirm-exit -i -m "psmon.console" -- $@
