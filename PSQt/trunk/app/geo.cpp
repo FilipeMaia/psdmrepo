@@ -20,6 +20,9 @@
 #include "PSQt/allinone.h"
 #include "PSQt/Logger.h" // for DEBUG, INFO, etc.
 #include "PSQt/GUILogger.h"
+#include "PSQt/WdgColorBar.h"
+#include "PSQt/WdgRadHist.h"
+#include "PSQt/WdgSpecHist.h"
 
 //===================
 
@@ -114,6 +117,9 @@ int main( int argc, char **argv )
     else if(atoi(argv[1])==9) { PSQt::WdgGeo*         w = new PSQt::WdgGeo();         w->show(); }
     else if(atoi(argv[1])==10){ PSQt::GUILogger*      w = new PSQt::GUILogger();      w->show(); }
     else if(atoi(argv[1])==11){ PSQt::WdgPointPos*    w = new PSQt::WdgPointPos();    w->show(); }
+    else if(atoi(argv[1])==12){ PSQt::WdgColorBar*    w = new PSQt::WdgColorBar();    w->show(); }
+    else if(atoi(argv[1])==13){ PSQt::WdgRadHist*     w = new PSQt::WdgRadHist();     w->show(); }
+    else if(atoi(argv[1])==14){ PSQt::WdgSpecHist*    w = new PSQt::WdgSpecHist();     w->show(); }
     else {cout << "Input argument \"" << argv[1] << "\" is not recognized...\n"; return 0;}
   }
   else {

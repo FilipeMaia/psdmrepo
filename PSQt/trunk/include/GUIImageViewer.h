@@ -18,6 +18,8 @@
 #include "PSQt/WdgPointPos.h"
 #include "PSQt/WdgColorTable.h"
 #include "PSQt/ImageProc.h"
+#include "PSQt/WdgRadHist.h"
+#include "PSQt/WdgSpecHist.h"
 
 namespace PSQt {
 class GUIImageViewer : public Frame
@@ -43,6 +45,7 @@ class GUIImageViewer : public Frame
     void onButRHis();
     void onButAdd();
     void onButColorTab();
+    void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&);
 
  private:
     //QLabel*      m_lab_fname;
@@ -51,16 +54,21 @@ class GUIImageViewer : public Frame
     QPushButton*   m_but_rhis;
     QPushButton*   m_but_add;
     QPushButton*   m_but_cols;
+    QHBoxLayout*   m_hbox;
+    QVBoxLayout*   m_vbox;
 
     //WdgImage*      m_image;
-    WdgImageFigs*  m_image;
-    WdgFile*       m_file;
-    WdgPointPos*   m_pointpos;
-    WdgColorTable* m_colortab;
-    ImageProc*     m_imageproc;
+    WdgImageFigs*    m_image;
+    WdgFile*         m_file;
+    WdgPointPos*     m_pointpos;
+    WdgColorTable*   m_colortab;
+    ImageProc*       m_imageproc;
+    WdgRadHist*      m_radhist;
+    WdgSpecHist*     m_spechist;
 
     inline const char* _name_(){ return "GUIImageViewer"; }
-    void showTips() ;
+    void setStyle();
+    void setTips();
 };
 
 } // namespace PSQt

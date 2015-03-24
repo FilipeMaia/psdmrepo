@@ -120,8 +120,8 @@ WdgImage::setWdgParams()
 
   this->resetZoom();
 
-  connect(this, SIGNAL(zoomIsChanged(int&, int&, int&, int&)), 
-          this, SLOT(testSignalZoomIsChanged(int&, int&, int&, int&)));
+  connect(this, SIGNAL(zoomIsChanged(int&, int&, int&, int&, float&, float&)), 
+          this, SLOT(testSignalZoomIsChanged(int&, int&, int&, int&, float&, float&)));
 }
 
 //--------------------------
@@ -210,7 +210,7 @@ WdgImage::zoomInImage()
      *m_pixmap_scl = m_pixmap_raw->copy(m_xmin_raw, m_ymin_raw, m_xmax_raw-m_xmin_raw, m_ymax_raw-m_ymin_raw);
      setPixmap(m_pixmap_scl->scaled(this->size(), Qt::KeepAspectRatio, Qt::FastTransformation));
 
-     emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw);
+     emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw, m_amin, m_amax);
   }
 }
 
@@ -265,7 +265,7 @@ WdgImage::setPixmapScailedImage(const QImage* image)
     m_xmax_raw = m_pixmap_raw->size().width();
     m_ymax_raw = m_pixmap_raw->size().height();
 
-    emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw);
+    emit zoomIsChanged(m_xmin_raw, m_ymin_raw, m_xmax_raw, m_ymax_raw, m_amin, m_amax);
   }
 }
 
@@ -412,24 +412,30 @@ WdgImage::onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 {
   p_nda_img_raw = &nda;
 
-  stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
+  stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window,"
+                      << " rows:" << nda.shape()[0] << " cols:" << nda.shape()[1]
+                      << " amin=" << m_amin
+                      << " amax=" << m_amax
+                      << " h1="   << m_hue1
+                      << " h2="   << m_hue2;
+
   MsgInLog(_name_(), INFO, ss.str()); 
 
   const ndarray<GeoImage::image_t,2> nda_norm = 
     getUint32NormalizedImage<const GeoImage::raw_image_t>(nda, m_amin, m_amax, m_ncolors, m_hue1, m_hue2); // from QGUtils
   
-  onNormImageIsUpdated(nda_norm);
+  setNormImage(nda_norm);
   update();
 }
 
 //--------------------------
 void 
-WdgImage::onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>& nda)
+WdgImage::setNormImage(const ndarray<GeoImage::image_t,2>& nda)
 {
   const unsigned int rows = nda.shape()[0];
   const unsigned int cols = nda.shape()[1];
 
-  stringstream ss; ss << "onNormImageIsUpdated::Receive and update normalized image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
+  stringstream ss; ss << "setNormImage::set normalized image in window, rows:" << nda.shape()[0] << " cols:" << nda.shape()[1] ;
   MsgInLog(_name_(), DEBUG, ss.str()); 
   
   QImage image((const uchar*) nda.data(), cols, rows, QImage::Format_ARGB32);
@@ -437,6 +443,46 @@ WdgImage::onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>& nda)
   
   static unsigned counter=0; stringstream sst; sst << "Image # " << ++counter;
   setWindowTitle(sst.str().c_str());
+}
+
+//--------------------------
+void 
+WdgImage::setIntensityRange(const float& amin, const float& amax)
+{
+  m_amin = amin;
+  m_amax = amax;
+
+  if(p_nda_img_raw) this->onImageIsUpdated(*p_nda_img_raw);
+
+  //update();
+  std::stringstream ss; ss << ":setIntensityRange amin:" << m_amin << " amax:" << m_amax;
+  MsgInLog(_name_(), INFO, ss.str());  
+}
+
+//--------------------------
+
+void 
+WdgImage::onPressOnAxes(QMouseEvent* e, QPointF p)
+{
+  std::stringstream ss;
+  ss << _name_() << " onPressOnAxes"
+     << "  button: " << e->button()
+     << "  window x(), y() = " << e->x() << ", " << e->y()
+     << "  scene x(), y() = " << p.x() << ", " << p.y();
+
+  MsgInLog(_name_(), INFO, ss.str());
+
+  float amin = m_amin;
+  float amax = m_amax;
+
+  switch (e->button()) {
+  case Qt::LeftButton  : amin = p.x(); break;
+  case Qt::RightButton : amax = p.x(); break;
+  default : 
+  case Qt::MidButton   : amin = 0; amax = 0; break;
+  }
+
+  setIntensityRange(amin, amax);
 }
 
 //--------------------------
@@ -455,14 +501,16 @@ WdgImage::onHueAnglesUpdated(const float& h1, const float& h2)
 
 //--------------------------
 void 
-WdgImage::testSignalZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax)
+WdgImage::testSignalZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax, float& amin, float& amax)
 {
   stringstream ss;
   ss << "testSignalZoomIsChanged(...): zoom is changed to"
      << "  xmin=" << xmin 
      << "  ymin=" << ymin
      << "  xmax=" << xmax 
-     << "  ymax=" << ymax;
+     << "  ymax=" << ymax
+     << "  amin=" << amin 
+     << "  amax=" << amax;
   MsgInLog(_name_(), INFO, ss.str());
 }
 

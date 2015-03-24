@@ -7,11 +7,13 @@
 #include "PSQt/GUAxes.h"
 #include <QGraphicsScene>
 #include <QGraphicsView>
+#include <QGraphicsPathItem>
 
 #include <math.h>   // atan2, abs, fmod
 #include <string> 
 #include <sstream>  // for stringstream
 #include <stdint.h> // uint8_t, uint32_t, etc.
+#include <iomanip>  // for setw
 //#include "PSQt/GeoImage.h"
 //#include <QPainter>
 //#include <QPen>
@@ -46,7 +48,7 @@ uint32_t HSV2RGBA(const float H, const float S, const float V);
  * H1, H2=[-360,360] - extended to negative hue range
  */ 
 uint32_t*
-  ColorTable(const unsigned& NColors=1024, const float& H1=-120, const float& H2=-360);
+  ColorTable(const unsigned& NColors=0, const float& H1=0, const float& H2=0);
 
 /**
  * Returns 2-d ndarray with colorbar image
@@ -79,9 +81,9 @@ void
 //--------------------------
 
 template<typename T>
-  std::string val_to_string(const T& v)
+  std::string val_to_string(const T& v, const unsigned& prec=0)
   {
-    std::stringstream ss; ss << v;
+    std::stringstream ss; ss << std::fixed << std::setprecision(prec) << v;
     return ss.str();
   }
 
@@ -93,9 +95,19 @@ template<typename T>
 
 //--------------------------
 
- void graph(QGraphicsScene* scene, const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
- void graph(QGraphicsView * view,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
- void graph(PSQt::GUAxes  * axes,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+ QGraphicsPathItem* 
+   graph(QGraphicsScene* scene, const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+
+ QGraphicsPathItem* 
+   graph(QGraphicsView * view,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+
+//--------------------------
+
+ QGraphicsPathItem* 
+   hist(QGraphicsScene* scene, const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
+
+ QGraphicsPathItem* 
+   hist(QGraphicsView * view,  const float* x, const float* y, const int n=1, const std::string& opt=std::string("-bT"));
 
 //--------------------------
  
@@ -199,22 +211,28 @@ ndarray<uint32_t,2>
 
   ndarray<image_t, 2> inda(dnda.shape());
 
-  double dmin, dmax, dave, drms;
-  //getMinMax(dnda, dmin, dmax);
+  double dmin, dmax;
 
   if (amin || amax) {
     dmin = amin;
     dmax = amax;
   }
   else {
-    getAveRms(dnda, dave, drms);
-    dmin = dave - 1*drms;
-    dmax = dave + 10*drms;
-  //dmin = 1300;
-  //dmax = 1700;
+    getMinMax(dnda, dmin, dmax);
+
+    //double dave, drms;
+    //getAveRms(dnda, dave, drms);
+    //dmin = dave - 1*drms;
+    //dmax = dave + 10*drms;
   }
 
-  std::stringstream ssd; ssd << "getUint32NormalizedImage(): dmin: " << dmin << " dmax: " << dmax;
+  std::stringstream ssd; ssd << "getUint32NormalizedImage():" 
+                             << " dmin:"  << dmin
+                             << " dmax:"  << dmax
+                             << " h1:"    << hue1
+                             << " h2:"    << hue2
+                             << " ncols:" << ncolors;
+
   MsgInLog("QGUtils", DEBUG, ssd.str());
 
   typename ndarray<T, 2>::iterator itd = dnda.begin();
@@ -237,7 +255,8 @@ ndarray<uint32_t,2>
     image_t* ctable = ColorTable(ncolors, hue1, hue2);
     ndarray<image_t, 2>::iterator iti;
     for(itd=dnda.begin(), iti=inda.begin(); itd!=dnda.end(); ++itd, ++iti) { 
-      unsigned cind = unsigned((*itd-dmin)*k);
+      float da = *itd-dmin;
+      unsigned cind = (da>0) ? unsigned(da*k) : 0;
       cind = (cind<ncolors) ? cind : ncolors-1;
       *iti = ctable[cind]; // converts to 24bits adds alpha layer
     }

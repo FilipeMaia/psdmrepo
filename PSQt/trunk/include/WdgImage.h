@@ -67,17 +67,17 @@ class WdgImage : public QLabel
   QPointF pointInImage(const QPointF& point_raw);
   QPointF pointInRaw(const QPointF& point_raw);
 
+
  public slots:
+    void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&) ;
     void onFileNameChanged(const std::string& fname) ;
     void onTest() ;
-    void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&) ;
-    void onNormImageIsUpdated(const ndarray<GeoImage::image_t,2>&) ;
+    void onPressOnAxes(QMouseEvent* e, QPointF p);
     void onHueAnglesUpdated(const float&, const float&);
-
-    void testSignalZoomIsChanged(int&, int&, int&, int&);
+    void testSignalZoomIsChanged(int&, int&, int&, int&, float&, float&);
 
  signals :
-    void zoomIsChanged(int&, int&, int&, int&);
+    void zoomIsChanged(int&, int&, int&, int&, float&, float&);
 					 
  protected:
 
@@ -138,6 +138,9 @@ class WdgImage : public QLabel
     inline const char* _name_(){return "WdgImage";}
     void setWdgParams() ;
     void resetZoom() ;
+    void setIntensityRange(const float& amin, const float& amax);
+    void setNormImage(const ndarray<GeoImage::image_t,2>&) ;
+
 };
 
 } // namespace PSQt

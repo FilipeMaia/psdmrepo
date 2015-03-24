@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2015-03-23 Mikhail S. Dubrovin
+- Add modules WdgColorBar, WdgRadHist, WdgSpecHist, 
+- add multiple protections - the 1st stable version with all basic features (PSAS-11)
+	
 2015-03-11 Mikhail S. Dubrovin
 - in GeoImage, WdgImage, ImageProc, GUIMain, GUIImageViewer signals and slots slots transfer ndarray w/o const
 - GUIMain - clean-up code

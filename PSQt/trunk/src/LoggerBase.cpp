@@ -48,6 +48,8 @@ LoggerBase::message(const std::string& name, const LEVEL& level, const std::stri
 
   // Check input message level. Messages with level lover than threshold are ignored in callback.
   if(level < m_level) return;
+
+  if(m_level == DEBUG) std::cout << rec.strRecordTotal() << '\n';
   new_record(rec);
 }
 
@@ -141,7 +143,7 @@ Record::strRecordTotal()
   ss << left << std::setw(4) << number
      << fixed << std::setw(16) << std::setprecision(3) << time 
      << std::setw(21) << tstamp
-     << std::setw(10) << name << ' '
+     << std::setw(12) << name << ' '
      << std::setw(10) << strLevel(level)
      << msg;
   return ss.str();

@@ -1,6 +1,8 @@
 #ifndef GUAXES_H
 #define GUAXES_H
 
+#include <PSQt/GURuler.h>
+
 #include <string>
 #include <QWidget>
 #include <QGraphicsView>
@@ -22,28 +24,51 @@ class GUAxes : public QGraphicsView
 
 public:
 
-  //enum ORIDIR {HORUP, HORDOWN, VERRIGHT, VERLEFT};
-
   GUAxes( QWidget *parent=0
-	  , const float& xmin =  0
-	  , const float& xmax = 30
-	  , const float& ymin =-10
-	  , const float& ymax = 20 
-	  , const unsigned pbits = 0177777); 
+	  , const float& xmin      = 0
+	  , const float& xmax      = 100
+	  , const float& ymin      = 0
+	  , const float& ymax      = 100 
+	  , const unsigned& nxdiv1 = 4
+	  , const unsigned& nydiv1 = 4
+	  , const unsigned& nxdiv2 = 2
+	  , const unsigned& nydiv2 = 2
+	  , const unsigned pbits   = 0); // 0177777
 
-  virtual ~GUAxes () {}
+  virtual ~GUAxes ();
+
+  void setLimits( const float& xmin = 0
+       	        , const float& xmax = 100
+       	        , const float& ymin = 0
+       	        , const float& ymax = 100
+       	        , const unsigned& nxdiv1 = 4
+                , const unsigned& nydiv1 = 4
+       	        , const unsigned& nxdiv2 = 2
+		, const unsigned& nydiv2 = 2);
 
   void updateTransform();
   void setAxes();
+  void setPen(const QPen& pen) { m_pen=pen; }
+  void setFont(const QFont& font) { m_font=font; }
+  void setColor(const QColor& color) { m_color=color; }
   void printMemberData();
   void printTransform();
 
-  QTransform  transform() { return pview()->transform(); }
-  QGraphicsScene * pscene() { return pview()->scene(); }
-  //QGraphicsView *  pview() { return dynamic_cast<QGraphicsView*>(this); }
-  //QGraphicsView &  rview() { return *dynamic_cast<QGraphicsView*>(this); }
+  QTransform  transform()  { return pview()->transform(); }
+  QGraphicsScene * pscene(){ return pview()->scene(); }
   QGraphicsView *  pview() { return this; }
   QGraphicsView &  rview() { return *this; }
+
+
+ signals :
+    void pressOnAxes(QMouseEvent*, QPointF) ;
+    void releaseOnAxes(QMouseEvent*, QPointF) ;
+    void moveOnAxes(QMouseEvent*, QPointF) ;
+
+ public slots:
+    void testSignalPressOnAxes(QMouseEvent*, QPointF) ;
+    void testSignalReleaseOnAxes(QMouseEvent*, QPointF) ;
+    void testSignalMoveOnAxes(QMouseEvent*, QPointF) ;
 
  protected:
     void closeEvent(QCloseEvent *event = 0) ;
@@ -54,17 +79,32 @@ public:
 
 private:
 
-  //QGraphicsView& m_view;
-    std::string    m_oristr;
-    float          m_xmin;
-    float          m_xmax;
-    float          m_ymin;
-    float          m_ymax;
-    unsigned       m_pbits;
+  //QGraphicsView&  m_view;
+    float           m_xmin;
+    float           m_xmax;
+    float           m_ymin;
+    float           m_ymax;
+    unsigned        m_nxdiv1;
+    unsigned        m_nydiv1;
+    unsigned        m_nxdiv2;
+    unsigned        m_nydiv2;
+    unsigned        m_pbits;
+    QColor          m_color;
+    QPen            m_pen;
+    QFont           m_font;
 
     QGraphicsScene* m_scene; 
+    QRectF          m_scene_rect;
 
-    //QPainterPath m_path;
+    PSQt::GURuler* m_ruler_hd; 
+    PSQt::GURuler* m_ruler_hu; 
+    PSQt::GURuler* m_ruler_vl; 
+    PSQt::GURuler* m_ruler_vr; 
+
+    inline const char* _name_(){return "GUAxes";}
+    QPointF pointOnAxes(QMouseEvent *e);
+    void connectForTest(); 
+    void message(QMouseEvent *e, const QPointF& sp, const char* cmt="");
 };
 
 //--------------------------

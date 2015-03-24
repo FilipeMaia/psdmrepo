@@ -58,13 +58,18 @@ HSV2RGBA(const float H, const float S, const float V) // H=[0,360), S, V = [0,1]
 uint32_t*
 ColorTable(const unsigned& NColors, const float& H1, const float& H2) // H1, H2=[-360,360]
 {
-  uint32_t* ctable = new uint32_t[NColors];
+  // Set default or input parameters for color table
+  unsigned NCols = (NColors) ? NColors : 1024;
+  float H1L = (H1 || H2) ? H1 : -120;
+  float H2L = (H1 || H2) ? H2 :   60;
+
+  uint32_t* ctable = new uint32_t[NCols];
 
   const float S=1; 
   const float V=1;
-  const float dH = (H2-H1)/NColors;
-  float H=H1;
-  for(unsigned i=0; i<NColors; ++i, H+=dH) {
+  const float dH = (H2L-H1L)/NCols;
+  float H=H1L;
+  for(unsigned i=0; i<NCols; ++i, H+=dH) {
     ctable[i] = HSV2RGBA(H, S, V);
   }
   return ctable;
@@ -143,21 +148,21 @@ void set_pen(QPen & pen, const std::string & opt)
   //pen.setCosmetic(true);
   //pen.setStyle (Qt::SolidLine) // Qt::DashLine, Qt::DotLine, Qt::DashDotLine, Qt::DashDotDotLine, Qt::NoPen	
 
-    if( opt.find('-') != std::string::npos ) pen.setStyle (Qt::SolidLine);
-    if( opt.find('.') != std::string::npos ) pen.setStyle (Qt::DotLine);
-    if( opt.find('!') != std::string::npos ) pen.setStyle (Qt::DashDotLine);
+    if     ( opt.find('-') != std::string::npos ) pen.setStyle (Qt::SolidLine);
+    else if( opt.find('.') != std::string::npos ) pen.setStyle (Qt::DotLine);
+    else if( opt.find('!') != std::string::npos ) pen.setStyle (Qt::DashDotLine);
 
-    if( opt.find('k') != std::string::npos ) pen.setColor(Qt::black);
-    if( opt.find('b') != std::string::npos ) pen.setColor(Qt::blue);
-    if( opt.find('r') != std::string::npos ) pen.setColor(Qt::red);
-    if( opt.find('g') != std::string::npos ) pen.setColor(Qt::green);
-    if( opt.find('y') != std::string::npos ) pen.setColor(Qt::yellow);
+    if     ( opt.find('k') != std::string::npos ) pen.setColor(Qt::black);
+    else if( opt.find('b') != std::string::npos ) pen.setColor(Qt::blue);
+    else if( opt.find('r') != std::string::npos ) pen.setColor(Qt::red);
+    else if( opt.find('g') != std::string::npos ) pen.setColor(Qt::green);
+    else if( opt.find('y') != std::string::npos ) pen.setColor(Qt::yellow);
 
-    if( opt.find('1') != std::string::npos ) pen.setWidth(1);
-    if( opt.find('2') != std::string::npos ) pen.setWidth(2);
-    if( opt.find('3') != std::string::npos ) pen.setWidth(3);
-    if( opt.find('4') != std::string::npos ) pen.setWidth(4);
-    if( opt.find('5') != std::string::npos ) pen.setWidth(5);
+    if     ( opt.find('1') != std::string::npos ) pen.setWidth(1);
+    else if( opt.find('2') != std::string::npos ) pen.setWidth(2);
+    else if( opt.find('3') != std::string::npos ) pen.setWidth(3);
+    else if( opt.find('4') != std::string::npos ) pen.setWidth(4);
+    else if( opt.find('5') != std::string::npos ) pen.setWidth(5);
 }
 //--------------------------
 
@@ -166,12 +171,12 @@ void set_brash(QBrush & brush, const std::string & opt)
   //QBrush brush(Qt::transparent, Qt::SolidPattern);  
   //brush.setStyle (Qt::SolidPattern);
 
-    if( opt.find('T') != std::string::npos ) brush.setColor(Qt::transparent);
-    if( opt.find('K') != std::string::npos ) brush.setColor(Qt::black);
-    if( opt.find('B') != std::string::npos ) brush.setColor(Qt::blue);
-    if( opt.find('R') != std::string::npos ) brush.setColor(Qt::red);
-    if( opt.find('G') != std::string::npos ) brush.setColor(Qt::green);
-    if( opt.find('Y') != std::string::npos ) brush.setColor(Qt::yellow);
+    if     ( opt.find('T') != std::string::npos ) brush.setColor(Qt::transparent);
+    else if( opt.find('K') != std::string::npos ) brush.setColor(Qt::black);
+    else if( opt.find('B') != std::string::npos ) brush.setColor(Qt::blue);
+    else if( opt.find('R') != std::string::npos ) brush.setColor(Qt::red);
+    else if( opt.find('G') != std::string::npos ) brush.setColor(Qt::green);
+    else if( opt.find('Y') != std::string::npos ) brush.setColor(Qt::yellow);
 }
 
 //--------------------------
@@ -185,36 +190,75 @@ void set_pen_brush(QPen & pen, QBrush & brush, const std::string & opt)
 
 //--------------------------
 
-void graph(QGraphicsScene* scene, const float* x, const float* y, const int n, const std::string& opt)
+QGraphicsPathItem* 	
+graph(QGraphicsScene* scene, const float* x, const float* y, const int n, const std::string& opt)
 {
   //std::cout << "QGraphicsScene\n";
   //QPen pen;
   QPen   pen  (Qt::blue, 2, Qt::SolidLine);
-  QBrush brush(Qt::transparent, Qt::SolidPattern);  
-
+  QBrush brush(Qt::transparent, Qt::SolidPattern);
   set_pen_brush(pen, brush, opt);
-
   pen.setCosmetic(true);
 
   QPainterPath path;     path.moveTo(x[0],y[0]);
   for(int i=1; i<n; ++i) path.lineTo(x[i],y[i]);
-  scene->addPath(path, pen, brush);
+  return scene->addPath(path, pen, brush);
 }
 
 //--------------------------
 
-void graph(QGraphicsView* view, const float* x, const float* y, const int n, const std::string& opt)
+QGraphicsPathItem* 	
+graph(QGraphicsView* view, const float* x, const float* y, const int n, const std::string& opt)
 {
-  //std::cout << "QGraphicsView\n";
-  graph(view->scene(), x, y, n, opt);
+  return graph(view->scene(), x, y, n, opt);
 }
 
 //--------------------------
 
-void graph(PSQt::GUAxes* axes, const float* x, const float* y, const int n, const std::string& opt)
+QGraphicsPathItem* 	
+hist(QGraphicsScene* scene, const float* x, const float* y, const int n, const std::string& opt)
 {
-  //std::cout << "PSQt::GUAxes\n";
-  graph(axes->pview()->scene(), x, y, n, opt);
+  //std::cout << "QGraphicsScene\n";
+  //QPen pen;
+  QPen   pen  (Qt::blue, 2, Qt::SolidLine);
+  QBrush brush(Qt::transparent, Qt::SolidPattern);
+  set_pen_brush(pen, brush, opt);
+  pen.setCosmetic(true);
+
+  QRectF sr = scene->sceneRect();
+  float ymin = sr.top();
+  /*
+  float ymax = sr.bottom();
+  float xmin = sr.left();
+  float xmax = sr.right();
+
+  std::cout << "  scene:" 
+            << "  xmin:"  << xmin
+            << "  xmax:"  << xmax
+            << "  ymin:"  << ymin
+            << "  ymax:"  << ymax
+            << '\n';
+  */
+
+  QPainterPath path; 
+      path.moveTo(x[0],ymin);
+      path.lineTo(x[0],y[0]);
+  for(int i=1; i<n; ++i) {
+      path.lineTo(x[i],y[i-1]);
+      path.lineTo(x[i],y[i]);
+  }
+      path.lineTo(x[n-1],ymin);
+      //path.lineTo(x[n],y[n-1]);
+      //path.lineTo(x[n],ymin);
+  return scene->addPath(path, pen, brush);
+}
+
+//--------------------------
+
+QGraphicsPathItem* 	
+hist(QGraphicsView* view, const float* x, const float* y, const int n, const std::string& opt)
+{
+  return hist(view->scene(), x, y, n, opt);
 }
 
 //--------------------------

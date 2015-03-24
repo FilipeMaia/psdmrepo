@@ -12,8 +12,8 @@ DragCenter::DragCenter(WdgImage* wimg, const QPointF* points)
   //std::cout << "c-tor DragCenter()  xc:" << points[0].x() << "  yc:" << points[0].y() << '\n';
   //std::cout << "DragCenter() c-tor\n";
 
-  connect(this, SIGNAL(centerIsMoved(const QPointF&)), 
-          this, SLOT(testSignalCenterIsMoved(const QPointF&)));
+  //connect(this, SIGNAL(centerIsMoved(const QPointF&)), 
+  //        this, SLOT(testSignalCenterIsMoved(const QPointF&)));
   connect(this, SIGNAL(centerIsChanged(const QPointF&)), 
           this, SLOT(testSignalCenterIsChanged(const QPointF&)));
 }

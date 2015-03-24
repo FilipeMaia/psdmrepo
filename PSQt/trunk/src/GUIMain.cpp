@@ -43,7 +43,7 @@ GUIMain::GUIMain( QWidget *parent
   m_wge       = new PSQt::WdgGeo(this);
   m_geoimg    = new PSQt::GeoImage(m_wgt->geoacc(), fname_nda);  
   m_guiimv    = new PSQt::GUIImageViewer(0);
-  m_wimage    = m_guiimv->wdgImage();
+  //m_wimage    = m_guiimv->wdgImage();
  
   m_but_image = new QPushButton("Image", this);
   m_but_save  = new QPushButton("Save", this);
@@ -108,11 +108,14 @@ GUIMain::GUIMain( QWidget *parent
   connect(m_wge,      SIGNAL(geoIsChanged(shpGO&)), 
           m_geoimg,   SLOT(onGeoIsChanged(shpGO&)));
 
-  connect(m_geoimg,   SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
-          m_wimage,   SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
+  //connect(m_geoimg,   SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
+  //        m_wimage,   SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
 
-  connect(m_geoimg,                 SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
-          m_guiimv->getImageProc(), SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
+  //connect(m_geoimg,                 SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
+  //        m_guiimv->getImageProc(), SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
+
+  connect(m_geoimg, SIGNAL(imageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)), 
+          m_guiimv, SLOT(onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&)));
 
   // Complete initialization through connected signals & slots
   m_wgt -> get_geotree() -> setItemSelected();
@@ -141,7 +144,7 @@ GUIMain::setStyle()
   m_but_image -> setIcon(QIcon(QString(adp_icon_image.path().c_str())));
   m_but_save  -> setIcon(QIcon(QString(adp_icon_save.path().c_str()))); 
 
-  this -> setGeometry(0, 0, 700, 726);
+  this -> setGeometry(0, 0, 600, 726);
   this -> setWindowTitle(tr("Detector alignment"));
 
   m_guiimv -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  

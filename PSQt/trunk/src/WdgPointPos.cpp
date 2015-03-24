@@ -105,11 +105,9 @@ WdgPointPos::setPointPos(const QPointF& pos)
   m_edi1->setText(ss1.str().c_str());
   m_edi2->setText(ss2.str().c_str());
 
-  stringstream ss; ss << "Center position is set to x: " << pos.x() << "  y: " << pos.y(); 
-  MsgInLog(_name_(), DEBUG, ss.str());
+  //stringstream ss; ss << "Center position is set to x: " << pos.x() << "  y: " << pos.y(); 
+  //MsgInLog(_name_(), DEBUG, ss.str());
   //std::cout << ss.str() << '\n'; 
-
-  //emit posIsChanged(pos);
 }
 
 //--------------------------
