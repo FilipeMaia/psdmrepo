@@ -107,10 +107,12 @@ class Hist(Plot):
     A data container for 1-d histogram data for the psmon client
     """
 
-    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, formats='-'):
+    def __init__(self, ts, title, bins, values, xlabel=None, ylabel=None, leg_label=None, leg_offset=None, formats='-'):
         super(Hist, self).__init__(ts, title, xlabel, ylabel)
         self.bins = bins
         self.values = values
+        self.leg_label = leg_label
+        self.leg_offset = leg_offset
         self.formats = formats
 
     @property
@@ -129,10 +131,12 @@ class XYPlot(Plot):
     A data container for xy scatter plot data for the psmon client
     """
 
-    def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None, formats='-'):
+    def __init__(self, ts, title, xdata, ydata, xlabel=None, ylabel=None, leg_label=None, leg_offset=None, formats='-'):
         super(XYPlot, self).__init__(ts, title, xlabel, ylabel)
         self.xdata = xdata
         self.ydata = ydata
+        self.leg_label = leg_label
+        self.leg_offset = leg_offset
         self.formats = formats
 
     @property

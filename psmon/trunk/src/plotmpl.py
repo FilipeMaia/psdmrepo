@@ -96,7 +96,7 @@ class PlotClient(object):
         if self.info.yrange is not None:
             self.ax.set_ylim(self.info.yrange)
 
-    def set_aspect(self, lock, ratio):
+    def set_aspect(self, lock=True, ratio=None):
         if ratio is None:
             ratio=self.info.aspect
         if lock:
@@ -133,6 +133,13 @@ class PlotClient(object):
                 plot.set_marker(marker)
                 plot.set_color(color)
                 old_fmts[index] = new_fmt
+
+    def add_legend(self, plots, plot_data, leg_label, leg_offset):
+        if leg_label is not None:
+            self.legend_labels = inflate_input(leg_label, plot_data)
+            for plot, label in zip(plots, self.legend_labels):
+                plot.set_label(label)
+            self.legend = self.ax.legend()
 
 
 class MultiPlotClient(object):
@@ -216,26 +223,46 @@ class HistClient(PlotClient):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
         # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
-        if init_hist.bins.size > init_hist.values.size:
-            plot_args = arg_inflate_flat(1, init_hist.bins[:-1], init_hist.values, init_hist.formats)
-        else:
-            plot_args = arg_inflate_flat(1, init_hist.bins, init_hist.values, init_hist.formats)
+        plot_args = arg_inflate_flat(1, self.correct_bins(init_hist.bins, init_hist.values), init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
         self.formats = inflate_input(init_hist.formats, init_hist.values)
         self.set_aspect()
         self.set_xy_ranges()
         self.set_grid_lines()
+        self.add_legend(self.hists, init_hist.values, init_hist.leg_label, init_hist.leg_offset)
 
     def update_sub(self, data):
         if data is not None:
             # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
-            if data.bins.size > data.values.size:
-                self.update_plot_data(self.hists, data.bins[:-1], data.values, data.formats, self.formats)
-            else:
-                self.update_plot_data(self.hists, data.bins, data.values, data.formats, self.formats)
+            self.update_plot_data(self.hists, self.correct_bins(data.bins, data.values), data.values, data.formats, self.formats)
             self.ax.relim()
             self.ax.autoscale_view()
         return self.hists
+
+    def correct_bins(self, bins, values):
+        """
+        Checks that number of bins is correct for matplotlib. pyqtgraph needs a 
+        trailing bin edge that mpl doesn't so check for that and remove if 
+        needed.
+
+        Takes the 'bins' numpy array (single or list of) and compares to the 
+        'values' numpy array (single or list of) and trims trailing entry from 
+        'bins' if its size is greater than that of the mathcing 'values'.
+
+        Returns the corrected 'bins'.
+        """
+        if is_py_iter(bins) or is_py_iter(values):
+            corrected_bins = []
+            for bin, value in zip(inflate_input(bins, values), values):
+                if bin.size > value.size:
+                    corrected_bins.append(bin[:-1])
+                else:
+                    corrected_bins.append(bin)
+            return corrected_bins
+        elif bins.size > values.size:
+            return bins[:-1]
+        else:
+            return bins
 
 
 class XYPlotClient(PlotClient):
@@ -247,6 +274,7 @@ class XYPlotClient(PlotClient):
         self.set_aspect()
         self.set_xy_ranges()
         self.set_grid_lines()
+        self.add_legend(self.plots, init_plot.ydata, init_plot.leg_label, init_plot.leg_offset)
 
     def update_sub(self, data):
         if data is not None:

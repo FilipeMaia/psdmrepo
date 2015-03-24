@@ -171,6 +171,13 @@ class PlotClient(object):
             mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
             self.cursor_hover_evt_sub(int(mouse_pos.x()), int(mouse_pos.y()))
 
+    def add_legend(self, leg_label, leg_offset):
+        if leg_label is not None:
+            if leg_offset is None:
+                self.plot_view.addLegend()
+            else:
+                self.plot_view.addLegend(offset=leg_offset)
+
 
 class ImageClient(PlotClient):
     def __init__(self, init_im, framegen, info, rate=1, **kwargs):
@@ -238,13 +245,15 @@ class XYPlotClient(PlotClient):
         super(XYPlotClient, self).__init__(init_plot, framegen, info, rate, **kwargs)
         self.plots = []
         self.formats = []
-        for xdata, ydata, format_val in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats):
+        self.add_legend(init_plot.leg_label, init_plot.leg_offset)
+        for xdata, ydata, format_val, legend in arg_inflate_tuple(1, init_plot.xdata, init_plot.ydata, init_plot.formats, init_plot.leg_label):
             cval = len(self.plots)
             self.formats.append((format_val, cval))
             self.plots.append(
                 self.plot_view.plot(
                     x=xdata,
                     y=ydata,
+                    name=legend,
                     **parse_fmt_xyplot(format_val, cval)
                 )
             )
@@ -270,12 +279,14 @@ class HistClient(PlotClient):
         super(HistClient, self).__init__(init_hist, framegen, info, rate, **kwargs)
         self.hists = []
         self.formats = []
-        for bins, values, format_val in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats):
+        self.add_legend(init_hist.leg_label, init_hist.leg_offset)
+        for bins, values, format_val, legend in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats, init_hist.leg_label):
             cval = len(self.hists)
             self.formats.append((format_val, cval))
             hist = pg.PlotCurveItem(
                 x=bins,
                 y=values,
+                name=legend,
                 stepMode=True,
                 fillLevel=0,
                 **parse_fmt_hist(format_val, cval)
