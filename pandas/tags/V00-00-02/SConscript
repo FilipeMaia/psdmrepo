@@ -1,0 +1,24 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 4651 2012-10-26 16:55:30Z salnikov@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package pandas
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+
+pkg = "pandas"
+pkg_ver = "0.13.1b"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
