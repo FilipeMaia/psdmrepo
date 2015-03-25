@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "gnuplot-py"
-pkg_ver = "1.8a"
+pkg_ver = "1.8b"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin("lib", '$PYTHON', "site-packages", "Gnuplot")
