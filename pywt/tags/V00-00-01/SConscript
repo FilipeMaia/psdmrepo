@@ -1,0 +1,24 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 8590 2014-07-10 00:17:53Z gapon@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package pywt
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+
+pkg = "pywt"
+pkg_ver = "0.2.2a"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
