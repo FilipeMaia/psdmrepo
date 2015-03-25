@@ -15,7 +15,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 
 pkg = "pandas"
-pkg_ver = "0.13.1a"
+pkg_ver = "0.13.1b"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
