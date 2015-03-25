@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "numpy"
-pkg_ver = "1.8.1"
+pkg_ver = "1.9.2"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 
