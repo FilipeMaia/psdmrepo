@@ -1,0 +1,9 @@
+
+.. _g2:
+
+############
+G2
+############
+
+See https://confluence.slac.stanford.edu/display/PSDM/Data+Processing+for+Time+Correlation 
+for some background information on the G2 calculation.
