@@ -1,0 +1,9 @@
+This release is based on ana-0.13.18 tags except those
+external packages which had to be upgraded due to changes
+in NumPy, SciPy and OpenCV. Otherwise this release must
+be identical to ana-0.13.18.
+
+External packages:
+- numpy: upgraded to version 1.9.2
+- scipy: upgraded to versin 0.15.1
+- opencv2: added version 2.4.11
