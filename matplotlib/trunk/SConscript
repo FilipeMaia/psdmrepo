@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "matplotlib"
-pkg_ver = "1.3.1c"
+pkg_ver = "1.3.1d"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
