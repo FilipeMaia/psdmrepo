@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 pkg = "pyFFTW"
-pkg_ver = "0.9.2"
+pkg_ver = "0.9.2a"
 
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin("lib", '$PYTHON', "site-packages")
