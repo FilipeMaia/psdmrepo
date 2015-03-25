@@ -1,0 +1,43 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: template!SConscript! 8 2008-10-08 22:35:33Z salnikov $
+#
+# Description:
+#  SConscript file for package opencv2
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+import os
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "opencv2"
+pkg_ver = "2.4.11"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+
+INCDIR = "include/"+pkg
+LIBDIR = "lib"
+BINDIR = "bin"
+
+LIBS = "lib*.so*"
+
+PKGLIBS = ' '.join(("opencv_calib3d","opencv_contrib","opencv_core",     "opencv_features2d","opencv_flann",  "opencv_gpu",
+                    "opencv_highgui","opencv_imgproc","opencv_legacy",   "opencv_ml",        "opencv_nonfree","opencv_objdetect",
+                    "opencv_ocl",    "opencv_photo",  "opencv_stitching","opencv_superres",  "opencv_video",  "opencv_videostab"))
+
+PYDIR = pjoin(LIBDIR, '$PYTHON', "site-packages")
+
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
+
