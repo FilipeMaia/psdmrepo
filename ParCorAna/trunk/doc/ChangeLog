@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-3-24 David A. Schneider
+- add sphinxdoc directory and .rst files for documentation.
+  updated default_config.py to include the worker_store_dtype value
+	
 2015-1-21 David A. Schneider
 - improve helper function returning delay list to always return requested # of delays
 	

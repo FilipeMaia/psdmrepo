@@ -1,10 +1,10 @@
 '''Example of implementing user code for the G2 calculation.
 
 Notes:
-An import of this module should not do anything complicated. Delay anything
-complicated until the __init__ method or other methods of the class. The reason 
-for this is that an import of the module is done when reading the params.py file.
-An import should not depend on MPI or take a long amount of time.
+  An import of this module should not do anything complicated. Delay anything
+  complicated until the __init__ method or other methods of the class. The reason 
+  for this is that an import of the module is done when reading the params.py file.
+  An import should not depend on MPI or take a long amount of time.
 '''
 
 import os
@@ -17,17 +17,20 @@ import ParCorAna.XCorrWorkerBase as XCorrWorkerBase
 ### helper functions for UserG2 class below
 def getMatchingIndex(delay, iiTimeIdx, n, timesSortIdx, T):
     '''This is a helper function to workerCalc.
-    returns index into T for time such that T[index]-T[iiTimeIdx]==delay
-    or None if no such time exists in T.
 
-    assumes that timesSortIdx is a sorted order of T.
+    Assumes that timesSortIdx is a sorted order of T.
 
-    args:
-      delay        - delay to match
-      iiTimeIdx    - index into T for start time
-      n            - number of times to consider in T
-      timesSortIdx - sorted order for T
-      T            - T values
+    Args:
+      delay (int):     delay to match
+      iiTimeIdx (int): index into T for start time
+      n (int):         number of times to consider in T
+      timesSortIdx (list/array): sorted order for T
+      T (list/array):          T values
+
+    Return:
+      index into T for time such that `T[index]-T[iiTimeIdx]==delay`
+      or None if no such time exists in T.
+
     '''
     jjTimeIdx = iiTimeIdx + delay
     if jjTimeIdx >= n:
@@ -41,12 +44,13 @@ def getMatchingIndex(delay, iiTimeIdx, n, timesSortIdx, T):
 
 ####################################
 class UserG2(object):
+    '''called on each rank after mpi parameters are identified.
+    
+    Keep code here simple. This class is called for both the viewer rank
+    and all the worker ranks. Initialize variables specific fo a worker or viewer
+    in the initWorker() and initViewer() callbacks.
+    '''
     def __init__(self, user_params, system_params, mpiParams):
-        '''called on each rank after mpi parameters are identified.
-        keep code here simple. This class is called for both the viewer rank
-        and all the worker ranks. Initialize variables specific fo a worker or viewer
-        in the initWorker() and initViewer() callbacks.
-        '''
         self.user_params = user_params
         self.system_params = system_params
         self.mp = mpiParams
@@ -76,10 +80,12 @@ class UserG2(object):
     #
     # All these functions need to be implemented.
     def arrayNames(self):
-        '''Return a list of names for the arrays calculated. This is how the
-        framework knows how many output arrays the user module creates.
+        '''Return a list of names for the arrays calculated. 
+
+        This is how the framework knows how many output arrays the user module creates.
         These must be the same names that workerCalc returns in its dictionary
         of named arrays.
+
         These will be the names the framework passes to the viewer with the
         assembed arrays.
         '''
@@ -97,12 +103,10 @@ class UserG2(object):
         Return True if an event is Ok to  proceeed with.
         This is called before the detector data array is retreived from the event.
         Do any filtering that does not require the data array here.
-        Filtering based on the data array should be done in 
-        
-        finalDataArray below
+        Filtering based on the data array should be done in :meth:`ParCorAna.UserG2:finalDataArray`
 
-        ARGS:
-           evt  - a psana event. Type psana.Event
+        Args:
+           evt (psana.Event): a psana event.
         '''
         return True
 
@@ -119,8 +123,9 @@ class UserG2(object):
     ######## WORKER CALLBACKS #########
     def initWorker(self, numElementsWorker):
         '''initialize UserG2 on a worker rank
-        ARGS:
-         numElementsWorker - number of elements this worker processes
+
+        Args:
+          numElementsWorker (int): number of elements this worker processes
         '''
         self.numElementsWorker = numElementsWorker
 
@@ -162,19 +167,19 @@ class UserG2(object):
         could be below or above the pivotPoint, however the framework will take care of moving things around
         in X and T to ensure that T is a circularly sorted array (WARNING: not implemented yet).
 
-        ARGS:
-         T       - 1D Times array, values are the 120hz int64 counters for events. 
+        Args:
+         T:        1D Times array, values are the 120hz int64 counters for events. 
                    T[dataIdx] is the value about to be overwritten (for SUBTRACT) or the value that
                    has just been replaced, or appended during the first time through T (for ADD)
-         X       - 2D data array, X[dataIdx,:] is the data about to replaced during SUBTRACT, or that has 
+         X:        2D data array, X[dataIdx,:] is the data about to replaced during SUBTRACT, or that has 
                    just been copied in from a server (for ADD)
-         dataIdx - the index into T and X of the time/data about to be removed (SUBTRACT), or that has just
+         dataIdx:  the index into T and X of the time/data about to be removed (SUBTRACT), or that has just
                    been added (ADD)
-         pivotIndex - the index for the smallest value in the Times array right now. Note - this can
-                      change from the SUTRACT call to the ADD call.
-         lenT    - the length of T/X that is being used so far. Will be less than the lenght of T during the
+         pivotIndex: the index for the smallest value in the Times array right now. Note - this can
+                     change from the SUTRACT call to the ADD call.
+         lenT:      the length of T/X that is being used so far. Will be less than the lenght of T during the
                    runup before we wrap.
-         mode:  - SUBTRACT/ADD, as discussed above.
+         mode:     SUBTRACT/ADD, as discussed above.
         '''
         if mode == XCorrWorkerBase.SUBTRACT:
             pass
@@ -187,26 +192,31 @@ class UserG2(object):
         
     def workerCalc(self, T, numTimesFilled, X):
         '''Must be implemented, returns all output arrays.
-        INPUT:
-          T - 1D array of int64, the 120hz counter identifying the events. Note - 
+        
+        Args:
+          T: 1D array of int64, the 120hz counter identifying the events. Note - 
               T is not sorted.
-          numTimesFilled - T may not be completely filled out. This is the number
+          numTimesFilled: T may not be completely filled out. This is the number
               of entries in T that are.
-          X - the 
-        OUTPUT:
-          namedArrays, counts, int8array
+          X: the data
+        
+        MultipleOutput::
 
-        where these output arguments are as follows. Below let D be the number of delays, 
-        that is len(system_params['delays'] and numElementsWorker is what was passed in
-        during initWorker.
+          namedArrays
+          counts
+          int8array
+
+          where these output arguments are as follows. Below let D be the number of delays, 
+          that is len(system_params['delays'] and numElementsWorker is what was passed in
+          during initWorker.
         
-        namedArrays - a dictionary, keys are the names returned in arrayNames, 
-                      i.e, 'G2', 'IF', 'IP'. Values are all numpy arrays of shape
-                      (D x numElementsWorker) dtype=np.float64
+          namedArrays - a dictionary, keys are the names returned in arrayNames, 
+                        i.e, 'G2', 'IF', 'IP'. Values are all numpy arrays of shape
+                        (D x numElementsWorker) dtype=np.float64
         
-        counts - a 1D array of np.int64, length=numElementsWorker
+          counts - a 1D array of np.int64, length=numElementsWorker
         
-        int8array - a 1D array of np.int8 length=numElementsWorker
+          int8array - a 1D array of np.int8 length=numElementsWorker
         '''
         allTimes = T
         n = numTimesFilled
@@ -237,9 +247,10 @@ class UserG2(object):
     ######## VIEWER CALLBACKS #############
     def initViewer(self, mask_ndarrayCoords, h5GroupUser):
         '''initialze viewer.
-        ARGS:
-         mask_ndarrayCoords - this is the array in MPI_Params.
-         h5GroupUser - if system was given an h5 file for output, this is a h5py group opened
+        
+        Args:
+          mask_ndarrayCoords: this is the array in MPI_Params.
+          h5GroupUser: if system was given an h5 file for output, this is a h5py group opened
                        into that file. Otherwise this argument is None
         '''
         colorFile = self.user_params['color_ndarrayCoords']        
@@ -271,18 +282,19 @@ class UserG2(object):
                       int8ndarray,  h5GroupUser):
         '''results have been gathered from workers. User can now publish, either into 
         h5 group, or by plotting, etc.
-        ARGS:
-         counts - this is the 1D array of int64, received from the first worker. It is assumed to be
-                  the same for all workers. Typically it is the counts of the number of pairs of times
-                  that were a given delay apart.
-         relsec - roughly how many seconds of data have been processed for this viewerPublish call.
-                  It is a floating point seconds relative floor(seconds) of the first event.
 
-         name2delay2ndarray - this is a 2D dictionary of the gathered, named arrays. For example
-                              name2delay2ndarray['G2'][2] will be the ndarray of G2 calcluations for
-                              the G2 term.
-         int8ndarray - gathered int8 array from all the workers, the pixels they found to be saturated.
-         h5GroupUser - either None, or a valid h5py Group to write results into the h5file
+        Args:
+         counts: this is the 1D array of int64, received from the first worker. It is assumed to be
+                 the same for all workers. Typically it is the counts of the number of pairs of times
+                 that were a given delay apart.
+         relsec: roughly how many seconds of data have been processed for this viewerPublish call.
+                 It is a floating point seconds relative floor(seconds) of the first event.
+
+         name2delay2ndarray: this is a 2D dictionary of the gathered, named arrays. For example
+                             name2delay2ndarray['G2'][2] will be the ndarray of G2 calcluations for
+                             the G2 term.
+         int8ndarray: gathered int8 array from all the workers, the pixels they found to be saturated.
+         h5GroupUser:  either None, or a valid h5py Group to write results into the h5file
         '''
 
         assert len(counts) == len(self.delays), "UserG2.viewerPublish: len(counts)=%d != len(delays)=%d" % \
@@ -353,9 +365,10 @@ class UserG2(object):
     ######## VIEWER HELPERS (NOT CALLBACKS, JUST USER CODE) ##########
     def maskOutNewSaturatedElements(self, saturated_ndarrayCoords):
         '''update masks and counts for each color based on new saturated elements
-        ARGS:
-        saturated_ndarrayCoords - an int8 with the detector ndarray shape. 
-                                  positive values means this is a saturated pixels.
+
+        Args:
+          saturated_ndarrayCoords: an int8 with the detector ndarray shape. 
+                                   positive values means this is a saturated pixels.
         '''
         
         saturatedIdx = saturated_ndarrayCoords > 0

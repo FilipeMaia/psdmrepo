@@ -182,6 +182,39 @@ This should run without error. You can get a listing of what is in the output fi
 
   h5ls -r g2calc_xpptut13-r1437.h5
 
+The h5 file contains two groups at the root level:
+
+  /system
+  /user
+
+In /system, one finds:
+
+  /system/system_params    Dataset 
+  /system/user_params      Dataset
+  /system/color_ndarrayCoords Dataset
+  /system/mask_ndarrayCoords Dataset 
+
+The first two are the output of the Python module pprint on the system_params and
+user_params dictionaries after evaluating the config file.
+
+The latter two are the mask and color ndarrays specified in the system_params.
+
+In /user one finds whatever the user viewer code decides to write. The example 
+UserG2 module writes, for example:
+
+/user/G2_results_at_539  Group
+/user/G2_results_at_539/G2 Group
+/user/G2_results_at_539/G2/delay_000001 Dataset {32, 185, 388}
+/user/G2_results_at_539/G2/delay_000002 Dataset {32, 185, 388}
+...
+/user/G2_results_at_539/IF Group
+/user/G2_results_at_539/IF/delay_000001 Dataset {32, 185, 388}
+/user/G2_results_at_539/IF/delay_000002 Dataset {32, 185, 388}
+...
+/user/G2_results_at_539/IP Group
+/user/G2_results_at_539/IP/delay_000001 Dataset {32, 185, 388}
+/user/G2_results_at_539/IP/delay_000002 Dataset {32, 185, 388}
+
 == Configure Framework ==
 
 Here we include more details on the configuration. Recall from the tutorial that the user writes a 

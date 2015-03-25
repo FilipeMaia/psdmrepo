@@ -16,9 +16,11 @@ def debugOut(flag, msg):
         sys.stderr.write(msg)
 
 def arrIndexListsToPoints(indexLists):
-    '''helper function that takes a list of indicies and returns points, i.e.
-    arrIndexListsToPoints([1,2,3],[0,1,1]) returns
-    [(1,0), (2,1), (3,1)]
+    '''helper function that takes a list of indicies and returns points
+
+    Examples:
+      >>> arrIndexListsToPoints([1,2,3],[0,1,1])
+      [(1,0), (2,1), (3,1)]
     '''
     points = []
     numDims = len(indexLists)
@@ -69,11 +71,12 @@ def findImageGaps(iX, iY):
     not mapped to by iX, iY. Report any components that do not touch the 
     border pixels.
 
-    Returns: a list of index lists, each the result of np.where(X) where
-             X is in image space. These lists are for pixels where a believed 
-             component is - i.e, a component is pixels
-             in the image that are both not mapped to by iX,iY and do not touch
-             a border pixel in the image
+    Returns: 
+      a list of index lists, each the result of np.where(X) where
+      X is in image space. These lists are for pixels where a believed 
+      component is - i.e, a component is pixels
+      in the image that are both not mapped to by iX,iY and do not touch
+      a border pixel in the image
     '''
 
     imageShape = (np.int(np.max(iX) + 1),  # number of rows 
@@ -109,8 +112,9 @@ def findImageGaps(iX, iY):
     
 def findImageManyToOne(iX, iY):
     '''are there any pixels that have several ndarray elements mapped to them?    
-    
-    Returns:
+    ::
+
+      Returns:
       dict: keys are 2D image index pairs, 
             values are lists of ndarrays for the multi dimensional indicies of the ndarr
       i.e, return result might be:

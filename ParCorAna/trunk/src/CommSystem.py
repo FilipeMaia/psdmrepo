@@ -1,6 +1,3 @@
-'''Implements CommSystem. TODO - more doc
-'''
-
 ### system
 from mpi4py import MPI
 import os
@@ -17,6 +14,7 @@ import PsanaUtil
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 import Timing
 from XCorrBase import XCorrBase
+
 ########## for Timing.timecall
 VIEWEREVT = 'update'
 CSPADEVT = 'cspadevt'
@@ -25,13 +23,23 @@ timingdict = {}
 ###########
 
 def roundRobin(n, dictData):
-    '''returns a list of n items from the values of a dict, in a 
-    round robin fashion over the keys. Raises an Exception if
-    to few items in the dictData.
+    '''returns list from dict by round robin over keys
+ 
+    Args:
+      n (int):         length of list to return
+      dictData (dict): values are lists to select return items from
+
+    Returns:
+      list: n items from values of dictData
+
+    Examples:
+      >>> roundRobin(5, {'keyA':[1,2,3], 'keyB':[10,20,30]})
+      [1,10,2,20,3]
     '''
     if n==0:
         return []
     keys = dictData.keys()
+    keys.sort()
     assert len(keys)>0, "rounRobin will fail to find n=%d items from empty dict" % n
     nextVal = dict([(ky,0) for ky in keys])
     results = []
@@ -55,22 +63,25 @@ def roundRobin(n, dictData):
                            
         
 def identifyServerRanks(comm, numServers, serverHosts=None):
-    '''returns ranks to be the servers. 
+    '''returns ranks to be the servers, defaults to maximimize distinct hosts/nodes.
 
-    ranks will be picked in a round robin fashion among the servers given, or all servers 
-    in the MPI communicator. The idea is to maximum the number of hosts used for servers.
+    Server ranks will be picked in a round robin fashion among the distinct hosts among
+    in the MPI world.
 
-    ARGS:
-       comm             - communicatior to identify hostnames in mpi world.
-                          *IMPORTANT*: This function may do blocking collective communication 
-                          with comm. All ranks in comm should call this during initialization.
-                          best to call this function during the driver program for the system.
-       numServers       - int - number of servers to find
-       serverHosts      - None or list of str - None or empty means use default host 
-                          assignment. Otherwise list must be a set of unique hostnames. 
-    RETURNS:
-       (servers, hostmsg) where servers is a list of ranks in the comm to use as servers,
-                          hostmsg is a logging string about the hosts chosen.
+    Args:
+      comm (MPI.Comm): communicator from whith mpi world hostnames are identified.
+                       *IMPORTANT* This function may do blocking collective communication 
+                       with comm. All ranks in comm should call this during initialization.
+                       best to call this function during the driver program for the system.
+      numServers (int): number of servers to find
+      serverHosts (list, optional): None or empty means use default host assignment. Otherwise 
+                                    list must be a set of unique hostnames. 
+    ::
+
+      Returns:
+        servers (dict): a list of ints, the ranks in the comm to use as servers
+        hostmsg (str): a logging string about the hosts chosen.
+
     '''
 
     assert comm.Get_size() >= numServers, "More servers requested than are in the MPI World. numServers=%d > MPI World Size=%d" % \
@@ -115,10 +126,8 @@ class MPI_Communicators:
     communications. Includes many parameters that identify the ranks
     and the communicators they are in.
 
-    call identifyCommSubsystems to return a initialized instance of this.
-    Then call the method setMask. setMask sets the following additional attributes:
-    mask  - a logical numpy array, True when the mask was one
-     
+    Call identifyCommSubsystems to return a initialized instance.
+    Then call the method setMask.
     '''
     def __init__(self):
         pass
@@ -159,18 +168,23 @@ class MPI_Communicators:
             self.logger.error(msg)
 
 
-    def setMask(self,mask_ndarrayCoords):
-        '''sets scatterv parameters and stores mask.
-        ARGS:
-           mask_ndarrayCoords - an integer numpy array that is 1 for elements that should be processed.
-                  it must have the same shape as the NDArray for the detector
-        OUTPUT:  sets the following attributes:
-           totalElements  - number of pizels that are 1 in the mask
-           workerWorldRankToCount[rank]   - number of element that worker processes
-           workerWorldRankToOffset[rank]  - offset of where those elements start in a 
-                                            flattened version of the ndarray
-           mask_ndarrayCoords - the mask as a logical True/False array, shape has not
-                              been changed
+    def setMask(self, mask_ndarrayCoords):
+        '''sets scatterv parameters and stores mask
+
+        Args:
+          mask_ndarrayCoords (numpy.ndarray): integer array, 1 for elements that should be processed. 
+                                              It must have the same shape as the NDArray for the detector.
+
+        Notes:
+          sets the following attributes
+
+          * totalElements:                 number of pixels that are 1 in the mask
+          * workerWorldRankToCount[rank]:  number of element that worker processes
+          * workerWorldRankToOffset[rank]: offset of where those elements start in 
+                                           a flattened version of the ndarray
+          * mask_ndarrayCoords:            the mask as a logical True/False array
+                                           shape has not been changed
+
         '''
         mask_flat = mask_ndarrayCoords.flatten()
         maskValues = set(mask_flat)
@@ -218,8 +232,9 @@ class MPI_Communicators:
         
 
 def identifyCommSubsystems(serverRanks, worldComm=None):
-    '''Return a fully initialized instance of a MPI_Communicators object.
-    The object will contain the following attributes:
+    '''Return a fully initialized instance of a MPI_Communicators object
+    The object will contain the following attributes::
+
       serverRanks      - ranks that are servers in COMM_WORLD
       comm             - duplicate of the COMM_WORLD
       rank             - rank in COMM_WORLD
@@ -315,29 +330,31 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
 
     
 class RunServer(object):
-    '''runs server message passing.
-    init ARGS:
-    dataIter - instance of a callback class. Must provide these methods:
-              .dataGenerator()   a Python generator. Each returned object
-                                 must have a time() returning sec,nsec
-              .sendToWorkers(datum)  receives a datum returned by dataGenerator.
-                                     user can now send data to workers
-                                     workers will know the upcoming time already
-    comm - MPI intra-communicator for server ranks and master rank.
-    rank - rank of this server
-    masterRank - rank of master
-    logger     - Python logging logger
-    
+    '''runs server rank
+
     This function carries out the server side communication in the package.
-    It does the following:
+    It does the following
+
+    ::
     
-    iteratates through data in Python generator argument
-    for each datum from generator:
-    sends sec/nsec to master
-    gets OkForWorkers or Abort from master
-    upon OkForWorkers - calls .sendToWorkers(datum) method in dataIterator
-                           The dataIterator handles details such as scattering 
-                           detector data to workers
+      * iteratates through data in Python generator argument
+      * for each datum from generator:
+      ** sends sec/nsec to master
+      ** gets OkForWorkers or Abort from master
+      ** upon OkForWorkers calls .sendToWorkers(datum) method in dataIterator
+         The dataIterator handles details such as scattering detector data to workers
+
+      Args:
+        dataIter:  instance of a callback class. Must provide these methods:
+                   .dataGenerator()   a Python generator. Each returned object
+                                      must have a time() returning sec,nsec
+                   .sendToWorkers(datum)  receives a datum returned by dataGenerator.
+                                          user can now send data to workers
+                                          workers will know the upcoming time already
+        comm:       MPI intra-communicator for server ranks and master rank.
+        rank:       rank of this server
+        masterRank: rank of master
+        logger:     Python logging logger
     '''
     def __init__(self,dataIter, comm, rank, masterRank, logger):
         self.dataIter = dataIter
@@ -432,7 +449,7 @@ class RunMaster(object):
         self.numEvents = 0
 
     def getEarliest(self, serverDataList):
-        '''Takes a list of server data buffers. identifies oldest server.
+        '''Takes a list of server data buffers. identifies oldest server::
         ARGS:
           serverDataList:  each element is a SeversMasterMessaging buffer
         RET:

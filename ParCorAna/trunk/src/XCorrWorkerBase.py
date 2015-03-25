@@ -1,9 +1,29 @@
 import numpy as np
 
+def getMinMaxStoreValues(storeType):
+    if issubclass(storeType, np.floating):
+        info = np.finfo(storeType)
+        return info.min, info.max
+    if issubclass(storeType, np.integer):
+        info = np.iinfo(storeType)
+        return info.min, info.max
+    raise Exception("getMinMaxStoreValues called with storeType=%r that is neither integral no floating" % storeType)
+
 class XCorrWorkerBase(object):
     SUBTRACT = 1
     ADD = 2
-    def __init__(self, numElementsWorker, maxTimes, isFirstWorker, logger):
+    ALLOWABLE_STORE_TYPES = [np.uint16, np.int16, np.int32, np.uint32, np.float32, np.float64]
+
+    def __init__(self, numElementsWorker, maxTimes, isFirstWorker, storeType, logger):
+        '''init XCorrWorkerBase to store scattered event data.
+        ARGS:
+        numElementsWorker - how many of the detector elements/pixels does this workers handle
+        maxTimes          - how many times will the worker store
+        isFirstWorker     - True if is first worker, then this worker will log messages.
+        storeType         - the numpy type to use to internally store values. one of the
+                            class member ALLOWABLE_STORE_TYPES.
+        An instance of XCorrWorkerBase creates a numElementsWorker * maxTimes array of storeType.
+        '''
         self.numElementsWorker = numElementsWorker
         self.maxTimes = maxTimes
         self.isFirstWorker = isFirstWorker
@@ -11,10 +31,24 @@ class XCorrWorkerBase(object):
         
         # a 1D array of times in 120hz counter. The 120hz counter for each row of X below
         self.T = np.empty(self.maxTimes, np.int64)
-
+        
+        assert storeType in XCorrWorkerBase.ALLOWABLE_STORE_TYPES, \
+            "storeType=%r, but it must be one or %r" % (storeType, \
+                                                        XCorrWorkerBase.ALLOWABLE_STORE_TYPES)
+           
+        self.checkForOverflow=False
+        self.storeTypeMinVal = None
+        self.storeTypeMaxVal = None
+        self.numOverflowEvents = 0
+        self.MaxOverflowReports=50
+        if storeType != np.float64:
+            self.checkForOverflow=True
+            self.storeTypeMinVal, self.storeTypeMaxVal = getMinMaxStoreValues(storeType)
+            
         # a 2D array of element values. X[i,:] is all the detector elements that this worker 
         # processes from time T[i]
-        self.X = np.empty((self.maxTimes, numElementsWorker), np.float)
+        self.X = np.empty((self.maxTimes, numElementsWorker), storeType)
+        
 
         # which column of X and element of time120Hz to fill out next
         self.nextTimeIdx = 0
@@ -57,6 +91,28 @@ class XCorrWorkerBase(object):
 
         # allow user object to make adjustments to data
         userObj.adjustData(data)
+
+        # check for overflow 
+        if self.checkForOverflow:
+            overflow=np.where(data>self.storeTypeMaxVal)[0]  # data is 1D, where returns tuple with 1 elem
+            underflow=np.where(data<self.storeTypeMinVal)[0] # data is 1D, where returns tuple with 1 elem
+            warnMsg = ''
+            if len(overflow)>0:
+                data[overflow]=self.storeTypeMaxVal
+                warnMsg += "%d pixels would have overflowed. Set them to maxvalue=%r" % (len(overflow), 
+                                                                                         self.storeTypeMaxVal)
+            if len(underflow)>0:
+                data[underflow]=self.storeTypeMinVal
+                warnMsg += "%d pixels would have underflowed. Set them to miinvalue=%r" % (len(underflow), 
+                                                                                           self.storeTypeMinVal)
+            if len(overflow) or len(underflow):
+                self.numOverflowEvents += 1
+                if self.numOverflowEvents < self.MaxOverflowReports:
+                    self.logger.warning("EvtTime=%r %s" % (evtTime,warnMsg))
+
+                if self.numOverflowEvents == self.MaxOverflowReports:
+                    self.logger.warning(("EvtTime=%r %s. No more overflow/underflow " + \
+                                        "warnings will be printed for this worker") % (evtTime,warnMsg))
 
         # now replace 
         self.X[self.nextTimeIdx,:] = data

@@ -2,9 +2,10 @@ from mpi4py import MPI
 import numpy as np
 
 class SM_MsgBuffer(object):
-    '''interface for buffer for server/master messages. Provides interface so 
-    client does not need to know how implemented. The implementation is
-    4 int32 with [msgtag, serverrank, seconds, nanoseconds]
+    '''interface for buffer for server/master messages. 
+
+    Provides interface so client does not need to know how implemented. 
+    The implementation is 4 int32 with [msgtag, serverrank, seconds, nanoseconds]
     '''
     SERVER_TO_MASTER_EVT = 1
     SERVER_TO_MASTER_END = 2
@@ -81,9 +82,11 @@ class SM_MsgBuffer(object):
         return int(self.msgbuffer[SM_MsgBuffer.IDX_NSEC])
 
 class MWV_MPI_Type(object):
-    '''returns MPI Type for MVW_MsgBuffer. Upon initialization, creates
-    a new MPI type that is [int32, int32, float] and Commit's the type
-    with the MPI library. Upon deleteion, calls Free on the type.
+    '''returns MPI Type for MVW_MsgBuffer. 
+
+    Upon initialization, creates a new MPI type that is [int32, int32, float] 
+    and Commit's the type with the MPI library. Upon deleteion, calls Free 
+    on the type.
 
     Use numpyDtype to get the equivalent numpy type.
     '''
@@ -106,9 +109,11 @@ class MWV_MPI_Type(object):
         
 class MVW_MsgBuffer(object):
     '''message buffer for MasterViewerWorkers. 
-    includes: msgtag -  message tag 
-              rank   -  server rank
-              relsec -  floating point seconds relative to some start
+    
+    Attributes:
+      msgtag: message tag 
+      rank:   server rank
+      relsec: floating point seconds relative to some start
     '''
     EVT = 10
     END = 20

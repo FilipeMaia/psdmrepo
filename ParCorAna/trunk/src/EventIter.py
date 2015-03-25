@@ -5,11 +5,13 @@ import StringIO
 import ParCorAna.PsanaUtil as PsanaUtil
 
 class EventData(object):
-    '''Object returned by EventIter. Has three members:
-    sec        - seconds of event from which data was retrieved
-    nsec       - nanoseconds of event from which data was retrieved
-    dataArray  -  a numpy data array from a detector in the event
-                  dataArray is guaranteed to be contiguous C ordered array
+    '''Object returned by EventIter. 
+
+    Attributes:
+      sec:       seconds of event from which data was retrieved
+      nsec:      nanoseconds of event from which data was retrieved
+      dataArray: a numpy data array from a detector in the event.
+                 dataArray is guaranteed to be contiguous C ordered array
     '''
     def __init__(self,sec, nsec, dataArray):
         self.sec=sec
@@ -21,27 +23,21 @@ class EventData(object):
         return self.sec, self.nsec
 
 class EventIter(object):
-    '''Provides an iterator over psana events. Basic usage:
-            dataIter = EventIter(args)
-            dataGen = dataIter.dataGenerator()
-            for datum in dataGen:
-               # wortk with datum.sec, nsec and dataArray
-    '''
-    def __init__(self,dataSourceString, rank, servers, 
-                 xCorrBaseObj, system_params, ndarrayShape, logger, numEvents=None):
-        '''initialize with the following:
-        how to run psana over a dataset and get specific detector data
-        how to decide which events this server will read from the dataset
-        user callbacks to filter events/preprocess data
+    '''Provides an iterator over psana events. 
+    ::
 
-        ARGS:
-        dataSourceString - psana datset specification
-        rank          - identifies this rank among the servers
-        servers       - number of servers
-        xCorrBaseObj      - user callback object. Must provide:
+      Used to run psana over a dataset and get specific detector data
+      Decides which events this server will read from the dataset
+      Provides user callbacks to filter events/preprocess data
+
+      Args:
+      dataSourceString (str): psana datset specification
+      rank (int):     identifies this rank among the servers
+      servers (int):  number of servers
+      xCorrBaseObj:   user callback object. Must provide:
                         eventOk(self, evt): return True/False
                         adjustDataArray(self, dataArray): can modify array before scattering to workers
-        system_params - dict with system keys. Keys used:
+      system_params: dict with system keys. Keys used:
                      ['psanaOptions']        - psana configuration  
                      ['outputArrayType']     - output array to get from event store, for example
                                                psana.ndarray_float64_2
@@ -53,6 +49,17 @@ class EventIter(object):
 
         rank and servers are used to distribute the events. 
         EventIter is run on  each server.
+
+    Example:
+      >>> dataIter = EventIter(args)
+      >>> dataGen = dataIter.dataGenerator()
+      >>> for datum in dataGen:
+          # wortk with datum.sec, nsec and dataArray
+    '''
+    def __init__(self,dataSourceString, rank, servers, 
+                 xCorrBaseObj, system_params, ndarrayShape, logger, numEvents=None):
+        '''
+
         '''
 
         if numEvents is None:

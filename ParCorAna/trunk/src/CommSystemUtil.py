@@ -4,12 +4,17 @@ import math
 import logging
 
 def checkCountsOffsets(counts, offsets, n):    
-    '''Makes sure that the counts and offsets partition n. For instance
-    counts=[2,2,2] offsets=[0,2,4] n=6 is correct. However
-    counts=[2,2,2] offsets=[0,2,4] n=7 is incorrect,
-    counts=[2,2,2] offsets=[2,4,6] n=6 is incorrect, ect
+    '''Makes sure that the counts and offsets partition n. 
     
     Throws an exception if there is a problem
+
+    Examples:
+      >>> checkCountsOffsets(counts=[2,2,2], offsets=[0,2,4], n=6)
+      # this is correct. 
+      >>> checkCountsOffsets(counts=[2,2,2], offsets=[0,2,4], n=7)
+      # incorrect, throws assert
+      >>> checkCountsOffsets(counts=[2,2,2], offsets=[2,4,6], n=6)
+      # incorrect, ect
     '''
     assert sum(counts)==n, 'counts=%r offsets=%r do not partition n=%d' % (counts, offsets, n)
     assert offsets[0]==0, 'counts=%r offsets=%r do not partition n=%d' % (counts, offsets, n)
@@ -20,11 +25,11 @@ def checkCountsOffsets(counts, offsets, n):
 
 def divideAmongWorkers(dataLength, numWorkers):
     '''partition the amount of data as evenly as possible among the given number of workers.
-    Returns counts and offsets of the partition.
 
-    example: divideAmongWorkers(11,3) 
-    returns offsets=[0,4,8]
-             counts=[4,4,3]    
+    Examples: 
+      >>> divideAmongWorkers(11,3) 
+      returns offsets=[0,4,8]
+              counts=[4,4,3]    
     '''
     k = int(math.floor(dataLength / numWorkers))
     r = dataLength % numWorkers
@@ -44,14 +49,16 @@ def divideAmongWorkers(dataLength, numWorkers):
     
 def makeLogger(isMaster, isViewer, isServer, rank, lvl=logging.INFO):
     '''Returns Python logger with prefix identifying master/viewer/server/worker & rnk
+
     If noMpi is true, returns logger with 'noMpi' prefix.
-    ARGS:
-     isMaster   - True if this is logger for master rank
-     isViewer   - True if this is logger for viewer rank
-     isServer   - True is this logger is for server rank
-     rank       - rank to report
-     lvl        - logging level
-     noMpi      - testing, True if noMpi
+
+    Args:
+     isMaster (bool): True if this is logger for master rank
+     isViewer (bool): True if this is logger for viewer rank
+     isServer (bool): True is this logger is for server rank
+     rank (bool): rank to report
+     lvl (int): logging level
+     noMpi (bool): testing, True if noMpi
     '''
     assert int(isMaster) + int(isViewer) + int(isServer) in [0,1], "more than one of isMaster, isViewer, isServer is true"
     if isMaster:

@@ -36,7 +36,7 @@ def getSystemAndUserParams(filename):
                               'outputArrayType', 'times', 'update', 
                               'mask_ndarrayCoords', 'h5output', 'overwrite',
                               'verbosity', 'numevents', 'elementsperworker',
-                              'delays','user_class'])
+                              'delays','user_class', 'worker_store_dtype'])
 
     undefinedSystemKeys = expectedSystemKeys.difference(set(system_params.keys()))
     newSystemKeys = set(system_params.keys()).difference(expectedSystemKeys)

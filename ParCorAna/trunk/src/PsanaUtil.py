@@ -2,15 +2,18 @@
 
 Functions include: 
 
-*  Parsing/managing the dataset string.
-*  Creating psana options (same as config file) for loading a module chain
+  *  Parsing/managing the dataset string.
+  *  Creating psana options (same as config file) for loading a module chain
 '''
 
 import psana
 
 def rangesToList(rangeString):
-    '''converts a string like
-    1-4,5,20-24 to a sorted list of ints, like [1,2,3,4,5,20,21,22,23,24]
+    '''converts a string with ranges to a list
+    
+    Examples:
+      >>> rangesToList('1-4,5,20-24')
+      [1,2,3,4,5,20,21,22,23,24]
     '''
     ranges = rangeString.split(',')
     values = set()
@@ -28,12 +31,13 @@ def rangesToList(rangeString):
     return values
 
 def changeDatasetStreams(dataset, newStreams):
-    '''changes the streams processed in a dataset. Checks if there are 
-    specified streams, then replaces value, otherwise adds stream spefication
-    ARGS:
-      dataset    - a psana dataset string, as specified in psana users manual
-      newStreams - a list of ints, the new streams to use in the dataset string
-    RETURN:
+    '''changes the streams processed in a dataset. 
+
+    Args:
+      dataset (str): a psana dataset string, as specified in psana users manual
+      newStreams (list): list of ints, the new streams to use in the dataset string
+
+    Return:
       a new dataset string. Either it will have :stream=xxx added to the
       end, or if there already was a :stream= in dataset, it ts value will be 
       replaced with newStreams.
@@ -51,19 +55,21 @@ def changeDatasetStreams(dataset, newStreams):
 
 def parseDataSetString(dataset):
     '''Return a dict of the pieces of the dataset string, and fills in defaults.
-    Note - not as robust as psana routine, this does not check for an experiment
-    number that it looks up in the database.
 
     If stream or run is in the key list, it will convert the list of ranges into
     sorted list of values.
 
-    example  exp=CXI/cxi342:xtc:run=3,5:stream=3-5,8
+    Example:
+      >>> exp=CXI/cxi342:xtc:run=3,5:stream=3-5,8
+     {'instr':'CXI', 'exp':'cxi343','xtc':True,'run':[3,5],'stream':[3,4,5,8], 
+     'xtc':True, 'idx':False, 'h5':False, 'shmem':False, 'live':False}
 
-    will return {'instr':'CXI', 'exp':'cxi343','xtc':True,'run':[3,5],'stream':[3,4,5,8], 
-                 'xtc':True, 'idx':False, 'h5':False, 'shmem':False, 'live':False}
+    Notes:
+      Not as robust as psana routine, this does not check for an experiment
+      number that it looks up in the database.
 
-    one potential point of confusion, shmem defaults to False in the dict if not provided, 
-    but will be a string if it is
+      One potential point of confusion, shmem defaults to False in the dict if not provided, 
+      but will be a string if it is
     '''
     spaceSplit = dataset.split()
     commaSplit = dataset.split(',')
@@ -127,22 +133,28 @@ def parseDataSetString(dataset):
     return keyValues
 
 def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, imageOutKey=None):
-    '''creates options for a psana config file that does the following:
-      * converts the given type into an ndarray ofdouble
-      * optionally calibrates it
-      * optionally produces an image from it. 
-    Returns a pair. The first argument is a dictionarys suitable for psana.dataSource.setOptions. 
-    The second is an ndarray type to retrieve from the event store.
+    '''returns Psana options to calibrate given detector data, and returns output array type.
 
-    ARGS:
-      srcString  detector src, type is str
-      psanaType  detector type
-      ndarrayOutKey   key that ndarray producer should use for output
-      ndarrayCalibOutKey  None means no ndarrayCalib
-                          otherwise key that ndarrayCalib should use
-      imageOutKey     None means no image (default) otherwise image key
-    OUT:
-      psanaOptions dict  ,  psana type for ndarray
+    Calibrating detector images is done by loading the appropriate Psana modules. At least two
+    modules are required. The first converts the LCLS DAQ type to a generic ndarray. The second
+    calibrates the ndarray. Optionally one can load a third module to turn an ndarray to an image.
+    
+    Optional one can not calibrate and just create options to return an ndarray.
+
+    Args:
+      srcString (str):  detector src 
+      psanaType (type):  detector type (such as psana.CsPad.DataV2)
+      ndarrayOutKey (str):   key that ndarray producer should use for output
+      ndarrayCalibOutKey (str):  key that ndarrayCalib should use as output, or None to
+                                 specify no calibration
+      imageOutKey (str, Optional): None means no image (default) otherwise image key
+
+    ::
+
+      Returns:
+      psanaOptions (dict) for passing to psana.setOptions
+      type (psana type for ndarray) the type of the ndarray to retrieve from event store
+
     '''    
     assert ndarrayCalibOutKey is None or ndarrayCalibOutKey != ndarrayOutKey, "calib output key must be different than ndarray output key"
     assert imageOutKey is None or (imageOutKey != ndarrayCalibOutKey and imageOutKey != ndarrayOutKey), "image ouput key must differ from other keys"

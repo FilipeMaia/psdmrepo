@@ -1,9 +1,6 @@
-from mpi4py import MPI
 import logging
 import numpy as np
-
 import psana
-
 import ParCorAna
 
 ###############################################################
@@ -50,15 +47,15 @@ system_params['psanaType'] = psana.CsPad.DataV2  # for tutorial data
 #system_params['psanaType'] = psana.Epix.ElementV2
 
 ############## PSANA CONFIG OPTIONS / OUTPUT ARRAY TYPE / OUTPUT KEY ##############
-# below we set the psana options/config that load two psana modules: 
-#   an ndarry producer and a calibration module. 
-# Using the ParCorAna.makePsanaOptions, the user just specifies the type and src for the dector (above), 
-# uses default output keys for the two modules (below), and save the resulting options and and final ndarray 
-# type produced in the system_params dict. (see below). The options can be extended after calling this function.
-# To see the final options, just run this file as a standalone python script.
+# Create psana options to calibrate detector data. Uses the ParCorAna.makePsanaOptions 
+# utility function. One does:
 #
-# TypeNdArrayProducer        ->   NdArrayCalib   
-# (make ndarray of double)        (produces ndarray of the same size)
+#   * specify the type and src for the detector (above), 
+#   * specify output keys for the two modules (below)
+#   * save the resulting options and final ndarray type produced in the system_params dict. (see below). 
+#
+# The options can be extended after calling this function.
+# To see the final options, just run this file as a standalone python script.
 #
 # Users can also skip calibration and just work with the NdArrayProducer output.
 # 
@@ -76,6 +73,26 @@ system_params['psanaOptions'], \
 
 # an example of adding options to the psana configuration:
 # system_params['psanaOptions']['ImgAlgos.NDArrCalib.do_gain'] = True
+
+system_params['worker_store_dtype'] = np.float64  # The calibration system is creating ndarrays of
+              # double - or np.float64. Each worker stores a portion of this ndarray. To guarantee no 
+              # loss of precision, workers should store results in the same data format - i.e, float64.
+              # However for large detectors and long correlation types, this may require too much 
+              # memory. For full cspad where all pixels are included in the mask, and 50,000 times are stored
+              # on the workers, this amounts to 50,000*(32*388*185)*8=855GB of memory that must be 
+              # distributed amoung all the workers. If each host has 24GB (as it is presently), one would 
+              # have to use 36 hosts. Given that each host runs 12 MPI ranks, we need 432 ranks for the workers.
+              #
+              # A simple way to use less memory, is to have the workers store the detector data as 4
+              # byte floats, or change from np.float64 to np.float32. One could also try np.int16 to
+              # get down to 2 bytes. It is not reccommended that one use unsigned integers as calibration
+              # can produce negative values. Note that the delay curves will always be calculated with float64
+              # in order to avoid loss of precision with that calculation. Changing the worker_store_type 
+              # does not affect the precision of the delay curves.
+              #
+              # The system will emit warnings if the calibrated ndarrays have to be truncated to fit
+              # into a worker_store_dtype that is not np.float64.
+
 
 ############## mask ##############
 # The mask a numpy array of int's that must have the same shape as the detector array returned by
@@ -147,17 +164,18 @@ system_params['serverhosts'] = None  # None means system selects which hosts to 
 
 system_params['times'] = 50000     # number of distinct times that each worker holds onto
 
-
-system_params['update'] = 120*60*4  # update/viewer publish every n events. 
+eventsPerMinute = 120*60
+numMinutes = 4
+system_params['update'] = eventsPerMinute*numMinutes  # update/viewer publish every n events. 
               # Set to 0 to only update at the end.
               # This is the number of events the system goes through before doing another viewer publish. Note - 
               # the workers, on 250 cores, will takes 130 seconds when processing 50,000 events.
 
+
 ######### delays ############
 system_params['delays'] = ParCorAna.makeDelayList(start=1,
                                                   stop=25000, 
-                                                  num=100,  # may return fewer than num delays, returns
-                                                  # unique integer delays after rounding
+                                                  num=100,
                                                   spacing='log',  # can also be 'lin'
                                                   logbase=np.e)
 
@@ -167,21 +185,17 @@ system_params['user_class'] = UserG2.UserG2
 
 ######## h5output, overwrite ########### 
 # The system will manage an h5output filename. This is not a file for collective
-# writes. Within the user code, only the viewer rank should write to the file. 
-# The system master rank may append to the file after running the viewer code.
-#
+# writes. Within the user code, only the viewer rank should write to the file. The viewer
+# will receive an open group to the file at run time.
 # In particular, for G2, the software will save the G2, IP IF 3D matrices, delays and counts to an h5 file.
 
 # set h5output to None if you do not want h5 output.
-
-# The code below constructs an h5output argument based on the dataset string.
-# It uses exp= and run= to construct the default name.
-# if using shared memory, these are not available. Remove default behavior (which throws
-# assert exceptions if 'exp' and 'run' are not in the dataset string) and either hard code
-# h5output filename, or use the command line switch -o to set an h5output filename (overrides 
-# this config file)
-
-system_params['h5output'] = 'g2calc_%s-r%4.4d.h5'% (experiment, run)
+# The system will recognize %T in the filename and replaces it with the current time in the format
+# yyyymmddhhmmss. (year, month, day, hour, minute, second). It will also recognize %C for a one up counter.
+# When forming a string by "a-%d" % 3, one needs to use two % to  Add %%T into the string
+system_params['h5output'] = 'g2calc_%s-r%4.4d.h5' % (experiment, run)
+#system_params['h5output'] = 'g2calc_%s-r%4.4d-%%T.h5' % (experiment, run)
+#system_params['h5output'] = 'g2calc_%s-r%4.4d-%%C.h5' % (experiment, run)
 
 ## overwrite can also be specified on the command line, --overwrite=True which overrides what is below
 system_params['overwrite'] = False   # if you want to overwrite an h5output file that already exists
@@ -202,6 +216,19 @@ system_params['numevents'] = 0
 # this can be overriden on the command line
 system_params['elementsperworker'] = 0
 
+##### parallel job allocation #####
+# below are parameters that the system will use to figure out the 
+# command to use to launch the job - MOVE INTO DRIVER
+#system_params['GB_per_host'] = 23.53   
+# there are a few hosts out there with 19.59GB - psana1116 in psanaq, psana1305 in psfehq
+# number_hosts_in_queue = {'psanaq':40,        # 941GB
+#                         'psfehpriorq':16,   # 372GB 
+#                         'psnehpriorq':16}   # 376GB 
+#system_params['slots_per_host'] = 12
+#system_params['number_hosts_in_queue'] = 40
+
+system_params['queue'] = 'psanaq' # put None for local
+system_params['bsub_cmd'] = None  # let the system construct bsub_cmd
 
 ##################################################
 ############ USER MODULE - G2 CONFIG #############

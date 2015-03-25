@@ -5,6 +5,7 @@ from PsanaUtil import psanaNdArrays
 '''psana module to track how pixels in ndarrays get set in 
 image producer 2D arrays.
 '''
+
 def label(ndarray, dim):
     rank = len(ndarray.shape)
     assert dim >=0 and dim < rank
@@ -35,18 +36,21 @@ class dupNdarrayWithIndicies(object):
     ndarray that was found. These ndarrays will have _dim_r added to their
     keys, where r is dimensions, 0,1,2, etc. The type will be ndarray_int32_x where x is the
     dimension.
-    The values of these arrays will be the 10 + dimension index, i.e., 
+    The values of these arrays will be the 10 + dimension index, i.e::
+
       10+row for dim_0
       10+col for dim_1
       10+subcol for dim_2, etc.
+
     The +10 will distinguish them from border pixels in the image.
     
     One can then identify the mapping from ndarray coordinates to image coordinates.
     For example, if for key calibrated a 3D (32,185,388) array is found, 3 arrays 
-    will be added to the event:
-    calibrated_dim_0:  values between 10 and 41
-    calibrated_dim_1:  values between 10 and 194
-    calibrated_dim_2:  values between 10 and 397
+    will be added to the event::
+
+      calibrated_dim_0:  values between 10 and 41
+      calibrated_dim_1:  values between 10 and 194
+      calibrated_dim_2:  values between 10 and 397
 
     If three image producers are run on these three keys, you can look for anything that is 10 
     or higher, and subtract 10 to recover the dim 0, 1, 2 that was used for a given row,col

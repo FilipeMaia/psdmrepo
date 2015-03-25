@@ -226,6 +226,7 @@ class XCorrBase(object):
         self.xCorrWorkerBase = XCorrWorkerBase(scatterCount,
                                                self.system_params['times'],
                                                self.mp.isFirstWorker,
+                                               self.system_params['worker_store_dtype'],
                                                self.mp.logger)
                                                
                                                
