@@ -65,10 +65,10 @@ class XCorrWorkerBase(object):
         self.numRepeatData = 0
         self.lastRepeatWarning = 0
 
-    def updateData(self, evtTime, data, userObj):
+    def updateData(self, counter, data, userObj):
         '''updates the data.
         '''
-        next120hz = np.int64(np.round(evtTime*120.0))
+        next120hz = counter
         # is this repeat data?
         if next120hz in self.currentTimesStored:
             self.numRepeatData += 1
@@ -87,7 +87,7 @@ class XCorrWorkerBase(object):
             pivotIndex = self.nextTimeIdx
             userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
-        self.logger.debug('XCorrWorkerBase.updateData evtTime=%.4f next120hz=%d' % (evtTime, next120hz))
+        self.logger.debug('XCorrWorkerBase.updateData next120hz=%d' % (next120hz,))
 
         # allow user object to make adjustments to data
         userObj.adjustData(data)
@@ -108,11 +108,11 @@ class XCorrWorkerBase(object):
             if len(overflow) or len(underflow):
                 self.numOverflowEvents += 1
                 if self.numOverflowEvents < self.MaxOverflowReports:
-                    self.logger.warning("EvtTime=%r %s" % (evtTime,warnMsg))
+                    self.logger.warning("counter=%d %s" % (counter, warnMsg))
 
                 if self.numOverflowEvents == self.MaxOverflowReports:
-                    self.logger.warning(("EvtTime=%r %s. No more overflow/underflow " + \
-                                        "warnings will be printed for this worker") % (evtTime,warnMsg))
+                    self.logger.warning(("EvtTime=%s %s. No more overflow/underflow " + \
+                                        "warnings will be printed for this worker") % (counter, warnMsg))
 
         # now replace 
         self.X[self.nextTimeIdx,:] = data

@@ -200,7 +200,7 @@ class UserG2(object):
               of entries in T that are.
           X: the data
         
-        MultipleOutput::
+        Multiple Return::
 
           namedArrays
           counts

@@ -17,9 +17,19 @@ from EventIter import EventIter
 #################################
 # utitlity functions users may use
 def makeDelayList(start, stop, num, spacing, logbase=np.e):
-    '''Constructs a list of delays, from [start,top] with endpoints, with either linear or log spacing.
-    returns list as array of int32. Always returns a list of unique integer values. Makes a best effort to 
-    hit the number of user requested delays.
+    '''Constructs a list of integer delays with either linear or log spacing
+
+    Args:
+      start (int):   starting delay
+      stop (int):    last delay to include
+      num (int):     number of delays to return, including start and stop
+      spacing (str): either 'lin' or 'log' for linear or logarthmic
+      logbase (float, optional): if 'log', what base to use. Default is e
+
+    Return:
+      list of distinct delays, as array of int32. 
+      Always returns a list of unique integer values. Makes a best effort to 
+      hit the number of user requested delays.
     '''
     ####### helper function #######
     def getUniqueRoundedIntegerDelays(start, stop, numToMakeUserNum, spacing, logbase):
@@ -288,9 +298,9 @@ class XCorrBase(object):
                 (self.system_params['h5output'], self.h5inprogress)
             shutil.move(self.h5inprogress, self.system_params['h5output'])
 
-    def storeNewWorkerData(self, relSeconds):
+    def storeNewWorkerData(self, counter):
         assert self.mp.isWorker, "storeNewWorkerData called for non-worker"
-        self.xCorrWorkerBase.updateData(relSeconds, self.workerScatterReceiveBuffer,
+        self.xCorrWorkerBase.updateData(counter, self.workerScatterReceiveBuffer,
                                         self.userObj, )
 
     def checkUserWorkerCalcArgs(self, name2array, counts, int8array):
@@ -307,7 +317,7 @@ class XCorrBase(object):
         assert int8array.shape == (self.elementsThisWorker,), "user workerCalc int8array counts array shape=%s != (%d,)" % \
             (int8array.shape, (self.elementsThisWorker,))
         
-    def viewerWorkersUpdate(self, relsec = None):
+    def viewerWorkersUpdate(self, counter = None):
         assert self.mp.isWorker or self.mp.isViewer, "can only call this function if viewer or worker"
 
         # send the delay counts calculated thus far from one worker to the viewer.
@@ -322,15 +332,15 @@ class XCorrBase(object):
                                                                     self.xCorrWorkerBase.X)
             calcTime = time.time() - t0
             self.checkUserWorkerCalcArgs(name2array, counts, int8array)
-            self.mp.logInfo('g2worker.calc at 120hz counterrelsec=%d took %.4f sec' % \
-                            (int(np.round(120*relsec)), calcTime))
+            self.mp.logInfo('g2worker.calc at 120hz counter=%s took %.4f sec' % \
+                            (counter, calcTime))
         ### begin point to point
         t0 = time.time()
         ## any data the viewer needs that is the same between the workers, send point to point to 
         # reduce network traffic
         if self.isViewerOrFirstWorker: 
             self.logger.debug('XCorrBase.viewerWorkersUpdate: before point to point Send/Recv for delayCounts ' + \
-                              ('from first worker -> viewer. relsec=%r' % relsec))
+                              ('from first worker -> viewer. counter=%r' % counter))
 
         if self.mp.isFirstWorker:            
             assert counts.dtype == np.int64, "expected int64 dtype for delay counts - counts"
@@ -344,12 +354,12 @@ class XCorrBase(object):
                                            source = self.mp.firstWorkerRankInViewerWorkersComm)
         self.mp.viewerWorkersComm.Barrier()
         if self.isViewerOrFirstWorker: 
-            self.logger.debug('XCorrBase.viewerWorkersUpdate: after point to point Send/Recv for delayCounts from first worker -> viewer and Barrier. relsec=%r' % relsec)
+            self.logger.debug('XCorrBase.viewerWorkersUpdate: after point to point Send/Recv for delayCounts from first worker -> viewer and Barrier. counter=%r' % counter)
         #### end point to point
 
         ### now gather up the results
         if self.isViewerOrFirstWorker: 
-            self.logger.debug('XCorrBase.viewerWorkersUpdate: before Gatherv between workers and viewer of results. relsec=%r' % relsec)
+            self.logger.debug('XCorrBase.viewerWorkersUpdate: before Gatherv between workers and viewer of results. counter=%r' % counter)
         if self.mp.isViewer:
             sendBuffer = np.zeros(0,np.float)
             for nm in self.arrayNames:
@@ -410,14 +420,14 @@ class XCorrBase(object):
 
         if self.mp.isViewer:
             # all results are now gathered into flat 1D arrays
-            name2delay2ndarray, int8ndarray = self.viewerFormNDarrays(counts, relsec)
+            name2delay2ndarray, int8ndarray = self.viewerFormNDarrays(counts, counter)
             
-            self.userObj.viewerPublish(counts, relsec, name2delay2ndarray, 
+            self.userObj.viewerPublish(counts, counter, name2delay2ndarray, 
                                        int8ndarray, self.h5GroupUser)
             
 
 
-    def viewerFormNDarrays(self, counts, relsec):
+    def viewerFormNDarrays(self, counts, counter):
         t0 = time.time()
         assert self.mp.isViewer, "XCorrBase.viewerFormNDarrays: viewerFormNDarrays called, but not viewer"
         assert len(counts) == self.numDelays, "XCorrBase.viewerFormNDarrays: len(counts)=%d != numDelays=%d" % \

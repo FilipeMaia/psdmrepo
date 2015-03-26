@@ -5,7 +5,7 @@ class SM_MsgBuffer(object):
     '''interface for buffer for server/master messages. 
 
     Provides interface so client does not need to know how implemented. 
-    The implementation is 4 int32 with [msgtag, serverrank, seconds, nanoseconds]
+    The implementation is 5 int32 with [msgtag, serverrank, seconds, nanoseconds, fiducials]
     '''
     SERVER_TO_MASTER_EVT = 1
     SERVER_TO_MASTER_END = 2
@@ -15,13 +15,15 @@ class SM_MsgBuffer(object):
     IDX_RANK = 1
     IDX_SEC = 2
     IDX_NSEC = 3
+    IDX_FIDUCIALS = 4
     MPI_TYPE = MPI.INT32_T
-    def __init__(self, msgtag=None, rank=None, sec=None, nsec=None):
-        self.msgbuffer = np.zeros(4, np.int32)
+    def __init__(self, msgtag=None, rank=None, sec=None, nsec=None, fiducials=None):
+        self.msgbuffer = np.zeros(5, np.int32)
         if msgtag != None: self.msgbuffer[SM_MsgBuffer.IDX_MSGTAG]=np.int32(msgtag)
         if rank != None: self.msgbuffer[SM_MsgBuffer.IDX_RANK]=np.int32(rank)
         if sec != None: self.msgbuffer[SM_MsgBuffer.IDX_SEC]=np.int32(sec)
         if nsec != None: self.msgbuffer[SM_MsgBuffer.IDX_NSEC]=np.int32(nsec)
+        if fiducials != None: self.msgbuffer[SM_MsgBuffer.IDX_FIDUCIALS]=np.int32(fiducials)
 
     def getNumpyBuffer(self):
         return self.msgbuffer
@@ -67,13 +69,13 @@ class SM_MsgBuffer(object):
         self.msgbuffer[SM_MsgBuffer.IDX_MSGTAG] = \
                         np.int32(SM_MsgBuffer.SERVER_TO_MASTER_EVT)
 
-    def setTime(self, sec, nsec):
+    def setEventId(self, sec, nsec, fiducials):
         self.msgbuffer[SM_MsgBuffer.IDX_SEC]=np.int32(sec)
         self.msgbuffer[SM_MsgBuffer.IDX_NSEC]=np.int32(nsec)
+        self.msgbuffer[SM_MsgBuffer.IDX_FIDUCIALS]=np.int32(fiducials)
 
-    def getTime(self):
-        return int(self.msgbuffer[SM_MsgBuffer.IDX_SEC]), \
-            int(self.msgbuffer[SM_MsgBuffer.IDX_NSEC])
+    def getEventId(self):
+        return self.getSec(), self.getNsec(), self.getFiducials()
 
     def getSec(self):
         return int(self.msgbuffer[SM_MsgBuffer.IDX_SEC])
@@ -81,19 +83,26 @@ class SM_MsgBuffer(object):
     def getNsec(self):
         return int(self.msgbuffer[SM_MsgBuffer.IDX_NSEC])
 
-class MWV_MPI_Type(object):
-    '''returns MPI Type for MVW_MsgBuffer. 
+    def getFiducials(self):
+        return int(self.msgbuffer[SM_MsgBuffer.IDX_FIDUCIALS])
 
-    Upon initialization, creates a new MPI type that is [int32, int32, float] 
+class MWV_MPI_Type(object):
+    '''returns MPI Type for MVW_MsgBuffer in master/viewer/worker communications.
+
+    Upon initialization, creates a new MPI type that is [int32, int32, int64] 
     and Commit's the type with the MPI library. Upon deleteion, calls Free 
     on the type.
 
-    Use numpyDtype to get the equivalent numpy type.
+    Use numpyDtype to get the equivalent numpy type, which is::
+    
+    msgtag  np.int32
+    rank    np.int32
+    counter np.int64 
     '''
     def __init__(self):
         blocklens = (1,1,1)
         displacements = (0,4,8)
-        types = (MPI.INT32_T, MPI.INT32_T, MPI.DOUBLE)
+        types = (MPI.INT32_T, MPI.INT32_T, MPI.INT64_T)
         dtype = MPI.Datatype.Create_struct(blocklens, displacements, types)
         dtype.Commit()
         self.dtype = dtype
@@ -104,16 +113,16 @@ class MWV_MPI_Type(object):
     def numpyDtype(self):
         return np.dtype([('msgtag',np.int32),
                          ('rank',np.int32),
-                         ('relsec',np.float)])
+                         ('counter',np.int64)])
 
         
 class MVW_MsgBuffer(object):
     '''message buffer for MasterViewerWorkers. 
     
     Attributes:
-      msgtag: message tag 
-      rank:   server rank
-      relsec: floating point seconds relative to some start
+      msgtag:  message tag 
+      rank:    server rank
+      counter: int64 120hz counter for event. Relative to some first event. Possible that it is negative.
     '''
     EVT = 10
     END = 20
@@ -121,17 +130,18 @@ class MVW_MsgBuffer(object):
 
     MPI_Type = MWV_MPI_Type()
 
-    def __init__(self, msgtag=None, rank=None, relsec=None):
+    def __init__(self, msgtag=None, rank=None, counter=None):
         
         self.msgbuffer = np.zeros(1, dtype=MVW_MsgBuffer.MPI_Type.numpyDtype())
         if msgtag is not None:
-            assert msgtag in [MVW_MsgBuffer.EVT, MVW_MsgBuffer.END,
+            assert msgtag in [MVW_MsgBuffer.EVT, 
+                              MVW_MsgBuffer.END,
                               MVW_MsgBuffer.UPDATE], "unknown message tag: %r" % msgtag
             self.msgbuffer[0]['msgtag'] = msgtag
         if rank is not None:
             self.msgbuffer[0]['rank']=rank
-        if relsec is not None:
-            self.msgbuffer[0]['relsec']=np.float(relsec)
+        if counter is not None:
+            self.msgbuffer[0]['counter']=np.int64(counter)
 
     def getNumpyBuffer(self):
         return self.msgbuffer
@@ -157,11 +167,11 @@ class MVW_MsgBuffer(object):
     def setUpdate(self):
         self.msgbuffer[0]['msgtag'] = MVW_MsgBuffer.UPDATE
 
-    def setRelSec(self, relsec):
-        self.msgbuffer[0]['relsec'] = relsec
+    def setCounter(self, counter):
+        self.msgbuffer[0]['counter'] = np.int64(counter)
         
-    def getRelSec(self):
-        return float(self.msgbuffer[0]['relsec'])
+    def getCounter(self):
+        return int(self.msgbuffer[0]['counter'])
 
     def setRank(self, rank):
         self.msgbuffer[0]['rank'] = np.int32(rank)

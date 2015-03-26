@@ -19,7 +19,7 @@ programDescriptionEpilog = '''
 '''
 
 def getSystemAndUserParams(filename):
-    assert os.path.exists(filename), "configuration file does not exist"
+    assert os.path.exists(filename), "configuration file: %s does not exist" % filename
     configGlobals={'__name__':'__mpiFnDriver__'}
     configLocals={}
     execfile(filename, configGlobals, configLocals)

@@ -7,6 +7,7 @@ import StringIO
 import traceback
 import copy
 import collections
+import logging
 
 ## this package
 import CommSystemUtil
@@ -14,6 +15,7 @@ import PsanaUtil
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 import Timing
 from XCorrBase import XCorrBase
+import Counter120hz
 
 ########## for Timing.timecall
 VIEWEREVT = 'update'
@@ -63,7 +65,7 @@ def roundRobin(n, dictData):
                            
         
 def identifyServerRanks(comm, numServers, serverHosts=None):
-    '''returns ranks to be the servers, defaults to maximimize distinct hosts/nodes.
+    '''returns ranks to be the servers, puts serves on distinct hosts if possible.
 
     Server ranks will be picked in a round robin fashion among the distinct hosts among
     in the MPI world.
@@ -141,8 +143,8 @@ class MPI_Communicators:
             return False
         return True
 
-    # these functions make it simpler to log only if you are not a later worker.
-    # if all the workers log messages it gets noisy.
+    # these functions make it simpler to exclude logging from all the workers.
+    # all workers generally do the same thing. If they all logged it gets noisy.
     def logInfo(self, msg, allWorkers=False):
         '''By default logs a message only from worker one
         '''
@@ -194,9 +196,10 @@ class MPI_Communicators:
         self.totalElements = np.sum(mask_flat)
         self.mask_ndarrayCoords = mask_ndarrayCoords == 1
 
-        self.logDebug("MPIParams.setMask: loaded and stored mask with shape=%s elements included=%d excluded=%s" % \
-                      (self.mask_ndarrayCoords.shape, np.sum(self.mask_ndarrayCoords),
-                       np.sum(0==self.mask_ndarrayCoords)))
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logDebug("MPIParams.setMask: loaded and stored mask with shape=%s elements included=%d excluded=%s" % \
+                          (self.mask_ndarrayCoords.shape, np.sum(self.mask_ndarrayCoords),
+                           np.sum(0==self.mask_ndarrayCoords)))
 
         workerOffsets, workerCounts = CommSystemUtil.divideAmongWorkers(self.totalElements, 
                                                                  self.numWorkers)
@@ -263,7 +266,6 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
       serverWorkers[serverRank]['workerRanksInCommDict'] -  a key for this dict is a
          worker rank in the world space. The value is the rank in the 'comm' value
       
-
     '''
     assert len(serverRanks) > 0, "need at least one server"
     assert min(serverRanks) >= 0, "cannot have negative server ranks"
@@ -386,9 +388,10 @@ class RunServer(object):
         t0 = None
         for datum in dataGen:
             self.recordTimeToGetData(startTime=t0, endTime=time.time())
-            sec, nsec = datum.time()
-            sendEventReadyBuffer.setTime(sec, nsec)
-            self.logger.debug("CommSystem.run: Before Send EVT sec=%d nsec=%d" % (sec, nsec))
+            sec, nsec, fiducials = datum.eventId()
+            sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem.run: Before Send EVT sec=%d nsec=%d" % (sec, nsec))
             self.comm.Send([sendEventReadyBuffer.getNumpyBuffer(),
                             sendEventReadyBuffer.getMPIType()],
                            dest=self.masterRank)
@@ -436,7 +439,6 @@ class RunMaster(object):
         self.logger = logger
         self.logger.info(hostmsg)
 
-        self.firstSec = None
         # initially all servers are not ready
         self.notReadyServers = [r for r in serverRanks]  # MPI Test on request is false
         self.readyServers = []                           # MPI Test on request is True
@@ -447,6 +449,8 @@ class RunMaster(object):
         self.viewerBuffer = MVW_MsgBuffer()
         self.lastUpdate = 0
         self.numEvents = 0
+        
+        self.eventIdToCounter = None
 
     def getEarliest(self, serverDataList):
         '''Takes a list of server data buffers. identifies oldest server::
@@ -456,12 +460,13 @@ class RunMaster(object):
          the buffer with the earliest time
         '''
         idx = 0
-        sec, nsec = serverDataList[idx].getTime()
+        sec, nsec, fiducials = serverDataList[idx].getEventId()
         for curIdx in range(1,len(serverDataList)):
-            curSec, curNsec = serverDataList[idx].getTime()
+            curSec, curNsec, curFiducials = serverDataList[idx].getEventId()
             if (curSec < sec) or ((curSec == sec) and (curNsec < nsec)):
                 sec = curSec
                 nsec = curNsec
+                fiducials = curFiducials
                 idx = curIdx
         return serverDataList[idx]
         
@@ -481,21 +486,23 @@ class RunMaster(object):
         return serverReceiveData, serverRequests
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def informWorkersOfNewData(self, selectedServerRank, relTime):
+    def informWorkersOfNewData(self, selectedServerRank, counter):
         self.bcastWorkersBuffer.setEvt()
         self.bcastWorkersBuffer.setRank(selectedServerRank)
-        self.bcastWorkersBuffer.setRelSec(relTime)
-        self.logger.debug("CommSystem: before Bcast -> workers EVT at %.5f" % relTime)
+        self.bcastWorkersBuffer.setCounter(counter)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug("CommSystem: before Bcast -> workers EVT counter=%d" % counter)
         self.masterWorkersComm.Bcast([self.bcastWorkersBuffer.getNumpyBuffer(),
                                       self.bcastWorkersBuffer.getMPIType()],
                                      root=self.masterRankInMasterWorkersComm)
         self.masterWorkersComm.Barrier()
-        self.logger.debug("CommSystem: after Bcast/Barrier -> workers EVT at %.5f" % relTime)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug("CommSystem: after Bcast/Barrier -> workers EVT counter=%d" % counter)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def informViewerOfUpdate(self, relSec):
+    def informViewerOfUpdate(self, counter):
         self.viewerBuffer.setUpdate()
-        self.viewerBuffer.setRelSec(relSec)
+        self.viewerBuffer.setCounter(counter)
         self.worldComm.Send([self.viewerBuffer.getNumpyBuffer(),
                              self.viewerBuffer.getMPIType()],
                             dest=self.viewerRank)
@@ -543,10 +550,12 @@ class RunMaster(object):
             '''
             assert len(self.notReadyServers)>0, "waitOnServer called, but no not-ready servers"
 
-            self.logger.debug("CommSystem: before waitany. notReadyServers=%s" % self.notReadyServers)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: before waitany. notReadyServers=%s" % self.notReadyServers)
             requestList = [serverRequests[rnk] for rnk in self.notReadyServers]
             idx=MPI.Request.Waitany(requestList)
-            self.logger.debug("CommSystem: after waitany. server %d is now ready" % self.notReadyServers[idx])
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: after waitany. server %d is now ready" % self.notReadyServers[idx])
 
             newReadyServers = [server for server in self.notReadyServers \
                                if serverRequests[server].Test()]
@@ -565,7 +574,6 @@ class RunMaster(object):
 
         serverReceiveData, serverRequests = self.initRecvRequestsFromServers()
 
-        relTime = 0.0
         numEventsAtLastDataRateMsg = 0
         timeAtLastDataRateMsg = time.time()
         startTime = time.time()
@@ -589,17 +597,19 @@ class RunMaster(object):
 
             earlyServerData = self.getEarliest([serverReceiveData[server] for server in self.readyServers])
             selectedServerRank = earlyServerData.getRank()
-            sec, nsec = earlyServerData.getTime()
-            self.logger.debug("CommSystem: next server rank=%d sec=%d nsec=%10d" % (selectedServerRank, sec, nsec))
-            if self.firstSec is None:
-                self.firstSec = sec
-
-            relTime = float(sec-self.firstSec)+1e-9*nsec
-            self.informWorkersOfNewData(selectedServerRank, relTime)
+            sec, nsec, fiducials = earlyServerData.getEventId()
+            if self.eventIdToCounter is None:
+                self.eventIdToCounter = Counter120hz.Counter120hz(sec, nsec, fiducials)
+            counter = self.eventIdToCounter.getCounter(sec, fiducials)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: next server rank=%d sec=%d nsec=%10d fiducials=0x%8.8X counter=%d" % \
+                                  (selectedServerRank, sec, nsec, fiducials, counter))
+            self.informWorkersOfNewData(selectedServerRank, counter)
 
             # tell server n to scatter to workers
             self.sendOkForWorkersBuffer.setSendToWorkers()
-            self.logger.debug("CommSystem: before SendOkForWorkers to server %d" % selectedServerRank)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: before SendOkForWorkers to server %d" % selectedServerRank)
             self.worldComm.Send([self.sendOkForWorkersBuffer.getNumpyBuffer(), 
                                          self.sendOkForWorkersBuffer.getMPIType()], 
                                         dest=selectedServerRank)
@@ -607,19 +617,21 @@ class RunMaster(object):
             # do new Irecv from worker n
             self.readyServers.remove(selectedServerRank)
             self.notReadyServers.append(selectedServerRank)
-            self.logger.debug("CommSystem: after sendOk, before replacing request with Irecv from rank %d" % selectedServerRank)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: after sendOk, before replacing request with Irecv from rank %d" % selectedServerRank)
             serverReceiveBuffer = serverReceiveData[selectedServerRank]
             serverRequests[selectedServerRank] = self.worldComm.Irecv([serverReceiveBuffer.getNumpyBuffer(), 
                                                                                serverReceiveBuffer.getMPIType()],  \
                                                                               source = selectedServerRank)
-            self.logger.debug("CommSystem: after Irecv from rank %d" % selectedServerRank)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("CommSystem: after Irecv from rank %d" % selectedServerRank)
 
             # check to see if there should be an update for the viewer
             self.numEvents += 1
             if (self.updateIntervalEvents > 0) and (self.numEvents - self.lastUpdate > self.updateIntervalEvents):
                 self.lastUpdate = self.numEvents
                 self.logger.debug("CommSystem: Informing viewers and workers to update" )
-                self.informViewerOfUpdate(relTime)
+                self.informViewerOfUpdate(sec, fiducials)
                 self.informWorkersToUpdateViewer()
 
             # check to display message
@@ -637,7 +649,7 @@ class RunMaster(object):
 
         # send one last update at the end
         self.logger.debug("CommSystem: servers finished. sending one last update")
-        self.informViewerOfUpdate(relTime)
+        self.informViewerOfUpdate(counter)
         self.informWorkersToUpdateViewer()
 
         self.sendEndToWorkers()
@@ -645,11 +657,11 @@ class RunMaster(object):
 
 class RunWorker(object):
     def __init__(self, masterWorkersComm, masterRankInMasterWorkersComm, 
-                 wrapEventNumber, g2, logger):
+                 wrapEventNumber, xCorrBase, logger):
         self.masterWorkersComm = masterWorkersComm
         self.masterRankInMasterWorkersComm = masterRankInMasterWorkersComm
         self.wrapEventNumber = wrapEventNumber
-        self.g2 = g2
+        self.xCorrBase = xCorrBase
         self.logger = logger
         self.msgBuffer = MVW_MsgBuffer()
         self.evtNumber = 0
@@ -672,32 +684,32 @@ class RunWorker(object):
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
     def serverWorkersScatterWrapped(self, serverWorldRank):
-        self.g2.serverWorkersScatter(serverFullDataArray=None,
+        self.xCorrBase.serverWorkersScatter(serverFullDataArray=None,
                                      serverWorldRank = serverWorldRank)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
     def serverWorkersScatterNotWrapped(self, serverWorldRank):
-        self.g2.serverWorkersScatter(serverFullDataArray=None,
+        self.xCorrBase.serverWorkersScatter(serverFullDataArray=None,
                                      serverWorldRank = serverWorldRank)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def storeNewWorkerDataWrapped(self, relSeconds):
-        self.g2.storeNewWorkerData(relSeconds = relSeconds)
+    def storeNewWorkerDataWrapped(self, counter):
+        self.xCorrBase.storeNewWorkerData(counter = counter)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def storeNewWorkerDataNotWrapped(self, relSeconds):
-        self.g2.storeNewWorkerData(relSeconds = relSeconds)
+    def storeNewWorkerDataNotWrapped(self, counter):
+        self.xCorrBase.storeNewWorkerData(counter = counter)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def viewerWorkersUpdateWrapped(self, relSeconds):
-        self.g2.viewerWorkersUpdate(relsec = relSeconds)
+    def viewerWorkersUpdateWrapped(self, counter):
+        self.xCorrBase.viewerWorkersUpdate(counter = counter)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def viewerWorkersUpdateNotWrapped(self, relSeconds):
-        self.g2.viewerWorkersUpdate(relsec = relSeconds)
+    def viewerWorkersUpdateNotWrapped(self, counter):
+        self.xCorrBase.viewerWorkersUpdate(counter = counter)
 
     def run(self):
-        relSeconds = 0.0
+        counter = 0
         while True:
             self.logger.debug("CommSystem.run: before Bcast from master")
             if self.wrapped:
@@ -707,21 +719,22 @@ class RunWorker(object):
 
             if self.msgBuffer.isEvt():
                 serverWithData = self.msgBuffer.getRank()
-                relSeconds = self.msgBuffer.getRelSec()
-                self.logger.debug("CommSystem.run: after Bcast from master. EVT server=%2d time=%.5f" % (serverWithData, relSeconds))
+                counter = self.msgBuffer.getCounter()
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug("CommSystem.run: after Bcast from master. EVT server=%2d counter=%d" % (serverWithData, counter))
                 if self.wrapped:
                     self.serverWorkersScatterWrapped(serverWorldRank = serverWithData)
-                    self.storeNewWorkerDataWrapped(relSeconds = relSeconds)
+                    self.storeNewWorkerDataWrapped(counter = counter)
                 else:
                     self.serverWorkersScatterNotWrapped(serverWorldRank = serverWithData)
-                    self.storeNewWorkerDataNotWrapped(relSeconds = relSeconds)
+                    self.storeNewWorkerDataNotWrapped(counter = counter)
 
             elif self.msgBuffer.isUpdate():
                 self.logger.debug("CommSystem.run: after Bcast from master - UPDATE")
                 if self.wrapped:
-                    self.viewerWorkersUpdateWrapped(relSeconds = relSeconds)
+                    self.viewerWorkersUpdateWrapped(counter = counter)
                 else:
-                    self.viewerWorkersUpdateNotWrapped(relSeconds = relSeconds)
+                    self.viewerWorkersUpdateNotWrapped(counter = counter)
                 self.logger.debug("CommSystem.run: returned from viewer workers update")
             elif self.msgBuffer.isEnd():
                 self.logger.debug("CommSystem.run: after Bcast from master - END. quiting")
@@ -733,11 +746,11 @@ class RunWorker(object):
                 self.wrapped = True
 
 class RunViewer(object):
-    def __init__(self, worldComm, masterRank, g2, logger):
+    def __init__(self, worldComm, masterRank, xCorrBase, logger):
         self.worldComm = worldComm
         self.masterRank = masterRank
         self.logger = logger
-        self.g2 = g2
+        self.xCorrBase = xCorrBase
         self.msgbuffer = MVW_MsgBuffer()
 
     @Timing.timecall(VIEWEREVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
@@ -747,8 +760,8 @@ class RunViewer(object):
                   source=self.masterRank)
 
     @Timing.timecall(VIEWEREVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def viewerWorkersUpdate(self, relsec):
-        self.g2.viewerWorkersUpdate(relsec=relsec)
+    def viewerWorkersUpdate(self, counter):
+        self.xCorrBase.viewerWorkersUpdate(counter=counter)
 
     def run(self):
         while True:
@@ -756,15 +769,16 @@ class RunViewer(object):
             self.waitForMasterMessage()
 
             if self.msgbuffer.isUpdate():
-                relsec = self.msgbuffer.getRelSec()
-                self.logger.debug('CommSystem.run: after Recv from master. get UPDATE: relsec=%.3f' % relsec)
-                self.viewerWorkersUpdate(relsec=relsec)
+                counter = self.msgbuffer.getCounter()
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug('CommSystem.run: after Recv from master. get UPDATE: counter=%d' % counter)
+                self.viewerWorkersUpdate(counter=counter)
             elif self.msgbuffer.isEnd():
                 self.logger.debug('CommSystem.run: after Recv from master. get END. quiting.')
                 break
             else:
                 raise Exception("unknown msgtag")
-        self.g2.shutdown_viewer()
+        self.xCorrBase.shutdown_viewer()
 
 def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg):
     '''main driver for the system. 
