@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 #include "PSQt/colors.h"
 #include <QApplication>
 #include <QPainter>

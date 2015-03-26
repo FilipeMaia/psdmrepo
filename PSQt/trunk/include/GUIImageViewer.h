@@ -22,6 +22,29 @@
 #include "PSQt/WdgSpecHist.h"
 
 namespace PSQt {
+
+//--------------------------
+
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Widget/GUI for image viewer.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GUIMain
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
+
 class GUIImageViewer : public Frame
 //class GUIImageViewer : public QWidget
 {
@@ -38,6 +61,7 @@ class GUIImageViewer : public Frame
     inline WdgImage* wdgImage(){ return (WdgImage*)m_image; }
     inline WdgFile*  wdgFile() { return m_file; }
     inline ImageProc* getImageProc() { return m_imageproc; }
+    void showChildWindows();
 
  public slots:
     void onButExit(); // is not used
@@ -69,6 +93,7 @@ class GUIImageViewer : public Frame
     inline const char* _name_(){ return "GUIImageViewer"; }
     void setStyle();
     void setTips();
+    void message(QWidget* wdg, const char* cmt);
 };
 
 } // namespace PSQt

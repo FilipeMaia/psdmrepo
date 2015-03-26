@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/GeoImage.h"
 #include "PSQt/Logger.h"
@@ -154,7 +161,7 @@ GeoImage::onImageFileNameIsChanged(const std::string& fname)
 void 
 GeoImage::updateImage()
 {
-  MsgInLog(_name_(), INFO, "updateImage(): re-generate raw image ndarray and emit signal: imageIsUpdated(nda)"); 
+  MsgInLog(_name_(), DEBUG, "updateImage(): re-generate raw image ndarray and emit signal: imageIsUpdated(nda)"); 
 
   //const ndarray<GeoImage::image_t,2> nda = getRandomImage();
   //const ndarray<GeoImage::image_t, 2> nda = getNormalizedImage();
@@ -202,7 +209,7 @@ void
 GeoImage::testSignalImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 {  
   stringstream ss; ss << "testSignalImageIsUpdated(), size = " << nda.size();
-  MsgInLog(_name_(), INFO, ss.str()); 
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 }
 
 //--------------------------

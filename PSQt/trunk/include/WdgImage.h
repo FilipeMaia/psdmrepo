@@ -35,13 +35,28 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  * 
- *  @brief Shows image in the QLabel box.
+ *  @brief Shows image in the inherited QLabel box.
  * 
+ *  @code
+ *  public slots:
+ *     void onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>&) ;
+ *     void onFileNameChanged(const std::string& fname) ;
+ *     void onTest() ;
+ *     void onPressOnAxes(QMouseEvent* e, QPointF p);
+ *     void onHueAnglesUpdated(const float&, const float&);
+ *     void testSignalZoomIsChanged(int&, int&, int&, int&, float&, float&);
+ *  @endcode
+ *
+ *  @code
+ *  signals :
+ *    void zoomIsChanged(int&, int&, int&, int&, float&, float&);
+ *  @endcode
+ *
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUView
+ *  @see WdgImageFigs.h
  *
  *  @version $Id$
  *
@@ -140,7 +155,7 @@ class WdgImage : public QLabel
     void resetZoom() ;
     void setIntensityRange(const float& amin, const float& amax);
     void setNormImage(const ndarray<GeoImage::image_t,2>&) ;
-
+    void getIntensityLimits(float& imin, float& imax);
 };
 
 } // namespace PSQt

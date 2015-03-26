@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/WdgColorBar.h"
@@ -47,8 +54,8 @@ void WdgColorBar::connectForTest()
   connect(this, SIGNAL(releaseColorBar(QMouseEvent*, const float&)),
           this, SLOT(testReleaseColorBar(QMouseEvent*, const float&)));
 
-  connect(this, SIGNAL(moveOnColorBar(QMouseEvent*, const float&)),
-          this, SLOT(testMoveOnColorBar(QMouseEvent*, const float&)));
+  //connect(this, SIGNAL(moveOnColorBar(QMouseEvent*, const float&)),
+  //        this, SLOT(testMoveOnColorBar(QMouseEvent*, const float&)));
 }
 
 //--------------------------

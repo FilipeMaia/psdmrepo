@@ -16,6 +16,26 @@ namespace PSQt {
 
 //--------------------------
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Test widget, is not used in this project.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see 
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
+
 class GUView // : public QWidget
 {
   //Q_OBJECT // macro is needed for connection of signals and slots
@@ -24,7 +44,6 @@ public:
 
   //GUView () {}
   //virtual ~GUView () {}
-  //enum ORIDIR {HORUP, HORDOWN, VERRIGHT, VERLEFT};
 
   static QGraphicsView*
   make_view( const float& xmin =   0

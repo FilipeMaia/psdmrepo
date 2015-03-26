@@ -16,6 +16,24 @@
 
 namespace PSQt {
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Widget for file name input.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GUIMain, GUIImageViewer
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
 class WdgFile : public QWidget
 {
  Q_OBJECT // macro is needed for connection of signals and slots

@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/DragStore.h"
@@ -7,6 +14,8 @@
 //#include "PSQt/DragLine.h"
 
 using namespace std;   // cout without std::
+
+//--------------------------
 
 namespace PSQt {
 
@@ -133,14 +142,17 @@ DragStore::cstrDragType(const DRAGTYPE& dfigtype)
 PSQt::DragBase*
 DragStore::Create(WdgImage* wimg, const DRAGTYPE& dfigtype, const QPointF* points, const int& npoints)
 {
-  MsgInLog(_name_(), INFO, "Create " + std::string(cstrDragType(dfigtype)));
+  stringstream ss; ss << "Create " << std::string(cstrDragType(dfigtype)) 
+                      << " with pars: npoints=" << npoints;
+  for(int i=0; i<npoints; ++i) ss << ", (" << points[i].x() << ", " << points[i].y() << ")";
+  MsgInLog(_name_(), INFO, ss.str());
 
   if (dfigtype == DRAGCIRCLE) { return new PSQt::DragCircle(wimg, points); }
   if (dfigtype == DRAGCENTER) { return new PSQt::DragCenter(wimg, points); }
   //if (dfigtype == DRAGLINE) { return new PSQt::DragLine(wimg); }
 
-  stringstream ss; ss << "Unknown draggable figure name " << std::string(cstrDragType(dfigtype)) << " - return 0-pointer...";
-  MsgInLog(_name_(), INFO, ss.str() );  
+  stringstream ss2; ss2 << "Unknown draggable figure name " << std::string(cstrDragType(dfigtype)) << " - return 0-pointer...";
+  MsgInLog(_name_(), WARNING, ss2.str() );  
   //abort();
   return 0; // NULL;
 }

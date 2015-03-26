@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 
 #include "PSQt/custombutton.h"
 #include <QApplication>

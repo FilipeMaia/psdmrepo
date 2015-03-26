@@ -16,6 +16,24 @@
 
 namespace PSQt {
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Widget showing colot wheel and setting parameters (hue angles) for color table.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GUIImageViewer
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
 class WdgColorTable : public QWidget
 {
  Q_OBJECT // macro is needed for connection of signals and slots

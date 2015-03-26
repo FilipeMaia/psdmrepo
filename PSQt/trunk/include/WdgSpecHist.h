@@ -16,13 +16,20 @@
 
 namespace PSQt {
 
-// /// @addtogroup PSQt PSQt
+/// @addtogroup PSQt PSQt
 
 /**
  *  @ingroup PSQt
  * 
- *  @brief WdgSpecHist - widget to display spectral historgam for image
+ *  @brief Widget to display spectral historgam for image.
  * 
+ *  @code
+ *  public slots:
+ *    void onSHistIsFilled(float*, const float&, const float&, const unsigned&);
+ *  @endcode
+ * 
+ *  Constructor creates a widget with default frame of axes.
+ *  Actual axes scale and histogram show up through the call to slot onSHistIsFilled(...).
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -46,6 +53,14 @@ class WdgSpecHist : public QWidget
     PSQt::GUAxes* axes() { return m_axes; };
 
   public slots:
+  /**
+   *  @brief Public slot for histogram update. 
+   *  
+   *  @param[in] - float* - pointer to the histogram array
+   *  @param[in] - const float& - low limit for histogram range
+   *  @param[in] - const float& - upper limit for histogram range
+   *  @param[in] - const unsigned& - number of bins
+   */ 
     void onSHistIsFilled(float*, const float&, const float&, const unsigned&);
 
   private:

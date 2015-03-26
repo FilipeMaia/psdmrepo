@@ -17,12 +17,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  *
- *  @brief ImageProc - processing on raw image ndarray using zoom rect selection
+ *  @brief Processing of raw image ndarray after zoom or intensity range selection
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUIMain
+ *  @see GUIImageViewer
  *
  *  @version $Id$
  *

@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/Logger.h"
@@ -17,7 +24,7 @@ Logger::Logger(const LEVEL& level)
   : QObject(NULL)
   , LoggerBase(level)
 {
-  message(_name_(), INFO, "Singleton object for logger is created.");
+  message(_name_(), DEBUG, "Singleton object for logger is created.");
 }
 
 //--------------------------

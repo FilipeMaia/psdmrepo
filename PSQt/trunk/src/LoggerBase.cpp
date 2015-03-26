@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/LoggerBase.h"
@@ -143,7 +150,7 @@ Record::strRecordTotal()
   ss << left << std::setw(4) << number
      << fixed << std::setw(16) << std::setprecision(3) << time 
      << std::setw(21) << tstamp
-     << std::setw(12) << name << ' '
+     << std::setw(16) << name << ' '
      << std::setw(10) << strLevel(level)
      << msg;
   return ss.str();
@@ -157,7 +164,7 @@ Record::strRecordBrief()
   stringstream ss; 
   ss << left << std::setw(4) << number
      << std::setw(21) << tstamp
-     << std::setw(10) << name << ' '
+     << std::setw(16) << name << ' '
      << std::setw(10) << strLevel(level)
      << msg;
   return ss.str();

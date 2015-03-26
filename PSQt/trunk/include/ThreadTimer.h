@@ -7,6 +7,24 @@
 
 namespace PSQt {
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Tread-worker, inherits from QThread
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see ../app/geo.cpp
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
 //--------------------------
 
 class ThreadTimer : public QThread

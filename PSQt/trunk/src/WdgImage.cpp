@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/WdgImage.h"
 #include "PSQt/Logger.h"
@@ -175,7 +182,7 @@ WdgImage::resetZoom()
 void 
 WdgImage::zoomInImage()
 {
-  MsgInLog(_name_(), INFO, "zoomInImage()");
+  MsgInLog(_name_(), DEBUG, "zoomInImage()");
 
   //std::cout << "  x1:" << m_point1->x() << "  y1:" << m_point1->y() 
   //          << "  x2:" << m_point2->x() << "  y2:" << m_point2->y()<< '\n'; 
@@ -412,7 +419,7 @@ WdgImage::onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
 {
   p_nda_img_raw = &nda;
 
-  stringstream ss; ss << "onImageIsUpdated(): Receive and update raw image in window,"
+  stringstream ss; ss << "Update raw image in window,"
                       << " rows:" << nda.shape()[0] << " cols:" << nda.shape()[1]
                       << " amin=" << m_amin
                       << " amax=" << m_amax
@@ -445,17 +452,47 @@ WdgImage::setNormImage(const ndarray<GeoImage::image_t,2>& nda)
   setWindowTitle(sst.str().c_str());
 }
 
+
+//--------------------------
+void 
+WdgImage::getIntensityLimits(float& imin, float& imax)
+{
+    float a(0);
+    const ndarray<GeoImage::raw_image_t,2>& nda = *p_nda_img_raw;
+    imin = (float)nda[m_ymin_raw][m_xmin_raw];
+    imax = imin;
+    for(int iy=m_ymin_raw; iy<m_ymax_raw; ++iy) {
+      for(int ix=m_xmin_raw; ix<m_xmax_raw; ++ix) {
+        a = (float)nda[iy][ix];
+        if(a<imin) imin = a;
+        if(a>imax) imax = a;
+      }
+    }
+}
+
 //--------------------------
 void 
 WdgImage::setIntensityRange(const float& amin, const float& amax)
 {
-  m_amin = amin;
-  m_amax = amax;
+  //m_amin = amin;
+  //m_amax = amax;
+
+  if(amin && amax) {
+    m_amin = amin;
+    m_amax = amax;
+  }
+  else {
+    float Imin, Imax;
+    //getMinMax<GeoImage::raw_image_t>(*p_nda_img_raw, Imin, Imax);
+    this->getIntensityLimits(Imin, Imax);
+    m_amax = (amax==0) ? Imax : amax;
+    m_amin = Imin;
+  }
 
   if(p_nda_img_raw) this->onImageIsUpdated(*p_nda_img_raw);
 
   //update();
-  std::stringstream ss; ss << ":setIntensityRange amin:" << m_amin << " amax:" << m_amax;
+  std::stringstream ss; ss << "Set intensity range amin=" << m_amin << " amax=" << m_amax;
   MsgInLog(_name_(), INFO, ss.str());  
 }
 
@@ -465,12 +502,11 @@ void
 WdgImage::onPressOnAxes(QMouseEvent* e, QPointF p)
 {
   std::stringstream ss;
-  ss << _name_() << " onPressOnAxes"
-     << "  button: " << e->button()
-     << "  window x(), y() = " << e->x() << ", " << e->y()
+  ss << _name_() << " onPressOnAxes  button: " << e->button()
+    //<< "  window x(), y() = " << e->x() << ", " << e->y()
      << "  scene x(), y() = " << p.x() << ", " << p.y();
 
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 
   float amin = m_amin;
   float amax = m_amax;
@@ -511,7 +547,7 @@ WdgImage::testSignalZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax, fl
      << "  ymax=" << ymax
      << "  amin=" << amin 
      << "  amax=" << amax;
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 }
 
 //--------------------------

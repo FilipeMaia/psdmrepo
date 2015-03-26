@@ -29,13 +29,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  * 
- *  @brief Shows image in the QLabel box.
+ *  @brief Inherits from WdgImage and adds interactive figures on image.
  * 
- *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUView
+ *  @see WdgImage, DragStore, DragBase, DragCenter, DragCircle.
  *
  *  @version $Id$
  *

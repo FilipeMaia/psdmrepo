@@ -14,12 +14,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  *
- *  @brief GUI (Frame) for Logger.
+ *  @brief GUI for Logger.
  * 
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUIMain
+ *  @see LoggerBase, Logger, GUIMain
  *
  *  @version $Id$
  *

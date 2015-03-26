@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/GUIImageViewer.h"
@@ -25,6 +32,8 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
     : Frame(parent)
     , m_colortab(0)
 {
+  MsgInLog(_name_(), INFO, "Open image viewer"); 
+
   AppUtils::AppDataPath adp_fname_def("PSQt/images/2011-08-10-Tiled-XPP.jpg"); //galaxy.jpeg"); 
 
   m_file      = new PSQt::WdgFile(this, "Image:", adp_fname_def.path());
@@ -54,7 +63,7 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   m_vbox -> addLayout(m_hbox);
 
   this -> setLayout(m_vbox);
-  this -> setWindowTitle(tr("Basic Drawing"));
+  this -> setWindowTitle(_name_());
   this -> move(100,50);  
 
   setStyle();
@@ -98,6 +107,7 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   // In order to complete initialization by natural signals
   ((DragCenter*)p_drag_center) -> forceToEmitSignal();
 
+  // open spectral and radial histogram windows
   //MsgInLog(_name_(), INFO, "c-tor is done");
 }
 
@@ -106,12 +116,12 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
 void
 GUIImageViewer::setTips() 
 {
-  m_but_spec -> setToolTip("Open/close spectral window");
-  m_but_rhis -> setToolTip("Open/close radial projection (angul-integrated)");
   m_but_add  -> setToolTip("Add circle for current center and random radius.\n"\
                            "Then move circle clicking on it by left mouse button and drag,\n"\
                            "or remove circle clicking on it by middle mouse button.");
   m_but_cols -> setToolTip("Open/close color setting tool");
+  m_but_spec -> setToolTip("Open/close spectral window");
+  m_but_rhis -> setToolTip("Open/close radial projection (angul-integrated)");
 }
 //--------------------------
 
@@ -129,8 +139,7 @@ GUIImageViewer::setStyle()
 void 
 GUIImageViewer::resizeEvent(QResizeEvent *event)
 {
-  //  m_frame->setGeometry(0, 0, event->size().width(), event->size().height());
-  stringstream ss; ss << "Window is resized, w:" << event->size().width() << " h:" <<  event->size().height();
+  stringstream ss; ss << _name_() << " w=" << event->size().width() << " h=" <<  event->size().height();
   setWindowTitle(ss.str().c_str());
 }
 
@@ -144,18 +153,17 @@ GUIImageViewer::closeEvent(QCloseEvent *event)
   if (m_spechist) m_spechist->close(); 
 
   QWidget::closeEvent(event);
-  stringstream ss; ss << "closeEvent(...): type = " << event -> type();
+  stringstream ss; ss << "Close image viewer: event type = " << event -> type();
   MsgInLog(_name_(), INFO, ss.str());
 }
 
 //--------------------------
+
 void
-GUIImageViewer::moveEvent(QMoveEvent *event)
+GUIImageViewer::moveEvent(QMoveEvent *e)
 {
-  int x = event->pos().x();
-  int y = event->pos().y();
-  QString text = QString::number(x) + "," + QString::number(y);
-  setWindowTitle(text);
+  stringstream ss; ss << _name_() << " x=" << e->pos().x() << " y=" << e->pos().y();
+  setWindowTitle(ss.str().c_str());
 }
 
 //--------------------------
@@ -168,6 +176,15 @@ GUIImageViewer::mousePressEvent(QMouseEvent *event)
   QString text = "mousePressEvent: " + QString::number(x) + "," + QString::number(y);
   //std::cout << text.toStdString()  << std::endl;
   setWindowTitle(text);
+}
+
+//--------------------------
+
+void 
+GUIImageViewer::showChildWindows()
+{
+  onButSpec();
+  onButRHis();
 }
 
 //--------------------------
@@ -185,13 +202,22 @@ GUIImageViewer::onButExit()
 //--------------------------
 
 void 
+GUIImageViewer::message(QWidget* wdg, const char* cmt)
+{
+  stringstream ss; ss << cmt << " window " << ((wdg->isVisible()) ? "is open" : "closed");
+  MsgInLog(_name_(), INFO, ss.str());
+}
+
+//--------------------------
+
+void 
 GUIImageViewer::onButRHis()
 {
   static unsigned counter=0; 
   if(!counter++)
-    m_radhist -> move(this->pos().x() + this->size().width() + 8, this->pos().y());      
+    m_radhist->move(this->pos().x() + this->size().width() + 8, this->pos().y());      
   m_radhist->setVisible(! (m_radhist->isVisible()));
-  MsgInLog(_name_(), INFO, "onButRHis");
+  this->message(m_radhist, "Radial histogram");
 }
 
 //--------------------------
@@ -201,9 +227,10 @@ GUIImageViewer::onButSpec()
 {
   static unsigned counter=0; 
   if(!counter++)
-    m_spechist -> move(this->pos().x() + this->size().width() + 8, this->pos().y()+400);      
+    m_spechist -> move(this->pos().x() + this->size().width() + 8, 
+                       this->pos().y() + 363);      
   m_spechist->setVisible(! (m_spechist->isVisible()));
-  MsgInLog(_name_(), INFO, "onButSpec");
+  this->message(m_spechist, "Spectral histogram");
 }
 
 //--------------------------
@@ -223,12 +250,11 @@ GUIImageViewer::onButColorTab()
 {
   static unsigned counter=0; 
   if(!counter++)
-    m_colortab -> move(this->pos().x() + this->size().width() + 8, this->pos().y());      
+    m_colortab -> move(this->pos().x() + 8, this->pos().y());      
+  //m_colortab -> move(this->pos().x() + this->size().width() + 8, this->pos().y());      
   m_colortab->setVisible(! (m_colortab->isVisible()));
   
-  stringstream ss; ss << "Color table selection window " << 
-		     ((m_colortab->isVisible()) ? "is open" : "closed");
-  MsgInLog(_name_(), INFO, ss.str());
+  this->message(m_colortab, "Color table");
 }
 
 //--------------------------

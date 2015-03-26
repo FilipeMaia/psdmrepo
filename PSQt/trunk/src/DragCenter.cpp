@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/DragCenter.h"
@@ -97,8 +104,8 @@ DragCenter::moveIsCompleted(const QPointF& p)
 {
   this->move(p); // last move
 
-  stringstream ss; ss << "Center x: " << fixed << std::setprecision(1) << m_points_raw[0].x()
-                                                            << "  y: " << m_points_raw[0].y();
+  stringstream ss; ss << "Set center in position x=" << fixed << std::setprecision(1) 
+                      << m_points_raw[0].x() << ", y=" << m_points_raw[0].y();
   MsgInLog(_name_(), INFO, ss.str() );  
 
   emit centerIsChanged(m_points_raw[0]);
@@ -140,7 +147,7 @@ void
 DragCenter::testSignalCenterIsChanged(const QPointF& pc)
 {
   stringstream ss; ss << "::testSignalCenterIsChanged() x: " << fixed << std::setprecision(1) << pc.x() << "  y: " << pc.y();  
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 }
 
 //--------------------------

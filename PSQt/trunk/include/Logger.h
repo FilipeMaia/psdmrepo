@@ -14,7 +14,7 @@ namespace PSQt {
 /**
  *  @ingroup PSQt Logger
  *
- *  @brief Logger - singleton for base class LoggerBase - messaging system
+ *  @brief Singleton for base class LoggerBase - messaging system
  *
  *  Connects LoggerBase with GUILogger using method
  *  new_record(Record& rec) - callback for re-implementation in subclass,

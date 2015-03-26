@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/WdgGeo.h"
@@ -244,8 +251,8 @@ WdgGeo::onRadioGroup()
   //std::cout << "onRadioGroup:  checked radio button:" << (but->text()).toStdString();
   //std::cout << " mapped edit field:" << (map_radio_to_edit[but]->text()).toStdString() << '\n';  
 
-  stringstream ss; ss << "Selected button: " << (but->text()).toStdString() 
-                      << " to edit field: " << (map_radio_to_edit[but]->text()).toStdString();
+  stringstream ss; ss << "Selected parameter " << (but->text()).toStdString() 
+                      << " value=" << (map_radio_to_edit[but]->text()).toStdString();
   MsgInLog(_name_(), INFO, ss.str()); 
 
   if(but == m_rad_x0
@@ -297,7 +304,7 @@ WdgGeo::onButAddSub(QAbstractButton* button)
   edi->setText(ss.str().c_str());
 
   stringstream smsg; smsg << "Value of \"" << (but_radio->text()).toStdString() << "\" is changed to " << val << " -> set geo, emit signal: geoIsChanged(m_geo)";
-  MsgInLog(_name_(), INFO, smsg.str()); 
+  MsgInLog(_name_(), DEBUG, smsg.str()); 
 
   this -> setGeoPars();
   //std::cout << "Do something here\n";

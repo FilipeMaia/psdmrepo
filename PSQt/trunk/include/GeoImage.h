@@ -16,12 +16,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  *
- *  @brief GeoImage - generates image using geometry and ndarray of intensity
+ *  @brief Generates image using geometry and ndarray of intensity.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see GUIMain
+ *  @see GUIMain, WdgImage, ImageProc
  *
  *  @version $Id$
  *

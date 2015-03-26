@@ -18,6 +18,26 @@ namespace PSQt {
 
 //--------------------------
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Inherits from QGraphicsView and displays window with axes.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GURuler, WdgRadHist, WdgSpecHist
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
+
 class GUAxes : public QGraphicsView
 {
   Q_OBJECT // macro is needed for connection of signals and slots

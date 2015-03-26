@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/WdgRadHist.h"
 #include "PSQt/Logger.h"
@@ -39,6 +46,7 @@ WdgRadHist::WdgRadHist(QWidget *parent)
 
   this -> setLayout(m_vbox);
   this->setContentsMargins(-9,-9,-9,-9);
+  this->setWindowTitle(_name_());
 }
 
 //--------------------------
@@ -57,7 +65,7 @@ WdgRadHist::~WdgRadHist()
 void 
 WdgRadHist::onRHistIsFilled(ndarray<float, 1>& nda, const unsigned& zirmin, const unsigned& zirmax)
 {
-  std::stringstream ss; ss <<  "::onRHistIsFilled() size()=" << nda.size()
+  std::stringstream ss; ss <<  "Draw radial histogram: array size()=" << nda.size()
                            <<  "  zirmin=" << zirmin
                            <<  "  zirmax=" << zirmax;
   MsgInLog(_name_(), INFO, ss.str());   

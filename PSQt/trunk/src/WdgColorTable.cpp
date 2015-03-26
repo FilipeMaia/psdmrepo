@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/WdgColorTable.h"
@@ -153,7 +160,7 @@ WdgColorTable::closeEvent(QCloseEvent *event)
 {
   QWidget::closeEvent(event);
   std::stringstream ss; ss << "closeEvent(...): type = " << event -> type();
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 }
 
 //--------------------------
@@ -305,7 +312,7 @@ void
 WdgColorTable::testSignalHueAnglesUpdated(const float& h1, const float& h2)
 {
   std::stringstream ss; ss << ":testSignalHueAnglesUpdated h1:" << m_h1 << " h2:" << m_h2;
-  MsgInLog(_name_(), INFO, ss.str());  
+  MsgInLog(_name_(), DEBUG, ss.str());  
 }
 
 //--------------------------

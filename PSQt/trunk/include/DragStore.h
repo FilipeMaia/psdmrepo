@@ -41,7 +41,7 @@ struct DragFig {
 /**
  *  @ingroup PSQt
  *
- *  @brief class DragStore has a static factory method Create for DragBase objects
+ *  @brief Contains static factory method Create for DragBase objects.
  *
  *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -113,7 +113,7 @@ class DragStore {
    *  @param[in] dfigtype - figure enumerated type
    *  @param[in] points - array of points which defines initial figure parameters
    *  @param[in] npoints - number of points in the array
-   */ 
+   */
   static PSQt::DragBase* Create(WdgImage* wimg, const DRAGTYPE& dfigtype=DRAGCIRCLE, const QPointF* points=0, const int& npoints=0);
   static const char* cstrDragType(const DRAGTYPE& dfigtype=DRAGCIRCLE);
   static inline const char* _name_(){return "DragStore";} 
@@ -123,13 +123,11 @@ class DragStore {
 
 
  private:
-  //virtual const char* _name_(){return "DragStore";}
 
   WdgImage*            m_wimg;
   std::vector<DragFig> v_dragfigs;
   DragFig*             p_dragfig_sel;
 };
-
 
 } // namespace PSQt
 

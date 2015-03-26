@@ -34,12 +34,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt DragBase
  *
- *  @brief DragBase - base class for draggable figures like circle, line, center, etc on the plot.
+ *  @brief Base class for draggable figures like circle, line, center, etc on the plot.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see DragStore, WdgImageFigs, WdgImage
+ *  @see DragStore, DragCenter, DragCircle, WdgImageFigs, WdgImage
  *
  *  @version $Id$
  *

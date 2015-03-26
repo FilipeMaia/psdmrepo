@@ -10,6 +10,28 @@
 
 namespace PSQt {
 
+//--------------------------
+
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Inherits from QFrame and sets its basic parameters. Is used to display widget frame.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see 
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
+
 class Frame : public QFrame
 {
  Q_OBJECT // macro is needed for connection of signals and slots

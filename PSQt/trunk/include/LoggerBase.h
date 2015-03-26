@@ -40,7 +40,7 @@ struct Record {
 
 //--------------------------
 
-std::string strLevel(const LEVEL& level=INFO) ;
+std::string strLevel(const LEVEL& level=DEBUG) ;
 LEVEL levelFromString(const std::string& str="INFO");
 std::string strTimeStamp(const std::string& format=std::string("%Y-%m-%d-%H:%M:%S"));
 double doubleTimeNow();
@@ -52,7 +52,7 @@ double doubleTimeNow();
 /**
  *  @ingroup PSQt LoggerBase
  *
- *  @brief LoggerBase - base class for messaging system.
+ *  @brief Base class for messaging system.
  *
  *  Accumulates messages as records in std::map<unsigned, Record> m_sslog;
  *  new_record(Record& rec) - callback for re-implementation in subclass.

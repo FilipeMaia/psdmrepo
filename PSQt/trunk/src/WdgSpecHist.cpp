@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/WdgSpecHist.h"
 #include "PSQt/Logger.h"
@@ -51,6 +58,7 @@ WdgSpecHist::WdgSpecHist(QWidget *parent)
 
   this -> setLayout(m_vbox);
   this->setContentsMargins(-9,-9,-9,-9);
+  this->setWindowTitle(_name_());
 }
 
 //--------------------------
@@ -69,7 +77,7 @@ WdgSpecHist::~WdgSpecHist()
 void 
 WdgSpecHist::onSHistIsFilled(float* arr, const float& amin, const float& amax, const unsigned& nbins)
 {
-  std::stringstream ss; ss <<  "::onSHistIsFilled() nbins=" << nbins
+  std::stringstream ss; ss <<  "Show spectral histogram with nbins=" << nbins
                            <<  "  amin=" << amin
                            <<  "  amax=" << amax;
   MsgInLog(_name_(), INFO, ss.str());   

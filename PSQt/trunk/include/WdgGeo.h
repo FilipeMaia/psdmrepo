@@ -15,7 +15,7 @@ namespace PSQt {
 /**
  *  @ingroup PSQt
  *
- *  @brief QWidget/Frame for GeometryObject editor.
+ *  @brief Widget for GeometryObject parameters editor.
  * 
  *  WdgGeo is a sub-class of Frame (QWidget).
  *

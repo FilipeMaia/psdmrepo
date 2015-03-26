@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/WdgGeoTree.h"
@@ -134,8 +141,8 @@ WdgGeoTree::mousePressEvent(QMouseEvent *event)
   //connect(this, SIGNAL(selectedText(const std::string&)), this, SLOT(testSignalString(const std::string&))); 
   connect(this, SIGNAL(geometryIsLoaded(PSCalib::GeometryAccess*)), this, SLOT(testSignalGeometryIsLoaded(PSCalib::GeometryAccess*))); 
   connect(this, SIGNAL(selectedGO(shpGO&)), this, SLOT(testSignalGO(shpGO&))); 
-  connect(this, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(testSignalCollapsed(const QModelIndex&)));
-  connect(this, SIGNAL(expanded(const QModelIndex&)), this, SLOT(testSignalExpanded(const QModelIndex&)));
+  //connect(this, SIGNAL(collapsed(const QModelIndex&)), this, SLOT(testSignalCollapsed(const QModelIndex&)));
+  //connect(this, SIGNAL(expanded(const QModelIndex&)), this, SLOT(testSignalExpanded(const QModelIndex&)));
 }
 
 //--------------------------
@@ -280,7 +287,7 @@ GeoTree::currentChanged(const QModelIndex & index, const QModelIndex & index_old
   //	    << " a:" << item->accessibleText().toStdString()
   //	    << " t:" << str; }
 
-  MsgInLog(_name_(), INFO, "Selected item: " + str + " emit signal"); 
+  MsgInLog(_name_(), INFO, "Selected geometry object: " + str); 
 
   //emit selectedText(str);
   emit selectedGO(map_item_to_geo[item]);

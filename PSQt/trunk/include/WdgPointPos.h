@@ -9,6 +9,21 @@
 
 namespace PSQt {
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Widget to display two values for 2-d point position. 
+ * 
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GUIImageViewer
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
 class WdgPointPos : public Frame // QWidget
 {
  Q_OBJECT // macro is needed for connection of signals and slots

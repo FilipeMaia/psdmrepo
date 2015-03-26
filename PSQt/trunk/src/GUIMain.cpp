@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/GUIMain.h"
@@ -22,7 +29,10 @@ GUIMain::GUIMain( QWidget *parent
    ): Frame(parent)
 //  : QWidget(parent)
 {
-  MsgInLog(_name_(), INFO, "Create main control window"); 
+  MsgInLog(_name_(), INFO, "Open main control window"); 
+  m_guilogger = new PSQt::GUILogger(this, false, false); // true/false - show/do not show buttons, frame
+  SetMsgLevel(level); // set level and update guilogger window for privious messages
+
 
   const std::string base_dir = "/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-05-15/";
   const std::string fname_geo = (gfname.empty()) ? (base_dir + "calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/2-end.data") : gfname; 
@@ -33,9 +43,6 @@ GUIMain::GUIMain( QWidget *parent
   //const std::string fname_nda = base_dir + "cspad-ndarr-max-cxig0715-r0023-lysozyme-rings.txt"; 
 
   const bool pbits = 0;
-
-  m_guilogger = new PSQt::GUILogger(this, false, false); // true/false - show/do not show buttons, frame
-  SetMsgLevel(level); // set level and update guilogger window for privious messages
 
   m_file_geo  = new PSQt::WdgFile(this, "Set geometry", fname_geo, "*.data \n *", false);
   m_file_nda  = new PSQt::WdgFile(this, "Set ndarray",  fname_nda, "*.txt *.dat \n *", false);
@@ -149,6 +156,7 @@ GUIMain::setStyle()
 
   m_guiimv -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
   m_guiimv -> show();
+  m_guiimv -> showChildWindows();
 
   //m_file_geo->setFixedWidth(150);
   //m_file_nda->setFixedWidth(150);

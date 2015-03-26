@@ -15,10 +15,14 @@
 
 namespace PSQt {
 
+typedef boost::shared_ptr<PSCalib::GeometryObject> shpGO;
+
+class GeoTree;
+
 /**
  *  @ingroup PSQt
  *
- *  @brief Qt Widget for geometry tree
+ *  @brief Widget to display and edit geometry tree.
  * 
  *  WdgGeoTree is a sub-class of Frame (QWidget)
  *  GeoTree is a sub-class of QTreeView
@@ -36,10 +40,6 @@ namespace PSQt {
  *
  *  @author Mikhail Dubrovin
  */
-
-typedef boost::shared_ptr<PSCalib::GeometryObject> shpGO;
-
-class GeoTree;
 
 class WdgGeoTree : public Frame
 {

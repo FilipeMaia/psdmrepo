@@ -17,6 +17,24 @@
 
 namespace PSQt {
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Wiget works with file directory tree (Is not used in current project).
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see 
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
 //class WdgDirTree : public QWidget
 class WdgDirTree : public Frame
 {

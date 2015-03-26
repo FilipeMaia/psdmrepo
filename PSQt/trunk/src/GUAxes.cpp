@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/GUAxes.h"
 //#include "PSQt/QGUtils.h"
@@ -44,7 +51,7 @@ namespace PSQt {
 
   if(m_pbits & 1) {std::cout << "GUAxes - ctor\n"; printMemberData();}
 
-  pview()->setGeometry(100, 50, 700, 400);
+  pview()->setGeometry(100, 50, 700, 378);
   pview()->setMinimumSize(300,200);
   //this->setContentsMargins(-9,-9,-9,-9);
  
@@ -258,7 +265,7 @@ GUAxes::message(QMouseEvent *e, const QPointF& sp, const char* cmt)
      << "  window x(), y() = " << e->x() << ", " << e->y()
      << "  scene x(), y() = " << sp.x() << ", " << sp.y();
 
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 }
 
 //--------------------------

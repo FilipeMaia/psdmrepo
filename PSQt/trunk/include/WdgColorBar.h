@@ -17,17 +17,31 @@ namespace PSQt {
 
 /**
  *  @ingroup PSQt
+ *  @brief ORIENT - enumerator for four color bar orientations; horisontal with raising color index to right or left and vertical with rising color index from to up and down.  
+ */
+enum ORIENT {HR=0, HL, VU, VD};
+
+
+/**
+ *  @ingroup PSQt
  * 
- *  @brief WdgColorBar - QLable widget showing interactive color bar 
+ *  @brief QLable-type widget with interactive image of the color bar. 
  * 
  *  Parameters of the color bar are set through the constructor, public method setColorBar, 
- *  and slot: onHueAnglesUpdated(const float&, const float&)
- *
- *  Emits signal on mouse button press/release/move:
- *     void pressColorBar(QMouseEvent*, const float&);
- *     void releaseColorBar(QMouseEvent*, const float&);
- *     void moveOnColorBar(QMouseEvent*, const float&);
+ *  and slot:
+ *  @code
+ *   public slots:                                            
+ *      void onHueAnglesUpdated(const float&, const float&) ; 
+ *  @endcode
  * 
+ *  Emits signals on mouse button press/release/move:
+ *  @code
+ *   signals :                                                
+ *      void pressColorBar  (QMouseEvent*, const float&) ;      
+ *      void releaseColorBar(QMouseEvent*, const float&) ;    
+ *      void moveOnColorBar (QMouseEvent*, const float&) ;     
+ *  @endcode
+ *                                                            
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -39,8 +53,6 @@ namespace PSQt {
  *  @author Mikhail Dubrovin
  */
 
-enum ORIENT {HR=0, HL, VU, VD};
-
 class WdgColorBar : public QLabel
 {
  Q_OBJECT // macro is needed for connection of signals and slots
@@ -49,6 +61,7 @@ class WdgColorBar : public QLabel
   /**
    *  @brief Class constructor with parameters
    *  
+   *  @param[in] parent - pointer to the parent QWidget.
    *  @param[in] h1 - 1st boarder hue angle.
    *  @param[in] h2 - 2nd boarder hue angle.
    *  @param[in] colors - number of colors in the color bar.
@@ -84,6 +97,11 @@ class WdgColorBar : public QLabel
     void resizeEvent       (QResizeEvent *event = 0) ;
 
  signals :
+  /**
+   *  @brief Emiting signal parameters
+   *  @param[in] - QMouseEvent*
+   *  @param[in] - const float& - [0,1]-fraction of the color bar from zero index to the point of the click.
+   */ 
     void pressColorBar(QMouseEvent*, const float&) ;
     void releaseColorBar(QMouseEvent*, const float&) ;
     void moveOnColorBar(QMouseEvent*, const float&) ;
@@ -92,7 +110,7 @@ class WdgColorBar : public QLabel
     void onHueAnglesUpdated(const float&, const float&) ;
     void testPressColorBar(QMouseEvent*, const float&) ;
     void testReleaseColorBar(QMouseEvent*, const float&) ;
-    void testMoveOnColorBar(QMouseEvent*, const float&) ;
+    void testMoveOnColorBar(QMouseEvent*, const float&) ; 
 
  private:
     float         m_h1;

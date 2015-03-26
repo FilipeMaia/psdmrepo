@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 
 #include "PSQt/WdgFile.h"
@@ -189,7 +196,7 @@ WdgFile::fileExists(const std::string& fname)
 void 
 WdgFile::testSignalString(const std::string& fname)
 {
-  MsgInLog(_name_(), INFO, "Received signal in testSignalSlot(string), fname: " + fname);
+  MsgInLog(_name_(), DEBUG, "Received signal in testSignalSlot(string), fname: " + fname);
 }
 
 //--------------------------

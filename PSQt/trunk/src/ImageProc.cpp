@@ -1,3 +1,10 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
+
 //--------------------------
 #include "PSQt/ImageProc.h"
 #include "PSQt/Logger.h"
@@ -85,9 +92,9 @@ ImageProc::onImageIsUpdated(ndarray<GeoImage::raw_image_t,2>& nda)
   m_rhist_is_set = false;
   m_zoom_is_set = false;
 
-  stringstream ss; ss << "onImageIsUpdated(), size = " << nda.size() 
+  stringstream ss; ss << "::onImageIsUpdated(), size = " << nda.size() 
                       << " shape = (" << nda.shape()[0] << ", " << nda.shape()[1] << ")";
-  MsgInLog(_name_(), INFO, ss.str()); 
+  MsgInLog(_name_(), DEBUG, ss.str()); 
 
   m_zxmin = 0; 
   m_zymin = 0;
@@ -108,8 +115,8 @@ ImageProc::onCenterIsChanged(const QPointF& pc)
   m_center = pc;
   m_center_is_set = true; 
 
-  stringstream ss; ss << "::onCenterIsChanged() x: " << fixed << std::setprecision(1) << pc.x() << "  y: " << pc.y();  
-  MsgInLog(_name_(), INFO, ss.str());
+  stringstream ss; ss << "Set center in position x=" << fixed << std::setprecision(1) << pc.x() << ", y=" << pc.y();  
+  MsgInLog(_name_(), DEBUG, ss.str());
   //std::cout << ss.str() << '\n';
 
   this->evaluateRadialIndexes();
@@ -120,7 +127,8 @@ ImageProc::onCenterIsChanged(const QPointF& pc)
 void 
 ImageProc::onZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax, float& amin, float& amax)
 {
-  if      (xmin>0) m_zoom_is_set = true;
+  if      (xmin==0 && xmax==0 && ymin==0 && ymax==0) m_zoom_is_set = false;
+  else if (xmin>0) m_zoom_is_set = true;
   else if (ymin>0) m_zoom_is_set = true; 
   else if ((unsigned)xmax<m_ixmax-1) m_zoom_is_set = true; 
   else if ((unsigned)ymax<m_iymax-1) m_zoom_is_set = true; 
@@ -132,23 +140,23 @@ ImageProc::onZoomIsChanged(int& xmin, int& ymin, int& xmax, int& ymax, float& am
   m_zymax = ymax;
 
   if(!(xmax<(int)m_nda_image.shape()[1])) {
-    m_zxmax = m_nda_image.shape()[1]-1;
+    m_zxmax = m_nda_image.shape()[1];
     m_rindx_is_set = false;
   }
   if(!(ymax<(int)m_nda_image.shape()[0])) {
-    m_zymax = m_nda_image.shape()[0]-1;
+    m_zymax = m_nda_image.shape()[0];
     m_rindx_is_set = false;
   }
 
   stringstream ss;
-  ss << "onZoomIsChanged(...): zoom is changed to"
-     << "  xmin=" << m_zxmin 
-     << "  ymin=" << m_zymin
-     << "  xmax=" << m_zxmax 
-     << "  ymax=" << m_zymax
-     << "  amin=" << amin 
-     << "  amax=" << amax
-     << "  m_zoom_is_set=" << m_zoom_is_set;
+  ss << "Zoom is set to"
+     << " xmin=" << m_zxmin 
+     << " ymin=" << m_zymin
+     << " xmax=" << m_zxmax 
+     << " ymax=" << m_zymax
+     << " amin=" << amin 
+     << " amax=" << amax
+     << " m_zoom_is_set=" << m_zoom_is_set;
 
   MsgInLog(_name_(), INFO, ss.str());
 
@@ -163,12 +171,12 @@ ImageProc::evaluateRadialIndexes()
   m_rindx_is_set = false;
 
   if(! m_image_is_set) {
-    MsgInLog(_name_(), WARNING, "::evaluateRadialIndexes() - image is not set, endexes are not evaluated");
+    MsgInLog(_name_(), DEBUG, "::evaluateRadialIndexes() - image is not set, indexes are not evaluated");
     return; // false;
   }
 
   if(! m_center_is_set) {
-    MsgInLog(_name_(), WARNING, "::evaluateRadialIndexes() - center is not set, endexes are not evaluated");
+    MsgInLog(_name_(), DEBUG, "::evaluateRadialIndexes() - center is not set, indexes are not evaluated");
     return; // false;
   }
 
@@ -176,7 +184,7 @@ ImageProc::evaluateRadialIndexes()
   m_ixmax = m_nda_image.shape()[1];
 
   stringstream ss;
-  ss << "  evaluateRadialIndexes:"
+  ss << "::evaluateRadialIndexes:"
      << "  m_ixmax:" << m_ixmax 
      << "  m_iymax:" << m_iymax;
   MsgInLog(_name_(), DEBUG, ss.str()); 
@@ -206,7 +214,7 @@ ImageProc::evaluateRadialIndexes()
   m_irmax+=1;
 
   stringstream ss2; ss2 <<  "::evaluateRadialIndexes() - r-indexes are evaluated. irmax = " << m_irmax;
-  MsgInLog(_name_(), INFO, ss2.str()); 
+  MsgInLog(_name_(), DEBUG, ss2.str()); 
 
   m_rindx_is_set = true;
   return; // true;
@@ -225,7 +233,7 @@ ImageProc::fillRadialHistogram()
   if(! m_rindx_is_set) {
     this->evaluateRadialIndexes();
     if(! m_rindx_is_set) {
-      MsgInLog(_name_(), WARNING, "::fillRadialHistogram() - radial indexes are not available");
+      MsgInLog(_name_(), DEBUG, "::fillRadialHistogram() - radial indexes are not available");
       return; // false;
     }
   }
@@ -323,7 +331,7 @@ ImageProc::fillSpectralHistogram(const float& amin, const float& amax, const uns
   m_shist_is_set = false;
 
   if(!m_image_is_set) { 
-    MsgInLog(_name_(), WARNING, "::fillSpectralHistogram() - image is not available - can't fill spectrum...");    
+    MsgInLog(_name_(), DEBUG, "::fillSpectralHistogram() - image is not available - can't fill spectrum...");    
     return; // false;
   }
 
@@ -342,13 +350,14 @@ ImageProc::fillSpectralHistogram(const float& amin, const float& amax, const uns
   
   std::fill_n(p_ssta, int(m_nbins), float(0));
 
-  if(amin!=0 && amax!=0) {
+  if(amin && amax) {
     m_amin = amin;
     m_amax = amax;
   }
   else {
     float Imin, Imax;
-    getIntensityLimits(Imin,Imax);
+    //getIntensityLimits(Imin,Imax);
+    getMinMax<GeoImage::raw_image_t>(m_nda_image, Imin, Imax);
     m_amax = (amax==0) ? Imax : amax;
     m_amin = Imin;
   }
@@ -412,7 +421,7 @@ ImageProc::testSignalRHistIsFilled(ndarray<float, 1>& nda, const unsigned& zirmi
   stringstream ss; ss <<  "::testSignalRHistIsFilled() size()=" << nda.size()
                       <<  "  zirmin=" << zirmin
                       <<  "  zirmax=" << zirmax;
-  MsgInLog(_name_(), INFO, ss.str());   
+  MsgInLog(_name_(), DEBUG, ss.str());   
 }
 
 //--------------------------
@@ -422,7 +431,7 @@ ImageProc::testSignalSHistIsFilled(float* p, const float& amin, const float& ama
   stringstream ss; ss <<  "::testSignalSHistIsFilled(): nbins=" << nbins
                       <<  "  amin=" << amin
                       <<  "  amax=" << amax;
-  MsgInLog(_name_(), INFO, ss.str());
+  MsgInLog(_name_(), DEBUG, ss.str());
 }
 
 //--------------------------

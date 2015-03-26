@@ -16,6 +16,25 @@
 
 namespace PSQt {
 
+//--------------------------
+
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Shows ruller on QGraphicsScene through QGraphicsView.
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see GUAxes
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
 
 //--------------------------
 

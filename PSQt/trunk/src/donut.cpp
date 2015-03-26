@@ -1,3 +1,9 @@
+//---------------------------------------------------------------------
+// File and Version Information:
+//   $Id$
+//
+// Author: Mikhail S. Dubrovin
+//---------------------------------------------------------------------
 #include "PSQt/donut.h"
 #include <QApplication>
 #include <QPainter>

@@ -13,7 +13,27 @@
 
 namespace PSQt {
 
+//--------------------------
 
+/**
+ *  @ingroup PSQt
+ * 
+ *  @brief Widget displaying interactive color rinng/wheel, which is used in WdgColorTable
+ * 
+ *  @code
+ *  @endcode
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see WdgColorTable
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
   //class WdgColorTable;
 
 class LabColorRing : public QLabel
@@ -52,16 +72,15 @@ class LabColorRing : public QLabel
     void mousePressEvent  (QMouseEvent  *event = 0) ;
     void mouseMoveEvent   (QMouseEvent  *event = 0) ;
     void mouseReleaseEvent(QMouseEvent  *event = 0) ;
-
     //bool eventFilter     (QObject *obj, QEvent *event = 0) ;
 
-
-
  public slots:
+
     void onButExit() ;
     void onSetShifter(const unsigned& selected) ;
 
  signals :
+
     void hueAngleIsMoving(const unsigned& selected) ;
     void hueAngleIsMoved() ;
 

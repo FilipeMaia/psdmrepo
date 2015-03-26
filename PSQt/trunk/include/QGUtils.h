@@ -24,9 +24,24 @@
 #include <QFont>
 
 namespace PSQt {
+
 //--------------------------
 
 /**
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @see 
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail Dubrovin
+ */
+
+//--------------------------
+
+/**
+ * @brief Returns uint32_t color code for R, G, and B parameters.
  * R - red   [0,1] 
  * G - green [0,1] 
  * B - blue  [0,1] 
@@ -34,6 +49,7 @@ namespace PSQt {
 uint32_t fRGBA(const float R, const float G, const float B);
 
 /**
+ * @brief Returns uint32_t color code for H, S, and V parameters.
  * H - hue [0,360) 
  * S - black/white satturation [0,1] 
  * V - value of color [0,1] 
@@ -44,6 +60,7 @@ uint32_t fRGBA(const float R, const float G, const float B);
 uint32_t HSV2RGBA(const float H, const float S, const float V);
 
 /**
+ * @brief Returns uint32_t* color table for requested parameters.
  * NColors - number of colors
  * H1, H2=[-360,360] - extended to negative hue range
  */ 
@@ -51,7 +68,7 @@ uint32_t*
   ColorTable(const unsigned& NColors=0, const float& H1=0, const float& H2=0);
 
 /**
- * Returns 2-d ndarray with colorbar image
+ * @brief Returns 2-d ndarray with colorbar image
  * @param[in] rows - number of rows in the color bar image
  * @param[in] cols - number of columns and colors in the color bar image *
  * @param[in] hue1 - first limit of the hue angle [0,360]
@@ -64,7 +81,7 @@ getColorBarImage(const unsigned& rows =   20,
                  const float&    hue2 =   60) ;
 
 /**
- * Sets image as a pixmap for label
+ * @brief Sets image as a pixmap for label
  */ 
 void 
   setPixmapForLabel(const QImage& image, QPixmap*& pixmap, QLabel*& label);
@@ -118,14 +135,14 @@ template<typename T>
 //--------------------------
  
 /**
- * check if directory exists
+ * @brief check if directory exists
  */ 
  bool dir_exists(const std::string& dir);
 
 //--------------------------
  
 /**
- * check if file exists
+ * @brief check if file exists
  */ 
  bool file_exists (const std::string& fname);
 
@@ -158,16 +175,16 @@ template<typename T>
 
 template <typename T>
 void
-  getMinMax(const ndarray<T,2>& nda, double& vmin, double& vmax)
+  getMinMax(const ndarray<T,2>& nda, float& vmin, float& vmax)
   {
-    double val = 0;
+    float v = 0;
     vmin = nda[0][0];
     vmax = nda[0][0];
     typename ndarray<T, 2>::iterator itd = nda.begin();
     for(; itd!=nda.end(); ++itd) { 
-      val = *itd;
-      if( val < vmin ) vmin = val;
-      if( val > vmax ) vmax = val;
+      v = float(*itd);
+      if( v < vmin ) vmin = v;
+      if( v > vmax ) vmax = v;
     }
   }
 
@@ -211,7 +228,7 @@ ndarray<uint32_t,2>
 
   ndarray<image_t, 2> inda(dnda.shape());
 
-  double dmin, dmax;
+  float dmin, dmax;
 
   if (amin || amax) {
     dmin = amin;

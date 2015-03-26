@@ -18,12 +18,12 @@ namespace PSQt {
 /**
  *  @ingroup PSQt DragCircle
  *
- *  @brief DragCircle - derived class for draggable circle.
+ *  @brief Derived class from DragBase for draggable circle.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see DragStore, WdgImageFigs, WdgImage
+ *  @see DragBase, DragStore, WdgImageFigs, WdgImage
  *
  *  @version $Id$
  *
