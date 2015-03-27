@@ -274,9 +274,17 @@ Dataset::dirName() const
   std::string dir = this->value("dir");
   if (dir.empty()) {
     const char* type = this->exists("h5") ? "hdf5" : "xtc";
-    boost::format fmt("/reg/d/psdm/%1%/%2%/%3%");
-    fmt % instrument() % experiment() % type;
-    dir = fmt.str();
+    boost::format fmt("%1%/%2%/%3%/%4%");
+    const char* datadir = getenv("SIT_PSDM_DATA");
+    if (datadir) {
+      printf("*** found env\n");
+      fmt % datadir % instrument() % experiment() % type;
+      dir = fmt.str();
+    } else {
+      printf("*** default\n");
+      fmt % "/reg/d/psdm" % instrument() % experiment() % type;
+      dir = fmt.str();
+    }
   }
   return dir;
 }

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2015-03-27 Christopher O'Grady
+- Allow user to override /reg/d/psdm as default location for data
+  using environment variable SIT_PSDM_DATA
+
 Tag: V00-01-10
 2015-03-3 David Schneider
 - small data JIRA issue PSAS-85
