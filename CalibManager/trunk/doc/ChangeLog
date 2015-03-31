@@ -13,11 +13,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2015-03-30 Mikhail S. Dubrovin
+Tag: V00-00-85
+- in Frame add method setBoarderVisible
 - add GUIAlignment, and widget wrapper GUIROIMask  (PSAS-6, PSAS-11)
 - replace "!= None" with "is not None" in many modules.
 - In many modules use class Frame in stead of QFrame.
 - in GUITabs, GUIConfig, GUIFileManager, GUIGeometry add self.gui_win.setVisible(True) in order to make visible widgets defined as Frame.
-
 	
 2015-03-12 Mikhail S. Dubrovin
 Tag: V00-00-84

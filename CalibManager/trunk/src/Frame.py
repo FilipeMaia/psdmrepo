@@ -24,9 +24,13 @@ class Frame(QtGui.QFrame):
         self.setFrameStyle(style) #Box, Panel | Sunken, Raised 
         self.setLineWidth(lw)
         self.setMidLineWidth(mlw)
-        self.setVisible(vis) 
+        self.setBoarderVisible(vis) 
         #self.setGeometry(self.parent.rect())
 
+
+    def setBoarderVisible(self, vis=True) :
+        if vis : self.setFrameShape(QtGui.QFrame.Box)
+        else   : self.setFrameShape(QtGui.QFrame.NoFrame)
     
 #    def resizeEvent(self, e):
 #        print 'resizeEvent'
