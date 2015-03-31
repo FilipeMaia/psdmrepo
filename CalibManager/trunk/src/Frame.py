@@ -14,7 +14,7 @@ class Frame(QtGui.QFrame):
 
     QFrame inherits from QWidget and hence Frame can be used in stead of QWidget
     """
-    def __init__(self, parent=None, lw=0, mlw=1, vis=False, style=QtGui.QFrame.Box | QtGui.QFrame.Sunken):
+    def __init__(self, parent=None, lw=0, mlw=1, vis=True, style=QtGui.QFrame.Box | QtGui.QFrame.Sunken):
         QtGui.QFrame.__init__(self, parent)
         self.parent = parent
         self.setFrame(lw, mlw, vis, style)

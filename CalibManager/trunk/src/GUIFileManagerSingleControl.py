@@ -41,8 +41,9 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersForApp import cp
 
-from Logger               import logger
-from FileNameManager      import fnm
+#from CalibManager.Frame     import Frame
+from Logger                 import logger
+from FileNameManager        import fnm
 
 #from CorAna.MaskEditor import MaskEditor
 import GlobalUtils     as     gu
@@ -55,6 +56,7 @@ from GUIRange               import *
 #---------------------
 #  Class definition --
 #---------------------
+#class GUIFileManagerSingleControl ( Frame ) :
 class GUIFileManagerSingleControl ( QtGui.QWidget ) :
     """Main GUI for main button bar.
 
@@ -69,6 +71,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.name = 'GUIFileManagerSingleControl'
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
+        #Frame.__init__(self, parent, mlw=0)
 
         self.setGeometry(10, 25, 630, 120)
         self.setWindowTitle('File Manager Select & Action GUI')
@@ -76,7 +79,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
-        self.setFrame()
+        #self.setFrame()
 
         #cp.setIcons()
 
@@ -171,13 +174,13 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.but_plot  .setToolTip('Launch plot browser')
         self.but_delete.setToolTip('Delete selected file\nDelete  is allowed for\nWORK or CALIB directories only')
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        self.frame.setVisible(False)
 
 
     def setStyle(self):
@@ -210,6 +213,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         #self.butExit.setFlat(True)
 
         self.setStyleButtons()
+        #self.setVisible(True)
 
 
     def setStyleButtons(self):
@@ -285,8 +289,9 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
         #print 'GUIFileManagerSingleControl resizeEvent: %s' % str(self.size())
+        pass
 
 
     def moveEvent(self, e):

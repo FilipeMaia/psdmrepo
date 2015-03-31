@@ -28,6 +28,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
+from CalibManager.Frame     import Frame
 from ConfigParametersForApp import cp
 from Logger                 import logger
 import GlobalUtils          as     gu
@@ -35,17 +36,20 @@ import GlobalUtils          as     gu
 #---------------------
 #  Class definition --
 #---------------------
-class GUIConfigPars ( QtGui.QWidget ) :
-    """GUI for Work/Result directories"""
+#class GUIConfigPars ( QtGui.QWidget ) :
+class GUIConfigPars ( Frame ) :
+    """GUI for management of configuration parameters"""
 
     #----------------
     #  Constructor --
     #----------------
     def __init__ ( self, parent=None ) :
-        QtGui.QWidget.__init__(self, parent)
+        #QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
+
         self.setGeometry(200, 400, 500, 200)
         self.setWindowTitle('Configuration Parameters')
-        self.setFrame()
+        #self.setFrame()
 
         #self.tit_dir_work = QtGui.QLabel('Parameters:')
 
@@ -165,13 +169,13 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.but_lsf_status  .setToolTip('Show LSF status')
         self.edi_dark_sele   .setToolTip('Selector event code;\n0=off, +N=select, -N=discard')
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        #self.frame.setVisible(False)
 
 
     def setStyle(self):
@@ -233,7 +237,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
+        pass
 
 
     def moveEvent(self, e):

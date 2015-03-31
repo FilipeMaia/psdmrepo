@@ -169,7 +169,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
         self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
   
-        if self.arr != None : self.on_draw()
+        if self.arr is not None : self.on_draw()
 
 
     def connectZoomMode(self):

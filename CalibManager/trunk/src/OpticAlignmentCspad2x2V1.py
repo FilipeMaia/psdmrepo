@@ -59,8 +59,8 @@ class OpticAlignmentCspad2x2V1 (OpticAlignmentCspadMethods) :
 
         if print_bits &  1 : print 'Start OpticAlignmentCspad2x2V1'
 
-        if fname != None : self.fname = fname
-        else             : self.fname = '/reg/neh/home1/dubrovin/LCLS/CSPadMetrologyProc/metrology_standard.txt'
+        if fname is not None : self.fname = fname
+        else                 : self.fname = '/reg/neh/home1/dubrovin/LCLS/CSPadMetrologyProc/metrology_standard.txt'
 
         if not os.path.lexists(self.fname) : 
             if print_bits &  1 : print 'Non-available input file: ' + self.fname

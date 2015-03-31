@@ -39,7 +39,7 @@ from Logger                 import logger
 #  Class definition --
 #---------------------
 class GUIConfig ( QtGui.QWidget ) :
-    """GUI sets path to files"""
+    """GUI with tabs for configuration management"""
 
     #----------------
     #  Constructor --
@@ -182,6 +182,8 @@ class GUIConfig ( QtGui.QWidget ) :
         #self.gui_win.setFixedHeight(180)
         #self.gui_win.setFixedHeight(600)
         self.hboxW.addWidget(self.gui_win)
+        self.gui_win.setVisible(True)
+
 
     def onTabBar(self):
         tab_ind  = self.tab_bar.currentIndex()

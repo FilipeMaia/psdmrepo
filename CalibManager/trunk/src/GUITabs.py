@@ -46,7 +46,7 @@ from ConfigParametersForApp import cp
 from Logger               import logger
 from GUIConfig            import * 
 from GUIDark              import * 
-from GUIMaskEditor        import * 
+from GUIROIMask           import * 
 from GUIFileManager       import * 
 from GUIGeometry          import * 
 
@@ -54,7 +54,7 @@ from GUIGeometry          import *
 #  Class definition --
 #---------------------
 class GUITabs ( QtGui.QWidget ) :
-    """Main GUI for calibration management project.
+    """GUI for tabs support in GUIMain.
 
     @see BaseClass
     @see OtherClass
@@ -207,7 +207,7 @@ class GUITabs ( QtGui.QWidget ) :
             self.gui_win = QtGui.QTextEdit('') # Gain is not implemented.') # GUIDark(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[2] :
-            self.gui_win = GUIMaskEditor(self)
+            self.gui_win = GUIROIMask(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[3] :
             self.gui_win = GUIGeometry(self)
@@ -221,6 +221,7 @@ class GUITabs ( QtGui.QWidget ) :
             #self.setStatus(0, 'Status: processing for data')
 
         self.hboxW.addWidget(self.gui_win)
+        self.gui_win.setVisible(True)
 
 
     def onTabBar(self):

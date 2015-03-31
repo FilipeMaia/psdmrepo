@@ -38,7 +38,7 @@ from Logger                 import logger
 #  Class definition --
 #---------------------
 class GUIFileManager ( QtGui.QWidget ) :
-    """GUI for file manager"""
+    """GUI with tabs for file management"""
 
     #----------------
     #  Constructor --
@@ -168,6 +168,8 @@ class GUIFileManager ( QtGui.QWidget ) :
         #self.gui_win.setFixedHeight(180)
         #self.gui_win.setFixedHeight(600)
         self.hboxW.addWidget(self.gui_win)
+        self.gui_win.setVisible(True)
+
 
     def onTabBar(self):
         tab_ind  = self.tab_bar.currentIndex()

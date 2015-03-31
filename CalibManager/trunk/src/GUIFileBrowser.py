@@ -246,7 +246,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         logger.debug('Start the GUIFileBrowser.',__name__)
         self.setStatus(0, 'Waiting for file selection...')
 
-        if selected_file != None and selected_file in self.list_of_files :
+        if selected_file is not None and selected_file in self.list_of_files :
             index = self.list_of_files.index(selected_file)
             self.box_file.setCurrentIndex( index )
 

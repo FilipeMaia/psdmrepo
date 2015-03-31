@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersForApp import cp
 from GUIMetrology           import *
+from GUIAlignment           import *
 from Logger                 import logger
 
 #from BatchJobPedestals      import bjpeds
@@ -38,7 +39,7 @@ from Logger                 import logger
 #  Class definition --
 #---------------------
 class GUIGeometry ( QtGui.QWidget ) :
-    """GUI for calibration of geometry"""
+    """GUI with tabs for calibration of geometry"""
 
     #----------------
     #  Constructor --
@@ -64,7 +65,7 @@ class GUIGeometry ( QtGui.QWidget ) :
         self.hboxB.addWidget(self.but_show )
 
         self.list_tab_titles = [ 'Metrology'
-                                ,'Alignment of quads'
+                                ,'Alignment'
                                ]
         self.makeTabBar()
         self.guiSelector()
@@ -154,7 +155,7 @@ class GUIGeometry ( QtGui.QWidget ) :
         try    :
             tab_index = self.list_tab_titles.index(cp.current_geometry_tab.value())
         except :
-            tab_index = 3
+            tab_index = 1
             cp.current_geometry_tab.setValue(self.list_tab_titles[tab_index])
         self.tab_bar.setCurrentIndex(tab_index)
 
@@ -177,13 +178,15 @@ class GUIGeometry ( QtGui.QWidget ) :
             self.gui_win.setFixedHeight(200)
             
         if cp.current_geometry_tab.value() == self.list_tab_titles[1] :
-            self.gui_win = QtGui.QTextEdit('') # GUIConfigFile(self)
+            #self.gui_win = QtGui.QTextEdit('') # GUIConfigFile(self)
+            self.gui_win = GUIAlignment(self)
             self.setStatus(0, 'Status: work with %s' % self.list_tab_titles[1])
-            self.gui_win.setFixedHeight(220)
+            self.gui_win.setFixedHeight(300)
 
         #self.gui_win.setFixedHeight(180)
         #self.gui_win.setFixedHeight(600)
         self.hboxW.addWidget(self.gui_win)
+        self.gui_win.setVisible(True)
 
 
     def onTabBar(self):

@@ -63,9 +63,9 @@ from CorAna.MaskEditor import MaskEditor
 #---------------------
 #  Class definition --
 #---------------------
-#class GUIMaskEditor ( Frame ) : 
-class GUIMaskEditor ( QtGui.QWidget ) :
-    """Main GUI for main button bar.
+#class GUIMaskEditor ( QtGui.QWidget ) :
+class GUIMaskEditor ( Frame ) : 
+    """GUI for ROI mask processing.
 
     @see BaseClass
     @see OtherClass
@@ -74,11 +74,10 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
         self.name = 'GUIMaskEditor'
         self.myapp = app
-        QtGui.QWidget.__init__(self, parent)
-        #Frame.__init__(self, parent, mlw=1)
+        #QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
 
 
-        self.fname_prefix           = cp.fname_prefix
         self.fname_geometry         = cp.fname_geometry     
         self.fname_roi_img_nda      = cp.fname_roi_img_nda  
         self.fname_roi_img          = cp.fname_roi_img 
@@ -90,11 +89,11 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
         self.img_arr = None
 
-        self.setFrame()
+        #self.setFrame()
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 650, 30)
+        self.setGeometry(10, 25, 800, 360)
         self.setWindowTitle('Mask Editor Control')
         #self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -193,20 +192,21 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         self.but_mask_editor.setToolTip('Open/Close Mask Editor window')
 
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        #self.frame.setVisible(False)
 
 
     def setStyle(self):
 
-        self.setMinimumSize(725,360)
-        self.setMaximumSize(800,360)
-        self.lab_status.setMinimumWidth(600) 
+        #self.setMinimumSize(725,360)
+        self.setFixedSize(750,360)
+        #self.setMaximumWidth(800)
+        #self.lab_status.setMinimumWidth(600) 
 
         self.                setStyleSheet(cp.styleBkgd)
         #self.but_mask_editor.setStyleSheet(cp.styleButton)
@@ -262,7 +262,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
         pass
 
 

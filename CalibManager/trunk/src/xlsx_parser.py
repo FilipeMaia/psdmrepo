@@ -145,9 +145,9 @@ def get_single_worksheet(arc, fname):
             if el_col.attrib['r'] == 'B'+str_row : Y = find_element_text(el_col, prefix+'v') # el_col.find(prefix+'v').text
             if el_col.attrib['r'] == 'C'+str_row : Z = find_element_text(el_col, prefix+'v') # el_col.find(prefix+'v').text
 
-        if X!=None and Y!=None and Z!=None :
+        if X is not None and Y is not None and Z is not None :
 
-            if point != None and point != 32 :
+            if point is not None and point != 32 :
                 point += 1
                 #print '    point  X, Y, Z : %2s %10s  %10s  %10s' % (point, X, Y, Z)
                 txt += '%2s %7s %7s %7s\n' % (point, X, Y, Z)

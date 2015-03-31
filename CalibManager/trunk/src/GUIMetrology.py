@@ -39,6 +39,7 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
+from CalibManager.Frame     import Frame
 from ConfigParametersForApp import cp
 
 from Logger               import logger
@@ -56,8 +57,9 @@ from OpticAlignmentCspad2x2V1 import OpticAlignmentCspad2x2V1
 #---------------------
 #  Class definition --
 #---------------------
-class GUIMetrology ( QtGui.QWidget ) :
-    """Main GUI for main button bar.
+#class GUIMetrology ( QtGui.QWidget ) :
+class GUIMetrology ( Frame ) :
+    """GUI for metrology processing.
 
     @see BaseClass
     @see OtherClass
@@ -66,7 +68,8 @@ class GUIMetrology ( QtGui.QWidget ) :
 
         self.name = 'GUIMetrology'
         self.myapp = app
-        QtGui.QWidget.__init__(self, parent)
+        #QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
 
         self.instr_name    = cp.instr_name # for comments in geometry file
         self.fname_prefix  = cp.fname_prefix
@@ -83,7 +86,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False
 
-        self.setFrame()
+        #self.setFrame()
 
         self.setParams()
   
@@ -185,13 +188,13 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butSrc       .setToolTip('Select name of the detector')
  
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        #self.frame.setVisible(False)
 
     def setParams(self) :
         #if self.path_fm_selected != '' :
@@ -250,8 +253,9 @@ class GUIMetrology ( QtGui.QWidget ) :
   
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
         #print 'GUIMetrology.resizeEvent: %s' % str(self.size())
+        pass
 
 
     def moveEvent(self, e):

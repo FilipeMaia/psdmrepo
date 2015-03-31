@@ -232,7 +232,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         but.setText('WAIT...')        
         but.setStyleSheet(cp.styleButtonBad)
 
-        if cp.guidarklist != None :
+        if cp.guidarklist is not None :
             cp.guidarklist.updateList()
 
         txt_on_but = txt if txt == 'Update list' else txt + self.char_expand 
@@ -243,7 +243,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
     def updateListOfRunsForNumRuns(self) :
         """DEPRICATED"""
         logger.info('WAIT for list of runs update...', __name__ )        
-        if cp.guidarklist != None :
+        if cp.guidarklist is not None :
             cp.guidarklist.updateList()
 
 

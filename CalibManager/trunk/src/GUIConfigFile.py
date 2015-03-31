@@ -28,14 +28,16 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
+from CalibManager.Frame     import Frame
 from ConfigParametersForApp import cp
 from Logger                 import logger
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIConfigFile ( QtGui.QWidget ) :
-    """GUI for configuration parameters management"""
+#class GUIConfigFile ( QtGui.QWidget ) :
+class GUIConfigFile ( Frame ) :
+    """GUI for configuration file parameters management"""
 
     #----------------
     #  Constructor --
@@ -43,13 +45,14 @@ class GUIConfigFile ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
         """Constructor"""
 
-        QtGui.QWidget.__init__(self, parent)
+        #QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
 
         #self.parent = cp.guimain
 
         self.setGeometry(370, 350, 500,150)
         self.setWindowTitle('Configuration File')
-        self.setFrame()
+        #self.setFrame()
         
         self.titFile     = QtGui.QLabel('File with configuration parameters:')
         self.titPars     = QtGui.QLabel('Operations on file:')
@@ -106,13 +109,13 @@ class GUIConfigFile ( QtGui.QWidget ) :
         self.butDefault.setToolTip('Reset the configuration parameters\nto their default values.')
         self.butPrint  .setToolTip('Print current values of the configuration parameters.')
 
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        #self.frame.setVisible(False)
 
     def setStyle(self):
 
@@ -142,7 +145,8 @@ class GUIConfigFile ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
+        pass
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 

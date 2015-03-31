@@ -64,6 +64,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
 
+    list_geo_log_levels=['DEBUG', 'INFO', 'WARNING', 'CRITICAL', 'ERROR', 'NONE']
     
     par01 = 'MPA1SdCp7h18m'
     par02 = __author__.split()[2].lower()
@@ -348,9 +349,17 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.fname_roi_img_nda      = self.declareParameter( name='FNAME_ROI_IMAGE_NDARRAY',    val_def=def_fname_roi_img_nda,           type='str' )
         self.fname_roi_img          = self.declareParameter( name='FNAME_ROI_IMAGE',            val_def='./work/roi_img.npy',            type='str' )
         self.fname_roi_mask_img     = self.declareParameter( name='FNAME_ROI_MASK_IMAGE',       val_def='./work/roi_mask_img.npy',       type='str' )
-        self.fname_roi_mask_nda     = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY',     val_def='./work/roi_mask_nda.npy',       type='str' )
+        self.fname_roi_mask_nda     = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY',     val_def='./work/roi_mask_nda.txt',       type='str' )
         self.fname_roi_mask_nda_tst = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY_TEST',val_def='./work/roi_mask_nda_tst.npy',   type='str' )
         self.sensor_mask_cbits      = self.declareParameter( name='SENSOR_MASK_CONTROL_BITS',   val_def=255,       type='int' )
+
+
+        def_fname_geo    = cdir + 'CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+        def_fname_geo_img_nda = cdir + '../cspad-ndarr-ave-cxii0114-r0227.dat'
+        self.fname_geo_img_nda      = self.declareParameter( name='FNAME_GEO_IMAGE_NDARRAY',    val_def=def_fname_geo_img_nda,           type='str' )
+        self.fname_geo_in           = self.declareParameter( name='FNAME_GEO_IN',               val_def=def_fname_geo,                   type='str' )
+        self.fname_geo_out          = self.declareParameter( name='FNAME_GEO_OUT',              val_def='./work/geometry.data',           type='str' )
+        self.geo_log_level          = self.declareParameter( name='GEO_LIST_LOG_LEVELS', val_def=self.list_geo_log_levels[1],            type='str' )
 
         # GUIFileManagerSingleControl.py
         #self.path_fm_selected   = self.declareParameter( name='PATH_FM_SELECTED',  val_def='./work/*.txt',       type='str' )

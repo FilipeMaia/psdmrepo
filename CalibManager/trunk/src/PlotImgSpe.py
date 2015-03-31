@@ -73,7 +73,7 @@ class PlotImgSpe (QtGui.QWidget) :
         self.setWindowTitle(title)
         self.setFrame()
 
-        if      arr != None : self.arr = arr
+        if      arr is not None : self.arr = arr
         elif ifname != '' \
              and os.path.exists(ifname) : self.arr = gu.get_image_array_from_file(ifname)
         else                            : self.arr = get_array2d_for_test()

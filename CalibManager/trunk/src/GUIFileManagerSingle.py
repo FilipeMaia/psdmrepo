@@ -24,6 +24,7 @@ import os
 from PyQt4 import QtGui, QtCore
 #import time   # for sleep(sec)
 
+from CalibManager.Frame     import Frame
 from ConfigParametersForApp import cp
 from Logger                 import logger
 
@@ -32,14 +33,17 @@ from GUIFileManagerSingleControl import *
 
 #-----------------------------
 
-class GUIFileManagerSingle ( QtGui.QWidget ) :
+#class GUIFileManagerSingle ( QtGui.QWidget ) :
+class GUIFileManagerSingle ( Frame ) :
     """GUI works with dark run"""
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
+        Frame.__init__(self, parent, mlw=1)
+
         self.setGeometry(200, 400, 800, 300)
         self.setWindowTitle('Single File Manager')
-        self.setFrame()
+        #self.setFrame()
 
         self.guistatus   = GUIStatus(self)
         self.guifilemanagersinglecontrol  = GUIFileManagerSingleControl(self)
@@ -90,19 +94,20 @@ class GUIFileManagerSingle ( QtGui.QWidget ) :
         #self.setStyleSheet(cp.styleBkgd)
 
   
-    def setFrame(self):
-        self.frame = QtGui.QFrame(self)
-        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-        self.frame.setLineWidth(0)
-        self.frame.setMidLineWidth(1)
-        self.frame.setGeometry(self.rect())
-        self.frame.setVisible(False)
+#    def setFrame(self):
+#        self.frame = QtGui.QFrame(self)
+#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+#        self.frame.setLineWidth(0)
+#        self.frame.setMidLineWidth(1)
+#        self.frame.setGeometry(self.rect())
+#        self.frame.setVisible(False)
 
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name)
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
         #print 'GUIFileManagerSingle resizeEvent: %s' % str(self.size())
+        pass
 
 
     def moveEvent(self, e):
