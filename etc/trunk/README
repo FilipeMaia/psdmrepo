@@ -1,0 +1,20 @@
+
+The etc package contains tools to start services and setup the 
+release environment (together with bin package). These tools are 
+specific to SLAC.
+
+The sub directories contain:
+
+cron:
+        scripts run in crontab 
+
+odbc:
+        odbc configuration files
+
+psdatmgr:
+        tools linked in ~psdatmgr/bin
+        (irods releated)
+
+hepix:
+        hepix config files (most likely obsolete)
+

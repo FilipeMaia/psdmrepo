@@ -1,0 +1,10 @@
+#!/bin/sh
+usage() {
+  echo Usage: `basename $0` file
+}
+if [ $# -eq 0 ] ; then
+  usage
+  exit 2
+fi
+irule "restoreFromHPSS||delayExec(<PLUSET>3s</PLUSET>,msiDataObjReplWithOptions(*PATH,lustre-resc,all,*RES),nop)|nop" "*PATH=$1" "*RES"
+
