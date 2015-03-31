@@ -1,4 +1,23 @@
 #!/bin/sh
 
-iqstat -l "$@" | gawk '/id:/{id=$2 } /exec_status:/ {stat=$2} /rei_file_path:/{rei=$2; if ( ! system("test -f " rei)) { cmd="strings " rei " | grep ^/psdm-zone/ | sort -u" ; cmd | getline path } else { path="does not exist" } } /---/ { printf "%6d %12s %s\n", id, stat, path } END {printf "%6d %12s %s\n", id, stat, path}'
+#
+# Show file names for irods tape migration and restore
+#
 
+iqstat -l "$@" | \
+    gawk ' /id:/ {id=$2} 
+           /exec_status:/ {stat=$2} 
+           /rei_file_path:/ {
+               rei=$2
+               if ( ! system("test -f " rei) ) {
+                   cmd="strings " rei " | grep ^/psdm-zone/ | sort -u"
+                   cmd | getline path
+                   close(cmd)
+               } else {
+                   path="does not exists"
+               } 
+
+           }
+           /---/ {printf "%6d %12s %s\n", id, stat, path }
+           END   {printf "%6d %12s %s\n", id, stat, path }
+         '
