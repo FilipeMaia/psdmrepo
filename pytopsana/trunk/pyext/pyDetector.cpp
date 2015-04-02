@@ -1,6 +1,6 @@
+
 #include <boost/python.hpp>
 #include "pytopsana/Detector.h"
-
 
 using namespace pytopsana;
 
@@ -24,7 +24,6 @@ ndarray<double,3> (Detector::*calib_2) (ndarray<data_t,3>) = &Detector::calib;
 // python class that calls the C++ Detector methods
 // NB: The name of the python module (pytopsana) MUST match the name given in
 // PYEXTMOD in the SConscript
-
 
 BOOST_PYTHON_MODULE(pytopsana)
 {    

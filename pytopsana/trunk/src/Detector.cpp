@@ -67,7 +67,6 @@ ndarray<data_t,3> Detector::pedestals(PSEvt::Source src, boost::shared_ptr<PSEvt
   std::fill_n(&ndarr[0][0][0], int(Size), TOUT(5));
   return ndarr;
 }
-  
 
 //-------------------
 
@@ -78,6 +77,7 @@ Detector::initCalibStore(PSEvt::Event& evt, PSEnv::Env& env)
   std::string calibdir = env.calibDir();
   boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
   int runnum = (eventId.get()) ? eventId->run() : 0; //ImgAlgos::getRunNumber(evt);
+  //int runnum = ImgAlgos::getRunNumber(evt);
   std::string group = std::string(); // for ex: "PNCCD::CalibV1";
   unsigned prbits = 255;
 
@@ -105,7 +105,6 @@ Detector::initCalibStore(PSEvt::Event& evt, PSEnv::Env& env)
 //-------------------
 //-------------------
 //-------------------
-
 
 // Return 3D NDarray of raw detector data
 ndarray<data_t,3> Detector::raw(PSEvt::Source src, boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
