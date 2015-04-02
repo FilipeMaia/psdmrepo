@@ -304,7 +304,7 @@ WdgGeo::onButAddSub(QAbstractButton* button)
   edi->setText(ss.str().c_str());
 
   stringstream smsg; smsg << "Value of \"" << (but_radio->text()).toStdString() << "\" is changed to " << val << " -> set geo, emit signal: geoIsChanged(m_geo)";
-  MsgInLog(_name_(), DEBUG, smsg.str()); 
+  MsgInLog(_name_(), INFO, smsg.str()); 
 
   this -> setGeoPars();
   //std::cout << "Do something here\n";

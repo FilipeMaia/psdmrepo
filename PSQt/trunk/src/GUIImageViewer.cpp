@@ -63,7 +63,7 @@ GUIImageViewer::GUIImageViewer( QWidget *parent )
   m_vbox -> addLayout(m_hbox);
 
   this -> setLayout(m_vbox);
-  this -> setWindowTitle(_name_());
+  this -> setWindowTitle("Image Viewer");
   this -> move(100,50);  
 
   setStyle();
@@ -139,7 +139,7 @@ GUIImageViewer::setStyle()
 void 
 GUIImageViewer::resizeEvent(QResizeEvent *event)
 {
-  stringstream ss; ss << _name_() << " w=" << event->size().width() << " h=" <<  event->size().height();
+  stringstream ss; ss << "Image Viewer, w=" << event->size().width() << " h=" <<  event->size().height();
   setWindowTitle(ss.str().c_str());
 }
 
@@ -162,20 +162,17 @@ GUIImageViewer::closeEvent(QCloseEvent *event)
 void
 GUIImageViewer::moveEvent(QMoveEvent *e)
 {
-  stringstream ss; ss << _name_() << " x=" << e->pos().x() << " y=" << e->pos().y();
+  stringstream ss; ss << _name_() << "Image Viewer, x=" << e->pos().x() << " y=" << e->pos().y();
   setWindowTitle(ss.str().c_str());
 }
 
 //--------------------------
 
 void 
-GUIImageViewer::mousePressEvent(QMouseEvent *event)
+GUIImageViewer::mousePressEvent(QMouseEvent *e)
 {
-  int x = event->pos().x();
-  int y = event->pos().y();
-  QString text = "mousePressEvent: " + QString::number(x) + "," + QString::number(y);
-  //std::cout << text.toStdString()  << std::endl;
-  setWindowTitle(text);
+  stringstream ss; ss << _name_() << "Image Viewer, x=" << e->pos().x() << " y=" << e->pos().y();
+  setWindowTitle(ss.str().c_str());
 }
 
 //--------------------------

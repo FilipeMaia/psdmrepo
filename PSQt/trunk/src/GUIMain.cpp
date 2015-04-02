@@ -152,7 +152,7 @@ GUIMain::setStyle()
   m_but_save  -> setIcon(QIcon(QString(adp_icon_save.path().c_str()))); 
 
   this -> setGeometry(0, 0, 600, 726);
-  this -> setWindowTitle(tr("Detector alignment"));
+  this -> setWindowTitle("Detector Alignment");
 
   m_guiimv -> move(this->pos().x() + this->size().width() + 8, this->pos().y());  
   m_guiimv -> show();
@@ -169,7 +169,7 @@ GUIMain::setStyle()
 void 
 GUIMain::resizeEvent(QResizeEvent *event)
 {
-  stringstream ss; ss << "w:" << event->size().width() << " h:" <<  event->size().height();
+  stringstream ss; ss << "Detector Alignment w:" << event->size().width() << " h:" <<  event->size().height();
   setWindowTitle(ss.str().c_str());
 }
 
@@ -178,7 +178,7 @@ GUIMain::resizeEvent(QResizeEvent *event)
 void
 GUIMain::moveEvent(QMoveEvent *event)
 {
-  stringstream ss; ss << "x:" << event->pos().x() << " y:" << event->pos().y();
+  stringstream ss; ss << "Detector Alignment x:" << event->pos().x() << " y:" << event->pos().y();
   setWindowTitle(ss.str().c_str());
 }
 

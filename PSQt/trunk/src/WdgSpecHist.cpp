@@ -58,7 +58,7 @@ WdgSpecHist::WdgSpecHist(QWidget *parent)
 
   this -> setLayout(m_vbox);
   this->setContentsMargins(-9,-9,-9,-9);
-  this->setWindowTitle(_name_());
+  this->setWindowTitle("Spectral Histogram");
 }
 
 //--------------------------

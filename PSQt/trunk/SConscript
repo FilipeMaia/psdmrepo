@@ -27,5 +27,6 @@ Import('*')
 #
 #
 # standardSConscript()
+# standardSConscript(NEED_QT=1, UTESTS=[])
 
-standardSConscript(NEED_QT=1, UTESTS=[])
+standardSConscript(NEED_QT=1, UTESTS=[], DOCGEN="doxy-all psana-modules-doxy")

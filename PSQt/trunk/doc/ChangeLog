@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2015-04-02 Mikhail S. Dubrovin
+- code cleenup, cosmetic improvement of messages, in SConscript add DOCGEN
+	
+Tag: V00-00-14
+2015-03-26 Mikhail S. Dubrovin
+- Improve doxygen documentation, cleenup code (PSAS-11) 
+
 Tag: V00-00-13
 2015-03-23 Mikhail S. Dubrovin
 - Add modules WdgColorBar, WdgRadHist, WdgSpecHist, 
