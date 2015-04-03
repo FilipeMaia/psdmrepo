@@ -11,6 +11,12 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2015-04-03 Ankush Mitra
+Added missing psalg functions.  Hit finder, rolling average, and other added.  
+Only missing function is psalgs commond mode subtraction algorithm. 
+Documentation strings are also included
+	
 Tag: V00-01-03
 2015-02-23 Christopher O'Grady
 - Add values method to histogram axis, to be used for plotting.

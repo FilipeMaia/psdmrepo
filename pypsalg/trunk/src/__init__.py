@@ -1,3 +1,11 @@
+"""
+pypsalg:
+
+pypsalg is a python module of common functions used at LCLS.
+It also includes functions from psalg (used in AMI).
+"""
+
+
 from AngularIntegration import AngularIntegrator
 from CircularBuffer import CircularBuffer
 from CommonModeRemoval import CommonModeRemoval
@@ -9,3 +17,4 @@ from AngularIntegrationM import AngularIntegratorM
 
 # Load python interface to psalg
 from pypsalg_cpp import *
+

@@ -51,13 +51,13 @@ logger.info("%s"%moment2)
 logger.info("MOMENT TEST 2D")
 logger.info("Running 2 argument")
 input_2D = np.random.rand(10,10)
-moment_2D_2 = pypsalg.moments(input_2D,3.0)
+moment_2D_2 = pypsalg.moments_2D(input_2D,3.0)
 logger.info("%s"%moment_2D_2)
 
 logger.info("MOMENT 2D BIT MASK")
 rowmask = (np.random.rand(10)* 100).astype(np.uint32)
 mask = (np.random.rand(10,10) * 100).astype(np.uint32)
-moment_2D_mask = pypsalg.moments(input_2D,rowmask,mask,10.0)
+moment_2D_mask = pypsalg.moments_2D(input_2D,rowmask,mask,10.0)
 logger.info("%s"%moment_2D_mask)
 
 
@@ -156,9 +156,35 @@ logger.info("%s"%commonmode_data)
 
 
 
+logger.info("Creating random image for hit finder testing")
+test_image = (np.random.rand(10,10) * 100).astype(np.uint32)
+print test_image
+
+hit_count = pypsalg.count_hits(test_image, 90)
+print hit_count
+            
+sum_hit = pypsalg.sum_hits(test_image, 70,10)
+print sum_hit
+
+count_excess = pypsalg.count_excess(test_image, 50)
+print count_excess
+
+sum_excess = pypsalg.sum_excess(test_image, 75, 10)
+print sum_excess
 
 
 
+logger.info("Testing rolling average")
+test_data = np.ones(10).astype(np.float64) \
+            +  ((np.random.rand(10).astype(np.float64)-0.5) * 0.2)
+print test_data
 
 
+avg = test_data
+
+for i in range(10) :
+    test_data = np.ones(10).astype(np.float64) \
+                + ((np.random.rand(10).astype(np.float64)-0.5) * 0.2)
+    avg = pypsalg.rolling_average(test_data,avg, 0.90)
+    print avg
 
