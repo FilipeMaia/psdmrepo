@@ -277,11 +277,9 @@ Dataset::dirName() const
     boost::format fmt("%1%/%2%/%3%/%4%");
     const char* datadir = getenv("SIT_PSDM_DATA");
     if (datadir) {
-      printf("*** found env\n");
       fmt % datadir % instrument() % experiment() % type;
       dir = fmt.str();
     } else {
-      printf("*** default\n");
       fmt % "/reg/d/psdm" % instrument() % experiment() % type;
       dir = fmt.str();
     }
