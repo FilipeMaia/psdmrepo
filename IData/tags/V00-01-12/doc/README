@@ -1,0 +1,15 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package IData
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+Package which provides primitives and access methods for input data.
+This includes idea of dataset and everything related to it.
