@@ -135,7 +135,7 @@ protected:
   std::string eventPosition();
 
   /// returns true if C++ type is an ndarray that the system can translate
-  bool isNDArray(const type_info *typeInfoPtr);
+  bool isNDArray(const std::type_info *typeInfoPtr);
 
   void checkForNewWriters(PSEvt::Event &evt);
   bool checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(const std::type_info *);

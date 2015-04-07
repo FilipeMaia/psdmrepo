@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-27
+- add std: to use of type_info in header, JIRA PSAS-127
+
 Tag: V00-02-26
 - extend reporting on unused parameters to cover chunk parameters
 	
