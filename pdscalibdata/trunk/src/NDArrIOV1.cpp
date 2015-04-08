@@ -82,6 +82,7 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   , m_ctor(2)
 {
   init();
+  m_size = nda_def.size();
   std::memcpy (&m_shape[0], nda_def.shape(), c_ndim*sizeof(shape_t));  
 }
 
@@ -102,7 +103,7 @@ template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 {
     // if file is not available - create default ndarray
-    if (! file_is_available() && m_ctor>0) { 
+    if ((!file_is_available()) && m_ctor>0) { 
         create_ndarray(true);
         m_status=std::string("loaded default");
         return; 
@@ -239,13 +240,14 @@ void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
     p_nda = new ndarray<TDATA, NDIM>(m_shape);
     p_data = p_nda->data();
     m_size = p_nda->size();
-    
+
     if (m_ctor>0 && fill_def) {
       if      (m_ctor==2) std::memcpy (p_data, m_nda_def.data(), m_size*sizeof(TDATA));
       else if (m_ctor==1) std::fill_n (p_data, m_size, m_val_def);
       else return; // There is no default initialization for ctor=0 w/o shape
     }    
-    if( m_print_bits & 16 ) MsgLog(__name__(), info, "Created ndarray of the shape=[" << str_shape() << "]");
+    if( m_print_bits & 16 ) MsgLog(__name__(), info, "Created ndarray of the shape=(" << str_shape() << ")");
+    //if( m_print_bits & 32 ) MsgLog(__name__(), info, "Created ndarray: " << *p_nda);
 }
 
 //-----------------------------
@@ -300,7 +302,7 @@ template <typename TDATA, unsigned NDIM>
 ndarray<TDATA, NDIM>& 
 NDArrIOV1<TDATA, NDIM>::get_ndarray(const std::string& fname)
 {
-  if (!fname.empty() and fname != m_fname) {
+  if ( (!fname.empty()) && fname != m_fname) {
     m_fname = fname;
     load_ndarray(); 
   }
