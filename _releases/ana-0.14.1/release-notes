@@ -1,0 +1,36 @@
+psana:
+- Allow user to override /reg/d/psdm as default location for data using
+  environment variable SIT_PSDM_DATA
+- psana_test: minor update
+- psana_python: add boost converters for Event,Env,Source.
+- eliminated strong ROOT dependency and teh relevant (obsolete)
+  histogramming service API (PSAS-131)
+- changed the API to the main histogramming service which is now returned
+  as a shared pointer instead of a reference (PSAS-131)
+
+Calibration algorithms and tools:
+- pdscalibdata: AndorBaseV1.h - set Rows=0, Cols=0 in order to support variable
+  shape for 514x512 and 2048x2048 data (PSAS-6, PSAS-121)
+  in NDArrIOV1.cpp - in constructor 2 set m_size = nda_def.size(), other things
+  are cosmetic.
+- CalibManager: add option to select dark events in any run using event
+  code filter (PSAS-122), add GUIAlignment, and widget wrapper GUIROIMask (PSAS-6,
+  PSAS-11). In many modules use class Frame in stead of QFrame + many cosmetic changes.
+- PSCalib: add support for calibration types pixel_mask, pixel_bkgd; fix problem
+  with different ndarray size/shape for common_mode.
+  GeometryObject - delete and make new array pointers only if array size is
+  changing (PSAS-11)
+
+Imaging algorithms and tools
+- ImgAlgos: add module EventCodeFilter (PSAS-122).
+  PixCoordsProducer - move calls of savePixCoordsInCalibStore(env)
+  in checkCalibPars(...) (PSAS-11)
+- PSQt: Add modules WdgColorBar, WdgRadHist, WdgSpecHist, add multiple
+  protections - the 1st stable version with all basic features (PSAS-11).
+  Improve doxygen documentation, cleenup code.
+ 
+External packages:
+- pypsalg: added many new python wrappers to C methods in psalg.
+- PSQt: this is the new package with the C++ GUI-based application for detector
+  alignment using Qt4
+- pytopsana: this is the new package with python to psana interface classes/methods
