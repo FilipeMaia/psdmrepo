@@ -18,6 +18,8 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <cfloat>
+#include <fstream>
 #include "psalg/psalg.h"
 
 //-------------------------------
@@ -285,7 +287,7 @@ Analyze::Analyze (const std::string& name)
     if (w.size()==0) {
       std::string weights_file = configStr("weights_file");
       if (!weights_file.empty()) {
-        ifstream s(weights_file.c_str());
+        std::ifstream s(weights_file.c_str());
         while(s.good()) {
           double v;
           s >> v;
@@ -308,7 +310,7 @@ Analyze::Analyze (const std::string& name)
 
   std::string ref_load  = configStr("ref_load");
   if (!ref_load.empty()) {
-    ifstream s(ref_load.c_str());
+    std::ifstream s(ref_load.c_str());
     std::vector<double> ref;
     while(s.good()) {
       double v;
@@ -354,6 +356,12 @@ Analyze::beginJob(Event& evt, Env& env)
 {
   m_analyze_projections = false;
 
+  m_hmgr = env.hmgr();
+  if (not m_hmgr and (m_hdump.size()>0)) {
+    MsgLog(name(), error, "env does not have a histogram manager, but histogramming has been requested "
+           "(config dump parmameter > 0). No histograms will be made");
+  }
+    
   shared_ptr<Psana::TimeTool::ConfigV2> c = 
     env.configStore().get(m_get_key);
   if (c.get()) {
@@ -501,22 +509,24 @@ Analyze::beginJob(Event& evt, Env& env)
   Axis a(m_sig_roi_hi[pdim]-m_sig_roi_lo[pdim]+1,
          double(m_sig_roi_lo[pdim])-0.5,double(m_sig_roi_hi[pdim]+0.5));
   unsigned i=0;
-  for(std::list<DumpH>::iterator it=m_hdump.begin();
-      it!=m_hdump.end(); it++,i++) {
-    { std::stringstream s;
-      s << "Raw projection: event " << i;
-      it->hraw = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
-    { std::stringstream s;
-      s << "Ref projection: event " << i;
-      it->href = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
-    { std::stringstream s;
-      s << "Ratio: event " << i;
-      it->hrat = env.hmgr().hist1d(s.str().c_str(),"ratio",a); }
-    { std::stringstream s;
-      s << "Filtered: event " << i;
-      it->hflt = env.hmgr().hist1d(s.str().c_str(),"filtered",a); }
+  if (m_hmgr) {
+    for(std::list<DumpH>::iterator it=m_hdump.begin();
+        it!=m_hdump.end(); it++,i++) {
+      { std::stringstream s;
+        s << "Raw projection: event " << i;
+        it->hraw = m_hmgr->hist1d(s.str().c_str(),"projection",a); }
+      { std::stringstream s;
+        s << "Ref projection: event " << i;
+        it->href = m_hmgr->hist1d(s.str().c_str(),"projection",a); }
+      { std::stringstream s;
+        s << "Ratio: event " << i;
+        it->hrat = m_hmgr->hist1d(s.str().c_str(),"ratio",a); }
+      { std::stringstream s;
+        s << "Filtered: event " << i;
+        it->hflt = m_hmgr->hist1d(s.str().c_str(),"filtered",a); }
+    }
   }
-
+    
   m_count=0;
 }
 
@@ -799,7 +809,7 @@ Analyze::event(Event& evt, Env& env)
   //
   ndarray<double,1> qwf = psalg::finite_impulse_response(m_weights,sigd);
 
-  if (!m_hdump.empty()) {
+  if (!m_hdump.empty() and m_hmgr) {
     DumpH& h = m_hdump.front();
     for(unsigned i=0; i<sig.shape()[0]; i++)
       h.hraw->fill(double(i)+m_sig_roi_lo[pdim],double(sig[i]));
@@ -892,7 +902,7 @@ void
 Analyze::endJob(Event& evt, Env& env)
 {
   if (!m_ref_store.empty()) {
-    ofstream f(m_ref_store.c_str());
+    std:: ofstream f(m_ref_store.c_str());
     for(unsigned i=0; i<m_ref_avg.size(); i++)
       f << m_ref_avg[i] << ' ';
     f << std::endl;

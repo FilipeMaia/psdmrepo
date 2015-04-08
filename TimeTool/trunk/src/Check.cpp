@@ -47,7 +47,22 @@ namespace TimeTool {
 // Constructors --
 //----------------
 Check::Check (const std::string& name)
-  : Module(name)
+  : Module(name), 
+    m_ampl(0),
+    m_fltp(0),
+    m_fltw(0),
+    m_ampl_v_fltp(0),
+    m_namp(0),
+    m_namp2(0),
+    m_p1_v_p2(0),
+    m_pos_v_p1(0),
+    m_pos_v_p2(0),
+    m_tt_v_p1(0),
+    m_tt_v_p2(0),
+    m_p1_m_p2(0),
+    m_tt_m_p1(0),
+    m_tt_m_p2(0),
+    m_tt_v_p2_2d(0)
 {
   // get the values from configuration or use defaults
   m_get_key1 = configStr("get_key1");
@@ -92,39 +107,45 @@ Check::beginJob(Event& evt, Env& env)
 {
 #define axis_from_vector(v) Axis(unsigned(v[0]),v[1],v[2])
 
-  m_ampl = env.hmgr().hist1d("Amplitude","ampl" ,
-                             m_amplitude_binning.size() ?
-                             axis_from_vector(m_amplitude_binning) :
-                             Axis(100,-0.02,0.18));
-  m_fltp = env.hmgr().hist1d("Position" ,"pos"  ,
-                             m_position_binning.size() ?
-                             axis_from_vector(m_position_binning) :
-                             Axis(100,0.,1000));
-  m_fltw = env.hmgr().hist1d("Width"    ,"width",
-                             m_width_binning.size() ?
-                             axis_from_vector(m_width_binning) :
-                             Axis(100,0.,100));
-  m_ampl_v_fltp = env.hmgr().hist2d("Amplitude v Position",
-                                    "amplvpos",
-                                    Axis(100,0.,1000),
-                                    Axis(100,-0.01,0.09));
-  m_namp = env.hmgr().hist1d("Next Ampl","ampl" ,Axis(100,-0.01,0.09));
-  m_namp2 = env.hmgr().hist2d("Next Amplitude v Amplitude",
-                              "nampvampl",
-                              Axis(100,-0.02,0.18),
-                              Axis(100,-0.01,0.09));
+  m_hmgr = env.hmgr();
+  if (not m_hmgr) {
+    MsgLog(name(), error, "histogram manager returned by psana env "
+           "is null. No histograms will be created.");
+  } else {
+    m_ampl = m_hmgr->hist1d("Amplitude","ampl" ,
+                               m_amplitude_binning.size() ?
+                               axis_from_vector(m_amplitude_binning) :
+                               Axis(100,-0.02,0.18));
+    m_fltp = m_hmgr->hist1d("Position" ,"pos"  ,
+                               m_position_binning.size() ?
+                               axis_from_vector(m_position_binning) :
+                               Axis(100,0.,1000));
+    m_fltw = m_hmgr->hist1d("Width"    ,"width",
+                               m_width_binning.size() ?
+                               axis_from_vector(m_width_binning) :
+                               Axis(100,0.,100));
+    m_ampl_v_fltp = m_hmgr->hist2d("Amplitude v Position",
+                                      "amplvpos",
+                                      Axis(100,0.,1000),
+                                      Axis(100,-0.01,0.09));
+    m_namp = m_hmgr->hist1d("Next Ampl","ampl" ,Axis(100,-0.01,0.09));
+    m_namp2 = m_hmgr->hist2d("Next Amplitude v Amplitude",
+                                "nampvampl",
+                                Axis(100,-0.02,0.18),
+                                Axis(100,-0.01,0.09));
 
-  Axis a(800,-4.,4.);
-  m_p1_v_p2  = env.hmgr().prof1("phcav2 v phcav1","phase cavity corr",a);
-  m_pos_v_p1 = env.hmgr().prof1("pos v phcav1","timetool pos1",a);
-  m_pos_v_p2 = env.hmgr().prof1("pos v phcav2","timetool pos2",a);
-  m_tt_v_p1  = env.hmgr().prof1("tt v phcav1","timetool corr1",a);
-  m_tt_v_p2  = env.hmgr().prof1("tt v phcav2","timetool corr2",a);
-  m_p1_m_p2  = env.hmgr().hist1d("phcav2 - phcav1","phase cavity diff",a);
-  m_tt_m_p1  = env.hmgr().hist1d("tt - phcav1","timetool diff1",a);
-  m_tt_m_p2  = env.hmgr().hist1d("tt - phcav2","timetool diff2",a);
-  m_tt_v_p2_2d  = env.hmgr().hist2i("tt v phcav2 2d","timetool corr2",
-                                    Axis(60,-0.3,0.3), Axis(80,640.,800.));
+    Axis a(800,-4.,4.);
+    m_p1_v_p2  = m_hmgr->prof1("phcav2 v phcav1","phase cavity corr",a);
+    m_pos_v_p1 = m_hmgr->prof1("pos v phcav1","timetool pos1",a);
+    m_pos_v_p2 = m_hmgr->prof1("pos v phcav2","timetool pos2",a);
+    m_tt_v_p1  = m_hmgr->prof1("tt v phcav1","timetool corr1",a);
+    m_tt_v_p2  = m_hmgr->prof1("tt v phcav2","timetool corr2",a);
+    m_p1_m_p2  = m_hmgr->hist1d("phcav2 - phcav1","phase cavity diff",a);
+    m_tt_m_p1  = m_hmgr->hist1d("tt - phcav1","timetool diff1",a);
+    m_tt_m_p2  = m_hmgr->hist1d("tt - phcav2","timetool diff2",a);
+    m_tt_v_p2_2d  = m_hmgr->hist2i("tt v phcav2 2d","timetool corr2",
+                                      Axis(60,-0.3,0.3), Axis(80,640.,800.));
+  }
 }
 
 /// Method which is called at the beginning of the run
@@ -179,13 +200,15 @@ Check::event(Event& evt, Env& env)
   } catch(PSEnv::Exception& e) {
   }
 
-  m_ampl->fill(ampl1);
-  m_fltp->fill(fltp1);
-  m_fltw->fill(fltw1);
-  m_ampl_v_fltp->fill(fltp1,ampl1);
+  if (m_hmgr) {
+    m_ampl->fill(ampl1);
+    m_fltp->fill(fltp1);
+    m_fltw->fill(fltw1);
+    m_ampl_v_fltp->fill(fltp1,ampl1);
   
-  m_namp->fill(namp1);
-  m_namp2->fill(ampl1,namp1);
+    m_namp->fill(namp1);
+    m_namp2->fill(ampl1,namp1);
+  }
 
   boost::shared_ptr<Psana::Bld::BldDataPhaseCavity> phcav = 
     evt.get(Source("BldInfo(PhaseCavity)"));
@@ -199,18 +222,18 @@ Check::event(Event& evt, Env& env)
     bool lphcav2 = (phcav->fitTime2()>m_phcav2_limits[0] &&
                     phcav->fitTime2()<m_phcav2_limits[1]);
 
-    if (lphcav1 && lphcav2) {
+    if (lphcav1 && lphcav2 && m_hmgr) {
       m_p1_v_p2->fill(phcav->fitTime1(),phcav->fitTime2());
       m_p1_m_p2->fill(phcav->fitTime2()-phcav->fitTime1());
     }
 
-    if (lphcav1) {
+    if (lphcav1 && m_hmgr) {
       m_pos_v_p1->fill(-phcav->fitTime1(),fltp1);
       m_tt_v_p1->fill(angsh-phcav->fitTime1(),tt);
       m_tt_m_p1->fill(tt-angsh+phcav->fitTime1());
     }
 
-    if (lphcav2) {
+    if (lphcav2 && m_hmgr) {
       m_pos_v_p2->fill(-phcav->fitTime2(),fltp1);
       m_tt_v_p2->fill(angsh-phcav->fitTime2(),tt);
       m_tt_m_p2->fill(tt-angsh+phcav->fitTime2());

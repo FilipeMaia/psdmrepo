@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <fstream>
 #include "psalg/psalg.h"
 
 //-------------------------------
@@ -54,7 +55,7 @@ namespace TimeTool {
 // Constructors --
 //----------------
 Setup::Setup (const std::string& name)
-  : Module(name)
+  : Module(name), m_hacf(0)
 {
   // get the values from configuration or use defaults
   m_get_key = configSrc("get_key","DetInfo(:Opal1000)");
@@ -127,7 +128,7 @@ Setup::Setup (const std::string& name)
 
   std::string ref_load  = configStr("ref_load");
   if (!ref_load.empty()) {
-    ifstream s(ref_load.c_str());
+    std::ifstream s(ref_load.c_str());
     std::vector<double> ref;
     while(s.good()) {
       double v;
@@ -207,30 +208,38 @@ Setup::beginJob(Event& evt, Env& env)
 #endif
     }
   }
+  
+  m_hmgr = env.hmgr();
 
-  unsigned pdim = m_projectX ? 1:0;
-  Axis a(m_sig_roi_hi[pdim]-m_sig_roi_lo[pdim]+1,
-         double(m_sig_roi_lo[pdim])-0.5,double(m_sig_roi_hi[pdim]+0.5));
-  for(unsigned i=0; i<m_hdump.size(); i++) {
-    { std::stringstream s;
-      s << "Raw projection: event " << i;
-      m_hdump[i].hraw = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
-    { std::stringstream s;
-      s << "Corr projection: event " << i;
-      m_hdump[i].hcor = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
-    { std::stringstream s;
-      s << "Corr reference: event " << i;
-      m_hdump[i].href = env.hmgr().hist1d(s.str().c_str(),"projection",a); }
-    { std::stringstream s;
-      s << "Ratio: event " << i;
-      m_hdump[i].hrat = env.hmgr().hist1d(s.str().c_str(),"ratio",a); }
-    { std::stringstream s;
-      s << "ACF: event " << i;
-      m_hdump[i].hacf = env.hmgr().hist1d(s.str().c_str(),"acf",a); }
+  if (not m_hmgr and m_hdump.size()>0) {
+    MsgLog(name(), error, "histogram manager returned by psana env "
+           "is null, but hisogramming has been requested in configuration");
   }
 
-  m_hacf = env.hmgr().prof1("Reference ACF","autocorrelation",a);
+  if (m_hmgr) {
+    unsigned pdim = m_projectX ? 1:0;
+    Axis a(m_sig_roi_hi[pdim]-m_sig_roi_lo[pdim]+1,
+           double(m_sig_roi_lo[pdim])-0.5,double(m_sig_roi_hi[pdim]+0.5));
+    for(unsigned i=0; i<m_hdump.size(); i++) {
+      { std::stringstream s;
+        s << "Raw projection: event " << i;
+        m_hdump[i].hraw = m_hmgr->hist1d(s.str().c_str(),"projection",a); }
+      { std::stringstream s;
+        s << "Corr projection: event " << i;
+        m_hdump[i].hcor = m_hmgr->hist1d(s.str().c_str(),"projection",a); }
+      { std::stringstream s;
+        s << "Corr reference: event " << i;
+        m_hdump[i].href = m_hmgr->hist1d(s.str().c_str(),"projection",a); }
+      { std::stringstream s;
+        s << "Ratio: event " << i;
+        m_hdump[i].hrat = m_hmgr->hist1d(s.str().c_str(),"ratio",a); }
+      { std::stringstream s;
+        s << "ACF: event " << i;
+        m_hdump[i].hacf = m_hmgr->hist1d(s.str().c_str(),"acf",a); }
+    }
 
+    m_hacf = m_hmgr->prof1("Reference ACF","autocorrelation",a);
+  } 
   m_count=0;
 }
 
@@ -384,7 +393,7 @@ Setup::event(Event& evt, Env& env)
     for(unsigned i=0; i<sig.shape()[0]; i++)
       drat[i] = sigd[i]/m_ref[i] - 1;
 
-    if (m_count < m_hdump.size()) {
+    if ((m_count < m_hdump.size()) and m_hmgr) {
       for(unsigned i=0; i<sig.shape()[0]; i++)
         m_hdump[m_count].hraw->fill(double(i)+m_sig_roi_lo[pdim],double(sig[i]));
       for(unsigned i=0; i<sigd.shape()[0]; i++)
@@ -407,10 +416,11 @@ Setup::event(Event& evt, Env& env)
     //
     //  Accumulate the ACF
     //
-    for(unsigned i=0; i<sig.shape()[0]; i++)
-      for(unsigned j=i; j<sig.shape()[0]; j++)
-        m_hacf->fill(double(j-i),drat[i]*drat[j]);
-
+    if (m_hmgr) {
+      for(unsigned i=0; i<sig.shape()[0]; i++)
+        for(unsigned j=i; j<sig.shape()[0]; j++)
+          m_hacf->fill(double(j-i),drat[i]*drat[j]);
+    }
     psalg::rolling_average(ndarray<const double,1>(sigd),
                            m_ref, m_ref_avg_fraction);
     

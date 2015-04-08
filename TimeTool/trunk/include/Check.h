@@ -115,6 +115,9 @@ private:
   PSHist::H1*      m_tt_m_p1;
   PSHist::H1*      m_tt_m_p2;
   PSHist::H2*      m_tt_v_p2_2d;
+
+  boost::shared_ptr<PSHist::HManager> m_hmgr;
+
   };
 } // namespace TimeTool
 

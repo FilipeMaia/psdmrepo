@@ -11,6 +11,13 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2015-4-8 David Schneider
+- Adapt to new API change for hmgr in PSEnv V00-14-00, adapt to use std:: due to removal of root headers
+  JIRA PSAS-131. TimeTool checks if hmgr available. For all modules (Analyze, 
+  Setup and Check) the new behavior is to print non fatal errors if histogramming
+  was requested. 
+
 Tag: V00-01-05
 2015-2-3 David Schneider
 - add options to Analyze module allow user to control beam and laser logic.

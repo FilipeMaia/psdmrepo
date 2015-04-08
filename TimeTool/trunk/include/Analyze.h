@@ -167,6 +167,9 @@ private:
   ndarray<double,1> m_analyze_signal; // the signal to be applied to each new reference
 
   int m_count;
+
+  boost::shared_ptr<PSHist::HManager> m_hmgr;
+
   };
 } // namespace TimeTool
 

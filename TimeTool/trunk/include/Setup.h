@@ -120,7 +120,7 @@ private:
 
   class DumpH {
   public:
-    DumpH() : hraw(0), hcor(0), hrat(0), hacf(0) {}
+    DumpH() : hraw(0), hcor(0), href(0), hrat(0), hacf(0) {}
     PSHist::H1* hraw;
     PSHist::H1* hcor;
     PSHist::H1* href;
@@ -131,6 +131,7 @@ private:
 
   PSHist::Profile* m_hacf;
 
+  boost::shared_ptr<PSHist::HManager> m_hmgr;
   unsigned m_count;
   };
 } // namespace TimeTool
