@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2015-04-08 David Schneider
+- add factory function to create an instance of a PSHist::HManager based on 
+  implementation using root. For dynamically loading root dependency. JIRA PSAS-131
+
 Tag: V00-02-02
 2014-01-13 Andy Salnikov
 - fix bug in last commit
