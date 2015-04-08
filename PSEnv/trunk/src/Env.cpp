@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <dlfcn.h>
 #include <boost/make_shared.hpp>
 
 //-------------------------------
@@ -25,8 +26,7 @@
 //-------------------------------
 #include "PSEvt/ProxyDict.h"
 #include "PSEvt/ProxyDictHist.h"
-#include "RootHist/RootHManager.h"
-
+#include "MsgLogger/MsgLogger.h"
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
@@ -65,8 +65,8 @@ Env::Env (const std::string& jobName,
   , m_cfgStore()
   , m_calibStore()
   , m_epicsStore(boost::make_shared<EpicsStore>())
-  , m_rhmgr()
   , m_hmgr()
+  , m_firstHmgrCall(true)
   , m_expNameProvider(expNameProvider)
   , m_calibDir(calibDir)
   , m_calibDirSetup(false)
@@ -80,10 +80,6 @@ Env::Env (const std::string& jobName,
   boost::shared_ptr<PSEvt::ProxyDictHist> calibDict(new PSEvt::ProxyDictHist(m_aliasMap));
   m_calibStore = boost::make_shared<EnvObjectStore>(calibDict);
   
-  // make root file name
-  std::string rfname = jobName + "-rhmgr.root";
-  m_rhmgr.reset(new RootHistoManager::RootHMgr(rfname));
-
   if (subproc >= 0) {
     m_jobNameSub += boost::lexical_cast<std::string>(subproc);
   }
@@ -112,16 +108,44 @@ Env::calibDir() const
   return m_calibDir;
 }
 
+
 // Access to histogram manager.
-PSHist::HManager& 
+boost::shared_ptr<PSHist::HManager> 
 Env::hmgr()
 {
-  if (not m_hmgr.get()) {
-    // Instantiate manager
-    std::string rfname = m_jobName + ".root";
-    m_hmgr.reset(new RootHist::RootHManager(rfname));
+  typedef PSHist::HManager *(*FnPSHistFromConstCharPtr)(const char *);
+  if (not m_hmgr.get() and m_firstHmgrCall) {
+    m_firstHmgrCall = false;
+    const char * histPackage = "libRootHist.so";  // this could become a psana parameter
+    const char * histFactoryFunction = "CREATE_PSHIST_HMANAGER_FROM_CONST_CHAR_PTR"; // this fixed,
+                                // but we could look for factory functions taking other parameters as well
+    void* histLibHandle = dlopen(histPackage, RTLD_NOW | RTLD_GLOBAL);
+    if (histLibHandle) {
+      FnPSHistFromConstCharPtr histFactorySymbol = (FnPSHistFromConstCharPtr)dlsym(histLibHandle,
+                                                                                   histFactoryFunction);
+      if (histFactorySymbol) {
+        // Instantiate manager
+        std::string rfname = m_jobName + ".root";
+        boost::shared_ptr<PSHist::HManager> hmgr(histFactorySymbol(rfname.c_str()));
+        if (hmgr) {
+          m_hmgr = hmgr;
+        } else {
+          MsgLogRoot(error, "Env::hmgr() factory function to create PSHist::HManager in package "
+                     << histPackage << " found and called, but it did not return a valid object.");
+        }
+      } else {
+        MsgLogRoot(error, "Env::hmgr() factory function=" << histFactoryFunction
+                   << " to create PSHist::Hmanager in package "
+                   << histPackage 
+                   << " not found.");
+      } 
+    } else {
+      MsgLogRoot(warning, "Env::hmgr() package to create PSHist::Hmanager = " 
+                 << histPackage 
+                 << " not found.");
+    }
   }
-  return *m_hmgr;
+  return m_hmgr;
 }
 
 

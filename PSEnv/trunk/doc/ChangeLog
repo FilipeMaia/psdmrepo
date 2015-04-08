@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-00 David Schneider
+- removing strong dependency on root: JIRA PSAS-131  
+- remove the rhmgr() function from Env. The root specific historgram manager 
+  is now officially deprecated. We should remove package RootHistoManager from the release.
+- *API change* hmgr() now returns a shared pointer rather than a reference.
+  Client code should not assume a histogram manager is present. They should check for a null
+  pointer.
+- internally, hmgr() now dynamically loads our libRootHist.so
+	
 Tag: V00-13-08 David Schneider
 - apply patches from user to eliminate warnings produced when -Wextra
   compiler option is used. 

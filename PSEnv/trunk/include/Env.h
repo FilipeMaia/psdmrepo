@@ -27,9 +27,7 @@
 #include "PSEnv/EnvObjectStore.h"
 #include "PSEnv/EpicsStore.h"
 #include "PSEnv/IExpNameProvider.h"
-#include "RootHistoManager/RootHMgr.h"
 #include "PSHist/HManager.h"
-
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
@@ -141,15 +139,8 @@ public:
   /// Access to alias map.
   boost::shared_ptr<PSEvt::AliasMap> aliasMap() { return m_aliasMap; }
 
-  /**
-   *  @brief DEPRECATED: Access to ROOT histogram manager.
-   *  
-   *  @deprecated Use hmgr() instead.
-   */
-  RootHistoManager::RootHMgr& rhmgr() { return *m_rhmgr; }
-
   /// Access to histogram manager.
-  PSHist::HManager& hmgr();
+  boost::shared_ptr<PSHist::HManager> hmgr();
 
 protected:
 
@@ -163,13 +154,12 @@ private:
   boost::shared_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
   boost::shared_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
   boost::shared_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store
-  boost::scoped_ptr<RootHistoManager::RootHMgr> m_rhmgr;  ///< Pointer to ROOT histogram manager
-  boost::scoped_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to ROOT histogram manager
+  boost::shared_ptr<PSHist::HManager> m_hmgr;  ///< Pointer to histogram manager
+  bool m_firstHmgrCall;
   boost::shared_ptr<IExpNameProvider> m_expNameProvider; ///< Object which provides experiment and instrument names
   mutable std::string m_calibDir;              ///< Name of the calibration directory
   mutable bool m_calibDirSetup;                ///< Flag set to true after calibration directory name is fixed
   int m_subproc;
-  
 };
 
 } // namespace PSEnv
