@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2015-04-08 David Schneider
+- Adapt to new API for histogram manager. JIRA PSAS-131
+
 Tag: V00-04-22
 2014-11-03 Mikhail Dubrovin
 - DumpEpix.cpp - add support for new types Psana::Epix::Config100aV1 and Psana::Epix::ElementV2

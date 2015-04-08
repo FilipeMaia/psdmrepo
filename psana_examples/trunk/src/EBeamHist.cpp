@@ -61,8 +61,12 @@ EBeamHist::~EBeamHist ()
 void 
 EBeamHist::beginJob(Event& evt, Env& env)
 {
-  m_ebeamHisto = env.hmgr().hist1i("ebeamHisto", "ebeamL3Energy value", Axis(1000, 13000, 16000));
-  m_chargeHisto = env.hmgr().hist1i("echargeHisto", "ebeamCharge value", Axis(250, 0, 0.25));
+  if (not env.hmgr()) {
+    MsgLog(name(), fatal, "psana env is not providing a hisogram manager. "
+           "This example is for histogramming.");
+  }
+  m_ebeamHisto = env.hmgr()->hist1i("ebeamHisto", "ebeamL3Energy value", Axis(1000, 13000, 16000));
+  m_chargeHisto = env.hmgr()->hist1i("echargeHisto", "ebeamCharge value", Axis(250, 0, 0.25));
 }
 
 // Method which is called with event data
