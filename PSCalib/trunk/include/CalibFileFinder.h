@@ -101,6 +101,14 @@ public:
    */
   static std::string selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber, unsigned print_bits=255);
 
+
+  /**
+   *  @brief If source name has DetInfo(...) - remove it
+   *  @param[in] str - input string with source name, ex: "DetInfo(Camp.0:pnCCD.0)"
+   */
+  static std::string trancateSourceName(const std::string& str);
+
+
 protected:
 
 private:

@@ -39,7 +39,7 @@ namespace PSCalib {
 
 //-----------------------------
 const size_t 
-CalibPars::ndim()
+CalibPars::ndim(const CALIB_TYPE& calibtype)
 {
   default_msg("ndim()");
   return 0;
@@ -47,7 +47,7 @@ CalibPars::ndim()
 
 //-----------------------------
 const size_t 
-CalibPars::size()
+CalibPars::size(const CALIB_TYPE& calibtype)
 {
   default_msg("size()");
   return 0;
@@ -55,7 +55,7 @@ CalibPars::size()
 
 //-----------------------------
 const unsigned* 
-CalibPars::shape() 
+CalibPars::shape(const CALIB_TYPE& calibtype) 
 {
   default_msg("shape()");
   return 0;
@@ -94,6 +94,22 @@ CalibPars::pixel_rms()
 }
 
 //-----------------------------
+const CalibPars::pixel_mask_t* 
+CalibPars::pixel_mask()
+{ 
+  default_msg("pixel_mask()");
+  return 0;
+}
+
+//-----------------------------
+const CalibPars::pixel_bkgd_t* 
+CalibPars::pixel_bkgd()
+{ 
+  default_msg("pixel_bkgd()");
+  return 0;
+}
+
+//-----------------------------
 const CalibPars::common_mode_t* 
 CalibPars::common_mode()
 { 
@@ -123,6 +139,7 @@ CalibPars::fill_map_type2str()
   map_type2str[PIXEL_STATUS] = std::string("pixel_status");
   map_type2str[PIXEL_RMS]    = std::string("pixel_rms");
   map_type2str[PIXEL_GAIN]   = std::string("pixel_gain");
+  map_type2str[PIXEL_MASK]   = std::string("pixel_mask");
   map_type2str[COMMON_MODE]  = std::string("common_mode");
 }
 

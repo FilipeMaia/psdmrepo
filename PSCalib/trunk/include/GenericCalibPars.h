@@ -117,9 +117,11 @@ namespace PSCalib {
  *  const size_t    size = calibpars -> size();
  *  const unsigned* p_shape = calibpars -> shape();
  *  const CalibPars::pedestals_t*    p_pedestals   = calibpars -> pedestals()
- *  const CalibPars::pixel_status_t* p_pixel_stat  = calibpars -> pixel_status()
  *  const CalibPars::common_mode_t*  p_common_mode = calibpars -> common_mode()
+ *  const CalibPars::pixel_status_t* p_pixel_stat  = calibpars -> pixel_status()
  *  const CalibPars::pixel_gain_t*   p_pixel_gain  = calibpars -> pixel_gain()
+ *  const CalibPars::pixel_mask_t*   p_pixel_mask  = calibpars -> pixel_mask()
+ *  const CalibPars::pixel_bkgd_t*   p_pixel_bkgd  = calibpars -> pixel_bkgd()
  *  const CalibPars::pixel_rms_t*    p_pixel_rms   = calibpars -> pixel_rms()
  *  ... etc. for all other access methods
  *  @endcode
@@ -142,7 +144,7 @@ public:
     // const static size_t Ndim = TBASE::Ndim; 
 
   /**
-   *  @brief DEPRICATED constructor, which use string& source
+   *  @brief Constructor, which use string& source
    *  
    *  @param[in] calibDir   Calibration directory for current experiment.
    *  @param[in] groupName  Data type and group names.
@@ -157,7 +159,7 @@ public:
                      unsigned             print_bits=255 );
 
   /**
-   *  @brief Regular constructor, which use Pds::Src& src
+   *  @brief Constructor, which use Pds::Src& src
    *  
    *  @param[in] calibDir   Calibration directory for current experiment.
    *  @param[in] groupName  Data type and group names.
@@ -175,12 +177,14 @@ public:
 
   /// INTERFACE METHODS
 
-  virtual const size_t   ndim() { return TBASE::Ndim; }
-  virtual const size_t   size();
-  virtual const shape_t* shape();
+  virtual const size_t   ndim (const CALIB_TYPE& calibtype=PEDESTALS);
+  virtual const size_t   size (const CALIB_TYPE& calibtype=PEDESTALS);
+  virtual const shape_t* shape(const CALIB_TYPE& calibtype=PEDESTALS);
 
   virtual const CalibPars::pedestals_t*    pedestals(); 
   virtual const CalibPars::pixel_gain_t*   pixel_gain();
+  virtual const CalibPars::pixel_mask_t*   pixel_mask();
+  virtual const CalibPars::pixel_bkgd_t*   pixel_bkgd();
   virtual const CalibPars::pixel_rms_t*    pixel_rms();
   virtual const CalibPars::pixel_status_t* pixel_status();
   virtual const CalibPars::common_mode_t*  common_mode();
@@ -201,10 +205,15 @@ public:
   //const ndarray<const CalibPars::pedestals_t,    TBASE::Ndim> pedestals_ndarr   (){ return m_pedestals    -> get_ndarray(); }
   //const ndarray<const CalibPars::pixel_status_t, TBASE::Ndim> pixel_status_ndarr(){ return m_pixel_status -> get_ndarray(); }
   //const ndarray<const CalibPars::pixel_gain_t,   TBASE::Ndim> pixel_gain_ndarr  (){ return m_pixel_gain   -> get_ndarray(); }
+  //const ndarray<const CalibPars::pixel_mask_t,   TBASE::Ndim> pixel_mask_ndarr  (){ return m_pixel_mask   -> get_ndarray(); }
+  //const ndarray<const CalibPars::pixel_bkgd_t,   TBASE::Ndim> pixel_bkgd_ndarr  (){ return m_pixel_bkgd   -> get_ndarray(); }
   //const ndarray<const CalibPars::pixel_rms_t,    TBASE::Ndim> pixel_rms_ndarr   (){ return m_pixel_rms    -> get_ndarray(); }
   //const ndarray<const CalibPars::common_mode_t,            1> common_mode_ndarr (){ return m_common_mode  -> get_ndarray(); }
 
 private:
+
+  /// dynamically generated 1-d shape for 1-d common mode array
+  shape_t* m_shape_cmode;
 
   /// Initialization, common for all constructors
   void init();
@@ -241,12 +250,16 @@ private:
 
   typedef pdscalibdata::NDArrIOV1<CalibPars::pedestals_t,   TBASE::Ndim> NDAIPEDS;
   typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_gain_t,  TBASE::Ndim> NDAIGAIN;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_mask_t,  TBASE::Ndim> NDAIMASK;
+  typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_bkgd_t,  TBASE::Ndim> NDAIBKGD;
   typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_rms_t,   TBASE::Ndim> NDAIRMS;
   typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_status_t,TBASE::Ndim> NDAISTATUS;
   typedef pdscalibdata::NDArrIOV1<CalibPars::common_mode_t,           1> NDAICMOD; 
 
   NDAIPEDS   *m_pedestals;
   NDAIGAIN   *m_pixel_gain;
+  NDAIMASK   *m_pixel_mask;
+  NDAIBKGD   *m_pixel_bkgd;
   NDAIRMS    *m_pixel_rms;
   NDAISTATUS *m_pixel_status; 
   NDAICMOD   *m_common_mode;

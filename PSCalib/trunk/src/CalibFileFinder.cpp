@@ -129,17 +129,27 @@ CalibFileFinder::~CalibFileFinder ()
 {
 }
 
+// If source name has DetInfo(...) - remove it, ex: "DetInfo(Camp.0:pnCCD.0)" -> "Camp.0:pnCCD.0"
+std::string
+CalibFileFinder::trancateSourceName(const std::string& str)
+{
+  size_t pL = str.find('(');  
+  size_t pR = str.find(')', pL+1);  
+  return (pL != std::string::npos) ? std::string(str, pL+1, pR-pL-1) : str;
+}
+
+
 // find calibration file
 std::string
 CalibFileFinder::findCalibFile(const std::string& src, const std::string& dataType, unsigned long runNumber) const
 try {
   // if no directory given then don't do anything
   if ( m_calibDir == "" ) return std::string();
-  
+
   // construct full path name
   fs::path dir = m_calibDir;
   dir /= m_typeGroupName;
-  dir /= src;
+  dir /= trancateSourceName(src);
   dir /= dataType;
 
   // scan directory

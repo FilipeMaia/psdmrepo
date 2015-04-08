@@ -99,6 +99,8 @@ void GenericCalibPars<TBASE>::init()
 {
   m_pedestals    = 0;
   m_pixel_gain   = 0;
+  m_pixel_mask   = 0;
+  m_pixel_bkgd   = 0;
   m_pixel_rms    = 0;
   m_common_mode  = 0;
   m_pixel_status = 0; 
@@ -183,6 +185,34 @@ GenericCalibPars<TBASE>::pixel_gain()
 //----------------
 
 template <typename TBASE> 
+const CalibPars::pixel_mask_t*
+GenericCalibPars<TBASE>::pixel_mask()
+{
+  if (m_pixel_mask == 0) {
+      std::string fname = getCalibFileName(PIXEL_MASK);
+      if (size()) m_pixel_mask = new NDAIMASK(fname, shape(), pixel_mask_t(1), m_prbits_type);
+      else        m_pixel_mask = new NDAIMASK(fname, m_prbits_type);
+  }
+  return m_pixel_mask->get_ndarray().data();
+}
+
+//----------------
+
+template <typename TBASE> 
+const CalibPars::pixel_bkgd_t*
+GenericCalibPars<TBASE>::pixel_bkgd()
+{
+  if (m_pixel_bkgd == 0) {
+      std::string fname = getCalibFileName(PIXEL_BKGD);
+      if (size()) m_pixel_bkgd = new NDAIBKGD(fname, shape(), pixel_bkgd_t(1), m_prbits_type);
+      else        m_pixel_bkgd = new NDAIBKGD(fname, m_prbits_type);
+  }
+  return m_pixel_bkgd->get_ndarray().data();
+}
+
+//----------------
+
+template <typename TBASE> 
 const CalibPars::pixel_rms_t*
 GenericCalibPars<TBASE>::pixel_rms()
 {
@@ -212,12 +242,18 @@ GenericCalibPars<TBASE>::common_mode()
 
 template <typename TBASE> 
 const size_t
-GenericCalibPars<TBASE>::size() 
+GenericCalibPars<TBASE>::ndim(const CALIB_TYPE& calibtype)
 { 
-  const size_t size_nda = size_of_ndarray();
-  //cout << "T: TBASE::Size : " << TBASE::size_base() << '\n';
-  //cout << "T: size_nda()  : " << size_nda << '\n';
-  //return (size_nda) ? size_nda : TBASE::Size;
+  return (calibtype!=COMMON_MODE) ? TBASE::Ndim : 1;
+}
+
+//----------------
+
+template <typename TBASE> 
+const size_t
+GenericCalibPars<TBASE>::size(const CALIB_TYPE& calibtype)
+{ 
+  const size_t size_nda = (calibtype!=COMMON_MODE) ? size_of_ndarray() : TBASE::SizeCM;
   return (size_nda) ? size_nda : TBASE::size_base();
 }
 
@@ -226,9 +262,16 @@ GenericCalibPars<TBASE>::size()
 template <typename TBASE> 
 const CalibPars::shape_t*
 //const unsigned*
-GenericCalibPars<TBASE>::shape()
+GenericCalibPars<TBASE>::shape(const CALIB_TYPE& calibtype)
 { 
-  return (size_of_ndarray()) ? shape_of_ndarray() : TBASE::shape_base(); 
+  const size_t size_nda = size(calibtype);
+
+  if(calibtype==COMMON_MODE) {
+    *m_shape_cmode = size_nda;
+    return m_shape_cmode;
+   }
+
+  return (size_nda) ? shape_of_ndarray() : TBASE::shape_base(); 
 }
 
 //----------------
@@ -240,6 +283,8 @@ GenericCalibPars<TBASE>::size_of_ndarray()
   if      (m_pedestals   ) return m_pedestals   ->get_ndarray().size();
   else if (m_pixel_status) return m_pixel_status->get_ndarray().size();
   else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().size();
+  else if (m_pixel_mask  ) return m_pixel_mask  ->get_ndarray().size();
+  else if (m_pixel_bkgd  ) return m_pixel_bkgd  ->get_ndarray().size();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().size();
 
   if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SIZE of non-loaded ndarray"); 
@@ -257,10 +302,12 @@ GenericCalibPars<TBASE>::shape_of_ndarray()
   if      (m_pedestals   ) return m_pedestals   ->get_ndarray().shape();
   else if (m_pixel_status) return m_pixel_status->get_ndarray().shape();
   else if (m_pixel_gain  ) return m_pixel_gain  ->get_ndarray().shape();
+  else if (m_pixel_mask  ) return m_pixel_mask  ->get_ndarray().shape();
+  else if (m_pixel_bkgd  ) return m_pixel_bkgd  ->get_ndarray().shape();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().shape();
  
   if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SHAPE of non-loaded ndarray");
-  return TBASE::shape_base(); 
+  return TBASE::shape_base();
 }
 
 //----------------
@@ -304,15 +351,10 @@ std::string GenericCalibPars<TBASE>::str_shape()
 template <typename TBASE> 
 void GenericCalibPars<TBASE>::loadAllCalibPars ()
 {
-  /*
-  const CalibPars::pedestals_t*    peds = pedestals(); 
-  const CalibPars::pixel_gain_t*   gain = pixel_gain();
-  const CalibPars::pixel_rms_t*    prms = pixel_rms();
-  const CalibPars::pixel_status_t* stat = pixel_status();
-  const CalibPars::common_mode_t*  cmod = common_mode();
-  */
   pedestals(); 
   pixel_gain();
+  pixel_mask();
+  pixel_bkgd();
   pixel_rms();
   pixel_status();
   common_mode();
@@ -329,6 +371,8 @@ void GenericCalibPars<TBASE>::printCalibParsStatus ()
     if (m_pedestals)    smsg << "\n  pedestals    : " << m_pedestals    -> str_status();
     if (m_pixel_status) smsg << "\n  pixel_status : " << m_pixel_status -> str_status();
     if (m_pixel_gain)   smsg << "\n  pixel_gain   : " << m_pixel_gain   -> str_status();
+    if (m_pixel_mask)   smsg << "\n  pixel_mask   : " << m_pixel_mask   -> str_status();
+    if (m_pixel_bkgd)   smsg << "\n  pixel_bkgd   : " << m_pixel_bkgd   -> str_status();
     if (m_pixel_rms)    smsg << "\n  pixel_rms    : " << m_pixel_rms    -> str_status();
     if (m_common_mode)  smsg << "\n  common_mode  : " << m_common_mode  -> str_status();
     MsgLog(m_name, info, smsg.str());
@@ -349,6 +393,8 @@ void GenericCalibPars<TBASE>::printCalibPars()
     }
     if (m_pixel_status) smsg << "\n  pixel_status : " << m_pixel_status -> str_ndarray_info();
     if (m_pixel_gain)   smsg << "\n  pixel_gain   : " << m_pixel_gain   -> str_ndarray_info();
+    if (m_pixel_mask)   smsg << "\n  pixel_mask   : " << m_pixel_mask   -> str_ndarray_info();
+    if (m_pixel_bkgd)   smsg << "\n  pixel_bkgd   : " << m_pixel_bkgd   -> str_ndarray_info();
     if (m_pixel_rms)    smsg << "\n  pixel_rms    : " << m_pixel_rms    -> str_ndarray_info();
     if (m_common_mode)  smsg << "\n  common_mode  : " << m_common_mode  -> str_ndarray_info();
     MsgLog(m_name, info, smsg.str());

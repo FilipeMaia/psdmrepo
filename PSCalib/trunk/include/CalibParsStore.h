@@ -98,8 +98,10 @@ namespace PSCalib {
  *  calibpars->printCalibPars();
  *  const PSCalib::CalibPars::pedestals_t*    peds_data = calibpars->pedestals();
  *  const PSCalib::CalibPars::pixel_gain_t*   gain_data = calibpars->pixel_gain();
+ *  const PSCalib::CalibPars::pixel_mask_t*   mask_data = calibpars->pixel_mask();
+ *  const PSCalib::CalibPars::pixel_bkgd_t*   bkgd_data = calibpars->pixel_bkgd();
  *  const PSCalib::CalibPars::pixel_rms_t*    rms_data  = calibpars->pixel_rms();
- *  const PSCalib::CalibPars::pixel_status_t* mask_data = calibpars->pixel_status();
+ *  const PSCalib::CalibPars::pixel_status_t* stat_data = calibpars->pixel_status();
  *  const PSCalib::CalibPars::common_mode_t*  cmod_data = calibpars->common_mode();
  *  @endcode
  */
@@ -112,24 +114,23 @@ public:
   //CalibParsStore () {}
   //virtual ~CalibParsStore () {}
 
+
   /**
-   *  @brief Regular constructor, which use Pds::Src& src
+   *  @brief Regular constructor, which use const std::string& str_src
    *  
    *  @param[in] calibdir       Calibration directory for current experiment.
    *  @param[in] group          Data type and group names.
-   *  @param[in] src            The data source object, for example Pds::Src m_src; defined in the env.get(...,&m_src)
+   *  @param[in] src            The data source name, ex.: Camp.0:pnCCD.0
    *  @param[in] runnum         Run number to search the valid file name.
    *  @param[in] print_bits     Print control bit-word.
    */ 
   static PSCalib::CalibPars*
-  Create ( const std::string&   calibdir,     //  /reg/d/psdm/mec/mec73313/calib
-           const std::string&   group,        //  CsPad2x2::CalibV1
-           const Pds::Src&      src,          //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
+  Create ( const std::string&   calibdir,     //  /reg/d/psdm/AMO/amoa1214/calib
+           const std::string&   group,        //  PNCCD::CalibV1
+           const std::string&   str_src,      //  Camp.0:pnCCD.0
            const unsigned long& runnum,       //  10
            unsigned             print_bits=255 )
   {
-
-        std::string str_src = ImgAlgos::srcToString(src); 
 	unsigned prbits = (print_bits & 8) ? 40 : 0;
 
 	/*
@@ -167,37 +168,37 @@ public:
         if ( str_src.find(":Cspad.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPadBaseV2>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPadBaseV2>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
         if ( str_src.find(":Cspad2x2.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Cspad2x2 source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "CsPad2x2::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPad2x2BaseV2>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPad2x2BaseV2>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
         if ( str_src.find(":pnCCD.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for pnCCD source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "PNCCD::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV1>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::PnccdBaseV1>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
         if ( str_src.find(":Princeton.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Princeton source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Princeton::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::PrincetonBaseV1>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
         if ( str_src.find(":Andor.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Andor source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Andor::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::AndorBaseV1>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
         if ( str_src.find(":Epix100a.") != std::string::npos ) {
            if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for Epix100a source: " << str_src);
 	   std::string type_group = (group==std::string()) ? "Epix100a::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::Epix100aBaseV1>(calibdir, type_group, src, runnum, prbits);
+	   return new PSCalib::GenericCalibPars<pdscalibdata::Epix100aBaseV1>(calibdir, type_group, str_src, runnum, prbits);
 	}
 
 	std::vector<std::string> v_camera_names;
@@ -216,7 +217,7 @@ public:
 	    std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;
             if (print_bits & 1) MsgLog("CalibParsStore", info, "Get access to calibration store for det " << *it 
                                            << " source: " << str_src << " group: " << type_group);
-	    return new PSCalib::GenericCalibPars<pdscalibdata::VarShapeCameraBaseV1>(calibdir, type_group, src, runnum, prbits);
+	    return new PSCalib::GenericCalibPars<pdscalibdata::VarShapeCameraBaseV1>(calibdir, type_group, str_src, runnum, prbits);
 	    //return new PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>(calibdir, type_group, src, runnum, prbits);
 	  }
 	}
@@ -228,6 +229,28 @@ public:
 
         //return NULL;
   }
+
+
+
+  /**
+   *  @brief Regular constructor, which use Pds::Src& src
+   *  
+   *  @param[in] calibdir       Calibration directory for current experiment.
+   *  @param[in] group          Data type and group names.
+   *  @param[in] src            The data source object, for example Pds::Src m_src; defined in the env.get(...,&m_src)
+   *  @param[in] runnum         Run number to search the valid file name.
+   *  @param[in] print_bits     Print control bit-word.
+   */ 
+  static PSCalib::CalibPars*
+  Create ( const std::string&   calibdir,     //  /reg/d/psdm/mec/mec73313/calib
+           const std::string&   group,        //  CsPad2x2::CalibV1
+           const Pds::Src&      src,          //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
+           const unsigned long& runnum,       //  10
+           unsigned             print_bits=255 )
+  {
+    return Create(calibdir, group, ImgAlgos::srcToString(src), runnum, print_bits);
+  }
+
 };
 
 } // namespace PSCalib
