@@ -1,0 +1,15 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package RootHist
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Brief description:
+==================
+
+ROOT-based implementation of the histogramming interfaces defines in
+PSHist package.
