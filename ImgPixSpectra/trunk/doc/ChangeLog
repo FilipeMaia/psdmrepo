@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-4-8 David Schneider
+Tag: V00-01-03
+- add std:: to a few used of ofstream. JIRA PSAS-131
+
 2013-10-24 Mikhail S. Dubrovin
 Tag: V00-01-02
 - CSPadPixSpectra extend CSPAD configuration up to V5
