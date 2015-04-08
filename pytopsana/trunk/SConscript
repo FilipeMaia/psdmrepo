@@ -31,5 +31,5 @@ Import('*')
 #
 # standardSConscript()
 
-standardSConscript(PYEXTMOD="pytopsana")
+standardSConscript(PYEXTMOD="pytopsana_ext")
 #, DOCGEN="doxy-all psana-modules-doxy")

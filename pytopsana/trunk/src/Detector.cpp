@@ -7,6 +7,7 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm> // for fill_n
+#include <sstream>  // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -17,9 +18,8 @@
 #include "PSEvt/EventId.h"
 #include "PSEvt/Source.h"
 #include "psddl_psana/pnccd.ddl.h"
-#include "PSCalib/CalibPars.h"
-//#include "ImgAlgos/GlobalMethods.h" // for DETECTOR_TYPE, getRunNumber(evt), etc.
-//#include "PSCalib/CalibParsStore.h"
+
+#include "PSCalib/CalibParsStore.h"
 
 //-------------------
 namespace pytopsana {
@@ -36,13 +36,26 @@ namespace pytopsana {
 //----------------
 // Constructors --
 //----------------
-//Detector::Detector (const PSEvt::Source src)
-Detector::Detector ()
+Detector::Detector (const PSEvt::Source src, const unsigned& prbits)
+  : m_calibpars(0)
+  , m_src(src)
+  , m_runnum(-1)
+  , m_prbits(prbits)
 {
-  //m_src = src;
-  std::cout << "ctor\n"; // : SOURCE: " << m_src << "\n";
-  //m_dettype = ImgAlgos::detectorTypeForSource(m_src);
-  //std::cout << "\nCALIB GROUP:" << ImgAlgos::calibGroupForDetType(m_dettype) << '\n';
+  std::stringstream ss; ss << src;
+  m_str_src = ss.str();
+  m_dettype = ImgAlgos::detectorTypeForSource(m_src);
+  m_cgroup  = ImgAlgos::calibGroupForDetType(m_dettype); // for ex: "PNCCD::CalibV1";
+
+  if(m_prbits) {
+      std::stringstream ss;
+      ss << "in ctor:" // "SOURCE: " << m_src
+  	 << "\nData source  : " << m_str_src
+  	 << "\nCalib group  : " << m_cgroup 
+         << "\nPrint bits   : " << m_prbits
+         << '\n';
+      MsgLog(_name_(), info, ss.str());
+  }
 }
 
 //--------------
@@ -55,17 +68,67 @@ Detector::~Detector ()
 
 //-------------------
 
-ndarray<data_t,3> Detector::pedestals(PSEvt::Source src, boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+ndarray<const Detector::pedestals_t, 1> Detector::pedestals(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
 {
-  m_src = src;
-  std::cout << "SOURCE     : " << m_src << '\n';
-  std::cout << "INSTRUMENT : " << env->instrument() << '\n';
-
   initCalibStore(*(evt.get()), *(env.get()));
   
-  ndarray<TOUT, 3> ndarr = make_ndarray<TOUT>(Segs, Rows, Cols);    
-  std::fill_n(&ndarr[0][0][0], int(Size), TOUT(5));
-  return ndarr;
+  //ndarray<TOUT, 3> ndarr = make_ndarray<TOUT>(Segs, Rows, Cols);    
+  //std::fill_n(&ndarr[0][0][0], int(Size), TOUT(5));
+  //return ndarr;
+  
+  //ndarray<const Detector::pedestals_t, 1> nda = make_ndarray(m_calibpars->pedestals(), m_calibpars->size());
+  return make_ndarray(m_calibpars->pedestals(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::pixel_rms_t, 1> Detector::pixel_rms(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  return make_ndarray(m_calibpars->pixel_rms(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::pixel_gain_t, 1> Detector::pixel_gain(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  return make_ndarray(m_calibpars->pixel_gain(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::pixel_mask_t, 1> Detector::pixel_mask(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  return make_ndarray(m_calibpars->pixel_mask(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::pixel_bkgd_t, 1> Detector::pixel_bkgd(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  return make_ndarray(m_calibpars->pixel_bkgd(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::pixel_status_t, 1> Detector::pixel_status(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  return make_ndarray(m_calibpars->pixel_status(), m_calibpars->size());
+}
+
+//-------------------
+
+ndarray<const Detector::common_mode_t, 1> Detector::common_mode(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env)
+{
+  initCalibStore(*(evt.get()), *(env.get()));
+  //std::cout << "TEST cm[0]: " << m_calibpars->common_mode()[0] << "\n";
+  //std::cout << "TEST cm[3]: " << m_calibpars->common_mode()[3] << "\n";
+  //std::cout << "TEST  size: " << m_calibpars->size(PSCalib::COMMON_MODE) << "\n";
+  return make_ndarray(m_calibpars->common_mode(), m_calibpars->size(PSCalib::COMMON_MODE));
 }
 
 //-------------------
@@ -73,22 +136,30 @@ ndarray<data_t,3> Detector::pedestals(PSEvt::Source src, boost::shared_ptr<PSEvt
 void 
 Detector::initCalibStore(PSEvt::Event& evt, PSEnv::Env& env)
 {
+  int runnum = ImgAlgos::getRunNumber(evt);
+  if(runnum == m_runnum) return;
+  m_runnum = runnum;
+
+  if(m_calibpars) delete m_calibpars;
+
   //std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
   std::string calibdir = env.calibDir();
-  boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
-  int runnum = (eventId.get()) ? eventId->run() : 0; //ImgAlgos::getRunNumber(evt);
-  //int runnum = ImgAlgos::getRunNumber(evt);
-  std::string group = std::string(); // for ex: "PNCCD::CalibV1";
-  unsigned prbits = 255;
 
-  std::cout << "\nCalib dir   : " << calibdir 
-            << "\nCalib group : " << group 
-            << "\nRun number  : " << runnum 
-            << "\nPrint bits  : " << prbits 
-            << '\n';
-  //MsgLog(_name_(), info, "Calibration directory: " << calibdir);
+  if(m_prbits) {
+      std::stringstream ss;
+      ss << "in initCalibStore(...):"
+         << "\nInstrument  : " << env.instrument()
+         << "\nCalib dir   : " << calibdir 
+         << "\nCalib group : " << m_cgroup 
+         << "\nData source : " << m_str_src
+         << "\nRun number  : " << m_runnum 
+         << "\nPrint bits  : " << m_prbits 
+         << '\n';
+      
+      MsgLog(_name_(), info, ss.str());
+  }
 
-  //PSCalib::CalibPars* m_calibparsm_calibpars = PSCalib::CalibParsStore::Create(calibdir, group, m_src, runnum, prbits);
+  m_calibpars = PSCalib::CalibParsStore::Create(calibdir, m_cgroup, m_str_src, m_runnum, m_prbits);
 
   //m_peds_data = (m_do_peds) ? m_calibpars->pedestals()    : 0;
   //m_gain_data = (m_do_gain) ? m_calibpars->pixel_gain()   : 0;
@@ -171,7 +242,7 @@ ndarray<double,3> Detector::calib(ndarray<data_t,3> raw_data)
 }
 
 
-std::string Detector::env(boost::shared_ptr<PSEnv::Env> env)
+std::string Detector::str_inst(boost::shared_ptr<PSEnv::Env> env)
 {  
   return env->instrument().c_str();
 }
