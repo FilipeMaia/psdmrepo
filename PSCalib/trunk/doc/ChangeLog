@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-36
+2015-04-07 Mikhail S. Dubrovin	
+- GenericCalibPars.cpp - set default pixel_bkgd to 0,
+- CalibPars.cpp- add map_type2str[PIXEL_BKGD].
+
 Tag: V00-02-35
 2015-04-07 Mikhail S. Dubrovin	
 - CalibPars, CalibParsStore, GenericCalibPars - add support for calibration types pixel_mask, pixel_bkgd

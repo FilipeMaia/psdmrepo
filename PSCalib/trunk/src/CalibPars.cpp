@@ -140,6 +140,7 @@ CalibPars::fill_map_type2str()
   map_type2str[PIXEL_RMS]    = std::string("pixel_rms");
   map_type2str[PIXEL_GAIN]   = std::string("pixel_gain");
   map_type2str[PIXEL_MASK]   = std::string("pixel_mask");
+  map_type2str[PIXEL_BKGD]   = std::string("pixel_bkgd");
   map_type2str[COMMON_MODE]  = std::string("common_mode");
 }
 

@@ -204,7 +204,7 @@ GenericCalibPars<TBASE>::pixel_bkgd()
 {
   if (m_pixel_bkgd == 0) {
       std::string fname = getCalibFileName(PIXEL_BKGD);
-      if (size()) m_pixel_bkgd = new NDAIBKGD(fname, shape(), pixel_bkgd_t(1), m_prbits_type);
+      if (size()) m_pixel_bkgd = new NDAIBKGD(fname, shape(), pixel_bkgd_t(0), m_prbits_type);
       else        m_pixel_bkgd = new NDAIBKGD(fname, m_prbits_type);
   }
   return m_pixel_bkgd->get_ndarray().data();
