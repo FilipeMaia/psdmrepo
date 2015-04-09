@@ -1,0 +1,148 @@
+#!@PYTHON@
+
+import os
+import sys
+import psutil
+import time
+import argparse
+from guppy import hpy
+
+# see http://man7.org/linux/man-pages/man5/proc.5.html
+first37statFields = [(int,'pid'),
+                     (str,'comm'),
+                     (str,'state'),
+                     (int,'ppid'),
+                     (int,'pgrp'),
+                     (int,'session'),
+                     (int,'tty'),
+                     (int,'tpgid'),
+                     (int,'flags'),
+                     (int,'minflt'),
+                     (int,'cminflt'),
+                     (int,'majflt'),
+                     (int,'cmajflt'),
+                     (int,'utime'),
+                     (int,'stime'),
+                     (int,'cutime'),
+                     (int,'cstime'),
+                     (int,'priority'),
+                     (int,'nice'),
+                     (int,'num'),
+                     (int,'itrealvalue'),
+                     (int,'starttime'),
+                     (int,'vsize'),
+                     (int,'rss'),
+                     (int,'rsslim'),
+                     (int,'startcode'),
+                     (int,'endcode'),
+                     (int,'startstack'),
+                     (int,'kstkesp'),
+                     (int,'kstkeip'),
+                     (int,'signal'),
+                     (int,'blocked'),
+                     (int,'sigignore'),
+                     (int,'sigcatch'),
+                     (int,'wchan'),
+                     (int,'nswap'),
+                     (int,'cnswap')]
+
+def statSelf():
+    fields = file('/proc/self/stat').read().split()
+    global first37statFields
+    returnDict = {}
+    for typeKey in first37statFields:
+        tp, key = typeKey
+        returnDict[key] = tp(fields.pop(0))
+    return returnDict
+
+def processMachineReport(hp):
+    print hp.heap()
+    statDict = statSelf()
+    print "  /proc/self/stat: majflt=%s rss=%.2f vsize=%.2f mb" % (statDict['majflt'], statDict['rss'], statDict['vsize']/(1024*1024.0))
+
+def psanaMonit(numEventsToDo, eventKeys, eventIds, extract, dataset):
+    import psana
+    hp = hpy()
+    hp.setrelheap()  # start point, relative to this heap
+    ds = psana.DataSource(dataset)
+    print "---------- BEFORE RUNNING PSANA ON DATASET -------------"
+    processMachineReport(hp)
+    print "  psutil.mem: %s" % (psutil.virtual_memory(),)
+
+    if eventKeys:
+        print "---------- CONFIGURE EVENT KEYS ---------"
+        print "  " + "  \n".join(map(str,ds.env().configStore().keys()))
+
+    totalTime0 = time.time()
+    extractTime = 0
+    numEvents = -1
+    numRuns = -1
+    numSteps = -1
+    stopEarly = False
+    for run in ds.runs():
+        numRuns += 1
+        for step in ds.steps():
+            numSteps += 1
+            events = step.events()
+            for evt in events:
+                numEvents += 1
+                if numEvents > numEventsToDo and numEventsToDo > 0:
+                    stopEarly = True
+                    break
+                if eventIds or eventKeys:
+                    evId = evt.get(psana.EventId)
+                    sec,nsec = evId.time()
+                    print "-- run=%3.3d step=%4.4d event=%8.8d sec=%8d nsec=%8d fid=%d" % \
+                        (numRuns, numSteps, numEvents, sec, nsec, evId.fiducials())
+                if eventKeys or extract:
+                    for key in evt.keys():
+                        if key.type() is None: continue
+                        if eventKeys:
+                            print "  %s" % key
+                        if extract:
+                            t0=time.time()
+                            pyObj = evt.get(key.type(), key.src(), key.key())
+                            extractTime += time.time()-t0
+            if stopEarly: break
+        if stopEarly: break
+    totalTime = time.time()-totalTime0
+    rate = numEvents/totalTime
+    print "--------- SUMMARY ----------"
+    print "procssed %d events at %.2f Hz (%.2f sec)" % (numEvents, rate, totalTime)
+    if extract:
+        print "extraction tool %.2f %% of total time, or %.2f sec" % (100.0*extractTime/totalTime, extractTime)
+    processMachineReport(hp)
+    print "  psutil.mem: %s" % (psutil.virtual_memory(),)
+            
+
+programDescription = '''
+monitor psana as it goes through a dataset.
+'''
+
+programDescriptionEpilog = '''
+'''
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=programDescription, 
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    ########################
+    # server paramemeters
+    parser.add_argument('-n', '--numevents', type=int, help="number of events to process, default is all", default=0)
+    parser.add_argument('--trace',action='store_true', help="get trace output from psana", default=False)
+    parser.add_argument('--debug',action='store_true', help="get debug output from psana", default=False)
+    parser.add_argument('-k', '--eventkeys', action='store_true', help="print event keys", default=False)
+    parser.add_argument('-e', '--eventids', action='store_true', help="print event ids", default=False)
+    parser.add_argument('-x', '--extract', action='store_true', help="extract all data for each event key", default=False)
+    parser.add_argument('dataset', type=str, nargs='+', help="psana dataset or list of files")
+    #######################
+    
+    args = parser.parse_args()
+
+    if args.trace:
+        os.environ['MSGLOGCONFIG']='trace'
+    if args.debug:
+        os.environ['MSGLOGCONFIG']='debug'
+    psanaMonit(args.numevents, args.eventkeys, args.eventids, args.extract, args.dataset)
+    
+
