@@ -67,6 +67,13 @@ namespace {
 
 class LargeObjectProxy : public PSEvt::ProxyI, public boost::enable_shared_from_this<LargeObjectProxy> {
   public:
+  static boost::shared_ptr<LargeObjectProxy> makeLargeObjectProxy(const std::type_info *evKeyType,
+                                                                  SmallDataProxy::ObjId objId,
+                                                                  boost::shared_ptr<SmallDataProxy> parentProxy) {
+    return boost::shared_ptr<LargeObjectProxy>( new LargeObjectProxy(evKeyType, objId, parentProxy));
+  }
+
+  protected:
   LargeObjectProxy(const std::type_info *evKeyType,
                    SmallDataProxy::ObjId objId,
                    boost::shared_ptr<SmallDataProxy> parentProxy) :
@@ -78,7 +85,7 @@ class LargeObjectProxy : public PSEvt::ProxyI, public boost::enable_shared_from_
            << PSEvt::TypeInfoUtils::typeInfoRealName(evKeyType)
            << " objId=" << objId);
   }
-  protected:
+
   virtual boost::shared_ptr<void> getImpl(PSEvt::ProxyDictI* dict,
                                           const Pds::Src& source, 
                                           const std::string& key)
@@ -93,7 +100,7 @@ class LargeObjectProxy : public PSEvt::ProxyI, public boost::enable_shared_from_
     MsgLog(logger, DEBUGMSG, "LargeObjectProxy calling parentProxy.get for " 
            << evKey << " objId=" << m_objId);
     // we save a reference to ourselves before calling parent proxy because there
-    // is a small change the last reference to this proxy gets deleted before we
+    // is a small chance the last reference to this proxy gets deleted before we
     // return. This is because for items proxied in the configStore, the parentProxy
     // will replace this objects entry in the configStore.
     boost::shared_ptr<LargeObjectProxy> referenceToPreventDeleteBeforeReturn = this->shared_from_this();
@@ -128,8 +135,7 @@ SmallDataProxy::makeSmallDataProxy(const XtcInput::XtcFileName & smallXtcFileNam
 {
   boost::shared_ptr<SmallDataProxy> toReturn;
   if (not smallXtcFileName.small()) {
-    // it is intended that input modules will call this on large and small xtc files - we just
-    // silenty return a null pointer for the large files.
+    // return null pointer if this is not a small xtc file
     return toReturn;
   }
   boost::shared_ptr<PSEvt::Event> evtPtr;
@@ -149,7 +155,8 @@ SmallDataProxy::makeSmallDataProxy(const XtcInput::XtcFileName & smallXtcFileNam
 SmallDataProxy::SmallDataProxy(const XtcInput::XtcFileName &smallXtcFileName, bool liveMode,
                                unsigned liveTimeOut, XtcConverter &cvt,
                                boost::shared_ptr<PSEvt::Event> evt, 
-                               boost::shared_ptr<PSEnv::Env> env, unsigned optimalReadBytes)
+                               boost::shared_ptr<PSEnv::Env> env, 
+                               unsigned optimalReadBytes)
 
   : m_smallXtcFileName(smallXtcFileName)
   , m_liveMode(liveMode)
@@ -158,37 +165,37 @@ SmallDataProxy::SmallDataProxy(const XtcInput::XtcFileName &smallXtcFileName, bo
   , m_finalized(false)
   , m_optimalReadBytes(optimalReadBytes)
   , m_triedToOpen(false)
-  , m_evtForProxies(evt)
-  , m_env(env)
+  , m_evtForProxies(boost::weak_ptr<PSEvt::Event>(evt))
   , m_nextObjId(1)
 {   
   if (not m_smallXtcFileName.small()) {
     MsgLog(logger, fatal, "small xtc file" << m_smallXtcFileName << " is not small");
     return;
   }
-  boost::filesystem::path parentDir = 
+  boost::filesystem::path smallDataDir = 
     boost::filesystem::path(m_smallXtcFileName.path()).parent_path();
-  if (not boost::algorithm::ends_with(parentDir.string(), std::string("smalldata"))) {
+  if (not boost::algorithm::ends_with(smallDataDir.string(), std::string("smalldata"))) {
     MsgLog(logger, fatal, "small data file in not in a directory called "
-           << "'smalldata', path is" << m_smallXtcFileName);
+           << "'smalldata', path is: " << m_smallXtcFileName);
     return;
   }
   if (m_liveMode and (m_liveTimeOut == 0)) {
     MsgLog(logger, warning, "live mode identified but liveTimeOut is 0, setting liveMode to False");
     m_liveMode = false;
   }
-  std::string largeDataDir = parentDir.parent_path().string();
   std::string largeBaseName = m_smallXtcFileName.largeBasename();
   if (m_liveMode and (not boost::algorithm::ends_with(largeBaseName, ".inprogress"))) {
     // in live mode, the small and large files may be arriving at different times. We want to first
     // check for an inprogress file
     largeBaseName += ".inprogress";
   }
-  m_largeXtcFileName = XtcInput::XtcFileName(largeDataDir + "/" + largeBaseName);
+  boost::filesystem::path largeDataDir = smallDataDir.parent_path();
+  boost::filesystem::path largeDataPath = largeDataDir / largeBaseName;
+  m_largeXtcFileName = XtcInput::XtcFileName(largeDataPath.string());
 
-  m_configStoreForProxies = env->configStore().shared_from_this();
+  m_configStoreForProxies = boost::weak_ptr<PSEnv::EnvObjectStore>(env->configStore().shared_from_this());
   boost::shared_ptr<PSEvt::AliasMap> aliasMap = env->aliasMap();
-  m_evtForLargeData = boost::make_shared<PSEvt::Event>(boost::make_shared<PSEvt::ProxyDict>(aliasMap));
+  m_evtForLargeData.reset(new PSEvt::Event(boost::make_shared<PSEvt::ProxyDict>(aliasMap)));
   boost::shared_ptr<PSEvt::ProxyDictHist> proxyDictHist = boost::make_shared<PSEvt::ProxyDictHist>(aliasMap);
 }
 
@@ -271,7 +278,7 @@ void SmallDataProxy::addEventProxy(const boost::shared_ptr<Pds::Xtc>& origXtc,
 {
   boost::shared_ptr<Pds::Xtc> xtc = uncompressIfNeeded(origXtc);
   if (addProxyChecksFailed(xtc, m_cvt)) return;
-  if (not m_evtForProxies) {
+  if (m_evtForProxies.expired()) {
     MsgLog(logger, error, "addEventProxy called for null event");
     return;
   }
@@ -295,14 +302,19 @@ void SmallDataProxy::addEventProxy(const boost::shared_ptr<Pds::Xtc>& origXtc,
   MsgLog(logger, DEBUGMSG, "  addEventProxy - assigned objId=" << objId);
   std::vector<const std::type_info *>::iterator curType;
 
+  boost::shared_ptr<PSEvt::Event> evtForProxies = m_evtForProxies.lock();
+  if (not evtForProxies) {
+    MsgLog(logger, error, "addEventProxy - the Event is null.");
+    return;
+  }
   for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
     PSEvt::EventKey curEventKey(*curType, src, "");
     boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
-      boost::make_shared<LargeObjectProxy>(*curType,
-                                           objId,
-                                           this->shared_from_this());
+      LargeObjectProxy::makeLargeObjectProxy(*curType,
+                                             objId,
+                                             this->shared_from_this());
     try {
-      m_evtForProxies->proxyDict()->put(largeObjProxy, curEventKey);
+      evtForProxies->proxyDict()->put(largeObjProxy, curEventKey);
     } catch (PSEvt::ExceptionDuplicateKey &) {
       MsgLog(logger, warning, "smallData duplicate Exception while adding " << curEventKey 
              << " to the user event for proxies - ignoring.");
@@ -339,13 +351,20 @@ void SmallDataProxy::addEnvProxy(const boost::shared_ptr<Pds::Xtc>& origXtc,
 
   std::vector<const std::type_info *>::iterator curType;
 
+  boost::shared_ptr<PSEnv::EnvObjectStore> configStoreForProxies = m_configStoreForProxies.lock();
+  
+  if (not configStoreForProxies) {
+    MsgLog(logger, error, "could not lock configStore pointer in addEnvProxy");
+    return;
+  }
+
   for (curType = typeInfoPtrs.begin(); curType != typeInfoPtrs.end(); ++curType) {
     PSEvt::EventKey curEventKey(*curType, src, "");
     boost::shared_ptr<LargeObjectProxy> largeObjProxy = \
-      boost::make_shared<LargeObjectProxy>(*curType,
-                                           objId,
-                                           this->shared_from_this());
-    m_configStoreForProxies->proxyDict()->put(largeObjProxy, curEventKey);
+      LargeObjectProxy::makeLargeObjectProxy(*curType,
+                                             objId,
+                                             this->shared_from_this());
+    configStoreForProxies->proxyDict()->put(largeObjProxy, curEventKey);
   }
 }
 
@@ -468,7 +487,7 @@ std::string SmallDataProxy::dumpStr() {
     if (m_groups.size()>0) msg << std::endl;
     std::list<PSEvt::EventKey>::iterator pos;
     // dump keys in evtForLargeData:
-    if (not m_evtForLargeData) {
+    if (not m_evtForLargeData.get()) {
       msg << "  evtForLargeData is null" << std::endl;
     } else {
       std::list<PSEvt::EventKey> largeEvtKeys = m_evtForLargeData->keys();
@@ -482,10 +501,11 @@ std::string SmallDataProxy::dumpStr() {
       }
     } 
     // dump keys in evtForProxies
-    if (not m_evtForProxies) {
+    boost::shared_ptr<PSEvt::Event> evtForProxies = m_evtForProxies.lock();
+    if (not evtForProxies) {
       msg << "  evtForProxies is null" << std::endl;
     } else {
-      std::list<PSEvt::EventKey> usrEvtKeys = m_evtForProxies->keys();
+      std::list<PSEvt::EventKey> usrEvtKeys = evtForProxies->keys();
       if (usrEvtKeys.size()==0) {
         msg << "  evtForProxies is empty" << std::endl;
       } else {
@@ -575,6 +595,11 @@ void SmallDataProxy::loadGroup(GroupId groupId) {
     return;
   }
   std::vector<ObjId> groupIds = groupData.ids;
+  boost::shared_ptr<PSEnv::EnvObjectStore> configStoreForProxies = m_configStoreForProxies.lock();
+  if (not configStoreForProxies) {
+    MsgLog(logger, fatal, "loadGroup - configStore pointer is null");
+    return;
+  }
   for (unsigned objIdx = 0; objIdx < numberIdsInGroup; ++objIdx) {
     ObjId & objId = groupIds.at(objIdx);
     ObjData & objData = m_ids[objId];
@@ -603,7 +628,7 @@ void SmallDataProxy::loadGroup(GroupId groupId) {
              << " SKIPPING");
       continue;
     }
-    xtcConvert(xtc, m_evtForLargeData.get(), *m_configStoreForProxies);
+    xtcConvert(xtc, m_evtForLargeData.get(), *configStoreForProxies);
   }
 }
 
@@ -626,7 +651,11 @@ boost::shared_ptr<void> SmallDataProxy::get(ObjId objId, const PSEvt::EventKey &
     groupData.loaded = true;
   }  
   boost::shared_ptr<void> ptrFromEvent = m_evtForLargeData->proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL);
-  boost::shared_ptr<void> ptrFromConfigStore = m_configStoreForProxies->proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL);
+  boost::shared_ptr<PSEnv::EnvObjectStore> configStoreForProxies = m_configStoreForProxies.lock();
+  if (not configStoreForProxies) {
+    MsgLog(logger, fatal, "get: configStoreForProxies is null");
+  }
+  boost::shared_ptr<void> ptrFromConfigStore = configStoreForProxies->proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL);
   if (ptrFromEvent and ptrFromConfigStore) {
     MsgLog(logger, error, "Unexpected: small data proxy has loaded same event key into both event and configstore? key=" 
            << eventKey << " returning event object.");

@@ -81,7 +81,7 @@ namespace psddl_pds2psana {
  *     same group. One read operation is done for the group, and all 3 cameras are dispatched - as
  *     described below.
  *  3) If the group has not been loaded, it is read from disk
- *  4) A shared point to the xtc for this object is created, sharing ownership with the block of
+ *  4) A shared pointer to the xtc for this object is created, sharing ownership with the block of
  *     memory read from disk.
  *  5) This xtc is then dispatched - using the pds2psana DDL back-end generated dispatch routine.
  *  5) Since the backend dispatch routine requires an event to put its result into, and since
@@ -230,9 +230,9 @@ public:
   unsigned m_optimalReadBytes;
   bool m_triedToOpen;
   XtcInput::SharedFile m_largeFile;
-  boost::shared_ptr<PSEvt::Event> m_evtForProxies, m_evtForLargeData;
-  boost::shared_ptr<PSEnv::Env> m_env;
-  boost::shared_ptr<PSEnv::EnvObjectStore> m_configStoreForProxies;
+  boost::weak_ptr<PSEvt::Event> m_evtForProxies;
+  std::auto_ptr<PSEvt::Event> m_evtForLargeData;
+  boost::weak_ptr<PSEnv::EnvObjectStore> m_configStoreForProxies;
 
 
   ObjId m_nextObjId;
