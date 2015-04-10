@@ -224,14 +224,14 @@ class SegGeometryMatrixV1(SegGeometry) :
         return sp.x_pix_arr_um, sp.y_pix_arr_um, sp.z_pix_arr_um
 
     def get_seg_xy_maps_um_with_offset(sp) : 
-        if  sp.x_pix_arr_um_offset == None :
+        if  sp.x_pix_arr_um_offset is None :
             x_min_um, y_min_um, z_min_um = sp.get_xyz_min_um()
             sp.x_pix_arr_um_offset = sp.x_pix_arr_um - x_min_um
             sp.y_pix_arr_um_offset = sp.y_pix_arr_um - y_min_um
         return sp.x_pix_arr_um_offset, sp.y_pix_arr_um_offset
 
     def get_seg_xyz_maps_um_with_offset(sp) : 
-        if  sp.x_pix_arr_um_offset == None :
+        if  sp.x_pix_arr_um_offset is None :
             x_min_um, y_min_um, z_min_um = sp.get_xyz_min_um()
             sp.x_pix_arr_um_offset = sp.x_pix_arr_um - x_min_um
             sp.y_pix_arr_um_offset = sp.y_pix_arr_um - y_min_um

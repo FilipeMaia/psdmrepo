@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-37
+2015-04-09 Mikhail S. Dubrovin	
+- in *.py replace !=None -> is not None, ==None -> is None 
+
 Tag: V00-02-36
 2015-04-07 Mikhail S. Dubrovin	
 - GenericCalibPars.cpp - set default pixel_bkgd to 0,
