@@ -55,7 +55,7 @@ from CalibManager.GlobalUtils import ready_to_start
 
 def subproc_submit(command_seq, logname=None, env=None, shell=False) :
     # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
-    log = subprocess.PIPE if logname==None else open(logname, 'w')
+    log = subprocess.PIPE if logname is None else open(logname, 'w')
     p = subprocess.Popen(command_seq, stdout=log, stderr=subprocess.PIPE, env=env, shell=shell) #, stdin=subprocess.STDIN
     #p.wait()
     #err = p.stderr.read() # reads entire file

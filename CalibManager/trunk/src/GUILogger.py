@@ -167,7 +167,7 @@ class GUILogger ( QtGui.QWidget ) :
         #try    : del cp.guilogger # GUILogger
         #except : pass
 
-        #if cp.guilogger!=None :
+        #if cp.guilogger is not None :
         #    del cp.guilogger
         #    cp.guilogger = None
 

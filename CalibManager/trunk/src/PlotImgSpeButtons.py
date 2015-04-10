@@ -81,8 +81,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         else :
             self.fig = widgimage.fig
 
-        if help_msg==None : self.help_msg = self.help_message()
-        else              : self.help_msg = help_msg
+        if help_msg is None : self.help_msg = self.help_message()
+        else                : self.help_msg = help_msg
 
         tit_more_less  = '&Less' if expand else '&More'
         self.but_more  = QtGui.QPushButton(tit_more_less)
@@ -301,12 +301,12 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
 
     def stringOrNone(self,value):
-        if value == None : return 'None'
+        if value is None : return 'None'
         else             : return str(value)
 
 
     def intOrNone(self,value):
-        if value == None : return None
+        if value is None : return None
         else             : return int(value)
 
     def set_buttons(self) :
@@ -359,7 +359,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         
         file_filter = 'Files (*.txt *.data *.npy)\nAll files (*)'
         path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with image', filter=file_filter)
-        if path == None or path == '' :
+        if path is None or path == '' :
             logger.info('Loading is cancelled...', __name__ )
             return
 
@@ -399,7 +399,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
         file_filter = 'Files (*.txt *.data *.npy)\nAll files (*)'
         path = gu.get_open_fname_through_dialog_box(self, path0, 'Select file to subtract', filter=file_filter)
-        if path == None or path == '' :
+        if path is None or path == '' :
             logger.info('Loading is cancelled...', __name__ )
             return
 
@@ -424,7 +424,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         path  = str( QtGui.QFileDialog.getSaveFileName(self,
                                                        caption='Select file to save the plot',
                                                        directory = path,
-                                                       filter = '*.png, *.eps, *pdf, *.ps'
+                                                       filter = '*.png *.eps *pdf *.ps'
                                                        ) )
         if path == '' :
             logger.debug('Saving is cancelled.', __name__ )

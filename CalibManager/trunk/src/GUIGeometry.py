@@ -136,7 +136,7 @@ class GUIGeometry ( QtGui.QWidget ) :
 
 
     def makeTabBar(self,mode=None) :
-        #if mode != None : self.tab_bar.close()
+        #if mode is not None : self.tab_bar.close()
         self.tab_bar = QtGui.QTabBar()
 
         #Uses self.list_tab_titles

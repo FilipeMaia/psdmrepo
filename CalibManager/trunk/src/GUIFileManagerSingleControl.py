@@ -410,7 +410,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         else :
             file_filter = 'Files (*.txt *.data *.dat HISTORY)\nAll files (*)'
             path = gu.get_open_fname_through_dialog_box(self, path0, 'Select file', filter=file_filter)
-            if path == None or path == '' :
+            if path is None or path == '' :
                 logger.debug('File selection is cancelled...', __name__ )
                 return
 

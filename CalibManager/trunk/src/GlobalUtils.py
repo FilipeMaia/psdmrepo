@@ -72,11 +72,11 @@ from CalibFileFinder import *
 #-----------------------------
 
 def stringOrNone(value):
-    if value == None : return 'None'
+    if value is None : return 'None'
     else             : return str(value)
 
 def intOrNone(value):
-    if value == None : return None
+    if value is None : return None
     else             : return int(value)
 
 #-----------------------------
@@ -521,7 +521,7 @@ def list_of_calib_files_with_run_range(list_of_files) :
 
 
         #beg = begin_run_from_calib_fname(file)
-        #if beg == None : continue
+        #if beg is None : continue
         #dic_num_file[beg] = fname
 
 
@@ -780,7 +780,7 @@ def selectRadioButtonInPopupMenu(dict_of_pars, win_title='Select option', do_con
 #----------------------------------
 
 def get_array_from_file(fname, dtype=np.float32) :
-    if fname==None or fname=='' :
+    if fname is None or fname=='' :
         logger.warning('File name is not specified...', __name__)         
         return None
         

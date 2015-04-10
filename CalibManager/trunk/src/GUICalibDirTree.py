@@ -116,7 +116,7 @@ class GUICalibDirTree (QtGui.QWidget):
         vbox = QtGui.QVBoxLayout()
         vbox.addWidget(self.view)
 
-        if parent == None :
+        if parent is None :
             self.setLayout(vbox)
 
         self.connect(self.view.selectionModel(), QtCore.SIGNAL('currentChanged(QModelIndex, QModelIndex)'), self.itemSelected)

@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-09 Mikhail S. Dubrovin
+Tag: V00-00-86
+- in *.py replace ==None -> is None, !=None -> is not None
+	
 2015-03-30 Mikhail S. Dubrovin
 Tag: V00-00-85
 - in Frame add method setBoarderVisible

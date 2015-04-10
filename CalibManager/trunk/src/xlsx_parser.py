@@ -152,7 +152,7 @@ def get_single_worksheet(arc, fname):
                 #print '    point  X, Y, Z : %2s %10s  %10s  %10s' % (point, X, Y, Z)
                 txt += '%2s %7s %7s %7s\n' % (point, X, Y, Z)
 
-            if point == None : point = 0 # skip 1st record, that is a title
+            if point is None : point = 0 # skip 1st record, that is a title
 
     # Add header 
 

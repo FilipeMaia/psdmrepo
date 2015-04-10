@@ -177,7 +177,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
     def onSave(self):
         logger.debug('onSave', __name__)
         path = gu.get_save_fname_through_dialog_box(self, self.fname, 'Select file to save', filter='*.txt')
-        if path == None or path == '' : return
+        if path is None or path == '' : return
         text = str(self.box_txt.toPlainText())
         logger.info('Save in file:\n'+text, __name__)
         f=open(path,'w')
@@ -192,7 +192,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         if len(self.list_of_files) > 1 : path0 = self.list_of_files[1]
 
         path = gu.get_open_fname_through_dialog_box(self, path0, 'Select text file for browser', filter='Text files (*.txt *.dat *.data *.cfg *.npy)\nAll files (*)')
-        if path == None or path == '' or path == path0 :
+        if path is None or path == '' or path == path0 :
             logger.debug('Loading is cancelled...', __name__ )
             return
 

@@ -355,7 +355,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             #print msg
 
             #self.img_arr = self.get_image_array_from_file(fname)
-            #if self.img_arr == None :
+            #if self.img_arr is None :
             #    return
 
             #print arr.shape,'\n', arr.shape
