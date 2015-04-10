@@ -234,7 +234,7 @@ class GUIViewControl ( QtGui.QWidget ) :
 
 
     def setFileName(self, fname=None) :
-        if fname == None : pass
+        if fname is None : pass
         else : cp.res_fname.setValue(fname)
 
 
@@ -624,7 +624,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.tau_val = self.list_of_tau[self.tau_ind]
         logger.info('onSliderReleased: ' + self.stringTau() , __name__)
 
-        if cp.plotimgspe_g != None :
+        if cp.plotimgspe_g is not None :
             self.redrawPlot()            
 
     def on_cbx(self):

@@ -14,7 +14,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Center')
 
-        if str_of_pars != None : 
+        if str_of_pars is not None : 
             xc,yc,xe,ye,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
             self.isSelected    = s
             self.myType        = t
@@ -23,7 +23,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
             xarr, yarr = self.get_xy_arrays_for_center_sign(xc,yx,xe,ye)
             lines.Line2D.__init__(self,  xarr,  yarr, linewidth=lw, color=col, picker=picker)
 
-        elif x == None or y == None : # Default line initialization
+        elif x is None or y is None : # Default line initialization
             xc,yc=(10,10)
             xarr, yarr = self.get_xy_arrays_for_center_sign(xc,yc,xerr,yerr)
             lines.Line2D.__init__(self, xarr, yarr, linewidth=linewidth, color=color, picker=picker)
@@ -241,7 +241,7 @@ class DragCenter( Drag, lines.Line2D ) : # lines.Line2D ) :
         #print 'Set new center coordinates xc, yc=' + str(self.xc) + ', ' +  str(self.yc) 
         #self.emit( QtCore.SIGNAL('new_xy_center(int,int)'), self.xc, self.yc)        
         self.on_release_graphic_manipulations()
-        #if self.press != None : self.print_pars()
+        #if self.press is not None : self.print_pars()
         self.press = None
 
 #-----------------------------

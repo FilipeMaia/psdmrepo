@@ -190,7 +190,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         except :
             logger.debug('except and open', __name__)
             arr = gu.get_array_from_file(fnm.path_blem())
-            if arr == None : return
+            if arr is None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_blem_plot())
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget().pos()
@@ -208,7 +208,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         except :
             img_fname = fnm.path_data_ave()
             logger.info( 'Open Mask Editor for image from file: ' + img_fname, __name__)
-            if img_fname == None : return
+            if img_fname is None : return
             #if ! os.path.exists(img_fname) : return
 
             #xy_beam0_img = self.xyLabToImg((cp.x_coord_beam0.value(), cp.y_coord_beam0.value()))

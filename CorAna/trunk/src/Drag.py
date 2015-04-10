@@ -145,7 +145,7 @@ class Drag () : # ( QtCore.QObject )
         #print 'select_deselect_obj() : self.isRemoved = ', self.isRemoved
 
         if not self.isInitialized             : return
-        if self.press == None                 : return
+        if self.press is None                 : return
         self.isChanged = True
 
         if self.get_mode() != self.modeSelect : return

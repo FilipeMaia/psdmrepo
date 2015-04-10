@@ -15,7 +15,7 @@ class DragPolygon( Drag, lines.Line2D ) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Polygon')
 
-        if str_of_pars != None : # Initialization for input from file
+        if str_of_pars is not None : # Initialization for input from file
             t,lw,col,s,r,nvtx,self.xarr,self.yarr = self.parse_str_of_pars(str_of_pars)
             self.isSelected    = s
             self.myType        = t
@@ -24,7 +24,7 @@ class DragPolygon( Drag, lines.Line2D ) :
             lines.Line2D.__init__(self, self.xarr, self.yarr, linewidth=lw, color=col, picker=picker)
             #self.print_pars()
 
-        elif x == None or y == None : # Default line initialization
+        elif x is None or y is None : # Default line initialization
             lines.Line2D.__init__(self, (0,1), (0,1), linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
         else :
@@ -189,8 +189,8 @@ class DragPolygon( Drag, lines.Line2D ) :
 
         if self.isInitialized  :
             self.on_release_graphic_manipulations()
-            #if self.press != None : self.print_pars()
-            if self.press != None : self.maskIsAvailable = False        
+            #if self.press is not None : self.print_pars()
+            if self.press is not None : self.maskIsAvailable = False        
             self.press = None
 
         else : # if not self.isInitialized
@@ -205,8 +205,8 @@ class DragPolygon( Drag, lines.Line2D ) :
                 self.set_data(self.xarr,self.yarr)
     
                 self.on_release_graphic_manipulations()
-                #if self.press != None : self.print_pars()
-                if self.press != None : self.maskIsAvailable = False        
+                #if self.press is not None : self.print_pars()
+                if self.press is not None : self.maskIsAvailable = False        
                 self.press = None
 
 #-----------------------------

@@ -64,7 +64,7 @@ class EventTimeRecords :
     def get_time_record_list_from_file(self):
         logger.debug('on_but_tspl', __name__)
         list_recs = gu.get_text_list_from_file(self.fname)
-        if list_recs == None :
+        if list_recs is None :
             self.list_vals = None 
             return
         #list_recs[1][:] = ['1', '8.026429', '8.026429', '20120616-080244.698036743', '8255', '1', '1']

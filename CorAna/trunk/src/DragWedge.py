@@ -15,7 +15,7 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
         If width is given, then a partial wedge is drawn from inner radius r - width to outer radius r."""
         Drag.__init__(self, linewidth, color, linestyle, my_type='Wedge')
 
-        if str_of_pars != None : 
+        if str_of_pars is not None : 
             x,y,r0,w,t1,t2,lw,col,s,t,rem = self.parse_str_of_pars(str_of_pars)
             self.center = (xc,yc) = (x,y)
             self.isSelected    = s
@@ -23,12 +23,12 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
             self.isRemoved     = rem
             self.isInitialized = True
 
-        elif xy == None :      # Default initialization
+        elif xy is None :      # Default initialization
             self.center = (xc,yc) = (10,10)
             r0, w, t1, t2, col = 10, width, theta1, theta2, color 
             self.isInitialized = False
 
-        elif radius == None : # Semi-default initialization
+        elif radius is None : # Semi-default initialization
             self.center = (xc,yc) = xy
             r0, w, t1, t2, col = 10, width, theta1, theta2, color 
             self.isInitialized = False
@@ -446,8 +446,8 @@ class DragWedge( Drag, lines.Line2D ) :  #patches.CirclePolygon
     #    'on release we reset the press data'
         self.set_standard_wedge_parameters()
         self.on_release_graphic_manipulations()
-        #if self.press != None : self.print_pars()
-        if self.press != None : self.maskIsAvailable = False        
+        #if self.press is not None : self.print_pars()
+        if self.press is not None : self.maskIsAvailable = False        
         self.press = None
 
 

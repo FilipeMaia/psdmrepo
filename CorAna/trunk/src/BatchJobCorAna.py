@@ -198,7 +198,7 @@ class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in o
 
     def remove_files_cora_proc(self, ind=None) :
 
-        if ind == None :
+        if ind is None :
             self.list_of_files_to_remove = fnm.get_list_of_files_cora_proc_work() + \
                                            fnm.get_list_of_files_cora_proc_work_log()
             self.list_of_files_to_remove.append(fnm.path_cora_proc_tau_out()) 
@@ -235,7 +235,7 @@ class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in o
     def get_batch_job_cora_proc_time_string(self, ind) :
         #print 'ind:', ind
         time_sub_sec = self.list_for_proc[ind][2]
-        if time_sub_sec == None : return 'Time N/A'
+        if time_sub_sec is None : return 'Time N/A'
         return gu.get_local_time_str(time_sub_sec, fmt='%Y-%m-%d %H:%M:%S')
 
 #-----------------------------

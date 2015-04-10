@@ -97,12 +97,12 @@ class FileNameManager :
 
     def str_exp_run_for_xtc_path(self, path) :
         instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
-        if experiment == None : return 'exp-run-'
+        if experiment is None : return 'exp-run-'
         else                  : return experiment + '-' + run_str + '-'
 
     def str_run_for_xtc_path(self, path) :
         instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
-        if run_str == None : return 'run-'
+        if run_str is None : return 'run-'
         else               : return run_str + '-'
 
 #-----------------------------

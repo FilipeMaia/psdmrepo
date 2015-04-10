@@ -80,7 +80,7 @@ class Parameter :
 #---------------------
 
     def setValue ( self, val=None ) :
-        if val == None :
+        if val is None :
             self._value = self._value_def
         else :
             if   self._type == 'str' :
@@ -207,7 +207,7 @@ class ConfigParameters :
     def declareListOfPars( self, list_name='EMPTY_LIST', list_val_def_type=None ) :
         list_of_pars = []
 
-        if list_val_def_type == None : return None
+        if list_val_def_type is None : return None
 
         for index,rec in enumerate(list_val_def_type) :
             name = list_name + ':' + str(index)
@@ -255,7 +255,7 @@ class ConfigParameters :
 #---------------------------------------
 
     def setParsFileName(self, fname=None) :
-        if fname == None :
+        if fname is None :
             self.fname = self.fname_cp.value()
         else :
             self.fname = fname

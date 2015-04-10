@@ -87,7 +87,7 @@ class RecordsFromFiles :
 
     def get_intens_stat_q_bins_arr(self) :
         """Returns <I>(t, q-static) 2D array"""
-        #if self.intens_stat_q_bins_vs_t != None : return self.intens_stat_q_bins_vs_t
+        #if self.intens_stat_q_bins_vs_t is not None : return self.intens_stat_q_bins_vs_t
 
         if not os.path.exists(self.fname_int_stat_q) :
             msg = 'The file: %s is not available' % (self.fname_int_stat_q)
@@ -96,7 +96,7 @@ class RecordsFromFiles :
 
         self.intens_stat_q_bins_vs_t = gu.get_array_from_file(self.fname_int_stat_q)[:,1:] # trim column with event number
 
-        if self.intens_stat_q_bins_vs_t != None :
+        if self.intens_stat_q_bins_vs_t is not None :
             logger.info('I(t,q-stat) is taken from file ' + fnm.path_cora_split_int_static_q(), __name__)
             return self.intens_stat_q_bins_vs_t
         else :
@@ -148,7 +148,7 @@ class RecordsFromFiles :
     def get_imon_cfg_pars(self) :
         logger.info('get_imon_cfg_pars', __name__)
         list_recs = gu.get_text_list_from_file(self.fname_imon_cfg)
-        if list_recs == None :
+        if list_recs is None :
             self.list_of_imon_cfg_pars = None 
             return
 
@@ -183,7 +183,7 @@ class RecordsFromFiles :
     def getIMonArray(self,imon):
         logger.info('getIMonArray for imon %d '%(imon), __name__)
         arr_all = gu.get_array_from_file(self.fname_imon)
-        if arr_all == None : return None
+        if arr_all is None : return None
         logger.info('Array shape: ' + str(arr_all.shape), __name__)
 
         ibase    = 1+imon*4
@@ -222,7 +222,7 @@ class RecordsFromFiles :
 
     def get_data_ave_array(self) :    
         arr = gu.get_array_from_file(self.fname_data_ave)
-        if arr == None : return np.ones((self.rows,self.cols), dtype=np.uint8)
+        if arr is None : return np.ones((self.rows,self.cols), dtype=np.uint8)
         return arr
 
 #-----------------------------

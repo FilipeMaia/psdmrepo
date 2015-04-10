@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2015-04-09 Mikhail S. Dubrovin
+- in *.py replace !=None -> is not None, ==None -> is None
+	
 Tag: V00-00-21
 2015-01-13 Mikhail S. Dubrovin
 - MaskEditorButtons.py - extend option -m to save the mask as a *.npy file

@@ -119,7 +119,7 @@ class PlotGraphWidget (QtGui.QWidget) :
 
     def set_arrays_to_plot(self) :
 
-        if self.arr_x == None : self.arrx = np.arange(self.arrsy.shape[1])
+        if self.arr_x is None : self.arrx = np.arange(self.arrsy.shape[1])
         else :                  self.arrx = self.arr_x
 
         bin_range   = (self.arr_n[0], self.arr_n[-1], self.nbins)
@@ -183,7 +183,7 @@ class PlotGraphWidget (QtGui.QWidget) :
 
         self.arrsy, self.arr_x, self.arr_n = self.arrays
 
-        if self.arr_n != None :
+        if self.arr_n is not None :
             #self.axgr = self.fig.add_axes([0.08, 0.08, 0.6, 0.8]) # [x0, y0, width, height]
             self.on_draw_multigraphs()
             self.set_xyaxes_limits(self.arrx, np.array(self.list_of_arr_y).flatten(), gr_xmin, gr_xmax, gr_ymin, gr_ymax)
@@ -214,18 +214,18 @@ class PlotGraphWidget (QtGui.QWidget) :
 
     def set_xyaxes_limits(self, arrx, arry, gr_xmin=None, gr_xmax=None, gr_ymin=None, gr_ymax=None):
 
-        if gr_xmin==None : xmin = arrx[0]
+        if gr_xmin is None : xmin = arrx[0]
         else             : xmin = gr_xmin
 
-        if gr_xmax==None : xmax = arrx[-1] # Last element
+        if gr_xmax is None : xmax = arrx[-1] # Last element
         else             : xmax = gr_xmax
 
         if xmin==xmax : xmax=xmin+1 # protection against equal limits
 
-        if gr_ymin==None : ymin = 0 # min(yarr)
+        if gr_ymin is None : ymin = 0 # min(yarr)
         else             : ymin = gr_ymin
 
-        if gr_ymax==None : ymax = 1.05*max(arry)
+        if gr_ymax is None : ymax = 1.05*max(arry)
         else             : ymax = gr_ymax
 
         self.axgr.set_xlim(xmin,xmax) 
@@ -258,7 +258,7 @@ class PlotGraphWidget (QtGui.QWidget) :
 
     def on_draw_onegraph(self):
         self.arr_y, self.arr_x, self.arr_n = self.arrays
-        if self.arr_n != None : return
+        if self.arr_n is not None : return
         self.axgr.plot(self.arr_x, self.arr_y, '-bo')
 
 

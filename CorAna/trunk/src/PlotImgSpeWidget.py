@@ -95,7 +95,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
         self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
   
-        if self.arr != None : self.on_draw()
+        if self.arr is not None : self.on_draw()
 
 
     def connectZoomMode(self):
@@ -188,7 +188,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         """Redraws the figure"""
 
         rows,cols = self.arr.shape
-        if xmin == None or xmax == None or ymin == None or ymax == None :
+        if xmin is None or xmax is None or ymin is None or ymax is None :
             self.arrwin  = self.arr
             if self.y_is_flip : self.range = [0,cols,0,rows] # original image range in pixels
             else              : self.range = None # original image range in pixels
@@ -211,7 +211,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         zmin = self.floatOrNone(zmin)
         zmax = self.floatOrNone(zmax)
 
-        if zmin==None and zmax==None : self.range_his = None
+        if zmin is None and zmax is None : self.range_his = None
         else                         : self.range_his = (zmin,zmax)
 
         #print 'self.range_his = ', self.range_his
@@ -239,7 +239,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.arr2d = np.log10(self.arrwin)
         #self.arr2d = self.arrwin
 
-        if self.range_his == None : 
+        if self.range_his is None : 
             vmin, vmax = np.min(self.arrwin), np.max(self.arrwin)
         else :
             vmin, vmax = self.range_his
@@ -296,7 +296,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.arr2d = np.log10(self.arrwin)
         #self.arr2d = self.arrwin
 
-        if self.range_his == None : 
+        if self.range_his is None : 
             vmin, vmax = np.min(self.arrwin), np.max(self.arrwin)
         else :
             vmin, vmax = self.range_his
@@ -634,12 +634,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
 
     def stringOrNone(self,value):
-        if value == None : return 'None'
+        if value is None : return 'None'
         else             : return str(value)
 
 
     def floatOrNone(self,value):
-        if value == None : return None
+        if value is None : return None
         else             : return float(value) # return int(value)
 
 

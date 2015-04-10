@@ -68,7 +68,7 @@ class BatchJob :
 
     def job_was_recently_submitted(self, t_sub, comment='') :
 
-        if t_sub == None : return False
+        if t_sub is None : return False
 
         if gu.get_time_sec() - t_sub > self.time_interval_sec :
             return False
@@ -82,7 +82,7 @@ class BatchJob :
 
     def check_batch_job(self, job_id, comment='') :
 
-        if job_id == None :
+        if job_id is None :
             logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
             return
 
@@ -96,7 +96,7 @@ class BatchJob :
 
     def kill_batch_job(self, job_id, comment='') :
 
-        if job_id == None :
+        if job_id is None :
             #logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
             return
 
@@ -110,7 +110,7 @@ class BatchJob :
 
     def get_batch_job_status(self, job_id, comment='') :
 
-        if job_id == None :
+        if job_id is None :
             self.batch_job_status = None
         else :
             self.batch_job_status = gu.batch_job_status(job_id, cp.bat_queue.value())
@@ -123,7 +123,7 @@ class BatchJob :
 
     def get_batch_job_status_and_string(self, job_id, time_sec, comment='') :
 
-        if job_id == None :
+        if job_id is None :
             return 'None', 'Batch job was not submitted in this session.'
 
         time_str = gu.get_local_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S')

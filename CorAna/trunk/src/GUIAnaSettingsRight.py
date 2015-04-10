@@ -328,7 +328,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         except :
             img_fname = fnm.path_data_ave()
             logger.info( 'Open Mask Editor for image from file: ' + img_fname, __name__)
-            if img_fname == None : return
+            if img_fname is None : return
 
             #xy_beam0_img = self.xyLabToImg((cp.x_coord_beam0.value(), cp.y_coord_beam0.value()))
             xy_beam0_img = (cp.x_coord_beam0.value(), cp.y_coord_beam0.value())
@@ -366,7 +366,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         path = fnm.path_roi_mask()
         #print 'path_roi_mask()', path
 
-        if path == None : dname, fname = cp.ana_mask_fname.value_def(), cp.ana_mask_dname.value_def()
+        if path is None : dname, fname = cp.ana_mask_fname.value_def(), cp.ana_mask_dname.value_def()
         else            : dname, fname = os.path.split(path)
 
         path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )

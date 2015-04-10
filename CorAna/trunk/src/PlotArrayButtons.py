@@ -57,7 +57,7 @@ class PlotArrayButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ofname    = ofname
 
-        if widgimage == None :
+        if widgimage is None :
             self.widgimage          = self
             self.widgimage.nbins    = 100
             self.widgimage.gridIsOn = True
@@ -65,8 +65,8 @@ class PlotArrayButtons (QtGui.QWidget) :
         else :
             self.widgimage = widgimage
 
-        if help_msg==None : self.help_msg = self.help_message()
-        else              : self.help_msg = help_msg
+        if help_msg is None : self.help_msg = self.help_message()
+        else                : self.help_msg = help_msg
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -182,12 +182,12 @@ class PlotArrayButtons (QtGui.QWidget) :
 
 
     def stringOrNone(self,value):
-        if value == None : return 'None'
+        if value is None : return 'None'
         else             : return str(value)
 
 
     def intOrNone(self,value):
-        if value == None : return None
+        if value is None : return None
         else             : return int(value)
 
 

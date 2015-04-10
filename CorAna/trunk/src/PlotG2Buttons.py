@@ -57,7 +57,7 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.parent    = parent
         self.ofname    = ofname
 
-        if widgimage == None :
+        if widgimage is None :
             self.widgimage          = self
             self.widgimage.iq_begin = 0
             self.widgimage.gridIsOn = True
@@ -179,12 +179,12 @@ class PlotG2Buttons (QtGui.QWidget) :
 
 
     def stringOrNone(self,value):
-        if value == None : return 'None'
+        if value is None : return 'None'
         else             : return str(value)
 
 
     def intOrNone(self,value):
-        if value == None : return None
+        if value is None : return None
         else             : return int(value)
 
 
@@ -244,7 +244,7 @@ class PlotG2Buttons (QtGui.QWidget) :
         path  = str( QtGui.QFileDialog.getSaveFileName(self,
                                                        caption='Select file to save the plot',
                                                        directory = path,
-                                                       filter = '*.png, *.eps, *pdf, *.ps'
+                                                       filter = '*.png *.eps *pdf *.ps'
                                                        ) )
         if path == '' :
             logger.debug('Saving is cancelled.', __name__ )

@@ -354,7 +354,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
             try    : del cp.plotarray
             except : pass
         except :
-            if arr == None : return
+            if arr is None : return
             cp.plotarray = PlotArray(None, arr,
                                      ofname=fnm.path_data_mons_plot(),
                                      title=self.titleForIMon(imon))
@@ -371,7 +371,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
     def redrawArray(self,imon):
         logger.debug('plotIMon', __name__)
         arr = self.getArray(imon)
-        if arr == None : return
+        if arr is None : return
         try :
             cp.plotarray.set_array(arr, title=self.titleForIMon(imon))
         except :
@@ -400,7 +400,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
     def getArray(self,imon):
         logger.debug('getArray for imon: '+str(imon), __name__)
         arr_all = gu.get_array_from_file(fnm.path_data_scan_monitors_data())
-        if arr_all == None : return None
+        if arr_all is None : return None
         logger.debug('Array shape: ' + str(arr_all.shape), __name__)
 
         ibase    = 1+imon*4

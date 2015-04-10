@@ -87,12 +87,12 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.widgimage = widgimage
 
 
-        if self.widgimage != None :
+        if self.widgimage is not None :
             self.fig        = self.widgimage.fig
             self.axes       = self.widgimage.get_axim()
 
-            if xyc != None : self.fig.my_xyc = xyc
-            else           : self.fig.my_xyc = self.widgimage.get_xy_img_center()
+            if xyc is not None : self.fig.my_xyc = xyc
+            else               : self.fig.my_xyc = self.widgimage.get_xy_img_center()
 
             if self.verb : print 'Image center: ', self.fig.my_xyc
 
@@ -374,7 +374,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         #Set FORM
         if but_text in self.list_of_forms :
-            if self.current_form == None : self.disconnect_all()
+            if self.current_form is None : self.disconnect_all()
             else : self.disconnect_form(self.current_form) # Disconnect objects for OLD form
             self.current_form = but_text
             self.connect_form(self.current_form)    # Connect objects for NEW form
@@ -395,7 +395,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         logger.debug(msg, __name__ )
         if self.verb : print msg
 
-        if fname == None : path0 = '.'
+        if fname is None : path0 = '.'
         else             : path0 = fname
 
 
@@ -406,7 +406,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             
             self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
-            if path == None :
+            if path is None :
                 self.setStatus()
                 return
             self.setStatus(2, 'WAIT!\nLoad image')
@@ -418,7 +418,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         if but_text == self.list_of_io_tits[1] : # 'Load Forms'
             self.setStatus(1, 'Waiting\nfor input')
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None :
+            if path is None :
                 self.setStatus()
                 return
             msg='Load shaping-objects for mask from file: ' + path 
@@ -438,7 +438,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             if self.list_of_objs_for_mask_is_empty() : return
             self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None :
+            if path is None :
                 self.setStatus()
                 return
             msg='Save shaping-objects for mask in file: ' + path 
@@ -470,7 +470,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
             self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
-            if path == None :
+            if path is None :
                 self.setStatus()
                 return
 
@@ -496,7 +496,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
             self.setStatus(1, 'Waiting\nfor input')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
-            if path == None : 
+            if path is None : 
                 self.setStatus()
                 return
             
@@ -553,14 +553,14 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.mask_total = None
         for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
             if obj.isSelected : continue # Loop over ROI-type objects
-            if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
+            if self.mask_total is None : self.mask_total = obj.get_obj_mask(shape)
             else                       : self.mask_total = np.logical_or(self.mask_total, obj.get_obj_mask(shape))
             msg = 'mask for ROI-type object %i is ready...' % (i)
             logger.info(msg, __name__ )
             
         for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
             if not obj.isSelected : continue # Loop over inversed objects
-            if self.mask_total == None : self.mask_total = obj.get_obj_mask(shape)
+            if self.mask_total is None : self.mask_total = obj.get_obj_mask(shape)
             else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
             msg = 'mask for inversed object %i is ready...' % (i)            
             logger.info(msg, __name__ )
@@ -623,16 +623,16 @@ class MaskEditorButtons (QtGui.QWidget) :
 
     def setStatus(self, ind=None, msg='') :
 
-        if ind == None and msg == '' :
+        if ind is not None and msg == '' :
             self.stat_msg = self.fig.my_mode
-            if self.current_form != None : self.stat_msg += '\n' + str(self.current_form)
+            if self.current_form is not None : self.stat_msg += '\n' + str(self.current_form)
             self.stat_ind = 0
 
-            if self.fig.my_mode == 'Zoom' and self.current_form != None :
+            if self.fig.my_mode == 'Zoom' and self.current_form is not None :
                 self.stat_ind = 2
                 self.stat_msg = 'What to do\nwith\n' + self.current_form + '?'
 
-            elif self.fig.my_mode != 'Zoom' and self.current_form == None :
+            elif self.fig.my_mode != 'Zoom' and self.current_form is None :
                 self.stat_ind = 2
                 self.stat_msg = self.fig.my_mode + '\nwhat form?'
 

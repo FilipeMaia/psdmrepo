@@ -134,19 +134,19 @@ def send_msg_with_att_to_elog_v0(inst='AMO', expt='amodaq09', run='825', tag='TA
                    '-t', tag
                    ]
 
-    if msg != None and msg != 'None' :
+    if msg is not None and msg != 'None' :
         command_seq.append('-m')
         command_seq.append(msg)
 
-    if fname_text != None and fname_text != 'None' :
+    if fname_text is not None and fname_text != 'None' :
         command_seq.append('-f')
         command_seq.append(fname_text)
 
-    if fname_att != None and fname_att != 'None' :
+    if fname_att is not None and fname_att != 'None' :
         command_seq.append('-a')
         command_seq.append(fname_att)
 
-    if resp != None and resp != 'None' :
+    if resp is not None and resp != 'None' :
         command_seq.append('-???')
         command_seq.append(resp)
 
@@ -482,7 +482,7 @@ def get_gm_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S %Z'):
 #----------------------------------
 
 def get_array_from_file(fname, dtype=np.float32) :
-    if fname==None or fname=='' :
+    if fname is None or fname == '' :
         logger.warning('File name is not specified...', __name__)         
         return None
         

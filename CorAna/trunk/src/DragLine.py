@@ -15,7 +15,7 @@ class DragLine( Drag, lines.Line2D ) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
 
-        if str_of_pars != None :      # Initialization from input file
+        if str_of_pars is not None :      # Initialization from input file
             x1,x2,y1,y2,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
             self.isSelected    = s
             self.myType        = t
@@ -23,7 +23,7 @@ class DragLine( Drag, lines.Line2D ) :
             self.isInitialized = True
             lines.Line2D.__init__(self, (x1,x2), (y1,y2), linewidth=lw, color=col, picker=picker)
 
-        elif x == None or y == None : # Default initialization using mouse 
+        elif x is None or y is None : # Default initialization using mouse 
             lines.Line2D.__init__(self, (0,1), (0,1), linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
         else :                        # Initialization from program call
@@ -171,8 +171,8 @@ class DragLine( Drag, lines.Line2D ) :
             return
 
         self.on_release_graphic_manipulations()
-        #if self.press != None : self.print_pars()
-        if self.press != None : self.maskIsAvailable = False        
+        #if self.press is not None : self.print_pars()
+        if self.press is not None : self.maskIsAvailable = False        
         self.press = None
 
 

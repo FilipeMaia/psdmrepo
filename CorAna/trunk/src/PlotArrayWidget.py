@@ -125,7 +125,7 @@ class PlotArrayWidget (QtGui.QWidget) :
 
 
     def set_xarray(self,arr):
-        if arr == None :
+        if arr is None :
             self.arrx = np.arange(self.arry.shape[0])
         else :
             self.arrx = arr
@@ -153,10 +153,10 @@ class PlotArrayWidget (QtGui.QWidget) :
         yarr = self.arry
         xarr = self.arrx
  
-        if gr_xmin==None : xmin = xarr[1]
+        if gr_xmin is None : xmin = xarr[1]
         else             : xmin = gr_xmin
 
-        if gr_xmax==None : xmax = xarr[-1] # Last element
+        if gr_xmax is None : xmax = xarr[-1] # Last element
         else             : xmax = gr_xmax
 
         if xmin==xmax : xmax=xmin+1 # protection against equal limits
@@ -164,10 +164,10 @@ class PlotArrayWidget (QtGui.QWidget) :
         yarrwin = yarr[int(xmin):int(xmax)]
         xarrwin = xarr[int(xmin):int(xmax)]
 
-        if gr_ymin==None : ymin = min(yarrwin)
+        if gr_ymin is None : ymin = min(yarrwin)
         else             : ymin = gr_ymin
 
-        if gr_ymax==None : ymax = max(yarrwin)
+        if gr_ymax is None : ymax = max(yarrwin)
         else             : ymax = gr_ymax
 
         if ymin==ymax : ymax=ymin+1 # protection against equal limits

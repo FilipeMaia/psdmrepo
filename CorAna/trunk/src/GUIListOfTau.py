@@ -189,7 +189,7 @@ class GUIListOfTau ( QtGui.QWidget ) :
         path = fnm.path_tau_list()
         #print 'path_tau_list()', path
 
-        if path == None : dname, fname = cp.ana_tau_list_fname.value_def(), cp.ana_tau_list_dname.value_def()
+        if path is None : dname, fname = cp.ana_tau_list_fname.value_def(), cp.ana_tau_list_dname.value_def()
         else            : dname, fname = os.path.split(path)
 
         path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )

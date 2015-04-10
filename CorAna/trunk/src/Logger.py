@@ -140,7 +140,7 @@ class Logger :
     def startLog(self, fname=None) :
         """Logger initialization at start"""
         self.str_start_time = self.timeStamp( fmt='%Y-%m-%d-%H:%M:%S' )
-        if  fname == None :
+        if  fname is None :
             self.fname       = self.str_start_time + '-log.txt'
             self.fname_total = self.str_start_time + '-log-total.txt'
         else :        
@@ -170,14 +170,14 @@ class Logger :
 
     def saveLogInFile(self, fname=None):
         """Save content of the selected log records in the text file"""
-        if fname == None : fname_log = self.fname
+        if fname is None : fname_log = self.fname
         else             : fname_log = fname
         self._saveTextInFile(self.getLogContent(), fname_log)
 
 
     def saveLogTotalInFile(self, fname=None):
         """Save content of all log records in the text file"""
-        if fname == None : fname_log = self.fname_total
+        if fname is None : fname_log = self.fname_total
         else             : fname_log = fname
         self._saveTextInFile(self.getLogContentTotal(), fname_log)
 

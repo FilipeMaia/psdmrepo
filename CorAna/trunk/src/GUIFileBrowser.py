@@ -168,7 +168,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
     def onSave(self):
         logger.debug('onSave', __name__)
         path = gu.get_save_fname_through_dialog_box(self, self.fname, 'Select file to save', filter='*.txt')
-        if path == None or path == '' : return
+        if path is None or path == '' : return
         text = str(self.box_txt.toPlainText())
         logger.info('Save in file:\n'+text, __name__)
         f=open(path,'w')
@@ -210,7 +210,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         logger.debug('Start the GUIFileBrowser.',__name__)
         self.setStatus(0, 'Waiting for file selection...')
 
-        if selected_file != None and selected_file in self.list_of_files :
+        if selected_file is not None and selected_file in self.list_of_files :
             index = self.list_of_files.index(selected_file)
             self.box_file.setCurrentIndex( index )
 

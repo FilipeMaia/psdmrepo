@@ -63,8 +63,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.widgimage = widgimage
         self.fig       = widgimage.fig
 
-        if help_msg==None : self.help_msg = self.help_message()
-        else              : self.help_msg = help_msg
+        if help_msg is None : self.help_msg = self.help_message()
+        else                : self.help_msg = help_msg
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
@@ -192,12 +192,12 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
 
     def stringOrNone(self,value):
-        if value == None : return 'None'
+        if value is None : return 'None'
         else             : return str(value)
 
 
     def intOrNone(self,value):
-        if value == None : return None
+        if value is None : return None
         else             : return int(value)
 
     def set_buttons(self) :
@@ -222,7 +222,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     def on_but_load(self):
         logger.debug('on_but_load', __name__ )
         path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with text image', filter='*.txt *.npy')
-        if path == None or path == '' :
+        if path is None or path == '' :
             logger.debug('Loading is cancelled...', __name__ )
             return
 
@@ -242,7 +242,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         path  = str( QtGui.QFileDialog.getSaveFileName(self,
                                                        caption='Select file to save the plot',
                                                        directory = path,
-                                                       filter = '*.png, *.eps, *pdf, *.ps'
+                                                       filter = 'Image files(*.png *.eps *pdf *.ps)'
                                                        ) )
         if path == '' :
             logger.debug('Saving is cancelled.', __name__ )

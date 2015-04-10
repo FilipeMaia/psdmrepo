@@ -15,7 +15,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Rectangle')
 
-        if str_of_pars != None :
+        if str_of_pars is not None :
             x,y,w,h,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
             patches.Rectangle.__init__(self, (x,y), w, h, linewidth=lw, color=col, fill=fill, picker=picker)
             self.isSelected    = s
@@ -23,7 +23,7 @@ class DragRectangle( Drag, patches.Rectangle ) :
             self.isRemoved     = r
             self.isInitialized = True
 
-        elif xy == None : # Default line initialization
+        elif xy is None : # Default line initialization
             xy0=(0,0)
             patches.Rectangle.__init__(self, xy0, width, height, linewidth=linewidth, color=color, fill=fill, picker=picker)
             self.isInitialized = False
@@ -242,8 +242,8 @@ class DragRectangle( Drag, patches.Rectangle ) :
     def on_release(self, event):
         'on release we reset the press data'
         self.on_release_graphic_manipulations()
-        #if self.press != None : self.print_pars()
-        if self.press != None : self.maskIsAvailable = False        
+        #if self.press is not None : self.print_pars()
+        if self.press is not None : self.maskIsAvailable = False        
         self.press = None
 
 

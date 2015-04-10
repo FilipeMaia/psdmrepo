@@ -102,7 +102,7 @@ def valueToIndexMasked(V, VRange, mask=None) :
     #return np.select([mask==0, indarr<0, indarr>Nbins1], [0, 0, 0], default=indarr)
 
 def get_limits_for_masked_array(map, mask=None) :
-    if mask==None :
+    if mask is None :
         return map.min(), map.max()
     else :
         arrm = map[mask==1]
@@ -111,7 +111,7 @@ def get_limits_for_masked_array(map, mask=None) :
 def q_map_partitions(map, nbins, mask=None) :
     q_min, q_max = get_limits_for_masked_array(map, mask)
     #print 'q_min, q_max = ', q_min, q_max
-    #if mask == None : map_for_binning = map
+    #if mask is None : map_for_binning = map
     #else            : map_for_binning = map*mask
     return valueToIndexMasked(map, [q_min, q_max, nbins], mask)
 
@@ -131,7 +131,7 @@ def divideZeroProteced(map_num, map_den, val_subst_zero=0) :
 #-----------------------------
 
 def bincount(map_bins, map_weights=None, length=None) :
-    if map_weights == None : weights = None
+    if map_weights is None : weights = None
     else                   : weights = map_weights.flatten() 
     
     bin_count = np.bincount(map_bins.flatten(), weights, length)
@@ -360,7 +360,7 @@ class ViewResults :
     def get_xy_maps(sp) :
         """Set map x, y for direct beam or reflected beam modes"""
         # MAKE HERE SELECTION OF THE X,Y MAPS FOR MODE !!!
-        if sp.x_map != None and sp.y_map != None : return sp.x_map, sp.y_map 
+        if sp.x_map is not None and sp.y_map is not None : return sp.x_map, sp.y_map 
         x_map, y_map = sp.get_xy_maps_for_direct_beam_data()
         #sp.x_map, sp.y_map = sp.get_xy_maps_for_reflected_beam_data()
         return x_map, y_map
@@ -406,7 +406,7 @@ class ViewResults :
         y - axis along the intersection of the RP and detector
         tilt - [radians] rotation angle
         """
-        if tilt != None : angle = tilt
+        if tilt is not None : angle = tilt
         else            : dx, dy, dr, alpha, angle = sp.get_reflected_beam_geometry_pars()
         x_map, y_map = sp.get_xy_maps()
         x_map_rp, y_map_rp = rotation_for_angle(x_map, y_map, angle)
@@ -426,21 +426,21 @@ class ViewResults :
 #-----------------------------
 
     def get_rphi_maps(sp) :
-        if sp.r_map != None and sp.phi_map != None : return sp.r_map, sp.phi_map 
+        if sp.r_map is not None and sp.phi_map is not None : return sp.r_map, sp.phi_map 
         sp.r_map, sp.phi_map = cart2polar(sp.x_map, sp.y_map)
         return sp.r_map, sp.phi_map
   
 #-----------------------------
 
     def get_r_map(sp) :
-        if sp.r_map != None : return sp.r_map
+        if sp.r_map is not None : return sp.r_map
         sp.r_map = cart2r(sp.x_map, sp.y_map)
         return sp.r_map
   
 #-----------------------------
 
     def get_phi_map(sp) :
-        if sp.phi_map != None : return sp.phi_map
+        if sp.phi_map is not None : return sp.phi_map
         sp.phi_map = cart2phi(sp.x_map, sp.y_map)
         return sp.phi_map
   
@@ -449,7 +449,7 @@ class ViewResults :
     def get_q_map(sp) :
         """Select between DIRECT and REFLECTED beam geometry here
         """
-        if sp.q_map != None : return sp.q_map
+        if sp.q_map is not None : return sp.q_map
         sp.q_map = sp.get_q_map_for_db()
         #if cp.exp_setup_geom.value() == 'Specular' : sp.q_map = sp.get_q_map_for_rb()
         #else                                       : sp.q_map = sp.get_q_map_for_db()
@@ -560,7 +560,7 @@ class ViewResults :
            The last (maximal) index is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.q_map_stat != None : return sp.q_map_stat
+        if sp.q_map_stat is not None : return sp.q_map_stat
         sp.q_map_stat = q_map_partitions(sp.get_q_map(), sp.ana_stat_part_q, sp.get_mask_total())
         return sp.q_map_stat
 
@@ -570,7 +570,7 @@ class ViewResults :
            The last (maximal) index is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.phi_map_stat != None : return sp.phi_map_stat
+        if sp.phi_map_stat is not None : return sp.phi_map_stat
         sp.phi_map_stat = phi_map_partitions(sp.get_phi_map(), sp.ana_stat_part_phi, sp.get_mask_total())
         return sp.phi_map_stat
 
@@ -580,7 +580,7 @@ class ViewResults :
            The last (maximal) index both in phi and in q is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.q_phi_map_stat != None : return sp.q_phi_map_stat               # +1 - for last overflow bin index 
+        if sp.q_phi_map_stat is not None : return sp.q_phi_map_stat               # +1 - for last overflow bin index 
         sp.q_phi_map_stat = sp.get_q_map_for_stat_bins() * (sp.ana_stat_part_phi+1) \
                           + sp.get_phi_map_for_stat_bins()
         #sp.q_phi_map_stat = sp.get_phi_map_for_stat_bins() * (sp.ana_stat_part_q+1) \
@@ -592,7 +592,7 @@ class ViewResults :
         """Returns array with the number of pixels for each static q-phi bin.
            Bins reserved for overflow contain zeros due to mask.
         """
-        if sp.counts_stat != None : return sp.counts_stat
+        if sp.counts_stat is not None : return sp.counts_stat
         sp.counts_stat = bincount(sp.get_q_phi_map_for_stat_bins(), sp.get_mask_total(), length=sp.npart_stat)
         msg = 'get_counts_for_stat_bins(): sp.counts_stat = ' + str(sp.counts_stat)
         logger.info(msg, __name__)
@@ -603,7 +603,7 @@ class ViewResults :
         """Returns array with the number of pixels for each static q bin.
            Bins reserved for overflow contain zeros due to mask.
         """
-        if sp.counts_stat_q != None : return sp.counts_stat_q
+        if sp.counts_stat_q is not None : return sp.counts_stat_q
         sp.counts_stat_q = bincount(sp.get_q_map_for_stat_bins(), sp.get_mask_total(), length=sp.ana_stat_part_q+1 )
         msg = 'get_counts_for_stat_q_bins(): sp.counts_stat_q = ' + str(sp.counts_stat_q)
         logger.info(msg, __name__)
@@ -611,7 +611,7 @@ class ViewResults :
 
 
     def get_q_average_for_stat_q_bins(sp) :
-        if sp.q_average_stat_q != None : return sp.q_average_stat_q
+        if sp.q_average_stat_q is not None : return sp.q_average_stat_q
 
         q_map_masked        = sp.get_q_map() * sp.get_mask_total()
         sum_q_stat          = bincount(sp.get_q_map_for_stat_bins(), q_map_masked, length=sp.ana_stat_part_q+1)
@@ -649,7 +649,7 @@ class ViewResults :
            The last (maximal) index is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.q_map_dyna != None : return sp.q_map_dyna
+        if sp.q_map_dyna is not None : return sp.q_map_dyna
         sp.q_map_dyna = q_map_partitions(sp.get_q_map(), sp.ana_dyna_part_q, sp.get_mask_total())
         return sp.q_map_dyna
 
@@ -659,7 +659,7 @@ class ViewResults :
            The last (maximal) index is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.phi_map_dyna != None : return sp.phi_map_dyna
+        if sp.phi_map_dyna is not None : return sp.phi_map_dyna
         sp.phi_map_dyna = phi_map_partitions(sp.get_phi_map(), sp.ana_dyna_part_phi, sp.get_mask_total())
         return sp.phi_map_dyna
 
@@ -669,7 +669,7 @@ class ViewResults :
            The last (maximal) index both in phi and in q is used for overflow, underflow and masked pixels.
            Map shape is the same as for image.
         """
-        if sp.q_phi_map_dyna != None : return sp.q_phi_map_dyna               # +1 - for last overflow bin index 
+        if sp.q_phi_map_dyna is not None : return sp.q_phi_map_dyna               # +1 - for last overflow bin index 
         sp.q_phi_map_dyna = sp.get_q_map_for_dyna_bins() * (sp.ana_dyna_part_phi+1) \
                           + sp.get_phi_map_for_dyna_bins()
         #sp.q_phi_map_dyna = sp.get_phi_map_for_dyna_bins() * (sp.ana_dyna_part_q+1) \
@@ -681,7 +681,7 @@ class ViewResults :
         """Returns array with the number of pixels for each dynamic q-phi bin.
            Bins reserved for overflow contain zeros due to mask.
         """
-        if sp.counts_dyna != None : return sp.counts_dyna
+        if sp.counts_dyna is not None : return sp.counts_dyna
         sp.counts_dyna = bincount(sp.get_q_phi_map_for_dyna_bins(), map_weights=sp.get_mask_total(), length=sp.npart_dyna)
 
         msg = 'get_counts_for_dyna_bins(): sp.counts_dyna = ' + str(sp.counts_dyna)
@@ -690,7 +690,7 @@ class ViewResults :
 
 
     def get_q_average_for_dyna_bins(sp) :
-        if sp.q_average_dyna != None : return sp.q_average_dyna
+        if sp.q_average_dyna is not None : return sp.q_average_dyna
 
         q_map_masked      = sp.get_q_map() * sp.get_mask_total()
         sum_q_dyna        = bincount(sp.get_q_phi_map_for_dyna_bins(), q_map_masked, length=sp.npart_dyna)
@@ -797,7 +797,7 @@ class ViewResults :
 #-----------------------------
 
     def get_intens_stat_q_bins_vs_itau_arr(sp) :
-        if sp.intens_stat_q_vs_itau_arr != None : return sp.intens_stat_q_vs_itau_arr        
+        if sp.intens_stat_q_vs_itau_arr is not None : return sp.intens_stat_q_vs_itau_arr        
         sp.list_of_tau = sp.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
         logger.info('Begin processing for I (<q>) vs tau array', __name__)
 
@@ -881,7 +881,7 @@ class ViewResults :
 
 
     def get_g2_vs_itau_arr(sp) :
-        if sp.g2_vs_itau_arr != None : return sp.g2_vs_itau_arr        
+        if sp.g2_vs_itau_arr is not None : return sp.g2_vs_itau_arr        
         sp.list_of_tau = sp.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
         #print 'sp.list_of_tau = ', sp.list_of_tau
 
@@ -942,7 +942,7 @@ class ViewResults :
         sp.cor_arr = None
         sp.g2_vs_itau_arr = None
 
-        if fname == None : sp.fname = cp.res_fname.value()
+        if fname is None : sp.fname = cp.res_fname.value()
         else :             sp.fname = fname
         logger.info('Use file with results:' + sp.fname, __name__) 
 
@@ -954,7 +954,7 @@ class ViewResults :
 
 
     def get_cor_array_from_binary_file(sp) :
-        if sp.cor_arr != None : return sp.cor_arr
+        if sp.cor_arr is not None : return sp.cor_arr
         logger.info('get_cor_array_from_binary_file: ' + sp.fname, __name__)
 
         sp.cor_arr = np.fromfile(sp.fname, dtype=np.float32)
@@ -1029,7 +1029,7 @@ class ViewResults :
         #fname_tau = fnm.path_cora_merge_tau()
         logger.info('get_list_of_tau_from_file: ' + fname_tau, __name__)
         list_of_tau = gu.get_array_from_file(fname_tau, dtype=np.uint16) # np.loadtxt(fname_tau, dtype=np.uint16)
-        if list_of_tau == None : return np.array([1])
+        if list_of_tau is None : return np.array([1])
         else                   : return list_of_tau
 
 #-----------------------------
@@ -1047,11 +1047,11 @@ class ViewResults :
 
 
     def get_mask_blemish(sp) :
-        if sp.mask_blemish != None : return sp.mask_blemish
+        if sp.mask_blemish is not None : return sp.mask_blemish
         if cp.ccdcorr_blemish.value() :
             sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
 
-            if sp.mask_blemish == None :
+            if sp.mask_blemish is None :
                 logger.info('Blemish mask file %s is not available. Use unit mask.' % fnm.path_blem(), __name__)
                 sp.mask_blemish = np.ones((sp.rows,sp.cols), dtype=np.uint8)
             logger.info('Blemish mask is taken from file ' + fnm.path_blem(), __name__)
@@ -1064,9 +1064,9 @@ class ViewResults :
 
     def get_mask_hotpix(sp) :
 
-        if sp.mask_hotpix != None : return sp.mask_hotpix
+        if sp.mask_hotpix is not None : return sp.mask_hotpix
         sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix_mask())
-        if sp.mask_hotpix != None and cp.mask_hot_is_used.value() :
+        if sp.mask_hotpix is not None and cp.mask_hot_is_used.value() :
             logger.info('HOTPIX mask is taken from file ' + fnm.path_hotpix_mask(), __name__)
         else :
             sp.mask_hotpix = np.ones((sp.rows,sp.cols), dtype=np.uint8)
@@ -1077,9 +1077,9 @@ class ViewResults :
 
     def get_mask_satpix(sp) :
 
-        if sp.mask_satpix != None : return sp.mask_satpix
+        if sp.mask_satpix is not None : return sp.mask_satpix
         sp.mask_satpix = gu.get_array_from_file(fnm.path_satpix_mask())
-        if sp.mask_satpix != None :
+        if sp.mask_satpix is not None :
             logger.info('SATPIX mask is taken from file ' + fnm.path_satpix_mask(), __name__)
         else :
             sp.mask_satpix = np.ones((sp.rows,sp.cols), dtype=np.uint8)
@@ -1090,7 +1090,7 @@ class ViewResults :
 
     def get_mask_roi(sp) :
         #return sp.get_random_binomial_img(p=0.50)
-        if sp.mask_roi != None : return sp.mask_roi
+        if sp.mask_roi is not None : return sp.mask_roi
         if cp.ana_mask_type.value() == 'from-file':
             sp.mask_roi = gu.get_array_from_file(fnm.path_roi_mask())
             logger.info('ROI mask is taken from file ' + fnm.path_roi_mask(), __name__)
@@ -1102,17 +1102,17 @@ class ViewResults :
 
 
     def get_mask_total(sp) :
-        if sp.mask_total != None : return sp.mask_total
+        if sp.mask_total is not None : return sp.mask_total
 
         sp.mask_total = sp.get_mask_image_limits()
         if cp.ccdcorr_blemish.value() :              sp.mask_total *= sp.get_mask_blemish()
         if cp.ana_mask_type.value() == 'from-file' : sp.mask_total *= sp.get_mask_roi()
 
         mask_hotpix = sp.get_mask_hotpix()
-        if mask_hotpix != None :                     sp.mask_total *= mask_hotpix
+        if mask_hotpix is not None :                     sp.mask_total *= mask_hotpix
 
         mask_satpix = sp.get_mask_satpix()
-        if mask_satpix != None :                     sp.mask_total *= mask_satpix
+        if mask_satpix is not None :                     sp.mask_total *= mask_satpix
  
         return sp.mask_total
 

@@ -421,7 +421,7 @@ class GUIData ( QtGui.QWidget ) :
         except :
             ifname =  fnm.path_data_raw_ave()
             arr = gu.get_array_from_file(ifname)
-            if arr == None : return
+            if arr is None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ifname, ofname=fnm.path_data_aver_plot())
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140)))

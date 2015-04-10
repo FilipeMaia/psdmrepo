@@ -141,7 +141,7 @@ class DragObjectSet :
 
             # This check is required for multi-click objects like polygon
             # It should not create new object until previous is completely initializad
-            if self.new_obj != None : 
+            if self.new_obj is not None : 
                 if not self.new_obj.isInitialized : return
 
             if event.button != 1 : return # if other than Left mouse button

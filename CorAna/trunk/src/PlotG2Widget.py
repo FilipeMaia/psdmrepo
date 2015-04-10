@@ -122,7 +122,7 @@ class PlotG2Widget (QtGui.QWidget) :
 
 
     def set_xarray(self,arr):
-        if arr == None :
+        if arr is None :
             self.arrx = np.arange(self.arr_g2.shape[0])
         else :
             self.arrx = arr
@@ -159,11 +159,11 @@ class PlotG2Widget (QtGui.QWidget) :
 
         self.fig.clear()
 
-        if gr_xmin==None : xmin = self.arrx[0]
-        else             : xmin = gr_xmin
+        if gr_xmin is None : xmin = self.arrx[0]
+        else               : xmin = gr_xmin
 
-        if gr_xmax==None : xmax = self.arrx[-1] # Last element
-        else             : xmax = gr_xmax
+        if gr_xmax is None : xmax = self.arrx[-1] # Last element
+        else               : xmax = gr_xmax
 
         if xmin==xmax : xmax=xmin+1 # protection against equal limits
 
@@ -188,11 +188,11 @@ class PlotG2Widget (QtGui.QWidget) :
             q_ave = self.arr_q[iq]
             q_str = 'q(%d)=%8.4f' % (iq, q_ave) 
 
-            if gr_ymin==None : ymin = min(yarr)
-            else             : ymin = gr_ymin
+            if gr_ymin is None : ymin = min(yarr)
+            else               : ymin = gr_ymin
 
-            if gr_ymax==None : ymax = max(yarr)
-            else             : ymax = gr_ymax
+            if gr_ymax is None : ymax = max(yarr)
+            else               : ymax = gr_ymax
 
             axgr = self.fig.add_axes([wx0, wy0, wwidth, wheight])
             if self.logIsOn :

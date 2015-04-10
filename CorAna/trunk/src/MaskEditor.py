@@ -85,19 +85,19 @@ class MaskEditor (QtGui.QWidget) :
         self.setWindowTitle(title)
         self.setFrame()
 
-        if      arr != None : self.arr = arr
+        if  arr is not None : self.arr = arr
         elif ifname != ''   : self.arr = gu.get_image_array_from_file(ifname)
         else                : self.arr = get_array2d_for_test()
 
-        if self.arr == None : self.arr = get_array2d_for_test()
+        if self.arr is None : self.arr = get_array2d_for_test()
 
         self.ifname = ifname
         self.title  = title
         ccd_rot_n90 = int(cp.ccd_orient.value())
-        if ccd_rot != None : ccd_rot_n90 = ccd_rot
+        if ccd_rot is not None : ccd_rot_n90 = ccd_rot
 
-        y_is_flip   = cp.y_is_flip.value() # True
-        if updown != None : y_is_flip = updown
+        y_is_flip = cp.y_is_flip.value() # True
+        if updown is not None : y_is_flip = updown
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr, ccd_rot_n90, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, help_msg=self.help_message())
@@ -123,13 +123,13 @@ class MaskEditor (QtGui.QWidget) :
 
     def set_image_array(self,arr,title=None):
         self.widgimage.set_image_array(arr)
-        if title != None : self.setWindowTitle(title)
+        if title is not None : self.setWindowTitle(title)
         else             : self.setWindowTitle(self.title)
 
 
     def set_image_array_new(self,arr,title=None):
         self.widgimage.set_image_array_new(arr)
-        if title != None : self.setWindowTitle(title)
+        if title is not None : self.setWindowTitle(title)
         else             : self.setWindowTitle(self.title)
 
 

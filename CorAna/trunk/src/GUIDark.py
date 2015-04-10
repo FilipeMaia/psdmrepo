@@ -388,7 +388,7 @@ class GUIDark ( QtGui.QWidget ) :
             except : pass
         except :
             arr = gu.get_array_from_file( fnm.path_pedestals_ave() )
-            if arr == None : return
+            if arr is None : return
             #print arr.shape,'\n', arr
             cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_pedestals_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)

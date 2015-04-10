@@ -193,7 +193,7 @@ class GUIFlatField ( QtGui.QWidget ) :
             except : pass
         except :
             arr = gu.get_array_from_file(fnm.path_flat())
-            if arr == None : return
+            if arr is None : return
             logger.debug('Array shape: ' + str(arr.shape), __name__)
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_flat_plot())
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget()

@@ -149,21 +149,21 @@ class PlotTimeWidget (QtGui.QWidget) :
         yarr = arr[:,2]
         iarr = arr[:,0]
 
-        if gr_xmin==None : xmin = xarr[1]
-        else             : xmin = gr_xmin
+        if gr_xmin is None : xmin = xarr[1]
+        else               : xmin = gr_xmin
 
-        if gr_xmax==None : xmax = xarr[-1] # Last element
-        else             : xmax = gr_xmax
+        if gr_xmax is None : xmax = xarr[-1] # Last element
+        else               : xmax = gr_xmax
 
         yarrwin = yarr[int(xmin):int(xmax)]
         xarrwin = xarr[int(xmin):int(xmax)]
         iarrwin = iarr[int(xmin):int(xmax)]
 
-        if gr_ymin==None : ymin = min(yarrwin)
-        else             : ymin = gr_ymin
+        if gr_ymin is None : ymin = min(yarrwin)
+        else               : ymin = gr_ymin
 
-        if gr_ymax==None : ymax = max(yarrwin)
-        else             : ymax = gr_ymax
+        if gr_ymax is None : ymax = max(yarrwin)
+        else               : ymax = gr_ymax
 
         hi_range = (ymin, ymax)
 
@@ -325,12 +325,12 @@ class PlotTimeWidget (QtGui.QWidget) :
 
 
 #    def stringOrNone(self,value):
-#        if value == None : return 'None'
+#        if value is None : return 'None'
 #        else             : return str(value)
 
 
 #    def intOrNone(self,value):
-#        if value == None : return None
+#        if value is None : return None
 #        else             : return int(value)
 
 
