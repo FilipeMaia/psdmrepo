@@ -3,8 +3,9 @@
 # Check the experiment folders on a dss node.
 #
 # Usage:  
-#      dss_instr_acls [-d] [-e] [-f] [-u] [-s]   
+#      dss_instr_acls [-a] [-d] [-e] [-f] [-u] [-s]   
 #      
+#      -a: set acl for instrument dir (instrdir must exist)
 #      -s: set the acls as sudo. Without this option it will only print the 
 #          command. 
 #      -u: show disk usage and #files of /u2/
@@ -14,15 +15,14 @@
 #   Default: -d -e -u
 #
 # Examples:
-#    dss-host% dss_instr_acls -d -e        (check the instr/exper directiries and print what needs to be done)  
-#    dss-host% dss_instr_acls -d -e -f -s  (check the directiries and files and correct acls)  
+#    dss-host% dss_instr_acls -d -e        (check the instr/exper directories and print what needs to be done)  
+#    dss-host% dss_instr_acls -d -e -f -s  (check the directories and files and correct acls)  
 #    dss-host% dss_instr_acls -u           (show disk usage)
 #    
 # If the command is run via ssh and -s is used specify the ssh -t option to get a pseudo tty:
 # % ssh -t <host>  dss_instr_acls -s -d -u -f      
 #
-#
-#
+
 
 instr_acl=(
     user::rwx
@@ -47,9 +47,21 @@ exp_acl=(
     default:mask::rwx
     default:other::r-x
 )
+
+
+function debug() {
+    if [[ ${DEBUG} -eq 1 ]] ; then
+        echo $*
+    fi
+}
+
+function set_acl() {
+    [[ "${as_sudo}" != "echo" ]] && echo "cmd: setfacl " "$@"
+    ${as_sudo} setfacl "$@"
+}      
  
 
-comp_acl() {
+function comp_acl() {
     local path="$1"
     local acl_type="$2"
 
@@ -75,28 +87,24 @@ comp_acl() {
     fi
 }
 
-
-
-
-function debug() {
-
-    if [[ ${DEBUG} -eq 1 ]] ; then
-        echo $*
-    fi
+function set_instr_acl() {
+    local path=$1
+    for acl in ${instr_acl[@]} ; do
+        if [[ "${acl%%:*}" = "default" ]] ; then
+            [[ "${acl/default:user:://}" != ${acl} ]] && continue
+            set_acl -d -m ${acl#default:} $path 
+        fi
+    done
 }
 
-function has_mode() {
 
+function has_mode() {
     for m in ${MODE[@]} ; do
         [[ ${m} == $1 ]] && return 0
     done
     return 1
 }
 
-function set_acl() {
-    [[ "${as_sudo}" != "echo" ]] && echo "cmd: setfacl " "$@"
-    ${as_sudo} setfacl "$@"
-}      
 
 
 function acls_instrdir() {
@@ -171,9 +179,10 @@ as_sudo=echo
 
 declare -a MODE 
 DEBUG=0
-while getopts :sdefuv OPT; do
+while getopts :asdefuv OPT; do
     case $OPT in
         s|+s) as_sudo=sudo ;;
+        a|+a) MODE[4]=instracl ;; 
         d|+d) MODE[0]=instrdir ;; 
         e|+e) MODE[1]=experdir ;; 
         f|+f) MODE[2]=files ;;
@@ -197,6 +206,10 @@ host=$(hostname -s)
 host=""
 instrdir=${rootdir}/${instr}
 
+
+if has_mode "instracl" ; then
+    set_instr_acl ${instrdir}
+fi
 
 if has_mode "space" ; then
     status_u2

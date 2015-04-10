@@ -289,10 +289,10 @@ def file_migration2nersc_start ( exper_id, file_name, file_type) :
         __do_sql ("UPDATE data_migration_nersc SET start_time=%d, stop_time=NULL, error_msg=NULL WHERE exper_id=%d AND file='%s' AND file_type='%s'" % (now, exper_id, file_name, file_type))
 
 def file_migration2nersc_stop ( exper_id, file_name, file_type, error_msg=None ) :
+    now       = __now_64 ()
     exper_id  = int (exper_id)
     file_name = __escape_string (file_name)
     file_type = __escape_string (file_type)
-    now       = __now_64 ()
     error_msg_sql = ", error_msg=NULL"
     if error_msg is not None : 
         error_msg_sql = ", error_msg='%s'" % __escape_string (error_msg)

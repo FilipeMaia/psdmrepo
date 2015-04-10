@@ -16,8 +16,9 @@ Tag: V00-00-07
 - Imported data-mover code from git repo (PsdmTools)
 - added features to the experiment path creation to handle creating xtc files on the ffb 
   for recorder transfers.
-
-
+- Add tool to compare checksums created by ffb and ana movers.
+- Added option to set acl for the instr-dir on a dss node.
+	
 	
 Tag: V00-00-06
 2015-01-21
