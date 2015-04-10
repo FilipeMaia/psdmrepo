@@ -1,4 +1,5 @@
 import numpy as np
+import logging
 
 def getMinMaxStoreValues(storeType):
     if issubclass(storeType, np.floating):
@@ -68,6 +69,9 @@ class XCorrWorkerBase(object):
     def updateData(self, counter, data, userObj):
         '''updates the data.
         '''
+        if self.isFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug('updateData from scatter. counter=%d data.shape=%r data.dtype=%r data[0]=%r' % \
+                              (counter, data.shape, data.dtype, data[0]))
         next120hz = counter
         # is this repeat data?
         if next120hz in self.currentTimesStored:
@@ -85,12 +89,12 @@ class XCorrWorkerBase(object):
 
             # assume ciruclarly sorted, so the smallest time is the one we are going to overwrite
             pivotIndex = self.nextTimeIdx
-            userObj.adjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
+            userObj.workerAdjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         self.logger.debug('XCorrWorkerBase.updateData next120hz=%d' % (next120hz,))
 
         # allow user object to make adjustments to data
-        userObj.adjustData(data)
+        userObj.workerAdjustData(data)
 
         # check for overflow 
         if self.checkForOverflow:
@@ -129,7 +133,7 @@ class XCorrWorkerBase(object):
             pivotIndex = 0
         else:
             pivotIndex = self.nextTimeIdx+1
-        userObj.adjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
+        userObj.workerAdjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         if self.nextTimeIdx == self.maxTimes - 1:
             self.wrapped = True

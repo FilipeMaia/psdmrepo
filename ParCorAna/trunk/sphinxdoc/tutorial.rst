@@ -64,7 +64,7 @@ Mask File
 ===========
 ::
 
-  system_params['mask_ndarrayCoords'] = 'maskfile.npy' # not created yet
+  system_params['maskNdarrayCoords'] = 'maskfile.npy' # not created yet
 
 You need to provide the framework with a mask file for the detector data. This is a 
 numpy array with the same dimensions as ndarray the psana calibration system uses to 
@@ -89,10 +89,10 @@ User Code
 ::
 
   import ParCorAna.UserG2 as UserG2
-  system_params['user_class'] = UserG2.UserG2
+  system_params['userClass'] = UserG2.G2atEnd
 
 The user_class is where users hook in their worker code. We will be using the example 
-class in the ParCorAna package - UserG2 - which does a simplified version of the G2 
+class in the ParCorAna package - G2atEnd does a simplified version of the G2 
 calculation used in XCS.
 
 User Color File
@@ -101,7 +101,7 @@ This is a parameter that the UserG2 needs - a color file that labels the detecto
 and determines which pixels are averaged together for the delay curve. It bins the pixels
 into groups. More on this in the next section::
 
-  user_params['color_ndarrayCoords'] = 'colorfile.npy' # not created yet
+  user_params['colorNdarrayCoords'] = 'colorfile.npy' # not created yet
 
 
 ***************************
@@ -137,8 +137,8 @@ Add to Config
 
 Now in myconfig.py, set the mask and color file::
 
-  system_params['mask_ndarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
-  user_params['color_ndarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
+  system_params['maskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
+  user_params['colorNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
 
 Note that the last parameter is to the user_params - the framework knows nothing about the coloring.
 

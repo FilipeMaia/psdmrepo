@@ -6,6 +6,7 @@ import time
 import shutil
 import StringIO
 import pprint
+import logging
 
 import h5py
 
@@ -105,33 +106,36 @@ def writeToH5Group(h5Group, name2delay2ndarray):
             delayDataset = nmGroup.create_dataset(dataSetName, dataSetShape, dataSetDType)
             delayDataset[:] = ndarray[:]
 
-def writeConfig(h5Group, system_params, user_params):
-    dictBuffer = StringIO.StringIO()
-    pprint.pprint(system_params, dictBuffer)
-    dictString = dictBuffer.getvalue()
-    h5Group["system_params"] = dictString
-
-    dictBuffer = StringIO.StringIO()
-    pprint.pprint(user_params, dictBuffer)
-    dictString = dictBuffer.getvalue()
-    h5Group["user_params"] = dictString
-
-    maskFile = system_params['mask_ndarrayCoords']
-    assert os.path.exists(maskFile), "mask file doesn't exist"
-    maskNumpyArray = np.load(file(maskFile,'r'))
-    h5Group['mask_ndarrayCoords']=maskNumpyArray
+def writeConfig(h5file, system_params, user_params):
+    if 'system' in h5file.keys():
+        h5Group = h5file['system']
+    else:
+        h5Group = h5file.create_group('system')
+    systemParamsGroup = h5Group.create_group('system_params')
+    userParamsGroup = h5Group.create_group('user_params')
+    for configDict, h5Group in zip([system_params, user_params],
+                                   [systemParamsGroup, userParamsGroup]):
+        configKeys = configDict.keys()
+        configKeys.sort()
+        for key in configKeys:
+            if key in ['maskNdarrayCoords', 'colorNdarrayCoords']:
+                filename = system_params['maskNdarrayCoords']
+                assert os.path.exists(filename), "file %s doesn't exist" % filename
+                numpyArray = np.load(file(filename,'r'))
+                h5Group[key]=numpyArray
+            else:
+                value = configDict[key]
+                try:
+                    h5Group[key]=value
+                except:
+                    h5Group[key]=str(value)
     
-    # really the system shouldn't know about details of user_params, but right now we
-    # will look for the color file and write it to the h5 file
-    colorFile = user_params['color_ndarrayCoords']
-    assert os.path.exists(colorFile), "specified color file doesn't exist: %s" % colorFile
-    colorNumpyArray = np.load(file(colorFile,'r'))
-    h5Group['color_ndarrayCoords'] = colorNumpyArray        
+    return h5Group
 
 ###############################
 class XCorrBase(object):
     def __init__(self, mp, dataSourceString, srcString,
-                 numEvents, maxTimes, system_params, user_params):
+                 numEvents, maxTimes, system_params, user_params, test_alt):
         self.dataSourceString = dataSourceString
         self.srcString = srcString
         self.numEvents = numEvents
@@ -144,10 +148,14 @@ class XCorrBase(object):
         self.isViewerOrFirstWorker = self.mp.isViewer or self.mp.isFirstWorker
         self.delays = self.system_params['delays']
         self.numDelays = len(self.delays)
-        userClass = system_params['user_class']
-        self.userObj = userClass(user_params, system_params, mp)
-        self.arrayNames = self.userObj.arrayNames()
-        self.totalMaskedElements = np.sum(self.mp.mask_ndarrayCoords)
+        userClass = system_params['userClass']
+        self.userObj = userClass(user_params, system_params, mp, test_alt)
+        self.arrayNames = self.userObj.fwArrayNames()
+        self.totalMaskedElements = np.sum(self.mp.maskNdarrayCoords)
+        self.test_alt = test_alt
+
+    def runTestAlt(self):
+        self.userObj.runTestAlt()
 
     def makeEventIter(self):
         self.logger.debug('XCorrBase.makeEventIter returning EventIter(datasource=%s,rank=%s,servers=%s,numEvents=%s)' % \
@@ -157,7 +165,7 @@ class XCorrBase(object):
                          self.mp.serverRanks,
                          self,
                          self.system_params,
-                         self.mp.mask_ndarrayCoords.shape,
+                         self.mp.maskNdarrayCoords.shape,
                          self.mp.logger,
                          self.numEvents)
 
@@ -165,8 +173,8 @@ class XCorrBase(object):
         '''called from both server and worker ranks for the scattering of the data.
 
         When called from the server, args are
-        serverFullDataArray - image producer result - 2D nparray float64
-        serverWorldRank     - None, one can get rank from self.mp.rank
+        serverFullDataArray - ndarray of float64
+        serverWorldRank     - must be None.
 
         When called from the worker, args are
         serverFullDataArray  - None
@@ -182,11 +190,15 @@ class XCorrBase(object):
         serverRankInComm = serverWorkersDict['serverRankInComm']
         workerRanksInCommDict = serverWorkersDict['workerRanksInCommDict']
         if self.mp.isServer:
-            assert serverFullDataArray is not None, "XCorrBase server expected data but got None"
-            assert serverFullDataArray.dtype == self.detectorData1Darray.dtype, "XCorrBase server data dtype != expected dtype"
-            self.detectorData1Darray[:] = serverFullDataArray[self.mp.mask_ndarrayCoords]
-            assert len(self.detectorData1Darray) == sum(counts), "counts for scatter is wrong"
-            assert counts[serverRankInComm] == 0, "sever count for scatter is not zero"
+            if self.logger.isEnabledFor(logging.DEBUG):
+                assert serverFullDataArray is not None, "XCorrBase server expected data but got None"
+                assert serverFullDataArray.dtype == self.detectorData1Darray.dtype, "XCorrBase server data dtype != expected dtype"
+                assert serverFullDataArray.dtype == np.float64, "data array must be float64 to correspond to MPI.DOUBLE"
+                assert len(self.detectorData1Darray) == sum(counts), "counts for scatter is wrong"
+                assert counts[serverRankInComm] == 0, "server count for scatter is not zero"
+                self.logger.debug('XCorrBase.serverWorkersScatter: server is sending data with first elem=%r' % serverFullDataArray[self.mp.maskNdarrayCoords].flatten()[0])
+
+            self.detectorData1Darray[:] = serverFullDataArray[self.mp.maskNdarrayCoords]
             sendBuffer = self.detectorData1Darray
             recvBuffer = self.serverScatterReceiveBuffer
         elif self.mp.isWorker:
@@ -195,7 +207,8 @@ class XCorrBase(object):
             thisWorkerRankInComm = workerRanksInCommDict[self.mp.rank]
             assert len(recvBuffer) == counts[thisWorkerRankInComm], 'recv buffer len != count'
 
-        if self.isServerOrFirstWorker: self.logger.debug('XCorrBase.serverWorkersScatter: before Scatterv')
+        if self.isServerOrFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug('XCorrBase.serverWorkersScatter: before Scatterv.')
         comm.Scatterv([sendBuffer,
                        counts,
                        offsets,
@@ -203,12 +216,17 @@ class XCorrBase(object):
                       recvBuffer,
                       root = serverRankInComm)
         comm.Barrier()
-        if self.isServerOrFirstWorker: self.logger.debug('XCorrBase.serverWorkersScatter: after Scatterv and Barrier')
+        if self.isServerOrFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
+            if self.mp.isServer:
+                self.logger.debug('XCorrBase.serverWorkersScatter: after Scatterv and Barrier')
+            else:
+                self.logger.debug('XCorrBase.serverWorkersScatter: after Scatterv and Barrier. First worker received %r as first element of buffer with dtype=%r' % (recvBuffer[0], recvBuffer.dtype))
 
-    def initServer(self):
+
+    def serverInit(self):
         self.detectorData1Darray = np.empty(self.mp.totalElements, np.float)
         self.serverScatterReceiveBuffer = np.zeros(0,dtype=np.float)
-        self.userObj.initServer()
+        self.userObj.serverInit()
 
     def initDelayAndGather(self):
         gatherOneNDArrayCounts = [self.mp.workerWorldRankToCount[rank] for rank in self.mp.workerRanks]
@@ -227,7 +245,7 @@ class XCorrBase(object):
         self.gatherAllDelayCounts = tuple(gatherAllDelayCounts)
         self.gatherAllDelayOffsets = tuple(gatherAllDelayOffsets)
 
-    def initWorker(self):
+    def workerInit(self):
         worldRank = self.mp.rank
         scatterCount = self.mp.workerWorldRankToCount[worldRank]
         thisWorkerStartElement = self.mp.workerWorldRankToOffset[worldRank]
@@ -236,15 +254,14 @@ class XCorrBase(object):
         self.xCorrWorkerBase = XCorrWorkerBase(scatterCount,
                                                self.system_params['times'],
                                                self.mp.isFirstWorker,
-                                               self.system_params['worker_store_dtype'],
+                                               self.system_params['workerStoreDtype'],
                                                self.mp.logger)
                                                
                                                
-        self.userObj.initWorker(scatterCount)
+        self.userObj.workerInit(scatterCount)
         self.elementsThisWorker = scatterCount
 
-
-    def initViewer(self):
+    def viewerInit(self):
         self.initDelayAndGather()
 
         self.gatheredFlatNDArrays = dict((name,np.zeros(self.numDelays*self.totalMaskedElements, np.float)) \
@@ -253,7 +270,7 @@ class XCorrBase(object):
         gatheredMsgParts =['gathered_%s.shape=%s' % (nm, self.gatheredFlatNDArrays[nm].shape) \
                            for nm in self.arrayNames]
         gatheredMsg = ' '.join(gatheredMsgParts)
-        self.logger.debug('XCorrBase.initViewer: numDelays=%d totalMaskedElements=%d (includes masked out) %s (masked in only)' % \
+        self.logger.debug('XCorrBase.viewerInit: numDelays=%d totalMaskedElements=%d (includes masked out) %s (masked in only)' % \
                          (self.numDelays, self.totalMaskedElements, gatheredMsg))
         
         for nm in self.arrayNames:
@@ -276,17 +293,16 @@ class XCorrBase(object):
             if os.path.exists(self.h5inprogress):
                 raise Exception("inprogress file for given h5output: %s exists. System will not overwrite even with --overwrite. Delete file before running" % self.h5inprogress)
             self.h5file = h5py.File(self.h5inprogress,'w')
-            self.h5GroupFramework = self.h5file.create_group('system')
-            writeConfig(self.h5GroupFramework,
-                        self.system_params,
-                        self.user_params)
+            self.h5GroupFramework = writeConfig(self.h5file,
+                                                self.system_params,
+                                                self.user_params)
             self.h5GroupUser = self.h5file.create_group('user')
         else:
             self.h5file = None
             self.h5GroupFramework = None
             self.h5GroupUser = None
 
-        self.userObj.initViewer(self.mp.mask_ndarrayCoords, self.h5GroupUser)
+        self.userObj.viewerInit(self.mp.maskNdarrayCoords, self.h5GroupUser)
 
     def shutdown_viewer(self):
         if self.h5file is not None:
@@ -317,9 +333,9 @@ class XCorrBase(object):
         assert int8array.shape == (self.elementsThisWorker,), "user workerCalc int8array counts array shape=%s != (%d,)" % \
             (int8array.shape, (self.elementsThisWorker,))
         
-    def viewerWorkersUpdate(self, counter = None):
+    def viewerWorkersUpdate(self, lastTime):
         assert self.mp.isWorker or self.mp.isViewer, "can only call this function if viewer or worker"
-
+        counter = lastTime['counter']
         # send the delay counts calculated thus far from one worker to the viewer.
         # The delay counts are the same across all the workers.
 
@@ -422,11 +438,9 @@ class XCorrBase(object):
             # all results are now gathered into flat 1D arrays
             name2delay2ndarray, int8ndarray = self.viewerFormNDarrays(counts, counter)
             
-            self.userObj.viewerPublish(counts, counter, name2delay2ndarray, 
+            self.userObj.viewerPublish(counts, lastTime, name2delay2ndarray, 
                                        int8ndarray, self.h5GroupUser)
             
-
-
     def viewerFormNDarrays(self, counts, counter):
         t0 = time.time()
         assert self.mp.isViewer, "XCorrBase.viewerFormNDarrays: viewerFormNDarrays called, but not viewer"
@@ -439,7 +453,7 @@ class XCorrBase(object):
             workerCount = self.mp.workerWorldRankToCount[workerRank]
             workerStartPositions.append(workerCount * self.numDelays)
 
-        ndarrayShape = self.mp.mask_ndarrayCoords.shape  
+        ndarrayShape = self.mp.maskNdarrayCoords.shape  
 
         name2delay2ndarray = dict([(nm,{}) for nm in self.arrayNames])
 
@@ -458,11 +472,11 @@ class XCorrBase(object):
                     flatMaskedThisWorker = self.gatheredFlatNDArrays[nm][startIdx:endIdx]
                     flatMaskedFromAllWorkers[workerOffset:(workerOffset+workerCount)] = flatMaskedThisWorker
 
-                name2delay2ndarray[nm][delay][self.mp.mask_ndarrayCoords] = flatMaskedFromAllWorkers
+                name2delay2ndarray[nm][delay][self.mp.maskNdarrayCoords] = flatMaskedFromAllWorkers
 
         # form the ndarray shaped int8 array
         int8ndarray = np.zeros(ndarrayShape, np.int8)
-        int8ndarray[self.mp.mask_ndarrayCoords] = self.gatheredInt8array
+        int8ndarray[self.mp.maskNdarrayCoords] = self.gatheredInt8array
 
         t1 = time.time()
         self.logger.info('viewerFormNDarrays took %.3f sec' % (t1-t0,))

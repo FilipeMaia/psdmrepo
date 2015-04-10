@@ -11,6 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2015-4-10 David Schneider
+- update sphinx documentation
+- implement testing part of framework, and cmp script for h5 output
+- change names of parameters in system_params/user_params, consistently camelcase
+- change message structure to include more than just 120hz counter, pass full
+  timing information to workers, viewer, etc
+	
 Tag: V00-00-03
 2015-3-26 David A. Schneider
 - switch to using fiducials for event time JIRA Issue PS-126. Servers include

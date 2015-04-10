@@ -47,28 +47,35 @@ def divideAmongWorkers(dataLength, numWorkers):
     checkCountsOffsets(counts, offsets, dataLength)
     return offsets, counts            
     
-def makeLogger(isMaster, isViewer, isServer, rank, lvl=logging.INFO):
+def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl=logging.INFO):
     '''Returns Python logger with prefix identifying master/viewer/server/worker & rnk
 
-    If noMpi is true, returns logger with 'noMpi' prefix.
+    If isTestMode is true, returns logger with 'noMpi' prefix.
 
     Args:
+     isTestMode (bool): True if this is test mode. only additional parameter used
+                        is lvl in this case.
      isMaster (bool): True if this is logger for master rank
      isViewer (bool): True if this is logger for viewer rank
      isServer (bool): True is this logger is for server rank
      rank (bool): rank to report
      lvl (int): logging level
-     noMpi (bool): testing, True if noMpi
+
+    Return:
+      (logger): python logging logger is returned with formatting describing role in framework, and time of logged messages.
     '''
-    assert int(isMaster) + int(isViewer) + int(isServer) in [0,1], "more than one of isMaster, isViewer, isServer is true"
-    if isMaster:
-        logger = logging.getLogger('master-rnk:%d' % rank)
-    elif isViewer:
-        logger = logging.getLogger('viewer-rnk:%d' % rank)
-    elif isServer:
-        logger = logging.getLogger('server-rnk:%d' % rank)
+    if isTestMode:
+        logger = logging.getLogger('testmode:')
     else:
-        logger = logging.getLogger('worker-rnk:%d' % rank)
+        assert int(isMaster) + int(isViewer) + int(isServer) in [0,1], "more than one of isMaster, isViewer, isServer is true"
+        if isMaster:
+            logger = logging.getLogger('master-rnk:%d' % rank)
+        elif isViewer:
+            logger = logging.getLogger('viewer-rnk:%d' % rank)
+        elif isServer:
+            logger = logging.getLogger('server-rnk:%d' % rank)
+        else:
+            logger = logging.getLogger('worker-rnk:%d' % rank)
     logger.setLevel(lvl)
     ch = logging.StreamHandler()
     ch.setLevel(lvl)

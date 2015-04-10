@@ -6,7 +6,10 @@ Functions include:
   *  Creating psana options (same as config file) for loading a module chain
 '''
 
+import sys
+import math
 import psana
+import numpy as np
 
 def rangesToList(rangeString):
     '''converts a string with ranges to a list
@@ -131,6 +134,149 @@ def parseDataSetString(dataset):
             keyValues['xtc'] = True
 
     return keyValues
+
+def readDetectorDataAndEventTimes(system_params, eventOkFunction=None):
+    '''gathers all masked data from a calibrated detector, as well as the even times.
+    
+    Reads through all, or specified number of events, of a psana datasource. Uses a 
+    mask to mask out part of the calibrated detector ndarray. 
+
+    WARNING: If the number of events is large,
+    and the mask includes many of the detector pixels, this will exhaust memory.
+
+    Args:
+      system_params (dict): the parametes for the ParCorAnaDriver. Uses parameters
+                            that specify the dataset, detector data, masking, and number of events.
+      eventOkFunction (function, optional): a function that takes a Psana Event as argument and
+    
+    Return:
+      (tuple): with
+
+         * data (ndarray): a 2D numpy array of float64 - each row is the masked data from a event
+         * times (list): each element is the EventId corresponding to the data row
+    '''
+    class DataResizeValues(object):
+        '''helper class to resize a growing data array
+        '''
+        def __init__(self, numevents, numelem, dataBlockLenInPixels = 10<<20):
+            self.numevents = numevents
+            self.blockLen = max(1,int(math.ceil(dataBlockLenInPixels / numelem)))
+        def initialDataLen(self):
+            if self.numevents > 0: return self.numevents
+            return self.blockLen
+        def growDataLen(self, data):
+            return data.shape[0]+self.blockLen
+        
+    dset = system_params['dataset']
+    numevents = system_params['numEvents']
+    sanaOptions = system_params['psanaOptions']
+    calibOutKey = system_params['ndarrayCalibOutKey']
+    outputArrayType = system_params['outputArrayType']
+    srcString = system_params['src']
+    maskFile = system_params['maskNdarrayCoords']
+    assert os.path.exists(maskFile), "maskfile=%s doesn't exist" % maskFile
+    mask = np.load(maskFile)
+    self.maskShape = mask.shape
+    self.maskFlatIndexArray = 1 == mask.flatten()
+
+    psana.setOptions(psanaOptions)
+    ds = psana.DataSource(dset)
+    data = None
+    dataResize = None
+    src = psana.Source(srcString)
+    eventTimesWithDetectorData = []
+    evtWithDetectorDataIdx = -1
+
+    def nextIdxAndEvent(ds, dset, numevents):
+        if parseDataSetString(dset)['idx']:
+            evtIdx = -1
+            for run in ds.runs():
+                times = run.times()
+                for tm in times:        
+                    evtIdx += 1
+                    if numevents > 0 and evtIdx >= numevents: 
+                        return
+                    evt = run.get(tm)
+                    yield evtIdx, evt
+        else:
+            for evtIdx, evt in enumerate(ds.events()):
+                if numevents > 0 and evtIdx >= numevents: 
+                    return
+                yield evtIdx, evt
+
+    for evtIdx, evt in nextIdxAndEvent(ds, dset, numevents):
+        eventId = evt.get(psana.EventId)
+        assert eventId is not None, "no eventId in event %d" % evtIdx
+        arrayData = evt.get(outputArrayType, src, calibOutKey)
+        if arrayData is None:
+            sys.stderr.write("WARNING: detector data not present for event %d\n" % evtIdx)
+            continue
+        evtWithDetectorDataIdx += 1
+        assert arrayData.shape == maskShape, "mask file and array do not have same shape"
+        arrayData = arrayData.flatten()
+        maskedData = arrayData[maskFlatIndexArray]
+        if data is None:
+            dataResize = DataResizeValues(numevents, len(maskedData))
+            data = np.zeros((dataResize.initialDataLen(), len(maskedData)), np.float64)
+        if evtWithDetectorDataIdx >= data.shape[0]:
+            data.resize((dataResize.growDataLen(), len(maskedData)), refcheck=False)
+        data[evtWithDetectorDataIdx,:]=maskedData[:]
+        eventTimesWithDetectorData.append(eventId.time())
+
+    if data.shape[0] > evtWithDetectorDataIdx + 1:
+        data.resize((evtWithDetectorDataIdx+1, data.shape[1]), refcheck=False)
+
+    assert data.shape[0] == len(eventTimesWithDetectorData)
+    return data, eventTimesWithDetectorData
+
+def getSortedCountersBasedOnSecNsecAtHertz(eventTimes, hertz=120):
+    '''Returns counters at given clock rate, and indicies to reorder data.
+
+    Args:
+      eventTimes (list): list of tuples - first two elements of each tuple must be seconds/nanoseconds
+                         each as an int. There may be other things in the tuple
+      hertz:   rate in seconds for counter
+
+    Example:
+      >>> counters, newOrder = getSortedCountersAtHertz([(3,2),(3,5),(2,0)], 120)
+      newOrder = [2, 0, 1]
+      counters = [0,120, 120]
+
+    For the counters in the example, a 120hz counter has .08 sec = 80 million nanoseconds between occureneces.
+    so seconds=3,nano=2 and sec=3,nano=5 both look like the same counter. Meanwhile there are 120 counter values 
+    between sec=2 and sec=3.
+
+    Returns:
+      (tuple): sorted counter values and a index mapping to re-order data
+
+        * sortedCounters: an array of int64, the 120hz counter values for all the event times
+                          usually this is an array of consecutive integers, starting at 0, but
+                          if may have gaps depending on the data
+        * newDataOrder:   an index array to reorder event data to get the counters.
+    '''
+    assert len(eventTimes)>0, "no event times for getCounters"
+    sec0= eventTimes[0][0]
+    floatTimes = np.array([(tm[0]-sec0) + 1e-9 * tm[1] for tm in eventTimes])
+    newDataOrder = np.argsort(floatTimes)
+    sortedTimes = floatTimes[newDataOrder]
+    sortedCounters = np.zeros(len(eventTimes), np.int64)
+    oneCounterSec = 1.0/float(hertz)
+    idx = 0
+    numWhereFractionCloseToHalf = 0
+    for prevSec, nextSec in zip(sortedTimes[0:-1],sortedTimes[1:]):
+        idx += 1
+        currDiff = nextSec-prevSec
+        incrCounter = round(currDiff/oneCounterSec)
+        fraction = currDiff/oneCounterSec - incrCounter
+        if fraction >= .45 and fraction <= .55:
+            numWhereFractionCloseToHalf += 1
+        sortedCounters[idx]=sortedCounters[idx-1]+incrCounter
+    if numWhereFractionCloseToHalf>0:
+        sys.stderr.write(("In general sec/nsec from event to event should be very close to a multiple of " + \
+                         " %.3f seconds apart. However %d of the events were not close. " % + \
+                         " They were within 10% of boundary value where it is ambiguous\n") % \
+                         (oneCounterSec, numWhereFractionCloseToHalf))
+    return sortedCounters, newDataOrder
 
 def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, imageOutKey=None):
     '''returns Psana options to calibrate given detector data, and returns output array type.

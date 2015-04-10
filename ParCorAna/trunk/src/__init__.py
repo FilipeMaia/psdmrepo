@@ -108,7 +108,7 @@ what dataset, source, and psana data type the framework needs to distribute to t
 The default values are for xpp tutorial data with full cspad. We will use these values
 to run the tutorial.
 
-  system_params['mask_ndarrayCoords']
+  system_params['maskNdarrayCoords']
 
 You need to provide the framework with a mask file for the dector data. This is a 
 numpy array with the same dimensions as ndarray the psana calibration system uses to 
@@ -116,14 +116,14 @@ represent the detector. This is not neccessarily a 2D image. More on this below.
 
   system_params['times']
   system_params['delays']
-  system_params['user_class']
+  system_params['userClass']
 
 For the tutorial, We will leave these alone. They specify a collection of 50,000 
 events, and a set of 100 logarithmically spaced delays from 1 to 25,000. The user_class
 is where users hook in their worker code. We will be using the example class in the ParCorAna
 package - UserG2 - which does a simplified version of the G2 calculation used in XCS.
 
-  user_params['color_ndarrayCoords']
+  user_params['colorNdarrayCoords']
 
 this is a parameter that the UserG2 needs - a color file that labels the detector pixels
 and determines which pixels are averaged together for the delay curve. It bins the pixels
@@ -160,8 +160,8 @@ next step.
 
 Now in myconfig.py, set the mask and color file:
 
- system_params['mask_ndarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
- user_params['color_ndarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
+ system_params['maskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
+ user_params['colorNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
 
 Note that the last parameter is to the user_params - the framework knows nothing about the coloring.
 
@@ -192,7 +192,7 @@ In /system, one finds:
   /system/system_params    Dataset 
   /system/user_params      Dataset
   /system/color_ndarrayCoords Dataset
-  /system/mask_ndarrayCoords Dataset 
+  /system/maskNdarrayCoords Dataset 
 
 The first two are the output of the Python module pprint on the system_params and
 user_params dictionaries after evaluating the config file.
@@ -269,8 +269,8 @@ Here is a summary of the callbacks:
 
 * MINIMUM SET OF CALLBACKS TO IMPLEMENT
 
-** arrayNames(self):   returns names for the float64 arrays calculated: ['G2', 'IF', 'IP']
-** initWorker(self, numELementsWorker): this is where the user code is told how many elements
+** fwArrayNames(self):   returns names for the float64 arrays calculated: ['G2', 'IF', 'IP']
+** workerInit(self, numELementsWorker): this is where the user code is told how many elements
    of the detector NDArray this worker will process.
 ** workerCalc(self, T, numTimesFilled, X): calculate the portion of the G2, IF and IP ndarrays 
    that this worker is responsible for,  as well as the corresponding int8array, and counts arrays
@@ -286,23 +286,23 @@ Here is a summary of the callbacks:
                           workers produce the same counts array.
 
 * OPTIONAL BUT USEFUL CALLBACKS
-** eventOk(self, evt): look at the event, decide whether or not workers should process it.
+** serverEventOk(self, evt): look at the event, decide whether or not workers should process it.
    The intention is that the user only look at small things before the framework takes the
    time to extract the detector data.
-* adjustData(self, data): allows workers to adjust the data that the framework will store,
+* workerAdjustData(self, data): allows workers to adjust the data that the framework will store,
    on a per event basis. Examples might be removing true zero's, or identifying saturated 
    pixels based on a threshold.
-* initViewer(self, mask_ndarrayCoords, h5GroupUser): allows viewer to initialize. Viewer is passed in 
+* viewerInit(self, maskNdarrayCoords, h5GroupUser): allows viewer to initialize. Viewer is passed in 
   loaded mask array, as a logical index array - True for elements of the ndarray to include.
   Viewer also receives h5py group to write to. This group will be passed in the publish function as well.
 
 * OPTIONAL AND USUALLY NOT NEEDED CALLBACKS 
-* initServer(self):  
-* finalDataArray(self, dataArray, evt): this is an opportunity for the user to filter the
+* serverInit(self):  
+* serverFinalDataArray(self, dataArray, evt): this is an opportunity for the user to filter the
   event by looking at the data array as well as other event data. This function returns None
   to filter, or the passed in dataArray to proceed. The function can also return modified copy
   of the array.
-* adjustTerms(self, mode, dataIdx, T, X): this allows workers to implement a 'rolling' calculation
+* workerAdjustTerms(self, mode, dataIdx, T, X): this allows workers to implement a 'rolling' calculation
   based on knowing when new data is added and replaces the oldest data
 
 == launch an MPI job ==
@@ -354,7 +354,7 @@ Below we take a top down approach to summarizing the components of the framework
                   a server, worker, viewer, or the master. We describe this below:
 - - - - - - -
 ** Server
-*** XCorrBase.initServer() -> in turn calls userObj.initServer()
+*** XCorrBase.serverInit() -> in turn calls userObj.serverInit()
 *** runServer = RunServer() # creates a RunServer object (in the CommSystem)
 *** runSurver.run()
 - - - - - - -
@@ -362,7 +362,7 @@ Below we take a top down approach to summarizing the components of the framework
 
 - - - - - - -
 ** Viewer
-*** XCorrBase.initViewer() -> see below, in turn calls userObj.initViewer()
+*** XCorrBase.viewerInit() -> see below, in turn calls userObj.viewerInit()
 
 - - - - - - -
 ** Master
@@ -373,9 +373,9 @@ Below we take a top down approach to summarizing the components of the framework
 * XCorrBase -
 ** init: 
 *** self.userObj = creates instance of user module from class in system_params['user_class']
-** initViewer()
+** viewerInit()
 *** 
-***  calls self.userObj.arrayNames(): users code implements this function. This is
+***  calls self.userObj.fwArrayNames(): users code implements this function. This is
      how framework knows how many arrays user F function is computing    
 '''
 from CommSystem import identifyCommSubsystems, identifyServerRanks
@@ -385,7 +385,8 @@ from CommSystem import CommSystemFramework
 from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 from PsanaUtil import parseDataSetString, makePsanaOptions, psanaNdArrays
-from XCorrBase import makeDelayList, writeToH5Group, XCorrBase
+from PsanaUtil import readDetectorDataAndEventTimes, getSortedCountersBasedOnSecNsecAtHertz
+from XCorrBase import makeDelayList, writeToH5Group, XCorrBase, writeConfig
 from XCorrWorkerBase import XCorrWorkerBase
 import maskColorImgNdarr
 

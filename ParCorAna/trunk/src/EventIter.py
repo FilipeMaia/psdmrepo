@@ -36,9 +36,7 @@ class EventIter(object):
       dataSourceString (str): psana datset specification
       rank (int):     identifies this rank among the servers
       servers (int):  number of servers
-      xCorrBaseObj:   user callback object. Must provide:
-                        eventOk(self, evt): return True/False
-                        adjustDataArray(self, dataArray): can modify array before scattering to workers
+      xCorrBaseObj:   instance of XCorrBase, used to do scatter and call user server callbacks
       system_params: dict with system keys. Keys used:
                      ['psanaOptions']        - psana configuration  
                      ['outputArrayType']     - output array to get from event store, for example
@@ -60,9 +58,6 @@ class EventIter(object):
     '''
     def __init__(self,dataSourceString, rank, servers, 
                  xCorrBaseObj, system_params, ndarrayShape, logger, numEvents=None):
-        '''
-
-        '''
 
         if numEvents is None:
             numEvents = 0
@@ -125,7 +120,7 @@ class EventIter(object):
         assert self.getKey is not None, "Neither 'ndarrayCalibOutKey' nor 'ndarrayProducerOutKey' is set in system_params"
 
     def eventOk(self, evt):
-        return self.userObj.eventOk(evt)
+        return self.userObj.serverEventOk(evt)
 
     def getDataArray(self, evt):
         dataArray = evt.get(self.getType, self.getSrc, self.getKey)
@@ -142,7 +137,7 @@ class EventIter(object):
             ("shape ERROR. evt ndarray shape=%s != %s (the expected ndarray shape usual from the mask file)" % \
              (dataArray.shape, self.ndarrayShape))
 
-        dataArray = self.userObj.finalDataArray(dataArray, evt)
+        dataArray = self.userObj.serverFinalDataArray(dataArray, evt)
         return dataArray # may be None, or modified copy
 
     def sendToWorkers(self, datum):
@@ -164,6 +159,15 @@ class EventIter(object):
         return EventData(sec, nsec, fiducials, dataArray)
 
     def dataGenerator(self):
+        '''yields a sequence of EventData.
+
+        Each element yielded is valid. Stops numEvents hit, or all data read.
+
+        Example:
+          >>>  for evtData in eventIter.dataGenerator():
+                 print "got detector data at sec=%d nsec=%d fid=%d of shape=%r" % \
+                  (evtData.sec, evtData.nsec, evtData.fiducials, evtData.dataArray.shape)
+        '''
         assert not self.called, "cannot call EventIter dataGenerator twice"
         self.called = True
 

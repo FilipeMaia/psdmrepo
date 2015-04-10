@@ -12,6 +12,10 @@ import numpy as np
 # to get the definition of SUBTRACT and ADD:
 import ParCorAna
 import ParCorAna.XCorrWorkerBase as XCorrWorkerBase
+import psana
+import logging
+from psmon import publish
+from psmon.plots import XYPlot, MultiPlot
 
 ##################################
 ### helper functions for UserG2 class below
@@ -43,43 +47,23 @@ def getMatchingIndex(delay, iiTimeIdx, n, timesSortIdx, T):
     return None
 
 ####################################
-class UserG2(object):
-    '''called on each rank after mpi parameters are identified.
-    
-    Keep code here simple. This class is called for both the viewer rank
-    and all the worker ranks. Initialize variables specific fo a worker or viewer
-    in the initWorker() and initViewer() callbacks.
+class G2Common(object):
+    '''stuff common to both ways to do the G2 calculation
     '''
-    def __init__(self, user_params, system_params, mpiParams):
+    def __init__(self, user_params, system_params, mpiParams, testAlternate):
         self.user_params = user_params
         self.system_params = system_params
         self.mp = mpiParams
+        self.testAlternate = testAlternate
         
         self._arrayNames = ['G2','IF','IP']
 
         self.delays = system_params['delays']
         self.numDelays = len(self.delays)
 
-        # Example of printing output:
-        # use logInfo, logDebug, logWarning, and logError to log messages.
-        # these messages get preceded with the rank and viewer/worker/server.
-        # By default, if the message comes from a worker, then only the first 
-        # worker logs the message. This reduces noise in the output. 
-        # Pass allWorkers=True to have all workers log the message.
-        # it is a good idea to include the class and method at the start of log messages
-        self.mp.logInfo("UserG2.init: initialized")
-
-    ########## CALLBACKS ###########
-    # The framework will call these functions. Some are called only on 
-    # server ranks, some only on worker ranks, and some only on the viewer rank. The
-    # first, arrayNames, may be called on all ranks. 
-    #
-    # In the future, some more technical functions may be called on both 
-    # workers/server or workers/viewer to allow the user to implement their own
-    # collective communication.
-    #
-    # All these functions need to be implemented.
-    def arrayNames(self):
+    ### COMMON CALLBACK ####
+    # callbacks used by multiple roles, i.e, workers and viewer
+    def fwArrayNames(self):
         '''Return a list of names for the arrays calculated. 
 
         This is how the framework knows how many output arrays the user module creates.
@@ -93,25 +77,34 @@ class UserG2(object):
 
     #### SERVER CALLBACKS #####
     # These callbacks are used on server ranks
-    def initServer(self):
+    def serverInit(self):
         '''Called after framework initializes server.
         '''
         pass
 
-    def eventOk(self, evt):
-        '''Callback from the EventIter class. 
-        Return True if an event is Ok to  proceeed with.
+    def serverEventOk(self, evt):
+        '''tells framework if this event is suitable for including in calculation.
+
+        This is a callback from the EventIter class. Return True if an event is Ok to  proceeed with.
         This is called before the detector data array is retreived from the event.
-        Do any filtering that does not require the data array here.
-        Filtering based on the data array should be done in :meth:`ParCorAna.UserG2:finalDataArray`
+        Although one could look at the detector data here, best practice is to do any filtering 
+        that does not require the data array here.
+
+        Filtering based on the data array should be done in :meth:`ParCorAna.UserG2:serverFinalDataArray`
+
+        To use the testing part of the framework, it is a good idea to make this callback a wrapper
+        around a function that is accessible to the testing class as well.
 
         Args:
            evt (psana.Event): a psana event.
+
+        Return:
+          (bool): True if this event should be included in analysis
         '''
         return True
 
-    def finalDataArray(self, dataArray, evt):
-        '''Callback from the EventIter class. After eventOk (above) 
+    def serverFinalDataArray(self, dataArray, evt):
+        '''Callback from the EventIter class. After serverEventOk (above) 
         
         servers calls this to allow user code to validate the event based on the dataArray.
         Return None to say the event should not be processed, or the oringial dataArray
@@ -121,7 +114,7 @@ class UserG2(object):
         return dataArray
 
     ######## WORKER CALLBACKS #########
-    def initWorker(self, numElementsWorker):
+    def workerInit(self, numElementsWorker):
         '''initialize UserG2 on a worker rank
 
         Args:
@@ -144,7 +137,7 @@ class UserG2(object):
         self.saturatedValue = self.user_params['saturatedValue']
         self.notzero = self.user_params['notzero']
 
-    def adjustTerms(self, mode, dataIdx, pivotIndex, lenT, T, X):
+    def workerAdjustTerms(self, mode, dataIdx, pivotIndex, lenT, T, X):
         '''called before and after X[dataIdx,:] is filled with new data scattered to this
         worker. Allows the user to see what new data has been written, and what the time is
         for that data. Once the T buffer wraps and the framework is overwriting the oldest data, 
@@ -186,9 +179,16 @@ class UserG2(object):
         elif mode == XCorrWorkerBase.ADD:
             pass
 
-    def adjustData(self, data):
-        self.saturatedElements[data >= self.saturatedValue]=1
-        data[data < self.notzero] = self.notzero
+    def workerAdjustData(self, data):
+        indexOfSaturatedElements = data >= self.saturatedValue
+        self.saturatedElements[indexOfSaturatedElements]=1
+        indexOfNegativeAndSmallNumbers = data < self.notzero   ## FACTOR OUT
+        data[indexOfNegativeAndSmallNumbers] = self.notzero
+        if self.mp.logger.isEnabledFor(logging.DEBUG):
+            numSaturated = np.sum(indexOfSaturatedElements)
+            numNeg = np.sum(indexOfNegativeAndSmallNumbers)
+            self.mp.logDebug("G2.workerAdjustData: set %d negative values to %r, identified %d saturated pixels" % \
+                             (numNeg, self.notzero, numSaturated))
         
     def workerCalc(self, T, numTimesFilled, X):
         '''Must be implemented, returns all output arrays.
@@ -208,9 +208,9 @@ class UserG2(object):
 
           where these output arguments are as follows. Below let D be the number of delays, 
           that is len(system_params['delays'] and numElementsWorker is what was passed in
-          during initWorker.
+          during workerInit.
         
-          namedArrays - a dictionary, keys are the names returned in arrayNames, 
+          namedArrays - a dictionary, keys are the names returned in fwArrayNames, 
                         i.e, 'G2', 'IF', 'IP'. Values are all numpy arrays of shape
                         (D x numElementsWorker) dtype=np.float64
         
@@ -245,21 +245,21 @@ class UserG2(object):
         return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
 
     ######## VIEWER CALLBACKS #############
-    def initViewer(self, mask_ndarrayCoords, h5GroupUser):
+    def viewerInit(self, maskNdarrayCoords, h5GroupUser):
         '''initialze viewer.
         
         Args:
-          mask_ndarrayCoords: this is the array in MPI_Params.
+          maskNdarrayCoords: this is the array in MPI_Params.
           h5GroupUser: if system was given an h5 file for output, this is a h5py group opened
                        into that file. Otherwise this argument is None
         '''
-        colorFile = self.user_params['color_ndarrayCoords']        
-        assert os.path.exists(colorFile), "user_params['color_ndarrayCoords']=%s not found" % colorFile
+        colorFile = self.user_params['colorNdarrayCoords']        
+        assert os.path.exists(colorFile), "user_params['colorNdarrayCoords']=%s not found" % colorFile
         self.color_ndarrayCoords = np.load(colorFile)
-        self.mask_ndarrayCoords = mask_ndarrayCoords
+        self.maskNdarrayCoords = maskNdarrayCoords
         assert np.issubdtype(self.color_ndarrayCoords.dtype, np.integer), "color array does not have an integer type."
-        assert self.mask_ndarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
-            (self.mask_ndarrayCoords.shape, self.color_ndarrayCoords.shape)
+        assert self.maskNdarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
+            (self.maskNdarrayCoords.shape, self.color_ndarrayCoords.shape)
         self.colors = [color for color in set(self.color_ndarrayCoords.flatten()) if color > 0]
         self.colors.sort()
         self.numColors = len(self.colors)
@@ -270,25 +270,31 @@ class UserG2(object):
         for color in self.colors:
             logicalThisColor = self.color_ndarrayCoords == color
             # take out masked elements
-            logicalThisColor[np.logical_not(self.mask_ndarrayCoords)] = False
+            logicalThisColor[np.logical_not(self.maskNdarrayCoords)] = False
             self.color2ndarrayInd[color] = logicalThisColor
             self.color2numElements[color] = np.sum(logicalThisColor)
 
-        self.mp.logInfo("UserG2.initViewer: colorfile contains colors=%s. Number of elements in each color: %s" % \
+        self.mp.logInfo("UserG2.viewerInit: colorfile contains colors=%s. Number of elements in each color: %s" % \
                         (self.colors, [self.color2numElements[c] for c in self.colors]))
-        
 
-    def viewerPublish(self, counts, relsec, name2delay2ndarray, 
+        self.plot = self.user_params['psmon_plot']
+        if self.plot:
+            self.mp.logInfo("Initializing psmon: viewer host is: %s" % os.environ.get('HOSTNAME','*UNKNOWN*'))
+            publish.init()
+
+
+    def viewerPublish(self, counts, lastEventTime, name2delay2ndarray, 
                       int8ndarray,  h5GroupUser):
         '''results have been gathered from workers. User can now publish, either into 
         h5 group, or by plotting, etc.
 
         Args:
-         counts: this is the 1D array of int64, received from the first worker. It is assumed to be
+         counts (array): this is the 1D array of int64, received from the first worker. It is assumed to be
                  the same for all workers. Typically it is the counts of the number of pairs of times
                  that were a given delay apart.
-         relsec: roughly how many seconds of data have been processed for this viewerPublish call.
-                 It is a floating point seconds relative floor(seconds) of the first event.
+         lastEventTime (dict): has keys 'sec', 'nsec', 'fiducials', and 'counter' for the last event that was
+                 scattered to workers before gathering at the viewer.
+         counter: 120hz counter for last event before publish
 
          name2delay2ndarray: this is a 2D dictionary of the gathered, named arrays. For example
                              name2delay2ndarray['G2'][2] will be the ndarray of G2 calcluations for
@@ -337,29 +343,43 @@ class UserG2(object):
                     average = np.sum(final[colorNdarrayInd]) / float(numElementsThisColor)
                     delayCurves[color][delayIdx] = average
 
+        counter120hz = lastEventTime['counter']
+        groupName = 'G2_results_at_%6.6d' % counter120hz
 
         if h5GroupUser is not None:
-            assert relsec is not None
-            counter120hz = int(np.round(120*relsec))
-            groupName = 'G2_results_at_%d' % counter120hz
+            createdGroup = False
             try:
                 group = h5GroupUser.create_group(groupName)
+                createdGroup = True
             except ValueError:
+                pass
+            if not createdGroup:
                 self.mp.logError("Cannot create group  h5 %s. Is viewer update is to frequent?" % groupName)
-                return
+            else:
+                delay_ds = group.create_dataset('delays',(len(self.delays),), dtype='i8')
+                delay_ds[:] = self.delays[:]
+                delay_counts_ds = group.create_dataset('delay_counts',(len(counts),), dtype='i8')
+                delay_counts_ds[:] = counts[:]
 
-            delay_ds = group.create_dataset('delays',(len(self.delays),), dtype='i8')
-            delay_ds[:] = self.delays[:]
-            delay_counts_ds = group.create_dataset('delay_counts',(len(counts),), dtype='i8')
-            delay_counts_ds[:] = counts[:]
+                for color in self.colors:
+                    if color not in delayCurves: continue
+                    delay_curve_color = group.create_dataset('delay_curve_color_%d' % color,
+                                                             (len(counts),),
+                                                             dtype='f8')
+                    delay_curve_color[:] = delayCurves[color][:]
+
+                # write out the G2, IF, IP matrices using framework helper function
+                ParCorAna.writeToH5Group(group, name2delay2ndarray)
+
+        if self.plot:
+            multi = MultiPlot(counter120hz, 'MULTI')
             for color in self.colors:
-                delay_curve_color = group.create_dataset('delay_curve_color_%d' % color,
-                                                         (len(counts),),
-                                                         dtype='f8')
-                delay_curve_color[:] = delayCurves[color][:]
+                if color not in delayCurves: continue
+                thisPlot = XYPlot(counter120hz, 'color/bin=%d' % color, 
+                                  self.delays, delayCurves[color], formats='bs')
+                multi.add(thisPlot)
+            publish.send('MULTI', multi)
 
-            # write out the G2, IF, IP matrices using framework helper function
-            ParCorAna.writeToH5Group(group, name2delay2ndarray)
 
 
     ######## VIEWER HELPERS (NOT CALLBACKS, JUST USER CODE) ##########
@@ -388,3 +408,100 @@ class UserG2(object):
         if numNewSaturatedElements > 0:
             self.mp.logInfo("UserG2.maskOutNewSaturatedElements: removed %d elements from among %d colors" % \
                             (numNewSaturatedElements, numColorsChanged))
+
+    def calcAndPublishForTestAlt(self, sortedEventIds, sortedData, h5GroupUser):
+        '''run the alternative test
+
+        This function receives all the data, with counters, sorted. It should
+        implement the G2 calculation in a robust, alternate way, that can then be compared
+        to the result of the framework.
+
+        The simplest way to compare results is to reuse the viewerPublish function, however one
+        may want to write an alternate calculate to test this as well.
+
+        Args:
+          sortedCounters: array of int64, sorted 120hz counters for all the data in the test.
+          sortedData: 2D array of all the accummulated, masked data. 
+          h5GroupUser (h5group): the output group that we should write results to.
+
+        '''
+        G2 = {}
+        IP = {}
+        IF = {}
+        counts = {}
+        numDetectorElements = sortedData.shape[1]
+        for delay in self.delays:
+            counts[delay]=0
+            G2[delay]=np.zeros(numDetectorElements)
+            IP[delay]=np.zeros(numDetectorElements)
+            IF[delay]=np.zeros(numDetectorElements)
+
+        self.mp.logInfo("calcAndPublishForTestAlt: starting double loop")
+
+        for idxA, eventIdA in enumerate(sortedEventIds):
+            counterA = eventIdA['counter']
+            for idxB in range(idxA+1,len(sortedEventIds)):
+                counterB = sortedEventIds[idxB]['counter']
+                delay = counterB - counterA
+                if delay == 0:
+                    print "warning: unexpected - same counter twice in data - idxA=%d, idxB=%d" % (idxA, idxB)
+                    continue
+                if delay not in self.delays: 
+                    continue
+                counts[delay] += 1
+                dataA = sortedData[idxA,:]
+                dataB = sortedData[idxB,:]
+                G2[delay] += dataA*dataB
+                IP[delay] += dataA
+                IF[delay] += dataB
+
+        self.mp.logInfo("calcAndPublishForTestAlt: finished double loop")
+
+        name2delay2ndarray = {}
+        for nm,delay2masked in zip(['G2','IF','IP'],[G2,IF,IP]):
+            name2delay2ndarray[nm] = {}
+            for delay,masked in delay2masked.iteritems():
+                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float64)
+                name2delay2ndarray[nm][delay][self.maskNdarrayCoords] = masked[:]
+            
+        saturatedElements = np.zeros(self.maskNdarrayCoords.shape, np.int8)
+        saturatedElements[self.maskNdarrayCoords] = self.saturatedElements[:]
+
+        lastEventTime = {'sec':sortedEventIds[-1]['sec'],
+                         'nsec':sortedEventIds[-1]['nsec'],
+                         'fiducials':sortedEventIds[-1]['fiducials'],
+                         'counter':sortedEventIds[-1]['counter']}
+
+        countsForViewerPublish = np.zeros(len(counts),np.int)
+        for idx, delay in enumerate(self.delays):
+            countsForViewerPublish[idx]=counts[delay]
+        self.viewerPublish(countsForViewerPublish, lastEventTime, 
+                           name2delay2ndarray, saturatedElements, h5GroupUser)
+
+#################### on going calculation ###################################        
+class G2onGoing(G2Common):
+    '''Workers keep terms of G2 calculation up to date. Do O(n) where n
+    is number of delays, work during each event.
+    '''
+    def __init__(self, user_params, system_params, mpiParams, testAlternate):
+        super(G2onGoing,self).__init__(user_params, system_params, mpiParams, testAlternate)
+        # Example of printing output:
+        # use logInfo, logDebug, logWarning, and logError to log messages.
+        # these messages get preceded with the rank and viewer/worker/server.
+        # By default, if the message comes from a worker, then only the first 
+        # worker logs the message. This reduces noise in the output. 
+        # Pass allWorkers=True to have all workers log the message.
+        # it is a good idea to include the class and method at the start of log messages
+        self.mp.logInfo("G2onGoing: object initialized")
+
+#################### calculate all at end ###################################        
+class G2atEnd(G2Common):
+    '''workers just store data.
+
+    Entire G2 calculation is done when update is requested.
+    '''
+    def __init__(self, user_params, system_params, mpiParams, testAlternate):
+        super(G2atEnd,self).__init__(user_params, system_params, mpiParams, testAlternate)
+        self.mp.logInfo("G2atEnd: object initialized")
+
+

@@ -74,7 +74,7 @@ system_params['psanaOptions'], \
 # an example of adding options to the psana configuration:
 # system_params['psanaOptions']['ImgAlgos.NDArrCalib.do_gain'] = True
 
-system_params['worker_store_dtype'] = np.float64  # The calibration system is creating ndarrays of
+system_params['workerStoreDtype'] = np.float64  # The calibration system is creating ndarrays of
               # double - or np.float64. Each worker stores a portion of this ndarray. To guarantee no 
               # loss of precision, workers should store results in the same data format - i.e, float64.
               # However for large detectors and long correlation types, this may require too much 
@@ -91,7 +91,7 @@ system_params['worker_store_dtype'] = np.float64  # The calibration system is cr
               # does not affect the precision of the delay curves.
               #
               # The system will emit warnings if the calibrated ndarrays have to be truncated to fit
-              # into a worker_store_dtype that is not np.float64.
+              # into a workerStoreDtype that is not np.float64.
 
 
 ############## mask ##############
@@ -102,15 +102,16 @@ system_params['worker_store_dtype'] = np.float64  # The calibration system is cr
 #
 # note: a mask file must be provided.
 
-system_params['mask_ndarrayCoords'] = "see __init__.py in ParCorAna/src for documentation on this parameter"
+system_params['maskNdarrayCoords'] = "see tutorial for documentation on this parameter"
+system_params['testMaskNdarrayCoords'] = None
 
-####### numservers serverhosts #################
+####### numservers serverHosts #################
 # The servers are responsible for working through the data. If they do a lot of 
 # processing of the detector data, such as complicated calibration, they can become a bottleneck.
 # Running several servers in parallel can increase performance. The 'numservers' parameter allows
 # users to increase the number of servers. When running from shared memory, only certain nodes have 
 # access to the data. In this case, users need to specify the names of these hosts. This is what the
-# 'serverhosts' parameter is for. 
+# 'serverHosts' parameter is for. 
 #
 # There are limits on the number of servers on can use. These depend on the input mode specified in the
 # psana datasource string. When running in live mode, the most servers one can run is the number of 
@@ -143,19 +144,19 @@ system_params['mask_ndarrayCoords'] = "see __init__.py in ParCorAna/src for docu
 # streams less than 80 are DAQ streams. Do not count control streams, only count DAQ streams. For live
 # mode, do not use more streams than there are DAQ streams.
 
-system_params['numservers'] = 1
-system_params['serverhosts'] = None  # None means system selects which hosts to use (default). 
+system_params['numServers'] = 1
+system_params['serverHosts'] = 1
 
 # when explicitly listing hosts, the number of hosts much agree with the number of servers
-# system_params['serverhosts'] = ['host1', 'host2']  # to explicitly set hosts, use a list of hostnames
+# system_params['serverHosts'] = ['host1', 'host2']  # to explicitly set hosts, use a list of hostnames
 
 # here are the hosts used for each instrument in shared memory mode
-# system_params['serverhosts'] = ['daq-amo-mon01', 'daq-amo-mon02', 'daq-amo-mon03'] 
-# system_params['serverhosts'] = ['daq-xcs-mon01', 'daq-xcs-mon02', 'daq-xcs-mon03']
-# system_params['serverhosts'] = ['daq-xpp-mon01', 'daq-xpp-mon02', 'daq-xpp-mon03']
-# system_params['serverhosts'] = ['daq-cxi-mon01', 'daq-cxi-mon02', 'daq-cxi-mon03']
-# system_params['serverhosts'] = ['daq-sxr-mon01', 'daq-sxr-mon02', 'daq-sxr-mon03']
-# system_params['serverhosts'] = ['daq-mec-mon01', 'daq-mec-mon02']
+# system_params['serverHosts'] = ['daq-amo-mon01', 'daq-amo-mon02', 'daq-amo-mon03'] 
+# system_params['serverHosts'] = ['daq-xcs-mon01', 'daq-xcs-mon02', 'daq-xcs-mon03']
+# system_params['serverHosts'] = ['daq-xpp-mon01', 'daq-xpp-mon02', 'daq-xpp-mon03']
+# system_params['serverHosts'] = ['daq-cxi-mon01', 'daq-cxi-mon02', 'daq-cxi-mon03']
+# system_params['serverHosts'] = ['daq-sxr-mon01', 'daq-sxr-mon02', 'daq-sxr-mon03']
+# system_params['serverHosts'] = ['daq-mec-mon01', 'daq-mec-mon02']
 
 
 ########### times ######## update ##############
@@ -181,7 +182,7 @@ system_params['delays'] = ParCorAna.makeDelayList(start=1,
 
 ######## User Module ########
 import ParCorAna.UserG2 as UserG2
-system_params['user_class'] = UserG2.UserG2
+system_params['userClass'] = UserG2.UserG2
 
 ######## h5output, overwrite ########### 
 # The system will manage an h5output filename. This is not a file for collective
@@ -194,8 +195,7 @@ system_params['user_class'] = UserG2.UserG2
 # yyyymmddhhmmss. (year, month, day, hour, minute, second). It will also recognize %C for a one up counter.
 # When forming a string by "a-%d" % 3, one needs to use two % to  Add %%T into the string
 system_params['h5output'] = 'g2calc_%s-r%4.4d.h5' % (experiment, run)
-#system_params['h5output'] = 'g2calc_%s-r%4.4d-%%T.h5' % (experiment, run)
-#system_params['h5output'] = 'g2calc_%s-r%4.4d-%%C.h5' % (experiment, run)
+system_params['testh5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
 
 ## overwrite can also be specified on the command line, --overwrite=True which overrides what is below
 system_params['overwrite'] = False   # if you want to overwrite an h5output file that already exists
@@ -203,18 +203,20 @@ system_params['overwrite'] = False   # if you want to overwrite an h5output file
 ######## verbosity #########
 # verbosity can be one of logging.INFO, logging.DEBUG, logging.WARNING
 # this can be overriden on the command line with aliases for those Python logging module values.
+# when debug is on, more asserts, etc are run in the code.
 system_params['verbosity'] = logging.INFO 
 
 ######## numevents #########
 # numevents - 0 or None means all events. This is primarily a debugging/development switch that
 # can be overriden on the command line
-system_params['numevents'] = 0
+system_params['numEvents'] = 0
+system_params['testNumEvents'] = 100
 
 ######## elementsperworker #########
 # elementsperworker - 0 or None means all elements. This is a debugging/development switch only.
-# use the mask_ndarrayCoords to control which elements are processed
+# use the maskNdarrayCoords to control which elements are processed
 # this can be overriden on the command line
-system_params['elementsperworker'] = 0
+system_params['elementsPerWorker'] = 0
 
 ##### parallel job allocation #####
 # below are parameters that the system will use to figure out the 
@@ -228,7 +230,7 @@ system_params['elementsperworker'] = 0
 #system_params['number_hosts_in_queue'] = 40
 
 system_params['queue'] = 'psanaq' # put None for local
-system_params['bsub_cmd'] = None  # let the system construct bsub_cmd
+system_params['bsubCmd'] = None  # let the system construct bsub_cmd
 
 ##################################################
 ############ USER MODULE - G2 CONFIG #############
@@ -237,7 +239,7 @@ user_params = {}
 # the partition is a numpy array of int's. 0 and negative int's are ignored. int's that are positive
 # partition the elements. That is all elements with '1' form one delay curve, likewise all elements that are '2'
 # form another delay curve.
-user_params['color_ndarrayCoords'] =  "see __init__.py in ParCorAna/src for documentation on this file"
+user_params['colorNdarrayCoords'] =  "see __init__.py in ParCorAna/src for documentation on this file"
 user_params['saturatedValue'] = (1<<15)
 user_params['LLD'] = 1E-9
 user_params['notzero'] = 1E-5

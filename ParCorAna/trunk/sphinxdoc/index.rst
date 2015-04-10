@@ -21,6 +21,7 @@ Contents:
    overview
    tutorial
    framework
+   testing
    architecture
 
 ############
