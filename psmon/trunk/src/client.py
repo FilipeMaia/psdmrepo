@@ -125,6 +125,20 @@ def parse_cmdline():
     )
 
     parser.add_argument(
+        '--logx',
+        action='store_true',
+        default=False,
+        help='show the x-axis in a logarithmic scale'
+    )
+
+    parser.add_argument(
+        '--logy',
+        action='store_true',
+        default=False,
+        help='show the y-axis in a logarithmic scale'
+    )
+
+    parser.add_argument(
         '-g',
         '--grid',
         action='store_true',
@@ -174,6 +188,8 @@ def main():
             xrange=args.x_range,
             yrange=args.y_range,
             zrange=args.z_range,
+            logx=args.logx,
+            logy=args.logy,
             aspect=args.aspect,
             bkg_col=args.bkg_color,
             fore_col=args.text_color,

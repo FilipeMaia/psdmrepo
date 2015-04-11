@@ -69,6 +69,8 @@ class PlotClient(object):
         self.multi_plot = False
         # set any user specified default axis ranges
         self.set_xy_ranges()
+        # set log scales
+        self.set_log_scale()
         # show grid lines if requested
         self.set_grid_lines()
         # create cursor event listener
@@ -153,6 +155,11 @@ class PlotClient(object):
             self.plot_view.setXRange(*self.info.xrange)
         if self.info.yrange is not None:
             self.plot_view.setYRange(*self.info.yrange)
+
+    def set_log_scale(self):
+        if self.info.logx or self.info.logy:
+            np.seterr(divide='ignore')
+        self.plot_view.setLogMode(self.info.logx, self.info.logy)
 
     def set_grid_lines(self, show=None, alpha=config.PYQT_GRID_LINE_ALPHA):
         if show is None:

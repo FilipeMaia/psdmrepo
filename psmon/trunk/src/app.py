@@ -26,10 +26,12 @@ class ClientInfo(object):
 
 
 class PlotInfo(object):
-    def __init__(self, xrange=None, yrange=None, zrange=None, aspect=None, fore_col=None, bkg_col=None, interpol=None, palette=None, grid=False):
+    def __init__(self, xrange=None, yrange=None, zrange=None, logx=False, logy=False, aspect=None, fore_col=None, bkg_col=None, interpol=None, palette=None, grid=False):
         self.xrange = xrange
         self.yrange = yrange
         self.zrange = zrange
+        self.logx = logx
+        self.logy = logy
         self.aspect = aspect
         self.fore_col = fore_col
         self.bkg_col = bkg_col

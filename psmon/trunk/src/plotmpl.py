@@ -96,6 +96,12 @@ class PlotClient(object):
         if self.info.yrange is not None:
             self.ax.set_ylim(self.info.yrange)
 
+    def set_log_scale(self):
+        if self.info.logx:
+            self.ax.set_xscale('log')
+        if self.info.logy:
+            self.ax.set_yscale('log')
+
     def set_aspect(self, lock=True, ratio=None):
         if ratio is None:
             ratio=self.info.aspect
@@ -204,6 +210,7 @@ class ImageClient(PlotClient):
         self.set_cb_col()
         self.set_aspect(init_im.aspect_lock, init_im.aspect_ratio)
         self.set_xy_ranges()
+        self.set_log_scale()
 
     def update_sub(self, data):
         """
@@ -228,6 +235,7 @@ class HistClient(PlotClient):
         self.formats = inflate_input(init_hist.formats, init_hist.values)
         self.set_aspect()
         self.set_xy_ranges()
+        self.set_log_scale()
         self.set_grid_lines()
         self.add_legend(self.hists, init_hist.values, init_hist.leg_label, init_hist.leg_offset)
 
@@ -273,6 +281,7 @@ class XYPlotClient(PlotClient):
         self.formats = inflate_input(init_plot.formats, init_plot.ydata)
         self.set_aspect()
         self.set_xy_ranges()
+        self.set_log_scale()
         self.set_grid_lines()
         self.add_legend(self.plots, init_plot.ydata, init_plot.leg_label, init_plot.leg_offset)
 
