@@ -564,11 +564,16 @@ bool Analyze::getIsOffFromOnOffKey(const std::string & moduleParameter, const st
 void 
 Analyze::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::EvrData::DataV3> evr = evt.get(Source("DetInfo(:Evr)"));
-  if (!evr.get()) {
-    MsgLog(name(), warning, name() << ": Could not fetch evr data");
+  shared_ptr<Psana::EvrData::DataV4> evr4 = evt.get(Source("DetInfo(:Evr)"));
+  shared_ptr<Psana::EvrData::DataV3> evr3;
+  if (not evr4) evr3 = evt.get(Source("DetInfo(:Evr)"));
+  if (not(evr3 or evr4)) {
+    MsgLog(name(), warning, name() << ": Could not fetch evr data - tried DataV3 and DataV4.");
     return;
   }
+
+  ndarray<const Psana::EvrData::FIFOEvent,1> fifoEvents =  \
+    evr4 ? evr4->fifoEvents() : evr3->fifoEvents();
 
   bool nobeam;
   bool nolaser;
@@ -578,7 +583,7 @@ Analyze::event(Event& evt, Env& env)
                                   m_beam_on_off_key, evt);
   } else {
     nobeam  = !calculate_logic(m_beam_logic,
-                                  evr.get()->fifoEvents());
+                               fifoEvents);
   }
   
 
@@ -587,13 +592,13 @@ Analyze::event(Event& evt, Env& env)
                                    m_laser_on_off_key, evt);
   } else {
     nolaser = !calculate_logic(m_laser_logic, 
-                               evr.get()->fifoEvents());
+                               fifoEvents);
   }
 
   bool use_sb_roi  = (m_sb_roi_lo [0]!=m_sb_roi_hi [0]);
   bool use_ref_roi = (m_ref_roi_lo[0]!=m_ref_roi_hi[0]);
 
-  MsgLog(name(), trace, name() << ": evr_codes " << evr.get()->fifoEvents().size()
+  MsgLog(name(), trace, name() << ": evr_codes " << fifoEvents.size()
          << ": nobeam " << (nobeam ? 'T':'F')
          << ": nolaser " << (nolaser ? 'T':'F'));
 

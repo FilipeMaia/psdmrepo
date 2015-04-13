@@ -11,6 +11,10 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2015-4-13 David Schneider
+- Update Analyze and Setup to look for both EvrData::DataV4 and DataV3.
+  
 Tag: V00-02-00
 2015-4-8 David Schneider
 - Adapt to new API change for hmgr in PSEnv V00-14-00, adapt to use std:: due to removal of root headers

@@ -265,10 +265,13 @@ Setup::event(Event& evt, Env& env)
     //
     //  Beam is absent if BYKIK fired
     //
-    shared_ptr<Psana::EvrData::DataV3> evr = evt.get(Source("DetInfo(:Evr)"));
-    if (evr.get()) {
+    shared_ptr<Psana::EvrData::DataV3> evr4 = evt.get(Source("DetInfo(:Evr)"));
+    shared_ptr<Psana::EvrData::DataV3> evr3;
+    if (not evr4) evr3 = evt.get(Source("DetInfo(:Evr)"));
+    if (evr3 or evr4) {
       bool nolaser=false;
-      ndarray<const Psana::EvrData::FIFOEvent,1> f = evr.get()->fifoEvents();
+      ndarray<const Psana::EvrData::FIFOEvent,1> f = \
+        evr4 ? evr4->fifoEvents() : evr3->fifoEvents();
       unsigned ec_nobeam = unsigned(abs(m_eventcode_nobeam));
       unsigned ec_skip   = unsigned(abs(m_eventcode_skip));
       for(unsigned i=0; i<f.shape()[0]; i++) {
@@ -285,7 +288,7 @@ Setup::event(Event& evt, Env& env)
     }
     else {
       MsgLog(name(), warning, 
-             name() << ": Failed to retrieve EVR event data.");
+             name() << ": Failed to retrieve EVR event data - tried DataV3 and DataV4.");
     }
 
     //
