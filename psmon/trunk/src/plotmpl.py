@@ -145,7 +145,7 @@ class PlotClient(object):
             self.legend_labels = inflate_input(leg_label, plot_data)
             for plot, label in zip(plots, self.legend_labels):
                 plot.set_label(label)
-            self.legend = self.ax.legend()
+            self.legend = self.ax.legend(loc=leg_offset)
 
 
 class MultiPlotClient(object):

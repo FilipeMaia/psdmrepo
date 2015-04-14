@@ -10,7 +10,7 @@ from pyqtgraph.Qt import QtCore, QtGui
 from psmon import config
 from psmon.util import is_py_iter, arg_inflate_tuple, window_ratio
 from psmon.plots import Hist, Image, XYPlot, MultiPlot
-from psmon.format import parse_fmt_xyplot, parse_fmt_hist
+from psmon.format import parse_fmt_xyplot, parse_fmt_hist, parse_fmt_leg
 
 
 LOG = logging.getLogger(__name__)
@@ -183,7 +183,12 @@ class PlotClient(object):
             if leg_offset is None:
                 self.plot_view.addLegend()
             else:
-                self.plot_view.addLegend(offset=leg_offset)
+                try:
+                    leg_offset_fmt = parse_fmt_leg(leg_offset)
+                except ValueError:
+                    LOG.warning('Inavlid legend offset for pyqtgraph: %s - Falling back to default offset', leg_offset)
+                    leg_offset_fmt = None
+                self.plot_view.addLegend(offset=leg_offset_fmt)
 
 
 class ImageClient(PlotClient):

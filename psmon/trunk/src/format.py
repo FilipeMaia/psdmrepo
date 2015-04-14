@@ -64,6 +64,48 @@ LINE_MAP = {
 }
 
 
+LEGEND_CENTER_X = -config.PYQT_SMALL_WIN.x/3
+LEGEND_CENTER_Y = -config.PYQT_SMALL_WIN.y/4
+LEGEND_TUPLE_SCALE = 100
+LEGEND_TUPLE_MIN = 0.001
+
+
+LEGEND_OFFSETS = {
+    'best': None,
+    'upper right': (-20, 20),
+    'upper left': (20, 20),
+    'lower left': (20, -20),
+    'lower right': (-20, -20),
+    'right': (-20, LEGEND_CENTER_Y),
+    'center left': (20, LEGEND_CENTER_Y),
+    'center right': (-20, LEGEND_CENTER_Y),
+    'lower center': (LEGEND_CENTER_X, -20),
+    'upper center': (LEGEND_CENTER_X, 20),
+    'center': (LEGEND_CENTER_X, LEGEND_CENTER_Y),
+}
+
+
+def parse_fmt_leg(leg_offset):
+    try:
+        x_pos, y_pos = leg_offset
+        if abs(x_pos) > 1 or abs(x_pos) > 1:
+            raise ValueError('Illegal legend offset tuple values: %s' % str(leg_offset))
+        if x_pos > 0.5:
+            result_x = LEGEND_TUPLE_SCALE * (x_pos - 1) - LEGEND_TUPLE_MIN
+        else:
+            result_x = LEGEND_TUPLE_SCALE * x_pos + LEGEND_TUPLE_MIN
+        if y_pos > 0.5:
+            result_y = LEGEND_TUPLE_SCALE * (y_pos - 1) - LEGEND_TUPLE_MIN
+        else:
+            result_y = LEGEND_TUPLE_SCALE * y_pos + LEGEND_TUPLE_MIN
+        return result_x, result_y
+    except (ValueError, TypeError):
+        if leg_offset in LEGEND_OFFSETS:
+            return LEGEND_OFFSETS[leg_offset]
+        else:
+            raise ValueError('Illegal legend offset value: %s' % str(leg_offset))
+
+
 def parse_fmt_str(fmt_str, color_index):
     color = None
     line_style = None
