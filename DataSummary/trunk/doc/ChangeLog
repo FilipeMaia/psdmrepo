@@ -11,6 +11,12 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-15 Justin Garofoli
+Tag: V00-00-05
+- fix potential bug where script hangs when not all ranks encounter
+all the same data
+- seperate output from each process into unique sub-directories to
+prevent filename collisions.
 
 2015-03-17 Justin Garofoli
 Tag: V00-00-04

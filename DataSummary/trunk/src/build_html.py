@@ -87,8 +87,9 @@ class build_html(event_process.event_process):
                 if 'figures' in thisep:
                     self.html.start_hidden(ep)                                       ######### the hidden part ##     #    #
                     for img in sorted(thisep['figures']):                                                  #     #    #
-                        self.html.page.a( markup.oneliner.img(src=os.path.basename(thisep['figures'][img]['png']),style='width:49%;'), 
-                                href=os.path.basename(thisep['figures'][img]['png']) )        #     #    #
+                        imgsrc = os.path.join(*thisep['figures'][img]['png'].split('/')[-2:])
+                        self.html.page.a( markup.oneliner.img(src=imgsrc,style='width:49%;'), 
+                                href=imgsrc )        #     #    #
                     self.html.end_hidden()                                           ############################     #    #
                 self.html.end_subblock()                                    #######################################    #
                                                                                                                         #
@@ -112,8 +113,9 @@ class build_html(event_process.event_process):
                 if 'figures' in thisep:
                     self.html.start_hidden(ep)                                       ######### the hidden part ##     #    #
                     for img in sorted(thisep['figures']):                                               #     #    #
-                        self.html.page.a( markup.oneliner.img(src=os.path.basename(thisep['figures'][img]['png']),style='width:49%;'), 
-                                href=os.path.basename(thisep['figures'][img]['png']) )        #     #    #
+                        imgsrc = os.path.join(*thisep['figures'][img]['png'].split('/')[-2:])
+                        self.html.page.a( markup.oneliner.img(src=imgsrc,style='width:49%;'), 
+                                href=imgsrc )        #     #    #
                     self.html.end_hidden()                                           ############################ #    #
                 self.html.end_subblock()                                    #######################################    #
                                                                                                                        #
@@ -137,8 +139,9 @@ class build_html(event_process.event_process):
                 if 'figures' in thisep:
                     self.html.start_hidden(ep)                                       ######### the hidden part ##     #    #
                     for img in sorted(thisep['figures']):                                               #     #    #
-                        self.html.page.a( markup.oneliner.img(src=os.path.basename(thisep['figures'][img]['png']),style='width:49%;'), 
-                                href=os.path.basename(thisep['figures'][img]['png']) )        #     #    #
+                        imgsrc = os.path.join(*thisep['figures'][img]['png'].split('/')[-2:])
+                        self.html.page.a( markup.oneliner.img(src=imgsrc,style='width:49%;'), 
+                                href=imgsrc )        #     #    #
                     self.html.end_hidden()                                           ############################ #    #
                 self.html.end_subblock()                                    #######################################    #
                                                                                                                        #

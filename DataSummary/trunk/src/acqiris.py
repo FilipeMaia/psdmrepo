@@ -12,6 +12,7 @@ class acqiris(event_process.event_process):
         self.data = {}
         self.output = event_process.event_process_output()
         self.logger = logging.getLogger(__name__+'.acqiris')
+        self.reducer_rank = 0
         return
 
     def set_stuff(self,src,psana_device,in_report=None,in_report_title=None,histmin=400,histmax=450):
@@ -49,10 +50,10 @@ class acqiris(event_process.event_process):
         self.reduced_data = {}
         for evr in self.data:
             self.logger.info('mpi reducing {:}'.format(evr))
-            self.reduced_data[evr] = self.data[evr].reduce(self.parent.comm,self.reducer_rank)
+            self.logger.info('reducer_rank={:} ranks={:}'.format(repr(self.reducer_rank),repr(self.reduce_ranks)))
+            self.reduced_data[evr] = self.data[evr].reduce(self.parent.comm,ranks=self.reduce_ranks,reducer_rank=self.reducer_rank,tag=11)
 
-
-        if self.parent.rank == self.reducer_rank:
+        if self.parent.rank == self.parent._reducer_rank[(self.__class__.__name__, repr( self.describe_self() ) )]:
             fig = pylab.figure()
             for evr in sorted(self.reduced_data):
                 fig.clear()
@@ -75,8 +76,9 @@ class acqiris(event_process.event_process):
                 pylab.ylim( 0 , max(self.reduced_data[evr].binentries)*1.1 )
                 #pylab.savefig( os.path.join( self.parent.output_dir, 'figure_evr_{:}.pdf'.format( evr ) ) )
                 #self.output['figures'][evr]['pdf'] = os.path.join( self.parent.output_dir, 'figure_evr_{:}.pdf'.format( evr ) )
-                pylab.savefig( os.path.join( self.parent.output_dir, 'figure_evr_{:}.png'.format( evr ) ) )
-                self.output['figures'][evr]['png'] = os.path.join( self.parent.output_dir, 'figure_evr_{:}.png'.format( evr ) )
+                pylab.savefig( os.path.join( self.output_dir, 'figure_evr_{:}.png'.format( evr ) ) )
+                self.output['figures'][evr]['png'] = os.path.join( self.output_dir, 'figure_evr_{:}.png'.format( evr ) )
+                self.logger.info( 'figure saved: {}'.format( self.output['figures'][evr]['png']) )
             del fig
             self.parent.output.append(self.output)
         return

@@ -92,14 +92,30 @@ class offbyone(event_process.event_process):
                     MR[k] = dict( dd[k] )
         return MR
 
-    def endJob(self):
-        self.logger.info( 'found {:} dropped shots'.format( self.count162 ) )
-        self.gathered_results = self.parent.comm.gather( self.results , root=self.reducer_rank )
+    def reduce(self,comm,ranks=[],reducer_rank=None,tag=None):
+        self.gathered_results = comm.gather( self.results , root=reducer_rank )
         self.allcount162 = np.array([0])
+        if reducer_rank is None and tag is None:
+            self.allcount162[0] += self.count162
+        elif reducer_rank == comm.Get_rank() and tag is not None:
+            for r in ranks:
+                if r == reducer_rank:
+                    self.allcount162[0] += self.count162
+                else :
+                    self.allcount162[0] += comm.recv( source=r, tag=tag)
+        elif reducer_rank != comm.Get_rank() and tag is not None:
+            comm.send( np.array(self.count162), dest=reducer_rank, tag=tag )
+
         self.parent.comm.Reduce( 
                 [np.array(self.count162), MPI.INT], 
                 [self.allcount162, MPI.INT],
-                op=MPI.SUM,root=self.reducer_rank)
+                op=MPI.SUM,root=reducer_rank)
+        return
+
+    def endJob(self):
+        self.logger.info( 'found {:} dropped shots'.format( self.count162 ) )
+        self.reduce(self.parent.comm,ranks=self.reduce_ranks,reducer_rank=self.reducer_rank, tag=77)
+
         if self.parent.rank == self.reducer_rank:
             self.logger.info('all dropped shots: {:}'.format( self.allcount162[0] ) )
             self.merged_results = self.mergeresults( self.gathered_results )
@@ -160,9 +176,9 @@ class offbyone(event_process.event_process):
                     plt.ylabel('response [arb.]',fontsize=8)
                 if subplotnum==8 or i==len(results.keys())-1:
                     pdf.savefig()
-                    pylab.savefig( os.path.join( self.parent.output_dir, 'figure_offbyone_{:}.png'.format( totalfigs ) ) )
+                    pylab.savefig( os.path.join( self.output_dir, 'figure_offbyone_{:}.png'.format( totalfigs ) ) )
                     self.output['figures'][totalfigs] = {}
-                    self.output['figures'][totalfigs]['png'] = os.path.join( self.parent.output_dir, 'figure_offbyone_{:}.png'.format( totalfigs ) )
+                    self.output['figures'][totalfigs]['png'] = os.path.join( self.output_dir, 'figure_offbyone_{:}.png'.format( totalfigs ) )
                     totalfigs += 1
                     #plt.show()
                     plt.close()

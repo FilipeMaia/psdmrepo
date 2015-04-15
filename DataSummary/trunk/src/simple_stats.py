@@ -45,7 +45,8 @@ class simple_stats(event_process.event_process):
         self.reduced_histograms = {}
         for attr in self.dev_attrs:
             self.logger.info('mpi reducing {:}'.format(attr))
-            self.reduced_histograms[attr] = self.histograms[attr].reduce(self.parent.comm,self.reducer_rank)
+            self.logger.info('reducer_rank={:} ranks={:}'.format(repr(self.reducer_rank),repr(self.reduce_ranks)))
+            self.reduced_histograms[attr] = self.histograms[attr].reduce(self.parent.comm,ranks=self.reduce_ranks,reducer_rank=self.reducer_rank,tag=33)
 
         if self.parent.rank == self.reducer_rank:
             # plot those histograms
@@ -64,8 +65,8 @@ class simple_stats(event_process.event_process):
                 pylab.ylabel('count [per bin]')
                 pylab.xlim( self.histograms[attr].minrange, self.histograms[attr].maxrange )
                 pylab.ylim( 0 , max(self.reduced_histograms[attr].binentries)*1.1 )
-                pylab.savefig( os.path.join( self.parent.output_dir, 'figure_{:}.png'.format( attr ) ))
-                self.output['figures'][attr]['png'] = os.path.join( self.parent.output_dir, 'figure_{:}.png'.format( attr ))
+                pylab.savefig( os.path.join( self.output_dir, 'figure_{:}.png'.format( attr ) ))
+                self.output['figures'][attr]['png'] = os.path.join( self.output_dir, 'figure_{:}.png'.format( attr ))
 
                 self.output['table'][attr] = {}
                 self.output['table'][attr]['Mean'] = self.reduced_histograms[attr].mean()

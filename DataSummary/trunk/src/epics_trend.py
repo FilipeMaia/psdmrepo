@@ -54,7 +54,7 @@ class epics_trend(event_process.event_process):
         self.reduced_trends = {}
         for chan in self.channels_to_trend:
             self.logger.info('mpi reducing {:}'.format(chan))
-            self.reduced_trends[chan] = self.trends[chan].reduce(self.parent.comm,self.reducer_rank)
+            self.reduced_trends[chan] = self.trends[chan].reduce(self.parent.comm,reducer_rank=self.reducer_rank,tag=55,ranks=self.reduce_ranks)
 
         if self.parent.rank == self.reducer_rank:
             self.output['text'].append('All available PVs in the EPICS store: <select><option>--</option>\n')
@@ -79,8 +79,8 @@ class epics_trend(event_process.event_process):
                 pylab.title(chan)
                 pylab.xlabel('time [sec]')
                 pylab.ylabel('value [min/mean/max]')
-                pylab.savefig( os.path.join( self.parent.output_dir, 'figure_trend_{:}.png'.format(chan.replace(':','_')) ))
-                self.output['figures'][chan]['png'] = os.path.join( self.parent.output_dir, 'figure_trend_{:}.png'.format( chan.replace(':','_') ))
+                pylab.savefig( os.path.join( self.output_dir, 'figure_trend_{:}.png'.format(chan.replace(':','_')) ))
+                self.output['figures'][chan]['png'] = os.path.join( self.output_dir, 'figure_trend_{:}.png'.format( chan.replace(':','_') ))
                 # finish this section
             del fig
             self.parent.output.append(self.output)

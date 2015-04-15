@@ -6,7 +6,7 @@ import pprint
 class store_report_results(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()
-        self.reducer_rank = 0
+        self.reducer_rank = 0 # this has no effect
         self.logger = logging.getLogger(__name__+'.store_report_results')
         return
 

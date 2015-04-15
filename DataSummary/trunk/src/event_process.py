@@ -1,4 +1,5 @@
 import logging
+import os
 
 
 # copied from psana/Module.h
@@ -12,6 +13,7 @@ class event_process(object):
     def __init__(self):
         self.output       = event_process_output()
         self.reducer_rank = 0
+        self.reduce_ranks = []
         self.logger       = logging.getLogger(__name__+'.default_logger')
         return
 
@@ -19,6 +21,23 @@ class event_process(object):
         self.parent = parent
         #if 'r{:}'.format(self.parent.rank) not in self.logger.name:
             #self.logger.name = '{:}.r{:}'.format(self.logger.name,self.parent.rank)
+
+    @property
+    def output_dir(self):
+        if not hasattr(self,'_output_dir_id'):
+            self._output_dir_id = repr(id(self)) + '-{:0.0f}'.format(self.parent.comm.Get_rank())
+        outdir = os.path.join(self.parent.output_dir, self._output_dir_id )
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+        return outdir
+
+    @output_dir.setter
+    def output_dir(self,val):
+        self._output_dir_id = repr(val)
+        outdir = os.path.join(self.parent.output_dir, self._output_dir_id )
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+        return 
         
 
     def beginJob(self):
@@ -44,6 +63,23 @@ class event_process(object):
         # return a pickleable object (dictionary)
         # that can be used to reproduce this instance (minus the data)
         return (str(self.__class__).split('.')[-1].replace("'>",""), self.replicate_info() )
+
+    def reduce(self,ranks,root=None,tag=None):
+        self.gathered =[]
+        if root is None and tag is None:
+            # do your own singular reduction
+            self.gathered.append( self.vals ) # replace vals with something appropriate
+        elif root == rank and tag is not None:
+            # recieve from the other guys
+            for r in ranks:
+                if r == rank:
+                    self.gathered.append( self.vals ) # replace vals with something appropriate
+                else :
+                    self.gathered.append( comm.recv( source=r, tag=tag) ) # replace vals with something appropriate
+        elif root != rank and tag is not None:
+            # send to the root
+            comm.send( self.vals, dest=root, tag=tag ) # replace vals with something appropriate
+        return
 
 #    def beginStep(self):
 #        return
