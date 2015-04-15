@@ -34,6 +34,55 @@ import matplotlib.patches as patches
 #    def __init__ (self) :
 #        print 'CSPadImageProducer __init__'
 #--------------------------------
+#------------------------------
+
+class Storage :
+    def __init__(self) :
+        pass
+
+#------------------------------
+store = Storage() # singleton
+#------------------------------
+
+#------------------------------
+
+def fig_axes(figsize=(13,12), title='Image') :
+    """ Creates and returns figure, and axes for image and color bar
+    """
+    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    axim = fig.add_axes([0.05,  0.03, 0.87, 0.93])
+    axcb = fig.add_axes([0.923, 0.03, 0.02, 0.93])
+    fig.canvas.set_window_title(title)
+    store.fig, store.axim, store.axcb = fig, axim, axcb
+    return fig, axim, axcb
+
+#------------------------------
+
+def plot_img(img, mode=None, amin=None, amax=None) :
+    
+    fig, axim, axcb = store.fig, store.axim, store.axcb
+
+    axim.cla()
+    imsh = axim.imshow(img, interpolation='nearest', aspect='auto', origin='upper') # extent=img_range)
+    colb = fig.colorbar(imsh, cax=axcb) # , orientation='horizontal')
+
+    ave = np.mean(img) if amin is not None or amax is not None else None
+    rms = np.std(img)  if amin is not None or amax is not None else None
+    #print 'img ave = %f, rms = %f' % (ave, rms)
+    store.amin = amin if amin is not None else ave-1*rms
+    store.amax = amax if amax is not None else ave+5*rms
+
+    imsh.set_clim(store.amin, store.amax)
+
+    #print_help(1)
+
+    if mode is None : plt.ioff() # hold contraol at show() (connect to keyboard for controllable re-drawing)
+    else            : plt.ion()  # do not hold control
+
+    #fig.canvas.draw()
+    plt.show()
+
+#------------------------------
 
 def getArrangedImage() :
     arr = np.arange(2400)

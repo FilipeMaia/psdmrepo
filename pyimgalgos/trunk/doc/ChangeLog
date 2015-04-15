@@ -3,15 +3,20 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package py_img_algos
+#  ChangeLog file for package pyimgalgos
 #------------------------------------------------------------------------
 
 Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-	
+
 =======
+
+Tag: V00-00-22
+2015-04-14 Mikhail S. Dubrovin
+- GlobalGraphics.py - add singleton Store, and methods plot_img and fig_axes
+
 Tag: V00-00-21
 2014-08-18 Mikhail S. Dubrovin
 - update src/TestImageGenerator.py
