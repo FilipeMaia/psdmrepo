@@ -71,7 +71,7 @@ class build_html(event_process.event_process):
         self.html.end_subblock()                                    ##############################################      #
                                                                                                                         #
                                                                                                                         #
-        for thisep in sorted(gathered):                                                                                #
+        for thisep in sorted(gathered,key=lambda kk: kk.in_report_title):                                                                                #
             if thisep['in_report'] == 'meta':                                                                     #
                 self.logger.info( 'adding '+ repr(thisep)+ ' to meta section')
                 ep = thisep['in_report_title'].replace(' ','_')
@@ -97,7 +97,7 @@ class build_html(event_process.event_process):
 
         self.html.start_block('Detector Data', id="detectordata") ################################## a block ########### 
                                                                                                                        #
-        for thisep in sorted(gathered):                                                                                #
+        for thisep in sorted(gathered,key=lambda kk: kk.in_report_title):                                                                                #
             if thisep['in_report'] == 'detectors':                                                                     #
                 self.logger.info( 'adding '+ repr(thisep)+ ' to detectors section')
                 ep = thisep['in_report_title'].replace(' ','_')
@@ -123,7 +123,7 @@ class build_html(event_process.event_process):
         self.html.end_block()                                      #####################################################
 
         self.html.start_block('Analysis', id='analysis')
-        for thisep in sorted(gathered):                                                                                #
+        for thisep in sorted(gathered,key=lambda kk: kk.in_report_title):                                                                                #
             if thisep['in_report'] == 'analysis':                                                                     #
                 self.logger.info( 'adding '+ repr(thisep)+ ' to analysis section')
                 ep = thisep['in_report_title'].replace(' ','_')
