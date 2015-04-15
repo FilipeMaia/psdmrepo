@@ -356,10 +356,13 @@ Analyze::beginJob(Event& evt, Env& env)
 {
   m_analyze_projections = false;
 
-  m_hmgr = env.hmgr();
-  if (not m_hmgr and (m_hdump.size()>0)) {
-    MsgLog(name(), error, "env does not have a histogram manager, but histogramming has been requested "
-           "(config dump parmameter > 0). No histograms will be made");
+  if (m_hdump.size()>0) {
+    m_hmgr = env.hmgr();
+    if (not m_hmgr) {
+      MsgLog(name(), error, 
+             "env does not have a histogram manager, but histogramming has been requested "
+             "(config dump parmameter > 0). No histograms will be made");
+    }
   }
     
   shared_ptr<Psana::TimeTool::ConfigV2> c = 

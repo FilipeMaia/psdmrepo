@@ -11,6 +11,14 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2015-4-15 David Schneider
+- Tag V00-02-00 introdcued a bug - setting dump=0 in Analyze and Setup no
+  longer completely turned off histogramming, meaning the .root file was  
+  created. Although this file gets overwritten, in an MPI program race conditions
+  and errors occur. Fixed bug - now setting dump = 0 in configuration means no
+  root file.
+  
 Tag: V00-02-01
 2015-4-13 David Schneider
 - Update Analyze and Setup to look for both EvrData::DataV4 and DataV3.

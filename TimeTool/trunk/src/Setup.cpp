@@ -209,13 +209,15 @@ Setup::beginJob(Event& evt, Env& env)
     }
   }
   
-  m_hmgr = env.hmgr();
-
-  if (not m_hmgr and m_hdump.size()>0) {
-    MsgLog(name(), error, "histogram manager returned by psana env "
-           "is null, but hisogramming has been requested in configuration");
+  if (m_hdump.size()>0) {
+    m_hmgr = env.hmgr();
+    if (not m_hmgr) {
+      MsgLog(name(), error, "histogram manager returned by psana env "
+             "is null, but histogramming has been requested in configuration. "
+             "No histograms will be created.");
+    }
   }
-
+  
   if (m_hmgr) {
     unsigned pdim = m_projectX ? 1:0;
     Axis a(m_sig_roi_hi[pdim]-m_sig_roi_lo[pdim]+1,
