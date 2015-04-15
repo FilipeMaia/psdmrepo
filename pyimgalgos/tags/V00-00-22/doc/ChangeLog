@@ -1,0 +1,143 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package pyimgalgos
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+=======
+
+Tag: V00-00-22
+2015-04-14 Mikhail S. Dubrovin
+- GlobalGraphics.py - add singleton Store, and methods plot_img and fig_axes
+
+Tag: V00-00-21
+2014-08-18 Mikhail S. Dubrovin
+- update src/TestImageGenerator.py
+	
+Tag: V00-00-20
+2014-08-08 Mikhail S. Dubrovin
+- move python modules from pyimgalgos to PSCalib for 
+        GeometryObject.py, GeometryAccess.py
+	SegGeometry.py, SegGeometryStore.py ,SegGeometryCspad2x1V1.py
+	
+Tag: V00-00-19
+2014-06-27 Mikhail S. Dubrovin
+- in cspad_image_producer.py use default path to calibration directory if parameter "calib_dir" is empty
+
+Tag: V00-00-18
+2014-06-24 Mikhail S. Dubrovin
+- add ex_peaks_nda to test results of ImgAlgos.CSPadArrPeakFinder 
+
+Tag: V00-00-17
+2014-06-24 Mikhail S. Dubrovin
+- add GeometryAccess to work with list of geos
+
+Tag: V00-00-16
+2014-06-20 Mikhail S. Dubrovin
+M       src/AngularIntegrator.py
+A       src/GeometryObject.py - "generic" geometry
+A       src/TestImageGenerator.py - a bunch of test images
+M       src/cspad_image_producer.py - in all python modules in evt.get change np.ndarray to np.int16, ...
+M       src/cspad_arr_producer.py
+M       src/image_crop.py
+M       src/image_save_in_file.py
+
+Tag: V00-00-15
+2014-04-28 Mikhail S. Dubrovin
+- cspad_image_producer - fix minor problems with member data,
+	add warning that image can be reconstructed for full-size cspad(2x2) ndarrays)
+- copy correct SvnProps.py from CalibManager/src/SvnProps.py
+	
+2014-04-18 Mikhail S. Dubrovin
+- ALL modules psvn mktxtprop src/*.py
+	- edit all file headers
+- add SvnProps.py
+
+Tag: V00-00-14
+2014-03-28 Mikhail S. Dubrovin
+- in image_crop.py uncomment self.img2d.setflags(write=False) 
+	
+Tag: V00-00-13
+2014-03-27 Mikhail S. Dubrovin
+- in image_crop.py set self.img2d.setflags(write=False)
+- add AngularIntegrator.py and GlobalGraphics.py, remove then from PyCSPadImage
+
+Tag: V00-00-12
+2014-03-26 Mikhail S. Dubrovin
+- add src/FastArrayTransformation.py
+	
+Tag: V00-00-11
+2014-03-06 Mikhail S. Dubrovin
+in image_save_in_file.py - cosmetic changes
+	
+Tag: V00-00-10
+2013-12-19 Mikhail S. Dubrovin
+in image_save_in_file implicitly convert tiff file to signed int16 tiff
+
+Tag: V00-00-09
+2013-12-18 Mikhail S. Dubrovin
+in image_save_in_file, image_crop.py, and cspad_image_producer add sources for env.fwkName() == "psana" 
+
+Tag: V00-00-08
+2013-11-13 Mikhail S. Dubrovin
+- add src/image_crop.py
+
+Tag: V00-00-07
+2013-11-12 Mikhail S. Dubrovin
+- in cspad_arr_producer.py - add/use dictionary of dtypes
+- in src/image_save_in_file.py - save 16-bit tiff file
+	
+Tag: V00-00-06
+2013-11-11 Mikhail S. Dubrovin
+- in cspad_arr_producer.py use pyana/psana dependent env.getConfig(...) method
+
+Tag: V00-00-05
+2013-11-09 Mikhail S. Dubrovin
+- rename package py_img_algos to pyimgalgos
+	
+Tag: V00-00-04
+2013-11-06 Mikhail S. Dubrovin
+- cspad_arr_producer.py - commented sections in print 
+	(which are not available in Cspad.ConfigV5)
+- image_save_in_file.py - add experiment in the output file name
+
+Tag: V00-00-03
+2013-10-22 Mikhail S. Dubrovin
+- fix a few minor things in order to make it consistent with description at confluence
+	
+Tag: V00-00-02
+2013-10-21 Mikhail S. Dubrovin
+- All modules work in pyana and psana frameworks
+- module src/cspad_arr_producer.py is modified in order to:
+  -- accounts for cspad configuration 
+  -- produce array for cspad and cspad2x2 depending on source parameter
+- module src/cspad_image_producer.py is modified in order to:
+  -- produce images for cspad and cspad2x2 depending on input array shape
+- module src/image_save_in_file.py is modified in order to:
+  -- save image in different formats, specified by the file name extension:
+  -- supported formats: txt, tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz	
+A       src/tahometer.py
+	
+
+Tag: V00-00-01
+2013-10-18 Mikhail S. Dubrovin
+
+This package is created by Marcin's request for pyana
+
+A         src/cspad_arr_producer.py
+A         src/cspad_image_producer.py
+A         src/image_save_in_file.py
+	
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
