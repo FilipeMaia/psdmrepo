@@ -73,6 +73,7 @@ NDArrCalib::NDArrCalib (const std::string& name)
   , m_count_event(0)
   , m_count_get(0)
   , m_count_msg(0)
+  , m_is_done_once(false) 
 {
   // get the values from configuration or use defaults
   m_str_src           = configSrc("source",   "DetInfo(:Camera)");
@@ -262,9 +263,9 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
 
   if( m_print_bits & 2 ) m_calibpars->printCalibPars();
 
-  static bool is_done_once = false; 
-  if ( ! is_done_once ) {
-         is_done_once = true;
+  if ( ! m_is_done_once ) {
+         m_is_done_once = true;
+
       m_bkgd_data = new PSCalib::CalibPars::pixel_bkgd_t[m_size];
       m_mask_data = new PSCalib::CalibPars::pixel_mask_t[m_size];
       m_nrms_data = new data_proc_t[m_size];
@@ -275,7 +276,9 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
       
       if( m_do_bkgd && !m_fname_bkgd.empty())
         pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_bkgd_t> (m_fname_bkgd, "Background", m_size, m_bkgd_data);
-      else std::fill_n(m_bkgd_data, int(m_size), PSCalib::CalibPars::pixel_bkgd_t(0));    
+      else std::fill_n(m_bkgd_data, int(m_size), PSCalib::CalibPars::pixel_bkgd_t(0));
+
+      if( m_print_bits & 2 ) printMaskAndBkgd();
   }
 
   if( m_do_nrms ) { for(unsigned i=0; i<m_size; i++) m_nrms_data[i] = m_low_nrms * m_rms_data[i]; }
@@ -354,6 +357,28 @@ NDArrCalib::printCommonModePars()
      std::stringstream ss; ss << "Common mode parameters: "; 
      for (int i=0; i<16;  ++i) ss << " " << m_cmod_data[i];
      MsgLog(name(), info, ss.str());
+}
+
+//--------------------
+
+void
+NDArrCalib::printMaskAndBkgd()
+{
+  std::stringstream ss; 
+
+  if( m_do_mask && !m_fname_mask.empty()) {
+    ss << "\n  Content of the file: " << m_fname_mask << ':';
+    for (int i=0; i<min(20,int(m_size)); ++i) ss << " " << m_mask_data[i];
+  }
+  else ss << "\n  File for mask: \"" << m_fname_mask << "\" is not requested in configuration parameters, m_do_mask=" << m_do_mask;
+
+  if( m_do_bkgd && !m_fname_bkgd.empty()) {
+    ss << "\n  Content of the file: " << m_fname_bkgd << ':'; 
+    for (int i=0; i<min(10,int(m_size)); ++i) ss << " " << m_bkgd_data[i];
+  }
+  else ss << "\n  File for bkgd: \"" << m_fname_bkgd << "\" is not requested in configuration parameters, m_do_bkgd=" << m_do_bkgd;
+
+  MsgLog(name(), info, ss.str());
 }
 
 //--------------------

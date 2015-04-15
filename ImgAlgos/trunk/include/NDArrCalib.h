@@ -107,6 +107,7 @@ protected:
   void initAtFirstGetNdarray(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void printCommonModePars();
+  void printMaskAndBkgd();
   void findDetectorType();
 
 private:
@@ -151,6 +152,7 @@ private:
   const PSCalib::CalibPars::common_mode_t*   m_cmod_data;
   const PSCalib::CalibPars::pixel_rms_t*     m_rms_data;
 
+  bool                                 m_is_done_once;
   PSCalib::CalibPars::pixel_bkgd_t*    m_bkgd_data;
   PSCalib::CalibPars::pixel_mask_t*    m_mask_data;
   data_proc_t*                         m_nrms_data;
