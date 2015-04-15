@@ -1,0 +1,58 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  ChangeLog file for package DataSummary
+#------------------------------------------------------------------------
+
+Package author: Justin Garofoli
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+2015-04-15 Justin Garofoli
+Tag: V00-00-06
+- now html sections are sorted alpha-numerically
+
+2015-04-15 Justin Garofoli
+Tag: V00-00-05
+- fix potential bug where script hangs when not all ranks encounter
+all the same data
+- seperate output from each process into unique sub-directories to
+prevent filename collisions.
+
+2015-03-17 Justin Garofoli
+Tag: V00-00-04
+- add unit test
+- add option to pass data directory to job
+
+
+Tag: V00-00-03 Igor Gaponenko
+- remove an obsolete test application test/myDS
+
+Tag: V00-00-02
+2015-03-16 Justin Garofoli
+- correctly produce report.py with changes in event_process.py
+- fix logging bug introduced by package name change
+
+Tag: V00-00-01
+2015-03-13 Igor Gaponenko
+- the initial source code of the package commited by Justin Garofoli
+- substantial modifications were made later as a part of this tag
+- flattened Python package directory to comply with the SIT build
+system's requirements
+- moved folder html/ and the dictionary file device_config.dict
+into folder data/
+- modified source code to locate html/ files and the dictionary file
+in the data/ folder
+- eliminated file extention and moved executable data-summary-tool
+into folder app/
+- eliminated file extention and moved test executable myDS
+folder test/
+- addded documentation folder doc/ and two files into it
+- consolidated documentation spread in files README.md into a single
+file README located in folder src/
+- see JIRA ticket PSDH-29
+
+
