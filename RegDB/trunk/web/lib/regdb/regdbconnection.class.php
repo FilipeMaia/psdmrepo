@@ -69,15 +69,36 @@ class RegDBConnection extends DbConnection {
      *   LDAP QUERIES
      * ================
      */
-    public function posix_groups ( ) {
+    public function posix_groups ( $all_groups=true ) {
 
         $this->connect();
 
+        // NOTE: It's much safer to generate many simple regular expressions
+        //       to be checked individually rather than a single complex
+        //       one which may fail due to some internal limitations
+        //       of the PHP engine.
+
+        $group_filter = array();
+        if( !$all_groups ) {
+            $regdb = RegDB::instance();
+            $regdb->begin();
+            foreach( $regdb->instrument_names() as $instr ) {
+                array_push( $group_filter, '/^'.strtolower($instr).'/' );
+            }
+            array_push( $group_filter, '/^ps/' );
+        }
         $list = array();
         $groups = $this->groups();
-        foreach( array_keys( $groups ) as $gid )
-            array_push( $list, $groups[$gid]['name'] );
-
+        foreach( array_keys( $groups ) as $gid ) {
+            $name = trim($groups[$gid]['name']);
+            if( $group_filter ) {
+                foreach( $group_filter as $filter )
+                    if ( 1 == preg_match( $filter, $name ))
+                        array_push( $list, $name );
+            } else {
+                array_push( $list, $name );
+            }
+        }
         sort( $list );
         return $list;
     }

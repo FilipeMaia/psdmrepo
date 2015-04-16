@@ -386,17 +386,20 @@ class RegDBExperiment {
      * @param $run - optional run number
      * @return array
      */
-    public function files( $run=null, $reverse_order=false ) {
+    public function files( $run=null, $reverse_order=false, $order_by_time=false ) {
 
     	$list = array();
         $table = "{$this->connection->database}.file";
 
         $run_selector = is_null( $run ) ? '' : 'AND run='.$run;
+
         $order = $reverse_order ? 'DESC' : '';
+        $order_by_opt = $order_by_time ?
+            "open {$order}" :
+            "run {$order}, stream {$order}, chunk {$order}";
 
-        $result = $this->connection->query(
-            "SELECT * FROM {$table} WHERE exper_id=".$this->id()." {$run_selector} ORDER BY run {$order}, stream {$order}, chunk {$order}" );
-
+        $sql = "SELECT * FROM {$table} WHERE exper_id=".$this->id()." {$run_selector} ORDER BY {$order_by_opt}";
+        $result = $this->connection->query( $sql );
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )
             array_push (
@@ -409,6 +412,40 @@ class RegDBExperiment {
         return $list;
     }
  
+    /**
+     * Return an iterator of files reported by the DAQ system as "open".
+     * 
+     * @param integer $min_run
+     * @param integer $max_run
+     * @param boelean $reverse_order
+     * @param boelean $order_by_time
+     * @return \RegDB\RegDBFileItr
+     */
+    public function files_itr (
+        $min_run=null ,
+        $max_run=null ,
+        $reverse_order=true ,
+        $order_by_time=true) {
+
+        $table = "{$this->connection->database}.file" ;
+
+        $run_selector = '' ;
+        if ($min_run && $max_run && ($min_run == $max_run)) {
+            $run_selector .= " AND run ={$min_run}" ;
+        } else {
+            if ($min_run) $run_selector .= " AND run >={$min_run}" ;
+            if ($max_run) $run_selector .= " AND run <={$max_run}" ;
+        }
+        $order = $reverse_order ? 'DESC' : '' ;
+        $order_by_opt = $order_by_time ?
+            "open {$order}" :
+            "run {$order}, stream {$order}, chunk {$order}" ;
+
+        $sql = "SELECT * FROM {$table} WHERE exper_id={$this->id()} {$run_selector} ORDER BY {$order_by_opt}" ;
+
+        return new RegDBFileItr($this->instrument()->regdb(), $this->connection, $sql) ;
+    }
+    
    /**
      * Get a list of files registered in the data migration table.
      *

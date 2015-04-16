@@ -38,8 +38,9 @@ function group2json( $group ) {
  * Return JSON objects with a list of groups.
  */
 try {
+    $all_groups = false;    // LCLS specific groups only
     RegDB::instance()->begin();
-    $groups = RegDB::instance()->posix_groups();
+    $groups = RegDB::instance()->posix_groups($all_groups);
 
     // Choose the desired presentation
     //

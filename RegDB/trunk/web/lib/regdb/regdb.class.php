@@ -555,12 +555,61 @@ HERE;
         return $list;
     }
 
+    /* =========
+     *   FILES
+     * =========
+     */
+
+    /**
+     * Return an iterator of files reported by the DAQ system as "open".
+     * 
+     * @param string $instr_name
+     * @param \LusiTime\LusiTime $begin_time
+     * @param \LusiTime\LusiTime $end_time
+     * @param boelean $reverse_order
+     * @param boelean $order_by_time
+     * @return \RegDB\RegDBFileItr
+     */
+    public function files_itr (
+        $instr_name    = null ,
+        $begin_time    = null ,
+        $end_time      = null ,
+        $reverse_order = true ,
+        $order_by_time = true) {
+
+        $select_opt = '' ;
+        if (!is_null($instr_name) ||
+            !is_null($begin_time) ||
+            !is_null($end_time)) {
+  
+            if (!is_null($instr_name)) {
+                $instr = $this->find_instrument_by_name($instr_name) ;
+                if (is_null($instr))
+                    throw new RegDBException (
+                        __METHOD__ ,
+                        "no such instrument: '{$instr_name}'") ;
+                $sql_subquery = "SELECT id FROM {$this->connection->database}.experiment WHERE instr_id={$instr->id()}" ;
+                $select_opt .= ($select_opt == '' ? ' WHERE' : ' AND')." exper_id IN ({$sql_subquery})" ;
+            }
+            if (!is_null($begin_time)) $select_opt .= ($select_opt == '' ? ' WHERE' : ' AND')." open >= {$begin_time->to64()}" ;
+            if (!is_null($end_time))   $select_opt .= ($select_opt == '' ? ' WHERE' : ' AND')." open <  {$end_time->to64()}" ;
+        }
+        $order = $reverse_order ? 'DESC' : '' ;
+        $order_by_opt = $order_by_time ?
+            "open {$order}" :
+            "run {$order}, stream {$order}, chunk {$order}" ;
+
+        $sql = "SELECT * FROM {$this->connection->database}.file {$select_opt} ORDER BY {$order_by_opt}" ;
+                        
+        return new RegDBFileItr($this, $this->connection, $sql) ;
+    }
+
     /* ====================
      *   GROUPS AND USERS
      * ====================
      */
-    public function posix_groups () {
-        return $this->connection->posix_groups(); }
+    public function posix_groups ( $all_groups=true ) {
+        return $this->connection->posix_groups( $all_groups ); }
 
     public function is_known_posix_group ( $name ) {
         return $this->connection->is_known_posix_group( $name ); }

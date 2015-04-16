@@ -29,6 +29,9 @@ class RegDBInstrument {
     public function parent () {
         return $this->registry; }
 
+    public function regdb () {
+        return $this->registry; }
+
     public function id () {
         return $this->attr['id']; }
 

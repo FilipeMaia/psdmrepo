@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-09
+2015-04-16 Igor Gaponenko
+- reduced a list of POSIX groups reported by the library (PSWA-1)
+- added an iterator of file entries created by the DAQ as a more
+efficient way of browsing through a large collection of entries.
+This was needed to implement a new File Migration Monitor (PSDH-34)
+
 Tag: V00-02-08
 2015-03-05 Igor Gaponenko
 - extended Python API to allow fetching attribute class names for
