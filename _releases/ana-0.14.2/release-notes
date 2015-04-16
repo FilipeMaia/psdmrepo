@@ -1,0 +1,19 @@
+psana:
+- allow default calibDir to be set using environment variable SIT_PSDM_DATA
+- psana_test: add diagnostic/testing script and C++ Psana module
+
+Imaging algorithms and tools:
+- ImgAlgos: NDArrCalib - add method printMaskAndBkgd()
+- pyimgalgos: GlobalGraphics.py - add singleton Store, and methods
+  plot_img and fig_axes.
+
+Bug fixes:
+- psana: fix bug with small data xtc. It was running out of file
+  handles when processing small data file. (PSAS-130)
+- PSCalib,CorAna,CalibManager: migration to the new version of NumPy
+- TimeTool.Analyze: do not create a .root file if dump=0 specified,
+  the bug was that it created an empty .root file, causing MPI jobs
+  to crash (PSAS-135)
+- TimeTool.(Analyze,Setup): updated to look for both EvrDataV4 as well
+  as EvrDataV3. Used to get warnings about no evr data for new data
+  with EvrDataV4.
