@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2015-04-16 Igor Gaponenko
+- fixed a memory leak bug in SmartTable widget
+- added a test for memory leaks
+- improved styling for tooltips
+
 Tag: V00-01-05
 2015-03-10 Igor Gaponenko
 - added group headers and fancy annotation to the PropList widget

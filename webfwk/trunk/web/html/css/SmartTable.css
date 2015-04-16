@@ -96,7 +96,7 @@ div.t-cont > .header > .column {
   border-right-color: #c0c0c0;
   border-bottom-color: #c0c0c0;
 
-  border-radius: 3px 3px 3px 0px;
+/*  border-radius: 3px 3px 3px 0px;*/
 
   //background: linear-gradient(to bottom right, #e0e0e0, #fcfcfc);
   background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
@@ -228,7 +228,7 @@ div.t-cont > .body   > table td.focus div[data]:hover:after {
   white-space: pre;
   max-width: 520px;
   z-index: 102;
-  border-radius: 2px ;
+/*  border-radius: 2px ;*/
   background-color: lemonchiffon;
   font-weight: normal;
   font-size: 12px;

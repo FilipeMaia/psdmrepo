@@ -269,6 +269,24 @@ a:hover, a.link:hover {
   color: red;
 }
 
+a.link[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-family: 'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  text-align: left;
+}
+
 /*
     Override JQuery UI styles
 */
@@ -279,4 +297,8 @@ li > a.ui-tabs-anchor {
 }
 li.ui-tabs-active > a.ui-tabs-anchor {
     font-weight:    bold !important;
+}
+.ui-corner-all {
+    -webkit-border-radius:  0 !important;
+    border-radius:          0 !important;
 }

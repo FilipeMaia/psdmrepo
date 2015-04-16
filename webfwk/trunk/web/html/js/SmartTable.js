@@ -67,6 +67,23 @@ function (
 
             if (!this._is_rendered) return ;
 
+            // Clean up the previous content to make sure eveyting is properly
+            // destroyed, including data atatched to DOM, etc. This way we
+            // would guarantee that we won't have any memory leaks.
+            //
+            // NOTE: elementas are destroyed in teh reverse order.
+
+            for (var i in this._cols)   { this._cols  [i].remove() ; }
+            for (var i in this._row2td) { this._row2td[i].remove() ; }
+            for (var i in this._col2td) { this._col2td[i].remove() ; }
+            if (this._table)  this._table.remove() ;
+            if (this._body)   this._body.remove() ;
+            if (this._header) this._header.remove() ;
+            if (this._menu)   this._menu.remove() ;
+            if (this._t_cont) this._t_cont.remove() ;
+
+            // Form a new table and set up event handlers
+
             var html =
 '<div class="t-cont">' +
 '  <div class="menu">' +
