@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-02-03
+2015-04-16 Igor Gaponenko
+- minor improvements in the UI to make the shifts table a bit less wide
+
 Tag: V00-02-02
 2014-10-24 Igor Gaponenko
 - modified a configuration of the module loader (RequireJS) as per JIRA ticket
