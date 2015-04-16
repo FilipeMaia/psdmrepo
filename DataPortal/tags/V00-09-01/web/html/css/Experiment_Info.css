@@ -1,0 +1,28 @@
+#exp-info {
+    padding:    10px;
+}
+#exp-info .info#updated {
+    margin-bottom:  5px;
+    color:          maroon;
+}
+#exp-info > #table {
+    margin-left:    10px;
+    margin-right:   25px;
+}
+.exp-info-descr {
+    max-width:      480px;
+    white-space:    normal;
+}
+
+#exp-info #group-members {
+  margin-left:          8px;
+  border-left:          1px solid #c0c0c0;
+  border-radius:        2px;
+  -moz-border-radius:   2px;
+}
+#exp-info .group-hidden  { display: none; }
+#exp-info .group-visible { display: block; }
+
+#exp-info #buttons button[name="update"] img {
+    width:      11px;
+}

@@ -1,0 +1,339 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DataPortal
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-09-01
+2015-04-16 Igor Gaponenko
+- minor improvements in the Run Tables UI
+- more option parsers added and bugs fixed in the ServiceJSON and Service
+PHP frameworks for Web services
+- removed any notions of runs from the e-Log UI of facilities
+
+Tag: V00-09-00
+2015-03-10 Igor Gaponenko
+- Re-factoring HDF5 translation ordering application (PSWA-35)
+- Web application to configure the Monitoring Interface Controller (PSWA-32)
+- Automated update of run tables when new runs reported by the DAQ (PSWA-31)
+- DAQ detectors run table migration (PSWA-37)
+- minor changes to the UI design of some applications: unified page refresh
+button, unified location of the page update timestamp
+- updated base class for Web services Service to match the API of ServiceJSON
+
+Tag: V00-08-08
+2014-12-19 Igor Gaponenko
+- finished refactoring Web services as per JIRA ticket PSDH-20
+
+Tag: V00-08-07
+2014-12-19 Igor Gaponenko
+- refactoring Web services as per JIRA ticket PSDH-20
+- renaming WS: SearchFiles into filemgs_files_search, and
+MoveFile into filemgr_files_move
+- extended/improved parameters parser in PHP class ServiceJSON
+
+Tag: V00-08-06
+2014-12-08 Igor Gaponenko
+- fixed a minor typo in a context of JIRA PSWA-19
+
+Tag: V00-08-05
+2014-12-08 Igor Gaponenko
+- implemented e-Log message forwarding as per JIRA PSWA-19
+- minor changes in CSS (fonts)
+
+Tag: V00-08-04
+2014-11-03 Igor Gaponenko
+- fixed a bug in the Experiment Switch notification e-mail (JIRA ticket
+PSWA-18)
+
+Tag: V00-08-03
+2014-10-24 Igor Gaponenko
+- modified a configuration of the module loader (RequireJS) as per JIRA ticket
+PSWA-14 to prevent pages from staying in browser caches forever.
+
+Tag: V00-08-02
+2014-10-10 Igor Gaponenko
+- continued migration to RequireJS
+- a bug fix in the HDF5 Translator UI and Web service preventing retranslation
+if the previous request failed
+- added an new application for configuring the custom HDF5 translation based
+on the new psana-based Translator
+- minor code cleanup in some files
+
+Tag: V00-08-01
+2014-05-21 Igor Gaponenko
+- nearly completed migration to the component model using RequireJS
+
+Tag: V00-08-00
+2014-05-17 Igor Gaponenko
+- partial migration to the component model using RequireJS
+
+Tag: V00-07-01
+2014-05-16 Igor Gaponenko
+- added regdbauth() database connector to the PHP JASON Web Service
+- a bug fix in teh statistics report tool (missing CSS)
+- a bug fix in the ELog message viewer class
+- added e-Log authorization management for the operator accounts in the Portal
+and Experiment Switch
+- cleaned facility e-Logs version of the Portal from mentioning runs or shifts
+- rename the application from 'Web Portal of Experiment' into 'Data Manager of Experiment'
+
+Tag: V00-07-00
+2014-04-30 Igor Gaponenko
+- code cleanup (removed the old version of the Portal)
+- refactoring due to migration of Web Services in LogBook
+- finished the new version of the Portal (ready to be deployed in production)
+
+Tag: V00-06-03
+2014-03-17 Igor Gaponenko
+- implemented the 'Runs' application within ELog
+- allowed HDF5 'Retranslate' for privileged users
+- fixed a bug in the experiment info report (teh bug was affecting Portals of the non-regular experiments)
+- extended the Web services framework to allow backward compatibility woth older clients (capitalzed 'Status' and 'Message' fields)
+
+Tag: V00-06-02
+2014-03-02 Igor Gaponenko
+- saving results of the on-going development
+
+Tag: V00-06-01
+2014-01-31 Igor Gaponenko
+- the first implementation of the new Web Portal
+
+Tag: V00-06-00
+2013-12-13 Igor Gaponenko
+- finished refactoring the Web Portal to the new WebFwk
+
+Tag: V00-05-03
+2013-11-15 Igor Gaponenko
+- finished implementing eLog Live in the new Portal
+
+Tag: V00-05-02
+2013-11-01 Igor Gaponenko
+- added two run tables: 'EPICS'
+- began working on the new version of the Portal based on Webfwk
+
+Tag: V00-05-01
+2013-10-23 Igor Gaponenko
+- extended MySQL schema for handling file restore requests from HPSS
+- added Run Tables tab to the Portal Web interface
+- added two run tables: 'Calibrations' and 'DAQ Detectors'
+- fixed a bug in the iRODS Web Services class
+
+Tag: V00-05-00
+2013-10-11 Igor Gaponenko
+- added the new tab 'Run Tables' and table 'Calibrations'
+- minor improvements to the JavaScript class Table
+- move tests of the new JS Fwk class into the corresponding package webfwk
+- added support for shiftmgr database in the PHP Web Services framework
+- reinforced the implementation of the DeleteExpiredFiles web service to make two consequitive
+attempts when deleting expired files. The first attempt may fail if the file isn't
+physically present on the file system
+- implemented the navigation between various contexts of the Portal for runs and messages
+
+Tag: V00-04-13
+2013-08-08 Igor Gaponenko
+- changed visual style for buttons in the Web Portal
+- implemented navigation by messages id within the Portal
+- extended ExpTimeMon database API with hautch door position monitoring PVs
+- extended API of the JS Fwk class to allow external switching between contexts
+
+Tag: V00-04-12
+2013-07-25 Igor Gaponenko
+- improved CSS inthe JS Table class
+- finalized implementation of teh JS Fwk
+- extended implementation of the Experiment Time Monitoring class (needed by the ShiftMgr app)
+- enabled HPSS operations from the Web Portal UI
+
+Tag: V00-04-11
+2013-05-16 Igor Gaponenko
+- improved mplementation of the JavaScript Table class and CSS,
+allow using JQuery object to specify table container,
+added an exception class TableError,
+- made the ExpTimeMon::beam_destination_masks bitmap public
+- fixed automatic sliders in the applicatin workareas of the Web Portal
+- unfinished development of the JavaScript Framework
+
+Tag: V00-04-10
+2013-04-23 Igor Gaponenko
+- incomplete implementation for the Fwk class
+- fixed a bug in E-Log
+- fixed a bug in the Web service searchig for files. The new implementation won't return
+errors for experiments not taken any runs
+
+Tag: V00-04-09
+2013-01-28 Igor Gaponenko
+- better implementation of the new messages highlight in e-log using JQUery animation
+
+Tag: V00-04-08
+2012-12-20 Igor Gaponenko
+- improved sorted in the Table class
+- option parser for JSON objects in the ServiceJSON class
+- a bug fix in the E-Log GUI
+
+Tag: V00-04-07
+2012-12-10 Igor Gaponenko
+- mobile DAQ support
+- improved Table.js class
+- code refactoring
+- PHP framework class service.php to support file downloads
+- fixed bugs
+
+Tag: V00-04-06
+2012-11-15 Igor Gaponenko
+- moved PDF generator's fonts into under Web Services
+- added Application Configuration service for interactive pages
+
+Tag: V00-04-05
+2012-11-08 Igor Gaponenko
+- added support for multiple DAQ 'stations' per instrument
+- improved Web services
+- fixed bugs
+
+Tag: V00-04-04
+2012-10-16 Igor Gaponenko
+- fixed a bug in the index.php. Teh bug affected non-privileged users who
+aren't data administrators.
+
+Tag: V00-04-03
+2012-10-12 Igor Gaponenko
+- Web Portal now partially supports facility e-logs
+- minor improvemenmts in the PHP WS framework
+
+Tag: V00-04-02
+2012-10-11 Igor Gaponenko
+- added a simple framework to simplify development of JSON Web services in PHP
+- added 3 tests for the new framework
+
+Tag: V00-04-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-03-00
+2012-08-14 Igor Gaponenko
+- added support for the new data retention policy
+
+Tag: V00-02-02
+2012-07-20 Igor Gaponenko
+- added support for migration delay (seconds) in the File Manager tab
+
+Tag: V00-02-01
+2012-06-06 Igor Gaponenko
+- enchanced implementation of the JS class Table
+
+Tag: V00-02-00
+2012-05-21 Igor Gaponenko
+- moved NeoCaptar into a dedicated package
+
+Tag: V00-01-07
+2012-05-17 Igor Gaponenko
+- updated database schema for NeoCaptar
+
+Tag: V00-01-06
+2012-04-23 Igor Gaponenko
+- first production version of the Data Taking (Beam Time) Monitor application
+- finished implementing label printout for NeoCAPTAR cables
+
+Tag: V00-01-05
+2012-03-16 Igor Gaponenko
+- saving results of the on-going development
+- lots of new code added, including Beam-Time Monitor
+- improved e-log in Web Portal allowing to expand/collaps messages on
+a per-day basis
+- note this isn't a stable version of NeoCaptar!
+
+Tag: V00-01-04
+2012-02-14 Igor Gaponenko
+- saving results of the on-going development
+
+
+Tag: V00-01-03
+2011-11-16 Igor Gaponenko
+- migrated to the NetBeans IDE
+
+Tag: V00-01-02-NeoCaptar
+2011-11-16 Igor Gaponenko
+- added new application NeoCaptar; the project is yet to be completed
+- the tag is created to save the status of teh on-going development before migrating from Eclipse
+to NetBeans IDE
+
+Tag: V00-01-01
+2011-09-20 Igor Gaponenko
+- implemented message deletion. Note, that  this operation requires to extend
+LogBook schema using the following MySQL DDL:
+ALTER TABLE `entry` ADD COLUMN (`deleted_time`  BIGINT UNSIGNED DEFAULT NULL, `deleted_by` VARCHAR(32) DEFAULT NULL);
+
+Tag: V00-01-00
+2011-09-16 Igor Gaponenko
+- code refactoring and clean up
+- renaming multiple files
+
+Tag: V00-00-09
+2011-09-16 Igor Gaponenko
+- implemented Data Migration Monitor
+
+Tag: V00-00-08
+2011-07-12 Igor Gaponenko
+- optimized implementation of the Portal to reduce the startup time
+by not loading run information
+- show IDs for threads and replies (this feature is needed by the new verison of
+the Grabber to post messages as replies)
+- allow posting for any run
+- improving the diagnostics by displaying a pop-up modal dialog in case
+of errors in e-log
+- do not allow posting messages/replies w/a any message
+
+
+Tag: V00-00-07
+2011-07-07 Igor Gaponenko
+- adding attachments and tags to existing messages
+- improved (more dynamic) interactions when posting/modifying e-log contents
+- final implementation of the message viewer in the list of runs
+- changed appearance of the message reply dialogs
+
+Tag: V00-00-06
+2011-06-30 Igor Gaponenko
+- added statistics.php to report data management statistics accross all experiments
+- the improved version of Web Portal; numerious improvements and bug fixes
+
+Tag: V00-00-05
+2011-06-14 Igor Gaponenko
+- added a tab for 'Active' experiments into Experiment Switch
+- allowed to deselect anyone (in the e-mail notification section) in
+the Experiment Switch
+- tightened Experiment Switch GUI
+- allowed to retranslate 'FAILED' runs in teh HDF5 translaton interface
+- improved e-log 'Post' and 'Reply' dialogs to submit messages (w/ attachments)
+w/o refreshing the page. This required to bring in an additional
+JQuery plug-in (AJAX Form)
+
+Tag: V00-00-04
+2011-06-10 Igor Gaponenko
+- committing and tagging the first production version of the Protal
+
+Tag: V00-00-03
+2011-05-15 Igor Gaponenko
+- protected Portal pages from being accessed by non-authorized users
+- tagging as the first production version
+
+2011-05-13 Igor Gaponenko
+- save results of the on-going development
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-02
+2011-02-25 Igor Gaponenko
+- the first usable version of e-log Live & Post pages
+
+Tag: V00-00-01
+2010-10-20 Igor Gaponenko
+- this is an initial commit of the Protal implementation with the main goal to save the
+code to SVN.
