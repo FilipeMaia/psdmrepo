@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2015-04-16 Igor Gaponenko
+- fixed a bug in method LusiTime::to_float()
+
 Tag: V00-01-05
 2014-10-10 Igor Gaponenko
 - extended LusiTime parser to support symbol 'T' as date/time separator as

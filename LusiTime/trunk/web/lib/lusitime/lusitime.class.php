@@ -246,7 +246,7 @@ class LusiTime {
     }
 
     public function to_float() {
-        return $this->sec + 10e-9 * $this->nsec; }
+        return $this->sec + 1e-9 * $this->nsec; }
 
     /* Create an object of the current class out of a packed 64-bit
      * numeric representation.
