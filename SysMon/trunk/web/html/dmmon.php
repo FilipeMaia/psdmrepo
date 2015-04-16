@@ -1,5 +1,9 @@
 <?php
 
+require_once 'authdb/authdb.inc.php' ;
+
+use AuthDB\AuthDB ;
+
 $title    = 'System Monitoring' ;
 $subtitle = 'Data Movers' ;
 
@@ -29,6 +33,8 @@ var app_config = {
 
     title:    '<?= $title ?>' ,
     subtitle: '<?= $subtitle ?>' ,
+
+    uid: '<?= AuthDB::instance()->authName() ?>' ,
 
     instruments: <?php echo json_encode($instruments) ?> ,
 

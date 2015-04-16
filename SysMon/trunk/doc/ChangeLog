@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2015-04-16 Igor Gaponenko
+- the first implementation of the new File Migration Monitor (PSDH-34)
+
 Tag: V00-01-14
 2015-03-10 Igor Gaponenko
 - minor update to the home page of pswww.slac.stanford.edu

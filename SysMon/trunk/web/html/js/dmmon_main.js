@@ -54,7 +54,9 @@ require.config ({
 require ([
     'webfwk/CSSLoader', 'webfwk/Fwk' ,
 
-    'sysmon/DMMon_Live', 'sysmon/DMMon_History', 'sysmon/DMMon_FS_Usage', 'sysmon/DMMon_FS_Summary' ,
+    'sysmon/DMMon_Live',      'sysmon/DMMon_History' ,
+    'sysmon/DMMon_FS_Usage',  'sysmon/DMMon_FS_Summary' ,
+    'sysmon/DMMon_FM_Status', 'sysmon/DMMon_FM_Notify' ,
 
 
     // Make sure the core libraries are preloaded so that the applications
@@ -67,7 +69,9 @@ require ([
 function (
     cssloader, Fwk ,
 
-    DMMon_Live, DMMon_History, DMMon_FS_Usage, DMMon_FS_Summary) {
+    DMMon_Live,      DMMon_History ,
+    DMMon_FS_Usage,  DMMon_FS_Summary ,
+    DMMon_FM_Status, DMMon_FM_Notify) {
 
     cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
     cssloader.load('/jquery/css/jquery-ui-timepicker-addon.css') ;
@@ -89,6 +93,10 @@ function (
             name: 'File Systems', menu: [{
                 name: 'Summary', application: new DMMon_FS_Summary(app_config)}, {
                 name: 'Usage',   application: new DMMon_FS_Usage  (app_config)}]
+        } , {
+            name: 'File Migration', menu: [{
+                name: 'Status',               application: new DMMon_FM_Status(app_config)}, {
+                name: 'E-mail Notifications', application: new DMMon_FM_Notify(app_config)}]
         }) ;
 
         Fwk.build (

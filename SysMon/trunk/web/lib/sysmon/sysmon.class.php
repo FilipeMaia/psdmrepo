@@ -6,10 +6,12 @@ require_once 'sysmon.inc.php' ;
 require_once 'authdb/authdb.inc.php' ;
 require_once 'filemgr/filemgr.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
 
 use \AuthDB\AuthDB ;
 use \FileMgr\DbConnection ;
 use \LusiTime\LusiTime ;
+use RegDB\RegDB ;
 
 define ('BYTES_IN_KB', 1024.0) ;
 define ('BYTES_IN_MB', 1024.0 * 1024.0) ;
@@ -464,6 +466,204 @@ class SysMon extends DbConnection {
             )) ;
         }
         return $list ;
+    }
+
+    /* -------------------------------------
+     *   File migraton delays subscription
+     * -------------------------------------
+     */
+
+    /**
+     * Find a subscription entry for delayed file migration for teh specified
+     * user account. Return 'nul' if none is found.
+     * 
+     * @param string $uid
+     * @return stdClass
+     * @throws DataPortalException
+     */
+    public function find_fm_delay_subscriber ($uid) {
+        $uid_escaped = $this->escape_string(trim($uid)) ;
+        $sql = "SELECT * FROM {$this->database}.fm_delay_subscriber WHERE uid='{$uid_escaped}'" ;
+        $result = $this->query($sql) ;
+        $nrows = mysql_numrows($result) ;
+        if (!$nrows) return null ;
+        if ($nrows == 1)
+            return $this->_fm_delay_subscriber2obj (
+                mysql_fetch_array (
+                    $result ,
+                    MYSQL_ASSOC)) ;
+
+        throw new DataPortalException (
+            __METHOD__ ,
+            "duplicate entries for migration subscriber: {$uid} in database.") ;
+    }
+
+    /* Get all known subscribers for delayed migration notifications.
+     * 
+     * The method will return an array (a list) of entries similar to
+     * the ones reported by the previous method.
+     */
+
+    public function fm_delay_subscribers () {
+        $sql = "SELECT * FROM {$this->database}.fm_delay_subscriber" ;
+        $result = $this->query($sql) ;
+        $list = array();
+        for ($nrows = mysql_numrows($result), $i = 0; $i < $nrows; $i++)
+            array_push (
+                $list ,
+                $this->_fm_delay_subscriber2obj (
+                    mysql_fetch_array (
+                        $result ,
+                        MYSQL_ASSOC))) ;
+
+        return $list ;
+    }
+
+    /**
+     * Return an object representing a subscription entry. The object is
+     * ready to be serialized into JSON.
+     *
+     *   Key             | Type      | Description
+     *   ----------------+-----------+----------------------------------------------------------------------------
+     *   .uid             | string   | user account of a person subscribed
+     *   .gecos           | string   | full user name fr the user account (if available)
+     *   .subscribed_uid  | string   | user account of a person who requested the subscription 
+     *   .subscribed_time | stdClass | time when the subscription was made:
+     *     .sec           | integer  | - the nuumber of seconds
+     *     .nsec          | integer  | - the nuumber of nanoseconds
+     *     .day           | string   | - the day like 2014-04-12
+     *     .hms           | string   | - the hour-minute-second like 20:23:05
+     *   .subscribed_host | string   | host (IP address or DNS name) name from which the operation was requested
+     *   .instr           | string   | the name of an instrument (optional)
+     *   .last_sec        | integer  | the number of last seconds to take into account
+     *   .delay_sec       | integer  | the minimum duration of delays to take into account
+     *
+     * @param stdClass $row
+     */
+    private function _fm_delay_subscriber2obj ($row) {
+
+        $obj = new \stdClass ;
+        $obj->uid = trim($row['uid']) ;
+
+        RegDB::instance()->begin() ;
+        $user = RegDB::instance()->find_user_account($obj->uid) ;
+        $obj->gecos = $user ? $user['gecos'] : $obj->uid ;
+
+        $obj->subscribed_uid = trim($row['subscribed_uid']) ;
+        $subscribed_user = RegDB::instance()->find_user_account($obj->subscribed_uid) ;
+        $obj->subscribed_gecos = $subscribed_user ? $subscribed_user['gecos'] : $obj->subscribed_uid ;
+
+        $subscribed_time = LusiTime::from64(trim($row['subscribed_time'])) ;
+        $obj->subscribed_time = new \stdClass ;
+        $obj->subscribed_time->sec  = $subscribed_time->sec ;
+        $obj->subscribed_time->nsec = $subscribed_time->nsec ;
+        $obj->subscribed_time->day  = $subscribed_time->toStringDay() ;
+        $obj->subscribed_time->hms  = $subscribed_time->toStringHMS() ;
+        $obj->subscribed_host = trim($row['subscribed_host']) ;
+        $obj->instr = is_null($row['instr']) ? '' : strtoupper(trim($row['instr'])) ;
+        $obj->last_sec = intval($row['last_sec']) ;
+        $obj->delay_sec = intval($row['delay_sec']) ;
+        return $obj ;
+    }
+    
+    /**
+     * Register a new subscriber and return an object describing
+     * the newely made subscripton.
+     *
+     * @param string $uid
+     * @param string $subscribed_uid
+     * @param string $instr
+     * @param integer $last_sec
+     * @param integer $delay_sec
+     * @return stdClass
+     */
+    public function add_fm_delay_subscriber (
+        $uid ,
+        $subscribed_uid ,
+        $instr ,
+        $last_sec ,
+        $delay_sec) {
+
+        $subscribed_time_64 = LusiTime::now()->to64() ;
+
+        $uid_escaped             = $this->escape_string(trim($uid)) ;
+        $subscribed_uid_escaped  = $this->escape_string(trim($subscribed_uid)) ;
+        $subscribed_host_escaped = $this->escape_string(trim(AuthDB::instance()->authRemoteAddr())) ;
+        $instr_escaped           = $this->escape_string(trim($instr)) ;
+
+        $last_sec  = intval($last_sec) ;
+        $delay_sec = intval($delay_sec) ;
+        
+        $sql = <<<HERE
+INSERT INTO {$this->database}.fm_delay_subscriber VALUES (
+    '{$uid_escaped}' ,
+    '{$subscribed_uid_escaped}' ,
+    {$subscribed_time_64} ,
+    '{$subscribed_host_escaped}' ,
+    '{$instr_escaped}' ,
+    {$last_sec} ,
+    {$delay_sec}
+)
+HERE;
+        $this->query($sql) ;
+
+        return $this->find_fm_delay_subscriber ($uid) ;
+    }
+
+    /**
+     * Update an entry of an existing subscriber and return an object
+     * describing the current status of the subscripton.
+     *
+     * @param string $uid
+     * @param string $subscribed_uid
+     * @param string $instr
+     * @param integer $last_sec
+     * @param integer $delay_sec
+     * @return stdClass
+
+     */
+    public function update_fm_delay_subscriber (
+        $uid ,
+        $subscribed_uid ,
+        $instr ,
+        $last_sec ,
+        $delay_sec) {
+
+        $subscribed_time_64 = LusiTime::now()->to64() ;
+
+        $uid_escaped             = $this->escape_string(trim($uid)) ;
+        $subscribed_uid_escaped  = $this->escape_string(trim($subscribed_uid)) ;
+        $subscribed_host_escaped = $this->escape_string(trim(AuthDB::instance()->authRemoteAddr())) ;
+        $instr_escaped           = $this->escape_string(trim($instr)) ;
+
+        $last_sec  = intval($last_sec) ;
+        $delay_sec = intval($delay_sec) ;
+        
+        $sql = <<<HERE
+UPDATE {$this->database}.fm_delay_subscriber SET
+    subscribed_uid='{$subscribed_uid_escaped}' ,
+    subscribed_time={$subscribed_time_64} ,
+    subscribed_host='{$subscribed_host_escaped}' ,
+    instr='{$instr_escaped}' ,
+    last_sec={$last_sec} ,
+    delay_sec={$delay_sec}
+  WHERE
+    uid='{$uid_escaped}'
+HERE;
+        $this->query($sql) ;
+
+        return $this->find_fm_delay_subscriber ($uid) ;
+    }
+
+    /**
+     * Remove any subscriptions for the specified user
+     *
+     * @param string $uid
+     */
+    public function remove_fm_delay_subscriber ($uid) {
+        $uid_escaped = $this->escape_string(trim($uid)) ;
+        $sql = "DELETE FROM {$this->database}.fm_delay_subscriber WHERE uid='{$uid_escaped}'" ;
+        $this->query($sql) ;
     }
 }
 

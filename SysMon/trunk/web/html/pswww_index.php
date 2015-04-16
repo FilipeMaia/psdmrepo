@@ -27,7 +27,7 @@ $groups = array (
         'links' => array (
             array (
                 'name'  => 'Experiment <b>Switch</b>' ,
-                'href'  => '/apps-dev/portal/experiment_switch' ,
+                'href'  => '/apps/portal/experiment_switch' ,
                 'title' =>
                     "The application is meant to activate select experiments for \n" .
                     "data taking at the corresponding instruments. Note, that only \n" .
@@ -37,7 +37,7 @@ $groups = array (
             ) ,
             array (
                 'name'  =>  '<b>Shift/Hutch</b> Manager' ,
-                'href'  => '/apps-dev/shiftmgr' ,
+                'href'  => '/apps/shiftmgr' ,
                 'title' =>
                     "The Shift/Hutch management application keeps a track of various \n" .
                     "activities in the instrument hutches, the amount of time spent for \n" .
@@ -50,7 +50,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Experiment <b>Registry</b> Database' ,
-                'href'  => '/apps-dev/regdb' ,
+                'href'  => '/apps/regdb' ,
                 'title' =>
                     "This is presently the main (and the only) tool for tegistering \n" .
                     "or modifying experiment entries in LCLS. Experiments are associated \n" .
@@ -65,7 +65,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => '<b>Authorization</b> Database' ,
-                'href'  => '/apps-dev/authdb' ,
+                'href'  => '/apps/authdb' ,
                 'title' =>
                     "The tool for managing the role-based access control to the data \n" .
                     "and Web applications. The tools also provides an interface for \n" .
@@ -76,7 +76,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Check and correct authorizations for <b>instrument groups</b>' ,
-                'href'  => '/apps-dev/authdb/AuthInstrGroups' ,
+                'href'  => '/apps/authdb/AuthInstrGroups' ,
                 'title' =>
                     "This script displays/manages e-Log and LDAP authorizations for \n" .
                     "instrument-specific POSIX groups. The management operations are \n" .
@@ -85,7 +85,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'POSIX <b>Groups Manager</b>' ,
-                'href'  => '/apps-dev/authdb/manage_my_groups' ,
+                'href'  => '/apps/authdb/manage_my_groups' ,
                 'title' =>
                     "View/manage members of select POSIX groups. Only LCLS specific \n" .
                     "groups are allowed to be managed by the tool. The management \n" .
@@ -94,7 +94,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Group Management <b>Log</b>' ,
-                'href'  => '/apps-dev/authdb/LDAP_group_management_log' ,
+                'href'  => '/apps/authdb/LDAP_group_management_log' ,
                 'title' =>
                     "View a log of the POSIX group management operations. Note, that \n" .
                     "this page has a restricted access." ,
@@ -102,7 +102,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Manage <b>Auto-Translation</b> option for <b>HDF5</b> files (<b>STANDARD</b> translation)' ,
-                'href'  => '/apps-dev/regdb/AutoTranslate2HDF5?service=STANDARD' ,
+                'href'  => '/apps/regdb/AutoTranslate2HDF5?service=STANDARD' ,
                 'title' =>
                     "View/Modify HDF5 translation options across all experiments. \n" .
                     "The management operations are available to the authorized \n" .
@@ -111,7 +111,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Manage <b>Auto-Translation</b> option for <b>HDF5</b> files (<b>MONITORING</b> translation)' ,
-                'href'  => '/apps-dev/regdb/AutoTranslate2HDF5?service=MONITORING' ,
+                'href'  => '/apps/regdb/AutoTranslate2HDF5?service=MONITORING' ,
                 'title' =>
                     "View/Modify HDF5 translation options across all experiments. \n" .
                     "The management operations are available to the authorized \n" .
@@ -125,7 +125,7 @@ $groups = array (
         'links' => array (
             array (
                 'name'  => 'Default <b>Data Path</b> of Experiments' ,
-                'href'  => '/apps-dev/regdb/ExperimentDataPath' ,
+                'href'  => '/apps/regdb/ExperimentDataPath' ,
                 'title' =>
                     "View/manage data placement of experiments. The applications \n" .
                     "maps the logical data path of an experiment to an underlying \n" .
@@ -144,7 +144,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => '<b>Data Migration</b> Monitor/Notifier' ,
-                'href'  => '/apps-dev/portal/DataMigrationMonitor' ,
+                'href'  => '/apps/portal/DataMigrationMonitor' ,
                 'title' =>
                     "View delays in the data migration activities, subscribe for \n" .
                     "e-mail notifications for the delayed migrations.",
@@ -167,7 +167,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Data Collection <b>Statistics</b>' ,
-                'href' => '/apps-dev/portal/statistics' ,
+                'href' => '/apps/portal/statistics' ,
                 'title' =>
                     "Compile and present data collection statistics accross \n" .
                     "instruments and experiments." ,
@@ -210,7 +210,7 @@ $groups = array (
         'links' => array (
             array (
                 'name'  => 'Cable Ordering & Management (<b>NeoCAPTAR</b>)' ,
-                'href'  => '/apps-dev/neocaptar' ,
+                'href'  => '/apps/neocaptar' ,
                 'title' =>
                     "The application to support a complete workflow of cable \n" .
                     "ordering, fabrication and installation at PCDS. " ,
@@ -218,7 +218,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => 'Inventory Database of Electronic Equipment (<b>IREP</b>)' ,
-                'href'  => '/apps-dev/irep' ,
+                'href'  => '/apps/irep' ,
                 'title' =>
                     "The inventory database for electronic equipment." ,
                 'login' => True
@@ -332,7 +332,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => '<b>Release Comparision</b> Tool' ,
-                'href'  => '/apps-dev/websrt/releases' ,
+                'href'  => '/apps/websrt/releases' ,
                 'title' =>
                     "See a history of all release builds, and release notes. Compare tags \n" .
                     "of select two releases, go to the SVN repository through the Web interface \n" .
