@@ -121,15 +121,15 @@ function (
                 var coldef = this._table_data.config.coldef ;
                 for (var i in coldef) {
                     var col = coldef[i] ;
-                    if (col.type.substring(0, 5) === 'EPICS') {
+//                    if (col.type.substring(0, 5) === 'EPICS') {
                         switch (column_mode) {
                             case 'descr'        : hdr.push(col.name) ; break ;
                             case 'pv'           : hdr.push(col.source) ; break ;
-                            case 'descr_and_pv' : hdr.push(col.name + '&nbsp; | &nbsp;'+col.source) ; break ;
+                            case 'descr_and_pv' : hdr.push(col.name + '&nbsp; &nbsp;('+col.source+')') ; break ;
                         }
-                    } else {
-                        hdr.push(col.name) ;
-                    }
+//                    } else {
+//                        hdr.push(col.name) ;
+//                    }
                 }
 
                 var num_hdr_rows = 2 ,
@@ -212,11 +212,11 @@ function (
 '      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '      <div style="clear:both;"></div>' +
 '      <div id="table_ctrl">' +
-'        <span>Display EPICS columns</span>' +
+'        <span>Display columns as</span>' +
 '        <select class="display-trigger" name="column_mode">' +
-'          <option value="descr"        >PV Description</option>' +
-'          <option value="pv"           >PV Name</option>' +
-'          <option value="descr_and_pv" >both</option>' +
+'          <option value="descr"        >description</option>' +
+'          <option value="pv"           >name</option>' +
+'          <option value="descr_and_pv" >description (name)</option>' +
 '        </select>' +
 '      </div>' +
 '      <div id="table" class="table" ></div>' +
@@ -269,7 +269,11 @@ function (
 
             this._load() ;
         } ;
-
+        function _value_display_trait_for (col_type) {
+            return col_type === 'DAQ Detectors' ?
+                function (val) { return val ? '<div style="width:100%; text-align:center; font-size:14px; color:red;">&diams;</div>' : '' ; } :
+                function (val) { return val ? val : '' ; } ;
+        }
         this._display = function () {
 
             var title = 'show the run in the e-Log Search panel within the current Portal' ;
@@ -285,6 +289,7 @@ function (
                 for (var i in coldef) {
                     var col = coldef[i] ;
                     var name  = col.name ;
+
                     var value = name in param2value ? param2value[name] : '' ;
 
                     // TODO: replace with lazy initialization using JQuery to
@@ -294,7 +299,8 @@ function (
                         var run_id = this._table_data.run2id[run] ;
                         row.push('<input class="editable" coldef_id="'+col.id+'" run_id="'+run_id+'" type="text" value="'+value+'" />') ;
                     } else {
-                        row.push(value) ;
+                        var value_display = _value_display_trait_for(col.type) ;
+                        row.push(value_display(value)) ;
                     }
                 }
                 rows.push(row) ;
@@ -510,9 +516,8 @@ function (
 '       the <b>SAVE</b> button. Note that more columns can be added later using the table manager' +
 '       dialog when viewing the table. If no columns are provided when creating the table then the table' +
 '       will initially have just one - for run numbers. Columns can also be removed later.' +
-'       Note that the EPICS selector' +
-'    </p>' +
-'    <p><b>NOTE:</b> each EPICS PV source is composed of a description separated by the <b>vertical bar</b> symbol from a formal name of the PV.' +
+'       Each source is composed of a <span style="font-style:italic;">description</span>' +
+'       followed by its formal <span style="font-style:italic;">name</span> included in the round parentheses.' +
 '       The current state of the global selector instructs the editor which part of' +
 '       the sources to pull into column names. Feel free to change the selector at any moment.' +
 '       It will not affect previously formed columns.' +
@@ -548,10 +553,10 @@ function (
 '      <div id="table_ctrl">' +
 '        <span>The editor will pull</span>' +
 '        <select class="display-trigger" name="column_mode">' +
-'          <option value="descr" >PV Description</option>' +
-'          <option value="pv"    >PV Name</option>' +
+'          <option value="descr" >description</option>' +
+'          <option value="pv"    >name</option>' +
 '        </select>' +
-'        <span>from EPICS sources</span>' +
+'        <span>from sources</span>' +
 '      </div>' +
 '      <table class="columns" border="0" cellspacing="0">' +
 '        <thead>' +
@@ -559,7 +564,7 @@ function (
 '            <td>&nbsp;</td>' +
 '            <td>Column Name</td>' +
 '            <td>Category</td>' +
-'            <td>Data Source</td>' +
+'            <td>Data Source <span style="font-weight:normal">description (name)</span></td>' +
 '          </tr>' +
 '        </thead>' +
 '        <tbody></tbody>' +
@@ -961,15 +966,15 @@ function (
                             var p = this._table_data.dict[select_type][i] ;
                             var source = p.name ;
                             var descr  = p.descr ;
-                            if (select_type.substr(0,5) === 'EPICS') {
-                                var opt = descr+' &nbsp;  |  &nbsp; '+source ;
+//                            if (select_type.substr(0,5) === 'EPICS') {
+                                var opt = descr+' &nbsp;&nbsp; ('+source+')' ;
                                 switch (column_mode) {
                                     case 'descr'        : html += '<option value="'+source+'" name="'+descr+'"  >'+opt+'</option>' ; break ;
                                     case 'pv'           : html += '<option value="'+source+'" name="'+source+'" >'+opt+'</option>' ; break ;
                                 }
-                            } else {
-                                html += '<option value="'+source+'" name="'+descr+'" >'+descr+'</option>' ;
-                            }
+//                            } else {
+//                                html += '<option value="'+source+'" name="'+descr+'" >'+descr+'</option>' ;
+//                            }
                         }
                         source_elem.html(html) ;
                         source_elem.removeAttr('disabled') ;
@@ -1000,12 +1005,12 @@ function (
                 var row = tr.attr('row') ;
 
                 var type = tr.find('select[name="type"]').val() ;
-                if ((type !== '') && (type.substring(0, 5) === 'EPICS')) {
+//                if ((type !== '') && (type.substring(0, 5) === 'EPICS')) {
 
                     var source = tr.find('select[name="source"]').val() ;
                     if (source !== '') _that._install_column_types(row, type, source) ;
                     else               _that._install_column_types(row, type) ;
-                }
+//                }
             }) ;
         } ;
 

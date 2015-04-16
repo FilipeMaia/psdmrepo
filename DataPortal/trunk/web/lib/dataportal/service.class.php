@@ -242,6 +242,37 @@ class Service {
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
 
+    public function required_time_any ($name) {
+        return $this->_parse_time_any($name, $this->required_str ($name)) ;
+    }
+    public function optional_time_any ($name, $default) {
+        $str = $this->optional_str ($name, null) ;
+        if (is_null($str)) return $default ;
+        return $this->_parse_time_any($name, $str) ;
+    }
+    private function _parse_time_any ($name, $str) {
+
+        require_once 'lusitime/lusitime.inc.php' ;
+
+        // Try ISO-style timestamp
+
+        $time = \LusiTime\LusiTime::parse ($str) ;
+        if (!is_null($time)) return $time ;
+
+        // Try 64-bit second/nanosecond variant if the number
+        // is larger than the maximum 32-bit unsigned integer.
+        // Otherwise assume UNIX timestamp.
+        //
+        // NOTE: This logic still won't allow to resolve 
+        //       ambiguty between a very small 64-bit number
+        //       made of nanoseconds versus a UNIX timestamp.
+
+        $num = intval($str) ;
+        if ($num < pow(2,32)) return new \LusiTime\LusiTime($num) ;
+
+        return \LusiTime\LusiTime::from64($str) ;
+    }
+
     public static $_ENUM_OPTIONS = array (
         'ignore_case'     => false ,
         'convert'         => 'none'
@@ -431,11 +462,26 @@ class Service {
     //  Convenience functions
     // -----------------------
 
+    /**
+     * Sanity check for an input parameter to be sure it's set and it's not null
+     *
+     * @param mixed $in
+     * @param string $msg
+     * @param integer $http_code
+     * @return mixed
+     */
     public function safe_assign ($in, $msg, $http_code=null) {
-        if (!$in) $this->abort($msg ? $msg : 'Web service failed', $http_code) ;
+        $this->assert(isset($in) || !is_null($in), $msg, $http_code) ;
         return $in ;
     }
 
+    /**
+     * Assert that the input parameter evaluates as TRUE
+     *
+     * @param mixed $condition
+     * @param string $msg
+     * @param integer $http_code
+     */
     public function assert ($condition, $msg, $http_code=null) {
         if (!$condition) $this->abort($msg ? $msg : 'Web service failed', $http_code) ;
     }

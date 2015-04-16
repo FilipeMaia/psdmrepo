@@ -134,11 +134,11 @@ function (
 '    </div>' +
 '    <div id="body">' +
 '      <div id="table_ctrl">' +
-'        <span>Display EPICS columns</span>' +
+'        <span>Column display mode</span>' +
 '        <select class="display-trigger" name="'+s_name+':column_mode">' +
-'          <option value="descr"        >PV Description</option>' +
-'          <option value="pv"           >PV Name</option>' +
-'          <option value="descr_and_pv" >both</option>' +
+'          <option value="descr"        >description</option>' +
+'          <option value="pv"           >name</option>' +
+'          <option value="descr_and_pv" >description (name)</option>' +
 '        </select>' +
 '      </div>' +
 '      <div id="table" class="table" ></div>' +
@@ -229,7 +229,7 @@ function (
                 switch (column_mode) {
                     case 'descr'        : hdr.push(p.descr) ; break ;
                     case 'pv'           : hdr.push(p.name) ; break ;
-                    case 'descr_and_pv' : hdr.push(p.descr + '&nbsp; | &nbsp;'+p.name) ; break ;
+                    case 'descr_and_pv' : hdr.push(p.descr + '&nbsp; &nbsp;('+p.name+')') ; break ;
                 }
             }
             var rows = null ;

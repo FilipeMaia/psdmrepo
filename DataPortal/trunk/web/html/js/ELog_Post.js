@@ -119,6 +119,7 @@ function (
 '    <input type="hidden" name="onsuccess" value="" />' +
 '    <input type="hidden" name="relevance_time" value="" />' +
 '    <input type="hidden" name="post2instrument" value="" />' +
+'    <input type="hidden" name="post2sds" value="" />' +
 '    <textarea name="message_text" rows="12" cols="64" style="padding:4px; margin-top:5px;" title="The first line of the message body will be used as its subject"></textarea>' +
 '    <div style="margin-top: 10px;">' +
 '      <div style="float:left;">' +
@@ -146,11 +147,14 @@ function (
 '  <div id="buttons" >' +
 '    <button class="control-button" name="submit" >Post</button>' +
 '    <button class="control-button" name="reset" style="margin-left:5px;">Reset form</button>' +
-'  </div>' +
+'  </div>' + (this.experiment.is_facility ? '' :
 '  <div id="extra_options" >' +
 '    <input name="post2instrument" type="checkbox" title="also post a copy of the message to the instrument e-log" />' +
 '    <span>Post a copy to the instrument e-Log</span>' +
-'  </div>' +
+'    <br>' +
+'    <input name="post2sds" type="checkbox" title="also post a copy of the message to the Sample Delivery System e-log" />' +
+'    <span>Post a copy to the Sample Delivery System e-Log</span>' +
+'  </div>') +
 '</div>' +
 '<div style="clear:both;"></div>' ;
             this.wa.html(html) ;
@@ -165,6 +169,7 @@ function (
             this.form_run_num        = this.form.find('input[name="run_num"]') ;
             this.form_shift_id       = this.form.find('input[name="shift_id"]') ;
             this.post2instrument     = this.form.find('input[name="post2instrument"]') ;
+            this.post2sds            = this.form.find('input[name="post2sds"]') ;
             this.form_message_text   = this.form.find('textarea[name="message_text"]') ;
             this.form_author_account = this.form.find('input[name="uthor_account"]') ;
             this.form_tags           = this.form.find('#tags') ;
@@ -215,8 +220,10 @@ function (
                         Fwk.report_error('Run number and shift are mutually exclusive options. Please, chose either one or another.') ;
                         return ;
                     }
+
+                    that.post2instrument.val(that.wa.find('#extra_options').children('input[name="post2instrument"]').attr('checked') ? 1 : 0) ;
+                    that.post2sds       .val(that.wa.find('#extra_options').children('input[name="post2sds"]')       .attr('checked') ? 1 : 0) ;
                 }
-                that.post2instrument.val(that.wa.find('#extra_options').children('input[name="post2instrument"]').attr('checked') ? 1 : 0) ;
 
                 /* Submit the new message using the JQuery AJAX POST plug-in,
                  * which also allow uploading files w/o reloading the current page.
@@ -270,8 +277,9 @@ function (
             if (!this.experiment.is_facility) {
                 this.runnum.val('') ;
                 this.shift.val(0) ;
+                this.post2instrument.val(0) ;
+                this.post2sds.val(0) ;
             }
-            this.post2instrument.val(0) ;
             this.form_scope.val('') ;
             this.form_message_text.val('') ;
             this.form_run_num.val('') ;
@@ -284,7 +292,10 @@ function (
 '</div>'
             ) ;
             this.form_attachments.find('input:file[name="file2attach_0"]').change(function () { that.post_add_attachment() ; }) ;
-            this.wa.find('#extra_options').children('input[name="post2instrument"]').removeAttr('checked') ;
+            if (!this.experiment.is_facility) {
+                this.wa.find('#extra_options').children('input[name="post2instrument"]').removeAttr('checked') ;
+                this.wa.find('#extra_options').children('input[name="post2sds"]')       .removeAttr('checked') ;
+            }
         } ;
 
         this.post_add_attachment = function () {

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-01
+2015-04-16 Igor Gaponenko
+- minor improvements in the Run Tables UI
+- more option parsers added and bugs fixed in the ServiceJSON and Service
+PHP frameworks for Web services
+- removed any notions of runs from the e-Log UI of facilities
+
 Tag: V00-09-00
 2015-03-10 Igor Gaponenko
 - Re-factoring HDF5 translation ordering application (PSWA-35)

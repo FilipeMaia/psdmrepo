@@ -324,6 +324,8 @@ function (
 
             if ('message' in app_config.global_extra_params) {
                 this.search_message_by_id(parseInt(app_config.global_extra_params['message']), true) ;
+            } else if ('run' in app_config.global_extra_params) {
+                this.search_run_by_num(parseInt(app_config.global_extra_params['run']), true) ;
             }
         } ;
 

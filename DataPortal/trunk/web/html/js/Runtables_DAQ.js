@@ -120,9 +120,9 @@ function (
 '      <div id="table_ctrl" > ' +
 '        <span>Column display mode</span> ' +
 '        <select class="display-trigger" name="'+s.id+':column_mode" disabled > ' +
-'          <option value="descr"          >Description</option> ' +
-'          <option value="name"           >Name</option> ' +
-'          <option value="descr_and_name" >both</option> ' +
+'          <option value="descr"          >description</option> ' +
+'          <option value="name"           >name</option> ' +
+'          <option value="descr_and_name" >description (name)</option> ' +
 '        </select> ' +
 '      </div> ' +
 '      <div id="table" class="table" ></div> ' +
@@ -304,7 +304,7 @@ function (
                 switch (this._column_mode(s_id).val()) {
                     case 'descr'          : hdr.push(s_data.descriptions[name]) ; break ;
                     case 'name'           : hdr.push(name) ; break ;
-                    case 'descr_and_name' : hdr.push(s_data.descriptions[name] + '&nbsp; | &nbsp;'+name) ; break ;
+                    case 'descr_and_name' : hdr.push(s_data.descriptions[name] + '&nbsp; &nbsp; ('+name+')') ; break ;
                 }
             }
 

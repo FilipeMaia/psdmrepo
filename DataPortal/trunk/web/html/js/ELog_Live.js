@@ -102,11 +102,11 @@ function (
 '      <option value="7d"  >     7 days </option>' +
 '      <option value=""    > everything </option>' +
 '    </select>' +
-'  </div>' +
+'  </div>' + (this.experiment.is_facility ? '' :
 '  <div style="float:left;" >' +
 '    <span>Include runs</span>' +
 '    <input class="refresh-action" name="include_runs" type="checkbox" checked="checked" title="search for runs as well" />' +
-'  </div>' +
+'  </div>') +
 '  <div style="float:left;" >' +
 '    <span>Show deleted</span>' +
 '    <input class="refresh-action" name="show_deleted" type="checkbox" checked="checked" title="display deleted messages" />' +
@@ -189,7 +189,9 @@ function (
                 format:                  'detailed' ,
                 limit:                   this._wa.find('select[name="num_messages"]').val()
             } ;
-            if (this._wa.find('input[name="include_runs"]').attr('checked')) params.inject_runs = 1 ;
+            if (!this.experiment.is_facility) {
+                if (this._wa.find('input[name="include_runs"]').attr('checked')) params.inject_runs = 1 ;
+            }
             if (this._wa.find('input[name="show_deleted"]').attr('checked')) params.inject_deleted_messages = 1 ;
 
             Fwk.web_service_GET (
@@ -230,7 +232,9 @@ function (
                 format:                  'detailed' ,
                 since:                   this._latest_timestamp
             } ;
-            if (this._wa.find('input[name="include_runs"]').attr('checked')) params.inject_runs = 1 ;
+            if (!this.experiment.is_facility) {
+                if (this._wa.find('input[name="include_runs"]').attr('checked')) params.inject_runs = 1 ;
+            }
             if (this._wa.find('input[name="show_deleted"]').attr('checked')) params.inject_deleted_messages = 1 ;
 
             Fwk.web_service_GET (

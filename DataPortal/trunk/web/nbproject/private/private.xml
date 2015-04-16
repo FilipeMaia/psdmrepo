@@ -6,9 +6,7 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Attachments.js</file>
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ELog_Post.js</file>
         </group>
-        <group name="PCDS Web Apps">
-            <file>file:/N:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/HDF5_Translator.js</file>
-        </group>
         <group name="PCDS Web App"/>
+        <group name="PCDS Web Apps"/>
     </open-files>
 </project-private>

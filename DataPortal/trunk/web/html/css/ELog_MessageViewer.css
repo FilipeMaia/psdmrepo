@@ -46,7 +46,7 @@
 }
 .elog-msg-viewer .m-cont .button-cont {
   float: right;
-  padding-left: 5px;
+/*  padding-left: 5px;*/
 }
 .elog-msg-viewer .m-cont .button-cont-last {
   clear: both;

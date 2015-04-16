@@ -26,14 +26,28 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
             array('name' => 'flat',     'descr' => 'flat') ,
             array('name' => 'geometry', 'descr' => 'geometry')
         ) ,
-        'DAQ Detectors' => array()
+        'DAQ Detectors'       => array() ,
+        'DAQ Detector Totals' => array()
     ) ;
 
-    $daq_detectors = LogBook\LogBookUtils::get_daq_detectors($experiment) ;
-    foreach ($daq_detectors['detector_names'] as $d) {
-        array_push(
+    $daq_detectors = LogBook\LogBookUtils::get_daq_detectors_new($experiment) ;
+    foreach ($daq_detectors['names'] as $name) {
+        array_push (
             $types['DAQ Detectors'] ,
-            array('name' => $d , 'descr' => $d)
+            array (
+                'name'  => $name ,
+                'descr' => $daq_detectors['descriptions'][$name]
+            )
+        ) ;
+    }
+    $daq_totals = LogBook\LogBookUtils::get_daq_detector_totals ($experiment) ;
+    foreach ($daq_totals['names'] as $name) {
+        array_push (
+            $types['DAQ Detector Totals'] ,
+            array (
+                'name'  => $name ,
+                'descr' => $daq_totals['descriptions'][$name]
+            )
         ) ;
     }
 
