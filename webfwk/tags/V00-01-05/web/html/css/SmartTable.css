@@ -1,0 +1,238 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 26, 2013, 5:58:25 PM
+    Author     : gapon
+*/
+
+.t-cont {
+  position: relative;
+/*  background-color: #fcfcfc;*/
+}
+
+.t-cont > .menu {
+
+  display: none;
+    
+  position: absolute;   /* this is required for z-index to work */
+  top: 0;
+  left: 0;
+  z-index: 102;
+
+  padding: 4px;
+  border: 1px solid #c0c0c0;
+  border-top: 1px dashed #a0a0a0;
+  background-color: #ffffff;
+
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+
+  color: #000000;
+}
+
+.t-cont > .menu .item {
+  padding: 2px;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  font-size: 12px;
+  color: rgb(94, 66, 66);
+}
+.t-cont > .menu div.item:hover {
+  cursor: pointer;
+  background-color: #A6C9E2;
+  font-weight: bold;
+}
+
+/* Temporarily disable all items in the column menu
+ */
+.t-cont > .menu div.item {
+  font-weight: normal !important;
+  color: #a0a0a0 !important;
+  cursor: none;
+}
+.t-cont > .menu div.item:hover {
+  cursor: none;
+}
+
+div.t-cont > .header {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  padding: 0;
+  margin: 0;
+  border-bottom: solid 2px #000000;
+}
+
+div.t-cont > .header > .global_menu {
+  /* IMPORTANT: disabe ir for now */
+  display: none;
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background-image: url("../img/gear_gray.png");
+}
+div.t-cont > .header > div.global_menu:hover {
+  background-image: url("../img/gear_blue.png");
+  cursor: pointer;
+}
+
+div.t-cont > .header > .column {
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  padding: 0;
+
+  height: 22px;
+
+  border: solid 1px transparent;
+  border-left-color: #ffffff;
+  border-top-color: #ffffff;
+  border-right-color: #c0c0c0;
+  border-bottom-color: #c0c0c0;
+
+/*  border-radius: 3px 3px 3px 0px;*/
+
+  //background: linear-gradient(to bottom right, #e0e0e0, #fcfcfc);
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+
+  font-size: 12px;
+  // color: #0071BC; // rgb(94, 66, 66);
+  font-family: verdana, sans-serif;
+}
+
+div.t-cont > .header > div.column:hover {
+
+  z-index: 101 !important;
+
+  border: 1px solid #000000;
+  background: aliceblue !important;
+  //background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc);
+  font-weight: bold;
+}
+div.t-cont > .header > .column.selected {
+  z-index: 101 !important;
+  border: 1px solid #000000;
+  background: aliceblue !important;
+  //background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc) ;
+  //background: linear-gradient(to bottom, #A6C9E2, aliceblue) ;
+  font-weight: bold;
+}
+div.t-cont > .header > .column.group {
+  z-index: 101 !important;
+  background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc) ;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+  //border-left-color: #000000;
+  //border-right: 1px solid #000000;
+  //font-weight: bold;
+}
+div.t-cont > .header > .column > .ctrl {
+  padding: 4px;
+  white-space: nowrap;
+}
+div.t-cont > .header > .column > div.ctrl:hover {
+  cursor: pointer;
+}
+
+div.t-cont > .header > .column_ext {
+
+  display: none;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 0px;
+  padding: 0;
+
+  border-left: 1px solid #000000;
+  border-right: 1px solid #000000;
+}
+
+div.t-cont > .header > .column_ext.selected {
+  display: block;
+  z-index: 101 !important;
+  background-color: aliceblue;
+  //background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc) ;
+  //background-color: #A6C9E2;
+  //background: linear-gradient(to bottom, aliceblue, #fcfcfc) ;
+  //opacity: 0.66;
+}
+
+
+div.t-cont > .body {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+}
+div.t-cont > .body > table {
+  width: 100%;
+  border-spacing: 0px;
+}
+div.t-cont > .body > table td {
+  padding: 0;
+  border-left: solid 1px #c0c0c0;
+  border-right: solid 1px transparent;
+  border-bottom: solid 1px #c0c0c0;
+}
+
+div.t-cont > .body > table td:last-child {
+  border-right: solid 1px #c0c0c0;
+}
+
+div.t-cont > .body > table td div {
+  position: relative;
+  padding: 2px 4px 2px 4px;
+  white-space: nowrap;
+  font-size: 12px;
+  font-family: Helvetica, Arial, sans-serif;
+}
+
+div.t-cont > .body > table td.highlight {
+  background-color: #eaeaea;
+}
+
+div.t-cont > .body > table td.selected {
+  background-color: aliceblue;
+  border-left-color: #000000;
+  border-right-color: #000000;
+}
+
+div.t-cont > .body > table td.focus {
+  background-color: #A6C9E2;
+  border-left: solid 1px #000000 !important;
+  border-right: solid 1px #000000 !important;
+}
+div.t-cont > .body > table tr.selected td {
+  border-left: solid 1px #c0c0c0;
+  border-right: solid 1px #c0c0c0;
+  border-bottom: solid 1px #000000;
+}
+div.t-cont > .header > .global_menu[data]:hover:after ,
+div.t-cont > .body   > table td.focus div[data]:hover:after {
+  content: attr(data);
+  padding: 4px;
+  color: #000000;
+  position: absolute;
+  left: 0px;
+  top: 20px;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 102;
+/*  border-radius: 2px ;*/
+  background-color: lemonchiffon;
+  font-weight: normal;
+  font-size: 12px;
+}
+div.t-cont > .header > .global_menu[data]:hover:after {
+  top: 32px;
+}

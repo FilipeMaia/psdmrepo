@@ -1,0 +1,214 @@
+/* 
+    Document   : Stack.css
+    Created on : Aug 9, 2013, 11:13:47 PM
+    Author     : gapon
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+/* The default theme */
+
+.stack-row-hidden  { display: none; }
+.stack-row-visible { display: block; }
+
+.stack-controls {
+  font-size: 12px;
+}
+.stack-controls > button {
+  font-size: 9px;
+  color: #000000;
+}
+.stack-header {
+  padding: 2px;
+  background-color: #c0c0c0;
+  border-bottom: solid 1px #000000;
+  border-radius: 3px 3px 0px 0px;
+  font-size: 12px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  /*
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  */
+  /*
+  font-family: 'Times', serif;
+  */
+  cursor: pointer;
+}
+.stack-header:hover {
+}
+.stack-header > .stack-column,
+.stack-header > .stack-column-first,
+.stack-header > .stack-column-separator {
+  float:left;
+  font-weight: bold;
+}
+.stack-header > .stack-column-first {
+  width: 22px;
+}
+.stack-header > .stack-column-last {
+  clear: both;
+}
+.stack-header > .stack-column-separator {
+  width: 2px;
+  padding: 0px 2px 0px 2px;
+  margin:  0px 0px 0px 2px;
+  border-left: solid 1px #000000;
+}
+.stack-header > .stack-column-right {
+  float:right;
+  font-weight: bold;
+}
+
+.stack-body {
+  font-size: 12px;
+}
+.stack-body > .stack-row > .stack-row-header {
+  padding: 2px;
+  background-color: #f0f0f0;
+  border: solid 1px #c0c0c0;
+  border-bottom: 0;
+  border-radius: 3px 3px 0px 0px;
+  cursor: pointer;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.stack-body > .stack-row > .stack-row-header:hover {
+  background-color: #c0c0c0;
+}
+.stack-body > .stack-row > .stack-row-header-open {
+  background: linear-gradient(to bottom, #f0f0f0, #ffffff);
+}
+.stack-body > .stack-row > .stack-row-header-open:hover {
+  background: linear-gradient(to bottom, #c0c0c0, #ffffff);
+}
+
+.stack-body > .stack-row > .stack-row-header > .stack-row-column,
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-first,
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-separator {
+  float:left;
+}
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-first {
+  width: 22px;
+}
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-separator {
+  width: 2px;
+  padding: 0px 2px 0px 2px;
+  margin:  0px 0px 0px 2px;
+  border-left: solid 1px #000000;
+}
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-right {
+  float: right ;
+}
+.stack-body > .stack-row > .stack-row-header > .stack-row-column-last {
+  clear: both ;
+}
+
+.stack-body > .stack-row > .stack-row-body {
+  padding: 10px;
+  /*border: solid 1px #b0b0b0;*/
+  border: solid 1px #c0c0c0;
+  border-top: 0;
+  border-bottom: 0;
+  border-radius: 0px 0px 3px 3px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.stack-body > .stack-row:last-child > .stack-row-body {
+  border-bottom: solid 1px #b0b0b0;
+}
+
+.stack-body > .stack-row > .stack-row-body.editing {
+  background-color: rgb(247, 234, 220) !important;
+}
+
+/* The shape themes */
+
+.stack-theme-large16 > .stack-controls                              { margin-bottom: 7px; font-size: 16px; }
+.stack-theme-large16 > .stack-controls > button                     { font-size: 12px; }
+.stack-theme-large16 > .stack-header                                { padding: 4px; border-radius: 5px 5px 0px 0px; font-size: 16px; }
+.stack-theme-large16 > .stack-header > .stack-column-separator      { width: 4px; }
+.stack-theme-large16 > .stack-body                                  { font-size: 16px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-header { padding:4px; border-radius: 5px 5px 0px 0px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator { width: 4px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-body   { padding: 15px; border-radius: 0px 0px 5px 5px; }
+
+
+.stack-theme-large14 > .stack-controls                              { margin-bottom: 7px; font-size: 14px; }
+.stack-theme-large14 > .stack-controls > button                     { font-size: 11px; }
+.stack-theme-large14 > .stack-header                                { padding: 4px; border-radius: 4px 4px 0px 0px; font-size: 14px; }
+.stack-theme-large14 > .stack-header > .stack-column-separator      { width: 4px; }
+.stack-theme-large14 > .stack-body                                  { font-size: 12px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-header { padding:4px; border-radius: 4px 4px 0px 0px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator { width: 4px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-body   { padding: 15px; border-radius: 0px 0px 4px 4px; }
+
+
+/* The color themes */
+
+.stack-theme-aliceblue > .stack-header                                           { background-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header            { background-color: aliceblue; border-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header:hover      { background-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, aliceblue, #ffffff); }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #A6C9E2,   #ffffff); }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-body              { border-color:     #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row:last-child > .stack-row-body   { border-color:     #A6C9E2; }
+
+.stack-theme-mustard   > .stack-header                                           { background-color: #c0c0c0; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header            { background-color: #E6E680; border-color: #CFCF73; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header:hover      { background-color: #CFCF73; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #E6E680, #ffffff); }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #CFCF73, #ffffff); }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-body              { border-color:     #CFCF73; }
+.stack-theme-mustard   > .stack-body > .stack-row:last-child > .stack-row-body   { border-color:     #CFCF73; }
+
+.stack-theme-green     > .stack-header                                           { background-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header            { background-color: #DEF0CD; border-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header:hover      { background-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #DEF0CD, #ffffff); }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #B9DD97, #ffffff); }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-body              { border-color:     #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row:last-child > .stack-row-body   { border-color:     #B9DD97; }
+
+.stack-theme-brown     > .stack-header                                           { background-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header            { background-color: #FAE2B1; border-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header:hover      { background-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #FAE2B1, #ffffff); }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #E6B85C, #ffffff); }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-body              { border-color:     #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row:last-child > .stack-row-body   { border-color:     #E6B85C; }
+
+
+/* Color theme overides for individual rows */
+
+.stack-theme-default.stack-row > .stack-row-header            { background-color: #f0f0f0 !important; border-color: #c0c0c0 !important; }
+.stack-theme-default.stack-row > .stack-row-header:hover      { background-color: #c0c0c0 !important; }
+.stack-theme-default.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, default, #f0f0f0) !important; }
+.stack-theme-default.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #c0c0c0, #ffffff) !important; }
+.stack-theme-default.stack-row > .stack-row-body              { border-color:     #c0c0c0 !important; }
+.stack-theme-default.stack-row:last-child > .stack-row-body   { border-color:     #c0c0c0 !important; }
+
+.stack-theme-aliceblue.stack-row > .stack-row-header            { background-color: aliceblue !important; border-color: #A6C9E2 !important; }
+.stack-theme-aliceblue.stack-row > .stack-row-header:hover      { background-color: #A6C9E2 !important; }
+.stack-theme-aliceblue.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, aliceblue, #ffffff) !important; }
+.stack-theme-aliceblue.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #A6C9E2, #ffffff) !important; }
+.stack-theme-aliceblue.stack-row > .stack-row-body              { border-color:     #A6C9E2 !important; }
+.stack-theme-aliceblue.stack-row:last-child > .stack-row-body   { border-color:     #A6C9E2 !important; }
+
+.stack-theme-mustard.stack-row > .stack-row-header            { background-color: #E6E680 !important; border-color: #CFCF73 !important; }
+.stack-theme-mustard.stack-row > .stack-row-header:hover      { background-color: #A6C9E2 !important; }
+.stack-theme-mustard.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #E6E680, #ffffff) !important; }
+.stack-theme-mustard.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #CFCF73, #ffffff) !important; }
+.stack-theme-mustard.stack-row > .stack-row-body              { border-color:     #CFCF73 !important; }
+.stack-theme-mustard.stack-row:last-child > .stack-row-body   { border-color:     #CFCF73 !important; }
+
+.stack-theme-green.stack-row > .stack-row-header            { background-color: #DEF0CD !important; border-color: #B9DD97 !important; }
+.stack-theme-green.stack-row > .stack-row-header:hover      { background-color: #B9DD97 !important; }
+.stack-theme-green.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #DEF0CD, #ffffff) !important; }
+.stack-theme-green.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #B9DD97, #ffffff) !important; }
+.stack-theme-green.stack-row > .stack-row-body              { border-color:     #B9DD97 !important; }
+.stack-theme-green.stack-row:last-child > .stack-row-body   { border-color:     #B9DD97 !important; }
+
+.stack-theme-brown.stack-row > .stack-row-header            { background-color: #FAE2B1 !important; border-color: #E6B85C !important; }
+.stack-theme-brown.stack-row > .stack-row-header:hover      { background-color: #E6B85C !important; }
+.stack-theme-brown.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, #FAE2B1, #ffffff) !important; }
+.stack-theme-brown.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #E6B85C, #ffffff) !important; }
+.stack-theme-brown.stack-row > .stack-row-body              { border-color:     #E6B85C !important; }
+.stack-theme-brown.stack-row:last-child > .stack-row-body   { border-color:     #E6B85C !important; }
+

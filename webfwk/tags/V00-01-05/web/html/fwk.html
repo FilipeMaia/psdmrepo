@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Framework Test</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
+
+<link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+
+<style>
+
+.table_container {
+  margin-right: 40px;
+}
+</style>
+
+<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
+
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+
+<script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
+<script type="text/javascript" src="../webfwk/js/Table.js"></script>
+
+<script type="text/javascript">
+
+// This is a sample application class
+
+function Export2Excel () {
+    this.icon     = function () { return 'img/MS_Excel_1.png' ; } ;
+    this.title    = function () { return 'Export into Microsoft Excel 2007 File' ; } ;
+    this.on_click = function () { alert('Exporting to Excel 2007...') ; } ;
+}
+
+function Print () {
+    this.icon     = function () { return 'img/Printer.png' ; } ;
+    this.title    = function () { return 'Print the documente' ; } ;
+    this.on_click = function () { alert('Printing...') ; } ;
+}
+function Shifts (name) {
+
+    // Make sure the base class constructor is called
+
+    FwkApplication.call(this) ;
+
+    // Data members
+
+    this.name = name ;
+    this.table_shifts = null ;
+
+    // Overide default event handlers of the base class
+
+    this.on_activate = function() {
+        window.console.log(this.name+': on_activate()') ;
+        this.init() ;
+        this.shift_service('../shiftmgr/ws/shift_get.php', {instr: this.name});
+    } ;
+
+    this.on_deactivate  = function() {
+        window.console.log(this.name+': on_deactivate()') ;
+        this.init() ;
+    } ;
+
+    this.on_update = function () {
+        window.console.log(this.name+': on_update()') ;
+        if (this.active) {
+            this.init() ;
+            this.shift_service('../shiftmgr/ws/shift_get.php', {instr: this.name});
+        }
+    } ;
+
+    this.tools = function () {
+        if (!this.my_tools)
+            this.my_tools = [
+                new Export2Excel() ,
+                new Print()] ;
+        return this.my_tools ;
+    } ;
+
+    this.shift_service = function (url, params, when_done) {
+
+        var that = this ;
+
+        this.init() ;
+
+        $.ajax ({
+            type: 'GET' ,
+            url:  url ,
+            data: params ,
+            success: function (result) {
+                if(result.status != 'success') {
+                    Fwk.report_error(result.message) ;
+                    return ;
+                }
+                var shifts_data = [] ;
+                for (var i in result.shifts) {
+                    var shift = result.shifts[i] ;
+                    shifts_data.push ([
+                        shift.id ,
+                        shift.instrument_name ,
+                        shift.begin_time ,
+                        shift.end_time
+                    ]) ;
+                }
+                that.table_shifts.load(shifts_data) ;
+                if (when_done) when_done() ;
+            } ,
+            error: function () {
+                that.table_shifts.erase(Table.Status.error('service is not available')) ;
+            } ,
+            dataType: 'json'
+        }) ;
+    } ;
+
+    this.init = function () {
+
+        var that = this ;
+
+        if (!this.table_shifts) {
+
+            this.container.css ('padding', '10px') ;
+
+            this.table_shifts = new Table (
+
+                this.container.find('#table_shifts') ,
+
+                [   { name: 'Id', type: Table.Types.Number } ,
+                    { name: 'Instr' } ,
+                    { name: 'Begin Time' } ,
+                    { name: 'End Time' }] ,
+
+                null ,  // no static data to preload at this time
+                {} ,    // no options
+                
+                Fwk.config_handler(this.name, 'table_shifts')
+            ) ;
+            this.table_shifts.display() ;
+            this.table_shifts.erase(Table.Status.Loading) ;
+
+            var button = this.container.find('#new_shift_'+this.name) ;
+            button.button().click(function() {
+                button.button('disable');
+                that.shift_service('../shiftmgr/ws/shift_new.php', {instr:that.name}, function() {
+                    button.button('enable');
+                });
+            });
+        }
+    } ;
+}
+define_class (Shifts, FwkApplication, {}, {}) ;
+
+$(function() {
+
+    Fwk.build (
+
+        // Title and subtitle (HTML allowed)
+
+        'Document Title' ,
+        'Document Subtitle' ,
+
+        //  Menus and applications
+
+        [
+            {   name: 'Shifts' , menu: [
+                {   name: 'AMO' ,
+                    application: new Shifts('AMO') ,
+                    html_container: 'shift_application_prototype_AMO'
+                } ,
+                {   name: 'SXR' ,
+                    application: new Shifts('SXR') ,
+                    html_container: 'shift_application_prototype_SXR'
+                } ,
+                {   name: 'Two' , menu: [
+                    {   name: 'Two_1' ,
+                        html: '<div style="padding:10px;"><h1>Two</h1><p>This is just a test</p></div>' } ] } ] } ,
+
+            {   name: 'Second' , menu: [
+                {   name: 'One' ,
+                    load_html: {
+                        url: '../webfwk/ws/fwk_test.php'
+                    }
+                } ,
+                {   name: 'Two' , menu: [
+                    {   name: 'Two_1' } ,
+                    {   name: 'Two_2' } ,
+                    {   name: 'Two_3' } ] } ,
+                {   name: 'Shift Management (XPP)' ,
+                    application: new Shifts('XPP')  ,
+                    html_container: 'shift_application_prototype_XPP' } ] } ,
+
+            {   name: 'Third' , menu: [
+                {   name: 'Alfa' } ,
+                {   name: 'Betha' } ,
+                {   name: 'Ghamma' } ,
+                {   name: 'Theta (the Letter)' } ,
+                {   name: 'And the whole ABC...' , menu: [
+                    {   name: 'A' } ,
+                    {   name: 'B' } ,
+                    {   name: 'C the letter' } ] } ,
+                {   name: 'Delta' } ,
+                {   name: 'Etc.' } ] }
+        ]  ,
+
+        // The function to be called on quick search
+
+        function (text2search) { Fwk.report_info('Search', text2search) ; }
+    ) ;
+});
+
+</script>
+
+</head>
+
+  <body>
+
+      Loading...
+
+      <div id="shift_application_prototype_AMO" style="display:none">
+        <div class="table_container" id="table_shifts" style="float:left;"></div>
+        <div style="float:left;">
+          <button id="new_shift_AMO">New Shift at AMO</button>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+
+      <div id="shift_application_prototype_SXR" style="display:none">
+        <div class="table_container" id="table_shifts" style="float:left;"></div>
+        <div style="float:left;">
+          <button id="new_shift_SXR">New Shift at SXR</button>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+
+      <div id="shift_application_prototype_XPP" style="display:none">
+        <div class="table_container" id="table_shifts" style="float:left;"></div>
+        <div style="float:left;">
+          <button id="new_shift_XPP">New Shift at XPP</button>
+        </div>
+        <div style="clear:both;"></div>
+      </div>
+  </body>
+
+</html>

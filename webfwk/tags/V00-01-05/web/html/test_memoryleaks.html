@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TODO supply a title</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script type="text/javascript">
+function start()
+{
+  var p = document.getElementById("p");
+  detached = document.createElement("div");
+  p.appendChild(detached);
+  p.removeChild(detached);
+  fill();
+}
+
+function fill()
+{
+  for (var i = 0; i < 25; ++i) {
+    var div = document.createElement('div');
+    div.data = new Array(10000);
+    for (var j = 0, l = div.data.length; j < l; ++j)
+      div.data[j] = j.toString();
+    detached.appendChild(div);
+  }
+}
+</script>
+</head>
+<body  onload="start()" >
+    <div id="p">Here be a problem</div>
+</body>
+</html>
