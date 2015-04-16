@@ -37,6 +37,7 @@ function handler ($SVC) {
             $SVC->assert (false, "invalid scope: '{$scope}'") ;
     }
     $post2instrument = $SVC->optional_int('post2instrument', 0) ;
+    $post2sds        = $SVC->optional_int('post2sds', 0) ;
     $relevance_time  = $SVC->optional_time('relevance_time', LusiTime::now()) ;
     $files           = $SVC->optional_files() ;
     $tags            = $SVC->optional_tags() ;
@@ -105,6 +106,37 @@ function handler ($SVC) {
                 $instr_entry->attach_document($f['contents'], $f['type'], $f['description']) ;
 
             $instr_experiment->notify_subscribers($instr_entry) ;
+        }
+    }
+
+    // Post the message into the "Sample Delivery System" e-Log if requested
+    // and if the one exists for the experiment.
+    //
+    // Note that the copy will get two additional tags:
+    //
+    //   '<source-exper-name>  : ''
+    //   'original_message_id' : <message-id>
+    //
+    // This will allow to identify the source of the message and open options
+    // for setting up some kind of symbolic link pointing from the SDS e-log
+    // directly to the source messages instead of presenting their copies.
+
+    if ($post2sds && $experiment->regdb_experiment()->instrument()->is_standard()) {
+
+        $sds_experiment = $SVC->logbook()->find_experiment('NEH', "Sample Delivery System") ;
+        if ($sds_experiment) {
+
+            $sds_entry = $sds_experiment->create_entry($author, $content_type, $message, null, null, $relevance_time) ;
+
+            $sds_entry->add_tag($experiment->name(),   '') ;
+            $sds_entry->add_tag('original_message_id', $entry->id()) ;
+            foreach($tags as $t)
+                $sds_entry->add_tag($t['tag'], $t['value']) ;
+
+            foreach ($files as $f)
+                $sds_entry->attach_document($f['contents'], $f['type'], $f['description']) ;
+
+            $sds_experiment->notify_subscribers($sds_entry) ;
         }
     }
 

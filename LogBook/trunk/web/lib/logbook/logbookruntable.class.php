@@ -129,11 +129,22 @@ class LogBookRunTable {
                     }
                     break ;
 
+                case 'DAQ_Detectors':
                 case 'DAQ Detectors':
-                    foreach ($run->attributes('DAQ_Detectors') as $attr) {
-                        $detector = $attr->name() ;
-                        if ($detector === $source) {
-                            $row[$name] = 'Y' ;
+                    foreach (array('DAQ_Detectors', 'DAQ Detectors') as $class) {
+                        foreach ($run->attributes($class) as $attr) {
+                            if ($attr->name() === $source) {
+                                $row[$name] = 1 ;
+                                break ;
+                            }
+                        }
+                    }
+                    break ;
+
+                case 'DAQ Detector Totals':
+                    foreach ($run->attributes('DAQ Detector Totals') as $attr) {
+                        if ($attr->name() === $source) {
+                            $row[$name] = $attr->val() ;
                             break ;
                         }
                     }
