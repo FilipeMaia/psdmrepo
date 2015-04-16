@@ -1,0 +1,22 @@
+.dmmon-fs-summary {
+    padding:    20px;
+}
+.dmmon-fs-summary {
+    padding:        0;
+}
+.dmmon-fs-summary > #controls {
+    background:     #f5f8f9;
+    padding:        10px;
+    padding-top:    20px;
+}
+.dmmon-fs-summary > #update_info {
+    margin-top:     10px;
+    padding-right:  10px;
+}
+.dmmon-fs-summary > #update_info > .info {
+    color:          maroon;
+}
+.dmmon-fs-summary .presentation {
+    margin:        40px;
+}
+

@@ -1,0 +1,60 @@
+#dmmon-fm-status {
+    padding:        10px;
+    padding-left:   20px;
+}
+#dmmon-fm-status .info {
+    color:  maroon;
+}
+#dmmon-fm-status > #ctrl > .control-group {
+    float:          left;
+    margin-right:   20px;
+}
+#dmmon-fm-status > #ctrl > .control-group
+                         > .control-group-title {
+    font-size:      12px;
+    font-weight:    bold;
+}
+#dmmon-fm-status > #ctrl > .control-group
+                         > .control-group-selector {
+    margin-top: 5px;
+}
+#dmmon-fm-status > #ctrl > .control-group
+                         > .control-group-selector
+                         > input[type="text"] {
+    width:  100%;
+}
+#dmmon-fm-status > #ctrl > .control-group-end {
+    clear:  both;
+}
+#dmmon-fm-status > #ctrl > .control-group-buttons {
+    margin-left:    30px;
+    margin-right:   0;
+}
+#dmmon-fm-status > #ctrl > .control-group button {
+    margin-top: 10px;
+}
+#dmmon-fm-status > #ctrl > .control-group button[name="update"] img {
+    width:      11px;
+}
+#dmmon-fm-status > #ctrl > .control-group button[data]:hover:after,
+#dmmon-fm-status > #ctrl > .control-group[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-family: 'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  text-align: left;
+}
+
+#dmmon-fm-status > #files {
+    margin-top: 15px;
+}
