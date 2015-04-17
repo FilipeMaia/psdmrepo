@@ -301,8 +301,13 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
         job_id_str = line_fields[1].strip('<').rstrip('>')
 
     if err != '' :
-        msg =  '\n' + 80*'!' + '\n' + err + 80*'!' + '\n'
-        logger.warning( msg, __name__) 
+        msg = ''
+        if 'job being submitted without an AFS token' in err :
+            msg = err + '      This warning does not matter for jobs on LCLS NFS, continue' 
+        else :
+            msg = '\n' + 80*'!' + '\n' + err + 80*'!' + '\n'
+
+        logger.warning(msg, __name__) 
 
     logger.info(out, __name__) 
 
@@ -1059,13 +1064,13 @@ def ready_to_start(check_bits=0777, fatal_bits=0777) :
 
 #----------------------------------
 
-def text_status_of_queues(lst_of_queues=['psanacsq', 'psnehq', 'psfehq']):
+def text_status_of_queues(lst_of_queues=['psanaq', 'psnehq', 'psfehq', 'psnehprioq', 'psfehprioq']):
     """Checks status of queues"""
     cmd = 'bqueues %s' % (' '.join(lst_of_queues))
     return cmd, getoutput(cmd)
 
 
-def msg_and_status_of_queue(queue='psanacsq') :
+def msg_and_status_of_queue(queue='psnehq') :
     """Returns status of queue for command: bqueues <queue-name>"""
        #QUEUE_NAME      PRIO STATUS          MAX JL/U JL/P JL/H NJOBS  PEND   RUN  SUSP 
        #psanacsq        115  Open:Active       -    -    -    -     0     0     0     0
@@ -1080,16 +1085,15 @@ def msg_and_status_of_queue(queue='psanacsq') :
         return txt, False
 
 
-def text_sataus_of_lsf_hosts(farm='psanacsfarm'):
+def text_sataus_of_lsf_hosts(farm='psnehfarm'):
     """Returns text output of the command: bhosts farm"""
     cmd = 'bhosts %s' % farm
     return cmd, getoutput(cmd)
     
 
-def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
-    """Checks the LSF status for requested queue"""
+def msg_and_status_of_lsf(farm='psnehfarm', print_bits=0):
+    """Checks the LSF status for requested farm"""
 
-    farm = '%sfarm' % queue[0:-1]
     if print_bits & 1 : print 'farm =', farm
 
     cmd, output = text_sataus_of_lsf_hosts(farm)
@@ -1242,8 +1246,9 @@ if __name__ == "__main__" :
     #status = is_good_lustre_version()
     #print 'Lustre version status: %s' % status
 
-    #queue='psfehq' # psnehq, psfehq, 'psanacsq'
-    #output, status = msg_and_status_of_lsf(queue)
+    #farm='psfehfarm' # psnehfarm, 'psanafarm'
+    #output, status = msg_and_status_of_lsf(farm)
+    #queue='psfehq' # psnehq, psfehq, psnehprioq, psfehprioq, psanaq
     #print 'LSF status: \n%s \nqueue:%s, status:%s' % (output, queue, status)
 
     print 'CalibManager package revision: "%s"' % get_pkg_version()

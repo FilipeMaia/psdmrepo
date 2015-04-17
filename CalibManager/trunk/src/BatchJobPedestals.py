@@ -147,20 +147,21 @@ class BatchJobPedestals (BatchJob) :
     def is_good_lsf(self) :
         """Checks and returns LSF status"""
         queue = self.queue.value()
-        msg, status = gu.msg_and_status_of_lsf(queue)
+        farm = cp.dict_of_queue_farm[queue]
+        msg, status = gu.msg_and_status_of_lsf(farm)
 
         ###status = False # FOR TEST PURPOSE ONLY!!!
 
         if status :
-            logger.info('LSF status is ok', __name__)
+            logger.info('LSF status is ok for queue: %s on farm: %s' % (queue, farm), __name__)
         else :
-            msgi = '\nLSF status for queue: %s \n%s\n' % (queue, msg)
+            msgi = '\nLSF status for queue: %s on farm: %s\n%s\n' % (queue, farm, msg)
             msgw = 'LSF farm for queue %s IS BUSY OR DOES NOT WORK !!!\n' % (queue)
             logger.info(msgi, __name__)
             logger.warning(msgw, __name__)
 
         msg, status = gu.msg_and_status_of_queue(queue)
-        logger.info(msg, __name__)
+        #logger.info(msg, __name__)
         
         return status
 
@@ -185,7 +186,8 @@ class BatchJobPedestals (BatchJob) :
             return False
 
         #command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
-        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + self.opt + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
+        #command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + self.opt + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
+        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + self.opt
         queue        = self.queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
 
@@ -193,7 +195,7 @@ class BatchJobPedestals (BatchJob) :
         self.procDarkStatus ^= 2 # set bit to 1
 
         if err != 'Warning: job being submitted without an AFS token.' :
-            logger.warning('This job is running on LCLS NFS, it does not need in AFS, ignore warning and continue.', __name__)
+            #logger.info('This job is running on LCLS NFS, it does not need in AFS, ignore warning and continue.', __name__)
             return True
 
         elif err != '' :
@@ -274,6 +276,9 @@ class BatchJobPedestals (BatchJob) :
 
     def status_batch_job_for_peds_aver(self) :
         return self.get_batch_job_status_and_string(self.job_id_peds_str, self.time_peds_job_submitted)
+
+    def job_id_peds_aver_str(self) :
+        return str(self.job_id_peds_str)
 
 #-----------------------------
 #-----------------------------

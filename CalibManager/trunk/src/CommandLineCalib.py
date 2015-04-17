@@ -56,6 +56,7 @@ class CommandLineCalib () :
     def __init__ (self, args, opts) :
 
         #print '__name__', __name__ # CalibManager.CommandLineCalib
+        cp.commandlinecalib = self 
 
         self.args = args
         self.opts = opts
@@ -272,7 +273,10 @@ class CommandLineCalib () :
             sleep(dt)
             sum_dt += dt
             status = self.bjpeds.status_for_peds_files_essential()
-            self.log('%3d sec: Files %s available' % (sum_dt, {False:'ARE NOT', True:'ARE'}[status]),1)
+            str_bj_stat, msg_bj_stat = self.bjpeds.status_batch_job_for_peds_aver() 
+
+            self.log('%3d sec: Files %s available. %s' % (sum_dt, {False:'ARE NOT', True:'ARE'}[status], msg_bj_stat), 1)
+
             if status :
                 self.print_dark_ave_batch_log()
                 return
@@ -368,13 +372,14 @@ class CommandLineCalib () :
 
     def get_print_lsf_status(self) :
         queue = cp.bat_queue.value()
-        msg, status = gu.msg_and_status_of_lsf(queue)
-        msgi = self.sep + 'LSF status for queue %s: \n%s\nLSF status for %s is %s'\
-               % (queue, msg, queue, {False:'bad',True:'good'}[status])
+        farm = cp.dict_of_queue_farm[queue]
+        msg, status = gu.msg_and_status_of_lsf(farm, print_bits=0)
+        msgi = self.sep + 'LSF status for queue %s on farm %s: \n%s\nLSF status for %s is %s'\
+               % (queue, farm, msg, queue, {False:'bad',True:'good'}[status])
         self.log(msgi,1)
 
         msg, status = gu.msg_and_status_of_queue(queue)
-        self.log(msg,1)
+        self.log('\nBatch queue status, %s'%msg, 1)
 
         return status
 

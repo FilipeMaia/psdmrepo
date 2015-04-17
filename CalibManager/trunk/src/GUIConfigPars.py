@@ -271,8 +271,10 @@ class GUIConfigPars ( Frame ) :
 
     def onButLsfStatus(self):
         queue = cp.bat_queue.value()
-        msg, status = gu.msg_and_status_of_lsf(queue)
-        msgi = '\nLSF status for queue %s: \n%s\nLSF status for %s is %s' % (queue, msg, queue, {False:'bad',True:'good'}[status])
+        farm = cp.dict_of_queue_farm[queue]
+        msg, status = gu.msg_and_status_of_lsf(farm)
+        msgi = '\nLSF status for queue %s on farm %s: \n%s\nLSF status for %s is %s' % \
+               (queue, farm, msg, queue, {False:'bad',True:'good'}[status])
         logger.info(msgi, __name__ )
 
         cmd, msg = gu.text_status_of_queues(cp.list_of_queues)

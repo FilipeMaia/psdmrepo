@@ -12,6 +12,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-17 Mikhail S. Dubrovin
+Tag: V00-00-87
+- add live mode for ffb, fix info messages about batch queue and farm (PSAS-6)
+- app/calibrun - add comment about ffb
+	       - do not check LUSTRE version on start-up
+- ConfigFileGenerator - add in dataset defenition ":dir=..." for non-standard directory and ":live" for ffb.
+- BatchJobPedestals - use command "psana -c <config-file.cfg>" with files defined inside. Fixes xtc/file (missing slash).
+- CommandLineCalib - extend status message when batch is running.
+- ConfigParametersForApp - add list of farms and dictionary for {queue:farm}
+- fix info messages about batch system
+
 2015-04-09 Mikhail S. Dubrovin
 Tag: V00-00-86
 - in *.py replace ==None -> is None, !=None -> is not None

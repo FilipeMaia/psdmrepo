@@ -140,9 +140,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         time_str = gu.get_local_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S')
         status = self.get_batch_job_status(job_id, comment)
 
-        msg = 'Job Id: ' + str(job_id) + \
-              ' was submitted at ' + str(time_str) + \
-              '    Status: ' + str(status)
+        msg = 'Job Id: %s submitted on %s status: %s' % (job_id, time_str, status)
         #print msg
         return status, msg
 
@@ -201,11 +199,15 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
 #-----------------------------
 
     def connectToThread1(self):
+        if cp.commandlinecalib is not None : return
+
         try : self.connect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
         except : logger.warning('connectToThread1 IS FAILED !!!', __name__)
 
 
     def disconnectFromThread1(self):
+        if cp.commandlinecalib is not None : return
+
         try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
         except : logger.warning('disconnectFromThread1 IS FAILED !!!', __name__)
 
