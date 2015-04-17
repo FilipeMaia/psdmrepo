@@ -13,6 +13,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2015-04-17 Mikhail S. Dubrovin
+Tag: V00-00-88
+- app/calibrun - return check LUSTRE version on start-up
+
+2015-04-17 Mikhail S. Dubrovin
 Tag: V00-00-87
 - add live mode for ffb, fix info messages about batch queue and farm (PSAS-6)
 - app/calibrun - add comment about ffb
