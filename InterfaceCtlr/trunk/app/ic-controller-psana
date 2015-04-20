@@ -223,12 +223,9 @@ class Controller ( AppBase ) :
                     
                     # must have some files associated
                     if not fs.xtc_files :
-                        
                         self.error ('expecting non-empty fileset: %s', fs)
-                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
-                        
+                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')                        
                     else:
-                    
                         # Found a new fileset to translate
                         self.trace('found new fileset %s', fs)
     
