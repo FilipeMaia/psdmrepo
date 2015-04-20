@@ -68,7 +68,7 @@ SharedFile::SharedFileImpl::SharedFileImpl (const XtcFileName& argPath,
     MsgLog( logger, error, "failed to open input XTC file: " << path );
     throw FileOpenException(ERR_LOC, path.path()) ;
   } else {
-    MsgLog( logger, trace, "opened input XTC file: " << path );
+    MsgLog( logger, trace, "opened input XTC file: " << path << " fd=" << fd);
   }
 }
 
