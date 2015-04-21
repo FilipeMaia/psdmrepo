@@ -4,6 +4,8 @@ import numpy
 #import logging # MPI doesn't play nicely with logging, it seams
 import logging
 
+__version__ = '00.00.06'
+
 class scatter(object):
     def __init__(self,xname,yname):
         self.entries = []

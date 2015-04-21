@@ -1,5 +1,7 @@
 import logging
 
+__version__ = '00.00.06'
+
 class epics_scatter(event_process.event_process):
     def __init__(self):
         self.logger                      = logging.getLogger(__name__+'.epics_scatter')

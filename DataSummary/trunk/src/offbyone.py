@@ -9,6 +9,8 @@ import matplotlib.pyplot as plt
 import math
 import pylab
 
+__version__ = '00.00.06'
+
 def array_calc(arr):
     flat = np.ravel(arr)
     return np.sum(flat)/(len(flat)-1)-flat[0]

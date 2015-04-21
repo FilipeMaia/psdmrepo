@@ -5,6 +5,8 @@ import toolbox
 import event_process
 import os
 
+__version__ = '00.00.06'
+
 class epics_trend(event_process.event_process):
     def __init__(self):
         self.logger                      = logging.getLogger(__name__+'.epics_trend')

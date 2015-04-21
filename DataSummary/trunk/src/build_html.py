@@ -5,6 +5,8 @@ import time
 import output_html
 import markup
 
+__version__ = '00.00.06'
+
 class build_html(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()

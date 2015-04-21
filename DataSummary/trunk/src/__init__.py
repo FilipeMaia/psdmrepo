@@ -17,6 +17,8 @@ from time_fiducials       import *
 from store_report_results import *
 from offbyone             import *
 
+__version__ = '00.00.06'
+
 import logging
 
 #from event_process import *

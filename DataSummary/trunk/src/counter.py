@@ -3,6 +3,8 @@ import numpy
 from mpi4py import MPI
 import event_process
 
+__version__ = '00.00.06'
+
 class counter(event_process.event_process):
     def __init__(self ):
         self.data  = numpy.array([0,])

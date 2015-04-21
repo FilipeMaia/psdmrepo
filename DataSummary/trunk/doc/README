@@ -26,10 +26,6 @@ are packaged in this directory.
     pick up which sata sources are available, and include some information
     about them.
 
-  myDS
-
-    Currently not working with the latest versions of the module.
-
 The data summary tool can be used in the following three ways:
 
   - locally on a single node in a single core mode,

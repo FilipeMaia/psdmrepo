@@ -3,6 +3,8 @@ import event_process
 import os
 import pprint
 
+__version__ = '00.00.06'
+
 class store_report_results(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()

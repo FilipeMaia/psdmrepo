@@ -7,6 +7,8 @@ import toolbox
 import pylab
 from common import strtype
 
+__version__ = '00.00.06'
+
 class simple_trends(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()

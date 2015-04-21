@@ -11,6 +11,12 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-21 Justin Garofoli
+Tag: V00-00-07
+- acqiris module now checks all acqiris traces
+- evr module updated to latest version of data type
+- added version numbers to all files
+
 2015-04-15 Justin Garofoli
 Tag: V00-00-06
 - now html sections are sorted alpha-numerically

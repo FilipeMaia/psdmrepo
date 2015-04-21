@@ -7,6 +7,7 @@ from epics_trend  import epics_trend
 from ipimb        import ipimb
 from cspad        import cspad
 
+__version__ = '00.00.06'
 
 class add_all_devices(event_process.event_process):
     def __init__(self,devs):

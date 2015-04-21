@@ -7,6 +7,8 @@ import pylab
 import psana
 from common import strtype
 
+__version__ = '00.00.06'
+
 class ipimb(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()

@@ -5,9 +5,11 @@ logger = logging.getLogger(__name__+'.packer')
 this library packs unhashable objects (dict, list) to tuples
 and provides the unpacking algorithm.
 
-...if there is a library to do this already, I'd rather use that.
+...if there is a library to do this already, I'd rather use that. (pickle??)
 
 """
+
+__version__ = '00.00.06'
 
 def pack(oo):
     logger.debug( 'pack ' + repr( oo ) )

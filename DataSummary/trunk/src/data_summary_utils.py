@@ -1,6 +1,8 @@
 from event_process import *
 from mpi4py import MPI 
 
+__version__ = '00.00.06'
+
 class AddEventProcessError(Exception):
     def __init__(self, msg):
         self.msg = msg

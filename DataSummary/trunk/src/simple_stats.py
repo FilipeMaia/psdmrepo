@@ -6,6 +6,8 @@ import toolbox
 import pylab
 from common import strtype
 
+__version__ = '00.00.06'
+
 class simple_stats(event_process.event_process):
     def set_stuff(self,psana_src,psana_device,device_attrs,hist_ranges,in_report=None,in_report_title=None):
         self.src         = psana.Source(psana_src)

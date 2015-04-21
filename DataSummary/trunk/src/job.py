@@ -13,7 +13,7 @@ import glob
 import random
 import traceback
 
-__version__ = 0.2
+__version__ = '00.00.06'
 
 
 class job(object):
@@ -25,21 +25,26 @@ class job(object):
         self.size = self.comm.Get_size()
         self._reducer_rank_selector = random.Random(1234) # this is the same amongst all ranks so they
                                                           # all choose the same reducer rank
-        self._reducer_rank = {}
-        self.maxEventsPerNode = 5000
-        self.all_times = []
+        self._reducer_rank    = {}
+        self.maxEventsPerNode = 5000 # arbitrarily chosen
+        self.all_times        = []
         self.shared = {}
         self.output = []
+
         self.output_dir = None
         self._output_dir_base = os.path.expanduser('~/data-summary')
+
         self.gathered_output = []
         self.previous_versions = []
+
         self.x_axes = ['time',]
-        self.logger = logging.getLogger(__name__+'.r{:0.0f}'.format( self.rank ))
-        self.start_time = time.time()
-        self.logger.info('start time is {:}'.format(self.start_time))
         self.eventN = 0
-        self.count = 0
+        self.count  = 0
+
+        self.start_time = time.time()
+        self.logger = logging.getLogger(__name__+'.r{:0.0f}'.format( self.rank ))
+        self.logger.info('start time is {:}'.format(self.start_time))
+
         return
 
     @property
@@ -191,24 +196,6 @@ class job(object):
         return
 
     def unify_ranks(self):
-        #subjob_data = [sj.describe_self() for sj in self.subjobs]
-        #self.logger.info('subjobs at end: {:}'.format(subjob_data))
-
-        #self.gathered_subjobs = self.comm.allgather( pup.pack(subjob_data) , root=0 )
-        #if self.rank == 0:
-        #    tftable = [self.gathered_subjobs[0] == gsj for gsj in self.gathered_subjobs]
-        #    allgood =  not False in tftable
-        #    self.logger.info('all ranks have identical subjobs: {:}'.format(allgood  ))
-        #    self.logger.debug('gathered subjobs: \n {:}'.format( pprint.pformat( self.gathered_subjobs) ) )
-        #    if not allgood:
-        #        self.logger.error.info('subjobs matching to sj 0: {:}'.format(repr(tftable)))
-        #    self.scattered_subjobs = self.check_subjobs( self.gathered_subjobs[0] )
-        #else:
-        #    self.scattered_subjobs = None
-        #self.scattered_subjobs = self.comm.scatter(self.scattered_subjobs, root=0 )
-        ## instantiate the necessary subjobs in the right order (or reorder them, or whatever)
-        ## and update the list of subjobs such that they are identical across all ranks.
-        #self.update_subjobs_before_endJob()
 
         # make a dictionary of the id:sj
         self.mymap = {(sj.__class__.__name__, repr(sj.describe_self()) ):sj for sj in self.subjobs}
@@ -315,6 +302,7 @@ class job(object):
         # do a pre endJob check to make sure all jobs have the same subjobs (unfinished)
         self.subjobs[5:-1] = sorted(self.subjobs[5:-1]) # sort all jobs except first and last
         self.unify_ranks()
+
         for sj in self.subjobs:
             self.logger.info( 'rank {:} endJob {:}'.format(self.rank, repr(sj) ) )
             self.logger.info( '   --- rank {:} should send to {:} ({:})'.format(self.rank, self._reducer_rank[(sj.__class__.__name__, repr( sj.describe_self() ))], sj.__class__.__name__ ) )

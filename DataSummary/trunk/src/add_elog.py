@@ -1,6 +1,8 @@
 import logging
 import event_process
 
+__version__ = '00.00.06'
+
 class add_elog(event_process.event_process):
     def __init__(self):
         self.output = event_process.event_process_output()

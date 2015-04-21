@@ -4,6 +4,8 @@ import os, sys
 import shutil
 import logging
 
+__version__ = '00.00.06'
+
 from AppUtils.AppDataPath import AppDataPath
 
 html_dir_finder = AppDataPath('DataSummary/html')

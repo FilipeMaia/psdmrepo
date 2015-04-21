@@ -3,6 +3,8 @@ import time
 import logging
 import event_process
 
+__version__ = '00.00.06'
+
 class time_fiducials(event_process.event_process):
     def __init__(self):
         self.timestamp = ()
