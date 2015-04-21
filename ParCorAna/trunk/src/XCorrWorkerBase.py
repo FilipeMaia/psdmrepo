@@ -89,7 +89,7 @@ class XCorrWorkerBase(object):
 
             # assume ciruclarly sorted, so the smallest time is the one we are going to overwrite
             pivotIndex = self.nextTimeIdx
-            userObj.workerAdjustTerms(XCorrWorkerBase.SUBTRACT, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
+            userObj.workerBeforeDataRemove(self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         self.logger.debug('XCorrWorkerBase.updateData next120hz=%d' % (next120hz,))
 
@@ -133,7 +133,7 @@ class XCorrWorkerBase(object):
             pivotIndex = 0
         else:
             pivotIndex = self.nextTimeIdx+1
-        userObj.workerAdjustTerms(XCorrWorkerBase.ADD, self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
+        userObj.workerAfterDataInsert(self.nextTimeIdx, pivotIndex, self.numTimesFilled(), self.T, self.X)
             
         if self.nextTimeIdx == self.maxTimes - 1:
             self.wrapped = True

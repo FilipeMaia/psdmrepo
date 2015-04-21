@@ -1,4 +1,3 @@
-import logging
 import numpy as np
 import psana
 import ParCorAna
@@ -201,10 +200,8 @@ system_params['testh5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
 system_params['overwrite'] = False   # if you want to overwrite an h5output file that already exists
 
 ######## verbosity #########
-# verbosity can be one of logging.INFO, logging.DEBUG, logging.WARNING
-# this can be overriden on the command line with aliases for those Python logging module values.
-# when debug is on, more asserts, etc are run in the code.
-system_params['verbosity'] = logging.INFO 
+# verbosity can be one of INFO, DEBUG, WARNING (levels from the Python logging module)
+system_params['verbosity'] = 'INFO'
 
 ######## numevents #########
 # numevents - 0 or None means all events. This is primarily a debugging/development switch that

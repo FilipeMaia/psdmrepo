@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+- implement WorkerData for incrememtal calculation
+- add some unit tests
+- add psmon plotting
+- before refactor to plug in WorkerData
+	
 Tag: V00-00-04
 2015-4-10 David Schneider
 - update sphinx documentation

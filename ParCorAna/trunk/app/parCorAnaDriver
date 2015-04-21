@@ -32,37 +32,8 @@ def getSystemAndUserParams(filename):
     user_params = configLocals['user_params']
     assert isinstance(system_params, dict), "system_params is not a dict"
     assert isinstance(user_params, dict), "user_params is not a dict"
-
-    expectedSystemKeys = set(['dataset',
-                              'src',
-                              'psanaType', 
-                              'ndarrayProducerOutKey',
-                              'ndarrayCalibOutKey', 
-                              'psanaOptions',
-                              'outputArrayType', 
-                              'workerStoreDtype',
-                              'maskNdarrayCoords',
-                              'testMaskNdarrayCoords',
-                              'numServers', 
-                              'serverHosts',
-                              'times', 
-                              'update',
-                              'delays',
-                              'h5output', 
-                              'testH5output',
-                              'overwrite',
-                              'verbosity', 
-                              'numEvents', 
-                              'userClass',
-                              'testNumEvents'])
-
-    undefinedSystemKeys = expectedSystemKeys.difference(set(system_params.keys()))
-    newSystemKeys = set(system_params.keys()).difference(expectedSystemKeys)
-    assert len(undefinedSystemKeys)==0, "config file %s does not define required keys in system_params: %r" % \
-        (filename, undefinedSystemKeys)
-    if len(newSystemKeys)>0 and MPI.COMM_WORLD.Get_rank()==0:
-        sys.stderr.write("Warning: unexpected keys in config file (%s) system_params: %r\n" % (filename, newSystemKeys))
     return system_params, user_params
+
 
 def mainRoutine(system_params, user_params, test_alt):
     framework = pca.CommSystemFramework(system_params, user_params, test_alt)
@@ -76,16 +47,7 @@ def setCommandLineOverrideArguments(args, system_params):
       system_params (dict): the system parameters to potential overwrite/modify
     '''
     if args.verbosity is not None:
-        if args.verbosity == 'debug':
-            verbosity = logging.DEBUG
-        elif args.verbosity == 'info':
-            verbosity = logging.INFO
-        elif args.verbosity == 'warn':
-            verbosity = logging.WARNING
-        else:
-            raise Exception("command line argument verbosity %s not understood. must be 'debug', 'info', or 'warn'" % args.verbosity)
         system_params['verbosity'] = verbosity
-
     
     for arg, dictkey, argtype in zip([args.numevents, args.h5output, args.dataset, args.numServers], \
                                      ['numEvents','h5output', 'maskFile', 'dataset', 'numServers'], \
@@ -128,6 +90,7 @@ if __name__ == '__main__':
     
     assert args.config is not None, "You must provide a config file"
     system_params, user_params = getSystemAndUserParams(args.config)
+    pca.checkParams(system_params, user_params)
     numSystemParamKeys = len(system_params)
     if args.test_main or args.test_alt:
         system_params['numEvents'] = system_params['testNumEvents']

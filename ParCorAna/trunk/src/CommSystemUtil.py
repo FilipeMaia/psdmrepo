@@ -46,8 +46,10 @@ def divideAmongWorkers(dataLength, numWorkers):
         nextOffset += count
     checkCountsOffsets(counts, offsets, dataLength)
     return offsets, counts            
-    
-def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl=logging.INFO):
+ 
+loggers = {}
+   
+def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl='INFO', propagate=False):
     '''Returns Python logger with prefix identifying master/viewer/server/worker & rnk
 
     If isTestMode is true, returns logger with 'noMpi' prefix.
@@ -59,27 +61,77 @@ def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl=logging.INFO)
      isViewer (bool): True if this is logger for viewer rank
      isServer (bool): True is this logger is for server rank
      rank (bool): rank to report
-     lvl (int): logging level
+     lvl (str): logging level
+     propogate (bool): True is logging message should propogage to parent
 
     Return:
       (logger): python logging logger is returned with formatting describing role in framework, and time of logged messages.
     '''
+    numLevel = None
+    if hasattr(logging,lvl.upper()) and isinstance(getattr(logging, lvl.upper()), int):
+        numLevel = getattr(logging, lvl.upper())
+    else:
+        validLevels = ','.join([attr for attr in dir(logging) if attr.isupper() and isinstance(getattr(logging, attr),int)])
+        raise ValueError("invalid verbosity/logging level=%s. valid levels are: %s" % (lvl, validLevels))
+    global loggers
+
+    loggerName = None
     if isTestMode:
-        logger = logging.getLogger('testmode:')
+        loggerName = 'testmode'
     else:
         assert int(isMaster) + int(isViewer) + int(isServer) in [0,1], "more than one of isMaster, isViewer, isServer is true"
         if isMaster:
-            logger = logging.getLogger('master-rnk:%d' % rank)
+            loggerName = 'master-rnk:%d' % rank
         elif isViewer:
-            logger = logging.getLogger('viewer-rnk:%d' % rank)
+            loggerName = 'viewer-rnk:%d' % rank
         elif isServer:
-            logger = logging.getLogger('server-rnk:%d' % rank)
+            loggerName = 'server-rnk:%d' % rank
         else:
-            logger = logging.getLogger('worker-rnk:%d' % rank)
-    logger.setLevel(lvl)
+            loggerName = 'worker-rnk:%d' % rank
+
+    logger = loggers.get(loggerName,None)
+    if logger is not None:
+        return logger
+
+    logger = logging.getLogger(loggerName)
+    logger.setLevel(numLevel)
+    logger.propagate=propagate
     ch = logging.StreamHandler()
-    ch.setLevel(lvl)
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    ch.setLevel(numLevel)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s' )
     ch.setFormatter(formatter)
+    logger.handlers = []
     logger.addHandler(ch)
+    loggers[loggerName]=logger
     return logger
+
+def checkParams(system_params, user_params):
+    expectedSystemKeys = set(['dataset',
+                              'src',
+                              'psanaType', 
+                              'ndarrayProducerOutKey',
+                              'ndarrayCalibOutKey', 
+                              'psanaOptions',
+                              'outputArrayType', 
+                              'workerStoreDtype',
+                              'maskNdarrayCoords',
+                              'testMaskNdarrayCoords',
+                              'numServers', 
+                              'serverHosts',
+                              'times', 
+                              'update',
+                              'delays',
+                              'h5output', 
+                              'testH5output',
+                              'overwrite',
+                              'verbosity', 
+                              'numEvents', 
+                              'userClass',
+                              'testNumEvents'])
+
+    undefinedSystemKeys = expectedSystemKeys.difference(set(system_params.keys()))
+    newSystemKeys = set(system_params.keys()).difference(expectedSystemKeys)
+    assert len(undefinedSystemKeys)==0, "Required keys are not in system_params: %r" % \
+        (undefinedSystemKeys,)
+    if len(newSystemKeys)>0 and MPI.COMM_WORLD.Get_rank()==0:
+        sys.stderr.write("Warning: unexpected keys in system_params: %r\n" % (newSystemKeys,))

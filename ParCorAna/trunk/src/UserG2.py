@@ -14,8 +14,9 @@ import ParCorAna
 import ParCorAna.XCorrWorkerBase as XCorrWorkerBase
 import psana
 import logging
-from psmon import publish
-from psmon.plots import XYPlot, MultiPlot
+import psmon.config as psmonConfig
+import psmon.publish as psmonPublish
+import psmon.plots as psmonPlots
 
 ##################################
 ### helper functions for UserG2 class below
@@ -137,47 +138,12 @@ class G2Common(object):
         self.saturatedValue = self.user_params['saturatedValue']
         self.notzero = self.user_params['notzero']
 
-    def workerAdjustTerms(self, mode, dataIdx, pivotIndex, lenT, T, X):
-        '''called before and after X[dataIdx,:] is filled with new data scattered to this
-        worker. Allows the user to see what new data has been written, and what the time is
-        for that data. Once the T buffer wraps and the framework is overwriting the oldest data, 
-        allows the user to see the old data getting removed (useful for maintaining a 'windowed'
-        correlation analysis rather than an accumulation of delays over all time.
+    def workerBeforeDataRemove(self, dataIdx, pivotIndex, lenT, T, X):
+        pass
 
-        Note, T is a ciruclarly sorted array. If the configuration parameters defined T to be a
-        500 long array, and we are at event 600, then T[0:100] are the times for the most
-        recent 100 events (events 501 to 600) while T[101:] are the times for events 101 to 500.
-
-        When working with T, the three things one needs to know are how much of T has been filled so
-        far (lenT argument to function), where the 'pivotIndex' is, and which index the being used 
-        for the new data for the worker (the dataIdx argument to the function).
-        
-        In the above example, lenT=500, pivotIndex = 99 and dataIdx = 99. Before we wrap around in
-        T, i.e, for evenst 1 to 500 in the example above, pivotIdx=0, and T is effectively a sorted array.
-        But after we wrap around, T is a true sorted circular array where dataIdx will most always be equal 
-        to pivotIndex. When dataIdx is not equal to pivotIdx can occur if the DAQ is sending events out
-        of order, or due to how we are getting events, we read them out of order. In this case dataIdx
-        could be below or above the pivotPoint, however the framework will take care of moving things around
-        in X and T to ensure that T is a circularly sorted array (WARNING: not implemented yet).
-
-        Args:
-         T:        1D Times array, values are the 120hz int64 counters for events. 
-                   T[dataIdx] is the value about to be overwritten (for SUBTRACT) or the value that
-                   has just been replaced, or appended during the first time through T (for ADD)
-         X:        2D data array, X[dataIdx,:] is the data about to replaced during SUBTRACT, or that has 
-                   just been copied in from a server (for ADD)
-         dataIdx:  the index into T and X of the time/data about to be removed (SUBTRACT), or that has just
-                   been added (ADD)
-         pivotIndex: the index for the smallest value in the Times array right now. Note - this can
-                     change from the SUTRACT call to the ADD call.
-         lenT:      the length of T/X that is being used so far. Will be less than the lenght of T during the
-                   runup before we wrap.
-         mode:     SUBTRACT/ADD, as discussed above.
-        '''
-        if mode == XCorrWorkerBase.SUBTRACT:
-            pass
-        elif mode == XCorrWorkerBase.ADD:
-            pass
+    def workerAfterDataInsert(self, dataIdx, pivotIndex, lenT, T, X):
+        self.mp.logInfo("dataIdx=%d" % dataIdx)
+        pass
 
     def workerAdjustData(self, data):
         indexOfSaturatedElements = data >= self.saturatedValue
@@ -220,6 +186,7 @@ class G2Common(object):
         '''
         allTimes = T
         n = numTimesFilled
+        print "n=%d" % n
         if n < len(allTimes):
             allTimes = T[0:n]
         timesSortIdx = np.argsort(allTimes)
@@ -279,8 +246,12 @@ class G2Common(object):
 
         self.plot = self.user_params['psmon_plot']
         if self.plot:
-            self.mp.logInfo("Initializing psmon: viewer host is: %s" % os.environ.get('HOSTNAME','*UNKNOWN*'))
-            publish.init()
+            hostname = os.environ.get('HOSTNAME','*UNKNOWN*')
+            port = self.user_params.get('psmon_port',psmonConfig.APP_PORT)
+            psmonPublish.init()
+            self.mp.logInfo("Initialized psmon. viewer host is: %s" % hostname)
+            psplotCmd = 'psplot --logx -s %s -p %s MULTI' % (hostname, port)
+            self.mp.logInfo("Run cmd: %s" % psplotCmd)
 
 
     def viewerPublish(self, counts, lastEventTime, name2delay2ndarray, 
@@ -372,13 +343,13 @@ class G2Common(object):
                 ParCorAna.writeToH5Group(group, name2delay2ndarray)
 
         if self.plot:
-            multi = MultiPlot(counter120hz, 'MULTI')
+            multi = psmonPlots.MultiPlot(counter120hz, 'MULTI', ncols=3)
             for color in self.colors:
                 if color not in delayCurves: continue
-                thisPlot = XYPlot(counter120hz, 'color/bin=%d' % color, 
-                                  self.delays, delayCurves[color], formats='bs')
+                thisPlot = psmonPlots.XYPlot(counter120hz, 'color/bin=%d' % color, 
+                                  self.delays, delayCurves[color], formats='bs-')
                 multi.add(thisPlot)
-            publish.send('MULTI', multi)
+            psmonPublish.send('MULTI', multi)
 
 
 

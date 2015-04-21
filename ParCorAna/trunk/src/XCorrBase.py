@@ -316,7 +316,8 @@ class XCorrBase(object):
 
     def storeNewWorkerData(self, counter):
         assert self.mp.isWorker, "storeNewWorkerData called for non-worker"
-        self.xCorrWorkerBase.updateData(counter, self.workerScatterReceiveBuffer,
+        self.xCorrWorkerBase.updateData(counter, 
+                                        self.workerScatterReceiveBuffer,
                                         self.userObj, )
 
     def checkUserWorkerCalcArgs(self, name2array, counts, int8array):
@@ -346,6 +347,7 @@ class XCorrBase(object):
             name2array, counts, int8array = self.userObj.workerCalc(self.xCorrWorkerBase.T, \
                                                                     self.xCorrWorkerBase.numTimesFilled(), \
                                                                     self.xCorrWorkerBase.X)
+
             calcTime = time.time() - t0
             self.checkUserWorkerCalcArgs(name2array, counts, int8array)
             self.mp.logInfo('g2worker.calc at 120hz counter=%s took %.4f sec' % \

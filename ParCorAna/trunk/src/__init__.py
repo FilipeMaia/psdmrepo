@@ -382,13 +382,15 @@ from CommSystem import identifyCommSubsystems, identifyServerRanks
 from CommSystem import RunServer, RunMaster, RunWorker, RunViewer
 from CommSystem import runCommSystem
 from CommSystem import CommSystemFramework
-from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger
+from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger, checkParams
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 from PsanaUtil import parseDataSetString, makePsanaOptions, psanaNdArrays
 from PsanaUtil import readDetectorDataAndEventTimes, getSortedCountersBasedOnSecNsecAtHertz
 from XCorrBase import makeDelayList, writeToH5Group, XCorrBase, writeConfig
 from XCorrWorkerBase import XCorrWorkerBase
+from WorkerData import WorkerData
 import maskColorImgNdarr
+from Exceptions import *
 
 __all__ = ['SM_MsgBuffer', 'MVW_MsgBuffer', 
            'RunServer', 'RunMaster', 'RunViewer', 'RunWorker',
@@ -396,4 +398,5 @@ __all__ = ['SM_MsgBuffer', 'MVW_MsgBuffer',
            'runCommSystem', 'CommSystemFramework', 'maskColorImgNdarr',
            'checkCountsOffsets', 'divideAmongWorkers', 'makeLogger',
            'divideAmongWorkers', 'checkCountsOffsets', 'XCorrWorkerBase',
-           'XCorrBase', 'makeDelayList', 'writeToH5Group']
+           'WorkerData', 'XCorrBase', 'makeDelayList', 'writeToH5Group',
+           'unitTests', 'checkParams']

@@ -935,6 +935,7 @@ def isNoneOrListOfStrings(arg):
 
 class CommSystemFramework(object):
     def __init__(self, system_params, user_params, test_alt=False):
+        CommSystemUtil.checkParams(system_params, user_params)
         numServers = int(system_params['numServers'])
         dataset = system_params['dataset']
         serverHosts = system_params['serverHosts']
