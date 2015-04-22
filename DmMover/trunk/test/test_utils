@@ -35,40 +35,44 @@ class MyTest( unittest.TestCase ) :
         target path for a file transfer. The parameter depend on the transfer mode. """ 
         
         trgfn = mvr.trgpath_param("ioc-ffb", "/test/d1")
-        reg_ana, incl_instr, path = trgfn('cxi')
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('cxi')
 
         self.assertEqual(path, "/test/d1")
         self.assertTrue(reg_ana)
         self.assertTrue(incl_instr)
-
+        self.assertTrue(cr_xtc_only)
 
         trgfn = mvr.trgpath_param("ioc-ffb", "/test/d1")
-        reg_ana, incl_instr, path = trgfn('dia')
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('dia')
 
         self.assertIsNone(path)
         self.assertFalse(reg_ana)
         self.assertTrue(incl_instr)
+        self.assertFalse(cr_xtc_only)
 
 
     def test_trgpath_dss(self):
         """ see test_trgpath_ioc  """
 
         trgfn = mvr.trgpath_param("dss-ffb", "/brick1")
-        reg_ana, incl_instr, path = trgfn('cxi')
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('cxi')
 
         self.assertEqual(path, "/brick1")
         self.assertTrue(reg_ana)
         self.assertFalse(incl_instr)
+        self.assertTrue(cr_xtc_only)
+
 
     def test_trgpath_offline(self):
         """ see test_trgpath_ioc  """
 
         trgfn = mvr.trgpath_param("ffb-offline")
-        reg_ana, incl_instr, path = trgfn('xpp')
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('xpp')
 
         self.assertIsNone(path)
         self.assertFalse(reg_ana)
         self.assertTrue(incl_instr)
+        self.assertFalse(cr_xtc_only)
 
 
     def test_networkname(self):
