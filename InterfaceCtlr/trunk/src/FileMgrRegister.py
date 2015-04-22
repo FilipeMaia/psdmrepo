@@ -133,6 +133,9 @@ class FileMgrRegister ( object ) :
         if type == 'xtc.idx':
             irods_resource = self._config.get('irodsIdxResource')
             data_subdir = 'xtc/index'
+        elif type == 'smd.xtc':
+            irods_resource = None
+            data_subdir = 'xtc/smalldata'            
         else:
             irods_resource = None
             data_subdir = type
