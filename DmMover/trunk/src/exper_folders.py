@@ -21,7 +21,7 @@ mkdir = os.mkdir
 #runcmd =  __print_cmd
 
 
-def check_all_destpath(exper, seldirs=None):
+def check_all_destpath(exper, seldirs=None, dolink=True):
     """ Create all the experiments subdirectories (in the offline files system) and 
     create the links in the experiment directory """
     
@@ -32,7 +32,8 @@ def check_all_destpath(exper, seldirs=None):
         if seldirs and folder not in seldirs:
             continue
         create_exp_path(folder, exper.name, exper.instr_lower, exper.posix_gid, datapath)
-        create_link(folder, exper.name, exper.instr_lower, datapath)
+        if dolink:
+            create_link(folder, exper.name, exper.instr_lower, datapath)
 
     datapath = exper.scratchpath
     print  "scratch", datapath
@@ -40,7 +41,8 @@ def check_all_destpath(exper, seldirs=None):
         if seldirs and folder not in seldirs:
             continue
         create_exp_path(folder, exper.name, exper.instr_lower, exper.posix_gid, datapath)
-        create_link(folder, exper.name, exper.instr_lower, datapath)
+        if dolink:
+            create_link(folder, exper.name, exper.instr_lower, datapath)
         
 
 def check_destpath(exper, instr=None):
@@ -167,7 +169,7 @@ def create_exp_path(datatype, exp, instr, posix_grp, physpath, no_instr_path=Fal
         runcmd('setfacl -d -m user::rwx %s' %(datapath))
         
         if datatype == 'xtc':
-            for subdir in ('md5', 'index'):
+            for subdir in ('md5', 'index', 'smalldata', 'smalldata/md5'):
                 spath = pjoin(datapath, subdir)
                 print "Create %s" %(spath)
                 mkdir(spath, 02750)
