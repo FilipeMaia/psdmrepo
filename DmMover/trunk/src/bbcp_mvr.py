@@ -1,6 +1,7 @@
 #!/usr/bin/env python 
 
 import os
+import logging
 from socket import gethostname
 
 class BbcpCmd(object):
@@ -42,10 +43,9 @@ class BbcpCmd(object):
 
     def to_local(self, src, src_path, trg_path, options=""):
         """ transfer a file to a local file system (no trg host)""" 
-        cmd = self._cmd(src, src_path, None,  trg_path, options="")
-        print "FFFFF", cmd
-        rc = os.system(cmd)
-        return rc
+        cmd = self._cmd(src, src_path, None,  trg_path, options)
+        logging.debug("bbcp cmd %s", cmd)
+        return os.system(cmd)
 
     
     def _cmd(self, src, src_path, trg, trg_path, options=""):
