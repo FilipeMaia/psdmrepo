@@ -498,12 +498,14 @@ class SysMon extends DbConnection {
             "duplicate entries for migration subscriber: {$uid} in database.") ;
     }
 
-    /* Get all known subscribers for delayed migration notifications.
+    /**
+     * Get all known subscribers for delayed migration notifications.
      * 
      * The method will return an array (a list) of entries similar to
      * the ones reported by the previous method.
+     *
+     * @return array
      */
-
     public function fm_delay_subscribers () {
         $sql = "SELECT * FROM {$this->database}.fm_delay_subscriber" ;
         $result = $this->query($sql) ;
@@ -520,50 +522,12 @@ class SysMon extends DbConnection {
     }
 
     /**
-     * Return an object representing a subscription entry. The object is
-     * ready to be serialized into JSON.
-     *
-     *   Key             | Type      | Description
-     *   ----------------+-----------+----------------------------------------------------------------------------
-     *   .uid             | string   | user account of a person subscribed
-     *   .gecos           | string   | full user name fr the user account (if available)
-     *   .subscribed_uid  | string   | user account of a person who requested the subscription 
-     *   .subscribed_time | stdClass | time when the subscription was made:
-     *     .sec           | integer  | - the nuumber of seconds
-     *     .nsec          | integer  | - the nuumber of nanoseconds
-     *     .day           | string   | - the day like 2014-04-12
-     *     .hms           | string   | - the hour-minute-second like 20:23:05
-     *   .subscribed_host | string   | host (IP address or DNS name) name from which the operation was requested
-     *   .instr           | string   | the name of an instrument (optional)
-     *   .last_sec        | integer  | the number of last seconds to take into account
-     *   .delay_sec       | integer  | the minimum duration of delays to take into account
+     * Return an object representing a subscription entry.
      *
      * @param stdClass $row
      */
     private function _fm_delay_subscriber2obj ($row) {
-
-        $obj = new \stdClass ;
-        $obj->uid = trim($row['uid']) ;
-
-        RegDB::instance()->begin() ;
-        $user = RegDB::instance()->find_user_account($obj->uid) ;
-        $obj->gecos = $user ? $user['gecos'] : $obj->uid ;
-
-        $obj->subscribed_uid = trim($row['subscribed_uid']) ;
-        $subscribed_user = RegDB::instance()->find_user_account($obj->subscribed_uid) ;
-        $obj->subscribed_gecos = $subscribed_user ? $subscribed_user['gecos'] : $obj->subscribed_uid ;
-
-        $subscribed_time = LusiTime::from64(trim($row['subscribed_time'])) ;
-        $obj->subscribed_time = new \stdClass ;
-        $obj->subscribed_time->sec  = $subscribed_time->sec ;
-        $obj->subscribed_time->nsec = $subscribed_time->nsec ;
-        $obj->subscribed_time->day  = $subscribed_time->toStringDay() ;
-        $obj->subscribed_time->hms  = $subscribed_time->toStringHMS() ;
-        $obj->subscribed_host = trim($row['subscribed_host']) ;
-        $obj->instr = is_null($row['instr']) ? '' : strtoupper(trim($row['instr'])) ;
-        $obj->last_sec = intval($row['last_sec']) ;
-        $obj->delay_sec = intval($row['delay_sec']) ;
-        return $obj ;
+        return new SysMonFMDelaySubscriber($this, $row) ;
     }
     
     /**
@@ -575,6 +539,7 @@ class SysMon extends DbConnection {
      * @param string $instr
      * @param integer $last_sec
      * @param integer $delay_sec
+     * @param array $events
      * @return stdClass
      */
     public function add_fm_delay_subscriber (
@@ -582,7 +547,8 @@ class SysMon extends DbConnection {
         $subscribed_uid ,
         $instr ,
         $last_sec ,
-        $delay_sec) {
+        $delay_sec ,
+        $events) {
 
         $subscribed_time_64 = LusiTime::now()->to64() ;
 
@@ -607,7 +573,12 @@ INSERT INTO {$this->database}.fm_delay_subscriber VALUES (
 HERE;
         $this->query($sql) ;
 
-        return $this->find_fm_delay_subscriber ($uid) ;
+        $subscriber = $this->find_fm_delay_subscriber ($uid) ;
+        foreach ($events as $e) {
+            if ($e->subscribed) $subscriber->subscribe  ($e->name) ;
+            else                $subscriber->unsubscribe($e->name) ;
+        }
+        return $this->find_fm_delay_subscriber ($uid) ; ;
     }
 
     /**
@@ -627,7 +598,8 @@ HERE;
         $subscribed_uid ,
         $instr ,
         $last_sec ,
-        $delay_sec) {
+        $delay_sec ,
+        $events) {
 
         $subscribed_time_64 = LusiTime::now()->to64() ;
 
@@ -652,7 +624,12 @@ UPDATE {$this->database}.fm_delay_subscriber SET
 HERE;
         $this->query($sql) ;
 
-        return $this->find_fm_delay_subscriber ($uid) ;
+        $subscriber = $this->find_fm_delay_subscriber ($uid) ;
+        foreach ($events as $e) {
+            if ($e->subscribed) $subscriber->subscribe  ($e->name) ;
+            else                $subscriber->unsubscribe($e->name) ;
+        }
+        return $this->find_fm_delay_subscriber ($uid) ; ;
     }
 
     /**
@@ -664,6 +641,27 @@ HERE;
         $uid_escaped = $this->escape_string(trim($uid)) ;
         $sql = "DELETE FROM {$this->database}.fm_delay_subscriber WHERE uid='{$uid_escaped}'" ;
         $this->query($sql) ;
+    }
+
+    /**
+     * Fetch all known file migration events
+     *
+     * @return array
+     */
+    public function fm_delay_events () {
+        $sql = "SELECT * FROM {$this->database}.fm_delay_event ORDER BY rank" ;
+        $result = $this->query($sql) ;
+        $list = array();
+        for ($nrows = mysql_numrows($result), $i = 0; $i < $nrows; $i++) {
+            array_push (
+                $list ,
+                new SysMonFMDelayEvent (
+                    $this ,
+                    mysql_fetch_array (
+                        $result ,
+                        MYSQL_ASSOC))) ;
+        }
+        return $list ;
     }
 }
 

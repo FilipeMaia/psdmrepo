@@ -7,22 +7,11 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_get.php</file>
         </group>
         <group>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_FM_Status.js</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_Live.js</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_get.php</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/SysMon/web/html/css/DMMon_FM_Status.css</file>
+            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_FM_Notify.js</file>
+            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_FM_Status.js</file>
         </group>
         <group name="PCDS Web Apps">
             <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_FM_Status.js</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/lib/sysmon/sysmon.class.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_get.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_notify.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/css/DMMon_FM_Status.css</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/css/DMMon_FM_Notify.css</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/lib/sysmon/sysmonfilemigrdelays.class.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_notify_get.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/ws/dmmon_fm_notify_save.php</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/SysMon/web/html/js/DMMon_FM_Notify.js</file>
         </group>
     </open-files>
 </project-private>

@@ -1,16 +1,31 @@
 <?php
 
 require_once 'authdb/authdb.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
 
 use AuthDB\AuthDB ;
+use RegDB\RegDB ;
 
 $title    = 'System Monitoring' ;
 $subtitle = 'Data Movers' ;
 
-$instruments = array('AMO','SXR','XPP','XCS','CXI','MEC') ;
+RegDB::instance()->begin() ;
+$instruments = array() ;
+foreach (RegDB::instance()->instruments() as $instr) {
+    if ($instr->is_location() || $instr->is_mobile()) continue ;
+    array_push($instruments, $instr->name()) ;
+}
 
 $select_app          = $instruments[0] ;
 $select_app_context1 = "Live" ;
+
+if (isset( $_GET['app'])) {
+    $app_path   = explode(':', trim($_GET['app'])) ;
+    $select_app = $app_path[0] ;
+    if (count($app_path) > 1)
+        $select_app_context1 = $app_path[1] ;
+}
+
 ?>
 
 <!DOCTYPE html>

@@ -1,10 +1,12 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk', 'webfwk/SimpleTable'] ,
+    'webfwk/Class',       'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'webfwk/SimpleTable', 'webfwk/CheckTable'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk, SimpleTable) {
+    Class,       FwkApplication, Fwk ,
+    SimpleTable, CheckTable) {
 
     cssloader.load('../sysmon/css/DMMon_FM_Notify.css') ;
 
@@ -62,9 +64,12 @@ function (
         // --------------------
 
         this._is_initialized = false ;
-        this._is_loading = false ;
 
-        var _MIN_ALLOWED_DELAY = 10 ;
+        this._users  = [] ;     // to be loaded
+        this._events = [] ;     // to be loaded
+
+        var _MIN_ALLOWED_DELAY = 600 ;
+        var _DEFAULT_DELAY = 3600 ;
 
         var _DELAYS_DEF = [
             {sec:    2*3600, name:  '2 hours'} ,
@@ -76,10 +81,11 @@ function (
             {sec: 2*24*3600, name:   '2 days'} ,
             {sec: 7*24*3600, name:     'week'}
         ] ;
+        
         this._wa = function (html) {
             if (!this._wa_elem) {
-                var title_subscription =
-                    'Check to subscribe a search for specified search criteria.' ;
+                var title_subscriptions =
+                    'Check to subscribe for a specific event.' ;
                 var title_instr =
                     'Narrow a search down to the specified instrument. \n' +
                     'Otherwise all instruments will be assumed.' ;
@@ -121,13 +127,6 @@ function (
   
   '<div id="ctrl" style="float:left;" > ' +
 
-    '<div class="control-group" data="'+title_subscription+'"> ' +
-      '<div class="control-group-title" >Subscribed</div> ' +
-      '<div class="control-group-selector" > ' +
-        '<input type="checkbox" name="subscription" / > ' +
-      '</div> ' +
-    '</div> ' +
-
     '<div class="control-group" data="'+title_instr+'" > ' +
       '<div class="control-group-title" >Instr.</div> ' +
       '<div class="control-group-selector" > ' +
@@ -137,7 +136,6 @@ function (
         '</select> ' +
       '</div> ' +
     '</div> ' +
-
     '<div class="control-group" data="'+title_last+'" > ' +
       '<div class="control-group-title" >Search last</div> ' +
       '<div class="control-group-selector" > ' +
@@ -146,24 +144,27 @@ function (
         '</select> ' +
       '</div> ' +
     '</div> ' +
-  
     '<div class="control-group" data="'+title_delay+'" > ' +
       '<div class="control-group-title" >Delayed by [sec]</div> ' +
       '<div class="control-group-selector" > ' +
         '<input type="text" size="1" name="delay" value="0" / > ' +
       '</div> ' +
     '</div> ' +
-
     '<div class="control-group control-group-buttons" > ' +
-      '<button class="control-button" name="reset"  title="click to reset the to recommended state" >SET TO RECOMMENDED</button> ' +
+      '<button class="control-button" name="subscribe"    title="subscribe to all events" >SUBSCRIBE FOR ALL</button> ' +
+      '<button class="control-button" name="unsubscribe"  title="subscribe to all events" >UN-SUBSCRIBE</button> ' +
     '</div> ' +
-    
     '<div class="control-group-end" ></div> ' +
-    
+
+    '<div class="control-group control-group-events" data="'+title_subscriptions+'" > ' +
+      '<div id="events" ></div>' +
+    '</div> ' +
+    '<div class="control-group-end" ></div> ' +
+
   '</div>' +
   '<div style="clear:both;" ></div> ' +
 
-  '<h2>All subscriptions:</h2>' +
+  '<h2>All subscribers:</h2>' +
   '<div id="users" >' +
   '</div>' +
 '</div>' ;
@@ -171,12 +172,6 @@ function (
                 this._wa_elem = this.container.children('#dmmon-fm-notify') ;
             }
             return this._wa_elem ;
-        } ;
-        this._subscription_selector = function () {
-            if (!this._subscription_selector_elem) {
-                this._subscription_selector_elem = this._wa().find('div.control-group-selector').children('input[name="subscription"]') ;
-            }
-            return this._subscription_selector_elem ;
         } ;
         this._instr_selector = function () {
             if (!this._instr_selector_elem) {
@@ -200,18 +195,39 @@ function (
             if (!this._updated_elem) this._updated_elem = this._wa().children('#updated') ;
             this._updated_elem.html(html) ;
         } ;
-
-        this._button_reset = function () {
-            if (!this._button_reset_elem) {
-                this._button_reset_elem = this._wa().find('.control-button[name="reset"]').button() ;
+        this._button_subscribe = function () {
+            if (!this._button_subscribe_elem) {
+                this._button_subscribe_elem = this._wa().find('.control-button[name="subscribe"]').button() ;
             }
-            return this._button_reset_elem ;
+            return this._button_subscribe_elem ;
+        } ;
+        this._button_unsubscribe = function () {
+            if (!this._button_unsubscribe_elem) {
+                this._button_unsubscribe_elem = this._wa().find('.control-button[name="unsubscribe"]').button() ;
+            }
+            return this._button_unsubscribe_elem ;
         } ;
         this._button_load = function () {
             if (!this._button_load_elem) {
                 this._button_load_elem = this._wa().find('.control-button[name="update"]').button() ;
             }
             return this._button_load_elem ;
+        } ;
+        this._events_checktable = function () {
+            if (!this._events_checktable_obj) {
+                var coldef = [
+                    {name: 'subscribed', text: ''} ,
+                    {name: 'event',      text: 'Event'} ,
+                    {name: 'descr',      text: 'Description'}
+                ] ;
+                this._events_checktable_obj = new CheckTable (
+                    coldef ,
+                    [] ,
+                    {on_click: function () { _that._save() ; }}
+                ) ;
+                this._events_checktable_obj.display(this._wa().find('div.control-group').children('#events')) ;
+            }
+            return this._events_checktable_obj ;
         } ;
         this._table = function () {
 
@@ -233,6 +249,19 @@ function (
                         }
                     } ,
                     {   name: 'Delay [s]'} ,
+                    {   name: 'Event', sorted: false ,
+                        type: {
+                            to_string: function (a)   {
+                                return _.reduce (
+                                    a ,
+                                    function (html, e) {
+                                        return html += e.name+'<br>' ;
+                                    } ,
+                                    ''
+                                ) ;
+                            } ,
+                            compare_values: function (a,b) { return 0 ; }
+                        }} ,
                     {   name: 'Subscribed' ,
                         type: {
                             to_string:      function (a)   { return a.day  + '&nbsp;&nbsp;' + a.hms+ '</span>' ; } ,
@@ -255,70 +284,121 @@ function (
             if (this._is_initialized) return ;
             this._is_initialized = true ;
 
-            this._subscription_selector().change(function () { _that._save() ; }) ;
-            this._instr_selector()       .change(function () { _that._save() ; }) ;
-            this._last_selector()        .change(function () { _that._save() ; }) ;
-            this._delay_selector()       .change(function () {
+            // Delayed initialization is required to load dedinitions
+            // of events.
+
+            this._action (
+                '../sysmon/ws/dmmon_fm_notify_events_get.php' ,
+                {} ,
+                function (data) {
+                    _that._init_success(data) ;
+                    _that._load() ;
+                }
+            ) ;
+        } ;
+        this._init_success = function (data) {
+
+            this._events = data.events ;
+
+            this._instr_selector().change(function () { _that._save() ; }) ;
+            this._last_selector() .change(function () { _that._save() ; }) ;
+            this._delay_selector().change(function () {
+
                 // Always make sure it's a positive numeric value.
                 // Otherwise force it to be the one before reloading the table.
+
                 var obj = $(this) ;
                 var delay = parseInt(obj.val()) ;
                 obj.val(delay >= _MIN_ALLOWED_DELAY ? delay : _MIN_ALLOWED_DELAY) ;
+
                 _that._save() ;
             }) ;
-            this._button_reset().click(function () { _that._reset() ; _that._save() ; }) ;
-            this._button_load() .click(function () { _that._load() ;  }) ;
+            this._button_subscribe().click(function () {
+                _that._events_checktable().check_all() ;
+                _that._save() ;
+            }) ;
+            this._button_unsubscribe().click(function () {
+                _that._events_checktable().uncheck_all() ;
+                _that._save() ;
+            }) ;
+            this._button_load() .click(function () {
+                _that._load() ;
+            }) ;
 
-            this._table() ;     // just to display an empty table
-            this._load() ;
+            this._events_checktable().remove_all() ;
+            for (var i in data.events) {
+                var e = data.events[i] ;
+                this._events_checktable().append ({
+                    subscribed: false ,
+                    event: e.name ,
+                    descr: e.descr
+                }) ;
+            }
+            this._table() ;    // just to display an empty table
         } ;
-        this._reset = function () {
-            this._instr_selector().val(0) ;
-            this._last_selector() .val(2*3600) ;
-            this._delay_selector().val(  3600) ;
+        this._load_success = function (data) {
+            _that._users = data.users ;
+            _that._display() ;
+            _that._set_updated('Last updated: <b>'+data.updated+'</b>') ;
+            _that._button_subscribe()  .button('enable') ;
+            _that._button_unsubscribe().button('enable') ;
+            _that._button_load()       .button('enable') ;
+        } ;
+        this._load_error = function () {
+            _that._button_subscribe()  .button('enable') ;
+            _that._button_unsubscribe().button('enable') ;
+            _that._button_load()       .button('enable') ;
         } ;
         this._load = function () {
             this._action (
                 '../sysmon/ws/dmmon_fm_notify_get.php' ,
-                {}
+                {} ,
+                function (data) { _that._load_success(data) ; } ,
+                function ()     { _that._load_error() ; }
             ) ;
         } ;
         this._save = function () {
+
             var params = {
                 uid: this._app_config.uid ,
-                is_subscribed: this._subscription_selector().attr('checked') ? 1 : 0
+
+                instr:     this._instr_selector().val() ,
+                last_sec:  this._last_selector() .val() ,
+                delay_sec: this._delay_selector().val() ,
+
+                events: JSON.stringify (
+                    _.reduce (
+                        this._events_checktable().rows() ,
+                        function(events, e) {
+                            events.push ({
+                                name: e.event ,
+                                subscribed: e.subscribed ? 1 : 0}) ;
+                            return events ;
+                        } ,
+                        []
+                    )
+                )
             } ;
-            if (params.is_subscribed) {
-                params.instr     = this._instr_selector().val() ;
-                params.last_sec  = this._last_selector() .val() ;
-                params.delay_sec = this._delay_selector().val() ;
-            }
-            this._action (
+            Fwk.web_service_POST (
                 '../sysmon/ws/dmmon_fm_notify_save.php' ,
-                params
+                params ,
+                function (data) { _that._load_success(data) ; } ,
+                function (msg)  {
+                    Fwk.report_error(msg) ;
+                    _that._load_error() ;
+                }
             ) ;
         } ;
-        this._action = function (url, params) {
-
-            if (this._is_loading) return ;
-            this._is_loading = true ;
-
+        this._action = function (url, params, on_success, on_error) {
             Fwk.web_service_GET (
                 url ,
                 params ,
                 function (data) {
-                    _that._users = data.users ;
-                    _that._display() ;
-                    _that._set_updated('Last updated: <b>'+data.updated+'</b>') ;
-                    _that._button_reset().button('enable') ;
-                    _that._button_load() .button('enable') ;
-                    _that._is_loading = false ;
+                    if (on_success) on_success(data) ;
                 } ,
                 function (msg) {
                     Fwk.report_error(msg) ;
-                    _that._button_reset().button('enable') ;
-                    _that._button_load().button('enable') ;
-                    _that._is_loading = false ;
+                    if (on_error) on_error() ;
                 }
             ) ;
         } ;
@@ -331,34 +411,41 @@ function (
                 if (user.uid === this._app_config.uid) {
                     my_subscription = user ;
                 }
-                rows.push([
-                    user.gecos ,
-                    user.instr ,
-                    user.last_sec ,
-                    user.delay_sec ,
-                    user.subscribed_time ,
-                    user.subscribed_gecos ,
-                    user.subscribed_host
-                ]) ;
+//                for (var j in user.events) {
+//                    var e = user.events[j] ;
+                    rows.push([
+                        user.gecos ,
+                        user.instr ,
+                        user.last_sec ,
+                        user.delay_sec ,
+                        user.events ,
+                        user.subscribed_time ,
+                        user.subscribed_gecos ,
+                        user.subscribed_host
+                    ]) ;
+//                }
             }
             this._display_my_subscription(my_subscription) ;
             this._table().load(rows) ;
         } ;
         this._display_my_subscription = function (user) {
             if (user) {
-                this._subscription_selector().attr('checked', 'checked') ;
-                this._instr_selector().val(user.instr) ;
-                this._last_selector() .val(user.last_sec) ;
-                this._delay_selector().val(user.delay_sec) ;
-                this._instr_selector().removeAttr('disabled') ;
-                this._last_selector() .removeAttr('disabled') ;
-                this._delay_selector().removeAttr('disabled') ;
+                this._instr_selector().val(user.instr)    .removeAttr('disabled') ;
+                this._last_selector() .val(user.last_sec) .removeAttr('disabled') ;
+                this._delay_selector().val(user.delay_sec).removeAttr('disabled') ;
+                _.each (
+                    user.events ,
+                    function (event) {
+                        _that._events_checktable().check (true, function (row) {
+                            var check = row.event == event.name ? true : false ;
+                            return check ;
+                        }) ;
+                    }) ;
             } else {
-                this._subscription_selector().removeAttr('checked') ;
-                this._reset() ;
-                this._instr_selector().attr('disabled', 'disabled') ;
-                this._last_selector() .attr('disabled', 'disabled') ;
-                this._delay_selector().attr('disabled', 'disabled') ;
+                this._instr_selector().val('')                .attr('disabled', 'disabled') ;
+                this._last_selector() .val(_DELAYS_DEF[0].sec).attr('disabled', 'disabled') ;
+                this._delay_selector().val(_DEFAULT_DELAY)    .attr('disabled', 'disabled') ;
+                this._events_checktable().uncheck_all() ;
             }
         } ;
     }

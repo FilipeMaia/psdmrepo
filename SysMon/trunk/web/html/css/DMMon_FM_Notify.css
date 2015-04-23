@@ -50,6 +50,10 @@
 #dmmon-fm-notify > #ctrl > .control-group button {
     margin-top: 17px;
 }
+#dmmon-fm-notify > #ctrl > .control-group-events {
+    margin-top:     20px;
+}
+
 #dmmon-fm-notify > #ctrl > .control-group[data]:hover:after {
   content: attr(data);
   padding: 8px;

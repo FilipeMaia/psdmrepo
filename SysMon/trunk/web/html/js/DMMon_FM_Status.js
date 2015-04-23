@@ -1,10 +1,14 @@
 define ([
     'webfwk/CSSLoader' ,
-    'webfwk/Class', 'webfwk/FwkApplication', 'webfwk/Fwk', 'webfwk/SimpleTable'] ,
+    'webfwk/Class',       'webfwk/FwkApplication', 'webfwk/Fwk' ,
+    'webfwk/SimpleTable', 'webfwk/TextInput',      'webfwk/SelectOption' ,
+    'webfwk/Checkbox'] ,
 
 function (
     cssloader ,
-    Class, FwkApplication, Fwk, SimpleTable) {
+    Class,       FwkApplication, Fwk ,
+    SimpleTable, TextInput,      SelectOption ,
+    Checkbox) {
 
     cssloader.load('../sysmon/css/DMMon_FM_Status.css') ;
 
@@ -62,10 +66,28 @@ function (
         // --------------------
 
         this._is_initialized = false ;
+
+        // The loading scheduler allows for keeping track of other loading
+        // requests while processing one. Once the active one is over
+        // the schedule may instantly trigger the next one if the counter
+        // of requests in teh queue is not 0.
         this._is_loading = false ;
+        this._load_queue = 0 ;      // num requests in the loading queue
 
         this._files = {} ;
         this._experiments = {} ;
+
+        /**
+         * The convenience method for creating configuration handlers
+         * of the user input elements.
+         *
+         * @param {string} parameter
+         * @returns {_FwkConfigHandlerCreator}
+         */
+        this._config_handler = function (parameter) {
+            var config_scope = this.application_name+':'+this.context1_name+':'+this.context2_name ;
+            return Fwk.config_handler(config_scope, parameter) ;
+        } ;
 
         var _DELAYS_DEF = [
             {sec:    2*3600, name:  '2 hours'} ,
@@ -122,33 +144,28 @@ function (
     '<div class="control-group" '+_DOCUMENT.instr+' > ' +
       '<div class="control-group-title" >Instr.</div> ' +
       '<div class="control-group-selector" > ' +
-        '<select name="instr" > ' +
-          '<option value="" ></option> ' + _.reduce(this._app_config.instruments, function (html, instr_name) { return html +=
-          '<option value="'+instr_name+'" >'+instr_name+'</option> ' ; }, '') +
-        '</select> ' +
+        '<select name="instr" ></select> ' +
       '</div> ' +
     '</div> ' +
 
     '<div class="control-group" '+_DOCUMENT.since+' > ' +
       '<div class="control-group-title" >Search last</div> ' +
       '<div class="control-group-selector" > ' +
-        '<select name="since" > ' + _.reduce(_DELAYS_DEF, function (html, d) { return html +=
-          '<option value="'+d.sec+'" >'+d.name+'</option> ' ; }, '') +
-        '</select> ' +
+        '<select name="since" ></select> ' +
       '</div> ' +
     '</div> ' +
   
     '<div class="control-group" '+_DOCUMENT.delay+' > ' +
       '<div class="control-group-title" >Delayed by [sec]</div> ' +
       '<div class="control-group-selector" > ' +
-        '<input type="text" size="1" name="delay" value="0" / > ' +
+        '<input type="text" size="1" name="delay" /> ' +
       '</div> ' +
     '</div> ' +
   
     '<div class="control-group" '+_DOCUMENT.complete+' > ' +
       '<div class="control-group-title" >Incl. complete</div> ' +
       '<div class="control-group-selector" > ' +
-        '<input type="checkbox" name="complete" checked="checked" / > ' +
+        '<input type="checkbox" name="complete" /> ' +
       '</div> ' +
     '</div> ' +
     
@@ -170,29 +187,82 @@ function (
             }
             return this._wa_elem ;
         } ;
+
         this._instr_selector = function () {
-            if (!this._instr_selector_elem) {
-                this._instr_selector_elem = this._wa().find('div.control-group-selector').children('select[name="instr"]') ;
+            if (!this._instr_selector_obj) {
+                this._instr_selector_obj = new SelectOption (
+                    this._wa().find('div.control-group-selector').children('select[name="instr"]') ,
+                    {   disabled: true ,
+                        options:
+                            _.reduce (
+                                this._app_config.instruments ,
+                                function (options, instr_name) {
+                                    options.push({value:instr_name, text: instr_name}) ;
+                                    return options ;
+                                } ,
+                                [{value: '', default: true}]) ,
+                        on_change:
+                            function () { _that._load() ; } ,
+                        config_handler:
+                            this._config_handler('instr')
+                    }
+                ) ;
             }
-            return this._instr_selector_elem ;
+            return this._instr_selector_obj ;
         } ;
         this._since_selector = function () {
-            if (!this._since_selector_elem) {
-                this._since_selector_elem = this._wa().find('div.control-group-selector').children('select[name="since"]') ;
+            if (!this._since_selector_obj) {
+                this._since_selector_obj = new SelectOption (
+                    this._wa().find('div.control-group-selector').children('select[name="since"]') ,
+                    {   disabled: true ,
+                        options:
+                            _.reduce (
+                                _DELAYS_DEF ,
+                                function (options, d) {
+                                    options.push({value:''+d.sec, text: d.name}) ;
+                                    return options ;
+                                } ,
+                                []) ,
+                        on_change:
+                            function () { _that._load() ; } ,
+                        config_handler:
+                            this._config_handler('since')
+                    }
+                ) ;
             }
-            return this._since_selector_elem ;
+            return this._since_selector_obj ;
         } ;
         this._delay_selector = function () {
-            if (!this._delay_selector_elem) {
-                this._delay_selector_elem = this._wa().find('div.control-group-selector').children('input[name="delay"]') ;
+            if (!this._delay_selector_obj) {
+                this._delay_selector_obj = new TextInput (
+                    this._wa().find('div.control-group-selector').children('input[name="delay"]') ,
+                    {   disabled: true ,
+                        default_value:  '0' ,
+                        on_validate:
+                            function (str) { var delay = parseInt(str) ; return delay >= 0 ? delay : 0 ; } ,
+                        on_change:
+                            function () { _that._load() ; } ,
+                        config_handler:
+                            this._config_handler('delay')
+                    }
+                ) ;
             }
-            return this._delay_selector_elem ;
+            return this._delay_selector_obj ;
         } ;
         this._complete_selector = function () {
-            if (!this._complete_selector_elem) {
-                this._complete_selector_elem = this._wa().find('div.control-group-selector').children('input[name="complete"]') ;
+            if (!this._complete_selector_obj) {
+                this._complete_selector_obj = new Checkbox (
+                    this._wa().find('div.control-group-selector').children('input[name="complete"]') ,
+                    {   disabled: true ,
+                        default_value:  1 ,
+                        on_change:
+                            function () { _that._load() ; } ,
+                        config_handler:
+                            this._config_handler('complete')
+                    }
+                ) ;
             }
-            return this._complete_selector_elem ;
+            return this._complete_selector_obj ;
         } ;
         function _begin_delay2html (stage) {
             switch (stage.status) {
@@ -237,7 +307,7 @@ function (
                         }
                     } ,
                     {   name: 'DSS &#8674; FFB', coldef: [
-                            {   name: 'host'} ,
+                            {   name: 'DSS host'} ,
                             {   name: 'delay', coldef: [
                                     {   name: 'begin', align: 'right' ,
                                         type: {
@@ -262,7 +332,7 @@ function (
                         ]
                     } ,
                     {   name: 'FFB &#8674; ANA', coldef: [
-                            {   name: 'host'} ,
+                            {   name: 'FFB host'} ,
                             {   name: 'delay', coldef: [
                                     {   name: 'begin', align: 'right' ,
                                         type: {
@@ -319,7 +389,7 @@ function (
                     {
                         default_sort_column:  4 ,           /* created */
                         default_sort_forward: false ,       /* sort in ascending order */
-                        text_when_empty:      'Loading...'
+                        text_when_empty:      null
                     }) ;
                 this._table_obj.display() ;
             }
@@ -346,33 +416,37 @@ function (
             if (this._is_initialized) return ;
             this._is_initialized = true ;
 
-            this._instr_selector().change(function () { _that._load() ; }) ;
-            this._since_selector().change(function () { _that._load() ; }) ;
-            this._delay_selector().change(function () {
-                // Always make sure it's a positive numeric value.
-                // Otherwise force it to be the one before reloading the table.
-                var obj = $(this) ;
-                var delay = parseInt(obj.val()) ;
-                obj.val(delay >= 0 ? delay : 0) ;
-                _that._load() ;
-            }) ;
-            this._complete_selector().change(function () { _that._load() ; }) ;
+            // Touch visual objects to make sure they're displayed before
+            // going for any loading of data
             this._button_reset().click(function () { _that._reset() ; }) ;
             this._button_load() .click(function () { _that._load() ;  }) ;
 
-            this._table() ;     // just to display an empty table
+            this._instr_selector()   .enable() ;
+            this._since_selector()   .enable() ;
+            this._delay_selector()   .enable() ;
+            this._complete_selector().enable() ;
+
+            this._table() ;
+
+            // Proceed to the first loading
             this._load() ;
         } ;
         this._reset = function () {
-            this._instr_selector().val(0) ;
-            this._since_selector().val(0) ;
-            this._delay_selector().val(0) ;
-            this._complete_selector().attr('checked','checked') ;
+            this._instr_selector()   .set_value('') ;                       // all instruments
+            this._since_selector()   .set_value(''+_DELAYS_DEF[0].sec) ;    // the first option
+            this._delay_selector()   .set_value('0') ;                      // all delays
+            this._complete_selector().set_value(1) ;
             this._load() ;
         } ;
         this._load = function () {
 
-            if (this._is_loading) return ;
+            if (!this._is_initialized) return ;
+
+            if (this._is_loading) {
+                // Schedule another loading when the current one is over
+                this._load_queue++ ;
+                return ;
+            }
             this._is_loading = true ;
 
             this._set_updated('Loading...') ;
@@ -382,11 +456,11 @@ function (
             selectors.attr('disabled', 'disabled') ;
 
             var params = {
-                begin_time:       Fwk.now().sec - this._since_selector().val() ,
-                min_delay_sec:    this._delay_selector().val() ,
-                include_complete: this._complete_selector().attr('checked') ? 1 : 0
+                begin_time:       Fwk.now().sec - parseInt(this._since_selector()   .value()) ,
+                min_delay_sec:                    parseInt(this._delay_selector()   .value()) ,
+                include_complete:                          this._complete_selector().value() ? 1 : 0
             } ;
-            var instr_name = this._instr_selector().val() ;
+            var instr_name = this._instr_selector().value() ;
             if (instr_name !== '') params.instr_name = instr_name ;
 
             Fwk.web_service_GET (
@@ -400,14 +474,28 @@ function (
                     _that._button_reset().button('enable') ;
                     _that._button_load() .button('enable') ;
                     selectors.removeAttr('disabled') ;
+
+                    // When done with this loading check if there is another
+                    // outstanding request and proceed to teh one.
                     _that._is_loading = false ;
+                    if (_that._load_queue) {
+                        _that._load_queue = 0 ;
+                        _that._load() ;
+                    }
                 } ,
                 function (msg) {
                     Fwk.report_error(msg) ;
                     _that._button_reset().button('enable') ;
                     _that._button_load().button('enable') ;
                     selectors.removeAttr('disabled') ;
+                    
+                    // When done with this loading check if there is another
+                    // outstanding request and proceed to teh one.
                     _that._is_loading = false ;
+                    if (_that._load_queue) {
+                        _that._load_queue = 0 ;
+                        _that._load() ;
+                    }
                 }
             ) ;
         } ;
@@ -439,7 +527,7 @@ function (
             }
             switch (f.FFB2ANA.status) {
                 case 'W': return 'FFB' ;
-                case 'P': return 'FFB &#8674; FFB' ;
+                case 'P': return 'FFB &#8674; ANA' ;
             }
             switch (f.ANA2HPSS.status) {
                 case 'W': return 'ANA' ;

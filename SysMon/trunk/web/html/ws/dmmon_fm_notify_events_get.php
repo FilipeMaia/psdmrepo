@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Report subscribers for the file migration delays
+ * REturn all known notification events for the file migration delays
  */
 require_once 'dataportal/dataportal.inc.php' ;
 
@@ -15,14 +15,14 @@ require_once 'dataportal/dataportal.inc.php' ;
          * object with members ready for the JSON serialization.
          * Until that we have to call this method explicitly.
          */
-        $users = array() ;
-        foreach ($SVC->sysmon()->fm_delay_subscribers() as $s)
-            array_push($users, $s->jsonSerialize()) ;
+        $events = array() ;
+        foreach ($SVC->sysmon()->fm_delay_events() as $e)
+            array_push($events, $e->jsonSerialize()) ;
 
-        return array ('users' => $users) ;
+        return array ('events' => $events) ;
     }
     return array (
-        'users' => $SVC->sysmon()->fm_delay_subscribers()) ;
+        'events' => $SVC->sysmon()->fm_delay_events()) ;
 }) ;
 
 ?>

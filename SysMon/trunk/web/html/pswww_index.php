@@ -144,7 +144,7 @@ $groups = array (
             ) ,
             array (
                 'name'  => '<b>Data Migration</b> Monitor/Notifier' ,
-                'href'  => '/apps/portal/DataMigrationMonitor' ,
+                'href'  => '/apps-dev/sysmon/dmmon?app=File%20Migration:E-mail%20Notifications' ,
                 'title' =>
                     "View delays in the data migration activities, subscribe for \n" .
                     "e-mail notifications for the delayed migrations.",

@@ -37,6 +37,7 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`FM_DELAY_EVENT` (
 
   `name`  VARCHAR(32) NOT NULL ,  -- event name (make it short)
   `descr` TEXT        NOT NULL ,  -- some meaningful description of the event
+  `rank`  INT         NOT NULL ,  -- its rank in a global sequence of stages
 
   PRIMARY KEY (`name`)
 )
