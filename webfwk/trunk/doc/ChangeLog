@@ -11,6 +11,18 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2015-04-23 Igor Gaponenko
+- extended widget CheckTable to allow registering a callback function
+on changes made to the object state
+- moved _ASSERT and _PROP methods which are used to parse widget configuration
+options from CheckTable into it sbase class Widget. This will allow using
+these methods from any derived widgets.
+- added three new widgets: Checkbox, SelectOption and TextInput. The widgets
+allow to be configured with an optional persistent state backend (to save
+teh state on each change and to restore it upon an initialization).
+- fixed a minor bug in the Framework
+
 Tag: V00-01-06
 2015-04-16 Igor Gaponenko
 - fixed a memory leak bug in SmartTable widget

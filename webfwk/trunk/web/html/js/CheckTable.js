@@ -94,30 +94,6 @@ function (
 
         Widget.Widget.call(this) ;
 
-        // --------------------
-        //   Static functions
-        // --------------------
-
-        function _ASSERT (expression) {
-            if (!expression) throw new Widget.WidgetError('CheckTable::'+arguments.callee.caller.name) ;
-        }
-
-        function _PROP (obj, prop, default_val, validator) {
-            if (_.has(obj, prop)) {
-                var val = obj[prop] ;
-                if (validator) _ASSERT(validator(val)) ;
-                return val ;
-            }
-            _ASSERT(!_.isUndefined(default_val)) ;
-            return default_val ;
-        }
-        function _PROP_STRING (obj, prop, default_val) {
-            return _PROP(obj, prop, default_val, _.isString) ;
-        }
-        function _PROP_BOOL (obj, prop, default_val) {
-            return _PROP(obj, prop, default_val, _.isBoolean) ;
-        }
-
         // ------------------------------
         //   Data members of the object
         // ------------------------------
@@ -125,6 +101,7 @@ function (
         this._colnames = [] ;   // names of the columns in the original order
         this._coldef   = {} ;   // the definitions of the columns (column names are the keys)
         this._rows     = [] ;
+        this._options  = {} ;
 
         this._is_rendered = false ; // rendering is done only once
 
@@ -144,24 +121,24 @@ function (
         //   Digest column definitions
         // -----------------------------
 
-        _ASSERT(_.isArray(coldef) && coldef.length) ;
+        Widget.ASSERT(_.isArray(coldef) && coldef.length) ;
 
         _.each(coldef, function (col) {
-            _ASSERT (
+            Widget.ASSERT (
                 _.isObject(col) &&
                 _.has(col, 'name') && _.isString(col.name) && col.name !== '') ;
 
-            var name = _PROP_STRING(col, 'name') ;
-            _ASSERT(name !== '') ;
+            var name = Widget.PROP_STRING(col, 'name') ;
+            Widget.ASSERT(name !== '') ;
 
             _that._colnames.push(name) ;
             _that._coldef[name]  = {
                 is_selector: _that._colnames.length === 1 ,
-                text:   _PROP_STRING(col, 'text',   name) ,   // use the name if no text is provided
-                class:  _PROP_STRING(col, 'class',  '') ,
-                style:  _PROP_STRING(col, 'style',  '') ,
-                align:  _PROP_STRING(col, 'align',  'left') ,
-                hidden: _PROP_BOOL  (col, 'hidden', false)
+                text:   Widget.PROP_STRING(col, 'text',   name) ,   // use the name if no text is provided
+                class:  Widget.PROP_STRING(col, 'class',  '') ,
+                style:  Widget.PROP_STRING(col, 'style',  '') ,
+                align:  Widget.PROP_STRING(col, 'align',  'left') ,
+                hidden: Widget.PROP_BOOL  (col, 'hidden', false)
             } ;
         }) ;
 
@@ -171,7 +148,7 @@ function (
 
         this._add_rows = function (rows) {
             if (!rows) return ;
-            _ASSERT(_.isArray(rows)) ;
+            Widget.ASSERT(_.isArray(rows)) ;
             _.each(rows, function (row) {
                 _that._add_row(row) ;
             }) ;
@@ -180,20 +157,20 @@ function (
 
             // Make a new data object representing object state
 
-            _ASSERT (_.isObject(row)) ;
+            Widget.ASSERT (_.isObject(row)) ;
             var row2add = _.reduce(this._colnames, function (row2add, name) {
-                if (_that._coldef[name].is_selector) row2add[name] = _PROP_BOOL  (row, name, false) ;
-                else                                 row2add[name] = _PROP_STRING(row, name, '') ;
+                if (_that._coldef[name].is_selector) row2add[name] = Widget.PROP_BOOL  (row, name, false) ;
+                else                                 row2add[name] = Widget.PROP_STRING(row, name, '') ;
                 return row2add ;
             } , {
                 _row_id : this._get_row_id() ,
-                _locked : _PROP_BOOL  (row, '_locked', false)
+                _locked : Widget.PROP_BOOL  (row, '_locked', false)
             }) ;
 
             if (_.isUndefined(position)) {
                 this._rows.push(row2add) ;
             } else {
-                _ASSERT (_.isNumber(position) && position >= 0) ;
+                Widget.ASSERT (_.isNumber(position) && position >= 0) ;
                 if (position >= this._rows.length) {
                     this._rows.push(row2add) ;
                 } else {
@@ -224,7 +201,7 @@ function (
          * @returns {array}
          */
         this.remove = function (predicate) {
-            _ASSERT (_.isFunction(predicate)) ;
+            Widget.ASSERT (_.isFunction(predicate)) ;
             var rows2remove = _.filter(this._rows, predicate) ;
             _.each(rows2remove, function (row) {
                 _that._undisplay_row(row) ;
@@ -240,13 +217,22 @@ function (
         this.remove_all = function () { return this.remove(function () { return true ; }) } ;
 
         /**
+         * Return all rows
+         * 
+         * @returns {Array}
+         */
+        this.rows = function () {
+            return this._rows ;
+        } ;
+
+        /**
          * @brief Return rows which satisfy the predicate
          *
          * @param {function} predicate
          * @returns {array}
          */
         this.find = function (predicate) {
-            _ASSERT (_.isFunction(predicate)) ;
+            Widget.ASSERT (_.isFunction(predicate)) ;
             return _.filter(this._rows, predicate) ;
         } ;
 
@@ -319,6 +305,14 @@ function (
             }) ;
         } ;
 
+        // --------------------------
+        //   Digest options (if any)
+        // --------------------------
+
+        var options2parse = options || {} ;
+        Widget.ASSERT(_.isObject(options2parse)) ;
+        this._options.on_click = Widget.PROP_FUNCTION(options2parse, 'on_click',  null) ;
+
         // ------------------------
         //   Digest rows (if any)
         // ------------------------
@@ -386,7 +380,7 @@ function (
             if (_.isUndefined(position)) {
                 this._tbody.append(html) ;
             } else {
-                _ASSERT (_.isNumber(position) && position >= 0) ;
+                Widget.ASSERT (_.isNumber(position) && position >= 0) ;
                 var trs = this._tbody.find('tr') ;
                 if (position >= trs.length) {
                     this._tbody.append(html) ;
@@ -409,6 +403,8 @@ function (
                             if (row[name]) toggler.removeClass('check-table-toggler-on') ;
                             else           toggler.addClass   ('check-table-toggler-on') ;
                             row[name] = !row[name] ;
+                            if (_that._options.on_click)
+                                _that._options.on_click(row) ;
                             break ;
                         }
                     }

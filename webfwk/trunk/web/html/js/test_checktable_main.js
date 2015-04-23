@@ -61,7 +61,11 @@ function (
         for (var i = 0; i < 20; i++)
             rows.push(make_row()) ;
 
-        checktable = new CheckTable(coldef, rows) ;
+        checktable = new CheckTable(coldef, rows, {
+            on_click: function (row) {
+                console.log(row) ;
+            }
+        }) ;
         checktable.display($('#checktable')) ;
     
         $('button').button().click(function () {

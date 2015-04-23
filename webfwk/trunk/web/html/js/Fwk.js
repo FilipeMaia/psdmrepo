@@ -64,7 +64,7 @@ function (
                     on_found(value) ;
                     if (handler2update_on_found) handler2update_on_found.set_cached_value(value) ;
                 } else {
-                    on_not_found() ;
+                    if (on_not_found) on_not_found() ;
                 }
             } ,
             'JSON').error(function () {
