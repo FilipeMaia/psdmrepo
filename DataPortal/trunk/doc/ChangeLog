@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-00
+2015-04-23 Igor Gaponenko
+- allowed to pass an optional parameter for the instrument name
+when collecting data statistics at application statistics.php.
+- got rid of the obsolete application DataMigrationMonitor and
+the corresponding methods in the library class config.php. It has
+now a more sophisticated implementation at sysmon/dmmon (JIRA PSDH-34).
+
 Tag: V00-09-01
 2015-04-16 Igor Gaponenko
 - minor improvements in the Run Tables UI

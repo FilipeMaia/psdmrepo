@@ -41,6 +41,12 @@ HERE;
     exit;
 }
 
+$instr_name = null;
+if( isset( $_GET['instr_name'] )) {
+    $instr_name = strtoupper( trim( $_GET['instr_name'] ));
+    if( $instr_name == '' ) $instr_name = null;;
+}
+
 /*
  * This optional paramater, if present, will tell the script to produce JSON output
  */
@@ -85,6 +91,10 @@ try {
 // $counter = 0;
 
     foreach( LogBook::instance()->experiments() as $experiment ) {
+
+        // Optional filtering on the specified instrument if provided
+
+        if( !is_null( $instr_name ) && ($instr_name != $experiment->instrument()->name())) continue;
 
 // TODO: This is the debug line. It will stop the loop after a few iterations in order
 //       to see the result. Please, remove this line when finished debugging.
