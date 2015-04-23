@@ -1,0 +1,25 @@
+#runtables-detectors {
+    padding:    0;
+}
+#runtables-detectors .update-button img {
+    width:      11px;
+}
+.runtables-detectors-ctrl {
+    width:      inherit;
+    padding:    10px 10px 10px 20px;
+}
+.runtables-detectors-wa {
+    width:      inherit;
+    padding:    10px 20px 10px 20px;
+}
+.runtables-detectors-body {
+    font-size:  11px;
+}
+.runtables-detectors-info {
+    color:      maroon;
+}
+#runtables-detectors a.link {
+    text-decoration:    none !important;
+    font-weight:        bold !important;
+    color:              #0071bc !important;
+}
