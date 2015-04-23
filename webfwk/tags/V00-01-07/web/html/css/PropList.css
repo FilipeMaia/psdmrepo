@@ -1,0 +1,65 @@
+
+.prop-list {
+  font-size: 13px;
+}
+.prop-list > table {
+  border-spacing: 0;
+}
+.prop-list > table > tbody > tr:hover {
+  background-color: #fafafa;
+}
+.prop-list > table > tbody > tr:hover > td {
+  border-bottom: 1px solid #b0b0b0 !important;
+}
+.prop-list > table > tbody > tr[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-family: 'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+}
+.prop-list > table > tbody > tr > td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.prop-list > table > tbody > tr > td.prop-list-group {
+  border-bottom:1px solid #c0c0c0;
+  color: maroon;
+  font-weight: bold;
+  font-style: italic;
+  font-size:11px;
+  background-color: aliceblue;
+}
+.prop-list > table > tbody > tr > td.prop-list-name {
+  border-right: 1px solid #e0e0e0;
+  font-weight: bold ;
+  white-space: nowrap;
+}
+.prop-list > table > tbody > tr:last-child > td {
+  border-bottom: 0;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing {
+  padding: 3px 6px;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing:hover {
+  cursor: pointer;
+  background: aliceblue !important;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing > input {
+  border: solid 1px #ffffff;
+  /*width: 100%;*/
+  padding: 2px;
+}
+.prop-list > table > tbody > tr > td.prop-list-value-editing > input:hover {
+  border: solid 1px #a0a0a0;
+}

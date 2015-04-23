@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
+<script type="text/javascript" src="js/libs/jquery-ui-1.10.3/jquery-ui.min.js" ></script>
+
+<link type="text/css" href="css/jquery-ui-1.10.3/jquery-ui.min.css" rel="Stylesheet" />
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+div.container {
+  position: relative;
+  margin: 20px;
+}
+
+div.container > div.menu {
+
+  display: none;
+    
+  position: absolute;   /* this is required for z-index to work */
+  top: 0;
+  left: 0;
+  z-index: 101;
+
+  padding: 4px;
+  border: 1px solid #c0c0c0;
+  border-top: 1px dashed #a0a0a0;
+  background-color: lemonchiffon;
+
+  color: #000000;
+}
+
+div.container > div.menu div.item {
+  padding: 2px;
+  font-family: 'Source Sans Pro',Arial,sans-serif;
+  font-size: 12px;
+  color: rgb(94, 66, 66);
+}
+div.container > div.menu div.item:hover {
+  cursor: pointer;
+  background-color: #A6C9E2;
+  font-weight: bold;
+}
+div.container > div.menu div.item#insert_before {
+  font-weight: normal !important;
+  color: #a0a0a0 !important;
+  cursor: none;
+}
+div.table_header {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  padding: 0;
+  margin: 0;
+  background-color: #fcfcfc;
+  border: solid 1px #c0c0c0;
+  border-bottom: solid 2px #000000;
+}
+div.table_header > div.column {
+
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  padding: 0;
+
+  height: 14px;
+  border-left: 1px solid #f0f0f0; //#c0c0c0;
+  border-top: 1px solid #f0f0f0; //#c0c0c0;
+  border-top-left-radius: 2px;
+
+  /*background-color: #fcfcfc;*/
+  background: linear-gradient(to bottom right, #f0f0f0, #fcfcfc);
+
+  font-size: 13px;
+  color: rgb(94, 66, 66);
+}
+
+div.table_header > div.column:hover {
+  /*
+  background-color: aliceblue;
+  */
+  border-color: #A6C9E2;
+  background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc);
+  font-weight: bold;
+}
+div.table_header > div.column.selected {
+  /*
+  background-color: aliceblue;
+  */
+  background: linear-gradient(to bottom right, #A6C9E2, #fcfcfc) ;
+  font-weight: bold;
+}
+div.table_header > div.column > div.ctrl {
+  padding: 4px;
+}
+div.table_header > div.column > div.ctrl:hover {
+  cursor: pointer;
+}
+
+div.table_container {
+  position: relative;
+  top: 0px;
+  left: 0px;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  font-family: Helvetica, Arial, sans-serif;
+}
+div.table_container > table {
+  width: 100%;
+  border-spacing: 0px;
+}
+div.table_container > table td {
+  font-size: 12px;
+  white-space: nowrap;
+  padding: 2px 4px 2px 4px;
+  border-left: solid 1px #c0c0c0;
+  border-bottom: solid 1px #c0c0c0;
+}
+
+div.table_container > table td:last-child {
+  border-right: solid 1px #c0c0c0;
+}
+
+div.table_container > table td.highlight {
+  background-color: #f0f0f0;
+}
+
+div.table_container > table td.selected {
+  background-color: aliceblue;
+}
+
+div.table_container > table td.focus {
+  background-color: #A6C9E2;
+}
+
+</style>
+
+<script>
+
+
+function create_fancy_table (container, hdr, rows, num_hdr_rows) {
+    var that = this ;
+    switch (typeof container) {
+        case 'string': this.container = $('#'+container) ; break ;
+        case 'object': this.container = container ; break ;
+        default: throw 'create_fancy_table: wrong type of the container parameter' ;
+    }
+    var html =
+'    <div class="menu">' +
+'      <div class="item" id="sort">Sort</div>' +
+'      <div class="item" id="hide">Hide</div>' +
+'      <div class="item" id="front">Front</div>' +
+'      <div class="item" id="back">Back</div>' +
+'      <div class="item" id="left">Left</div>' +
+'      <div class="item" id="right">Right</div>' +
+'      <div class="item" id="rename">Rename</div>' +
+'      <div class="item" id="rename">Delete</div>' +
+'      <div class="item" id="insert_before">Insert column before</div>' +
+'      <div class="item" id="insert_after">Insert column after.</div>' +
+'    </div>' +
+'<div class="table_header" style="height:'+(24*num_hdr_rows - 1)+'px;">' ;
+    for (var i in hdr) {
+        html +=
+'  <div class="column column_'+i+'" id="'+i+'" style="z-index:'+(100 - i % num_hdr_rows)+';">' +
+'    <div class="ctrl">' + hdr[i] + '</div>' +
+'  </div>' ;
+    }
+    html +=
+'</div>' +
+'<div class="table_container">' +
+'  <table border="0" cellspacing="0" cellpadding="0" ><tbody>' ;
+    for (var i in rows) {
+        var row = rows[i] ;
+        html +=
+'    <tr>' ;
+        for (var j in row) {
+            var extra_class = j % num_hdr_rows ? '' : 'highlight' ;
+            var cell = row[j] ;
+            html +=
+'      <td class="row_'+i+' column_'+j+' '+extra_class+'" id="'+i+':'+j+'">' +
+cell +
+'      </td>' ;
+        }
+        html +=
+'    </tr>' ;
+    }
+    html +=
+'  </tbody></table>' +
+'</div>' ;
+    this.container.html(html) ;
+    this.menu            = this.container.find('.menu') ;
+    this.table_header    = this.container.find('.table_header') ;
+    this.table_container = this.container.find('.table_container') ;
+    this.table           = this.table_container.find('table') ;
+    this.cols = [] ;
+
+    // Pop-down menu
+
+    this.prev_menu_col = null ;
+
+    /**
+     * Toggle the menu for the specific column and return True if it's on screen.
+     *
+     * @returns {boolean}
+     */
+    that.menu_available = function (col) {
+        if (this.prev_menu_col === col) {
+            this.deactivate_menu() ;
+            return false;
+        }
+        that.menu.css('display', 'block') ;
+        that.prev_menu_col = col ;
+        $(document).on('keyup.show_menu', function (e) {
+            if (e.keyCode === 27) { that.deactivate_menu() ; }
+        }) ;
+        return true ;
+    } ;
+    that.deactivate_menu = function () {
+        that.menu.css('display', 'none') ;
+        that.prev_menu_col = null ;
+        $(document).unbind('keyup.show_menu') ;
+    } ;
+    this.table_container.click(function() {
+        that.deactivate_menu() ;
+    }) ;
+
+    for (var i in hdr) {
+        this.cols[i] = this.table_header.find('div.column#'+i) ;
+        this.cols[i]
+            .mouseover(function () {
+                that.table.find('td.column_'+this.id).addClass('selected') ;
+            })
+            .mouseout(function () {
+                that.table.find('td.column_'+this.id).removeClass('selected') ;
+            }) ;
+        this.table.find('td.column_'+i)
+            .mouseover(function () {
+                var row_col = this.id.split(':') ;
+                var row = row_col[0] ,
+                    col = row_col[1] ;
+                that.table_header.find('div.column#'+col).addClass('selected') ;
+                that.table.find('td.row_'+row).addClass('selected') ;
+                that.table.find('td.column_'+col).addClass('selected') ;
+                $(this).addClass('focus') ;
+            })
+            .mouseout(function () {
+                var row_col = this.id.split(':') ;
+                var row = row_col[0] ,
+                    col = row_col[1] ;
+                that.table_header.find('div.column#'+col).removeClass('selected') ;
+                that.table.find('td.row_'+row).removeClass('selected') ;
+                that.table.find('td.column_'+col).removeClass('selected') ;
+                $(this).removeClass('focus') ;
+            }) ;
+    }
+    this.table_header.find('.column').click(function() {
+
+        if (!that.menu_available(this.id)) return ;
+
+        var offset = $(this).offset() ;
+
+        var ctrl = $(this).find('.ctrl') ;
+
+        var str = ctrl.css('paddingTop') ;
+        var paddingTop    = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+        str     = ctrl.css('paddingBottom') ;
+        var paddingBottom = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+
+        that.menu.offset({
+            top:  offset.top + parseInt(ctrl.css('height')) + paddingTop + paddingBottom ,
+            left: offset.left
+        }) ;
+        that.menu.css('min-width', ($(this).width() - parseInt(that.menu.css('paddingLeft')) - parseInt(that.menu.css('paddingRight'))) + 'px') ;
+    }) ;
+    this.menu.find('.item').click(function() {
+        var col = that.prev_menu_col ;
+        var op = this.id ;
+        switch (op) {
+            case 'rename' :
+                var elem = that.table_header.find('.column#'+col).find('.ctrl') ;
+                elem.html(elem.text().substr(0,5)) ;
+                break ;
+            case 'front' :
+                var elem = that.table_header.find('.column#'+col) ;
+                elem.css('z-index', parseInt(elem.css('z-index')) + 1) ;
+                break ;
+            case 'back' :
+                var elem = that.table_header.find('.column#'+col) ;
+                elem.css('z-index', parseInt(elem.css('z-index')) - 1) ;
+                break ;
+        }
+        that.deactivate_menu() ;
+    }) ;
+
+    this.container.resize(function () { that.render_header() ; }) ;
+    this.render_header = function () {
+        var column_width = [] ;
+        this.table.find('tr:first-child td').each(function () {
+            var str = $(this).css('borderLeftWidth') ;
+            var borderLeft   = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+            str     = $(this).css('paddingLeft') ;
+            var paddingLeft  = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+            str     = $(this).css('paddingRight') ;
+            var paddingRight = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+            str     = $(this).css('borderRightWidth') ;
+            var borderRight  = str ? parseInt(str.substr(0,str.length-2)) : 0 ;
+            column_width.push(borderLeft + paddingLeft + $(this).width() + paddingRight + borderRight) ;
+        }) ;
+        this.table_header.width(this.table.width() - parseInt(this.table_header.css('borderLeftWidth')) - parseInt(this.table_header.css('borderRightWidth'))) ;
+        var left = -1 ;
+        for (var i in hdr) {
+            var top = 95 - 24 * ((i % num_hdr_rows)) ;
+            this.cols[i].css('top', top+'px').css('left',left+'px') ;
+            left += column_width[i] ;
+            var height = 23 * ((i % num_hdr_rows) + 1) + (i % num_hdr_rows) ;
+            this.cols[i].height(height) ;
+        }
+    } ;
+    this.render_header() ;
+    return this ;
+}
+
+$(function () {
+    var num_hdr_rows = 5 ;
+    var num_rows = 20 ;
+    var rows = [] ;
+    for (var i=0; i < 40; i++) {
+        var row = [] ;
+        for (var j=0; j < num_rows; j++) {
+            var val = (j + 1) % 7 ? 100000 * (i % 10 + 1) + j*j*j*j : 'IN:VALUE1 OUT:OUT' ;
+            row.push(val) ;
+        }
+        rows.push(row) ;
+    }
+    var hdr = [
+        'AMO:R14:EVR:21:CTRL.DG0D',
+        'AMO:R14:IOC:21:VHS7:CH2:VoltageMeasure',
+        'AmoEndstation-0|Opal1000-0',
+        'AMO:R14:IOC:10:ao0:out2',
+        'FEE mirror LVDT position',
+        'AMO:R14:EVR:21:CTRL.DG0D',
+        'AMO:HFP:MMS:72.RBV',
+        '7-th may not be as long as others',
+        'AMO:DIA:STC:07',
+        'Gas attenuator calculated transmission',
+        'And one more before to finish',
+        'AMO:R14:IOC:21:VHS7:CH2:VoltageMeasure',
+        'The long one again',
+        'AMO:DIA:STC:07',
+        '7-th may not be as long as others',
+        'gasjet x-position (rel. distance)',
+        'AMO:HFP:MMS:72.RBV',
+        'And the third one',
+        'AMO:DIA:STC:07',
+        'etc.'
+    ] ;
+    hdr.sort() ;
+    var table = create_fancy_table (
+        $('#container') ,
+        hdr ,
+        rows ,
+        num_hdr_rows
+    ) ;
+}) ;
+
+</script>
+
+</head>
+<body>
+<div id="container" class="container"></div>
+</body>
+</html>

@@ -1,0 +1,134 @@
+@CHARSET "ISO-8859-1";
+
+/* 
+    Document   : Table
+    Created on : Apr 25, 2012, 1:38:07 PM
+    Author     : gapon
+    Description:
+        The stylesheet for the custom Table class.
+*/
+
+/* ---------------------------
+ * Standard table with borders
+ * ---------------------------
+ */
+ td.table_hdr {
+  background-color:#d0d0d0;
+  padding: 2px 6px 2px 6px;
+  border: solid 1px #000000;
+  border-top: none;
+  border-left: none;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  /*
+  font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-weight: bold;
+  font-size: 12px;
+  white-space: nowrap;
+}
+td.table_active_hdr {
+}
+td.table_active_hdr:hover {
+   cursor: pointer;
+   background-color:#A6C9E2;
+}
+td.table_active_hdr_selected {
+   background-color:#A6C9E2;
+} 
+td.table_hdr_tight {
+  padding: 0px 0px 0px 0px;
+}
+td.table_cell {
+  border: solid 1px #d0d0d0;
+  border-top: none;
+  border-left: none;
+  padding: 4px 8px 4px 8px;
+  /*
+  font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 12px;
+  white-space: nowrap;
+}
+td.table_cell_strong_bottom {
+  border-bottom: solid 1px #000000;
+}
+td.table_cell_left {
+  font-weight: bold;
+}
+td.table_cell_left_closed {
+  border-left: solid 1px #d0d0d0;
+}
+td.table_cell_right {
+  border-right: none;
+}
+td.table_cell_top {
+  border-top: solid 1px #d0d0d0;
+}
+td.table_cell_bottom {
+  border-bottom: none;
+}
+td.table_cell_within_group {
+  border-bottom: none;
+}
+td.table_cell_borderless {
+  border: 0;
+}
+tr.table_row_selectable {
+  cursor: pointer;
+}
+tr.table_row_selectable:hover {
+  background-color:#f0f0f0;
+}
+
+td.table_cell_selectable {
+  cursor: pointer;
+  font-weight: bold;
+}
+td.table_cell_selectable:hover {
+  background-color:#A6C9E2;
+}
+td.table_cell_selectable_selected {
+  background-color:#b9dcf5;
+}
+td.table_cell_nonselectable {
+  font-weight: bold;
+}
+
+/* ------------------------
+ * Compact borderless table
+ * ------------------------
+ */
+td.ctable_hdr {
+  background-color:#d0d0d0;
+  padding: 2px 6px 2px 6px;
+  /*
+  font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-weight: bold;
+}
+td.ctable_hdr:hover {
+  background-color:#f8f8f8;
+  cursor: pointer;
+}
+td.ctable_cell {
+  /*
+  font-family: Arial, sans-serif;
+  */
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+td.ctable_cell_left {
+  font-weight: bold;
+}
+td.ctable_cell_right {
+}
+td.ctable_cell_bottom {
+}
+td.ctable_cell_within_group {
+}
+td.table_cell_highlight {
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+}
