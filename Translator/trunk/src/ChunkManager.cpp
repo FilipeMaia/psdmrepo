@@ -67,7 +67,7 @@ void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output, st
   m_chunkSizeTargetInBytes = h5Output.configReportIfNotDefault("chunkSizeTargetInBytes",_16MB);  // default - 16 MB chunks
   remainingConfigKeys.remove("chunkSizeTargetInBytes");
   m_chunkSizeTargetObjects = h5Output.configReportIfNotDefault("chunkSizeTargetObjects", 0);      // a non-zero value overrides 
-  remainingConfigKeys.remove("chunkSizeTargetInObjects");
+  remainingConfigKeys.remove("chunkSizeTargetObjects");
   m_chunkSizeTargetObjectsOrig = m_chunkSizeTargetObjects;
   
                                                                  // default chunk size calculation
@@ -120,6 +120,8 @@ void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output, st
   m_epicsPvChunkSizeTargetObjects = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   remainingConfigKeys.remove("epicsPvChunkSizeTargetObjects");
   m_epicsPvChunkSizeTargetObjectsOrig = m_epicsPvChunkSizeTargetObjects;
+  m_useControlData = h5Output.configReportIfNotDefault("useControlData",true);
+  remainingConfigKeys.remove("useControlData");
 
   m_defaultChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_chunkSizeTargetInBytes,
                                                                      m_chunkSizeTargetObjects,
@@ -171,11 +173,15 @@ void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output, st
 }
 
 void ChunkManager::beginJob(PSEnv::Env &env) {
-  checkForControlDataToSetChunkSize(env);
+  if (m_useControlData) {
+    checkForControlDataToSetChunkSize(env);
+  }
 }
 
 void ChunkManager::beginCalibCycle(PSEnv::Env &env) {
+  if (m_useControlData) {
   checkForControlDataToSetChunkSize(env);
+  }
 }
   
 void ChunkManager::endCalibCycle(size_t ) { // numberEventsInCalibCycle) {

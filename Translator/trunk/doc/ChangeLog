@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-28
+- add parameter useControlData to get chunking control.
+- added unit test for chunking. Still have bug for controlling ndarray
+  chunking separately: JIRA PSAS-137
+
 Tag: V00-02-27
 - add std: to use of type_info in header, JIRA PSAS-127
 

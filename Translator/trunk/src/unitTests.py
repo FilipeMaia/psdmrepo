@@ -729,6 +729,38 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
         
+    def test_chunks(self):
+        '''make sure that ndarray ndarrayChunkSizeTargetObjects option works
+        '''
+        input_file = TESTDATA_T1
+        output_h5 = makeH5OutputNameFromXtc(input_file).replace('.h5','_test_chunks.h5')
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList = "Translator.testModuleForNDarray Translator.H5Output")
+        cfgfile.write('src_filter = exclude BldInfo(XppSb2_Ipm)\n')
+        cfgfile.write('deflate = -1\n')
+        cfgfile.write('shuffle = 0\n')
+#        cfgfile.write('ndarrayChunkSizeTargetObjects = 1\n')
+        cfgfile.write('chunkSizeTargetObjects = 2\n')
+        cfgfile.write('useControlData = 0\n')
+        cfgfile.write('minObjectsPerChunk = 1\n')
+        cfgfile.write('[Translator.testModuleForNDarray]\n')
+        cfgfile.write('add_to_event_src = BldInfo(XppSb2_Ipm)\n')
+        cfgfile.write('add_to_event_key = array\n')
+        
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='', printPsanaOutput=self.printPsanaOutput)        
+ 
+        f = h5py.File(output_h5,'r')
+        arrayDs=f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_2/XppSb2_Ipm__array/data']
+        psanaDs = f['/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV2/XppSb3_Ipm/data']
+        self.assertFalse(arrayDs.shuffle)
+        self.assertFalse(psanaDs.shuffle)
+        self.assertEqual(psanaDs.chunks[0],2)
+#        self.assertEqual(arrayDs.chunks[0],1)
+        
+        if self.cleanUp:
+            os.unlink(output_h5)
+        
+
+        
     def test_doNotTranslate(self):
         '''Test doNotTranslate with a basic key string: "do_not_translate"
         '''

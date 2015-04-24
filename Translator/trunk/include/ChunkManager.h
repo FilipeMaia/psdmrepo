@@ -71,6 +71,8 @@ class ChunkManager {
   int m_epicsPvChunkSizeTargetObjects;
   int m_epicsPvChunkSizeTargetObjectsOrig;
 
+  bool m_useControlData;
+
   boost::shared_ptr<Translator::ChunkPolicy> m_defaultChunkPolicy;
   boost::shared_ptr<Translator::ChunkPolicy> m_eventIdChunkPolicy;
   boost::shared_ptr<Translator::ChunkPolicy> m_damageChunkPolicy;
