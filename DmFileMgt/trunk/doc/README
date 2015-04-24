@@ -1,0 +1,21 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package DmFileMgt
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Brief description:
+==================
+
+Collections of tools to handle file and file related operations.
+
+Detailed description:
+=====================
+
+Tools:
+- move xtc, hdf5 or usr directory to a different offline file system
+

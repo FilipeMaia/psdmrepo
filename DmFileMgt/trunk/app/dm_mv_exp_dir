@@ -1,0 +1,91 @@
+#!@PYTHON@
+
+import logging
+import argparse
+
+import DmFileMgt.mvexp as mvexp
+import os.path as op
+
+"""
+Move files from one directory to another one
+
+--setup:
+         - create new directory
+         - update nfs link
+         - rsync files if needed
+         - create links (xtc files, hdf5 files)
+--trans: 
+         - transfer files, next to link
+         - with option --clean (--inplace) remove the src right after a 
+           successfull transfer
+Usage:
+   1) move cxi80419 from ana12 to ana01. 
+     a) create new filders rsync md5,index dir, create link for files from new to old, 
+        update the dir link (in nfs) and transfer files to a tmp name in the new location
+        % mv_exper --setup --link --trans  cxi cxi80419 ana12 an01
+     b) as above but for each transferred file rename it to the proper name and remove it from the src
+        % mv_exper --setup --link --trans --clean  cxi cxi80419 ana12 an01
+     c) do first (a) and than run the cleanup
+        % mv_exper --clean --link --trans  cxi cxi80419 ana12 an01
+ 
+"""
+
+
+# trying   mv_exper cxi cxi80410 hdf5 ana12 ana01 
+
+def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--setup", action="store_true", help="setup new folder and do inital sync")
+    parser.add_argument("--link", action="store_true", help="update nfs link")
+    parser.add_argument("--rename", action="store_true", help="rename old folder to moved_<folder>")
+    parser.add_argument("--clean", action="store_true", help="cleanup files in the old location")
+    parser.add_argument("--trans", action="store_true", help="do the file transfer")
+    parser.add_argument("--md5", action="store_true", help="compare md5 when moving file inplace (expensive)")
+    parser.add_argument("--md5clean", action="store_true", help="compare md5 when removing files (expensive)")
+
+    parser.add_argument("instr", help="just read config and exit")
+    parser.add_argument("exper", help="check also on disk")
+    parser.add_argument("mvdir", help="xtc file names either on ffb or ana")
+    parser.add_argument("anaold", help="xtc file names either on ffb or ana")
+    parser.add_argument("ananew", help="xtc file names either on ffb or ana")
+    
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+        
+    logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(name)s %(message)s',
+                        datefmt="%Y%m%d %H:%M:%S")
+    
+    logging.info("Move %s %s %s %s %s", args.instr, args.exper, args.mvdir, args.anaold, args.ananew)
+    exp = mvexp.MvExpDir(args.instr, args.exper, args.mvdir, args.anaold, args.ananew)
+    # 'xppa4513', 'hdf5', 'ana02', 'ana01')
+    exp.show()
+    
+    if args.setup:
+        exp.create_new()
+        # rsync and link
+        moving = mvexp.MoveExper(exp)
+        moving.do_rm = False
+        moving.do_link()
+        if args.link:
+            exp.update_symlink()
+
+    # rename only all files were copied and are inplace
+    if args.rename:
+        exp.rename_to_moved()
+
+    if args.trans:
+        # transfer and clean an experiment
+        moving = mvexp.MoveExper(exp)
+        if args.md5:
+            moving.do_md5 = True
+        if args.md5clean:
+            moving.do_md5_clean = True
+        moving.do_sync(rm_src=args.clean)
+
+    
+if __name__ == "__main__":
+
+    main()
