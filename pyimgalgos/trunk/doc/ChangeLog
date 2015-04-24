@@ -13,6 +13,10 @@ reverse time order.
 
 =======
 
+Tag: V00-00-23
+2015-04-24 Mikhail S. Dubrovin
+- GlobalGraphics.py - add methods move_fig, save_fig, hist1d (PSAS-34)
+
 Tag: V00-00-22
 2015-04-14 Mikhail S. Dubrovin
 - GlobalGraphics.py - add singleton Store, and methods plot_img and fig_axes
