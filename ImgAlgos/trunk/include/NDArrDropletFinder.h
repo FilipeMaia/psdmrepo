@@ -23,6 +23,10 @@
 #include "ImgAlgos/AlgDroplet.h"
 #include "ImgAlgos/AlgSmearing.h"
 
+#include "PSCalib/CalibPars.h"
+#include "pdscalibdata/GlobalMethods.h" // for load_pars_from_file(...)
+
+#include <sstream> // for stringstream
 #include <cstddef>  // for size_t
 #include <string>
 #include <vector>
@@ -67,6 +71,8 @@ class NDArrDropletFinder : public Module {
 public:
 
   typedef float droplet_t;
+
+  typedef PSCalib::CalibPars::pixel_mask_t mask_t;
 
   // Default constructor
   NDArrDropletFinder (const std::string& name) ;
@@ -127,6 +133,8 @@ private:
   int         m_rpeak;       // number of pixels for peak finding in [i0-m_npeak, i0+m_npeak]
   double      m_low_value;   // low value of intensity of pixels below threshold and outside windows
   std::string m_windows;     // windows for processing
+  std::string m_fname_mask;  // input file name with mask ndarray
+  double      m_mask_val;    // Value substituted for masked bits
   std::string m_ofname_pref; // output file name common prefix
   unsigned    m_print_bits;
   unsigned    m_count_evt;
@@ -152,6 +160,7 @@ private:
   std::vector<AlgDroplet*>  v_algdf;    // vector of pointers to the AlgDroplet objects for windows
   std::vector<AlgSmearing*> v_algsm;    // vector of pointers to the AlgSmearing objects for windows
   std::vector<AlgDroplet::Droplet> v_droplets; // vector of droplets for entire event
+  mask_t* m_mask_data; // pointer to the mask array
 
 //-------------------
 //-------------------
@@ -197,6 +206,20 @@ private:
 	         pbits_sm = (m_print_bits & 128) ? 0177777 : pbits_sm;
 	unsigned pbits_df = (m_print_bits &  64) ?     017 : 0;
 	         pbits_df = (m_print_bits & 128) ? 0177777 : pbits_df;
+
+
+	// Load mask from file if needed
+        if(!m_fname_mask.empty()) {
+          m_mask_data = new mask_t[nda.size()];
+          pdscalibdata::load_pars_from_file<mask_t> (m_fname_mask, "Mask", nda.size(), m_mask_data);
+          //else std::fill_n(m_mask_data, int(m_size), mask_t(1));
+
+	  if (m_print_bits & 2) {
+            std::stringstream ss; ss << "\n  Content of the file: " << m_fname_mask << ':';
+            for (int i=0; i<20; ++i) ss << " " << m_mask_data[i];
+            MsgLog(name(), info, ss.str());
+	  }
+	}
 
 
 	// Fill-in vectors of processing algorithms
@@ -277,6 +300,7 @@ private:
         v_droplets.clear();
         v_droplets.reserve(AlgDroplet::NDROPLETSBLOCK);
 
+
         //m_ndim
         //m_dtype
 	bool has_data = false;
@@ -311,8 +335,26 @@ private:
 	    //cout << "df seg:" << seg << '\n';
 	    
 	    unsigned int shape[2] = {m_nrows, m_ncols};
-            ndarray<const T,2> nda_raw(&data[seg*m_stride], shape);
-            //ndarray<const T,2> nda_raw = make_ndarray(&data[seg*m_stride], m_nrows, m_ncols);
+
+            //ndarray<const T,2> nda_raw(&data[seg*m_stride], shape);
+	    //====================================
+            ndarray<T,2> nda_raw(shape);
+
+            const T* p_data = &nda.data()[seg*m_stride];
+	          T* p_raw  = nda_raw.data();
+
+	    // apply mask, if requested
+	    if(m_mask_data) {
+	      mask_t* p_mask = &m_mask_data[seg*m_stride];
+	      T mask_val = (T) m_mask_val;
+
+              for(unsigned i=0; i<m_stride; i++) {
+                p_raw[i] = (p_mask[i]) ? p_data[i] : mask_val; // m_mask_data[i] == 1 - good pixel 
+	      }
+	    }              	  
+	    else std::memcpy(p_raw, p_data, m_stride*sizeof(T));
+
+	    //====================================
 	    
 	    if (m_sigma) {
                 // Apply smearing before droplet-finder

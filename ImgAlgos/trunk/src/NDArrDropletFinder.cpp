@@ -52,12 +52,15 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   , m_rpeak()
   , m_low_value()
   , m_windows()  
+  , m_fname_mask()
+  , m_mask_val()
   , m_ofname_pref()
   , m_print_bits()
   , m_count_evt(0)
   , m_count_get(0)
   , m_count_msg(0)
   , m_count_sel(0)
+  , m_mask_data(0)
 {
   // get the values from configuration or use defaults
   m_source        = configSrc("source",  "DetInfo()");
@@ -71,6 +74,8 @@ NDArrDropletFinder::NDArrDropletFinder (const std::string& name)
   m_rpeak         = config   ("peak_radius",       3);
   m_low_value     = config   ("low_value",         0);
   m_windows       = configStr("windows",          "");
+  m_fname_mask    = configStr("mask",             "");
+  m_mask_val      = config   ("masked_value",     0.);
   m_ofname_pref   = configStr("fname_prefix",     "");
   m_print_bits    = config   ("print_bits",        0);
 
@@ -163,7 +168,7 @@ void
 NDArrDropletFinder::printInputPars()
 {
   MsgLog(name(), info, "\n Input parameters:"
-         << "\n source        : " << m_source
+	 << "\n source        : " << m_source
 	 << "\n key           : " << m_key      
 	 << "\n key_out       : " << m_key_out
 	 << "\n key_sme       : " << m_key_sme
@@ -174,8 +179,10 @@ NDArrDropletFinder::printInputPars()
 	 << "\n npeak         : " << m_rpeak
 	 << "\n low_value     : " << m_low_value
 	 << "\n windows       : " << m_windows
-	 << "\n ofname_pref   : " << m_ofname_pref
-	 << "\n print_bits    : " << m_print_bits;
+	 << "\n fname_mask    : " << m_fname_mask
+	 << "\n mask_val      : " << m_mask_val
+         << "\n ofname_pref   : " << m_ofname_pref
+         << "\n print_bits    : " << m_print_bits
 	)
 }
 

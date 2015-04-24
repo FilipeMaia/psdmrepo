@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-84
+2015-04-24 Mikhail S. Dubrovin
+- NDArrDropletFinder - add parameters mask and masked_value (PSAS-68)
+	
 Tag: V00-03-83
 2015-04-14 Mikhail S. Dubrovin
 - NDArrCalib - add method printMaskAndBkgd(), use m_is_done_once as member data in stead of static
