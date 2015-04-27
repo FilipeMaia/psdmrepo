@@ -47,12 +47,14 @@ store = Storage() # singleton
 
 #------------------------------
 
-def fig_axes(figsize=(13,12), title='Image') :
+def fig_axes(figsize=(13,12), title='Image', dpi=80, \
+             win_axim=(0.05,  0.03, 0.87, 0.93), \
+             win_axcb=(0.923, 0.03, 0.02, 0.93)) :
     """ Creates and returns figure, and axes for image and color bar
     """
-    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    axim = fig.add_axes((0.05,  0.03, 0.87, 0.93))
-    axcb = fig.add_axes((0.923, 0.03, 0.02, 0.93))
+    fig  = plt.figure(figsize=figsize, dpi=dpi, facecolor='w', edgecolor='w', frameon=True)
+    axim = fig.add_axes(win_axim)
+    axcb = fig.add_axes(win_axcb)
     fig.canvas.set_window_title(title)
     store.fig, store.axim, store.axcb = fig, axim, axcb
     return fig, axim, axcb
@@ -98,6 +100,7 @@ def getArrangedImage(shape=(40,60)) :
     return arr
 
 #--------------------------------
+
 def getRandomImage(mu=200, sigma=25, shape=(40,60)) :
     arr = mu + sigma*np.random.standard_normal(shape)
     return arr

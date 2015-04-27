@@ -13,6 +13,11 @@ reverse time order.
 
 =======
 
+Tag: V00-00-24
+2015-04-27 Mikhail S. Dubrovin
+- add directory data/scripts with test scripts (PSAS-34)
+- add class EventViewer
+	
 Tag: V00-00-23
 2015-04-24 Mikhail S. Dubrovin
 - GlobalGraphics.py - add methods move_fig, save_fig, hist1d (PSAS-34)
