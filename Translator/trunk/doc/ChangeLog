@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-29
+- fix bug with controlling ndarray chunking: JIRA PSAS-137
+  save 'class' of type in writer map. use this to lookup which dataset
+  creation properties to use.
+
 Tag: V00-02-28
 - add parameter useControlData to get chunking control.
 - added unit test for chunking. Still have bug for controlling ndarray

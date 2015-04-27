@@ -11,7 +11,7 @@
 #include "PSEvt/TypeInfoUtils.h"
 
 #include "Translator/HdfWriterFromEvent.h"
-
+#include "Translator/TypeClassEnum.h"
 
 namespace Translator {
 
@@ -33,17 +33,40 @@ namespace Translator {
     /// vlen map.
     /// return true if type was there before being replaced.
     bool replace(const std::type_info * typeInfoPtr,
-                 boost::shared_ptr<HdfWriterFromEvent>, bool vlen = false );
+                 boost::shared_ptr<HdfWriterFromEvent> hdfWriter, TypeClass typeClass) 
+    {
+      return replaceImpl(typeInfoPtr, hdfWriter, false, typeClass);
+    };
+
+    bool replaceVlen(const std::type_info * typeInfoPtr,
+                     boost::shared_ptr<HdfWriterFromEvent> hdfWriter) {
+      return replaceImpl(typeInfoPtr, hdfWriter, true, NdarrayType);
+    }
 
     // return writer from main map by default or vlen map if specified.
-    boost::shared_ptr<HdfWriterFromEvent> find(const std::type_info * typeInfoPtr, bool vlen = false);
+    // also returns class of type - DAQ, ndarray, string, newWriter, if last
+    // argument is not a NULL pointer
+    boost::shared_ptr<HdfWriterFromEvent> find(const std::type_info * typeInfoPtr,  TypeClass *typeClass = NULL) {
+      return findImpl(typeInfoPtr, false, typeClass);
+    }
+
+    boost::shared_ptr<HdfWriterFromEvent> findVlen(const std::type_info * typeInfoPtr) {
+      return findImpl(typeInfoPtr, true, NULL);
+    }
     
     // return list of types for given map - main (default) or vlen(optional arg).
     std::vector<const std::type_info *> types(bool vlen = false);
 
-  private:
-    typedef std::map<const std::type_info *, 
-      boost::shared_ptr<HdfWriterFromEvent> , 
+  private:    
+    bool replaceImpl(const std::type_info * typeInfoPtr,
+                     boost::shared_ptr<HdfWriterFromEvent>, bool vlen, TypeClass typeClass);
+
+    boost::shared_ptr<HdfWriterFromEvent> findImpl(const std::type_info * typeInfoPtr,  
+                                                   bool vlen, TypeClass *typeClass);
+
+    typedef std::pair<boost::shared_ptr<HdfWriterFromEvent>, TypeClass> MapValue;
+    typedef std::map<const std::type_info *,
+      MapValue,
       PSEvt::TypeInfoUtils::lessTypeInfoPtr >  MapImpl;
     MapImpl m_mainMap;
     MapImpl m_vlenMap;

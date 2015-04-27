@@ -627,19 +627,19 @@ namespace Translator {
 
 void HdfWriterMap::initialize() {
 {% for psana_type in psana_types %}
-  m_mainMap[ & typeid({{psana_type}}) ] = boost::make_shared<HdfWriterPsana<{{psana_type}}> >();
+  m_mainMap[ & typeid({{psana_type}}) ] = MapValue(boost::make_shared<HdfWriterPsana<{{psana_type}}> >(), DaqType);
 {% endfor %}
 
   // ndarrays
 {% for elem, ndim in elemDimPairs %}
-  m_mainMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, false > >();  
+  m_mainMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = MapValue(boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, false > >(), NdarrayType);  
 {% endfor %}
   // string               
-  m_mainMap[ & typeid(std::string) ] = boost::make_shared<HdfWriterStringFromEvent>();
+  m_mainMap[ & typeid(std::string) ] = MapValue(boost::make_shared<HdfWriterStringFromEvent>(),StringType);
 
   // vlen ndarrays
 {% for elem, ndim in elemDimPairs %}
-  m_vlenMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, true > >();  
+  m_vlenMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = MapValue(boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, true > >(), NdarrayType);  
 {% endfor %}
 }
 
@@ -655,24 +655,25 @@ bool HdfWriterMap::remove(const std::type_info * typeInfoPtr)
   return true;
 }
 
-bool HdfWriterMap::replace(const std::type_info * typeInfoPtr,
-             boost::shared_ptr<HdfWriterFromEvent> hdfWriter, bool vlen )
+bool HdfWriterMap::replaceImpl(const std::type_info * typeInfoPtr,
+             boost::shared_ptr<HdfWriterFromEvent> hdfWriter, bool vlen, TypeClass typeClass )
 {
   MapImpl *map = &m_mainMap;
   if (vlen) map = &m_vlenMap;
   bool replaced = (map->find(typeInfoPtr) != map->end());
-  (*map)[typeInfoPtr] = hdfWriter;
+  (*map)[typeInfoPtr] = MapValue(hdfWriter, typeClass);
   return replaced;
 }
 
-boost::shared_ptr<HdfWriterFromEvent> HdfWriterMap::find(const std::type_info * typeInfoPtr, bool vlen)
+boost::shared_ptr<HdfWriterFromEvent> HdfWriterMap::findImpl(const std::type_info * typeInfoPtr, bool vlen, TypeClass *typeClass)
 {
   boost::shared_ptr<HdfWriterFromEvent> writer;
   MapImpl *map = &m_mainMap;
   if (vlen) map = &m_vlenMap;
   MapImpl::iterator pos = map->find(typeInfoPtr);
   if (pos == map->end()) return writer;
-  writer = pos->second;
+  writer = pos->second.first;
+  if (typeClass) *typeClass =  pos->second.second;
   return writer;
 }
 

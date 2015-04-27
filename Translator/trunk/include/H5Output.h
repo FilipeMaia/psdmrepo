@@ -115,9 +115,11 @@ protected:
   Pds::Damage getDamageForEventKey(const EventKey &eventKey, 
 				   boost::shared_ptr<PSEvt::DamageMap> damageMap);
 
+  // last argument is output argument, typeclass of found filter, or UnknownType if not found
   boost::shared_ptr<HdfWriterFromEvent> checkTranslationFilters(PSEvt::Event &evt,
-								const EventKey &eventKey, 
-								bool checkForCalibratedKey);
+                                                                const EventKey &eventKey, 
+                                                                bool checkForCalibratedKey,
+                                                                TypeClass &typeClass);
   std::list<PSEvt::EventKey> getUpdatedConfigKeys(PSEnv::Env &env);
   void setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
                                std::list<EventKeyTranslation> & toTranslate,
@@ -141,6 +143,8 @@ protected:
   bool checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(const std::type_info *);
 
   void reportRunTime();
+
+  const DataSetCreationProperties & lookUpDataSetCreationProp(TypeClass typeClass);
 
 private:
   hdf5pp::File m_h5file;

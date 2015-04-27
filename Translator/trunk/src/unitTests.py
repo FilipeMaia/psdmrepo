@@ -738,7 +738,7 @@ class H5Output( unittest.TestCase ) :
         cfgfile.write('src_filter = exclude BldInfo(XppSb2_Ipm)\n')
         cfgfile.write('deflate = -1\n')
         cfgfile.write('shuffle = 0\n')
-#        cfgfile.write('ndarrayChunkSizeTargetObjects = 1\n')
+        cfgfile.write('ndarrayChunkSizeTargetObjects = 1\n')
         cfgfile.write('chunkSizeTargetObjects = 2\n')
         cfgfile.write('useControlData = 0\n')
         cfgfile.write('minObjectsPerChunk = 1\n')
@@ -754,7 +754,7 @@ class H5Output( unittest.TestCase ) :
         self.assertFalse(arrayDs.shuffle)
         self.assertFalse(psanaDs.shuffle)
         self.assertEqual(psanaDs.chunks[0],2)
-#        self.assertEqual(arrayDs.chunks[0],1)
+        self.assertEqual(arrayDs.chunks[0],1)
         
         if self.cleanUp:
             os.unlink(output_h5)

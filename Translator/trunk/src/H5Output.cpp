@@ -758,7 +758,7 @@ void H5Output::checkForNewWriters(PSEvt::Event &evt) {
       boost::shared_ptr<HdfWriterNewDataFromEvent> newWriterFromEvent = 
         boost::make_shared<HdfWriterNewDataFromEvent>(*newWriter,key);
       // overwrite the old writer if it is there.
-      bool replaced = m_hdfWriters.replace(newType, newWriterFromEvent);
+      bool replaced = m_hdfWriters.replace(newType, newWriterFromEvent, NewWriterType);
       if (replaced) {
         MsgLog(logger, warning, " overwriting previous writer for type"
                << PSEvt::TypeInfoUtils::typeInfoRealName(newType));
@@ -888,8 +888,11 @@ Pds::Damage H5Output::getDamageForEventKey(const EventKey &eventKey,
 //               of the key exists, and we are not storing uncalibrated data
 
 boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::Event &evt,
-									const EventKey &eventKey, 
-									bool checkForCalibratedKey) {
+                                                                        const EventKey &eventKey, 
+                                                                        bool checkForCalibratedKey,
+                                                                        TypeClass &typeClass)
+{
+  typeClass = UnknownType;
   const type_info * typeInfoPtr = eventKey.typeinfo();
   const Pds::Src & src = eventKey.src();
   const string & key = eventKey.key();
@@ -921,11 +924,14 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
     return nullHdfWriter;
   }
 
-  boost::shared_ptr<HdfWriterFromEvent> hdfWriter = m_hdfWriters.find(typeInfoPtr, hasVlenPrefix);
+  typeClass = NdarrayType;
+  boost::shared_ptr<HdfWriterFromEvent> hdfWriter = hasVlenPrefix ? m_hdfWriters.findVlen(typeInfoPtr) : m_hdfWriters.find(typeInfoPtr, &typeClass);
   if (not hdfWriter) {
     if (hasVlenPrefix and (not m_h5groupNames->isNDArray(typeInfoPtr))) {
-      // user may have added vlen prefix to non ndarray, but ndarrays won't be there if they
-      // were filtered. check for an ndarray
+      // The vlen prefix can only be added for ndarrays. Adding it to other types is not
+      // supported. However if we can detect that the user did this, print a warning.
+      // If ndarrays weren't filtered, then print the warning. Check for an ndarray 
+      // (any ndarray will do to see if they are filtered or not)
       bool ndArraysNotFiltered = m_hdfWriters.find(&typeid(ndarray<uint8_t,1>));
       if (ndArraysNotFiltered) {
         MsgLog(logger, warning, "vlen prefix found for key: " 
@@ -995,12 +1001,14 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
   set<EventKey> nonBlanks;
   list<EventKey>::iterator keyIter;
   for (keyIter = updatedConfigKeys.begin(); keyIter != updatedConfigKeys.end(); ++keyIter) {
-    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt,*keyIter,false);
+    TypeClass typeClass;
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt,*keyIter,false, typeClass);
     if (not hdfWriter) continue;
     Pds::Damage damage = getDamageForEventKey(*keyIter, damageMap);
     toTranslate.push_back(EventKeyTranslation(*keyIter, damage, hdfWriter,
                                               EventKeyTranslation::NonBlank, 
-                                              inConfigStore));
+                                              inConfigStore,
+                                              typeClass));
     nonBlanks.insert(*keyIter);
   }
 
@@ -1014,13 +1022,15 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
 
     if (eventIsFiltered) continue;
 
-    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, *keyIter,true);
+    TypeClass typeClass;
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, *keyIter,true, typeClass);
     if (not hdfWriter) continue;
 
     Pds::Damage damage = getDamageForEventKey(*keyIter, damageMap);
     toTranslateFromEvent.push_back(EventKeyTranslation(*keyIter, damage, hdfWriter,
                                                        EventKeyTranslation::NonBlank, 
-                                                       inEvent));
+                                                       inEvent,
+                                                       typeClass));
     nonBlanks.insert(*keyIter);
   }
 
@@ -1052,12 +1062,14 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
       bool alreadyAddedAsNonBlank = nonBlanks.find(eventKey) != nonBlanks.end();
       if (alreadyAddedAsNonBlank) continue;
 
-      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, eventKey, true);
+      TypeClass typeClass;
+      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, eventKey, true, typeClass);
       if (not hdfWriter) continue;
 
       toTranslate.push_back(EventKeyTranslation(eventKey,damage,hdfWriter,
                                                 EventKeyTranslation::Blank,
-                                                inEvent));
+                                                inEvent,
+                                                typeClass));
     }
   }
 
@@ -1106,6 +1118,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
     DataTypeLoc dataTypeLoc = keyIter->dataTypeLoc;
     Pds::Damage damage = keyIter->damage;
     boost::shared_ptr<HdfWriterFromEvent> hdfWriter = keyIter->hdfWriter;
+    TypeClass typeClass = keyIter->typeClass;
     const Pds::Src & src = eventKey.src();
     MsgLog(logger,DBGLVL,"eventKey=" << eventKey << "damage= " << damage.value() <<
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
@@ -1131,7 +1144,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
         srcKeyGroup.make_timeDamageDatasets();
       } else {
         MsgLog(logger,TRACELVL," initial event is nonblank.  Creating event datasets, and time/damage datasets");
-        srcKeyGroup.make_datasets(dataTypeLoc, evt, env, m_defaultCreateDsetProp);
+        srcKeyGroup.make_datasets(dataTypeLoc, evt, env, lookUpDataSetCreationProp(typeClass));
       }
       srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
     }
@@ -1183,7 +1196,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
       else {
         if (not srcKeyGroup.arrayTypeDatasetsCreated()) {
           MsgLog(logger,TRACELVL, "appending nonblank and type dataset not created, making type datasets");
-          srcKeyGroup.make_typeDatasets(dataTypeLoc, evt, env, m_defaultCreateDsetProp);
+          srcKeyGroup.make_typeDatasets(dataTypeLoc, evt, env, lookUpDataSetCreationProp(typeClass));
         } else {
           MsgLog(logger,DBGLVL,"appending nonblank");
         }
@@ -1288,7 +1301,8 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
     for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
       EventKey &eventKey = *iter;
       MsgLog(logger,DBGLVL,"addConfigureTypes eventKey: " << *iter << " loc: " << dataLoc);
-      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, eventKey,checkForCalib);
+      TypeClass typeClass;
+      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(evt, eventKey, checkForCalib, typeClass);
       if (not hdfWriter) continue;
       const std::type_info * typeInfoPtr = eventKey.typeinfo();
       const Pds::Src & src = eventKey.src();
@@ -1334,7 +1348,7 @@ void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env,
                  << " eventId=0. Cannot write timestamp. This can occur"
                  << " when modules end early, such as from mpi split scan");
         } else {
-          srcKeyGroup.make_datasets(inEvent, evt, env, m_defaultCreateDsetProp);
+          srcKeyGroup.make_datasets(inEvent, evt, env, lookUpDataSetCreationProp(typeClass));
           Pds::Damage damage = getDamageForEventKey(eventKey, damageMap);
           srcKeyGroup.appendDataTimeAndDamage(eventKey, inEvent, evt, env, eventId, damage);
         }
@@ -1390,7 +1404,7 @@ void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
     const std::type_info *calibType = calibWriterNew->typeInfoPtr();
     boost::shared_ptr<HdfWriterNewDataFromEvent> calibWriter;
     calibWriter = boost::make_shared<HdfWriterNewDataFromEvent>(*calibWriterNew,"calib-store");
-    bool replacedType = hdfWriters.replace(calibType, calibWriter);
+    bool replacedType = hdfWriters.replace(calibType, calibWriter, CalibStoreType);
     if (replacedType) {
       MsgLog(logger, warning, "calib type " << TypeInfoUtils::typeInfoRealName(calibType)
              << " already has writer, OVERWRITING");
@@ -1759,6 +1773,17 @@ bool H5Output::srcIsFiltered(const Pds::Src &src) {
     return true;
   }
   return false;
+}
+
+const DataSetCreationProperties & H5Output::lookUpDataSetCreationProp(TypeClass typeClass) {
+  switch (typeClass) {
+  case NdarrayType:
+    return m_ndarrayCreateDsetProp;
+  case StringType:
+    return m_stringCreateDsetProp;
+  default:
+    return m_defaultCreateDsetProp;
+  }
 }
 
 string H5Output::eventPosition() {
