@@ -9,7 +9,7 @@
 #include "pdsdata/xtc/Xtc.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/XtcFileIterator.hh"
-#include "pdsdata/xtc/XtcIterator.hh"
+#include "psana_test/XtcIterator.h"
 
 using namespace Pds;
 using namespace psana_test;
@@ -89,13 +89,13 @@ std::pair<Pds::Dgram *,size_t> DgramWithXtcPayloadIterator::nextAndOffsetFromSta
 
 
 //----------------------------------------------------
-class ListXtcIterator : public Pds::XtcIterator {
+class ListXtcIterator : public psana_test::XtcIterator {
 public:
   ListXtcIterator(Pds::Xtc *root, 
                   std::vector<XtcDepthOffset> & list, 
                   int depth, 
                   uint8_t * baseOffset) : 
-    Pds::XtcIterator(root), 
+    psana_test::XtcIterator(root), 
     _list(list), 
     _depth(depth), 
     _baseOffset(baseOffset)  {}
@@ -116,7 +116,8 @@ private:
 };
 
 class XtcChildrenIteratorImpl {
-  // uses the Pds::XtcIterator to recursively to through the xtc container
+  // uses the psana_test::XtcIterator (based on Pds::XtcIterator) to 
+  // recursively to through the xtc container
   // and adds xtcs to a list.  The user then goes through this list.
   // inefficient as we process the xtc container twice - but reuses code
   // coming from pds library to iterate over an xtc
@@ -209,7 +210,10 @@ void XtcOffsetIterator::iterate(Pds::Xtc* root, int depth) {
   int remaining = root->sizeofPayload();
   
   while(remaining > 0)  {
-    if(xtc->extent==0) break; // try to skip corrupt event
+    if(xtc->extent==0) {
+      fprintf(stderr, "trying to skip corrupt event. xtc->extent is 0, but remaining is > 0\n");
+      break;
+    }
     int32_t xtcOffset = int32_t((uint8_t *)xtc-m_offsetFrom);
     if(!process(xtc,xtcOffset,depth)) break;
     if (xtc->contains.id()==Pds::TypeId::Id_Xtc) iterate(xtc,depth+1);
