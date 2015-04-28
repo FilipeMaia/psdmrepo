@@ -22,9 +22,9 @@ class counter(event_process.event_process):
         return
 
     def endJob(self):
-        self.parent.comm.Reduce([self.data, MPI.DOUBLE], [self.mergeddata, MPI.DOUBLE],op=MPI.SUM,root=self.reducer_rank)
+        self.parent.comm.Reduce([self.data, MPI.DOUBLE], [self.mergeddata, MPI.DOUBLE],op=MPI.SUM,root=0)
         self.logger.info( "rank {:} events processed: {:}".format(self.parent.rank,self.data[0]) )
-        if self.parent.rank == 0: #self.reducer_rank:
+        if self.parent.rank == 0:
             self.logger.info( "total events processed: {:}".format(self.mergeddata[0]) )
             self.parent.shared['total_processed'] = self.mergeddata[0]
         return
