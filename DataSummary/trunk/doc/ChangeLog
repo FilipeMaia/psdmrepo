@@ -11,6 +11,11 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-28 Justin Garofoli
+Tag: V00-00-08
+- quick fix of bug in counter.py.  reduction node must be 0,
+  to be the same as build_html job.
+
 2015-04-21 Justin Garofoli
 Tag: V00-00-07
 - acqiris module now checks all acqiris traces
