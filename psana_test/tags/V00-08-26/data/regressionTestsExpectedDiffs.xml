@@ -1,0 +1,274 @@
+<?xml version="1.0"?>
+<data>
+  <regress src="xtc" number="2">
+    <diff>
+<![CDATA[
+]]>
+    </diff>
+    <comment>
+In reality, the epics pv AMO:R14:IOC:10:ao0:out1 points to pvId 134. However that pvName has been
+reused as a epics alias. The alias points to pvid 44 and that is what psana is doing, letting the 
+epics alias override the pvname. Unfortunately, there is no way to get at the unaliased pvname 
+because of this, so the Translator does not set up these aliases - thus the difference.
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="8">
+    <diff>
+<![CDATA[
+]]>
+    </diff>
+    <comment>
+Before I turned off printing the pvid, I had differences. Now that I do not dump the 
+pvid's I do not get differences, but here are the notes from before:
+
+The first difference shows 5 pv's that showed up in the event data for the xtc that are not in the event data for the h5.
+The first one, CXI:KB1:MMS:07.RBV, is from a second epics source (xtclinedump):
+
+xtc d=2  offset=0x000472D8 extent=000000B4 dmg=00000 src=010020EB,09000001 level=1 srcnm=EpicsArch.0:NoDevice.1 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1 pvId=0 pvName=CXI:KB1:MMS:07.RBV payload=0x00...
+
+however note that it is also in the typical epics source (xtclinedump):
+
+xtc d=2  offset=0x00069F40 extent=000000B4 dmg=00000 src=010064CE,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1 pvId=219 pvName=CXI:KB1:MMS:07.RBV payload=0xDB...
+
+During the configure or beginJob, the dump shows the same thing for this pv (psana_test.dump):
+
+  pvName=CXI:KB1:MMS:07.RBV  pvid=219 dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units=mrad upper_disp_limit=2.0000e+02 lower_disp_limit=-2.0000e+02 upper_alarm_limit=0.0000e+00 upper_warning_limit=0.0000e+00 lower_warning_limit=0.0000e+00 lower_alarm_limit=0.0000e+00 upper_ctrl_limit=2.0000e+02 lower_ctrl_limit=-2.0000e+02 data=8.9570e-03
+
+When we get to the first event, both the xtc and h5 dump's have the pv:
+
+  pvName=CXI:KB1:MMS:07.RBV  pvid=219 dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=736527078 stamp.nsec=98899000 data=9.0100e-03
+
+But then when we get to the second event, there is another entry for it in the xtc:
+
+=== event: run=0 step=0 event=1 seconds= 1367679098 nanoseconds= 61318067 fiducials= 579
+Epics PV
+  pvName=CXI:KB1:MMS:07.RBV  pvid=0 dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=736527078 stamp.nsec=98899000 data=9.0100e-03
+
+however note that this timestamp is the same as the first event timestamp. The issue is that the Translator does not bring in new epics unless the timestamp changes.
+psana_test.dump is re-printing the epics if anything in the pv string changes. Here the change is that the second source is transmiting the pv on event 2, and the pvId has changed.
+So the pvId can change from one event to the next with psana.
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="10">
+    <diff>
+<![CDATA[
+]]>
+    </diff>
+    <comment>
+There was a bug here trac #304. See notes at https://pswww.slac.stanford.edu/trac/psdm/ticket/304 that is now fixed.
+See also trac # 305 that is fixed now.
+
+Here are additional notes that make this file interesting:
+
+In the xtclinedump, this pv shows up during configure:
+
+dg=    1 offset=0x00000000 tp=Event sv=      Configure ex=1 ev=0 sec=51E9F8AF nano=0E1A3D7E tcks=0000000 fid=1FFFF ctrl=84 vec=0000 env=000024F4
+xtc d=2  offset=0x0000048C extent=000000B4 dmg=00000 src=010044F7,09000001 level=1 srcnm=EpicsArch.0:NoDevice.1 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 payload=0x04...
+  epics: pvId=4 dbrType=34 numElem=1 isCtrl=1 isTime=0 pvName=CXI:SC2:MZM:09:ENCPOSITIONGET status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_l
+
+it is pvid=4 from src 1, there is an alias to it:
+
+xtc d=2  offset=0x0000003C extent=00000180 dmg=00000 src=010044F7,09000001 level=1 srcnm=EpicsArch.0:NoDevice.1 typeid=54 ver=1 value=10036 compr=0 compr_ver=1 type_name=EpicsConfig plen=364 payload=0x05...
+  pvId=  4  descr=KB1 Vert Foucssing Mirror Pitch-CXI:SC2:MZM:09:ENCPOSITIONGET
+
+it also named in the arch 0 aliases:
+
+xtc d=2  offset=0x00058710 extent=00004110 dmg=00000 src=010004E5,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=54 ver=1 value=10036 compr=0 compr_ver=1 type_name=EpicsConfig plen=16636 payload=0xE7...
+  pvId= 46  descr=CXI:SC2:MZM:09:ENCPOSITIONGET
+
+This is very confusing, as that alias name of 09 points to 10:
+xtc d=2  offset=0x0005ECDC extent=000000B4 dmg=00000 src=010004E5,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 payload=0x2E...
+  epics: pvId=46 dbrType=34 numElem=1 isCtrl=1 isTime=0 pvName=CXI:SC2:MZM:10:ENCPOSITIONGET status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_
+
+When I look in the dump, in the h5 dump:
+  pvName=CXI:SC2:MZM:08:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=5.4000e-01
+  pvName=CXI:SC2:MZM:10:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=-2.5000e-02
+
+this guy, 09 is skipped!
+
+for the xtc:
+  pvName=CXI:SC2:MZM:08:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=5.4000e-01
+  pvName=CXI:SC2:MZM:09:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=-2.5000e-02
+  pvName=CXI:SC2:MZM:10:ENCPOSITIONGET  dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units= upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=-2.5000e-02
+
+there he is!
+
+When I run the translator:
+
+psanacs049:~/rel/transReFact $ psana  -n 6 -m Translator.H5Output -o Translator.H5Output.output_file=psana_test/data/current_h5/test_010_cxi_cxia4113_e325-r0002-s00-c00.regress.h5 -o Translator.H5Output.overwrite=True /reg/g/psdmcxi_cxia4113_e325-r0002-s00-c00.xtc
+[warning:2014-06-02 16:14:45.418:ExpNameFromDs.cpp:65] ExpNameFromDs: dataset name /reg/g/psdm/data_test/Translator/test_010_cxi_cxia4113_e325-r0002-s00-c00.xtc has no valid experiment number
+[info:Translator.H5Output] output file: psana_test/data/current_h5/test_010_cxi_cxia4113_e325-r0002-s00-c00.regress.h5
+[info:Translator.H5Output]  param overwrite = 1 (non-default value)
+[info:Translator.H5Output] Starting translation process 2014-06-02 16:14:45.843709000-0700
+[warning:2014-06-02 16:14:45.880:EpicsH5GroupDirectory.cpp:143] normalized alias 'CXI:SC2:MZM:09:ENCPOSITIONGET' (which points to 'CXI:SC2:MZM:10:ENCPOSITIONGET') is the same as existing group. skipping.
+[info:Translator.H5Output] : endJob 2014-06-02 16:14:46.526842000-0700
+[info:Translator.H5Output] real time (finish - start): 0.683133 (sec) =  0.0113855 (min)
+
+I see that I am skipping the alias, but why did the group get skipped?
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="11">
+    <diff>
+<![CDATA[
+]]>
+    </diff>
+    <comment>
+This looks like the same thing as test 8
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="23">
+    <diff>
+<![CDATA[
+]]>
+    </diff>
+    <comment>
+This is alarming. In the config transition, we see (xtclinedump):
+
+xtc d=2  offset=0x00009574 extent=000000B4 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1 pvId=99  pvName=SXR:GMD:IMD:photons_mJ payload=0x63...
+xtc d=2  offset=0x00009BB0 extent=000000B4 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1 pvId=106 pvName=SXR:GMD:IMD:photons_mJ payload=0x6A...
+
+Now we track pvid 99 and 106:
+
+dg=    1 offset=0x00000000 tp=Event sv=      Configure ex=1 ev=0 sec=50A85267 nano=02C83370 tcks=0000000 fid=1FFFF ctrl=84 vec=0000 env=00000D6B
+xtc d=2  offset=0x00009574 extent=000000B4 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1  pvId=99 pvName=SXR:GMD:IMD:photons_mJ payload=0x6300220001005358523A474D443A494D443A70686F746F6E735F6D4A000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006D4A00000000000000000000000000000000000000000000000000000000F87F000000000000F87F000000000000F87F000000000000F87F00000000000000000000000000000000E26DCFF917AF5B3F
+xtc d=2  offset=0x00009BB0 extent=000000B4 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=160 dbr=34 numElem=1 pvId=106 pvName=SXR:GMD:IMD:photons_mJ payload=0x6A00220001005358523A474D443A494D443A70686F746F6E735F6D4A000000000000000000000000000000000000000000000000000000000000000000000000000000000000F87F00000000000000006D4A00000000000000000000000000000000000000000000000000000000F87F000000000000F87F000000000000F87F000000000000F87F00000000000000000000000000000000E26DCFF917AF5B3F
+dg=    5 offset=0x000110B4 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=19DA4FA5 tcks=00504E8 fid=0AD19 ctrl=0C vec=0000 env=00000003
+xtc d=2  offset=0x0001253C extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1  pvId=99 payload=0x630014000100000000000000EAB4092B0CDFA60E00220001572EF5A2B6E6BFBE
+xtc d=2  offset=0x000126A0 extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=106 payload=0x6A00140001002E4200000000EAB4092B0CDFA60E000000DD572EF5A2B6E6BFBE
+dg=   17 offset=0x001EAE60 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=1FD0A2EB tcks=0050BCC fid=0AD3D ctrl=0C vec=000C env=00000003
+xtc d=2  offset=0x002121A4 extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092BA07FAD1A0022000113E322FB7AE9BFBE
+dg=   29 offset=0x003C1F28 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=25C6D525 tcks=00507DC fid=0AD61 ctrl=0C vec=0018 env=00000003
+xtc d=2  offset=0x003E926C extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092B1ECEAE20000000D3572EF5A2B6E6BFBE
+dg=   41 offset=0x00598FF0 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=2BBD12AF tcks=005093A fid=0AD85 ctrl=0C vec=0024 env=00000003
+xtc d=2  offset=0x005C0334 extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092BE0D49E240022000175A827169894C4BE
+dg=   53 offset=0x007700B8 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=31B37197 tcks=0050D62 fid=0ADA9 ctrl=0C vec=0030 env=00000003
+xtc d=2  offset=0x007973FC extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092BE0D49E240022000175A827169894C4BE
+dg=   65 offset=0x00947180 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526A nano=37A987B6 tcks=005044E fid=0ADCD ctrl=0C vec=003C env=00000003
+xtc d=2  offset=0x0096E4C4 extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092BE0D49E240022000175A827169894C4BE
+dg=   77 offset=0x00B1E248 tp=Event sv=       L1Accept ex=0 ev=1 sec=50A8526B nano=020513D3 tcks=0050C66 fid=0ADF1 ctrl=0C vec=0048 env=00000003
+xtc d=2  offset=0x00B4558C extent=00000034 dmg=00000 src=01005FAC,09000000 level=1 srcnm=EpicsArch.0:NoDevice.0 typeid=13 ver=1 value=1000D compr=0 compr_ver=1 type_name=Epics plen=32 dbr=20 numElem=1 pvId=99 payload=0x630014000100000000000000EAB4092BE0D49E240022000175A827169894C4BE
+
+From the dump, in the config:
+
+  pvName=SXR:GMD:IMD:photons_mJ  pvid=106 dbrtype=34 isCtrl=1 numElements=1 status=0 severity=0 units=mJ upper_disp_limit=0.0000e+00 lower_disp_limit=0.0000e+00 upper_alarm_limit=nan upper_warning_limit=nan lower_warning_limit=nan lower_alarm_limit=nan upper_ctrl_limit=0.0000e+00 lower_ctrl_limit=0.0000e+00 data=1.6897e-03
+=== event: run=0 step=0 event=0 seconds= 1353208426 nanoseconds= 433737637 fiducials= 44313
+  pvName=SXR:GMD:IMD:photons_mJ  pvid=106 dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=722056426 stamp.nsec=245817100 data=-1.9015e-06
+=== event: run=0 step=0 event=12 seconds= 1353208426 nanoseconds= 533766891 fiducials= 44349
+  pvName=SXR:GMD:IMD:photons_mJ  pvid=99 dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=722056426 stamp.nsec=447578016 data=-1.9021e-06
+=== event: run=0 step=0 event=24 seconds= 1353208426 nanoseconds= 633787685 fiducials= 44385
+  pvName=SXR:GMD:IMD:photons_mJ  pvid=99 dbrtype=20 isTime=1 numElements=1 status=0 severity=0 stamp.sec=722056426 stamp.nsec=548326942 data=-1.9015e-06
+
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="84">
+    <diff>
+<![CDATA[
+1756c1756
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1793c1793
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1838c1838
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1879c1879
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1920c1920
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+1961c1961
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2002c2002
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2039c2039
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2080c2080
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+2117c2117
+<   excludedRows: ndarray_uint16_2: dim=[ 0 x 384 ]
+---
+>   excludedRows: ndarray_uint16_2: dim=[ 0 x 0 ]
+]]>
+    </diff>
+    <comment>
+This is not a big deal, to have zero dimensional arrays show up as 0x384 in the xtc
+but 0x0 in the hdf5 translation.
+    </comment>
+  </regress>
+
+  <regress src="xtc" number="88">
+    <diff>
+<![CDATA[
+99c99
+<       ProcInfo(0.0.0.0, pid=8130032)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+101c101
+<       ProcInfo(0.0.0.0, pid=8130040)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+103c103
+<       ProcInfo(0.0.0.0, pid=8130040)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+105c105
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+107c107
+<       ProcInfo(0.0.0.0, pid=49)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+109c109
+<       ProcInfo(0.0.0.0, pid=7990560)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+111c111
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+113c113
+<       ProcInfo(0.0.0.0, pid=0)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+115c115
+<       ProcInfo(0.0.0.0, pid=7679904)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+117c117
+<       ProcInfo(0.0.0.0, pid=48)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+119c119
+<       ProcInfo(0.0.0.0, pid=129)
+---
+>       ProcInfo(255.255.255.255, pid=16777215)
+]]>
+    </diff>
+    <comment>
+This looks like the same thing as test 8
+    </comment>
+  </regress>
+
+
+</data>
