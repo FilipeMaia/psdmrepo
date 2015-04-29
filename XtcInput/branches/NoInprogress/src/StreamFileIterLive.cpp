@@ -105,13 +105,23 @@ StreamFileIterLive::next()
       // wait for some time until at least one file appears on disk
       std::time_t t0 = std::time(0);
       bool found = false;
+      bool useInProgress = false;
+      const char * useInProgressEnvVar = getenv("USE_INPROGRESS");
+      if (useInProgressEnvVar and strlen(useInProgressEnvVar)>0 and useInProgressEnvVar[0]=='1') {
+        useInProgress = true;
+      }
+      if (useInProgress) {
+        MsgLog(logger, info, "Found USE_INPROGRESS=1 in environment, NORMAL psana behavior, looking for inprogress");
+      } else {
+        MsgLog(logger, info, "Will not open .inprogress files. Make sure livetimeout high enough to wait. Set environment variable USE_INPROGRESS=1 for normal psana behavior.");
+      }
       while (not found) {
         for (std::vector<XtcFileName>::const_iterator it = files.begin(); it != files.end(); ++ it) {
 
           const std::string path = it->path();
           const std::string inprog_path = path + ".inprogress";
 
-          if (access(inprog_path.c_str(), R_OK) == 0) {
+          if (useInProgress and (access(inprog_path.c_str(), R_OK) == 0)) {
             MsgLog(logger, debug, "Found file on disk: " << inprog_path);
             found = true;
             break;

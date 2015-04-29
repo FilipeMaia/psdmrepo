@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Branch NoInprogress
+2015-04-29 David Schneider
+This branch hacks psana to not open .inprogress files. It uses the livetimeout to
+wait for the .xtc files to fully arrive. One can set the environment variable
+USE_INPROGRESS=1 to recover the old psana behavior JIRA Issue PSAS-140 and PSAS-138
+	
 Tag: V00-10-14
 2015-04-20 David Schneider
 - Adjust trace log message for SharedFile. Add file descriptor to trackdown file
