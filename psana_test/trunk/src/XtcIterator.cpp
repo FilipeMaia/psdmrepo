@@ -20,6 +20,8 @@
  ** --
  */
 
+#include <stdio.h>
+
 #include "psana_test/XtcIterator.h"
 #include "pdsdata/xtc/Xtc.hh"
 
@@ -41,15 +43,24 @@ using namespace psana_test;
 
 void XtcIterator::iterate(Xtc* root) 
 {
-  if (root->damage.value() & ( 1 << Damage::IncompleteContribution))
+  if (root->damage.value() & ( 1 << Damage::IncompleteContribution)) {
+    if (_diagnose) {
+      fprintf(stderr, "xtc object has Damage::IncompleteContribution.\n");
+    }
     return;
+  }
 
   Xtc* xtc     = (Xtc*)root->payload();
   int remaining = root->sizeofPayload();
 
   while(remaining > 0)
   {
-    if(xtc->extent==0) break; // try to skip corrupt event
+    if(xtc->extent==0) {
+      if (_diagnose) {
+        fprintf(stderr, "*There is a xtc object with a 0 extent.*\n");
+      }
+      break; // try to skip corrupt event
+    }
     if(!process(xtc)) break;
     remaining -= xtc->sizeofPayload() + sizeof(Xtc);
     xtc      = xtc->next();

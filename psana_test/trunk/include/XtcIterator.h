@@ -31,7 +31,7 @@
 **	000 - October 11,1998
 **
 **  Revision History:
-**	None.
+**	Modified to take a diagnose flag for more output - David
 **
 ** --
 */
@@ -46,7 +46,7 @@ namespace psana_test {
 class XtcIterator
   {
   public:
-    XtcIterator(Pds::Xtc* root);
+    XtcIterator(Pds::Xtc* root, bool diagnose);
     XtcIterator() {}
    virtual ~XtcIterator() {}
   public:
@@ -57,6 +57,7 @@ class XtcIterator
     const Pds::Xtc* root()              const;
   private:
      Pds::Xtc* _root; // Collection to process in the absence of an argument...
+     bool _diagnose;
   };
 
 }
@@ -73,8 +74,8 @@ using namespace psana_test;
 ** --
 */
 
-inline XtcIterator::XtcIterator(Pds::Xtc* root) :
-  _root(root)
+inline XtcIterator::XtcIterator(Pds::Xtc* root, bool diagnose) :
+                   _root(root), _diagnose(diagnose)
   {
   } 
 

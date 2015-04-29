@@ -35,7 +35,8 @@ namespace psana_test {
   // iterate the Xtc's.
   class DgramWithXtcPayloadIterator {
   public:
-    DgramWithXtcPayloadIterator(int fd, size_t maxDgramSize=1<<26); // construct with open file handle
+    static const int DEFAULT_MAX_DGRAM_SIZE=1<<26;
+    DgramWithXtcPayloadIterator(int fd, size_t maxDgramSize=DEFAULT_MAX_DGRAM_SIZE, bool xtcDiagnose=false); // construct with open file handle
     ~DgramWithXtcPayloadIterator(); 
     Pds::Dgram *next();             
     std::pair<Pds::Dgram *, size_t> nextAndOffsetFromStart();
@@ -63,7 +64,7 @@ namespace psana_test {
   class XtcChildrenIterator {
   public:
     
-    XtcChildrenIterator(Pds::Xtc * root, int startingDepth);
+    XtcChildrenIterator(Pds::Xtc * root, int startingDepth, bool xtcDiagnose);
     ~XtcChildrenIterator();
     Pds::Xtc * next();
     XtcDepthOffset nextWithPos();

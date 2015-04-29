@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-26
+2015-4-28 David Schneider
+- modify xtc iterator to print message for unusual events, JIRA issue PSAS-141	
+
 Tag: V00-08-25
 2015-4-28 David Schneider
 - copy pdsdata xtc iterator into psana_test so that it can be modified
