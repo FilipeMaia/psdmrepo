@@ -11,6 +11,10 @@ Package author: Justin Garofoli
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-04-29 Justin Garofoli
+Tag: V00-00-09
+- change output path per Wilco and Igor's request
+
 2015-04-28 Justin Garofoli
 Tag: V00-00-08
 - quick fix of bug in counter.py.  reduction node must be 0,

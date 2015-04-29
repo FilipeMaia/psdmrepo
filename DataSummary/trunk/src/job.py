@@ -12,6 +12,7 @@ import tarfile
 import glob
 import random
 import traceback
+import time
 
 __version__ = '00.00.06'
 
@@ -61,37 +62,49 @@ class job(object):
         return self._output_dir_base
 
 
-    def smart_rename(self,out):
-        if out == './':
-            return
-        while out[-1] == '/':
-            out = out[:-1]
-        ii = 0
-        while True:
-            self.logger.info('checking if ({:}) exists ({:})'.format( out+'.{:02.0f}'.format(ii),os.path.isdir(out+'.{:02.0f}'.format(ii))))
-            if os.path.isdir(out+'.{:02.0f}'.format(ii)):
-                self.previous_versions.append( [out+'.{:02.0f}'.format(ii),] )
-                if os.path.isdir(out+'.{:02.0f}'.format(ii)) and os.path.isfile( out+'.{:02.0f}'.format(ii) +'/report.html'):
-                    self.previous_versions[-1].append( time.ctime( os.path.getctime(  out+'.{:02.0f}'.format(ii) +'/report.html' ) ) )
-                else: 
-                    self.previous_versions[-1].append( None )
-                ii += 1
-            else : 
-                break
-        self.output_dir_orig = self.output_dir
-        self.output_dir = self.output_dir+'.{:02.0f}'.format(ii)
-        self.logger.info('setting output dir to {:}'.format(self.output_dir))
-        os.makedirs(self.output_dir)
-        if os.path.exists( self.output_dir_orig + '.latest' ):
-            os.unlink( self.output_dir_orig + '.latest' ) # remove the previous symlink
-        os.symlink( self.output_dir, self.output_dir_orig + '.latest') # make a new symlink
-        return
-                     
+#    def smart_rename(self,out):
+#        if out == './':
+#            return
+#        while out[-1] == '/':
+#            out = out[:-1]
+#        ii = 0
+#        while True:
+#            self.logger.info('checking if ({:}) exists ({:})'.format( out+'.{:02.0f}'.format(ii),os.path.isdir(out+'.{:02.0f}'.format(ii))))
+#            if os.path.isdir(out+'.{:02.0f}'.format(ii)):
+#                self.previous_versions.append( [out+'.{:02.0f}'.format(ii),] )
+#                if os.path.isdir(out+'.{:02.0f}'.format(ii)) and os.path.isfile( out+'.{:02.0f}'.format(ii) +'/report.html'):
+#                    self.previous_versions[-1].append( time.ctime( os.path.getctime(  out+'.{:02.0f}'.format(ii) +'/report.html' ) ) )
+#                else: 
+#                    self.previous_versions[-1].append( None )
+#                ii += 1
+#            else : 
+#                break
+#        self.output_dir_orig = self.output_dir
+#        self.output_dir = self.output_dir+'.{:02.0f}'.format(ii)
+#        self.logger.info('setting output dir to {:}'.format(self.output_dir))
+#        os.makedirs(self.output_dir)
+#        if os.path.exists( self.output_dir_orig + '.latest' ):
+#            os.unlink( self.output_dir_orig + '.latest' ) # remove the previous symlink
+#        os.symlink( self.output_dir, self.output_dir_orig + '.latest') # make a new symlink
+#        return
+
+    def get_previous_versions(self):
+        for dr in glob.glob( os.path.join( self._output_dir_base, self.exp.split('/')[1], repr(self.run),"*" )):
+            self.previous_versions.append( [ dr, None ] )
+            if os.path.isfile( os.path.join( dr, 'report.html' )):
+                self.previous_versions[-1][1] = time.ctime( os.path.getctime( os.path.join( dr, 'report.html') ) )
+        return 
+
     def set_outputdir(self,*args):
         if len(args) == 1:
             self.output_dir = args[0]
         if self.rank==0:
-            self.smart_rename(self.output_dir)
+            #self.smart_rename(self.output_dir)
+            self.tstamp = time.strftime("%Y%m%dT%H%M%S")
+            self.output_dir = os.path.join( self._output_dir_base, self.exp.split('/')[1], repr(self.run), self.tstamp )
+            os.makedirs(self.output_dir)
+            self.get_previous_versions()
+
         self.logger.info('waiting for rank 0 to set up directories..')
         outdir = self.comm.bcast(self.output_dir,root=0) # block and wait for rank0 to finish the directory stuff
         self.logger.info('waiting for rank 0 to set up directories..done')
@@ -151,7 +164,8 @@ class job(object):
         self.run = run
         self.srcdir = srcdir
         instr, thisexp = exp.split('/')
-        self.set_outputdir(os.path.join( self.baseoutputdir ,'{:}_run{:0.0f}'.format(thisexp,run)))
+        #self.set_outputdir(os.path.join( self.baseoutputdir ,'{:}_run{:0.0f}'.format(thisexp,run)))
+        self.set_outputdir()
 
         self.logger.info('connecting to data source')
         if srcdir is not None :
