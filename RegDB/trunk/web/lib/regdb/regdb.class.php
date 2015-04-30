@@ -730,6 +730,7 @@ HERE;
             $groups['ps-cxi'] = True;
             $groups['ps-cxi-sci'] = True;
             $groups['ps-cxi-elog'] = True;
+            $groups['ps-cxi-geom'] = True;
             $groups['cxiopr'] = True;
         }
         /* MEC commissionning, in-house, etc. experiments for the year of 2010.
