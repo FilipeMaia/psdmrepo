@@ -90,7 +90,7 @@ ChunkFileIterLive::next()
     MsgLog(logger, debug, "Found file in database: " << fname.path());
 
     const std::string path = fname.path();
-    const std::string inprog_path = path + ".inprogress";
+    const std::string inprog_path = path; // + ".inprogress";
 
     fname = XtcFileName();
 
