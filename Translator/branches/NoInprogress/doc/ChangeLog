@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+April 29 2015
+David Schneider
+- branch to not use inprogress, JIRA PSAS-140
+	
 Tag: V00-02-29
 - fix bug with controlling ndarray chunking: JIRA PSAS-137
   save 'class' of type in writer map. use this to lookup which dataset

@@ -297,10 +297,13 @@ void mpiGetWorld( int &worldSize, int &worldRank, std::string &processorName) {
 
     const std::string INPROGRESS = ".inprogress";
     bool isInProgress = boost::algorithm::ends_with(otherPath,INPROGRESS);
-    std::string otherPathNotInProgress(otherPath);
     if (isInProgress) {
-      otherPathNotInProgress.erase(otherPath.size()-INPROGRESS.length());
+      MsgLog(m_logger, fatal, "Unexpected, hacked version got inprogress file");
     }
+    std::string otherPathNotInProgress(otherPath);
+    //    if (isInProgress) {
+      //      otherPathNotInProgress.erase(otherPath.size()-INPROGRESS.length());
+    //    }
         
     const unsigned liveTimeout = 300;
     unsigned timeWaited = 0;
