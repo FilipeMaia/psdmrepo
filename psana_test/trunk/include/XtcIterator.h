@@ -1,6 +1,8 @@
 #ifndef PSANA_TEST_XTCITERATOR
 #define PSANA_TEST_XTCITERATOR
 
+#include <stdint.h>
+
 // copied from pdsdata
 
 /*
@@ -46,7 +48,7 @@ namespace psana_test {
 class XtcIterator
   {
   public:
-    XtcIterator(Pds::Xtc* root, bool diagnose);
+    XtcIterator(Pds::Xtc* root, bool diagnose, uint32_t maxXtcExtent);
     XtcIterator() {}
    virtual ~XtcIterator() {}
   public:
@@ -58,6 +60,7 @@ class XtcIterator
   private:
      Pds::Xtc* _root; // Collection to process in the absence of an argument...
      bool _diagnose;
+     uint32_t _maxXtcExtent;
   };
 
 }
@@ -74,8 +77,8 @@ using namespace psana_test;
 ** --
 */
 
-inline XtcIterator::XtcIterator(Pds::Xtc* root, bool diagnose) :
-                   _root(root), _diagnose(diagnose)
+inline XtcIterator::XtcIterator(Pds::Xtc* root, bool diagnose, uint32_t maxXtcExtent) :
+                   _root(root), _diagnose(diagnose), _maxXtcExtent(maxXtcExtent)
   {
   } 
 

@@ -60,7 +60,7 @@ std::pair<Pds::Dgram *,size_t> DgramHeaderIterator::nextAndOffsetFromStart() {
 // ----------------------------------------------
 // DgramWithXtcPayloadIterator 
 
-DgramWithXtcPayloadIterator::DgramWithXtcPayloadIterator(int fd,size_t maxDgramSize, bool xtcDiag) : 
+DgramWithXtcPayloadIterator::DgramWithXtcPayloadIterator(int fd,size_t maxDgramSize, bool xtcDiag, uint32_t maxXtcExtent) : 
   _posNextDgram(0)
 {
   // TODO: presently we don't do diagnostics on the dgram iteration, add it based on xtcDiag flag?
@@ -96,18 +96,20 @@ public:
                   std::vector<XtcDepthOffset> & list, 
                   int depth, 
                   uint8_t * baseOffset,
-                  bool xtcDiagnose) : 
-    psana_test::XtcIterator(root, xtcDiagnose), 
+                  bool xtcDiagnose,
+                  uint32_t maxXtcExtent) : 
+    psana_test::XtcIterator(root, xtcDiagnose, maxXtcExtent), 
     _list(list), 
     _depth(depth), 
     _baseOffset(baseOffset),
-    _xtcDiagnose(xtcDiagnose) {}
+    _xtcDiagnose(xtcDiagnose),
+    _maxXtcExtent(maxXtcExtent) {}
 
   virtual int process(Pds::Xtc * xtc) {
     size_t xtcOffset = (size_t)(((uint8_t*)xtc) - _baseOffset);
     _list.push_back(XtcDepthOffset::makeXtcDepthOffset(xtc,_depth,xtcOffset));
     if (xtc->contains.id() == Pds::TypeId::Id_Xtc) {
-      ListXtcIterator iterChildren(xtc, _list, _depth+1, _baseOffset, _xtcDiagnose);
+      ListXtcIterator iterChildren(xtc, _list, _depth+1, _baseOffset, _xtcDiagnose, _maxXtcExtent);
       iterChildren.iterate();
     }
     return 1; // keep iterating
@@ -117,6 +119,7 @@ private:
   int _depth;
   uint8_t *_baseOffset;
   bool _xtcDiagnose;
+  uint32_t _maxXtcExtent;
 };
 
 class XtcChildrenIteratorImpl {
@@ -126,12 +129,13 @@ class XtcChildrenIteratorImpl {
   // inefficient as we process the xtc container twice - but reuses code
   // coming from pds library to iterate over an xtc
 public:
-  XtcChildrenIteratorImpl(Pds::Xtc *root, int startingDepth, bool xtcDiagnose) : _pos(0) {
+  XtcChildrenIteratorImpl(Pds::Xtc *root, int startingDepth, bool xtcDiagnose, uint32_t maxXtcExtent) : _pos(0) {
     ListXtcIterator * _listXtcIter = new ListXtcIterator(root,
                                                          _childrenXtcAndPositions,
                                                          startingDepth,
                                                          (uint8_t *)root,
-                                                         xtcDiagnose);
+                                                         xtcDiagnose,
+                                                         maxXtcExtent);
     _listXtcIter->iterate();
     delete _listXtcIter;
   }
@@ -154,8 +158,8 @@ private:
   unsigned  _pos;
 };
 
-XtcChildrenIterator::XtcChildrenIterator(Pds::Xtc *root, int startingDepth, bool xtcDiagnose) {
-  _impl = new XtcChildrenIteratorImpl(root,startingDepth, xtcDiagnose);
+  XtcChildrenIterator::XtcChildrenIterator(Pds::Xtc *root, int startingDepth, bool xtcDiagnose, uint32_t maxXtcExtent) {
+    _impl = new XtcChildrenIteratorImpl(root,startingDepth, xtcDiagnose, maxXtcExtent);
 }
 XtcChildrenIterator::~XtcChildrenIterator() {
   delete _impl;

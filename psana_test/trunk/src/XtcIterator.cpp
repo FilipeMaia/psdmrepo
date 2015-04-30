@@ -61,6 +61,10 @@ void XtcIterator::iterate(Xtc* root)
       }
       break; // try to skip corrupt event
     }
+    if(xtc->extent > _maxXtcExtent) {
+      fprintf(stderr, "ERROR: There is an xtc object with an extent > %u\n", _maxXtcExtent);
+      break;
+    }
     if(!process(xtc)) break;
     remaining -= xtc->sizeofPayload() + sizeof(Xtc);
     xtc      = xtc->next();
