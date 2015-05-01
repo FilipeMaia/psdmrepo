@@ -610,4 +610,21 @@
   double _Fwhm[@self._nPeaks] -> FWHM;
 
 }
+
+//------------------ BldDataAnalogInputV1 ------------------
+/* Structure which contains voltage data from an analog input device. */
+@type BldDataAnalogInputV1
+  [[type_id(Id_AnalogInput, 1)]]
+  [[pack(4)]]
+{
+  /* Constructor which takes values for every attribute. */
+  @init()  [[auto, inline]];
+
+  /* The number of active channels on the analog input device. */
+  uint32_t _numChannels -> numChannels;
+
+  /* Array of voltage values were each entry represents a channel of the analog input device. */
+  double _channelVoltages[@self._numChannels] -> channelVoltages;
+}
+
 } //- @package Bld

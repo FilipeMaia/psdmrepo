@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-00-27
+2015-04-30 Daniel Damiani
+- bld.ddl: add BldDataAnalogInputV1 type
+
 Tag V01-00-26
 
 Tag V01-00-25
