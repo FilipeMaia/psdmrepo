@@ -1,0 +1,24 @@
+psana:
+- psana_test: modify xtclinedump to check for some errors in xtc files.
+  Motivated by PSAS-141.
+- XtcInput: adjust trace message for SharedFile to also show file
+  descriptor. It will help debug certain problems.
+- new XTC type BldDataAnalogInputV1
+
+Calibraton algorithms and tools:
+- CalibManager: add "live" mode for ffb, fix info messages about
+  batch queue and farm (PSAS-6).
+
+Imaging algorithms and tools:
+- pyimgalgos: GlobalGraphics.py - add methods move_fig, save_fig, hist1d (PSAS-34),
+  add class EventViewer,
+  add directory data/scripts with test scripts.
+- ImgAlgos: NDArrDropletFinder - add parameters mask and masked_value (PSAS-68)
+
+Other algorithms:
+- cheetah: new package of algorithms imported from "libcheetah"
+  currently callable from C++.
+
+Bugs fixed:
+- Translator: control chunking of ndarrays independent of normal
+  DAQ datasets (PSAS-137)
