@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-21
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
 Tag: V00-09-20
 2015-4-9 David Schneider
 - fix shared pointer cycle causing exhaustion of system file handles for small data JIRA PSAS-130

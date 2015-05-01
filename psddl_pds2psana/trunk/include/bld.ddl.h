@@ -208,6 +208,20 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+
+class BldDataAnalogInputV1 : public Psana::Bld::BldDataAnalogInputV1 {
+public:
+  typedef Pds::Bld::BldDataAnalogInputV1 XtcType;
+  typedef Psana::Bld::BldDataAnalogInputV1 PsanaType;
+  BldDataAnalogInputV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataAnalogInputV1();
+  virtual uint32_t numChannels() const;
+  virtual ndarray<const double, 1> channelVoltages() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Bld
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_BLD_DDL_H

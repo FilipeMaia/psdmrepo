@@ -413,5 +413,24 @@ ndarray<const double, 1> BldDataSpectrometerV1::FWHM() const {
   return m_xtcObj->FWHM(m_xtcObj);
 }
 
+BldDataAnalogInputV1::BldDataAnalogInputV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataAnalogInputV1()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataAnalogInputV1::~BldDataAnalogInputV1()
+{
+}
+
+
+uint32_t BldDataAnalogInputV1::numChannels() const {
+  return m_xtcObj->numChannels();
+}
+
+
+ndarray<const double, 1> BldDataAnalogInputV1::channelVoltages() const {
+  return m_xtcObj->channelVoltages(m_xtcObj);
+}
+
 } // namespace Bld
 } // namespace psddl_pds2psana

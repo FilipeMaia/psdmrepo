@@ -158,6 +158,26 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_AnalogInput:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataAnalogInputV1, psddl_pds2psana::Bld::BldDataAnalogInputV1, Pds::Bld::BldDataAnalogInputV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataAnalogInputV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataAnalogInputV1, psddl_pds2psana::Bld::BldDataAnalogInputV1, Pds::Bld::BldDataAnalogInputV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataAnalogInputV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_AndorConfig:
     {
       switch (version) {
@@ -2511,6 +2531,16 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Alias::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AnalogInput:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataAnalogInputV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataAnalogInputV1) );
       break;
     } // end version switch
     break;
