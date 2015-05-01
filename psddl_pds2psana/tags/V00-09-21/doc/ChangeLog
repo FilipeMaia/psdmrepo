@@ -1,0 +1,516 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_pds2psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-09-21
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
+Tag: V00-09-20
+2015-4-9 David Schneider
+- fix shared pointer cycle causing exhaustion of system file handles for small data JIRA PSAS-130
+- set path for large file more carefully, other minor cleanup
+	
+Tag: V00-09-19
+2015-3-5 David Schneider
+- small data JIRA issue PSAS-85
+  uncompress small data proxy payload if need be
+  cache pointer from big event for efficiency
+  have largeObjectProxy protect itself from destruction by incrementing shared pointer ref count to self
+- add some const corretness to XtcConverter
+
+Tag: V00-09-18
+2015-3-3 David Schneider
+- small data JIRA issue PSAS-85
+- make XtcConverter splitTypes public so that smallDataProxy can check for this
+- add class SmallDataProxy to handle all proxied items in a datagram
+
+Tag: V00-09-17
+2015-2-23 David Schneider
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+	
+Tag: V00-09-16
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+	
+Tag: V00-09-15
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103.
+
+Tag: V00-09-14
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
+Tag: V00-09-13
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
+Tag: V00-09-12
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+	
+Tag: V00-09-11
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with:
+  Evr::IOConfigV2
+	
+Tag: V00-09-10
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+
+Tag: V00-09-09
+2014-07-03 David Schneider
+- regenerate for new pdsdata/psddldata with BldEBeamV6
+
+Tag: V00-09-08
+2014-06-16 David Schneider
+- pass epics store event tag through, allows epicsStore to save later of
+  pvs from multiple recorders, allows translator to translate timetool
+  pvs (trac ticket #310)
+
+Tag: V00-09-07
+2014-06-14 David Schneider
+- regenerate whole thing from psddldata V01-00-10
+- trac ticket #309
+
+Tag: V00-09-06
+2014-05-08 David Schneider
+- regenerate whole thing from psddldata V01-00-09
+- trac ticket #300
+
+Tag: V00-09-05
+2014-05-02 David Schneider
+- regenerate whole thing from psddldata V01-00-08
+- trac ticket #295
+
+Tag: V00-09-04
+2014-03-10 David Schneider
+- regenerate whole thing from psddldata V01-00-06
+- trac ticket #278
+
+Tag: V00-09-03
+2014-03-10 David Schneider
+- regenerate whole thing from psddldata V01-00-05
+- trac ticket #277
+
+Tag: V00-09-02
+2014-03-04 Andy
+- regenerate whole thing from psddldata V01-00-04
+- trac ticket #276
+
+Tag: V00-09-01
+2014-02-12 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+
+Tag: V00-09-00
+2013-12-22 Andy Salnikov
+- regenerate whole thing from psddldata V01-00-00 with psddl V00-13-00
+ (no changes to generated code, only driver script change)
+
+Tag: V00-08-09
+2013-12-22 Andy Salnikov
+- acqiris.cpp: upgrade to pdsdata 7.2.13 there TdcDataV1::data() method 
+  needs extra argument
+
+Tag: V00-08-08
+2013-12-19 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-56
+- new epix package
+
+Tag: V00-08-07
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-53
+- new type Evr::SrcConfigV1
+
+Tag: V00-08-06
+2013-12-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-50
+- new epixsampler package
+
+Tag: V00-08-05
+2013-11-12 Andy Salnikov
+- small improvement to ddl_* script
+
+Tag: V00-08-04
+2013-11-12 Andy Salnikov
+- previous tag missed rayonix, adding it now
+
+Tag: V00-08-03
+2013-11-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-47 with psddl V00-12-04
+- new rayonix package
+- ipimb.Config types have new method
+
+Tag: V00-08-02
+2013-11-07 David Schneider
+- regenerate dispatch from psddl V00-12-01. Adds dispatch that takes xtc 
+  type id to list of C++ type_info pointers.
+- Extend XtcConverter interface to give C++ type_info pointers for convert
+- Make shared xtc splitting logic more explicit and reusable
+  
+
+Tag: V00-08-01
+2013-10-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-45 with psddl V00-08-18
+
+Tag: V00-08-00
+2013-09-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
+- switching to DDL-based pdsdata, psddl_pdsdata is not used anymore
+
+Tag: V00-07-01
+2013-07-10 Andy Salnikov
+- regenerated with psddl V00-08-01
+- pass owning pointer to pdsdata methods returning ndarrays
+
+Tag: V00-07-00
+2013-07-10 Andy Salnikov
+- regenerated with psddl V00-08-00
+- switching to templated classes
+
+Tag: V00-06-00
+2013-06-20 Andy Salnikov
+- regenerated with psddl V00-07-00
+
+Tag: V00-05-27
+2013-06-20 Andy Salnikov
+- regenerated with psddl V00-06-07
+- do not produce warnings for duplicated event keys
+
+Tag: V00-05-26
+2013-05-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-28
+
+Tag: V00-05-25
+2013-05-15 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-27
+
+Tag: V00-05-24
+2013-04-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-26
+
+Tag: V00-05-23
+2013-04-23 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-25
+- add support for compressed data
+- integrate special PnccdFullframProxy into generated dispatch code
+
+Tag: V00-05-22
+2013-03-29 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-24
+
+Tag: V00-05-21
+2013-03-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-21
+
+Tag: V00-05-20
+2013-03-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-19
+
+Tag: V00-05-19
+2013-03-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-17
+
+Tag: V00-05-18
+2013-03-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-15
+
+Tag: V00-05-17
+2013-03-22 Andy Salnikov
+- add protection against zero-payload XTC objects
+
+Tag: V00-05-16
+2013-03-15 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-14
+
+Tag: V00-05-15
+2013-03-13 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-13
+- small improvement in PnccdFullFrameV1 performance
+
+Tag: V00-05-14
+2013-03-10 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-11
+
+Tag: V00-05-13
+2013-03-04 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-10
+
+Tag: V00-05-12
+2013-03-04 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-09
+- typeid switch (formerly in XtcConverter) is now generated from DDL,
+  new files generated are dispatch.{h,cc}
+
+Tag: V00-05-11
+2013-02-28 Andy Salnikov
+- merge V00-05-10 into main trunk
+
+Tag: V00-05-10 (from branch BV00-05-03)
+2013-02-28 Andy Salnikov
+- add forgotten CsPad2x2::ConfigV2 to Xtcconverter
+
+Tag: V00-05-07
+2013-02-26 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-07
+
+Tag: V00-05-06
+2013-02-26 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-06
+
+Tag: V00-05-05
+2013-02-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-05
+
+Tag: V00-05-04
+2013-02-06 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-04
+
+Tag: V00-05-03
+2013-02-05 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-03
+
+Tag: V00-05-02
+2013-02-05 Andy Salnikov
+- upgrading to pdsdata V06-01-04
+- regenerate whole thing from psddldata V00-04-02
+
+Tag: V00-05-01
+2013-02-04 Andy Salnikov
+- upgrading to pdsdata V06-01-02
+- regenerate whole thing from psddldata V00-04-01
+
+Tag: V00-05-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays for array data
+
+Tag: V00-04-17
+2013-01-28 Andy Salnikov
+- updates related to changes in ndarray constness
+
+Tag: V00-04-16
+2013-01-10 Andy Salnikov
+- implement splitting of the shared BLD types (ticket #184)
+
+Tag: V00-04-15
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- regenerate whole thing from psddldata V00-03-15
+
+Tag: V00-04-14
+2012-11-16 Andy Salnikov
+- adding configV4 handling for princeton frame
+
+Tag: V00-04-13
+2012-11-15 Andy Salnikov
+- upgrading to pdsdata V05-01-00
+- regenerate whole thing from psddldata V00-03-13
+
+Tag: V00-04-12
+2012-11-08 Andy Salnikov
+- upgrading to pdsdata V04-05-00
+- regenerate whole thing from psddldata V00-03-12
+
+Tag: V00-04-11
+2012-10-23 Andy Salnikov
+- upgrading to pdsdata V04-02-07
+- regenerate whole thing from psddldata V00-03-11
+
+Tag: V00-04-10
+2012-10-08 Andy Salnikov
+- upgrading to pdsdata V04-02-01
+- regenerate whole thing from psddldata V00-03-09
+
+Tag: V00-04-09
+2012-09-28 Andy Salnikov
+- add new typeid enums to switch to avoid compilation warnings
+
+Tag: V00-04-08
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- regenerate whole thing from psddldata V00-03-08
+
+Tag: V00-04-07
+2012-07-06 Andy Salnikov
+- upgrading to pdsdata V03-07-10
+- regenerate whole thing from psddldata V00-03-06
+- special proxy class for pnccd.FullFrameV1 type
+
+Tag: V00-04-06
+2012-06-26 Andy Salnikov
+- Encoder.DataV[12]: added value() method
+- regenerate whole thing from psddldata V00-03-05
+
+Tag: V00-04-05
+2012-06-22 Andy Salnikov
+- EvrData.EventCodeV5: one member method was incorrectly named
+- regenerate whole thing from psddldata V00-03-04
+
+Tag: V00-04-04
+2012-06-07 Andy Salnikov
+- special treatment necessary for Timepix::DataV1, see
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/158
+
+Tag: V00-04-03
+2012-06-03 Andy Salnikov
+- upgrading to pdsdata V03-07-07
+- regenerate whole thing from psddldata V00-03-03
+
+Tag: V00-04-02
+2012-05-11 Andy Salnikov
+- upgrading to pdsdata V03-07-00
+- regenerate whole thing from psddldata V00-03-02
+
+Tag: V00-04-01
+2012-05-03 Andy Salnikov
+- upgrading to pdsdata V03-06-00
+- regenerate whole thing from psddldata V00-03-01
+
+Tag: V00-04-00
+2012-05-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-03-00 with psddl V00-02-01
+
+Tag: V00-03-06
+2012-05-01 Andy Salnikov
+- regenerate whole thing from psddldata V00-02-04
+- new class epics.ConfigV1
+
+Tag: V00-03-05
+2012-03-27 Andy Salnikov
+- upgrading to pdsdata V03-04-01
+- regenerate whole thing from psddldata V00-02-03
+
+Tag: V00-03-04
+2012-03-14 Andy Salnikov
+- upgrading to pdsdata V03-03-01A
+- regenerate whole thing from psddldata V00-02-02
+
+Tag: V00-03-03
+2012-02-18 Andy Salnikov
+- forgot to add new Timepix::DataV2 class to XtcConverter
+
+Tag: V00-03-02
+2012-02-17 Andy Salnikov
+- upgrading to pdsdata V03-02-12
+- regenerate whole thing from psddldata V00-02-01
+
+Tag: V00-03-01
+2012-02-06 Andy Salnikov
+- adding forgotten cspad2x2.ddl.* files
+
+Tag: V00-03-00
+2012-02-06 Andy Salnikov
+- regenerate whole thing from psddldata V00-02-00
+- added support for cspad2x2 types
+
+Tag: V00-02-01
+2012-01-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-01-01 with psddl V00-01-02
+- new package timepix
+
+Tag: V00-02-00
+2011-12-09 Andy Salnikov
+- switching to ndarray
+- regenerate whole thing from psddldata V00-01-00 with psddl V00-01-00
+
+Tag: V00-01-06
+2011-11-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-14
+- new data types added to XtcConverter
+
+Tag: V00-01-05
+2011-10-05 Andy Salnikov
+- PSEnv::EpicsStore interface has changed to support multi-source
+  EPICS data, update client code here
+
+Tag: V00-01-04
+2011-10-04 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-13
+
+Tag: V00-01-03
+2011-09-12 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-12
+- added CsPad::MiniElementV1 to converter
+
+Tag: V00-01-02
+2011-08-29 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-11
+- added Bld::BldDataPimV1 to converter
+
+Tag: V00-01-01
+2011-08-22 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-10
+- added Princeton::ConfigV2 to converter
+
+Tag: V00-01-00
+2011-07-15 Andy Salnikov
+- PSEnv::ConfigStore renamed to PSEnv::EnvObjectStore, need to change 
+  few methods here
+
+Tag: V00-00-12
+2011-06-27 Andy Salnikov
+- implemented ordering of quadrants in CsPad
+
+Tag: V00-00-11
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-10
+2011-05-23 Andy Salnikov
+- catch DuplicateKey exceptions when adding stuff to event, print warning
+
+Tag: V00-00-09
+2011-04-26 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-08
+
+Tag: V00-00-08
+2011-04-07 Andy Salnikov
+- regenerated whole thing from psddldata V00-00-07
+
+Tag: V00-00-07
+2011-04-01 Andy Salnikov
+- fix for PNCCD::FrameV1 proxy instantiation
+
+Tag: V00-00-06
+2011-03-31 Andy Salnikov
+- regenerated whole thing after changes in psddl
+
+Tag: V00-00-05
+2011-03-30 Andy Salnikov
+- adding support for AcqTdcData type (unknown size data)
+- constructor definition is added manually (in acqiris.cpp)
+- EvtProxy changed to pass additional size parameter to constructor
+
+Tag: V00-00-04
+2011-03-28 Andy Salnikov
+- few changes in epics classes, regenerated epics.ddh.*
+- XtcConverter now adds epics data to environment
+
+Tag: V00-00-03
+2011-03-21 Andy Salnikov
+- ConfigStore::get() does not need template parameter
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- changes in the array member access code
+
+Tag: V00-00-01
+2011-03-21 Andy Salnikov
+- first import into svn
+- mostly working, but there will be updates no doubt
