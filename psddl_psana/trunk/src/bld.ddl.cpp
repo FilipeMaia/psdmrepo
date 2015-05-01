@@ -391,5 +391,8 @@ BldDataSpectrometerV0::~BldDataSpectrometerV0() {}
 
 BldDataSpectrometerV1::~BldDataSpectrometerV1() {}
 
+
+BldDataAnalogInputV1::~BldDataAnalogInputV1() {}
+
 } // namespace Bld
 } // namespace Psana

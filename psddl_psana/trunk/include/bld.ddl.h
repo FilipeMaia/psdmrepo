@@ -974,6 +974,23 @@ public:
      PV: TBD */
   virtual ndarray<const double, 1> FWHM() const = 0;
 };
+
+/** @class BldDataAnalogInputV1
+
+  Structure which contains voltage data from an analog input device.
+*/
+
+
+class BldDataAnalogInputV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_AnalogInput /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~BldDataAnalogInputV1();
+  /** The number of active channels on the analog input device. */
+  virtual uint32_t numChannels() const = 0;
+  /** Array of voltage values were each entry represents a channel of the analog input device. */
+  virtual ndarray<const double, 1> channelVoltages() const = 0;
+};
 } // namespace Bld
 } // namespace Psana
 #endif // PSANA_BLD_DDL_H
