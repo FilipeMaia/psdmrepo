@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-28
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
 Tag: V00-08-27
 2015-4-28 David Schneider
 - further modified xtc iterator to warn for large xtc extents, JIRA issue PSAS-141	

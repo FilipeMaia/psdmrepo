@@ -5159,6 +5159,20 @@ def Bld_BldDataSpectrometerV1_to_str(obj, indent, lvl, methodSep):
     methodStrings = [meth for meth in methodStrings if len(meth)>0]
     return methodSep.join(methodStrings)
 
+def Bld_BldDataAnalogInputV1_to_str(obj, indent, lvl, methodSep):
+    assert obj.TypeId == psana.Bld.BldDataAnalogInputV1.TypeId
+    assert obj.Version == psana.Bld.BldDataAnalogInputV1.Version
+    methodStrings = []
+    # one_line_methods
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'numChannels: %s' % uint32_to_str( obj.numChannels() )
+    methodStrings.append(methodStr)                                 
+    methodStr = doIndent(indent, lvl)
+    methodStr += 'channelVoltages: %s' % ndarray_to_str( obj.channelVoltages() )
+    methodStrings.append(methodStr)                                 
+    methodStrings = [meth for meth in methodStrings if len(meth)>0]
+    return methodSep.join(methodStrings)
+
 def Arraychar_DataV1_to_str(obj, indent, lvl, methodSep):
     assert obj.TypeId == psana.Arraychar.DataV1.TypeId
     assert obj.Version == psana.Arraychar.DataV1.Version
@@ -8001,6 +8015,7 @@ objFunctionTable = {
     (psana.Andor.FrameV1.TypeId,1) : Andor_FrameV1_to_str,
     (psana.Arraychar.DataV1.TypeId,1) : Arraychar_DataV1_to_str,
     (psana.Bld.BldDataAcqADCV1.TypeId,1) : Bld_BldDataAcqADCV1_to_str,
+    (psana.Bld.BldDataAnalogInputV1.TypeId,1) : Bld_BldDataAnalogInputV1_to_str,
     (psana.Bld.BldDataEBeamV0.TypeId,0) : Bld_BldDataEBeamV0_to_str,
     (psana.Bld.BldDataEBeamV1.TypeId,1) : Bld_BldDataEBeamV1_to_str,
     (psana.Bld.BldDataEBeamV2.TypeId,2) : Bld_BldDataEBeamV2_to_str,
