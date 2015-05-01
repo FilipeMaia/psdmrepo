@@ -57,6 +57,10 @@ TypeAliases::TypeAliases() {
   Alias.insert( & typeid(Psana::Alias::ConfigV1));
   m_alias2TypesMap["Alias"] = Alias;
 
+  TypeInfoSet AnalogInput;
+  AnalogInput.insert( & typeid(Psana::Bld::BldDataAnalogInputV1));
+  m_alias2TypesMap["AnalogInput"] = AnalogInput;
+
   TypeInfoSet Andor;
   Andor.insert( & typeid(Psana::Andor::ConfigV1));
   Andor.insert( & typeid(Psana::Andor::FrameV1));

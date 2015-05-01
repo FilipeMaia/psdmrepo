@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-30
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
 Tag: V00-02-29
 - fix bug with controlling ndarray chunking: JIRA PSAS-137
   save 'class' of type in writer map. use this to lookup which dataset

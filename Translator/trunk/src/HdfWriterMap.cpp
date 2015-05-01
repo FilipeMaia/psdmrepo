@@ -158,6 +158,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Andor::FrameV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Andor::FrameV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Arraychar::DataV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Arraychar::DataV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Bld::BldDataAcqADCV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataAcqADCV1> >(), DaqType);
+  m_mainMap[ & typeid(Psana::Bld::BldDataAnalogInputV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataAnalogInputV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV0) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV0> >(), DaqType);
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Bld::BldDataEBeamV2) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV2> >(), DaqType);
