@@ -509,6 +509,17 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataSpectrometerV1> >(Pds::TypeId::Id_Spectrometer));
 
   {
+  scope outer = 
+  class_<Psana::Bld::BldDataAnalogInputV1, boost::shared_ptr<Psana::Bld::BldDataAnalogInputV1>, boost::noncopyable >("BldDataAnalogInputV1", "Structure which contains voltage data from an analog input device.", no_init)
+    .def("numChannels", &Psana::Bld::BldDataAnalogInputV1::numChannels,"The number of active channels on the analog input device.")
+    .def("channelVoltages", &Psana::Bld::BldDataAnalogInputV1::channelVoltages,"Array of voltage values were each entry represents a channel of the analog input device.")
+  ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AnalogInput);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataAnalogInputV1> >(Pds::TypeId::Id_AnalogInput));
+
+  {
     PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataSpectrometerV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataSpectrometerV1"));
@@ -547,6 +558,12 @@ void createWrappers(PyObject* module) {
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataIpimbV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataIpimbV1"));
     PyObject_SetAttrString(submodule, "BldDataIpimb", unvlist);
+    Py_CLEAR(unvlist);
+  }
+  {
+    PyObject* unvlist = PyList_New(1);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataAnalogInputV1"));
+    PyObject_SetAttrString(submodule, "BldDataAnalogInput", unvlist);
     Py_CLEAR(unvlist);
   }
   {

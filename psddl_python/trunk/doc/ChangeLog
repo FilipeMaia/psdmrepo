@@ -11,6 +11,10 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-18
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
 Tag: V00-08-17
 2015-2-23 David Schneider
 - update to pdsdata 8.2.4 with EvrDataV4 and present function
