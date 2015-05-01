@@ -323,4 +323,17 @@
   @dataset peakHeight [[zero_dims]];
   @dataset FWHM [[zero_dims]];
 }
+
+//------------------ BldDataAnalogInputV1 ------------------
+/* Structure which contains voltage data from an analog input device. */
+@h5schema BldDataAnalogInputV1
+  [[version(0)]]
+{
+  @dataset data {
+    @attribute numChannels;
+  }
+  @dataset channelVoltages [[zero_dims]];
+}
+
+
 } //- @package Bld

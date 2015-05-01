@@ -1051,6 +1051,53 @@ void make_datasets(const Psana::Bld::BldDataSpectrometerV1& obj, hdf5pp::Group g
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
+
+namespace ns_BldDataAnalogInputV1_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataAnalogInputV1& psanaobj);
+  ~dataset_data();
+
+  uint32_t numChannels;
+
+
+};
+}
+
+
+class BldDataAnalogInputV1_v0 : public Psana::Bld::BldDataAnalogInputV1 {
+public:
+  typedef Psana::Bld::BldDataAnalogInputV1 PsanaType;
+  BldDataAnalogInputV1_v0() {}
+  BldDataAnalogInputV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~BldDataAnalogInputV1_v0() {}
+  virtual uint32_t numChannels() const;
+  virtual ndarray<const double, 1> channelVoltages() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Bld::ns_BldDataAnalogInputV1_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const double, 1> m_ds_channelVoltages;
+  void read_ds_channelVoltages() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAnalogInputV1> > make_BldDataAnalogInputV1(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataAnalogInputV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataAnalogInputV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Bld::BldDataAnalogInputV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
 } // namespace Bld
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_BLD_DDL_H

@@ -87,6 +87,10 @@ try {
       evt.putProxy(psddl_hdf2psana::Princeton::make_FrameV2(schema_version, group, idx, cfgPtr), src);
     }
     break;
+  case 78353934:
+    // Bld::BldDataAnalogInputV1
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataAnalogInputV1(schema_version, group, idx), src);
+    break;
   case 115545194:
     // Bld::BldDataPhaseCavity
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataPhaseCavity(schema_version, group, idx), src);

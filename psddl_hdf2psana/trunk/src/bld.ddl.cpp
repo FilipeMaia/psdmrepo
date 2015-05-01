@@ -2992,5 +2992,153 @@ void store_at(const Psana::Bld::BldDataSpectrometerV1* obj, hdf5pp::Group group,
   store_BldDataSpectrometerV1(obj, group, index, version, true);
 }
 
+
+hdf5pp::Type ns_BldDataAnalogInputV1_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataAnalogInputV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("numChannels", offsetof(DsType, numChannels), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataAnalogInputV1_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataAnalogInputV1_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataAnalogInputV1_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataAnalogInputV1_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("numChannels", offsetof(DsType, numChannels), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataAnalogInputV1_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataAnalogInputV1_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataAnalogInputV1_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataAnalogInputV1_v0::dataset_data::dataset_data(const Psana::Bld::BldDataAnalogInputV1& psanaobj)
+  : numChannels(psanaobj.numChannels())
+{
+}
+
+ns_BldDataAnalogInputV1_v0::dataset_data::~dataset_data()
+{
+}
+uint32_t BldDataAnalogInputV1_v0::numChannels() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->numChannels);
+}
+ndarray<const double, 1> BldDataAnalogInputV1_v0::channelVoltages() const {
+  if (m_ds_channelVoltages.empty()) read_ds_channelVoltages();
+  return m_ds_channelVoltages;
+}
+void BldDataAnalogInputV1_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataAnalogInputV1_v0::dataset_data>(m_group, "data", m_idx);
+}
+void BldDataAnalogInputV1_v0::read_ds_channelVoltages() const {
+  if (not m_group.hasChild("channelVoltages")) {
+    m_ds_channelVoltages = ndarray<double, 1>();
+    return;
+  }
+  m_ds_channelVoltages = hdf5pp::Utils::readNdarray<double, 1>(m_group, "channelVoltages", m_idx);
+}
+
+void make_datasets_BldDataAnalogInputV1_v0(const Psana::Bld::BldDataAnalogInputV1& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataAnalogInputV1_v0::dataset_data::stored_type();
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.channelVoltages()) PsanaArray;
+    const PsanaArray& psana_array = obj.channelVoltages();
+    if (psana_array.size() > 0) {
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<double>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Utils::createDataset(group, "channelVoltages", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+    }
+  }
+}
+
+void store_BldDataAnalogInputV1_v0(const Psana::Bld::BldDataAnalogInputV1* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Bld::ns_BldDataAnalogInputV1_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+  }
+  if (group.hasChild("channelVoltages")) {
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "channelVoltages", obj->channelVoltages(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "channelVoltages", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "channelVoltages", obj->channelVoltages());
+  }
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAnalogInputV1> > make_BldDataAnalogInputV1(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataAnalogInputV1> >(boost::make_shared<BldDataAnalogInputV1_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataAnalogInputV1> >(boost::shared_ptr<Psana::Bld::BldDataAnalogInputV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataAnalogInputV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_BldDataAnalogInputV1_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataAnalogInputV1", version);
+  }
+}
+
+void store_BldDataAnalogInputV1(const Psana::Bld::BldDataAnalogInputV1* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_BldDataAnalogInputV1_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataAnalogInputV1", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataAnalogInputV1& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataAnalogInputV1(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Bld::BldDataAnalogInputV1* obj, hdf5pp::Group group, long index, int version)
+{
+  store_BldDataAnalogInputV1(obj, group, index, version, true);
+}
+
 } // namespace Bld
 } // namespace psddl_hdf2psana
