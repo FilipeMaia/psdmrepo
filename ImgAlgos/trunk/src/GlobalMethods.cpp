@@ -342,7 +342,7 @@ DETECTOR_TYPE detectorTypeForStringSource(const std::string& str_src)
 
 //--------------------
 
-DETECTOR_TYPE detectorTypeForSource(PSEvt::Source& src)
+DETECTOR_TYPE detectorTypeForSource(const PSEvt::Source& src)
 { 
   std::stringstream ss; ss << src;
   return detectorTypeForStringSource(ss.str());
@@ -368,6 +368,29 @@ std::string calibGroupForDetType(const DETECTOR_TYPE det_type)
   else if ( det_type == EPIX      ) return "Epix::CalibV1";
   else if ( det_type == EPIX100A  ) return "Epix100a::CalibV1";
   else if ( det_type == EPIX10K   ) return "Epix10k::CalibV1";
+  else                              return std::string(); 
+}
+
+//--------------------
+
+std::string stringForDetType(const DETECTOR_TYPE det_type)
+{ 
+  if      ( det_type == CSPAD     ) return "CSPAD";
+  else if ( det_type == CSPAD2X2  ) return "CSPAD2x2";
+  else if ( det_type == PNCCD     ) return "PNCCD";
+  else if ( det_type == PRINCETON ) return "Princeton";
+  else if ( det_type == ACQIRIS   ) return "Acqiris";
+  else if ( det_type == TM6740    ) return "Camera-TM6740";
+  else if ( det_type == OPAL1000  ) return "Camera-OPAL1000";
+  else if ( det_type == OPAL2000  ) return "Camera-OPAL2000";
+  else if ( det_type == OPAL4000  ) return "Camera-OPAL4000";
+  else if ( det_type == OPAL8000  ) return "Camera-OPAL5000";
+  else if ( det_type == ANDOR     ) return "Andor";
+  else if ( det_type == ORCAFL40  ) return "Camera-ORCAFL40";
+  else if ( det_type == FCCD960   ) return "Camera-FCCD960";
+  else if ( det_type == EPIX      ) return "Epix";
+  else if ( det_type == EPIX100A  ) return "Epix100a";
+  else if ( det_type == EPIX10K   ) return "Epix10k";
   else                              return std::string(); 
 }
 

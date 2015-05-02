@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-85
+2015-05-01 Mikhail S. Dubrovin
+- GlobalMethods - add method stringForDetType, add const in detectorTypeForSource
+	
 Tag: V00-03-84
 2015-04-24 Mikhail S. Dubrovin
 - NDArrDropletFinder - add parameters mask and masked_value (PSAS-68)

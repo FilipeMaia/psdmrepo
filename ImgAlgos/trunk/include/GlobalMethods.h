@@ -197,8 +197,9 @@ private:
   bool file_exists(std::string& fname);
   std::string srcToString( const Pds::Src& src ); // convert source address to string
   DETECTOR_TYPE detectorTypeForStringSource(const std::string& str_src);
-  DETECTOR_TYPE detectorTypeForSource(PSEvt::Source& src);
+  DETECTOR_TYPE detectorTypeForSource(const PSEvt::Source& src);
   std::string calibGroupForDetType(const DETECTOR_TYPE det_type);
+  std::string stringForDetType(const DETECTOR_TYPE det_type);
   std::string calibGroupForSource(PSEvt::Source& src);
   std::string split_string_left(const std::string& s, size_t& pos, const char& sep=':');
   std::string strDataType(const DATA_TYPE& dtype);
