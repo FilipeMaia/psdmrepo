@@ -23,6 +23,8 @@
 
 #include "ImgAlgos/GlobalMethods.h" // for DETECTOR_TYPE, getRunNumber(evt), etc.
 #include "PSCalib/CalibPars.h"
+#include "pytopsana/NDArrProducerStore.h"
+//#include "pytopsana/NDArrProducerCSPAD.h"
 
 //-------------------
 namespace pytopsana {
@@ -61,44 +63,55 @@ class Detector {
   typedef PSCalib::CalibPars::pixel_status_t  pixel_status_t;
   typedef PSCalib::CalibPars::common_mode_t   common_mode_t;
 
+  typedef NDArrProducerCSPAD::data_t          data_i16_t;  
+
   // Default constructor
-  Detector (const PSEvt::Source src, const unsigned& prbits=0x0) ; // 0xffff
+  Detector (const PSEvt::Source& source, const unsigned& prbits=0x0) ; // 0xffff
   
   // Destructor
   virtual ~Detector () ;
 
-  ndarray<const pedestals_t,1>    pedestals   (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const pixel_rms_t,1>    pixel_rms   (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const pixel_gain_t,1>   pixel_gain  (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const pixel_mask_t,1>   pixel_mask  (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const pixel_bkgd_t,1>   pixel_bkgd  (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const pixel_status_t,1> pixel_status(boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
-  ndarray<const common_mode_t,1>  common_mode (boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
+  ndarray<const pedestals_t,1>    pedestals   (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const pixel_rms_t,1>    pixel_rms   (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const pixel_gain_t,1>   pixel_gain  (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const pixel_mask_t,1>   pixel_mask  (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const pixel_bkgd_t,1>   pixel_bkgd  (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const pixel_status_t,1> pixel_status(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const common_mode_t,1>  common_mode (boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
   
 //-------------------
+
+  ndarray<const int16_t, 1>       data_int16_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 2>       data_int16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 3>       data_int16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 4>       data_int16_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+
 //-------------------
 //-------------------
 //-------------------
 
   // Return 3D NDarray of raw detector data
-  ndarray<data_t,3> raw(PSEvt::Source src, boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);  
+  ndarray<data_t,3> raw(PSEvt::Source source, boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);  
   
   // Return 3D NDarray of calibrated detector data
-  ndarray<double,3> calib(PSEvt::Source src, boost::shared_ptr<PSEvt::Event> evt, boost::shared_ptr<PSEnv::Env> env);
+  ndarray<double,3> calib(PSEvt::Source source, boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
   ndarray<double,3> calib(ndarray<data_t,3> raw_data);
 
   // Returns instrument as string
-  std::string str_inst(boost::shared_ptr<PSEnv::Env> env);  
+  std::string str_inst(boost::shared_ptr<PSEnv::Env> shp_env);  
   
  private:
 
    ImgAlgos::DETECTOR_TYPE m_dettype;          // numerated detector type source
    PSCalib::CalibPars*     m_calibpars;        // pointer to calibration store
-   PSEvt::Source           m_src;
+   PSEvt::Source           m_source;
    std::string             m_str_src;
    std::string             m_cgroup;
    int                     m_runnum;
    unsigned                m_prbits; 
+
+   //NDArrProducerCSPAD*     m_nda_prod;
+   NDArrProducerBase*      m_nda_prod;
 
    //   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
    //   const PSCalib::CalibPars::pixel_gain_t*    m_gain_data;
@@ -110,8 +123,10 @@ class Detector {
 
    //const pedestals_t* m_peds_data;
 
-   void initCalibStore(PSEvt::Event& evt, PSEnv::Env& env);
    inline const char* _name_(){return "Detector";}
+
+   void initCalibStore(PSEvt::Event& evt, PSEnv::Env& env);
+   void initNDArrProducer(const PSEvt::Source& source);
 };
 
 //-------------------
