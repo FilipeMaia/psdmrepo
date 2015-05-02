@@ -1,0 +1,878 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ImgAlgos
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-03-85
+2015-05-01 Mikhail S. Dubrovin
+- GlobalMethods - add method stringForDetType, add const in detectorTypeForSource
+	
+Tag: V00-03-84
+2015-04-24 Mikhail S. Dubrovin
+- NDArrDropletFinder - add parameters mask and masked_value (PSAS-68)
+	
+Tag: V00-03-83
+2015-04-14 Mikhail S. Dubrovin
+- NDArrCalib - add method printMaskAndBkgd(), use m_is_done_once as member data in stead of static
+	
+Tag: V00-03-82
+2015-03-20 Mikhail S. Dubrovin
+- PixCoordsProducer - move calls of savePixCoordsInCalibStore(env) in checkCalibPars(...) (PSAS-11)
+	
+Tag: V00-03-81
+2015-03-12 Mikhail S. Dubrovin
+- add module EventCodeFilter (PSAS-122)
+
+Tag: V00-03-80
+2015-03-10 Mikhail S. Dubrovin
+- ImgSaveInFile - constrain the number of messages about missing data
+	
+Tag: V00-03-79
+2015-01-27 Mikhail S. Dubrovin
+- NDArrAverage, GlobalMethods - re-factoring templated code.
+
+Tag: V00-03-78
+2015-01-27 Mikhail S. Dubrovin
+- NDArrCalib - add parameter outtype to save calibrated ndarray in double(def), float, int, int16 (PSAS-95)
+	
+Tag: V00-03-77
+2015-01-13 Mikhail S. Dubrovin
+- NDArrDropletFinder - parameter value, control on print out etc. (PSAS-68)
+- AlgSmearing - add parameter value for base intensity level
+- AlgDroplet.h - add comments 
+- add data/PlotNDArrayAndPeaks.py
+- GlobalMethods.h - add parameter print_bits in the method saveNDArrayInFile
+	
+Tag: V00-03-76 
+2015-01-09 Mikhail S. Dubrovin
+- NDArrImageProducer - add parameters
+	mode - for mapping algorithm of ndarray to 2-D image
+	do_tilt - on/off tilt angle correction for sensors (PSAS-11)
+- NDArrDropletFinder - add saving image and droplets/peaks in files for test purpose (PSAS-68)
+
+DO NOT TAG BEFORE VACATION
+
+2014-12-16 Mikhail S. Dubrovin
+- In GlobalMethods.h add method saveNDArrayInEvent
+- AlgSmearing, AlgDroplet - bring them to production shape; organize output control by pbits, add doxy-doc.
+- NDArrDropletFinder - organize output control, save smeared ndarray in the event store (PSAS-68)
+	
+2014-12-12 Mikhail S. Dubrovin
+- NDArrDropletFinder, AlgDroplet, AlgSmearing - test version of the NDArrDropletFinder, update data/*.py scripts
+
+Tag: V00-03-75
+2014-12-11 Mikhail S. Dubrovin
+- CameraImageProducer.h - change gain factors for Fccd960 (PSAS-44)
+
+Tag: V00-03-74
+2014-12-11 Mikhail S. Dubrovin
+- in CameraImageProducer.h, PrincetonImageProducer.h, GlobalMethods.h, AndorImageProducer.h,
+  GlobalMethods.cpp, NDArrDropletFinder.cpp, NDArrImageProducer.cpp, NDArrAverage.cpp,
+  NDArrCalib.cpp, ImgAverage.cpp, ImgCalib.cpp - put warning messages about missing 
+  data under control of print_bits (PSAS-83)
+- add NDArrDropletFinder - non-copleted psana module (PSAS-68)
+- in GlobalMethods add dataType() and strDataType() methods
+
+Tag: V00-03-73
+2014-12-03 Mikhail S. Dubrovin
+- Implementation of common mode correction for Epix100a (PSAS-7) and Fccd960 (PSAS-44) 
+- CommonMode::medianInRegion is implemented as ami/event/FrameCalib::median
+- NDArrCalib::findDetectorType now uses GlobalMethods::detectorTypeForSource
+- NDArrCalib.h - add do_common_mode_median, re-organize do_common_mode
+ 	
+Tag: V00-03-72
+2014-11-25 Mikhail S. Dubrovin
+- CommonMode - fixesd for RHEL6
+	
+Tag: V00-03-71
+2014-11-25 Mikhail S. Dubrovin
+- add AlgSmearing, AlgDroplet, (PSAS-68) CommonMode 
+- move common mode correction algorithms from GlobalMethods.h to CommonMode.h
+- in NDArrCalib and CommonMode add common mode support for Epix100a (PSAS-7)
+
+Tag: V00-03-70
+2014-11-13 Mikhail S. Dubrovin
+- NDArrCalib.cpp - move conditional printCalibPars() after constants loading (PSAS-44)
+	
+Tag: V00-03-69
+2014-11-11 Mikhail S. Dubrovin
+- NDArrCalib.cpp - improve all info printout under control of print_bits (PSAS-44) 
+	
+Tag: V00-03-68
+2014-11-10 Mikhail S. Dubrovin
+- CameraImageProducer - For FCCD960 apply gain-bit factor 1,2,8 if outtype!='asdata' (PSAS-44)
+	
+Tag: V00-03-67
+2014-11-06 Mikhail S. Dubrovin
+- GlobalMethods(.h,.cpp) - support for EPIX, EPIX100A, EPIX10K (PSAS-7, PSAS-11)
+- NDArrImageProducer.cpp - extend prbits for all bits from 0377 for 0177777
+
+Tag: V00-03-66
+2014-11-03 Mikhail S. Dubrovin
+- EpixNDArrProducer - add support for Epix::ElementV2 and Epix::Config100aV1 (see PSAS-7)
+	
+Tag: V00-03-65
+2014-10-17 Mikhail S. Dubrovin
+- add NDArrImageProducer
+- GlobalMethods - add support for FCCD960, fix bug in calibGroupForDetType()
+	
+Tag: V00-03-64
+2014-10-07 Mikhail S. Dubrovin
+- PixCoordsProducer
+  - save geometry file name as a string (as ndarray<char,1> - is depricated but still available)
+  - add saving mask for edge and unbound pixels
+  - add x,y origin offsets for indexing 
+	
+Tag: V00-03-63
+2014-09-27 Mikhail S. Dubrovin
+- in PixCoordsProducer - check and savePixCoordsInCalibStore(env) in all callbacks
+
+Tag: V00-03-62
+2014-09-23 Mikhail S. Dubrovin
+- add EpixNDArrProducer
+	
+Tag: V00-03-61
+2014-09-11 Mikhail S. Dubrovin
+- in PixCoordsProducer save pixel coordinate and index arrays in env.calibStore() in stead of evt,
+	+ add key_fname and save path to "geometry" calibration file
+
+Tag: V00-03-60
+2014-09-02 Mikhail S. Dubrovin
+- in PixCoordsProducer add new keyword-parameters which allows to get pixel area and index iX, iY arrays for image
+
+Tag: V00-03-59
+2014-08-29 Mikhail S. Dubrovin
+- add PixCoordsProducer, add methods in GlobalMethods
+
+Tag: V00-03-58
+2014-08-29 Mikhail S. Dubrovin
+- in ImgPeakFinder add saving in the event store info about peaks as ndarray if m_key_peaks_nda is non-empty
+	
+Tag: V00-03-57
+2014-08-27 Mikhail S. Dubrovin
+- in ImgPeakFinder implicetly increase vector reserved capacity when it is exceeded
+	
+Tag: V00-03-56
+2014-07-31 Mikhail S. Dubrovin
+- remove leftover GeometryObject.cpp
+	
+Tag: V00-03-55
+2014-07-30 Mikhail S. Dubrovin
+- move modules GeometryAccess, GeometryObject, and test/ex_geometry_access.cpp from ImgAlgos to PSCalib in order to get rid of cyclic dependences between packages ImgAlgos and CSPadPixCoords
+	
+Tag: V00-03-54
+2014-07-28 Mikhail S. Dubrovin
+- AcqirisArrProducer - add print_bits = 16
+
+Tag: V00-03-53
+2014-07-28 Mikhail S. Dubrovin
+- AcqirisArrProducer - add on/off switch correct_t for waveform time correction
+	
+Tag: V00-03-52
+2014-07-18 Mikhail S. Dubrovin
+- add GeometryObject, GeometryAccess, and test/ex_geometry_access.cpp
+- NDArrAverage - add evaluation and save "maxfile"
+
+Tag: V00-03-51
+2014-07-03 Mikhail S. Dubrovin
+- NDArrAverage.cpp, GlobalMethods - constrain output
+
+Tag: V00-03-50
+2014-07-02 Mikhail S. Dubrovin
+- NDArrCalib - do not print common mode parameters for print_bits=4 if they are not defined, do_cmod=no
+- CSPadArrPeakAnalysis - get rid of root dependency, histogram, and n-tuple by Igor's request. Module prints peak info only.
+
+Tag: V00-03-49
+2014-06-29 Mikhail S. Dubrovin
+- NDArrAverage - add parameter ftype (=txt by def.) and option to save ndarray in file with metadata when ftype=metatxt 
+- GlobalMethods.h in saveNDArrayInFile add ndarray saving for file_type == METADTEXT using pdscalibdata::NDArrIOV1
+	
+Tag: V00-03-48
+2014-06-24 Mikhail S. Dubrovin
+- in CSPadArrPeakFinder add saving peaks in ndarray<const float,2> shape={Npeaks,12}
+	
+Tag: V00-03-47
+2014-06-17 Mikhail S. Dubrovin
+- fix doc/ChangeLog
+
+Tag: V00-03-46
+2014-06-16 Mikhail S. Dubrovin
+-in ImgCalib - add processing for int16_t, constrain number of printed warnings
+-in NDArrCalib - constrain number of printed warnings
+-add EventCounterFilter
+
+Tag: V00-03-45
+2014-06-13 Mikhail S. Dubrovin
+- clean-up messages for missing data
+
+Tag: V00-03-44
+2014-06-09 Mikhail S. Dubrovin
+- in UsdUsbEncoderFilter add nsec in time stamp
+
+Tag: V00-03-43
+2014-06-09 Mikhail S. Dubrovin
+- add UsdUsbEncoderFilter
+- add data/mask_cspad_2x1_edges.py	
+
+Tag: V00-03-42
+2014-05-28 Mikhail S. Dubrovin
+- fix include/NDArrAverage.h - the non-const ndarray was not checked because of duplication of if(ndim==2)
+- NDArrCalib.cpp - do not load calibration parameters if they are not used
+	
+Tag: V00-03-41
+2014-05-06 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
+Tag: V00-03-40
+2014-04-29 Mikhail S. Dubrovin
+- NDArrCalib.h - use ndarray to keep output data unchanged in event store
+- GlobalMethods.h add methods save<n>DArrayInEvent(...), for n = 1,3,4,5, fix doxy doc. 
+- PnccdImageProducer.h - cosmetic
+- AndorImageProducer.h - cosmetic 
+- src/SvnProps.py - add the par "updated" 
+
+Tag: V00-03-39
+2014-04-18 Mikhail S. Dubrovin
+- ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files
+- add src/SvnProps.py
+	
+Tag: V00-03-38
+2014-03-28 Mikhail S. Dubrovin
+- in NDArrCalib.h call common mode correction methods depending on 1-st parameter in common_mode calib file.
+	3 algorithms are implemented
+	1 - Andy's - common mode peak finding from GlobalMethods.h
+	2, 3 - Phil's - Mean and Median from psalg package
+- in NDArrCalib.cpp add m_dtype = INT16
+
+Tag: V00-03-37
+2014-03-21 Mikhail S. Dubrovin
+- in all modules except Acquiris* 
+   -  all ndarr<T,Ndim> are replaced by ndarr<const T,Ndim> in evt.put(...) methods
+   -  along with
+          ndarr<T,Ndim> = get.evt(...) also check
+	  ndarr<const T,Ndim> = get.evt(...)
+- add ExampleDumpImg
+	
+Tag: V00-03-36
+2014-03-08 Mikhail S. Dubrovin
+- in PnccdImageProducer introduce two gap parameters in rows and cols in stead of one
+
+Tag: V00-03-35
+2014-03-07 Mikhail S. Dubrovin
+- in NDArrAverage add automatic evaluation of threshold on rms for evaluation of hot pixels.
+
+Tag: V00-03-34
+2014-03-06 Mikhail S. Dubrovin
+- in NDArrCalib and GlobalMethods - Andy's common mode correction is implemented for CSPAD and CSPAD2x2
+- in NDArrAverage.cpp - status mask bits are distinguishable now; 0-good, 1-hot(too big rms), 2-satturated(too big ave), 3-cold(too small ave)   
+
+Tag: V00-03-33
+2014-03-05 Mikhail S. Dubrovin
+- in NDArrCalib - work in progress for common mode implementation for cspads
+
+Tag: V00-03-32
+2014-02-14 Mikhail S. Dubrovin
+- in PnccdNDArrProducer and PnccdImageProducer hide warnings under print_bits control	
+
+Tag: V00-03-31
+2014-02-09 Mikhail S. Dubrovin
+- in NDArrCalib - use for n*rms threshold calibration parameters from pixel_rms
+	
+Tag: V00-03-30
+2014-02-07 Mikhail S. Dubrovin
+- NDArrCalib - full functional peds, common mode, pixel_status, mask, gain, background, threshold (const and rms)
+	
+Tag: V00-03-29
+2014-02-05 Mikhail S. Dubrovin
+- add NDArrCalib - 1st working version w/o common mode correction
+
+Tag: V00-03-28
+2014-01-31 Mikhail S. Dubrovin
+- add PnccdNDArrProducer
+- modify PnccdImageProducer, add image production from ndarray<T,3>
+- other small cosmetic things	
+	
+Tag: V00-03-27
+2014-01-17 Mikhail S. Dubrovin
+- add AndorImageProducer
+- in ImgSaveInFile add  save2DArrayInFileForType <unsigned short>
+
+Tag: V00-03-26
+2014-01-15 Mikhail S. Dubrovin
+- in ImgSaveInFile commented: // throw std::runtime_error(msg); WARNING will be printed
+	
+Tag: V00-03-25
+2014-01-13 Andy
+- add some parens to avoid compiler warnings (gcc44)
+
+2013-12-20 Mikhail S. Dubrovin
+- in NDArrAverage in case of 2d array print for parser: BATCH_IMG_ROWS and BATCH_IMG_COLS
+	
+Tag: V00-03-24
+2013-12-12 Mikhail S. Dubrovin
+- in NDArrAverage add printStatBadPix()
+
+Tag: V00-03-23
+2013-12-10 Mikhail S. Dubrovin
+- update data/*.py scripts
+
+Tag: V00-03-22
+2013-12-10 Mikhail S. Dubrovin
+- add module NDArrAverage
+- add in GlobalMethods methods saveNDArrayInFile, defineNDArrParsForType, etc.
+
+Tag: V00-03-21
+2013-11-19 Mikhail S. Dubrovin
+- in CameraImageProducer, ImgAverage, and GlobalMethods:
+	- separate counters for images and events 
+	- correct processing in case if image is missing in the 1st event
+	- set limit on number of warning messages < 100
+
+Tag: V00-03-20
+2013-11-18 Mikhail S. Dubrovin
+- in src/ImgAverage.cpp - do not add the run number for file name extention ".txt"
+- in ImgAverage and GlobalMethods - do correct initialization and image counting 
+       if images are not presented in all events. 
+	
+Tag: V00-03-19
+2013-11-14 Christopher O'Grady
+- add AcqirisCFD, 
+- in AcqirisArrProducer - improve time indexing
+
+Tag: V00-03-18
+2013-11-12 Mikhail S. Dubrovin
+- in include/GlobalMethods.h add int16 to save in tiff
+
+2013-11-10 Christopher O'Grady
+- in AcqirisAverage - add lists of parameters for signal polarity and type of selection acqiris chanels
+	
+Tag: V00-03-17
+2013-11-01 Mikhail S. Dubrovin
+- the 1st version of the 3-module project for Acqiris is ready: AcqirisArrProducer, AcqirisAverage, and AcqirisCalib
+- in Tahometer - define m_str_runnum in the beginRun, because the run number is not defined in engJob...
+	
+2013-10-30 Mikhail S. Dubrovin
+- add AcqirisAverage and AcqirisCalib
+
+2013-10-26 Mikhail S. Dubrovin
+- add AcqirisArrProducer
+- in GlobalMethods add stringInstrument, stringExperiment, stringExpNum, expNum, aveTextInFile, 
+
+2013-10-10 Mikhail S. Dubrovin
+- in ImgHitFinder k_val_def_u/d move from class to namespace with const: const double k_val_def_d = ...; 
+	
+Tag: V00-03-16
+2013-10-09 Mikhail S. Dubrovin
+- in ImgHitFinder k_val_def_u/d - remove const static - to make happy builder in dbg mode
+
+Tag: V00-03-15
+2013-10-08 Mikhail S. Dubrovin
+- add module ImgHitFinder by request of Brendan Murphy, amo74213
+- add but not use global methods GlobalHitFinder
+- modify ImgAverage to have an output image with sum of amplitudes over all events
+	
+Tag: V00-03-14
+2013-08-30 Mikhail S. Dubrovin
+- modified modules:
+       include/CorAnaData.h
+       include/GlobalMethods.h
+       include/ImgVsTimeSplitInFiles.h
+       src/CorAnaData.cpp
+       src/GlobalMethods.cpp
+       src/ImgAverage.cpp
+
+Tag: V00-03-13
+2013-06-07 Mikhail S. Dubrovin
+- minor improvement of scripts in ImgAlgos/data/ directory 
+	
+Tag: V00-03-12
+2013-06-03 Mikhail S. Dubrovin
+- Code re-factoring;
+- move common stuff from modules CSPadArrAverage, CSPadArrNoise, CSPadArrSaveInFile to CSPadBaseModule
+- for other CSPad* modules use some of common things from CSPadBaseModule	
+- add more protection in python scripts in ImgAlgos/data/ directory
+
+Tag: V00-03-11
+2013-05-21 Mikhail S. Dubrovin
+- improvements in ImgAverage.cpp
+- in ImgSaveInFile add more data types for input array
+
+Tag: V00-03-10
+2013-05-02 Mikhail S. Dubrovin
+- in GlobalMethods.h add saving in TIFF for double, float, int, uint8_t
+	saving in PNG works for uint16_t and uint8_t only... 
+	(glitch in boost::gil library, where png_write_view does not work with other image formats...)
+
+Tag: V00-03-09
+2013-04-30 Mikhail S. Dubrovin
+M       include/ImgSaveInFile - add saving of image in BIN, TIFF, PNG formats. 
+M       include/GlobalMethods.h - add global method for image saving 
+M       SConscript - add  LIBS="... png tiff"
+
+Tag: V00-03-08
+2013-04-04 Mikhail S. Dubrovin
+- add ImgIntForBins module
+
+Tag: V00-03-07	
+2013-04-01 Mikhail S. Dubrovin
+- in IntensityMonitorsData and ImgIntMonCorr 
+	get calibrated data from Psana::Lusi::IpmFexV1 in stead of raw
+
+Tag: V00-03-06	
+2013-03-24 Mikhail S. Dubrovin
+- in CorAna add print for event index vs tau index
+	
+Tag: V00-03-05	
+2013-03-22 Mikhail S. Dubrovin
+- for CorAna project make correct exchange between types in different modules:
+M       include/ImgCalib.h
+M       include/GlobalMethods.h
+M       include/ImgIntMonCorr.h
+M       include/ImgVsTimeSplitInFiles.h
+M       src/ImgCalib.cpp
+M       src/ImgParametersV1.cpp
+M       src/PrincetonImageProducer.cpp
+M       src/GlobalMethods.cpp
+M       src/ImgVsTimeSplitInFiles.cpp
+M       src/CorAnaData.cpp	
+
+2013-03-18 Mikhail S. Dubrovin
+- add ImgIntMonCorr - not finished yet. 
+- in IntensityMonitorsData - restracturization; now it accepts input intensity monitor sources in any order.
+	
+Tag: V00-03-04	
+2013-03-15 Mikhail S. Dubrovin
+- in ImgAverage add evaluation of the hot-pixel mask. Pixel is hot if its rms > threshold.
+
+Tag: V00-03-03	
+2013-03-08 Andy Salnikov
+- removed unused variable to suppress comilation warnings
+
+Tag: V00-03-02	
+2013-03-08 Mikhail S. Dubrovin
+- In ImgCalib add do_threshold switch to On/Off low level threshold
+- In ImgParametersV1 improve print() method
+	
+Tag: V00-03-01	
+2013-03-07 Mikhail S. Dubrovin
+- add N*RMS-dependent threshold, make type of output data equal to type of input data 
+M       include/ImgCalib.h
+M       src/ImgCalib.cpp
+- add scale factor for input array
+M       include/ImgParametersV1.h
+M       src/ImgParametersV1.cpp
+- add more types for recognition in 
+M       include/ImgMaskEvaluation.h
+M       src/ImgMaskEvaluation.cpp
+	
+Tag: V00-03-00
+2013-03-05 Andy Salnikov
+- fixing issues with ndarray data ownership
+- save2DArrayInEvent() now accepts ndarray instead of data pointer
+- replaced data pointers with ndarrays in few modules
+
+Tag: V00-02-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays for array data
+
+Tag: V00-01-03
+2013-01-28 Andy Salnikov
+- update relates to changes in ndarray constness
+- replace configStr() with configSrc() where possible
+
+Tag: V00-01-02
+2013-01-25 Andy Salnikov
+- fixing namespace issues
+
+Tag: V00-01-01
+2012-12-11 Andy Salnikov
+- bug fix for my last changes:
+  - CSPadArrPeakFinder::beginRun() method did a bit more that others
+  - source address printed at the beingJob() should be using configured
+    source instead of discovered source
+
+Tag: V00-01-00
+2012-11-29 Andy Salnikov
+- small-scale refactoring, new base class CSPadBaseModule added which
+  contains code common to many cspad modules; those modules were 
+  re-implmented using CSPadBaseModule instead of Module for base
+- make sure that evt.get() is always called with Source and not string
+
+Tag: V00-00-??
+==============
+2012-11-28 Mikhail S. Dubrovin
+- Add/modify modules
+A       include/IntensityMonitorsData.h
+A       src/IntensityMonitorsData.cpp
+	
+2012-11-21 Mikhail S. Dubrovin
+- Add/modify modules
+A       include/ImgTimeStampList.h
+A       src/ImgTimeStampList.cpp
+M       src/Tahometer.cpp
+
+2012-11-18 Mikhail S. Dubrovin
+- Modify modules - add summary print for parser
+M       include/Tahometer.h
+M       src/Tahometer.cpp
+	
+2012-11-06 Mikhail S. Dubrovin
+- Add/modify modules - add other data types for image processing: int, float, uint16_t, uint8_t, etc.
+M       include/ImgAverage.h
+M       include/ImgMaskEvaluation.h
+M       src/ImgMaskEvaluation.cpp
+M       src/ImgAverage.cpp
+M       src/GlobalMethods.cpp
+	
+2012-10-12 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+M       include/ImgCalib.h - add low implementation for low threshold
+M       src/ImgCalib.cpp            
+A       include/ImgMaskEvaluation.h - evaluation of the dynamic masks for saturated and noisy pixels 
+A       src/ImgMaskEvaluation.cpp
+	
+Tag: V00-00-19
+2012-10-02 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+A       app/corana_procres.cpp
+M       app/corana_submit
+M       include/CorAnaMergeFiles.h
+A       include/CorAnaProcResults.h
+M       src/CorAnaPars.py
+M       src/CorAnaSubmit.py
+M       src/CorAnaMergeFiles.cpp
+A       src/CorAnaProcResults.cpp
+D       test/corana_merge.cpp
+D       test/corana.cpp
+A  +    app/corana_merge.cpp
+A  +    app/corana.cpp
+M       src/CorAnaSubmit.py
+A       data/PlotCorAnaResults.py
+A       data/psana-xcsi0112-r0015-img-auto-correlation.cfg
+	
+2012-09-26 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+A       app
+A       app/corana_submit.py
+M       include/CorAna.h
+A       src/CorAnaPars.py
+M       src/CorAna.cpp
+A       src/CorAnaSubmit.py	
+M       src/GlobalMethods.cpp
+M       src/ImgVsTimeSplitInFiles.cpp
+M       include/GlobalMethods.h
+M       include/ImgVsTimeSplitInFiles.h
+	
+Tag: V00-00-18
+2012-09-22 Andy Salnikov
+- fix compilation errors and warnings on RHEL6/gcc44
+
+Tag: V00-00-17
+2012-09-17 Mikhail S. Dubrovin
+- Add modules for extraction of spectral array from image	
+A         include/ImgSpectraProc.h
+A         include/ImgSpectra.h
+A         src/ImgSpectra.cpp
+A         src/ImgSpectraProc.cpp
+	
+2012-09-14 Mikhail S. Dubrovin
+- Add/modify modules for image correlation analysis
+A       test/corana_merge.cpp
+M       test/corana.cpp
+A       include/CorAnaMergeFiles.h
+M       include/CorAnaData.h
+A       include/CorAna.h
+A       src/CorAna.cpp
+A       src/CorAnaMergeFiles.cpp
+M       src/CorAnaData.cpp
+
+2012-09-07 Mikhail S. Dubrovin
+- Add modules for image correlation analysis
+A       include/CorAnaInputParameters.h
+A       include/CorAnaData.h
+A       src/CorAnaInputParameters.cpp
+A       src/CorAnaData.cpp
+A       test
+A       test/corana.cpp
+A       include/ImgVsTimeSplitInFiles.h
+A       src/ImgVsTimeSplitInFiles.cpp
+M       src/PrincetonImageProducer.cpp
+M       src/ImgSaveInFile.cpp
+M       src/GlobalMethods.cpp
+M       include/GlobalMethods.h
+M       include/TimeInterval.h
+M       src/TimeInterval.cpp
+M       include/Tahometer.h
+M       src/Tahometer.cpp
+	
+2012-08-31 Mikhail S. Dubrovin
+- Add the image producer for Princeton camera,
+A       include/PrincetonImageProducer.h
+A       src/PrincetonImageProducer.cpp
+	
+Tag: V00-00-16
+2012-08-30 Mikhail S. Dubrovin
+- Add the peak-finding module with algorithm suggested by Anton Barty (AB),
+	the same as implemented for CSPad in CSPadArrPeakFinder.cpp
+A       include/ImgPeakFinderAB.h
+A       src/ImgPeakFinderAB.cpp
+
+Tag: V00-00-15
+2012-08-27 Mikhail S. Dubrovin
+- Re-name SaveImageInFile (keep it for now...) -> ImgSaveInFile 
+- Add ImgAverage algorithm for image, which is equivalent to CSPadArrAverage
+- Status
+A       include/ImgAverage.h
+A       include/ImgSaveInFile.h
+A       src/ImgAverage.cpp
+A       src/ImgSaveInFile.cpp
+M       src/ImgCalib.cpp
+
+Tag: V00-00-14	
+2012-08-23 Mikhail S. Dubrovin
+- Add new modules
+A       include/ImgParametersV1.h
+A       include/ImgCalib.h
+M       include/GlobalMethods.h
+A       src/ImgCalib.cpp
+A       src/ImgParametersV1.cpp
+M       src/GlobalMethods.cpp
+A       data/MakeImagePixelMask.py
+A       data/MakeCSPadArrayPixelMask.py
+
+Tag: V00-00-13
+2012-08-20 Mikhail S. Dubrovin
+- Add print of info at the peak finding for connected groups of pixels 
+	if( m_print_bits & 2048 ...) printPeakWork(pw);
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadArrPeakFinder.cpp
+
+Tag: V00-00-12
+2012-08-12 Mikhail S. Dubrovin
+- Add CameraImageProducer
+- Move SaveImageInFile from CSPadPixCoords to ImgAlgos
+- Make new GlobalMethods for common global methods
+- Improve ImgPeakFinder, ImgPeakFilter: input parameters, output file aming etc.
+A       include/CameraImageProducer.h
+M       include/ImgPeakFinder.h
+M       include/ImgPeakFilter.h
+A       include/GlobalMethods.h
+A       include/SaveImageInFile.h
+A       src/CameraImageProducer.cpp
+M       src/ImgPeakFinder.cpp
+M       src/ImgPeakFilter.cpp
+A       src/GlobalMethods.cpp
+M       src/Tahometer.cpp
+M       src/CSPadArrPeakFinder.cpp
+A       src/SaveImageInFile.cpp
+A       data/PlotCSPad2x2ArrayFromFile.py
+M       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotCSPadArrayAndPeaksFromFile.py
+
+Andy has changed:
+U    src/EventNumberFilter.cpp
+U    src/CSPadBackgroundV1.cpp
+U    src/CSPadMaskV1.cpp
+	
+Tag: V00-00-11
+2012-07-25 Andy Salnikov
+- fix const char* warning
+
+Tag: V00-00-10
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-00-08
+2012-07-12 Mikhail S. Dubrovin
+- fix error in hot-pixel mask defenition when the file name is omited in parameters
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       data/proc.C
+
+Tag: V00-00-07
+2012-07-06 Mikhail S. Dubrovin
+- add PnccdImageProducer which adds pnccd image in the event
+- add CSPadArrPeakAnalysis which accumulates ntuple and histograms for peaks 
+  and saves them in root file
+A       include/PnccdImageProducer.h
+A       include/CSPadArrPeakAnalysis.h
+M       include/CSPadArrPeakFinder.h
+A       src/PnccdImageProducer.cpp
+A       src/CSPadArrPeakAnalysis.cpp
+M       src/CSPadArrPeakFinder.cpp
+  add renew auxiliary scripts:
+A       data/renameMovePlots
+M       data/MakePixelMask.py
+M       data/PlotHDF5Dataset.py
+M       data/PlotCSPadArrayFromFile.py
+A       data/proc.C
+M       data/PlotCameraImageFromFile.py
+A       data/PlotCSPadArrayAndPeaksFromFile.py
+	
+2012-06-27 Mikhail S. Dubrovin
+	- work on PeakFinder
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadArrPeakFinder.cpp
+	
+2012-06-25 Mikhail S. Dubrovin
+- work on PeakFinder
+M       include/TimeInterval.h
+M       include/CSPadMaskApply.h
+A       include/Tahometer.h
+M       src/CSPadCommonModeCorrection.cpp
+M       src/TimeInterval.cpp
+M       src/CSPadArrSaveInFile.cpp
+M       src/CSPadMaskApply.cpp
+M       src/CSPadMaskV1.cpp
+A       src/Tahometer.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       src/CSPadBkgdSubtract.cpp
+M       src/CSPadArrAverage.cpp
+M       src/CSPadArrNoise.cpp
+
+	
+Tag: V00-00-06
+2012-06-21 Mikhail S. Dubrovin
+- multithreading mode for sections in quad of the CSPAD detector.
+M       include/CSPadArrPeakFinder.h
+M       src/TimeStampFilter.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       SConscript
+
+	
+Tag: V00-00-05
+2012-06-15 Mikhail S. Dubrovin
+- finalizing all modules for CSPadArrPeakFinder
+A       include/CSPadArrSaveInFile.h
+M       include/TimeInterval.h
+M       include/CSPadMaskApply.h
+M       include/CSPadArrPeakFinder.h
+A       src/CSPadArrSaveInFile.cpp
+M       src/TimeInterval.cpp
+M       src/CSPadMaskApply.cpp
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+
+	
+Tag: V00-00-04
+2012-05-11 Mikhail S. Dubrovin
+- modified modules:
+M       include/CSPadArrNoise.h
+M       include/CSPadMaskV1.h
+M       include/CSPadArrPeakFinder.h
+M       src/CSPadMaskV1.cpp
+M       src/CSPadArrPeakFinder.cpp
+M       src/CSPadArrNoise.cpp
+
+
+2012-05-09 Mikhail S. Dubrovin
+- add modules:
+A         ImgAlgos/include/CSPadArrNoise.h
+A         ImgAlgos/include/CSPadArrPeakFinder.h
+A         ImgAlgos/src/CSPadArrPeakFinder.cpp
+A         ImgAlgos/src/CSPadArrNoise.cpp
+	
+Tag: V00-00-03
+2012-04-24 Mikhail S. Dubrovin
+- add/updated scripts:
+        ImgAlgos/data/MakePixelMask.py
+        ImgAlgos/data/PlotCSPadArrayFromFile.py
+        ImgAlgos/data/PlotCameraImageAndPeaks.py
+        ImgAlgos/data/PlotCameraImageFromFile.py
+        ImgAlgos/data/PlotHDF5Dataset.py
+        ImgAlgos/data/PrintHDF5Structure.py
+
+2012-04-20 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/include/CSPadMaskApply.h
+        ImgAlgos/include/CSPadMaskV1.h
+        ImgAlgos/src/CSPadMaskApply.cpp
+        ImgAlgos/src/CSPadMaskV1.cpp
+
+2012-04-11 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/ImgRadialCorrection.cpp
+        ImgAlgos/include/ImgRadialCorrection.h
+	
+2012-04-10 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBackgroundV1.cpp
+	ImgAlgos/include/CSPadBackgroundV1.h	
+
+
+2012-04-04 Mikhail S. Dubrovin
+- add modules:
+        ImgAlgos/src/CSPadBkgdSubtract.cpp 
+	ImgAlgos/include/CSPadBkgdSubtract.h
+
+2012-04-03 Mikhail S. Dubrovin
+- add modules:
+	ImgAlgos/include/EventNumberFilter.h
+	ImgAlgos/include/TimeStampFilter.h
+	ImgAlgos/include/CSPadArrAverage.h
+	ImgAlgos/src/EventNumberFilter.cpp
+	ImgAlgos/src/TimeStampFilter.cpp
+	ImgAlgos/src/CSPadArrAverage.cpp
+	
+Tag: V00-00-02
+2012-03-21 Mikhail S. Dubrovin
+- add modules:
+         ImgPeakFinder.cpp
+         ImgPeakFilter.cpp
+- Add scripts for psana and graphical presentation of results
+         ImgAlgos/data
+         ImgAlgos/data/psana.cfg
+         ImgAlgos/data/PlotCameraImageFromFile.py
+         ImgAlgos/data/PlotCameraImageAndPeaks.py
+
+Tag: V00-00-01
+2012-03-17 Mikhail S. Dubrovin
+	- add EventNumberFilter.cpp
+              ImgPeakFinder.cpp
+              ImgPixAmpFilter.cpp
+	      TimeInterval.cpp
+
+
+2012-02-29 Mikhail S. Dubrovin
+- add CSPadCommonModeCorrection - psana module 
+  for a simple algorithm of common mode correction.
+  It should be used after the pedestal subtraction in cspad_mod.CsPadCalib, 
+  but in stead of doCommonMode in the CsPadCalib... 
+  (a little bit wired, but still this is one more example of correction in psana)
+- psana.cfg for example:
+------------------------
+[psana]                                                               
+files         = /reg/d/psdm/CXI/cxi35711/xtc/e86-r0020-s00-c00.xtc
+modules       = cspad_mod.CsPadCalib ImgAlgos.CSPadCommonModeCorrection 
+
+[cspad_mod.CsPadCalib]
+inputKey      = 
+outputKey     = calibrated
+doPedestals   = yes
+doPixelStatus = no
+doCommonMode  = no
+
+[ImgAlgos.CSPadCommonModeCorrection]                                      
+inputKey      = calibrated
+outputKey     = cm_subtracted
+events        = 10 
+ampthr        = 30
+------------------------
+
+2012-02-23 Mikhail S. Dubrovin
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
