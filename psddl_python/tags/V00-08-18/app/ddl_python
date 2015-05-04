@@ -1,0 +1,36 @@
+#!@PYTHON@
+
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
+
+programDescription = '''
+script to run the python backend to produce the DDL generated 
+for the psana_test package. Also creates WrapperList.txt.
+'''
+
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc'],
+                                                          includeHdf=False,
+                                                          includeDecl=True)
+
+    if verbose: sys.stdout.write("Creating Wrappers.txt from %d package files\n" % len(pkgdict))
+    fout = file('psddl_python/src/WrapperList.txt','w')
+    fout.write('\n')
+    packageNames = [subdict['decl'] for subdict in pkgdict.values()]
+    declareMacros = ['DECL(%s)' % pkg for pkg in packageNames]
+    fout.write('\n'.join(declareMacros) + '\n')
+    fout.close()
+
+    for pkg, subdict in pkgdict.iteritems():
+        cmd = psddlCmdStart + ' -b python -I data -I psddl_psana -t psddl_python ' + \
+              '-e psddl_python/include/' + pkg + '.ddl.h ' + \
+              '-o psddl_python/src/' + pkg + '.ddl.cpp ' + subdict['ddlfile']
+
+        if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+        sys.stdout.flush()
+        res = subprocess.call(cmd, shell=True)
+        assert res == 0, "error with cmd: %s" % cmd
+

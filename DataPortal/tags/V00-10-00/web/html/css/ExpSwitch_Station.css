@@ -1,0 +1,30 @@
+#expswitch-station {
+  padding: 20px;
+}
+#expswitch-station > #body {
+  margin-top: 10px;
+}
+#expswitch-station .info {
+  color: maroon;
+}
+#expswitch-station .group {
+  margin-left: 15px;
+  margin-bottom: 20px;
+}
+#expswitch-station .group > .label {
+  font-size: 13px;
+  font-weight: bold;
+  font-family: Helvetica, sans-serif !important;
+}
+#expswitch-station .group > .value {
+  margin-left: 5px;
+}
+#expswitch-station .group > #checktable {
+  margin-top:10px;
+}
+.expswitch-enabled {
+  display: block;
+}
+.expswitch-disabled {
+  display: none;
+}

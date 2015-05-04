@@ -26,7 +26,7 @@ def network_name(hostname):
 
 def trgpath_param(mode, path=None):
     """ Return a function that returns a tuple with status
-             (register_to_ana, instr_in_trg_path, rootpath)
+             (register_to_ana_tb, create_xtc_only, instr_in_trg_path, rootpath)
     for an instrument. The rootpath is used to write files e.g.: <rootpath>/<instr>/....
     The rootpath is None if the path (datapath) from the DB should be used.
     If register_to_ana is True the transfer will be registered to the data_migration
@@ -40,15 +40,17 @@ def trgpath_param(mode, path=None):
     def rootpath(instr):
         """ Return  (reg_ana, cr_instr, rpath)  """
         
+        #  (register_to_ana_tb, create_xtc_only, instr_in_trg_path, rootpath)
         if mode == "dss-ffb":
-            return (True, False, path)
+            return (True, True, False, path)
         elif mode == "ioc-ffb":
             if instr.upper() in ('AMO', 'CXI', 'MEC', 'SXR', 'XCS', 'XPP'):
-                return (True, True, path)
+                return (True, True, True, path)
             else:
-                return (False, True, None)
+                # dia experiments
+                return (False, False, True, None)
         
-        return (False, True, path)
+        return (False, False, True, path)
     
     return rootpath
 

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>An example of the SimpleTable widget</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+<style>
+body {
+  margin:   0;
+  padding:  0;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.first {
+  float:    left;
+}
+.next {
+  float:        left;
+  margin-left:  40px;
+}
+.last {
+  clear:    both;
+}
+</style>
+
+<script data-main="../webfwk/js/test_simpletable_main.js" src="/require/require.js"></script>
+
+</head>
+<body>
+
+  <div style="padding:20px;">
+
+    <div class="first">
+      <h2>1 level</h2>
+      <div style="margin-left:0px;" id="table1"></div>
+    </div>
+
+    <div class="next">
+      <h2>2 levels</h2>
+      <div style="margin-left:0px;" id="table2"></div>
+    </div>
+
+    <div class="next">
+      <h2>3 levels</h2>
+      <div style="margin-left:0px;" id="table3"></div>
+    </div>
+
+    <div class="last"></div>
+
+    <br>
+
+    <div class="first">
+      <h2>Non-trivial cell types,<br>
+          Loading data from static memory object</h2>
+      <div style="float:left; margin-left: 0px;" id="table4"></div>
+      <div style="float:left; margin-left:20px;" ><button id="table4_load">Load</button></div>
+      <div style="float:left; margin-left: 5px;" ><button id="table4_erase">Erase</button></div>
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="next">
+      <h2>Data from Web service</h2>
+      <div style="float:left; margin-left: 0px;" id="table5"></div>
+      <div style="float:left; margin-left:20px;" ><button id="table5_load">Load</button></div>
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="last"></div>
+
+    <br>
+
+    <div class="first">
+      <h2>Columns which can be hidden<br>
+          or aligned as needed</h2>
+      <div style="float:left; margin-left: 0px;" id="table6"></div>
+      <div style="clear:both"></div>
+    </div>
+
+    <div class="next">
+      <h2>Custom styles for columns</h2>
+      <div style="float:left; margin-left: 0px;" id="table7"></div>
+      <div style="clear:both"></div>
+    </div>
+    <div class="last"></div>
+
+  </div>
+
+</body>
+</html>

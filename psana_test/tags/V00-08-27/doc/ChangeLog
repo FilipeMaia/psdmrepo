@@ -1,0 +1,290 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana-tools
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-08-27
+2015-4-28 David Schneider
+- further modified xtc iterator to warn for large xtc extents, JIRA issue PSAS-141	
+
+Tag: V00-08-26
+2015-4-28 David Schneider
+- modify xtc iterator to print message for unusual events, JIRA issue PSAS-141	
+
+Tag: V00-08-25
+2015-4-28 David Schneider
+- copy pdsdata xtc iterator into psana_test so that it can be modified
+
+Tag: V00-08-24
+2015-4-9 David Schneider
+- add diagnostic command pyPsanaMonit and C++ module PsanaModuleGetObjects
+	
+Tag: V00-08-23
+2015-3-16 David Schneider
+- update psanaTestLib function copyToMultiTestDir to also create index files
+
+Tag: V00-08-22
+2015-3-3 David Schneider
+- small data JIRA issue PSAS-85
+- add option dump_sml to psana_test.dump which is false by default (means do not
+  dump small data types). This means be default we can compare dump of .smd.xtc and .xtc
+  and expect same thing, but put on option to see those types.
+- fix liveModeTest to ignore warnings in dump. Since psana now understands small data,
+  and I created that test data using a beta version of the small data tool, psana 
+  complains about finding small data in a .xtc file (but just as warnings).
+
+Tag: V00-08-21
+2015-2-24 David Schneider
+- fix rel6 build
+
+Tag: V00-08-20
+2015-2-24 David Schneider
+- add option --sml to xtclinedump to parse smlDataProxy payload
+
+Tag: V00-08-19
+2015-2-23 David Schneider
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+	
+Tag: V00-08-18
+2015-2-5 David Schneider
+- reenable livemod test
+	
+Tag: V00-08-17
+2015-2-4 David Schneider
+- I messed up the tag in the last commit and it is hard to undo that, so
+  psana_test is now at tag V00-08-17 - but this is not a major change.
+	
+Tag: V00-00-44
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+
+Tag: V00-00-43
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103.
+
+Tag: V00-00-42
+2015-01-08 David Schneider
+- add library code and unit test for live mode test. 
+- tests data with s80 stream to merge.
+- added multifile/test_009 test files - modified shrunken down xtc files for test
+- Track JIRA issue PSAS-4
+
+Tag: V00-00-41
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
+Tag: V00-00-40
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
+Tag: V00-00-39
+2014-10-23 David Schneider
+- fix bug with identifying data files on disk - minor feature not used in build or testing
+	
+Tag: V00-00-38
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+
+Tag: V00-00-37
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with: Evr::IOConfigV2. 
+  Track JIRA issue PSAS-41. 
+- Add test_088 to regression - file evrio.xtc from Matt with new type.
+
+
+Tag: V00-00-36
+2014-09-22 David Schneider
+- fix bug with unit tests for external packages. A test created an output
+  file in a directory where I had permission, but not psrel.
+
+Tag: V00-00-35
+2014-09-19 David Schneider
+- add regression tests for test data 84-87. These are sample xtc files
+  Matt provides that have the new types. tests 85-87exercise TimeTool::DataV1 
+  with/without the projections.  We test all three to cover zero length arrays 
+  to make sure our hdf5 schema handles them correctly.
+
+Tag: V00-00-34
+2014-09-18 David Schneider
+- regenerate dump module for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+
+Tag: V00-00-33
+2014-09-18 David Schneider
+- add unit tests for external packages. Test h5py, tables and pandas
+- test h5tools to excersice h5py vlen patch
+
+Tag: V00-00-32
+2014-09-16 David Schneider
+- add function for making small multifile test data with specific datagrams
+
+Tag: V00-00-31
+2014-09-16 David Schneider
+- test for Python str <-> C++ std::string event conversion in Psana
+	
+Tag: V00-00-30
+2014-09-11 David Schneider
+- Somehow the tags in the changLog are off by one with the tags. 
+  synching ChangeLog tag with svn tags.
+
+Tag: V00-00-29
+2014-09-11 David Schneider
+- test get/put with key strings for configStore/calibStore get/put test.
+
+Tag: V00-00-28
+2014-09-09 David Schneider
+- extend configStore calibStore get/put test a bit.
+
+Tag: V00-00-27
+2014-09-05 David Schneider
+- add test for configStore calibStore get/put interface. To make sure
+  we don't brake anything when addressing JIRA PSAS-25
+	
+Tag: V00-00-26
+2014-09-03 David Schneider
+- add tests for mpi split scan translator.
+- change test for new config file options in PSXtcInput to 'third event'
+- add option to psana dump module to skip dump of beginJob events - to get
+  mpi translate dump to look like typical translate dump - see JIRA PSAS-26
+	
+Tag: V00-00-25
+2014-08-28 Christopher O'Grady
+- switch to analyzing a smaller version of run 15, given the
+  fake run number "999"
+
+Tag: V00-00-24
+2014-08-27 Christopher O'Grady
+- remove temporary file created by index test
+
+Tag: V00-00-23
+2014-08-27 Christopher O'Grady
+- fix printout bug in index test
+
+Tag: V00-00-22
+2014-08-27 Christopher O'Grady
+- add indexing test to unitTests.py
+
+Tag: V00-00-21
+2014-08-07 David Schneider
+- fix bug causing unitTest failure with getMultiFileDataDir() function
+
+Tag: V00-00-20
+2014-08-06  David Schneider
+- use $SIT_ROOT environment variable to form path to test data
+
+Tag: V00-00-19
+2014-07-25  David Schneider
+- add test for psana shared memory mode.
+  Test is not part of regression for buildbot. Run manually with
+  python psana_test/src/psanaTestLib.py testshm
+
+Tag: V00-00-18
+2014-07-18  David Schneider
+- add unit test for merging control streams
+  multifile/test_004 has s80 stream data
+- add psana module noop, for testing
+- fix bug with psanaTestLib.py test set=full syntax
+- currently not adding test_004 to regression due to trac ticket:318
+
+Tag: V00-00-16 David Schneider
+- add test for data with BldEBeamV6, and two multi tests
+
+Tag: V00-00-15 David Schneider
+- fix bug with epics options
+
+Tag: V00-00-14
+2014-07-03 David Schneider
+- regenerate for new pdsdata/psddldata with BldEBeamV6
+
+Tag: V00-00-13
+2014-06-27 David Schneider
+- add multi test 001. 4 streams with two calib cycles.
+
+Tag: V00-00-12
+2014-06-27 David Schneider
+- update code to handle single or multi file (psana dataset) tests
+- add test for the first multifile test set
+
+Tag: V00-00-11
+2014-06-18 David Schneider
+- improve error messages when md5sum call fails
+
+Tag: V00-00-10
+2014-06-18 David Schneider
+- add test_082 to regression tests, new test data with 
+  BldDataFEEGasDetEnergyV1 and EPICS float of 200
+
+Tag: V00-00-09
+2014-06-16 David Schneider
+- regenerate previousDump.txt for new epics storing model that uses
+  event tag to save more recent pv from several recorders
+- add unit test where change observed (when using event tag)
+
+Tag: V00-00-08
+2014-06-14 David Schneider
+- regenerate dump module from psddldata V01-00-10
+- trac ticket #309
+
+Tag: V00-00-07
+2014-06-10 David Schneider
+- unit tests, make sure command line calls to psana don't accidentally
+  pick up a default psana.cfg file
+
+Tag: V00-00-06
+2014-06-10 David Schneider
+- fix bug with dumping ndarrays
+
+Tag: V00-00-05
+2014-06-08 David Schneider
+- Add Psana modules to test putting and getting ndarray's from event store
+
+Tag: V00-00-04
+2014-06-08 David Schneider
+- Integrate regression test into build (scons test).
+- Change dump to sort keys.
+- Change dump to include pvName in EPICS printout.
+- Regenerate previousDump.txt for sorted keys, for PSEnv V00-13-04 
+  and psddl_hdf2psana V00-09-08.
+
+Tag: V00-00-03
+2014-05-16 David Schneider
+- updated dumping of epics in dump and xtclinedump
+
+Tag: V00-00-02
+2014-05-16 David Schneider
+- Cleaned up code. 
+- Explicitly add libz (for adler32) to build through SConscript
+- Add dump of nonlinearCorrected for OceanOptics.Data
+- re-generated data/prev.txt
+	
+Tag: V00-00-01
+2014-05-15 David Schneider
+- First tag for a release.
+- Adjusted dump to print all epics info.
+- Added epics dbr type and numElements to xtclinedump xtc printout.
+- test data maintenance script is still work in progress.
+
+Tag: no tag yet
+2014-05-09 David Schneider
+- psana python module that dumps all non-epics data
+- got rid of much of the C++ Dump module.
+	
+Tag: No tag yet, just in development 
+2014-02-04 David A. Schneider
+- checking in C++ Dump module that prints basic attributes of non-epics, 
+  and some basic arrays.
+

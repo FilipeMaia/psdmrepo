@@ -11,13 +11,13 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-07
-2015-03-17
+Tag: V00-01-00
 - Imported data-mover code from git repo (PsdmTools)
 - added features to the experiment path creation to handle creating xtc files on the ffb 
   for recorder transfers.
 - Add tool to compare checksums created by ffb and ana movers.
 - Added option to set acl for the instr-dir on a dss node.
+- Support for smalldata
 	
 	
 Tag: V00-00-06

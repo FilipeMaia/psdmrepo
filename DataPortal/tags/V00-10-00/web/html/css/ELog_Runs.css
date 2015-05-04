@@ -1,0 +1,51 @@
+#elog-runs {
+  padding: 0;
+}
+
+
+#elog-runs > #ctrl .search-dialog {
+  border-left: 1px solid #c0c0c0;
+  padding: 20px 10px 10px 20px;
+  background-color: #ffffff;
+  font-size: 12px;
+}
+#elog-runs #ctrl .search-dialog span.label {
+  display: block;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  font-weight: bold;
+}
+#elog-runs #ctrl .search-dialog input[type="text"],
+#elog-runs #ctrl .search-dialog select {
+  display: block;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+#elog-runs #ctrl .search-dialog input[name="text2search"] {
+  width: 100%;
+}
+
+#elog-runs #ctrl .search-dialog .group {
+  float: left;
+  margin-right: 20px;
+}
+#elog-runs #ctrl .search-dialog .buttons {
+  margin-left: 20px;
+  padding-top: 19px;
+}
+
+#elog-runs > #body {
+  padding: 10px 20px 10px 20px;
+}
+
+#elog-runs .info {
+  color: maroon;
+}
+#elog-runs > #body > #viewer {
+  margin-top: 10px;
+}
+    
+#elog-runs > #body .run-cont > #messages {
+  margin: 0px 10px 15px 10px;
+}

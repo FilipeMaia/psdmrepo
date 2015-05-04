@@ -1,0 +1,38 @@
+#elog-live {
+  padding: 0;
+}
+
+#elog-live > #ctrl {
+  padding: 10px;
+}
+#elog-live > #ctrl > div {
+  margin-right: 10px;
+}
+#elog-live > #ctrl > div > span {
+  font-weight: bold;
+}
+#elog-live > #ctrl > div:first-child {
+  margin-left: 10px;
+}
+
+#elog-live > #body {
+  padding: 10px 20px 10px 20px;
+  /*
+  border-top: solid 1px #c0c0c0;
+  */
+}
+
+#elog-live #list {
+  margin-top: 15px;
+}
+
+#elog-live .info {
+  color: maroon;
+}
+#elog-live > #loading {
+  position: fixed;
+  right: 20px;
+  bottom: 5px;
+  
+  display: none;
+}

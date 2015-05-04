@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package RegDB
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+This is the Registry Database for LCLS ONLINE and OFLINE systems. The database
+stores information about instruments, experimental groups, experiments, etc.
+
+Detailed description:
+=====================
+
+The package contains:
+
+- database schema
+- PHP library for accessing and manipulating the database contents
+- Pythin library and tools to access and manipulate the database contents
+- a reference Web application for the database

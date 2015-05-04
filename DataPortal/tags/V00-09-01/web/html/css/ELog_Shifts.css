@@ -1,0 +1,46 @@
+#elog-shifts {
+  padding: 0;
+}
+
+#elog-shifts > #ctrl {
+  border-left: 1px solid #c0c0c0;
+  padding: 20px 10px 10px 20px;
+  background-color: #ffffff;
+  font-size: 12px;
+}
+
+#elog-shifts > #body {
+  border-left: 1px solid #c0c0c0;
+  padding: 20px 20px 10px 20px;
+  background-color: #ffffff;
+  font-size: 12px;
+}
+
+#elog-shifts .info {
+  color: maroon;
+}
+#elog-shifts > #body > #viewer {
+  margin-top: 10px;
+}
+
+#elog-shifts .shift-cont #body .shift-interval {
+  margin-top: 5px;
+}
+#elog-shifts .shift-cont #body .shift-interval .label {
+  display: inline-block;
+  width: 75px;
+  margin-right: 10px;
+  font-weight: bold;
+}
+#elog-shifts .shift-cont #body .shift-interval .shift-day {
+  margin-right: 8px;
+  padding: 0px 2px 0px 2px;
+  width: 70px;
+}
+#elog-shifts .shift-cont #body .shift-interval .shift-hms {
+  width: 17px;
+  padding: 0px 2px 0px 2px;
+}
+.elog-shifts-disabled {
+  display: none;
+}

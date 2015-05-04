@@ -215,20 +215,17 @@ class Job ( object ) :
 
         count = lsf.lsb_openjobinfo(self._jobid, None, "all", None, None, lsf.ALL_JOB)
         if count < 1:
-            # job is not there any more
             logging.warning('lsb_openjobinfo() failed for %s (job may be finished long ago or has not started)', self)
             self.__reset()
-            return None
-        if count > 1:
-            logging.warning('lsb_openjobinfo() returned more than one match for %s', self)
-        
-        # get job info
-        jobp = lsf.new_intp()
-        lsf.intp_assign(jobp, 0)
-        data = lsf.lsb_readjobinfo(jobp)
+            data = None
+        else:
+            if count > 1:
+                logging.warning('lsb_openjobinfo() returned more than one match for %s', self)
+            jobp = lsf.new_intp()
+            lsf.intp_assign(jobp, 0)
+            data = lsf.lsb_readjobinfo(jobp)
 
         lsf.lsb_closejobinfo()
-
         return data
 
     def __reset(self):
@@ -267,9 +264,7 @@ def submit_bsub(command, queue="psanaq", jobName=None, log=None, numProc=1, \
                         
     cmd = bsub_cmd.split()
     cmd.extend(command.split())
-    #print cmd
-    #sys.exit(2)
-    #return 
+    
     res = subprocess.check_output(cmd)
     for line in res.split('\n'):
         if line.startswith('Job <'):

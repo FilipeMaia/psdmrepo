@@ -1,0 +1,45 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  README file for package DataSummary
+#------------------------------------------------------------------------
+
+Package author: Justin Garofoli
+
+Brief description:
+==================
+
+The Data Summary scanner for the XTC files
+
+Detailed description:
+=====================
+
+A tool to prepare an data summary/data quality report of the data run.
+Uses bootstrap and a couple of other packages, but the dependencies
+are packaged in this directory.
+
+  data-summary-tool
+
+    The Python cript that will launch a data summary job and automatically
+    pick up which sata sources are available, and include some information
+    about them.
+
+  myDS
+
+    Currently not working with the latest versions of the module.
+
+The data summary tool can be used in the following three ways:
+
+  - locally on a single node in a single core mode,
+  - locally on a single node in a multi-process mode with mpirun,
+  - or in a batch multi-core mode using the bsub command.
+
+These three examples illustrate each technique:
+
+  data-summary-tool CXI/cxic0114 111
+  mpirun -n 6 data-summary-tool CXI/cxic0114 111
+  bsub -a mympi -n 24 -o mpi.log -q psanaq data-summary-tool CXI/cxic0114 111
+
+

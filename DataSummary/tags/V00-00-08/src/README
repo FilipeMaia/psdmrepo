@@ -1,0 +1,88 @@
+Data Summary Module
+
+  __init__.py
+
+    Loads the necessary modules.
+
+  job.py
+
+    Processes the subjobs over each event.
+
+  data_summary_utils.py
+
+    Make a few ready made data processing tools.  Mostly not used anymore.
+
+  device_config.py
+  device_config.dict
+
+    Imported from Jason's psdata utility.  Defines relations between PVs and
+    DAQ devices. Would be nice to move away from this.
+
+  evplib/
+
+    Library of code for handling specific detectors data.
+
+
+The package also contains a Library of routines to handle data processing.
+
+  event_process.py
+
+    Bare bones event_process object.  All others should inherit from this.
+
+  markup.py
+
+    Library written by nogradi.  See: http://markup.sourceforge.net
+    Used by output_html.py.
+
+  output_html.py
+
+    Generates the report html file.
+
+  toolbox.py
+
+    A small library of data types for the subjobs.
+
+  packunpack.py
+
+    Library to convert unhashable native objects (dicts, lists) to hashable
+    tuples in a reversible manner.  Provides the forward (pack) and reverse (unpack)
+    algorithms.
+
+  offbyone.py
+
+    Chris O'Grady's algorithm for testing if data packages have been built correctly.
+
+  acqiris.py
+
+  add_all_devices.py
+
+  add_available_data.py
+
+  add_elog.py
+
+  build_html.py
+
+  common.py
+
+  counter.py
+
+  cspad.py
+
+  epics_scatter.py
+
+  epics_trend.py
+
+  evr.py
+
+  ipimb.py
+
+  simple_stats.py
+
+  simple_trends.py
+
+  store_report_results.py
+
+  time_fiducials.py
+
+
+

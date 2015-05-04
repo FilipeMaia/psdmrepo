@@ -107,8 +107,12 @@ def main():
     
     prlen = len("/reg/d/psdm")
     n_good, n_bad = 0,0
+    experiments = set()
     for pfn in args.fnames:
         ptoken = [x for x in pfn.split('/') if x]
+        exp = ptoken[4]
+        if not exp in experiments:
+            experiments.add(exp)
         prefix = path.join("/", *ptoken[:3]) if args.disk else None
         # lfn: /<instr>/<exp>/xtc/... 
         lfn = path.join("/", *ptoken[3:])
@@ -119,7 +123,7 @@ def main():
             n_bad += 1
             print "ERROR:", pfn
 
-    print "Result Good:", n_good, "Bad:", n_bad
+    print "Result Good:", n_good, "Bad:", n_bad, experiments
 
 
 if __name__ == "__main__":

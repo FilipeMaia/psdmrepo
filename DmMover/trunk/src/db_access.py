@@ -178,17 +178,17 @@ def getexp_datapath_all():
 # Report the file migration start event
 # -------------------------------------
 
-def file_migration_start(exper_id,file):
+def file_migration_start(exper_id, fn):
     now = __now_64()
     __do_sql("UPDATE %s SET start_time=%d, stop_time=NULL, error_msg=NULL "
-             "WHERE exper_id=%d AND file='%s'" % ( __dmtable, now, exper_id, file ))
+             "WHERE exper_id=%d AND file='%s'" % (__dmtable, now, exper_id, fn))
     
 # --------------------------------------------------
 # Report the file migration stop event and error_msg
 #  if error_msg='' mark file as FAIL
 # --------------------------------------------------
 
-def file_migration_stop(exper_id,file,error_msg=None):
+def file_migration_stop(exper_id, fn, error_msg=None):
     now = __now_64()
     if error_msg is None:
         error_msg_sql = ", error_msg=NULL, status='DONE'"
@@ -198,25 +198,42 @@ def file_migration_stop(exper_id,file,error_msg=None):
         error_msg_sql = ", error_msg='%s'" % __escape_string(error_msg)
             
     __do_sql("UPDATE %s SET stop_time=%d %s WHERE exper_id=%d AND file='%s'" %
-             (__dmtable, now, error_msg_sql, exper_id, file ))
+             (__dmtable, now, error_msg_sql, exper_id, fn))
     return
 
 # -----------------------------------------------------------------------------
-# Report files which are yet to be migrated from the specified (if any provided)
-# host belonging to the specified instrument (if any provided).
 # -----------------------------------------------------------------------------
 
 def files2migrate(instr=None,host=None,filetype=None):
+    """ Report files which are yet to be migrated from the specified (if any provided)
+    host belonging to the specified instrument (if any provided).
+    Select files from instrument(s), host the file originates or filetype.
+    <instr> is either a instrument name or a list of instr names.
+    """
+    
     exper_id_select_sql = ""
-    if instr is not None: 
-        exper_id_select_sql = "AND exper_id in (SELECT e.id FROM experiment `e`, " \
-                              "instrument `i` WHERE i.name='%s' AND e.instr_id=i.id)" % instr
+    if instr:
+        if isinstance(instr,str):
+            instr_q = "i.name='%s'" % instr
+        elif isinstance(instr,list):
+            if len(instr) == 1:
+                instr_q = "i.name='%s'" % instr[0]
+            else:
+                instr_q = "i.name IN (%s)" % ",".join(["'%s'" % x for x in instr])
+        else:
+            instr_q=None
+        if instr_q:
+            exper_id_select_sql = "AND exper_id in (SELECT e.id FROM experiment `e`, " \
+                                  "instrument `i` WHERE %s AND e.instr_id=i.id)" % instr_q
+    
     host_sql = ""
     if host is not None: 
         host_sql = "AND host='%s'" % host
     ftype_sql = ""
-    if filetype is not None:
+    if filetype:
         ftype_sql = "AND file_type='%s'" % filetype
+    else:
+        ftype_sql = "AND file_type != '%s'" % "smd.xtc"
 
     select_condition = "status = 'WAIT'"
     

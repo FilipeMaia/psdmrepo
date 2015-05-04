@@ -84,6 +84,7 @@ class ExperimentInfo(object):
         self.instr_lower = instrument.lower()
 
         self.datapath = datapath
+        self.no_instrpath = no_instr_path
         if no_instr_path:
             self.exppath = exppath = pjoin(datapath, self.name)
         else:
@@ -121,3 +122,12 @@ class ExperimentInfo(object):
     @property
     def calibpath(self):
         return pjoin(self.exppath, 'calib')
+    
+    @property
+    def smd_xtcpath(self):
+        return pjoin(self.exppath, 'xtc', 'smalldata')
+
+    @property
+    def smd_md5path(self):
+        return pjoin(self.exppath, 'xtc', 'smalldata','md5')
+        

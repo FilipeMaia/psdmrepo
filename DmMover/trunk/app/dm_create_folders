@@ -91,7 +91,10 @@ def main():
                         help="Select all experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
     parser.add_argument('--dirs', help='directories to create')
     parser.add_argument('--scratchpath', default="/reg/data/ana04", help="Set ana path for scratch, res,...")
+    parser.add_argument('--scratchRR', action='store_true', help="Use round-robin to select scratch folders")
     parser.add_argument('--datapath', help="Set ana path for xtc,hdf5 and usr")
+    parser.add_argument('--nolink', dest="dolink", action='store_false', default=True, 
+                        help="Do not create link and do not use link to check if dir already exists.")
     parser.add_argument("--verbose", "-v", action='count', default=0)
     parser.add_argument('sel_exper', nargs='?', help="experiments to check") 
 
@@ -106,6 +109,8 @@ def main():
                         datefmt="%Y%m%d %H:%M:%S")
 
     all_dirs = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
+
+    scratch_dirs = ("/reg/data/ana04", "/reg/data/ana14")
 
     if args.active:
         gen = active_experiments()
@@ -125,7 +130,7 @@ def main():
 
     nexp, nmissing, nset = 0,0,0
     for expname, instr in gen:
-        logging.debug("Exp %s %s", expname, instr)
+        logging.debug("Exp %s %s link %s", expname, instr, args.dolink)
 
         nexp += 1
         if len(expname) != 8:
@@ -139,7 +144,7 @@ def main():
         exppath = "/reg/d/psdm/%s/%s/" % (instr, expname)
         missing_dirs = []
         for dt in dirs_to_check:
-            if not os.path.exists(exppath + dt):
+            if not args.dolink or  not os.path.exists(exppath + dt):
                 missing_dirs.append(dt)
 
         if missing_dirs:
@@ -154,7 +159,7 @@ def main():
                 exper.datapath = args.datapath
             logging.debug(" ana dir: %s %s", exper.datapath, exper.scratchpath)
             if args.mkdir:
-                exper_folders.check_all_destpath(exper, missing_dirs)
+                exper_folders.check_all_destpath(exper, missing_dirs, args.dolink)
     
         
     date = datetime.datetime.now()

@@ -1,0 +1,891 @@
+:
+:  Library of Jinja2 templates for Hdf5Translator backend
+:
+:  Lines starting with colon are comments, except for special '::::template::::'
+:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: macros
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: psana_cfg_template
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for a psana.cfg file that uses the Hdf5 Translator module.
+:  This sets default values for all of the type filters.
+:  
+:  Parameters for this template:
+:
+: type_filter_options - a multiline list of the aliases, includes, and a comment
+:                       to list all the types associated with the alias
+######################################################################
+[psana]
+
+# MODULES: any modules that produce data to be translated need be loaded 
+# **BEFORE** Translator.H5Output (such as calibrated data or ndarray's)
+# event data added by modules listed after Translator.H5Output is not translated.
+modules = Translator.H5Output
+
+files = **TODO: SPECIFY INPUT FILES OR DATA SOURCE HERE**
+
+######################################################################
+[Translator.H5Output]
+
+# The only option you need to set for the Translator.H5Output module is
+# output_file. All other options have default values (explained below).
+
+# TODO: enter the full h5 output file name, including the output directory
+output_file = output_directory/h5output.h5
+
+# By default, the Translator will not overwrite the h5 file if it already exists
+overwrite = false
+
+# # # # # # # # # # # # # # # # # # # # #
+# EPICS FILTERING
+# The Translator can store epics pv's in one of three ways, or not at all.
+# set store_epics below, to one of the following:
+#
+# updates_only   stores an EPICS pv when it has been updated in the psana epics store.
+#                For xtc input this happens whenever EPICS data is present in a datagram.
+#                Note - many EPICS pvs are not present in every shot. A dataset
+#                for an EPIC pv is often shorter than the total number of events.
+#                Experiments with many short calib cycles may have some calib cycles where
+#                no EPICS pv's show up. Users would then have to look back through several 
+#                calib cycle's to find the latest value of a pv.
+#
+# calib_repeat   This is the same as updates_only except that each calib cycle starts with
+#                the most recent value of each pv. This makes it easier to find pv's in a 
+#                calib cycle. For experiments with many short calib cycles, it can produce
+#                more datasets than neccessary.
+#
+# always         For each event, store the most recent value of the EPICs pv. Produces 
+#                longer datasets than neccessary, but makes it easier to find the latest
+#                pv for an event.
+#
+# no             epics pv's will not be stored. You may also want to set Epics=exclude
+#                (see below) if you do not want the epics configuration data stored
+
+# The default is 'calib_repeat'
+
+store_epics = calib_repeat
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# FILTERING
+# 
+# By default, all xtc data is Translated and many ndarrays that user modules (if any) 
+# add are translated. Filtering can occur in either the code of user modules, or
+# through options in the psana.cfg file. Here in the config file, different groups of 
+# data can be filtered. There are four options for filtering data: 
+#
+#    type filtering   -  for example, exclude all cspad, regardless of the detector source
+#    source filtering -  for example, exclude any data from a given detector source
+#    key filtering    -  for example, include only ndarrays with a given key string
+#    calibration      -  do not translate original xtc if a calibrated version is found
+#
+# Type filtering is based on sets of Psana data types. If you know what detectors or 
+# devices to filter, leave type filtering alone and go to src_filter. 
+#
+# Type filtering has the highest precedence, then key filtering, then source 
+# filtering, and lastly calibration filtering. When the Translator sees new data, 
+# it first checks the type filter. If it is a filtered type (or unknown type) no further 
+# translation occurs with the data - regardless of src or key. For data that gets 
+# past the type filter, the Translator looks at the src and key. If the key 
+# string is empty, it checks the source filter. Data with non empty key strings are 
+# handled via the key filter. If the src is filtered, but the key is not, then the
+# data will be translated. Data with the special calibration key string are handled 
+# via the calibration filtering. 
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# TYPE FILTERING 
+#
+# One can include or exclude a class of Psana types with the following 
+# options. Only the strings include or exclude are valid for these 
+# type filtering options. 
+# 
+# Note - Epics in the list below refers only to the epicsConfig data
+# which is the epics alias list, not the epics pv's. To filter the epics pv's
+# see the 'store_epics' option above.
+
+{{type_filter_options}}
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# TYPE FILTER SHORTCUT
+#
+# In addition to filtering Psana types by the options above, one can use
+# the type_filter option below. For example:
+#
+# type_filter = include cspad       # will only translate cspad types. Will not translate
+#                                 # ndarrays or strings
+# type_filter = exclude Andor evr   # translate all except the Andor or Evr types
+# 
+# If you do not want to translate what is in the xtc file, use the psana shortcut:
+#
+# type_filter = exclude psana       # This will only translate ndarray's and strings 
+#
+# Likewise doing:
+#
+# type_filter = include psana       # will translate all xtc data, but skip any ndarray's or strings
+#
+# The default is to include all
+
+type_filter = include all
+
+# note - if type_filter is anything other than 'include all' it takes precedence
+# over the classes of type filter options above, like Cspad=include.
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# SOURCE FILTERING
+#
+# The default for the src_filter option is "include all"
+# If you want to include a subset of the sources, do
+#
+# src_filter include srcname1 srcname2  
+#
+#  or if you want to exclude a subset of sources, do
+#
+# src_filter exclude srcname1 srcname2
+#
+# The syntax for specifying a srcname follows that of the Psana Source (discussed in 
+# the Psana Users Guide). The Psana Source recognizes DAQ alias names (if present
+# in the xtc files), several styles for specifying a Pds Src, as well as detector matches 
+# where the detector number, or device number is not known. 
+#
+# Unknown sources generate exceptions that by default stop the Translator. This can be 
+# inconvenient for users that reuse one configuration across many runs in an experiment, 
+# where some runs includes certain sources and some runs don't. You can tell the Translator
+# to ignore unknown sources by setting the option
+#
+# unknown_src_ok=0   # to 1, by default it is False, which means stop.
+# 
+# Specifically, format of the match string can be:
+#
+#       DetInfo(det.detId:dev.devId) - fully or partially specified DetInfo
+#       det.detId:dev.devId - same as above
+#       DetInfo(det-detId|dev.devId) - same as above
+#       det-detId|dev.devId - same as above
+#       BldInfo(type) - fully or partially specified BldInfo
+#       type - same as above
+#       ProcInfo(ipAddr) - fully or partially specified ProcInfo
+#
+# For example
+#        DetInfo(AmoETOF.0.Acqiris.0)  
+#        DetInfo(AmoETOF.0.Acqiris)  
+#        DetInfo(AmoETOF:Acqiris)
+#        AmoETOF:Acqiris
+#        AmoETOF|Acqiris
+#
+# will all match the same data, AmoETOF.0.Acqiris.0. The later ones will match
+# additional data (such as detector 1, 2, etc.) if it is present.
+#
+# A simple way to set up src filtering is to take a look at the sources in the 
+# xtc input using the psana EventKeys module.  For example
+#
+# psana -n 5 -m EventKeys exp=cxitut13:run=22 
+#
+# Will print the EventKeys in the first 5 events.  If the output includes
+#
+#   EventKey(type=Psana::EvrData::DataV3, src=DetInfo(NoDetector.0:Evr.2))
+#   EventKey(type=Psana::CsPad::DataV2, src=DetInfo(CxiDs1.0:Cspad.0))
+#   EventKey(type=Psana::CsPad2x2::ElementV1, src=DetInfo(CxiSc2.0:Cspad2x2.1))
+#   EventKey(type=Psana::Bld::BldDataEBeamV3, src=BldInfo(EBeam))
+#   EventKey(type=Psana::Bld::BldDataFEEGasDetEnergy, src=BldInfo(FEEGasDetEnergy))
+#   EventKey(type=Psana::Camera::FrameV1, src=BldInfo(CxiDg2_Pim))
+#
+# Then one can filter on these six srcname's:
+#
+#  NoDetector.0:Evr.2  CxiDs1.0:Cspad.0  CxiSc2.0:Cspad2x2.1  EBeam  FEEGasDetEnergy  CxiDg2_Pim
+#
+
+src_filter = include all
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# CALIBRATION FILTERING
+#
+# Psana calibration modules can produce calibrated versions of different 
+# data types. Depending on the module used, you may get an NDArray, an 
+# image, or the same data type as was in the xtc but with calibrated data.
+#
+# If you are doing the latter, the module output will be data of the same type 
+# and src as the uncalibrated data, with an additional key, such as 'calibrated'.
+# If these modules are configured to use a different key, set calibration_key
+# below accordingly:
+
+calibration_key = calibrated
+
+# The Translator defaults to writing calibrated data in place of uncalibrated
+# data. If you do not want the calibrated data and would prefer to have the
+# original uncalibrated data from the xtc, then set skip_calibrated to true.
+
+skip_calibrated = false
+
+# note, setting skip_calibrated to true will force sets exclude_calibstore 
+# (below) to be true as well.
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# CALIBSTORE FILTERING
+#
+# Calibration modules may publish the data they used to produce the calibrated
+# event objects. Examples of data would be pedestal values, pixel status (what
+# pixels are hot) and common mode algorithm parameters. This data will be published
+# in what is called the Psana calibStore. When the Translator sees calibrated 
+# event data, it will look for the corresponsinding calibStore data as well.
+# If you do not want it to translate calibStore data, set the following to true.
+
+exclude_calibstore = false
+
+# otherwise, the Translator will create a group CalibStore that holds the
+# calibstore data. Note, the Translator looks for all calibStore data associated 
+# with the calibration modules. If a calibration module was configured to not do 
+# certain calibrations (such as gain) but the module still put gain values
+# in the config store (even though it did not use them) the Translator 
+# would still translate those gain values.
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# KEY FILTERING
+#
+# Psana modules loaded before the translator may put a variety of objects in the event 
+# store. Be default, the Translator will translate any new data that it knows about.
+# In addition to the psana types, it knows about NDArrays, C++ strings, and has a C++ interface 
+# for registering new simple types. NDarray's up to 4 dimensions of 10 basic types 
+# (8, 16, 32 and 64 bit signed and unsigned int, float and double) as well as the const 
+# versions of these types are translated.
+#
+# Generally Psana modules will attach keys to these objects (the keys are simply strings).
+# To filter the set of keys that are translated, modify the parameter below:
+
+key_filter = include all
+
+# The default is to not look at the key but rather translate all data that the translator
+# knows about. An example of including only data with the key finalanswer would be
+#
+# key_filter = include finalanswer
+#
+# To exclude a few keys, one can do
+#
+# key_filter = exclude arrayA arrayB
+#
+# Note, key filtering does not affect translation of data without keys. For instance
+# setting key_filter = include keyA does not turn off translation of data without keys.
+# Of all the data with keys, only those where the key is keyA will be translated.
+#
+
+# ---------------------------------------
+# SPLIT INTO SEPARTE HDF5 FILES BASED ON CALIB CYCLES
+#
+# There are two reasons to split the Translator output into separate files based on
+# calib cycles. The first is to reduce the size of the hdf5 files, and the second is
+# to speedup translation by translating separate calib cycles in parallel. The default 
+# is to not split:
+
+split = NoSplit
+
+# however the Translator also supports SplitScan mode. This can only be invoked by running
+# the separate driver program
+#
+#  h5-mpi-translate
+#
+# which requires MPI to be available in the environment. Under the hood, it will use the two other
+# values for the split parameter - MPIWorker and MPIMaster - but users should not set these directly.
+
+# In SplitScan mode, in addition to the output File, separate files will be made for the calib cycles. 
+# The output file (the master file) will include external links to the other files. Several mpi jobs are 
+# run simultaneously to divide the work of creating the calib cycle files. For example, running six jobs 
+# to produce out.h5 might look like:
+#
+#   mpirun -n 6 h5-mpi-translate -m Translator.H5Output -o Translator.H5Output.output_file=out.h5 exp=xppd9714:run=16
+#
+# The driver program, h5-mpi-translate, takes all arguments that psana takes.
+
+# If six jobs were used, one becomes the master process and the other five are the workers.
+# The master process does two things. First it writes the file out.h5 with the external links 
+# to the calib files. Second it reads through all the data and finds the calib cycles. When it
+# finds a calib cycle, it tells the next available worker where this is. When a worker is done,
+# it tells the master process. The master process than adds all neccessary external links from
+# out.h5 to the translated calib file produced by the worker.
+#
+# Generally, there will be one calib cycle file for each calib cycle. However to prevent to many 
+# calib cycle files from being produced for experiments that have only a few events per calib cycle, 
+# an option controls the minumum number of events per external calib cycle file. The default is
+
+# min_events_per_calib_file = 100
+
+# For example, if there are only 10 events per calib cycle, and assuming the master file is called 
+# out.h5, the file output_cc0000.h5 will contain the groups 
+#
+# /CalibCycle:0000
+# /CalibCycle:0001
+# ...
+# /CalibCycle:0009
+#
+# and the file output_cc0010.h5 will start with group /CalibCycle:0010
+#
+# As mentioned above, when workers finish a calib cycle file, they send a message to the master. 
+# How frequently the master stops reading through the data to check for these messages is controlled 
+# by the following parameter
+
+# num_events_check_done_calib_file = 120
+
+# that is, it defaults to check for a 'done' message from a worker every 120 events.
+
+# by default, the calib cycle files are written to the same directory as the master file. Optionally,
+# they can be placed into a subdirectory based on the master filename. The subdirectory name is the
+# master file basename, without the extension, with _ccfiles appended to it. This subdirectory will be
+# created if need be. To do this, set
+#
+# split_cc_in_subdir = True
+#
+# then if one does something like
+#
+# output_file = mydir/xpptut13-r0179.h5
+# split_cc_in_subdir = True
+#
+# one will get
+# 
+# mydir/xpptut13-r0179.h5
+# mydir/xpptut13-r0179_ccfiles/xpptut13-r0179_cc0000.h5
+# mydir/xpptut13-r0179_ccfiles/xpptut13-r0179_cc0001.h5
+# ...
+#
+# rather than 
+# mydir/xpptut13-r0179.h5
+# mydir/xpptut13-r0179_cc0000.h5
+# mydir/xpptut13-r0179_cc0001.h5
+##
+# When running the h5-mpi-translate and specifying user psana modules (perhaps to add ndarrays
+# into the translation or dynamically filter events) it is important to note that these modules
+# are restarted for each calib cycle file. That is these modules will have their beginJob/endJob
+# and beginRun/endRun routines called for each calib file that a worker produces.
+#
+#### FAST INDEX ####
+#
+# For online analysis with live data, one of the impediments to keeping up with the data is the time 
+# it takes h5-mpi-translate's to read through the data to find the calib cycles. Typically the data is 
+# recorded in 6 or more separate files and each must be read through to identify the start of calib cycles. 
+# Unfortunately this read speed can be 30-40hz for a typical experiment - far short of the 120hz we'd like 
+# to obtain. A recent feature added to h5-mpi-translate takes advantage of the unique signature of each 
+# new calib cycle, combined with the regular structure of the separate data files in order to limit the 
+# reading to just one of the files. In this way, the h5-mpi-translate master rank need only get through the 
+# data it reads/searches at 20hz to keep up with the data. We have had good success with this feature 
+# recently, but it is not guaranteed to work. It is a temporary solution until a more robust way to do 
+# fast/live indexing is put in place. However in the meantime, the translator supports the following options 
+# to turn on fast indexing and controlling how much time is spent searching the other files
+#
+# fast_index=0                 # set to 1 to turn fast indexing on
+# fi_mb_half_block=12          # when fast indexing is on, use 12MB on each side, or 24MB for each block that is searched
+# fi_num_blocks=50             # this it half the number of 'other' blocks to try. The translator will try 1 + 2*50 = 101 blocks if this is 50
+#
+# Some details, If the Translator finds a calib cycle at offset N in DAQ stream 0, then the Translator 
+# will by default look in a 24MB block around offset N in stream 1, i.e., N -+ 12MB. It is looking for a 
+# match on about 52 bits, spread out among 20 bytes. If the Translator fails to find the calib cycle in 
+# those 24MB, then it tries the next 24MB below, then the next 24MB above, then below again, then above 
+# again, etc. In the end, the Translator will cover 5` of these blocks, or 51*24MB=1.2GB in stream 1. 
+# After it finds the calib cycle in stream 1, it repeats this process for stream 2,3,4 and 5. 
+# If the Translator fails with any of these streams, it throws an exception.
+#
+# Another option related to split scan is
+#
+# first_calib_cycle_number
+#
+# which is a 0-up counter for the first calib cycle that the MPIWorker will see. However users should not set
+# this option - it is set by the Translator.
+#
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# COMPRESSION 
+#
+# The following options control compression for most all datasets.
+# Shuffling improves compression for certain datasets. Valid values for
+# deflate (gzip compression level) are 0-9. Setting deflate = -1 turns off
+# compression.
+
+shuffle = true
+deflate = 1
+
+# if deflate is set to -1, set shuffle to false, as it performs no function without compression.
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# TECHNICAL, ADVANCED CONFIGURATION
+# 
+# ---------------------------------------
+# CHUNKING
+# The commented options below give the default chunking options.
+# Objects per chunk are selected from the target chunk size (16 MB) and 
+# adjusted based on min/max objects per chunk, and the max bytes per chunk.
+# It is important that the chunkCache (created on a per dataset basis) be 
+# large enough to hold at least one chunk, ideally all chunks we need to have
+# open at one time when writing to the dataset (usually one, unless we repair
+# split events):
+ 
+# chunkSizeTargetInBytes = 1703936 (16MB)
+# chunkSizeTargetObjects = 0 (0 means select objects per chunk from chunkSizeInBytes)
+# maxChunkSizeInBytes = 10649600  (100MB)
+# minObjectsPerChunk = 50              
+# maxObjectsPerChunk = 2048
+# chunkCacheSizeTargetInChunks = 3
+# maxChunkCacheSizeInBytes = 10649600  (100MB)
+
+# By default, the Translator looks for control data to see if the number of events is known.
+# If so, this overrides options above. To control chunking, one should also set useControlData
+# below to 0 (or False)
+# useControlData = 1  
+#
+# ---------------------------------------
+# REFINED DATASET CONTROL
+#
+# There are six classes of datasets for which individual options for shuffle,
+# deflate, chunkSizeTargetInBytes and chunkSizeTargetObjects can be specified:
+#
+# regular (most everything, all psana types)
+# epics (all the epics pv's)
+# damage (accompanies all regular data from event store)
+# ndarrays (new data from other modules)
+# string's (new data from other modules)
+# eventId (the time dataset that also accompanies all regular data, epics pvs, ndarrays and strings)
+#
+# The options for regular datasets have been discussed above. The other five datasets 
+# get their default values for shuffle, deflate, chunkSizeInBytes and chunkSizeInObjects
+# from the regular dataset options except in the cases below:
+ 
+# damageShuffle = false
+# stringShuffle = false
+# epicsPvShuffle = false
+# stringDeflate = -1
+# eventIdChunkSizeTargetInBytes = 16384
+# epicsPvChunkSizeTargetInBytes = 16384
+
+# The rest of the shuffle, deflate and chunk size options for the other five datasets are:
+#
+# eventIdShuffle = true
+# eventIdDeflate = 1
+# damageDeflate = 1
+# epicsPvDeflate = 1
+# ndarrayShuffle = true
+# ndarrayDeflate = 1
+# eventIdChunkSizeTargetObjects = 0
+# damageChunkSizeTargetInBytes = 1703936
+# damageChunkSizeTargetObjects = 0
+# stringChunkSizeTargetInBytes = 1703936
+# stringChunkSizeTargetObjects = 0
+# ndarrayChunkSizeTargetInBytes = 1703936
+# ndarrayChunkSizeTargetObjects = 0
+# epicsPvChunkSizeTargetObjects = 0
+
+# ---------------------------------------
+# SPLIT EVENTS
+# When the Translator encounters a split event, it checks a cache to see
+# if it has already seen it.  If it has, it fills in any blanks that it can.
+# To prevent this cache from growing to large, set the maximum number of
+# split events to look back through here (default is 3000):
+
+max_saved_split_events = 3000
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: type_aliases_cpp
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for a psana.cfg file that uses the Hdf5 Translator module.
+:  This sets default values for all of the type filters.
+:  
+:  Parameters for this template:
+:
+:  base_headers - list of the include files
+:  type_aliases - list of objects, each has a alias and typeList - the latter is a list of types
+:  
+/* Do not edit this file.  It is created by a code generator. */
+
+#include "Translator/TypeAliases.h"
+
+{% for baseheader in base_headers %}
+#include "psddl_psana/{{baseheader}}"
+{% endfor %}
+#include "ndarray/ndarray.h"
+
+using namespace Translator;
+using namespace std;
+
+TypeAliases::TypeAliases() {
+{% for entry in type_aliases %}
+  TypeInfoSet {{entry.alias}};
+{% for type in entry.typeList %}
+  {{entry.alias}}.insert( & typeid({{type}}));
+{% endfor %}
+  m_alias2TypesMap["{{entry.alias}}"] = {{entry.alias}};
+
+{% endfor %}
+
+  Alias2TypesMap::iterator pos;
+  for (pos = m_alias2TypesMap.begin(); pos != m_alias2TypesMap.end(); ++pos) {
+    m_aliasKeys.insert(pos->first);
+    TypeInfoSet & typeSet = pos->second;
+    TypeInfoSet::iterator typePos;
+    for (typePos = typeSet.begin(); typePos != typeSet.end(); ++typePos) {
+      m_type2AliasMap[*typePos] = pos->first;
+    }
+  }  
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: hdfwritermap_cpp
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for a Translator/src/HdfWriterMap.cpp.  One function in this file, 
+:  initializeHdfWriterMap is generated as it uses all the Psana types.
+:  
+:  Parameters for this template:
+:  base_headers  - list of the basename of the header files in the psddl_hdf2psana package 
+:             that include the store, store_at, make_datasets functions that we will use.  
+:
+:  namespaces - list of the namespaces that organize the store, store_at, make_datasets functions
+:               in the psddl_hdf2psana package.
+:  
+:  psana_types - list of the psana types that we generate converters for
+:
+/* Do not edit this file.  It is created from a code generator.
+Edit the template which resides in 
+
+psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
+*/
+
+#include "PSEvt/EventKey.h"
+#include "PSEvt/TypeInfoUtils.h"
+#include "Translator/HdfWriterFromEvent.h"
+#include "Translator/HdfWriterMap.h"
+#include "MsgLogger/MsgLogger.h"
+{% for header in base_headers %}
+#include "psddl_hdf2psana/{{header}}"
+{% endfor %}
+#include "Translator/HdfWriterNDArray.h"
+#include "Translator/HdfWriterStringFromEvent.h"
+ 
+using namespace std;
+
+namespace {
+
+const char *logger = "Translator.HdfWriterMap";
+const int latestTypeSchema = -1;
+
+using namespace Translator;
+using namespace psddl_hdf2psana;
+{% for namespace in namespaces %}
+using namespace psddl_hdf2psana::{{namespace}};
+{% endfor %}
+
+
+template<typename T>
+class HdfWriterPsana : public HdfWriterFromEvent {
+public:
+  void make_datasets(DataTypeLoc dataTypeLoc, hdf5pp::Group & srcGroup, 
+                     const PSEvt::EventKey & eventKey, 
+                     PSEvt::Event & evt, PSEnv::Env & env,
+                     bool shuffle, int deflate,
+                     boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy)
+  {
+    boost::shared_ptr<T> ptr = getFromEventStore<T>(eventKey, dataTypeLoc, evt, env);
+    MsgLog(logger, trace, "HdfWriter<" << PSEvt::TypeInfoUtils::typeInfoRealName(& typeid(T) ) << ">::make_datasets in group: " << srcGroup.name());
+    ::make_datasets(*ptr,srcGroup,*chunkPolicy,deflate,shuffle,latestTypeSchema);
+  }
+
+  void store(DataTypeLoc dataTypeLoc, 
+             hdf5pp::Group & srcGroup, 
+             const PSEvt::EventKey & eventKey, 
+             PSEvt::Event & evt, 
+             PSEnv::Env & env) 
+  {
+    boost::shared_ptr<T> ptr = getFromEventStore<T>(eventKey, dataTypeLoc, evt, env);
+    ::store(*ptr,srcGroup,latestTypeSchema); 
+  }
+  
+  void store_at(DataTypeLoc dataTypeLoc, 
+                long index, hdf5pp::Group & srcGroup, 
+                const PSEvt::EventKey & eventKey, 
+                PSEvt::Event & evt, 
+                PSEnv::Env & env) {
+    boost::shared_ptr<T> ptr = getFromEventStore<T>(eventKey, dataTypeLoc, evt, env);
+    ::store_at(ptr.get(),srcGroup, index, latestTypeSchema); 
+  }
+
+  void append(DataTypeLoc dataTypeLoc,
+              hdf5pp::Group & srcGroup, const PSEvt::EventKey & eventKey, 
+              PSEvt::Event & evt, PSEnv::Env & env) 
+  {
+    boost::shared_ptr<T> ptr = getFromEventStore<T>(eventKey, dataTypeLoc, evt, env);
+    ::store_at(ptr.get(), srcGroup, indexForAppend, latestTypeSchema);
+  }
+
+  void addBlank(hdf5pp::Group & group)
+  {
+    T *ptrForBlank = NULL;
+    ::store_at(ptrForBlank,group, indexForAppend, latestTypeSchema);
+  }
+  static const long indexForAppend = -1;
+};  // class HdfWriterPsana<T>
+
+
+} // local namespace 
+
+namespace Translator {
+
+
+void HdfWriterMap::initialize() {
+{% for psana_type in psana_types %}
+  m_mainMap[ & typeid({{psana_type}}) ] = boost::make_shared<HdfWriterPsana<{{psana_type}}> >();
+{% endfor %}
+
+  // ndarrays
+{% for elem, ndim in elemDimPairs %}
+  m_mainMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, false > >();  
+{% endfor %}
+  // string               
+  m_mainMap[ & typeid(std::string) ] = boost::make_shared<HdfWriterStringFromEvent>();
+
+  // vlen ndarrays
+{% for elem, ndim in elemDimPairs %}
+  m_vlenMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, true > >();  
+{% endfor %}
+}
+
+bool HdfWriterMap::remove(const std::type_info * typeInfoPtr)
+{
+  MapImpl::iterator posMain = m_mainMap.find(typeInfoPtr);
+  MapImpl::iterator posVlen = m_vlenMap.find(typeInfoPtr);
+  bool inMain = posMain != m_mainMap.end();
+  bool inVlen = posVlen != m_vlenMap.end();
+  if ((not inMain) and (not inVlen)) return false;
+  if (inMain) m_mainMap.erase(posMain);
+  if (inVlen) m_vlenMap.erase(posVlen);
+  return true;
+}
+
+bool HdfWriterMap::replace(const std::type_info * typeInfoPtr,
+             boost::shared_ptr<HdfWriterFromEvent> hdfWriter, bool vlen )
+{
+  MapImpl *map = &m_mainMap;
+  if (vlen) map = &m_vlenMap;
+  bool replaced = (map->find(typeInfoPtr) != map->end());
+  (*map)[typeInfoPtr] = hdfWriter;
+  return replaced;
+}
+
+boost::shared_ptr<HdfWriterFromEvent> HdfWriterMap::find(const std::type_info * typeInfoPtr, bool vlen)
+{
+  boost::shared_ptr<HdfWriterFromEvent> writer;
+  MapImpl *map = &m_mainMap;
+  if (vlen) map = &m_vlenMap;
+  MapImpl::iterator pos = map->find(typeInfoPtr);
+  if (pos == map->end()) return writer;
+  writer = pos->second;
+  return writer;
+}
+
+std::vector<const std::type_info *>  HdfWriterMap::types(bool vlenTable) {
+  MapImpl *mapPtr = &m_mainMap;
+  if (vlenTable) mapPtr = &m_vlenMap;
+  vector<const type_info *> types(mapPtr->size());
+  unsigned idx = 0;
+  for (MapImpl::iterator pos = mapPtr->begin(); pos != mapPtr->end(); ++pos) {
+    types.at(idx++) = pos->first;
+  }
+  return types;
+}
+
+
+} // Translator namespace
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: epics_ddl_h
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for a Translator/include/epics.dll.h
+:
+:  Parameters for this template:
+:  base_headers  - list of the basename of the header files in the psddl_hdf2psana package 
+:             that include the store, store_at, make_datasets functions that we will use.  
+:
+:  namespaces - list of the namespaces that organize the store, store_at, make_datasets functions
+:               in the psddl_hdf2psana package.
+:  
+:  psana_types - list of the psana types that we generate converters for
+:
+#ifndef TRANSLATOR_EPICS_DDL_H
+#define TRANSLATOR_EPICS_DDL_H
+
+/* ****************************
+** Do not edit this file.  It is auto generated. **
+
+The code is generated from psddl/src/DdlHdf5Translator.py 
+  and the template in      psddl/data/templates/hdf5Translator.tmpl?XXX
+
+The DDL defines the 14 epics classes via a C++ class hierarchy. 
+These 14 types are EpicsPvCtrl* and EpicsPvTime* where * is one of:
+String, Short, Float, Enum, Char, Long or Double.
+
+An example of the hierarchy is
+
+EpicsPvTimeDouble  derives from 
+EpicsPvTimeHeader  derives from
+EpicsPvHeader
+
+moreover, classes have attributes that are themselves classes - the
+dbr and stamp attributes.
+
+We use the DDL description of the Epics Pv to 'unroll' the 14 epicsPv
+types into  'flat' structures.  All fields within dbr are brought into
+the top level. stamp in not flattened, so as not to deviate from the previous hdf5 schema.
+
+
+For each of the 14 classes, we define a flat structure (except for stamp) in the Unroll
+namespace. These structs hold one value.  See EpicsWriteBuffer for the templatized class
+that will hold all the values.
+
+Note for Unroll::EpicsPvCtrlEnum - space is allocated for the maximum number of 
+enum string constants and the first value is stored after this. The hdf5 type will
+only store the number of string constants used, with the values occuring after these.
+
+ */
+
+#include <string.h>
+
+#include "hdf5/hdf5.h"
+#include "psddl_psana/epics.ddl.h"
+
+namespace Translator {
+
+namespace Unroll {
+
+struct epicsTimeStamp {
+  uint32_t secPastEpoch;
+  uint32_t nsec;
+  epicsTimeStamp & operator=(const Psana::Epics::epicsTimeStamp & rhs) {
+    secPastEpoch = rhs.sec();
+    nsec = rhs.nsec();
+    return *this;
+ };
+};
+
+{% for epicsPv in epicsPvs %}
+struct {{epicsPv['name']}} {
+  typedef Psana::Epics::{{epicsPv['name']}} PsanaSrc;
+  typedef {{epicsPv['value_basetype']}} valueBaseType{{epicsPv['value_array_print_info']}};
+{% for attr in epicsPv['attrs'] %}
+  {{attr['basetype']}} {{attr['name']}}{{attr['array_print_info']}};
+{% endfor %} 
+  {{epicsPv['value_basetype']}} value{{epicsPv['value_array_print_info']}};
+};
+
+{% endfor %}
+} // namespace Unroll
+
+{% for epicsPv in epicsPvs %}
+void copyToUnrolledExceptForValue(const Psana::Epics::{{epicsPv['name']}} &source, Unroll::{{epicsPv['name']}} &dest);
+{% endfor %} 
+
+} // namespace Translator
+
+#endif
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: epics_ddl_cpp
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for Translator/src/epics.dll.cpp
+:
+:  Parameters for this template:
+:  base_headers  - list of the basename of the header files in the psddl_hdf2psana package 
+:             that include the store, store_at, make_datasets functions that we will use.  
+:
+:  namespaces - list of the namespaces that organize the store, store_at, make_datasets functions
+:               in the psddl_hdf2psana package.
+:  
+:  psana_types - list of the psana types that we generate converters for
+:
+/* Do not edit this file.  It is created by a code generator. */
+
+#include <string.h>
+#include <algorithm>
+#include "MsgLogger/MsgLogger.h"
+#include "Translator/epics.ddl.h"
+
+namespace {
+
+void copyEpicsPvCtrlEnumStrings(const Psana::Epics::EpicsPvCtrlEnum & sourceObject, 
+                                Translator::Unroll::EpicsPvCtrlEnum & destObject)
+{
+  const Psana::Epics::dbr_ctrl_enum& dbr = sourceObject.dbr();
+  for (uint16_t stringNumber = 0; stringNumber < dbr.no_str(); ++stringNumber) {
+    strncpy(destObject.strs[stringNumber], dbr.strings(stringNumber), Psana::Epics::MAX_ENUM_STRING_SIZE);
+  }
+}
+
+} // local namespace
+
+namespace Translator {
+
+{% for epicsPv in epicsPvs %}
+void copyToUnrolledExceptForValue(const Psana::Epics::{{epicsPv['name']}} &source,
+                    Unroll::{{epicsPv['name']}} &dest) 
+{
+{% for attr in epicsPv['attrs'] %}
+{% if attr['assignment'] == 'normal' %}
+  dest.{{attr['name']}} = source.{{attr['accessor']}};
+{% endif %}
+{% if attr['assignment'] == 'enumstr' %}
+  copyEpicsPvCtrlEnumStrings(source, dest);
+{% endif %}
+{% if attr['assignment'] == 'strncpy' %}
+  strncpy(dest.{{attr['name']}}, source.{{attr['accessor']}}, Psana::Epics::{{attr['strncpy_max']}});
+{% endif %}
+{% endfor %}
+}
+
+{% endfor %} 
+
+ 
+} // Translator
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_cpp
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for Translator/src/HdfWriterEpicsPvDispatch.cpp
+:
+:  Parameters for this template:
+:  base_headers  - list of the basename of the header files in the psddl_hdf2psana package 
+:             that include the store, store_at, make_datasets functions that we will use.  
+:
+:  namespaces - list of the namespaces that organize the store, store_at, make_datasets functions
+:               in the psddl_hdf2psana package.
+:  
+:  psana_types - list of the psana types that we generate converters for
+:
+/* Do not edit this file. It is generated by a code generator.
+*/
+#include "MsgLogger/MsgLogger.h"
+#include "psddl_psana/epics.ddl.h"
+#include "Translator/epics.ddl.h"
+#include "Translator/HdfWriterEpicsPv.h"
+
+using namespace Translator;
+
+namespace {
+  const char * logger = "HdfWriterEpicsPv";
+}
+
+void HdfWriterEpicsPv::dispatch(hid_t groupId, int16_t dbrType, 
+                                PSEnv::EpicsStore & epicsStore, 
+                                const std::string & epicsPvName,
+                                boost::shared_ptr<PSEvt::EventId> eventId,
+                                DispatchAction dispatchAction) {
+  switch (dbrType) {
+{% for el in dbrTypes %}
+  case Psana::Epics::{{el['dbr_str']}}:
+    doDispatchAction<Unroll::{{el['pv_type']}}>(dbrType, "{{el['dbr_str']}}", 
+                             "Psana::Epics::{{el['pv_type']}}",
+                             groupId, epicsStore, epicsPvName, 
+                             eventId, dispatchAction);
+    break;
+{% endfor %}
+  default:
+    MsgLog(logger, warning, "unexpected dbr type: " << dbrType << " in dispatch");
+  }
+}
+

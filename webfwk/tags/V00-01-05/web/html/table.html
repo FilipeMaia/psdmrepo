@@ -1,0 +1,235 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>JQuery tests</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
+
+<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
+
+<style>
+    
+#navigation {
+    float: right;
+    width: 150px;
+}
+#intro {
+    width: 450px;
+}
+body {
+    font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;
+    color: #3E3E3E;
+    background: #94C5EB url(../images/background-grad.png) repeat-x;
+    font-size: 12px;
+}
+p {
+    padding: 5px;
+}
+a {
+    color: #3687AF;
+}
+#container{
+    margin:0 auto;
+    text-align: left;
+    width: 650px;
+}
+#header {
+    height: 60px;
+    color: #172322;
+    background: transparent url(../images/header-corners.png) no-repeat bottom left;
+}
+#header h1 {
+    padding:0;
+    margin:0;
+}
+#content {
+    background-color: #fff;
+    padding: 0 15px 10px 15px;
+} 
+#footer{
+    background-color: #fff;
+    padding:15px;
+    clear: both;
+}
+h2 {
+    border-bottom:2px solid #015287;
+    color: #D15600;
+    padding-top: 10px;
+    margin-top: 0;
+}
+table {
+    border-collapse:collapse;
+    font-size:12px;
+    margin:0 20px 20px 20px;
+    border-top:2px solid #015287;
+    width:480px;
+}
+th {
+    border-bottom: 2px solid #015287;
+    color: #D15600;
+    font-size: 14px;
+    font-weight: normal;
+    text-align: left;
+    padding: 3px 8px;
+}
+td {
+    padding: 6px;
+}
+
+.faux-head {
+    position: absolute;
+    z-index: 100;
+    background-color: #fff;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.faux-head li {
+    float: left;
+    color: #D15600;
+    border-bottom:2px solid #015287;
+    color:#D15600;
+    font-size:14px;
+    font-weight:normal;
+    padding:3px 8px;
+    text-align:left;
+    margin: 0;
+}
+
+</style>
+
+<script type="text/javascript">
+
+var TABLE = {};
+
+TABLE.fixHeader = function(table) {
+    $(table).each(function() {
+        var $table = $(this);
+        var $thead = $table.find('thead');
+        var $ths = $thead.find('th');
+        $table.data('top', $thead.offset().top);
+        $table.data('left', $thead.offset().left);
+        $table.data('bottom', $table.data('top') + $table.height() - $thead.height());
+        var $list = $('<ul class="faux-head"></ul>');
+        $ths.each(function(i) {
+            _th = $(this);
+            $list.append($("<li></li>")
+                .addClass(_th.attr("class"))
+                .html(_th.html()) 
+                .width(_th.width())
+                .click(function() {
+                    _th.click()
+                })
+            ).hide().css({left: $table.data('left'),top: $table.data('top')});
+        });
+        $('body').append($list);
+        $(window).scroll(function() {
+            clearTimeout(timer);
+            timer = setTimeout(function() {
+                if ($table.data('top') < $(document).scrollTop() && $(document).scrollTop() < $table.data('bottom')) {
+                    $list
+                        .show()
+                        .stop()
+                        .animate({
+                          top: $(document).scrollTop(),
+                          opacity: 1
+                      });
+                } else {
+                    $list.fadeOut(function() {
+                        $(this).css({top: $table.data('top')});
+                    });
+                }
+            }, 100);
+        });    
+    });
+};
+
+$(function () {
+    TABLE.fixHeader('#people') ;
+    $('#people')
+        .find('tr:first')
+        .clone()
+        .insertAfter('#people tr:nth-child(10n)');
+    });
+
+</script>
+</head>
+<body>
+<table id="people">
+  <thead>
+    <tr>
+      <th>Id</th>
+      <th>Name</th>
+      <th>Occupation</th>
+      <th>Approx. Location</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+    <tr><td>1</td><td>Igor Gaponenko</td><td>Research Software Developer</td><td>Walnut Creek, CA 94595,  U.S.A</td><td>333k</td></tr>
+  </tbody>
+</table>
+</body>
+</html>

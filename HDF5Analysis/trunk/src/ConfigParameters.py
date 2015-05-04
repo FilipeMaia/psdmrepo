@@ -91,8 +91,8 @@ class ConfigParameters ( object ) :
         #self.dirName              = '/reg/d/psdm/XPP/xppcom10/hdf5'
         #self.fileName             = 'xppcom10-r0546.h5'
 
-        self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
-        self.fileName             = 'cxi80410-r0730.h5'
+        self.dirName              = '/reg/d/psdm/CXI/cxitut13/hdf5'
+        self.fileName             = 'cxitut13-r0135.h5'
 
         self.list_of_checked_item_names=[]
         self.list_of_checked_item_names.append('/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1/CxiSc1.0:Tm6740.1/image')       

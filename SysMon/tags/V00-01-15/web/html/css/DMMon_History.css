@@ -1,0 +1,10 @@
+#dmmon-history {
+    padding:    20px;
+}
+#dmmon-history .info {
+    margin-top: 15px;
+    color:      maroon;
+}
+#dmmon-history > #rates {
+    margin-top: 10px;
+}
