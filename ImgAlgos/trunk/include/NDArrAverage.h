@@ -130,7 +130,8 @@ private:
 
   std::string    m_fname_ext;       // file name extension, for example for run 123: "-r0123.dat" 
 
-  double         m_thr_rms;         // if rms > m_thr_rms - pixel is bad
+  double         m_rms_min;         // if rms < m_rms_min - pixel is bad
+  double         m_rms_max;         // if rms > m_rms_max - pixel is bad
   double         m_thr_min;         // if ave < m_thr_min - pixel is bad
   double         m_thr_max;         // if ave > m_thr_max - pixel is bad
   unsigned       m_print_bits;   
@@ -166,8 +167,8 @@ private:
   double*        m_sum2;  // sum of squares per pixel
   double*        m_ave;   // average per pixel
   double*        m_rms;   // rms per pixel
-  int*           m_msk;   // pixel mask per pixel; pixel is hot if rms > m_thr_rms, hot/cold = 0/1 
-  int*           m_hot;   // hot-pixel mask per pixel (in style of Phil); pixel is hot if rms > m_thr_rms, hot/cold = 1/0 , 
+  int*           m_msk;   // pixel mask per pixel; pixel is hot if rms > m_rms_max, hot/cold = 0/1 
+  int*           m_hot;   // hot-pixel mask per pixel (in style of Phil); pixel is hot if rms > m_rms_max, hot/cold = 1/0 , 
   double*        m_max;   // maximal value over events per pixel
 
 protected:

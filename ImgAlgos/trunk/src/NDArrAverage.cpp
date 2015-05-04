@@ -61,7 +61,8 @@ NDArrAverage::NDArrAverage (const std::string& name)
   , m_hotFile()
   , m_maxFile()
   , m_file_type()
-  , m_thr_rms()
+  , m_rms_min()
+  , m_rms_max()
   , m_thr_min()
   , m_thr_max()
   , m_print_bits()
@@ -82,7 +83,8 @@ NDArrAverage::NDArrAverage (const std::string& name)
   m_hotFile     = configStr("hotpixfile",  "");
   m_maxFile     = configStr("maxfile",     "");
   m_file_type   = configStr("ftype",    "txt");
-  m_thr_rms     = config("thr_rms_ADU",   10000.);
+  m_rms_min     = config("thr_rms_min",       0.);
+  m_rms_max     = config("thr_rms_ADU",   10000.);
   m_thr_min     = config("thr_min_ADU", -100000.);
   m_thr_max     = config("thr_max_ADU",  100000.);
   m_nev_stage1  = config("evts_stage1",  1000000);
@@ -134,7 +136,8 @@ NDArrAverage::printInputParameters()
         << "\n m_hotFile  : " << m_hotFile    
         << "\n m_maxFile  : " << m_maxFile    
         << "\n m_ftype    : " << m_file_type
-        << "\n m_thr_rms  : " << m_thr_rms  
+        << "\n m_rms_min  : " << m_rms_min  
+        << "\n m_rms_max  : " << m_rms_max  
         << "\n m_thr_min  : " << m_thr_min  
         << "\n m_thr_max  : " << m_thr_max
         << "\n m_do_sum   : " << m_do_sum
@@ -380,22 +383,25 @@ NDArrAverage::procStatArrays()
     }
 
     // Use default or non-default or default (auto-evaluated) threshold
-    double thr_rms = (m_thr_rms>0) ? m_thr_rms : evaluateThresholdOnRMS();
+    double thr_rms_min = m_rms_min;
+    double thr_rms_max = (m_rms_max>0) ? m_rms_max : evaluateThresholdOnRMS();
 
     m_nbadpix = 0;
     if (m_do_msk || m_do_hot) {
       for (unsigned i=0; i!=m_size; ++i) {
- 	 bool is_bad_pixel = m_rms[i] >   thr_rms
+ 	 bool is_bad_pixel = m_rms[i] > thr_rms_max
+                          || m_rms[i] < thr_rms_min
                           || m_ave[i] < m_thr_min
                           || m_ave[i] > m_thr_max;
 
          if (is_bad_pixel) { m_msk[i] = 1; ++ m_nbadpix; }
 	 else                m_msk[i] = 0;
 
-         m_hot[i] = 0;                            // good pixel
-	 if (m_rms[i] >   thr_rms) m_hot[i]  = 1; // hot pixel
-	 if (m_ave[i] > m_thr_max) m_hot[i] |= 2; // satturated
-	 if (m_ave[i] < m_thr_min) m_hot[i] |= 4; // cold
+         m_hot[i] = 0;                              // good pixel
+	 if (m_rms[i] > thr_rms_max) m_hot[i]  = 1; // hot pixel
+	 if (m_ave[i] > m_thr_max)   m_hot[i] |= 2; // satturated
+	 if (m_ave[i] < m_thr_min)   m_hot[i] |= 4; // cold
+	 if (m_rms[i] < thr_rms_min) m_hot[i] |= 8; // cold-rms
       }
     }
 }

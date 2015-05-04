@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-86
+2015-05-04 Mikhail S. Dubrovin
+- NDArrAverage - add parameter thr_rms_min (PSAS-6)
+	
 Tag: V00-03-85
 2015-05-01 Mikhail S. Dubrovin
 - GlobalMethods - add method stringForDetType, add const in detectorTypeForSource
