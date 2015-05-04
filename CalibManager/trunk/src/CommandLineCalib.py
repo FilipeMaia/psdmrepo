@@ -145,6 +145,7 @@ class CommandLineCalib () :
         self.scan_events = cp.bat_dark_scan.value()  if self.opts['scan_events'] is None else self.opts['scan_events']
         self.skip_events = cp.bat_dark_start.value() if self.opts['skip_events'] is None else self.opts['skip_events']
         self.num_events  = cp.bat_dark_end.value() - cp.bat_dark_start.value() if self.opts['num_events'] is None else self.opts['num_events']
+        self.thr_rms_min = cp.mask_rms_thr_min.value() if self.opts['thr_rms_min'] is None else self.opts['thr_rms_min']
         self.thr_rms     = cp.mask_rms_thr.value() if self.opts['thr_rms'] is None else self.opts['thr_rms']
         self.workdir     = cp.dir_work.value()  if self.opts['workdir'] is None else self.opts['workdir']
 	#self.queue       = cp.bat_queue.value() if self.opts['queue'] is None else self.opts['queue']
@@ -165,16 +166,17 @@ class CommandLineCalib () :
 
         self.xtcdir       = cp.xtc_dir_non_std.value_def() if self.opts['xtcdir'] is None else self.opts['xtcdir']
 
-        cp.xtc_dir_non_std.setValue(self.xtcdir)
-        cp.calib_dir      .setValue(self.calibdir)
-        cp.dir_work       .setValue(self.workdir)
-        cp.bat_queue      .setValue(self.queue)
-        cp.bat_dark_sele  .setValue(self.event_code)
-        cp.bat_dark_scan  .setValue(self.scan_events)
-        cp.bat_dark_start .setValue(self.skip_events)
-        cp.bat_dark_end   .setValue(self.num_events+self.skip_events)
-        cp.mask_rms_thr   .setValue(self.thr_rms)
-	cp.det_name       .setValue(self.det_name)
+        cp.xtc_dir_non_std .setValue(self.xtcdir)
+        cp.calib_dir       .setValue(self.calibdir)
+        cp.dir_work        .setValue(self.workdir)
+        cp.bat_queue       .setValue(self.queue)
+        cp.bat_dark_sele   .setValue(self.event_code)
+        cp.bat_dark_scan   .setValue(self.scan_events)
+        cp.bat_dark_start  .setValue(self.skip_events)
+        cp.bat_dark_end    .setValue(self.num_events+self.skip_events)
+        cp.mask_rms_thr_min.setValue(self.thr_rms_min)
+        cp.mask_rms_thr    .setValue(self.thr_rms)
+	cp.det_name        .setValue(self.det_name)
 
         #cp.log_file      .setValue(self.logfile)          
 
@@ -198,6 +200,7 @@ class CommandLineCalib () :
         + '\n     num_events    : %d' % self.num_events\
         + '\n     skip_events   : %d' % self.skip_events\
         + '\n     scan_events   : %d' % self.scan_events\
+        + '\n     thr_rms_min   : %f' % self.thr_rms_min\
         + '\n     thr_rms       : %f' % self.thr_rms\
         + '\n     process       : %s' % self.process\
         + '\n     deploy        : %s' % self.deploy\

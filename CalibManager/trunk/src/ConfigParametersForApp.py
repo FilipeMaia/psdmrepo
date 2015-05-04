@@ -328,6 +328,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_dark_sele     = self.declareParameter( name='BATCH_DARK_SELECTOR',   val_def=0,        type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
+        self.mask_rms_thr_min  = self.declareParameter( name='MASK_HOT_PIX_MIN_THR_RMS',  val_def=    0,  type='float' )
         self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=    0,  type='float' )
         self.mask_min_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MIN',  val_def=    2,  type='float' )
         self.mask_max_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MAX',  val_def=65000,  type='float' )

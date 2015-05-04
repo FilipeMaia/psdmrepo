@@ -229,15 +229,16 @@ class ConfigFileGenerator :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-cspad-with-mask.cfg').path()
         mod_prod = '%s:%i' % (module_prod, self.ind)
         mod_aver = '%s:%i' % (module_aver, self.ind)
-        self.d_subs = {'MODULE_PROD'      : mod_prod,
-                       'MODULE_AVER'      : mod_aver,
-                       'DETINFO'          : self.source,
-                       'FNAME_PEDS_AVE'   : self.fname_ave,
-                       'FNAME_PEDS_RMS'   : self.fname_rms,
-                       'FNAME_PEDS_HOT'   : self.fname_mask,
-                       'THR_RMS_HOTPIX'   : str( cp.mask_rms_thr.value() ),
-                       'THR_MIN_HOTPIX'   : str( cp.mask_min_thr.value() ),
-                       'THR_MAX_HOTPIX'   : str( cp.mask_max_thr.value() )
+        self.d_subs = {'MODULE_PROD'       : mod_prod,
+                       'MODULE_AVER'       : mod_aver,
+                       'DETINFO'           : self.source,
+                       'FNAME_PEDS_AVE'    : self.fname_ave,
+                       'FNAME_PEDS_RMS'    : self.fname_rms,
+                       'FNAME_PEDS_HOT'    : self.fname_mask,
+                       'THR_RMS_HOTPIX_MIN': str( cp.mask_rms_thr_min.value() ),
+                       'THR_RMS_HOTPIX'    : str( cp.mask_rms_thr.value() ),
+                       'THR_MIN_HOTPIX'    : str( cp.mask_min_thr.value() ),
+                       'THR_MAX_HOTPIX'    : str( cp.mask_max_thr.value() )
                       }
 
         self.add_module_in_cfg ('%s %s' % (mod_prod, mod_aver))
@@ -256,6 +257,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
@@ -287,6 +289,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
@@ -308,6 +311,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
@@ -331,6 +335,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
                          'FTYPE'                : str(ftype),
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
@@ -353,6 +358,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
                          'FTYPE'                : str(ftype),
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
@@ -376,6 +382,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
                          'FTYPE'                : str(ftype),
+                         'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
                          'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
