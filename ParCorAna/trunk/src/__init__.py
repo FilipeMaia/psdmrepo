@@ -387,7 +387,6 @@ from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 from PsanaUtil import parseDataSetString, makePsanaOptions, psanaNdArrays
 from PsanaUtil import readDetectorDataAndEventTimes, getSortedCountersBasedOnSecNsecAtHertz
 from XCorrBase import makeDelayList, writeToH5Group, XCorrBase, writeConfig
-from XCorrWorkerBase import XCorrWorkerBase
 from WorkerData import WorkerData
 import maskColorImgNdarr
 from Exceptions import *
@@ -397,6 +396,6 @@ __all__ = ['SM_MsgBuffer', 'MVW_MsgBuffer',
            'identifyCommSubsystems','identifyServerRanks',
            'runCommSystem', 'CommSystemFramework', 'maskColorImgNdarr',
            'checkCountsOffsets', 'divideAmongWorkers', 'makeLogger',
-           'divideAmongWorkers', 'checkCountsOffsets', 'XCorrWorkerBase',
+           'divideAmongWorkers', 'checkCountsOffsets',
            'WorkerData', 'XCorrBase', 'makeDelayList', 'writeToH5Group',
            'unitTests', 'checkParams']

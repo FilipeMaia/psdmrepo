@@ -499,7 +499,7 @@ class WorkerDataCorrelationCalc( unittest.TestCase ) :
         swapTimes = [tm for tm in times]
         swapDatas = [arr.copy() for arr in datas]
 
-        swapList = [(0,1),(2,4), (9,10),(13,16)]
+        swapList = [(0,1), (2,4), (9,10), (13,16)]
         for swapPair in swapList:
             a,b = swapPair
             tmp = swapTimes[a]
@@ -574,7 +574,7 @@ class WorkerDataCorrelationCalc( unittest.TestCase ) :
         numTimes = 5
         numDataPointsThisWorker = 10
         storeDtype = np.float32
-        delays = [1,2,3,5,8, 10]  # with numTimes == 5, won't get anything for 5,8,10
+        delays = [1,2,3,5,8,10]  # with numTimes == 5, won't get anything for 5,8,10
         corrCallback = CorrelationCalcCallback(delays, doRemove=True, tester=self)
 
         workerData = corAna.WorkerData(logger, isFirstWorker, 

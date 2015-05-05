@@ -1,62 +1,36 @@
-'''Example of implementing user code for the G2 calculation.
+'''This module demonstrates how to do the G2 calculation in three ways:
 
-Notes:
-  An import of this module should not do anything complicated. Delay anything
-  complicated until the __init__ method or other methods of the class. The reason 
-  for this is that an import of the module is done when reading the params.py file.
-  An import should not depend on MPI or take a long amount of time.
+* at the end - workers just store data. Once the maximum number of times 
+  has been stored, workers overwrite the oldest stored data. The final
+  calculation is done with the most recently stored data during the
+  viewer publish callback. This calculation is O(T*D) where T is the number
+  of stored times, and D is the number of delays.
+
+* Incrementally, accumulating delays over all time. 
+
+* Incrementally and windowed - the same result as at the end, but done in
+  an ongoing fashion.
 '''
 
 import os
 import numpy as np
-# to get the definition of SUBTRACT and ADD:
 import ParCorAna
-import ParCorAna.XCorrWorkerBase as XCorrWorkerBase
 import psana
 import logging
 import psmon.config as psmonConfig
 import psmon.publish as psmonPublish
 import psmon.plots as psmonPlots
 
-##################################
-### helper functions for UserG2 class below
-def getMatchingIndex(delay, iiTimeIdx, n, timesSortIdx, T):
-    '''This is a helper function to workerCalc.
-
-    Assumes that timesSortIdx is a sorted order of T.
-
-    Args:
-      delay (int):     delay to match
-      iiTimeIdx (int): index into T for start time
-      n (int):         number of times to consider in T
-      timesSortIdx (list/array): sorted order for T
-      T (list/array):          T values
-
-    Return:
-      index into T for time such that `T[index]-T[iiTimeIdx]==delay`
-      or None if no such time exists in T.
-
-    '''
-    jjTimeIdx = iiTimeIdx + delay
-    if jjTimeIdx >= n:
-        jjTimeIdx = n-1
-    iiTime = T[iiTimeIdx]
-    while (T[jjTimeIdx]-iiTime) > delay and jjTimeIdx > iiTimeIdx:
-        jjTimeIdx -= 1
-    if T[jjTimeIdx]-iiTime == delay:
-        return jjTimeIdx
-    return None
-
 ####################################
 class G2Common(object):
-    '''stuff common to both ways to do the G2 calculation
+    '''
     '''
     def __init__(self, user_params, system_params, mpiParams, testAlternate):
         self.user_params = user_params
         self.system_params = system_params
         self.mp = mpiParams
         self.testAlternate = testAlternate
-        
+
         self._arrayNames = ['G2','IF','IP']
 
         self.delays = system_params['delays']
@@ -138,14 +112,41 @@ class G2Common(object):
         self.saturatedValue = self.user_params['saturatedValue']
         self.notzero = self.user_params['notzero']
 
-    def workerBeforeDataRemove(self, dataIdx, pivotIndex, lenT, T, X):
-        pass
+    def workerBeforeDataRemove(self, tm, xInd, workerData):
+        '''called right before data is being overwritten
 
-    def workerAfterDataInsert(self, dataIdx, pivotIndex, lenT, T, X):
-        self.mp.logInfo("dataIdx=%d" % dataIdx)
-        pass
+        Args:
+          tm (int):   the counter time of the data being overwritten
+          xInd (int): the index into workerData.X of the row about to be overwritten
+          workerData: instance of WorkerData with the data stored for this worker
+
+        Return:
+          None
+        '''
+        raise Exception("G2Common.workerBeforeDataRemove not implemented: use sub class")
+
+    def workerAfterDataInsert(self, tm, xInd, workerData):
+        '''called after data has been added, and workerAdjustData has been called.
+
+        Args:
+          tm (int):   the counter time of the data that has been added
+          xInd (int): the index into workerData.X of the row of new data
+          workerData: instance of WorkerData with the data stored for this worker
+
+        Return:
+          None
+        '''
+        raise Exception("workerBeforeDataRemove.workerAfterDataInsert not implemented: use sub class")
 
     def workerAdjustData(self, data):
+        '''called before data added to WorkerData.X - allows filtering/cleaning of data
+
+        Args:
+          data: ndarray of data to be changed. Data must be modified in place.
+
+        Return:
+          None
+        '''
         indexOfSaturatedElements = data >= self.saturatedValue
         self.saturatedElements[indexOfSaturatedElements]=1
         indexOfNegativeAndSmallNumbers = data < self.notzero   ## FACTOR OUT
@@ -153,18 +154,14 @@ class G2Common(object):
         if self.mp.logger.isEnabledFor(logging.DEBUG):
             numSaturated = np.sum(indexOfSaturatedElements)
             numNeg = np.sum(indexOfNegativeAndSmallNumbers)
-            self.mp.logDebug("G2.workerAdjustData: set %d negative values to %r, identified %d saturated pixels" % \
+            self.mp.logDebug("G2Common.workerAdjustData: set %d negative values to %r, identified %d saturated pixels" % \
                              (numNeg, self.notzero, numSaturated))
         
-    def workerCalc(self, T, numTimesFilled, X):
+    def workerCalc(self, workerData):
         '''Must be implemented, returns all output arrays.
         
         Args:
-          T: 1D array of int64, the 120hz counter identifying the events. Note - 
-              T is not sorted.
-          numTimesFilled: T may not be completely filled out. This is the number
-              of entries in T that are.
-          X: the data
+          workerData (WorkerData): object that contains data
         
         Multiple Return::
 
@@ -184,32 +181,94 @@ class G2Common(object):
         
           int8array - a 1D array of np.int8 length=numElementsWorker
         '''
-        allTimes = T
-        n = numTimesFilled
-        print "n=%d" % n
-        if n < len(allTimes):
-            allTimes = T[0:n]
-        timesSortIdx = np.argsort(allTimes)
-        self.G2[:]=0.0
-        self.IP[:]=0.0
-        self.IF[:]=0.0
-        self.counts[:]=0
+        raise Exception("G2Common.workerCalc not implemented, use sub class")
 
-        for delayIdx, delay in enumerate(self.delays):
-            for ii in range(n-delay):
-                iiTimeIdx = timesSortIdx[ii]
-                jjTimeIdx = getMatchingIndex(delay, iiTimeIdx, n, timesSortIdx, T)
-                if jjTimeIdx is None:
+
+    ######## TEST FUNCTION ##########
+    def calcAndPublishForTestAlt(self,sortedEventIds, sortedData, h5GroupUser):
+        '''run the alternative test
+
+        This function receives all the data, including any data that would have been 
+        overwritten due to wrap around, with counters, sorted. It should
+        implement the G2 calculation in a robust, alternate way, that can then be compared
+        to the result of the framework. It should only be run with a small mask file to limit the
+        amount of data accumulated.
+
+        The simplest way to compare results is to reuse the viewerPublish function, however one
+        may want to write an alternate calculate to test this as well.
+
+        Args:
+          sortedEventIds: array of int64, sorted 120hz counters for all the data in the test.
+          sortedData: 2D array of all the accummulated, masked data. 
+          h5GroupUser (h5group): the output group that one should write results to.
+
+        '''
+        raise Exception("G2Common.calcAndPublishForTestAlt Not implemented - use subclass")
+
+    def calcAndPublishForTestAltHelper(self,sortedEventIds, sortedData, h5GroupUser, startIdx):
+        '''This implements the alternative test calculation in a way that is suitable for the sub classes
+        
+        The Incremental will always go through the data from the start, so startingIndex should
+        be 0. However the atEnd and Windowed will only work through the last numEvents of 
+        data, so startingIndex should be that far back.
+        '''
+        G2 = {}
+        IP = {}
+        IF = {}
+        counts = {}
+        assert len(sortedData.shape)==2
+        assert sortedData.shape[0]==len(sortedEventIds)
+        assert startIdx < len(sortedEventIds), "startIdx > last index into data"
+        numPixels = sortedData.shape[1]
+        for delay in self.delays:
+            counts[delay]=0
+            G2[delay]=np.zeros(numPixels)
+            IP[delay]=np.zeros(numPixels)
+            IF[delay]=np.zeros(numPixels)
+
+        self.mp.logInfo("UserG2.calcAndPublishForTestAltHelper: starting double loop")
+
+        for idxA, eventIdA in enumerate(sortedEventIds):
+            if idxA < startIdx: continue
+            counterA = eventIdA['counter']
+            for idxB in range(idxA+1,len(sortedEventIds)):
+                counterB = sortedEventIds[idxB]['counter']
+                delay = counterB - counterA
+                if delay == 0:
+                    print "warning: unexpected - same counter twice in data - idxA=%d, idxB=%d" % (idxA, idxB)
                     continue
-                assert T[jjTimeIdx] - T[iiTimeIdx] == delay, "getMatchingIndex failed"
-                I_ii = X[iiTimeIdx,:]
-                I_jj = X[jjTimeIdx,:]
-                self.counts[delayIdx] += 1
-                self.G2[delayIdx,:] += I_ii * I_jj
-                self.IP[delayIdx,:] += I_ii
-                self.IF[delayIdx,:] += I_jj
-                
-        return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
+                if delay not in self.delays: 
+                    continue
+                counts[delay] += 1
+                dataA = sortedData[idxA,:]
+                dataB = sortedData[idxB,:]
+                G2[delay] += dataA*dataB
+                IP[delay] += dataA
+                IF[delay] += dataB
+
+        self.mp.logInfo("calcAndPublishForTestAlt: finished double loop")
+
+        name2delay2ndarray = {}
+        for nm,delay2masked in zip(['G2','IF','IP'],[G2,IF,IP]):
+            name2delay2ndarray[nm] = {}
+            for delay,masked in delay2masked.iteritems():
+                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float64)
+                name2delay2ndarray[nm][delay][self.maskNdarrayCoords] = masked[:]
+            
+        saturatedElements = np.zeros(self.maskNdarrayCoords.shape, np.int8)
+        saturatedElements[self.maskNdarrayCoords] = self.saturatedElements[:]
+
+        lastEventTime = {'sec':sortedEventIds[-1]['sec'],
+                         'nsec':sortedEventIds[-1]['nsec'],
+                         'fiducials':sortedEventIds[-1]['fiducials'],
+                         'counter':sortedEventIds[-1]['counter']}
+
+        countsForViewerPublish = np.zeros(len(counts),np.int)
+        for idx, delay in enumerate(self.delays):
+            countsForViewerPublish[idx]=counts[delay]
+        self.viewerPublish(countsForViewerPublish, lastEventTime, 
+                           name2delay2ndarray, saturatedElements, h5GroupUser)
+
 
     ######## VIEWER CALLBACKS #############
     def viewerInit(self, maskNdarrayCoords, h5GroupUser):
@@ -380,82 +439,11 @@ class G2Common(object):
             self.mp.logInfo("UserG2.maskOutNewSaturatedElements: removed %d elements from among %d colors" % \
                             (numNewSaturatedElements, numColorsChanged))
 
-    def calcAndPublishForTestAlt(self, sortedEventIds, sortedData, h5GroupUser):
-        '''run the alternative test
 
-        This function receives all the data, with counters, sorted. It should
-        implement the G2 calculation in a robust, alternate way, that can then be compared
-        to the result of the framework.
-
-        The simplest way to compare results is to reuse the viewerPublish function, however one
-        may want to write an alternate calculate to test this as well.
-
-        Args:
-          sortedCounters: array of int64, sorted 120hz counters for all the data in the test.
-          sortedData: 2D array of all the accummulated, masked data. 
-          h5GroupUser (h5group): the output group that we should write results to.
-
-        '''
-        G2 = {}
-        IP = {}
-        IF = {}
-        counts = {}
-        numDetectorElements = sortedData.shape[1]
-        for delay in self.delays:
-            counts[delay]=0
-            G2[delay]=np.zeros(numDetectorElements)
-            IP[delay]=np.zeros(numDetectorElements)
-            IF[delay]=np.zeros(numDetectorElements)
-
-        self.mp.logInfo("calcAndPublishForTestAlt: starting double loop")
-
-        for idxA, eventIdA in enumerate(sortedEventIds):
-            counterA = eventIdA['counter']
-            for idxB in range(idxA+1,len(sortedEventIds)):
-                counterB = sortedEventIds[idxB]['counter']
-                delay = counterB - counterA
-                if delay == 0:
-                    print "warning: unexpected - same counter twice in data - idxA=%d, idxB=%d" % (idxA, idxB)
-                    continue
-                if delay not in self.delays: 
-                    continue
-                counts[delay] += 1
-                dataA = sortedData[idxA,:]
-                dataB = sortedData[idxB,:]
-                G2[delay] += dataA*dataB
-                IP[delay] += dataA
-                IF[delay] += dataB
-
-        self.mp.logInfo("calcAndPublishForTestAlt: finished double loop")
-
-        name2delay2ndarray = {}
-        for nm,delay2masked in zip(['G2','IF','IP'],[G2,IF,IP]):
-            name2delay2ndarray[nm] = {}
-            for delay,masked in delay2masked.iteritems():
-                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float64)
-                name2delay2ndarray[nm][delay][self.maskNdarrayCoords] = masked[:]
-            
-        saturatedElements = np.zeros(self.maskNdarrayCoords.shape, np.int8)
-        saturatedElements[self.maskNdarrayCoords] = self.saturatedElements[:]
-
-        lastEventTime = {'sec':sortedEventIds[-1]['sec'],
-                         'nsec':sortedEventIds[-1]['nsec'],
-                         'fiducials':sortedEventIds[-1]['fiducials'],
-                         'counter':sortedEventIds[-1]['counter']}
-
-        countsForViewerPublish = np.zeros(len(counts),np.int)
-        for idx, delay in enumerate(self.delays):
-            countsForViewerPublish[idx]=counts[delay]
-        self.viewerPublish(countsForViewerPublish, lastEventTime, 
-                           name2delay2ndarray, saturatedElements, h5GroupUser)
-
-#################### on going calculation ###################################        
-class G2onGoing(G2Common):
-    '''Workers keep terms of G2 calculation up to date. Do O(n) where n
-    is number of delays, work during each event.
-    '''
+#################### Incremental Accumulator Calculation #######################        
+class G2IncrementalAccumulator(G2Common):
     def __init__(self, user_params, system_params, mpiParams, testAlternate):
-        super(G2onGoing,self).__init__(user_params, system_params, mpiParams, testAlternate)
+        super(G2IncrementalAccumulator,self).__init__(user_params, system_params, mpiParams, testAlternate)
         # Example of printing output:
         # use logInfo, logDebug, logWarning, and logError to log messages.
         # these messages get preceded with the rank and viewer/worker/server.
@@ -463,16 +451,105 @@ class G2onGoing(G2Common):
         # worker logs the message. This reduces noise in the output. 
         # Pass allWorkers=True to have all workers log the message.
         # it is a good idea to include the class and method at the start of log messages
-        self.mp.logInfo("G2onGoing: object initialized")
+        self.mp.logInfo("G2IncrementalAccumulator: object initialized")
 
-#################### calculate all at end ###################################        
+    def workerAfterDataInsert(self, tm, xInd, workerData):
+        maxStoredTime = workerData.maxTimeForStoredData()
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            tmEarlier = tm - delay
+            xIndEarlier = workerData.tm2idx(tmEarlier)
+            earlierLaterPairs=[]
+            if xIndEarlier is not None:
+                earlierLaterPairs.append((xIndEarlier, xInd))
+            tmLater = tm + delay
+            xIndLater = workerData.tm2idx(tmLater)
+            if xIndLater is not None:
+                earlierLaterPairs.append((xInd, xIndLater))
+            for earlierLaterPair in earlierLaterPairs:
+                idxEarlier, idxLater = earlierLaterPair
+                intensitiesFirstTime = workerData.X[idxEarlier,:]
+                intensitiesLaterTime = workerData.X[idxLater,:]
+                self.G2[delayIdx,:] += intensitiesFirstTime * intensitiesLaterTime
+                self.IP[delayIdx,:] += intensitiesFirstTime
+                self.IF[delayIdx,:] += intensitiesLaterTime
+                self.counts[delayIdx] += 1
+
+    def workerCalc(self, workerData):
+        return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
+
+    def calcAndPublishForTestAlt(self, sortedEventIds, sortedData, h5GroupUser):
+        self.calcAndPublishForTestAltHelper(sortedEventIds, sortedData, h5GroupUser, startIdx=0)
+
+#################### Incremental Windowed Calculation #######################        
+class G2IncrementalWindowed(G2IncrementalAccumulator):
+    def __init__(self, user_params, system_params, mpiParams, testAlternate):
+        super(G2IncrementalWindowed,self).__init__(user_params, system_params, mpiParams, testAlternate)
+        self.mp.logInfo("G2IncrementalWindowed: object initialized")
+
+    def workerBeforeDataRemove(self, tm, xInd, workerData):
+        maxStoredTime = workerData.maxTimeForStoredData()
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            earlierLaterPairs = []
+            tmEarlier = tm - delay
+            xIndEarlier = workerData.tm2idx(tmEarlier)
+            if xIndEarlier is not None:
+                earlierLaterPairs.append((xIndEarlier, xInd))
+            tmLater = tm + delay
+            xIndLater = workerData.tm2idx(tmLater)
+            if xIndLater is not None:
+                earlierLaterPairs.append((xInd, xIndLater))
+            for earlierLaterPair in earlierLaterPairs:
+                idxEarlier, idxLater = earlierLaterPair
+                intensitiesEarlier = workerData.X[idxEarlier,:]
+                intensitiesLater = workerData.X[idxLater,:]
+                assert self.counts[delayIdx] > 0, "G2IncrementalWindowed.workerBeforeDataRemove - about to remove affect at delay=%d but counts=0" % delay
+                self.counts[delayIdx] -= 1
+                self.G2[delayIdx,:] -= intensitiesEarlier * intensitiesLater
+                self.IP[delayIdx,:] -= intensitiesEarlier
+                self.IF[delayIdx,:] -= intensitiesLater
+
+        
+    def calcAndPublishForTestAlt(self, sortedEventIds, sortedData, h5GroupUser):
+        times = self.system_params['times']
+        startIdx = max(0, len(sortedData)-times)
+        self.calcAndPublishForTestAltHelper(sortedEventIds, sortedData, h5GroupUser, startIdx=startIdx)
+
+############## Straightforward Calculation of all Results at End ############
 class G2atEnd(G2Common):
-    '''workers just store data.
-
-    Entire G2 calculation is done when update is requested.
-    '''
     def __init__(self, user_params, system_params, mpiParams, testAlternate):
         super(G2atEnd,self).__init__(user_params, system_params, mpiParams, testAlternate)
         self.mp.logInfo("G2atEnd: object initialized")
 
+    def workerBeforeDataRemove(self, tm, xInd, workerData):
+        pass
 
+    def workerAfterDataInsert(self, tm, xInd, workerData):
+        pass
+
+    def workerCalc(self, workerData):
+        assert not workerData.empty(), "UserG2.workerCalc called on empty data"
+        maxStoredTime = workerData.maxTimeForStoredData()
+        
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            for tmA, xIdxA in workerData.timesDataIndexes():
+                tmB = tmA + delay
+                if tmB > maxStoredTime: break
+                xIdxB = workerData.tm2idx(tmB)
+                timeNotStored = xIdxB is None
+                if timeNotStored: continue
+                intensities_A = workerData.X[xIdxA,:]
+                intensities_B = workerData.X[xIdxB,:]
+                self.counts[delayIdx] += 1
+                self.G2[delayIdx,:] += intensities_A * intensities_B
+                self.IP[delayIdx,:] += intensities_A
+                self.IF[delayIdx,:] += intensities_B
+
+        return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
+
+    def calcAndPublishForTestAlt(self, sortedEventIds, sortedData, h5GroupUser):
+        times = self.system_params['times']
+        startIdx = max(0, len(sortedData)-times)
+        self.calcAndPublishForTestAltHelper(sortedEventIds, sortedData, h5GroupUser, startIdx=startIdx)

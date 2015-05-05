@@ -1,5 +1,4 @@
 from mpi4py import MPI
-#import ctypes
 import numpy as np
 import os
 import time
@@ -10,7 +9,7 @@ import logging
 
 import h5py
 
-from ParCorAna.XCorrWorkerBase import XCorrWorkerBase
+from ParCorAna.WorkerData import WorkerData
 import ParCorAna.Timing as Timing
 import ParCorAna.CommSystemUtil as CommSystemUtil
 from EventIter import EventIter
@@ -251,15 +250,14 @@ class XCorrBase(object):
         thisWorkerStartElement = self.mp.workerWorldRankToOffset[worldRank]
         self.workerScatterReceiveBuffer = np.zeros(scatterCount,dtype=np.float)
         self.initDelayAndGather()
-        self.xCorrWorkerBase = XCorrWorkerBase(scatterCount,
-                                               self.system_params['times'],
-                                               self.mp.isFirstWorker,
-                                               self.system_params['workerStoreDtype'],
-                                               self.mp.logger)
-                                               
-                                               
         self.userObj.workerInit(scatterCount)
         self.elementsThisWorker = scatterCount
+        self.workerData = WorkerData(logger=self.mp.logger, 
+                                     isFirstWorker=self.mp.isFirstWorker,
+                                     numTimes=self.system_params['times'],
+                                     numDataPointsThisWorker=self.elementsThisWorker,
+                                     storeDtype=self.system_params['workerStoreDtype'],
+                                     addRemoveCallbackObject=self.userObj)
 
     def viewerInit(self):
         self.initDelayAndGather()
@@ -316,9 +314,8 @@ class XCorrBase(object):
 
     def storeNewWorkerData(self, counter):
         assert self.mp.isWorker, "storeNewWorkerData called for non-worker"
-        self.xCorrWorkerBase.updateData(counter, 
-                                        self.workerScatterReceiveBuffer,
-                                        self.userObj, )
+        self.workerData.addData(counter, 
+                                self.workerScatterReceiveBuffer)
 
     def checkUserWorkerCalcArgs(self, name2array, counts, int8array):
         assert set(name2array.keys())==set(self.arrayNames), \
@@ -344,9 +341,7 @@ class XCorrBase(object):
         if self.mp.isWorker:
             ## calculate:
             t0 = time.time()
-            name2array, counts, int8array = self.userObj.workerCalc(self.xCorrWorkerBase.T, \
-                                                                    self.xCorrWorkerBase.numTimesFilled(), \
-                                                                    self.xCorrWorkerBase.X)
+            name2array, counts, int8array = self.userObj.workerCalc(self.workerData)
 
             calcTime = time.time() - t0
             self.checkUserWorkerCalcArgs(name2array, counts, int8array)

@@ -108,7 +108,7 @@ To use this framework, the user does the following,
   * provides a mask file identifying what part of the detector data to process
   * implement worker code to calculate F on subset of the detector data
   * tells the framework how many output arrays it is computing
-  * implement viewer code to plot/save the D x NDArray* results
+  * implement viewer code to plot/save the results
   * launch an MPI job
 
 We will go through these steps in the tutorial that follows.

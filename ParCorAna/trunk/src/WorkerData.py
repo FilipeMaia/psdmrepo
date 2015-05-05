@@ -44,6 +44,11 @@ class WorkerData(object):
         self.logger = logger
         self.addRemoveCallbackObject = addRemoveCallbackObject
 
+    def dumpstr(self):
+        res = "tmIdx: start=%d afterEnd=%d\n" % (self._timeStartIdx, self._timeAfterEndIdx)
+        res += "times=\n%r" % self._timesXInds
+        return res
+
     def timesDataIndexes(self):
         '''iterator over tm,idx pairs, the times in order, with indicies into X
         of where the data for that time is

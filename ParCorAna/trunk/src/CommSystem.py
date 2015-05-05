@@ -855,6 +855,7 @@ def runTestAlt(mp, xCorrBase):
         
     xCorrBase.userObj.calcAndPublishForTestAlt(sortedEventIds, sortedData, xCorrBase.h5GroupUser)
     xCorrBase.shutdown_viewer()
+    return 0
 
 def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_alt):
     '''main driver for the system. 
@@ -868,8 +869,7 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
       test_alt (bool): True if this is testing mode
     '''
     if test_alt:
-        runTestAlt(mp, xCorrBase)
-        return
+        return runTestAlt(mp, xCorrBase)
 
     logger = mp.logger
     reportTiming = False
@@ -916,13 +916,15 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
         traceback.print_exc(file=exceptBuffer)
         logger.error('encountered exception: %s' % exceptBuffer.getvalue())
         MPI.COMM_WORLD.Abort(1)
+        return -1
 
     if reportTiming:
         hdr = '--BEGIN %s TIMING--' % timingNode
         footer = '--END %s TIMING--' % timingNode
         Timing.reportOnTimingDict(logger,hdr, footer,
                                   timingDict=timingdict, keyOrder=timingorder)
- 
+    return 0
+
 def isNoneOrListOfStrings(arg):
     def isListOfStrings(arg):
         if not isinstance(arg, list):
@@ -982,5 +984,5 @@ class CommSystemFramework(object):
         self.updateInterval = system_params['update']
         
     def run(self):
-        runCommSystem(self.mp, self.updateInterval, self.maxTimes, self.xcorrBase, self.hostmsg, self.test_alt)
+        return runCommSystem(self.mp, self.updateInterval, self.maxTimes, self.xcorrBase, self.hostmsg, self.test_alt)
 
