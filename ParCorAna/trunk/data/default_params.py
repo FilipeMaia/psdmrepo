@@ -14,9 +14,7 @@ import ParCorAna
 system_params={}
 
 ######## dataset ########### 
-# specify the experiment/run or shared memory. Any psana dataset string can be used, options
-# like live, shmem, idx, run, stream can be used. The software will do different things depending 
-# on the dataset options.
+# specify the experiment/run. This is used to define the dataset, and h5output file.
 
 run = 1437
 experiment = 'xpptut13'
@@ -28,7 +26,10 @@ experiment = 'xpptut13'
 # experiment = 'xcsi0314'; run=178  # cspad2x2, dark is 179
 # experiment = 'xcs84213'; run=117  # this has CsPad.DataV2  # 40k - 60k
 
-system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run)  # tutorial data for getting started
+system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
+
+# below, example where one specifies 
+# system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run)  # tutorial data for getting started
 
 # system_params['dataset'] = 'shmem=XCS:stop=no'     # when running on shared memory, may want to set h5 ouput to None for shmem
 
@@ -181,7 +182,7 @@ system_params['delays'] = ParCorAna.makeDelayList(start=1,
 
 ######## User Module ########
 import ParCorAna.UserG2 as UserG2
-system_params['userClass'] = UserG2.UserG2
+system_params['userClass'] = UserG2.G2atEnd
 
 ######## h5output, overwrite ########### 
 # The system will manage an h5output filename. This is not a file for collective

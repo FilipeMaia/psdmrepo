@@ -22,17 +22,18 @@ The framework identifies different mpi ranks as
 
 The user provides the following:
   * a mask file identifying the detector elements to process
-  * a user module that:
+  * a user module that runs on servers, workers and the viewer. This module:
 
-    * calculates correlations for workers
-    * views or stores gathered results in the viewer
-    * optionally filters/preprocesses events in the servers
+    * calculates correlations for the pixels assigned to each worker
+    * plots or saves gathered results in the viewer
+    * optionally filters/pre-processes events in the servers
+    * optionally provides a testing mask file, and testing function
 
 
 **********************
  User Function Domain
 **********************
-The user module implements a multi valued function **F**. 
+The user module implements a multi-valued function **F**. 
 The domain of the function is::
 
   T x DetectorNDArray
@@ -40,8 +41,10 @@ The domain of the function is::
 where 
 
 **T**
-  is a 120hz counter over a potentially large number of events. This counter is relative to
-  the whole seconds for the first event. It usually does not start at 0 (but it is less than 120),
+  is a 120hz counter over a potentially large number of events. This counter is derived from the 
+  timestamp and fiducials for the events psana sees. The first event gets counter value 0. 
+  If the DAQ produces out of order events (a rare damage condition) the framework can assign a 
+  negative counter value to an event.
 
 **DetectorNDArray**
   represents an NDArray of the detector data. 
@@ -93,13 +96,13 @@ at some point and should thus be excluded from the presented results.
  Parallelization
 **********************
 
-The parallelization is acheived by distributing the detector NDarray elements
+The parallelization is achieved by distributing the detector NDArray elements
 among the workers. That is this framework is presently only for
 functions **F** where the calculations across NDArray elements are independent
 of one another. Each worker gets a fraction of the NDArray elements.
 
 **********************
- Using the Frameowrk
+ Using the Framework
 **********************
 
 To use this framework, the user does the following,

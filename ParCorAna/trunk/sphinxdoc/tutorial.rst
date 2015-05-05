@@ -9,16 +9,22 @@
  Get/Build the Software
 **************************
 
-To get started with the software, make a newrelease directory and add the ParCorAna
-package to it (Presently the package is not part of the release). For example, do
+To get started with the software, make a new release directory and add the ParCorAna
+package to it. Presently ParCorAna is not part of the ana release. For example, do
 these commands::
 
-  newrel ana-current parCorRel
-  cd parCorRel
+  newrel ana-current ParCorAnaRel
+  cd ParCorAnaRel
   sit_setup
-  # now get a kerboses ticket to get code from the repository
+
+  # now get a kerberos ticket to get code from the repository
   kinit   
-  addpkg ParCorAna HEAD
+
+  # now identify the most recent tag of ParCorAna
+  psvn tags ParCorAna
+
+  # suppose the last tag in the Vnn-nn-nn series is V00-00-06, then do
+  addpkg ParCorAna V00-00-06
   scons
 
 **************************
@@ -35,28 +41,54 @@ system_params defines a number of keys that the framework uses. user_params
 is only for the user module, the framework simple passes user_params through to the user module.
 
 The simplest way to do this is to copy the default config file from the ParCorAna.
-From the release directory parCorRel where you have added the ParCorAna package, do::
+From the release directory ParCorAnaRel where you have added the ParCorAna package, do::
 
   cp data/ParCorAna/default_params.py myconfig.py
 
-Below we go over the most important parts of the config file. Full details are in the
-comments of the config file you have copied. 
+Below we go over the config file. See comments in the config file for additional details.
 
 The config file starts by importing modules used later. In particular::
 
+  import numpy as np
   import psana
   import ParCorAna
+
+It then defines the system_params dictionary to fill out::
+
+  system_params={}
 
 DataSource
 =============
 
-These paramters::
+Next one specifies the datasource psana will read. It is recommended that one do this in pieces by first defining
+the run and experiment. Then the h5 output file can be created from the same run and experiment easily::
+by first specifying the run and experiment::
 
-  system_params['dataset']   = 'exp=xpptut3:run=1437'
+  run = 1437
+  experiment = 'xpptut13'
+  system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
+
+When doing online monitoring against live data, add something like the following to the dataset parameter::
+
+  system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xpp/xpptut13' % (experiment, run) 
+
+This will start processing xtc files as soon as they appear on the ffb - usually a few seconds behind the shot.
+Further by running with 6 servers on psfehq, one should be able to keep up with reading the data.
+
+For testing purposes, here are some other experiments runs of interest::
+
+  # experiment = 'xcsc9114'; run=20  # this is for testing. No real signal, but a very long run to test performance
+  # experiment = 'xcsi0314'; run=211  # 63k frames of epix, mask all but bottom quarter, run 214 is dark
+  # experiment = 'xcsi0314'; run=177  # cspad2x2, dark is 179
+  # experiment = 'xcsi0314'; run=178  # cspad2x2, dark is 179
+  # experiment = 'xcs84213'; run=117  # this has CsPad.DataV2  # 40k - 60k
+
+These parameters::
+
   system_params['src']       = 'DetInfo(XppGon.0:Cspad.0)'
   system_params['psanaType'] = psana.CsPad.DataV2
 
-tell the frameowrk the dataset, source, and psana data type the framework needs to distribute to the workers.
+tell the framework the source, and psana data type the framework needs to distribute to the workers.
 The default values are for xpp tutorial data with full cspad. Note that because the config file import's psana,
 it can use the psana type CsPad.DataV2. We will use these values to run the tutorial.
 
@@ -68,7 +100,7 @@ Mask File
 
 You need to provide the framework with a mask file for the detector data. This is a 
 numpy array with the same dimensions as ndarray the psana calibration system uses to 
-represent the detector. This is not neccessarily a 2D image. More on this below. 
+represent the detector. This is not necessarily a 2D image. More on this below. 
 
 Times, Delays
 ========================
@@ -203,3 +235,5 @@ UserG2 module writes, for example::
   /user/G2_results_at_539/IP/delay_000001 Dataset {32, 185, 388}
   /user/G2_results_at_539/IP/delay_000002 Dataset {32, 185, 388}
 
+
+..  LocalWords:  ParCorAna ParCorAnaRel cd kerboses

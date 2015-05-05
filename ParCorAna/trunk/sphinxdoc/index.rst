@@ -8,10 +8,11 @@
 ############
 
 This package provides a framework for doing cross 
-correlation analysis using MPI to run calculations in parallel.
-It is designed around running the :ref:`g2` calculation. However
-any correlation calculation that operates independently on each
-pixel will work.
+correlation analysis on LCLS detector data. It is written in Python
+and uses MPI to parallelize across pixels in the detector data.
+It is designed around running the :ref:`g2` calculation, however
+it can be adapted to parallelize any correlation that operates independently 
+on each pixel in the detector.
 
 Contents:
 
