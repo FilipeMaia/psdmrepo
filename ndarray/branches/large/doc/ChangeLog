@@ -1,0 +1,80 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ndarray
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V01-01-06
+2013-09-17 Andy Salnikov
+- ndarray will be installed in external area now, remove SConscript so
+  that package is not built in the nightly even if it is checked out
+- new ndarray_ext package will provide interface for external ndarray
+
+Tag: V01-01-05
+2013-08-15 Andy Salnikov
+- add makefile for building this for DAQ
+
+Tag: V01-01-04
+2013-08-13 Andy Salnikov
+- Matt noticed that ndarray::reshape() is sonst but calls non-const method
+- removed constness from reshape() and fix type oof its second parameter
+- added unit test for reshape()
+
+Tag: V01-01-03
+2013-03-25 Andy Salnikov
+- improved ndarray formatting:
+  - print characes as integers
+  - print actual type name for a subset of types
+
+Tag: V01-01-02
+2013-03-10 Andy Salnikov
+- add nd_base::data_ptr() method
+
+Tag: V01-01-01
+2013-03-05 Andy Salnikov
+- fix constness of reference returned from operator[] in proxy
+
+Tag: V01-01-00
+2013-01-30 Andy Salnikov
+- imlemented conversion constructor from ndarray<T, N> to ndarray<const T, N>
+- implemented formatting of ndarrays to ostream a la numpy array
+- strides are made signed to support weird memory ordering
+
+Tag: V01-00-01
+2013-01-29 Andy Salnikov
+- fix for test and couple of small bugs
+
+Tag: V01-00-00
+2013-01-29 Andy Salnikov
+- major redesign of ndarray
+- ndarray was a pointer to the data, now it has become smart pointer,
+  this gives us ability to manage the data and to allocate data
+  if necessary
+- data managed by ndarray are not const any more, one can use ndarray
+  interface to change the data
+- more thoughts on constness issues: https://pswww.slac.stanford.edu/trac/psdm/ticket/187
+- unit test extended with new tests
+
+Tag: V00-01-01
+2012-01-12 Andy Salnikov
+- add ndarray::empty() method
+
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- get rid of data ownership in ndarray, now it is strictly a "pointer" 
+  to existing data
+- removed ndarray::copy() method
+- added ndarray::swap() method
+- ndarray now is read-only, cannot change data through ndarray interface
+- doxygenated whole shebang
+
+Tag: V00-00-01
+2011-11-27 Andy Salnikov
+- first version of the ndarray class

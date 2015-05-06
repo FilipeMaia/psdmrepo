@@ -1,0 +1,20 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package ndarray
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+Ndarray package contains class(es) which provide high-level C++ object
+interface to multi-dimensional arrays. 
+ 
+Detailed description:
+=====================
+
+To be provided.
