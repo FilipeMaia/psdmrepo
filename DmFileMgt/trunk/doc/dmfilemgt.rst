@@ -20,3 +20,10 @@ Now start the transfer and after a file has been copied to the new location remo
 
 % dm_mv_exp_dir --trans --clean cxi cxi12345 xtc ana12 ana01 
 
+
+
+
+Cleanup file size mismatch
+==========================
+
+_irods_scan_cleanup_ checks file that were reported by the irods scanner.
