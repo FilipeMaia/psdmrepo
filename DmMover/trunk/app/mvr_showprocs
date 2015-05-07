@@ -1,17 +1,29 @@
 #!/bin/bash
 #
-# Get the offline data-mover processes. Show the host the mover runs on
+# Show data-mover processes. Show the host the mover runs on
 # and the src host from which data are transferred.
 #
-# Usage:
-#     % mvr_showprocs [-f] [stat]
-#        show procServ and mvr status on the psana or ffb (-f) movers
-#     % mvr_showprocs [-f] logs
-#       show latest procServ log files
-#     % mvr_showprocs [-f] procs
-#       show only the data-mover process
-#     % mvr_showprocs [-f] procserv
-#       show only the procServ info  
+# Usage:  mvr_showprocs [options] [action]
+#   options:
+#     -f  : show ffb movers (default is movers running on psanaNNN)
+#     -s  : ping host
+#     -D  : debug
+#     -h  : this help
+#     -i <instr>: show only movers for <instr>
+#   actions:
+#      stat:     print procServ and corresponding mover script. 
+#                One line per found procServ. (default)        
+#      procs:    list daq nodes for which a datamover is running
+#      procserv: list running procServ process and ports they listen on
+#      logs:     show latest logs in the /u1/.... log directory used by procServ
+# 
+# Examples   
+#     show all procs on psanaNNN nodes
+#       % mvr_showprocs
+#     show procs for xpp ffb movers
+#       % mvr_showprocs -i xpp -f 
+#     show running procServ command 
+#       % mvr_showprocs procserv
 #
 
 debug() {
@@ -63,4 +75,4 @@ fi
 
 debug $cmd $hlist
 echo "    host       data-src  port   mvr-elap  mvr command"
-pdsh -t 15 -u 10 -w ${hlist} "${cmd} -s ${1:-stat}"
+pdsh -t 15 -u 10 -w ${hlist} "${cmd}  ${1:-stat}"
