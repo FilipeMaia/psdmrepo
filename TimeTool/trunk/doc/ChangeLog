@@ -11,6 +11,11 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+2015-5-7 David Schneider
+- Add unit test. Read some test data outside of package, test against previously seen 
+  TimeTool.Analyze results. 
+
 Tag: V00-02-02
 2015-4-15 David Schneider
 - Tag V00-02-00 introdcued a bug - setting dump=0 in Analyze and Setup no
