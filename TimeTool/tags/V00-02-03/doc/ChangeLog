@@ -1,0 +1,88 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package TimeTool
+#------------------------------------------------------------------------
+
+Package author: Matthew J. Weaver
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-03
+2015-5-7 David Schneider
+- Add unit test. Read some test data outside of package, test against previously seen 
+  TimeTool.Analyze results. 
+
+Tag: V00-02-02
+2015-4-15 David Schneider
+- Tag V00-02-00 introdcued a bug - setting dump=0 in Analyze and Setup no
+  longer completely turned off histogramming, meaning the .root file was  
+  created. Although this file gets overwritten, in an MPI program race conditions
+  and errors occur. Fixed bug - now setting dump = 0 in configuration means no
+  root file.
+  
+Tag: V00-02-01
+2015-4-13 David Schneider
+- Update Analyze and Setup to look for both EvrData::DataV4 and DataV3.
+  
+Tag: V00-02-00
+2015-4-8 David Schneider
+- Adapt to new API change for hmgr in PSEnv V00-14-00, adapt to use std:: due to removal of root headers
+  JIRA PSAS-131. TimeTool checks if hmgr available. For all modules (Analyze, 
+  Setup and Check) the new behavior is to print non fatal errors if histogramming
+  was requested. 
+
+Tag: V00-01-05
+2015-2-3 David Schneider
+- add options to Analyze module allow user to control beam and laser logic.
+  Tracks JIRA issue PSAS-102. 
+
+	
+Tag: V00-01-04
+2014-12-11 David Schneider
+- restore adding results into the psana Event. Note, results are now added
+  as TimeTool::DataV2 as opposed to TimeTool::DataV1. Users will have to update  
+  their code. Track JIRA issue PSAS-82.
+	
+Tag: V00-01-03
+2014-12-09 Matt Weaver
+- added more histograms for dump to root file
+- added support for TimeTool::ConfigV2, DataV2 data types and two ROI analysis
+- removed need to specify empty ROIs, ipm_get_key
+	
+Tag: V00-01-02 
+2014-10-23 David Schneider
+- change config files to use eventcode_nobeam rather than eventcode_bykik (fix bug
+  in config files)
+	
+Tag: V00-01-01
+2014-10-15 David Schneider
+- includes Matt's fix for JIRA PSAS-47 (crash when no laser logic given, i.e, 
+  laser always on or off).
+- additional fix to local TimeToolData constructor in Analyze.cpp which sets
+  EventType parameter
+- note: there was no ChangeLog entry for Tag V00-01-00. This Tag includes 
+  those change as well - from svn message:
+  Fix to fill AMPLNXT r9005
+  Changed Analyze module to use TimeTool::ConfigV1 for defaults and TimeTool::DataV1 
+  when appropriate r8964
+
+	
+Tag: V00-00-03
+2014-07-31 David Schneider
+- added config file option put_ndarrays to TimeTool.Analyze to put Event
+  results as ndarrays rather than doubles. ndarrays get converted to
+  numpy arrays for Python modules. Allows easier access to results from Python.
+
+Tag: V00-00-02
+2014-05-06 Matthew J. Weaver
+- added doc directory.
+
+Tag: V00-00-01
+2014-05-06 Matthew J. Weaver
+- initial checkin.
+
+
