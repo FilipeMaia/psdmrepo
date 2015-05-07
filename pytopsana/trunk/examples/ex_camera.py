@@ -4,15 +4,17 @@ import sys
 from psana import *
 import pytopsana
 
-# psana -m EventKeys -n 5 exp=amob5114:run=403
+# psana -m EventKeys -n 5 exp=sxrf9414:run=72
 
-ds  = DataSource('exp=amob5114:run=403')
+ds  = DataSource('exp=sxrf9414:run=72')
 evt = ds.events().next()
 env = ds.env()
 
-src = Source('DetInfo(Camp.0:pnCCD.0)')
+src = Source('DetInfo(SxrEndstation.0:Fccd960.0)')
+#src = Source('Camp.0:pnCCD.1')
 
-det = pytopsana.Detector(src, 0) # , 0xffff)
+det = pytopsana.Detector(src,0) # , 0xffff)
+# src)
 
 #print evt.keys()
 
@@ -40,12 +42,13 @@ print '\ncommon_mode:\n', pcmod
 print '\nInstrument: ', det.inst(env)
 
 #det.set_print_bits(255);
-det.print_members()
+#det.set_mode(1);
+#det.print_members()
 det.print_config(evt,env)
 
-raw_data = det.data_uint16_3(evt,env)
+raw_data = det.data_uint16_2(evt,env)
 print '\nRaw data:\n', raw_data
-print '\nRaw data shape:\n', raw_data.shape
+print '\nRaw data shape: ', raw_data.shape
 print '\nRaw data type: ', raw_data.dtype
 
 sys.exit(0)

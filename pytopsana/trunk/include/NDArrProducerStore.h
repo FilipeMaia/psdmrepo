@@ -25,45 +25,29 @@
 
 #include "pytopsana/NDArrProducerBase.h"
 #include "pytopsana/NDArrProducerCSPAD.h"
-//#include "pytopsana/NDArrProducerPNCCD.h"
-
-
-//#include "pdsdata/xtc/Src.hh"
-//#include "PSCalib/CalibPars.h"
-
-//#include "PSCalib/CSPad2x2CalibIntensity.h"
-//#include "PSCalib/CSPadCalibIntensity.h"
-//#include "PSCalib/PnccdCalibPars.h"
-//#include "PSCalib/PrincetonCalibPars.h"
-
+#include "pytopsana/NDArrProducerCSPAD2X2.h"
+#include "pytopsana/NDArrProducerCamera.h"
+#include "pytopsana/NDArrProducerAndor.h"
+#include "pytopsana/NDArrProducerPnccd.h"
+#include "pytopsana/NDArrProducerPrinceton.h"
+#include "pytopsana/NDArrProducerEpix.h"
 
 //#include "ImgAlgos/GlobalMethods.h" // for DETECTOR_TYPE, getRunNumber(evt), detectorTypeForSource, etc.
 //#include "PSCalib/GenericCalibPars.h"
-
-//#include "pdscalibdata/CsPadBaseV2.h"     // shape_base(), Ndim, Rows, Cols, Size, etc.
-//#include "pdscalibdata/CsPad2x2BaseV2.h"
-//#include "pdscalibdata/PnccdBaseV1.h"
-//#include "pdscalibdata/PrincetonBaseV1.h"
-//#include "pdscalibdata/AndorBaseV1.h"
-//#include "pdscalibdata/Epix100aBaseV1.h"
-//#include "pdscalibdata/VarShapeCameraBaseV1.h"
-//#include "pdscalibdata/Opal1000BaseV1.h"
-//#include "pdscalibdata/Opal4000BaseV1.h"
-
 
 //-----------------------------
 
 namespace pytopsana {
 
 /**
- *  @defgroup PSCalib PSCalib package
- *  @brief Package PSCalib provides access to the calibration parameters of all detectors
+ *  @defgroup pytopsana package
+ *  @brief Package pytopsana provides access to psana data from python
  */
 
-/// @addtogroup PSCalib PSCalib
+/// @addtogroup pytopsana
 
 /**
- *  @ingroup PSCalib
+ *  @ingroup pytopsana
  *
  *  @brief class NDArrProducerStore has a static factory method Create for CalibPars
  *
@@ -74,45 +58,34 @@ namespace pytopsana {
  *
  *  @author Mikhail S. Dubrovin
  *
- *  @see CalibPars
+ *  @see 
  *
  *  @anchor interface
  *  @par<interface> Interface Description
  * 
  *  @li  Includes
  *  @code
- *  #include "psana/Module.h" // for evt, env, get,  etc.
- *  #include "PSCalib/CalibPars.h"
- *  #include "PSCalib/NDArrProducerStore.h"
+ *  #include "pytopsana/NDArrProducerStore.h"
  *  @endcode
  *
  *  @li Instatiation
  *  \n
  *  Here we assume that code is working inside psana module where evt and env variables are defined through input parameters of call-back methods. 
- *  Code below instateates calibpars object using factory static method PSCalib::NDArrProducerStore::Create:
+ *  Code below instateates calibpars object using factory static method pytopsana::NDArrProducerStore::Create:
  *  @code
- *  std::string calib_dir = env.calibDir(); // or "/reg/d/psdm/<INS>/<experiment>/calib"
- *  std::string  group = std::string(); // or something like "PNCCD::CalibV1";
- *  const std::string source = "Camp.0:pnCCD.1";
- *  const std::string key = ""; // key for raw data
- *  Pds::Src src; env.get(source, key, &src);
- *  PSCalib::CalibPars* calibpars = PSCalib::NDArrProducerStore::Create(calib_dir, group, src, PSCalib::getRunNumber(evt));
+ *  PSEvt::Source source("Camp.0:pnCCD.1");
+ *  pytopsana::NDArrProducerBase* nda_prod = NDArrProducerStore::Create(source);
  *  @endcode
  *
  *  @li Access methods
  *  @code
- *  calibpars->printCalibPars();
- *  const PSCalib::CalibPars::pedestals_t*    peds_data = calibpars->pedestals();
- *  const PSCalib::CalibPars::pixel_gain_t*   gain_data = calibpars->pixel_gain();
- *  const PSCalib::CalibPars::pixel_mask_t*   mask_data = calibpars->pixel_mask();
- *  const PSCalib::CalibPars::pixel_bkgd_t*   bkgd_data = calibpars->pixel_bkgd();
- *  const PSCalib::CalibPars::pixel_rms_t*    rms_data  = calibpars->pixel_rms();
- *  const PSCalib::CalibPars::pixel_status_t* stat_data = calibpars->pixel_status();
- *  const PSCalib::CalibPars::common_mode_t*  cmod_data = calibpars->common_mode();
+ *  nda_prod->print();
+ *  ndarray<const int16_t, 3> nda = nda_prod->data_nda_int16_3(*shp_evt, *shp_env); // for cspad, cspad2x2
+ *  ndarray<const uint16_t, 2> nda = nda_prod->data_nda_uint16_2(*shp_evt, *shp_env); // for Camera, pnCCD, Andor, etc 
  *  @endcode
  */
 
-//----------------
+//-----------------------------
 
 class NDArrProducerStore  {
 
@@ -121,102 +94,66 @@ private:
   inline const char* name(){return "NDArrProducerStore";}
 
 public:
-
   //NDArrProducerStore () {}
   //virtual ~NDArrProducerStore () {}
+
+//-----------------------------
   /**
    *  @brief Regular constructor, which use const std::string& str_src
    *  
-   *  @param[in] calibdir       Calibration directory for current experiment.
-   *  @param[in] group          Data type and group names.
-   *  @param[in] src            The data source name, ex.: Camp.0:pnCCD.0
-   *  @param[in] runnum         Run number to search the valid file name.
-   *  @param[in] print_bits     Print control bit-word.
+   *  @param[in] source    The data source name, ex.: Source("Camp.0:pnCCD.0")
+   *  @param[in] mode      Mode of operation, depending on detector, =0 - main mode.
+   *  @param[in] pbits     Print control bit-word.
+   *  @param[in] vdef      Default intensity value for missing in data pixels.
    */ 
   static pytopsana::NDArrProducerBase*
   Create ( const PSEvt::Source& source,      //  Camp.0:pnCCD.0
-           const unsigned& pbits=255 )
+           const unsigned& mode=0,
+           const unsigned& pbits=1, 
+           const float&    vdef=0)
   {
-        //unsigned prbits = (pbits & 8) ? 40 : 0;
+    // enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2, PNCCD, PRINCETON, ACQIRIS, TM6740, 
+    //                     OPAL1000, OPAL2000, OPAL4000, OPAL8000,
+    //                     ANDOR, ORCAFL40, FCCD960, EPIX, EPIX100A, EPIX10K};
 
-        ImgAlgos::DETECTOR_TYPE m_dettype = ImgAlgos::detectorTypeForSource(source);  // numerated detector type defined from source string info
+        ImgAlgos::DETECTOR_TYPE m_dettype = ImgAlgos::detectorTypeForSource(source);  // enumerated detector type defined from source string info
         if (pbits & 1) MsgLog("NDArrProducerStore", info, "Get access to CSPAD data source: " << source);
 
 
-	if (m_dettype == ImgAlgos::CSPAD) {
-	  return new NDArrProducerCSPAD(source);
-	}
+	if (m_dettype == ImgAlgos::CSPAD)
+	  return new NDArrProducerCSPAD(source, mode, pbits, vdef);
 
+	if (m_dettype == ImgAlgos::CSPAD2X2)
+	  return new NDArrProducerCSPAD2X2(source, mode, pbits, vdef);
 
-	/*
-        if ( str_src.find(":Cspad.") != std::string::npos ) {
-           MsgLog("NDArrProducerStore", info, "Get access to calibration store for Cspad source: " << str_src);
-	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
-	   unsigned prbits = (print_bits & 1) ? 255 : 0;
-	   return new PSCalib::CSPadCalibIntensity(calibdir, type_group, src, runnum, prbits);
-	}
-	*/
+	if (   m_dettype == ImgAlgos::OPAL1000
+	    || m_dettype == ImgAlgos::OPAL2000
+	    || m_dettype == ImgAlgos::OPAL4000
+	    || m_dettype == ImgAlgos::OPAL8000
+	    || m_dettype == ImgAlgos::FCCD960
+	    || m_dettype == ImgAlgos::TM6740
+	    || m_dettype == ImgAlgos::ORCAFL40
+           ) 
+	  return new NDArrProducerCamera(source, mode, pbits, vdef);
 
-	// Generic approach to calibration 
+	if (m_dettype == ImgAlgos::ANDOR)
+	  return new NDArrProducerAndor(source, mode, pbits, vdef);
 
-	/*
-        if ( str_src.find(":Cspad.") != std::string::npos ) {
-           if (print_bits & 1) MsgLog("NDArrProducerStore", info, "Get access to calibration store for Cspad source: " << str_src);
-	   std::string type_group = (group==std::string()) ? "CsPad::CalibV1" : group;
-	   return new PSCalib::GenericCalibPars<pdscalibdata::CsPadBaseV2>(calibdir, type_group, str_src, runnum, prbits);
-	}
+	if (m_dettype == ImgAlgos::PNCCD) 
+	  return new NDArrProducerPnccd(source, mode, pbits, vdef);
 
-	std::vector<std::string> v_camera_names;
-	v_camera_names.push_back(":Opal1000.");
-	v_camera_names.push_back(":Opal2000.");
-	v_camera_names.push_back(":Opal4000.");
-	v_camera_names.push_back(":Opal8000.");
-	v_camera_names.push_back(":Tm6740.");
-	v_camera_names.push_back(":OrcaFl40.");
-	v_camera_names.push_back(":Fccd960.");
+	if (m_dettype == ImgAlgos::PRINCETON) 
+	  return new NDArrProducerPrinceton(source, mode, pbits, vdef);
 
-        prbits = (print_bits & 8) ? 255 : 0;
-
-	for (std::vector<std::string>::iterator it = v_camera_names.begin(); it != v_camera_names.end(); ++it) {
-          if ( str_src.find(*it) != std::string::npos ) {
-	    std::string type_group = (group==std::string()) ? "Camera::CalibV1" : group;
-            if (print_bits & 1) MsgLog("NDArrProducerStore", info, "Get access to calibration store for det " << *it 
-                                           << " source: " << str_src << " group: " << type_group);
-	    return new PSCalib::GenericCalibPars<pdscalibdata::VarShapeCameraBaseV1>(calibdir, type_group, str_src, runnum, prbits);
-	    //return new PSCalib::GenericCalibPars<pdscalibdata::Opal1000BaseV1>(calibdir, type_group, src, runnum, prbits);
-	  }
-	}
-	*/
+	if (m_dettype == ImgAlgos::EPIX100A) 
+	  return new NDArrProducerEpix(source, mode, pbits, vdef);
 
         MsgLog("NDArrProducerStore", error, "Access to data for source " << source << " is not implemented yet...");  
         abort();
 
         return NULL;
   }
-
-
-
-  /**
-   *  @brief Regular constructor, which use Pds::Src& src
-   *  
-   *  @param[in] calibdir       Calibration directory for current experiment.
-   *  @param[in] group          Data type and group names.
-   *  @param[in] src            The data source object, for example Pds::Src m_src; defined in the env.get(...,&m_src)
-   *  @param[in] runnum         Run number to search the valid file name.
-   *  @param[in] print_bits     Print control bit-word.
-   */ 
-
-  /*
-  static PSCalib::CalibPars*
-  Create ( const std::string&   calibdir,     //  /reg/d/psdm/mec/mec73313/calib
-           const std::string&   group,        //  CsPad2x2::CalibV1
-           const Pds::Src&      src,          //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
-           const unsigned long& runnum,       //  10
-           unsigned             print_bits=255 )
-  {
-    return Create(calibdir, group, ImgAlgos::srcToString(src), runnum, print_bits);
-  }
-  */
+//-----------------------------
 
 }; // class
 

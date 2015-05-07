@@ -56,49 +56,45 @@ namespace pytopsana {
 class NDArrProducerBase  {
 public:
 
-  typedef unsigned  shape_t;
-
-  typedef int16_t   data_int16_t;
-  typedef uint16_t  data_uint16_t;
-  typedef float     data_float_t;
+  //typedef unsigned  shape_t;
+  //typedef int16_t   data_int16_t;
+  //typedef uint16_t  data_uint16_t;
+  //typedef float     data_float_t;
 
   // Constructor
-  NDArrProducerBase(const PSEvt::Source& source);
-  // Constructor
-  NDArrProducerBase(const std::string& str_src);
+  NDArrProducerBase(const PSEvt::Source& source, const unsigned& mode=0, const unsigned& pbits=0, const float& vdef=0);
 
+  // Constructor
+  NDArrProducerBase(const std::string& str_src, const unsigned& mode=0, const unsigned& pbits=0, const float& vdef=0);
 
   // Destructor
   virtual ~NDArrProducerBase();
 
-  // NOTE: THE METHOD DECLARED AS virtual type method() = 0; (equal to 0) IS PURE VIRTUAL,
-  //       PURE VIRTUAL METHOD NEEDS TO BE IMPLEMENTED IN DERIVED CLASS 
-  //       OR IT SHOULD NOT BE "PURE" VIRTUAL, BUT JUST A VIRUAL
-
-  /// Returns number of dimensions in ndarray
-  //virtual const size_t ndim() = 0;
-
-  /// Returns ndarray size (total number of elements)
-  //virtual const size_t size() = 0;
-
-  /// Returns ndarray shape
-  //virtual const shape_t* shape() = 0;
+  // NOTE: THE METHOD DECLARED AS virtual <type> <method>() = 0; (equal to 0) IS PURE VIRTUAL, NEEDS TO BE IMPLEMENTED IN DERIVED CLASS
 
   virtual ndarray<const int16_t, 1>  data_nda_int16_1(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_1"); return make_ndarray<int16_t>(1); }
-  virtual ndarray<const int16_t, 2>  data_nda_int16_2(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_2"); return make_ndarray<int16_t>(1,2); } 
-  virtual ndarray<const int16_t, 3>  data_nda_int16_3(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_3"); return make_ndarray<int16_t>(1,2,3); } 
-  virtual ndarray<const int16_t, 4>  data_nda_int16_4(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_4"); return make_ndarray<int16_t>(1,2,3,4); } 
+  virtual ndarray<const int16_t, 2>  data_nda_int16_2(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_2"); return make_ndarray<int16_t>(1,1); } 
+  virtual ndarray<const int16_t, 3>  data_nda_int16_3(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_3"); return make_ndarray<int16_t>(1,1,1); } 
+  virtual ndarray<const int16_t, 4>  data_nda_int16_4(PSEvt::Event& evt, PSEnv::Env& env)  { print_def("data_nda_int16_4"); return make_ndarray<int16_t>(1,1,1,1); } 
 				     								                 
-  virtual ndarray<const uint16_t, 1> data_nda_uint16_1(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_1"); return make_ndarray<uint16_t>(1); } 
-  virtual ndarray<const uint16_t, 2> data_nda_uint16_2(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_2"); return make_ndarray<uint16_t>(1,2); }
-  virtual ndarray<const uint16_t, 3> data_nda_uint16_3(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_3"); return make_ndarray<uint16_t>(1,2,3); } 
-  virtual ndarray<const uint16_t, 4> data_nda_uint16_4(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_4"); return make_ndarray<uint16_t>(1,2,3,4); }
+  //virtual ndarray<const uint16_t, 1> data_nda_uint16_1(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_1"); return make_ndarray<uint16_t>(1); } 
+  virtual ndarray<const uint16_t, 2> data_nda_uint16_2(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_2"); return make_ndarray<uint16_t>(1,1); }
+  virtual ndarray<const uint16_t, 3> data_nda_uint16_3(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_3"); return make_ndarray<uint16_t>(1,1,1); } 
+  //virtual ndarray<const uint16_t, 4> data_nda_uint16_4(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint16_4"); return make_ndarray<uint16_t>(1,1,1,1); }
+
+  //virtual ndarray<const uint8_t, 1> data_nda_uint8_1(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint8_1"); return make_ndarray<uint8_t>(1); } 
+  virtual ndarray<const uint8_t, 2> data_nda_uint8_2(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint8_2"); return make_ndarray<uint8_t>(1,1); }
+  //virtual ndarray<const uint8_t, 3> data_nda_uint8_3(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint8_3"); return make_ndarray<uint8_t>(1,1,1); } 
+  //virtual ndarray<const uint8_t, 4> data_nda_uint8_4(PSEvt::Event& evt, PSEnv::Env& env) { print_def("data_nda_uint8_4"); return make_ndarray<uint8_t>(1,1,1,1); }
 
   /// Returns the pointer to array with data
   //virtual const int16_t* data_int16();
 
   /// Print member data
   virtual void print();
+
+  /// Print configuration data
+  virtual void print_config(PSEvt::Event& evt, PSEnv::Env& env);
 
 protected:
 
@@ -107,7 +103,7 @@ protected:
   Pds::Src      m_src;
   std::string   m_key;            // empty string for raw data  
   unsigned      m_mode;
-  float         m_val_def;
+  float         m_vdef;
   unsigned      m_pbits;
 
   ImgAlgos::DETECTOR_TYPE m_dettype;  // numerated detector type defined from source string info

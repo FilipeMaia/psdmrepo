@@ -2,6 +2,7 @@
 #include <boost/python.hpp>
 #include "pytopsana/Detector.h"
 
+//-------------------
 using namespace pytopsana;
 
 typedef Detector::data_t data_t;
@@ -16,6 +17,7 @@ typedef pytopsana::Detector::common_mode_t   common_mode_t;  // double
 
 //typedef pytopsana::Detector::data_i16_t      data_i16_t;     // int16_t
 
+//-------------------
 
 // Create function pointer to each overloaded Detector::calib method
 ndarray<const pedestals_t, 1>    (Detector::*peds_1)  (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pedestals;
@@ -27,18 +29,30 @@ ndarray<const pixel_status_t, 1> (Detector::*pstat_1) (boost::shared_ptr<PSEvt::
 ndarray<const common_mode_t, 1>  (Detector::*pcmod_1) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::common_mode;
 
 //-------------------
-//-------------------
-//-------------------
+
 ndarray<const int16_t, 1>     (Detector::*pdata_1) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_int16_1;
 ndarray<const int16_t, 2>     (Detector::*pdata_2) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_int16_2;
 ndarray<const int16_t, 3>     (Detector::*pdata_3) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_int16_3;
 ndarray<const int16_t, 4>     (Detector::*pdata_4) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_int16_4;
-//-------------------
-//-------------------
+
+ndarray<const uint16_t, 2>    (Detector::*pdata_5) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_uint16_2;
+ndarray<const uint16_t, 3>    (Detector::*pdata_6) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_uint16_3;
+
+ndarray<const uint8_t, 2>     (Detector::*pdata_7) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_uint8_2;
+
 //-------------------
 
-ndarray<double,3> (Detector::*calib_1) (PSEvt::Source, boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::calib;
-ndarray<double,3> (Detector::*calib_2) (ndarray<data_t,3>) = &Detector::calib;
+void (Detector::*set_1) (const unsigned&) = &Detector::setMode;
+void (Detector::*set_2) (const unsigned&) = &Detector::setPrintBits;
+void (Detector::*set_3) (const float&)    = &Detector::setDefaultValue;
+
+
+void (Detector::*print_1) () = &Detector::print;
+void (Detector::*print_2) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::print_config;
+
+//-------------------
+//ndarray<double,3> (Detector::*calib_2) (ndarray<data_t,3>) = &Detector::calib;
+//-------------------
 
 // BOOST wrapper to create pytopsana module that contains the Detector
 // python class that calls the C++ Detector methods
@@ -61,9 +75,15 @@ BOOST_PYTHON_MODULE(pytopsana_ext)
     .def("data_int16_2", pdata_2)
     .def("data_int16_3", pdata_3)
     .def("data_int16_4", pdata_4)
-    .def("calib",        calib_1)
-    .def("calib",        calib_2)
-    .def("raw",          &Detector::raw)
-    .def("inst",         &Detector::str_inst)
-    ;
+    .def("data_uint16_2",pdata_5)
+    .def("data_uint16_3",pdata_6)
+    .def("data_uint8_2", pdata_7)
+    .def("set_mode",       set_1)
+    .def("set_print_bits", set_2)
+    .def("set_def_value",  set_3)
+    .def("print_members",print_1)
+    .def("print_config", print_2)
+    .def("inst",         &Detector::str_inst);
 }
+
+//-------------------

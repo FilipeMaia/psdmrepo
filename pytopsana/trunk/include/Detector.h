@@ -65,8 +65,8 @@ class Detector {
 
   typedef NDArrProducerCSPAD::data_t          data_i16_t;  
 
-  // Default constructor
-  Detector (const PSEvt::Source& source, const unsigned& prbits=0x0) ; // 0xffff
+  // Constructor
+  Detector (const PSEvt::Source& source, const unsigned& pbits=0x1) ; // 0xffff
   
   // Destructor
   virtual ~Detector () ;
@@ -81,25 +81,40 @@ class Detector {
   
 //-------------------
 
-  ndarray<const int16_t, 1>       data_int16_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
-  ndarray<const int16_t, 2>       data_int16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
-  ndarray<const int16_t, 3>       data_int16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
-  ndarray<const int16_t, 4>       data_int16_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 1>  data_int16_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 2>  data_int16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 3>  data_int16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const int16_t, 4>  data_int16_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+
+  //ndarray<const uint16_t, 1> data_uint16_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const uint16_t, 2> data_uint16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const uint16_t, 3> data_uint16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  //ndarray<const uint16_t, 4> data_uint16_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+
+  //ndarray<const uint8_t, 1>  data_uint8_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  ndarray<const uint8_t, 2>  data_uint8_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  //ndarray<const uint8_t, 3>  data_uint8_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+  //ndarray<const uint8_t, 4>  data_uint8_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
+
+//-------------------
+
+   // Returns instrument as string
+   std::string str_inst(boost::shared_ptr<PSEnv::Env> shp_env);  
+
+   inline void setMode (const unsigned& mode) {m_mode = mode;}
+   inline void setPrintBits (const unsigned& pbits) {m_pbits = pbits;}
+   inline void setDefaultValue (const float& vdef) {m_vdef = vdef;}
+
+//-------------------
+
+   void print();
+   void print_config(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
 
 //-------------------
 //-------------------
 //-------------------
+//-------------------
 
-  // Return 3D NDarray of raw detector data
-  ndarray<data_t,3> raw(PSEvt::Source source, boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);  
-  
-  // Return 3D NDarray of calibrated detector data
-  ndarray<double,3> calib(PSEvt::Source source, boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env);
-  ndarray<double,3> calib(ndarray<data_t,3> raw_data);
-
-  // Returns instrument as string
-  std::string str_inst(boost::shared_ptr<PSEnv::Env> shp_env);  
-  
  private:
 
    ImgAlgos::DETECTOR_TYPE m_dettype;          // numerated detector type source
@@ -108,22 +123,15 @@ class Detector {
    std::string             m_str_src;
    std::string             m_cgroup;
    int                     m_runnum;
-   unsigned                m_prbits; 
+   unsigned                m_mode; 
+   unsigned                m_pbits; 
+   float                   m_vdef; 
+   std::string             m_calibdir;
 
-   //NDArrProducerCSPAD*     m_nda_prod;
-   NDArrProducerBase*      m_nda_prod;
+   //NDArrProducerCSPAD*     m_nda_prod;  // direct access
+   NDArrProducerBase*      m_nda_prod;   // factory store access
 
-   //   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
-   //   const PSCalib::CalibPars::pixel_gain_t*    m_gain_data;
-   //   const PSCalib::CalibPars::pixel_mask_t*    m_mask_data;
-   //   const PSCalib::CalibPars::pixel_bkgd_t*    m_bkgd_data;
-   //   const PSCalib::CalibPars::pixel_status_t*  m_stat_data;
-   //   const PSCalib::CalibPars::common_mode_t*   m_cmod_data;
-   //   const PSCalib::CalibPars::pixel_rms_t*     m_rms_data;
-
-   //const pedestals_t* m_peds_data;
-
-   inline const char* _name_(){return "Detector";}
+   inline const char* _name_() {return "Detector";}
 
    void initCalibStore(PSEvt::Event& evt, PSEnv::Env& env);
    void initNDArrProducer(const PSEvt::Source& source);

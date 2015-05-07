@@ -6,7 +6,7 @@
 // 	$Id$
 //
 // Description:
-//	Class NDArrProducerCSPAD.
+//	Class NDArrProducerCSPAD
 //
 //------------------------------------------------------------------------
 
@@ -19,10 +19,10 @@
 #include <algorithm> // for fill_n
 #include <sstream>  // for stringstream
 #include <boost/shared_ptr.hpp>
+
 //----------------------
 // Base Class Headers --
 //----------------------
-
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -53,6 +53,8 @@ namespace pytopsana {
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
+ *
+ *  @see NDArrProducerBase, NDArrProducerStore
  */
 
 
@@ -71,7 +73,7 @@ public:
   const static uint32_t N2x1InCSPAD = NQuadsMax * N2x1InQuad;
 
   // Constructor
-  NDArrProducerCSPAD(const PSEvt::Source& source);
+  NDArrProducerCSPAD(const PSEvt::Source& source, const unsigned& mode=0, const unsigned& pbits=0, const float& vdef=0);
 
   // Destructor
   virtual ~NDArrProducerCSPAD();
@@ -128,7 +130,7 @@ private:
    * Returns empty (default) ndarray if data is missing
    */
   template <typename TDATA, typename TELEM, typename TOUT>
-  ndarray<TOUT,3> getNDArrFullForType (PSEvt::Event& evt, const float& val_def=0) {
+  ndarray<TOUT,3> getNDArrFullForType (PSEvt::Event& evt, const float& vdef=0) {
       boost::shared_ptr<TDATA> shp = evt.get(m_source, m_key, &m_src); // get m_src here
       
       if (shp.get()) {
@@ -136,7 +138,7 @@ private:
             // Create and initialize the array of full cspad shape [32,185,388]
             const unsigned shape[] = {N2x1InCSPAD, NRows2x1, NCols2x1};
             ndarray<TOUT,3> nda_out(shape);
-            std::fill(nda_out.begin(), nda_out.end(), TOUT(val_def));    
+            std::fill(nda_out.begin(), nda_out.end(), TOUT(vdef));    
 	    
             //typename ndarray<TOUT,3>::iterator it_out = nda_out.begin(); 
             //TOUT* it_out = nda_out.data();
@@ -222,7 +224,7 @@ private:
   ndarray<TOUT,3> getNDArrForType (PSEvt::Event& evt) {
 
    if (m_as_data) return getNDArrAsDataForType<TDATA, TELEM, TOUT>(evt);
-   else           return getNDArrFullForType<TDATA, TELEM, TOUT>(evt, m_val_def);
+   else           return getNDArrFullForType<TDATA, TELEM, TOUT>(evt, m_vdef);
   }
 
 //-----------------------------

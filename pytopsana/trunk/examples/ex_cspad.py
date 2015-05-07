@@ -40,17 +40,13 @@ print '\ncommon_mode:\n', pcmod
 
 print '\nInstrument: ', det.inst(env)
 
+
+det.set_print_bits(255);
+det.set_def_value(-5.);
+det.set_mode(1);
 raw_data = det.data_int16_3(evt,env)
 print '\nRaw data:\n', raw_data
-print '\nRaw data shape:\n', raw_data.shape
-
-#raw_data = det.data_int16_2(evt,env)
-#print '\nRaw data:\n', raw_data
-#print '\nRaw data shape:\n', raw_data.shape
-
-#raw_data = det.raw(src,evt,env)
-#print raw_data
-#print det.calib(src,evt,env)
-#print det.calib(raw_data)
+print '\nRaw data shape: ', raw_data.shape
+print '\nRaw data type: ', raw_data.dtype
 
 sys.exit(0)

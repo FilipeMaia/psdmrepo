@@ -20,31 +20,15 @@ typedef NDArrProducerCSPAD::data_t data_t;
 
 //-----------------------------
 
-NDArrProducerCSPAD::NDArrProducerCSPAD(const PSEvt::Source& source)
-  : NDArrProducerBase(source)
-  , m_as_data(false)
-  , m_numSect(N2x1InCSPAD)
+  NDArrProducerCSPAD::NDArrProducerCSPAD(const PSEvt::Source& source, const unsigned& mode, const unsigned& pbits, const float& vdef)
+  : NDArrProducerBase(source, mode, pbits, vdef)
+  , m_as_data(mode)
   , m_count_evt(0)
   , m_count_cfg(0)
   , m_count_msg(0)
 {
   for (uint32_t q=0; q<NQuadsMax; ++q) m_roiMask[q] = 0xff;
-
-  //m_dettype = ImgAlgos::detectorTypeForSource(m_source);
-  //std::cout << "m_nda_def.size() = " << m_nda_def.size() << '\n';
-  //std::stringstream ss; ss << source;
-  //std::string str_src = ss.str();
 }
-
-//-----------------------------
-
-/*
-NDArrProducerCSPAD::NDArrProducerCSPAD(const std::string& str_src)
-  : NDArrProducerBase(str_src)
-{
-  NDArrProducerCSPAD(PSEvt::Source(str_src));
-}
-*/
 
 //-----------------------------
 
