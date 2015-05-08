@@ -308,10 +308,10 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
                   if rank not in mc.serverRanks]
     assert len(availRanks)>=3, "To many servers for world size. " + \
         ("Only %d ranks left for master/viewer/workers" % len(availRanks))
-    mc.masterRank = min(availRanks)
-    availRanks.remove(mc.masterRank)
     mc.viewerRank = min(availRanks)
     availRanks.remove(mc.viewerRank)
+    mc.masterRank = min(availRanks)
+    availRanks.remove(mc.masterRank)
     mc.workerRanks = availRanks
     mc.firstWorkerRank = min(mc.workerRanks)
 

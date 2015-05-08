@@ -27,6 +27,8 @@ these commands::
   addpkg ParCorAna V00-00-06
   scons
 
+.. _configfile:
+
 **************************
  Make a Config File
 **************************
@@ -308,7 +310,6 @@ Debugging/Develepment Switches
   system_params['verbosity'] = 'INFO'
   system_params['numEvents'] = 0
   system_params['testNumEvents'] = 100
-  system_params['elementsPerWorker'] = 0
 
 These options are useful during development or debugging. Setting the verbosity to
 DEBUG greatly increases the amount of output. It can trigger additional runtime checks.
@@ -316,26 +317,54 @@ Typically it is only the first worker that outputs a message, as all the workers
 thing.
 
 One can also limit the number of events processes, and specify the number of event to process
-during testing (for both the main code, and the alternative calculation). Finally one can 
-override the number of pixels each worker gets, and set it to a smaller amount (just to speed 
-up runs during development).
+during testing (for both the main code, and the alternative calculation). 
 
 
-User Color File
-=======================
-This is a parameter that the UserG2 needs - a color file that labels the detector pixels
+User Parameters
+====================
+The user_params dictionary is where users put all the options that the G2 calculation
+will use.
+
+
+Color/Bin/Label File
+----------------------
+This is a parameter that the UserG2 needs - a file that labels the detector pixels
 and determines which pixels are averaged together for the delay curve. It bins the pixels
-into groups. More on this in the next section::
+into groups. In this package, we call this a 'color' file following conventions in MPI
+for grouping different ranks. More on this in the next section::
 
   user_params['colorNdarrayCoords'] = 'colorfile.npy' # not created yet
 
+Filtering Parameters
+-----------------------
+Often G2 calculations need to adjust/filter the data. The UserG2 module sets several 
+parameters that it makes use of::
+
+  user_params['saturatedValue'] = (1<<15)
+  user_params['LLD'] = 1E-9
+  user_params['notzero'] = 1E-5
+
+Plotting
+----------
+The UserG2 module provides an example of how to use the psmon package to plot.
+This is the preffered method to plot for online monitoring where the analysis job
+runs on a batch farm. For now we set this value to False. Using psmon for plotting
+will be covered in section XXX???
+::
+
+  user_params['psmon_plot'] = False
 
 
 ***************************
  Create a Mask/Color File
 ***************************
-The system requires a mask file that identifies the pixels to process. 
+The system requires a mask file that identifies the pixels to process.
 Reducing the number of pixels processed can be the key to fast feedback during an experiment.
+A userClass for correlation analysis will usually use a 'color' file to label
+pixels to average together. In addition to the mask file for analyzing data, 
+users should produce a testmask file for testing their compution. 
+This file should only compute on a few (10-100) pixels.
+
 
 The ParCorAna package provides a tool to make mask and color files in the numpy ndarray
 format required. To read the tools help do::
@@ -346,9 +375,10 @@ format required. To read the tools help do::
 
   parCorAnaMaskColorTool --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 300 -c 6
 
-Will produce a mask and color file suitable for this tutorial::
+Will produce a mask, testmask, and color file suitable for this tutorial::
 
   xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy  
+  xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy  
   xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy 
 
 Note that our input will be ndarr files, not image files. The mask file is only  0 or 1. It is 1
@@ -356,15 +386,29 @@ for pixels that we **INCLUDE**. The color file uses 6 colors (since we gave the 
 As an example, these colors bin pixels based on intensity. In practice users will want to bin pixels
 based on other criteria.
 
+The tool parCorAnaMaskColorTool can produce a great deal of output that can be ignored.
+To deal with converting from images to ndarrays, it is neccessary to work with geometry files.
+If a geometry file is not present for your experiment, one should be deployed into the calibration
+area. One can also specify a geometry file with the -g file. 
+
+Often people will edit image files to produce the mask and color file. These need to then be converted
+back to ndarrays. The help for parCorAnaMaskColorTool explains how to do this. One issue with this though,
+is that sometimes the geometry files map two ndarray pixels to the same image pixel, and do not map some
+of the ndarray pixels to any image pixel. This means that the ndarray mask or color file produced from the
+image file will have a few imperfections. For the cspad in the xpp tutorial data, the number of such pixels 
+is quite small. The tool reports on this pixels. It also reports on the location of the 10 pixels chosen
+for the mask.
+
 Once you have modified these files, or produced similarly formatted files you are ready for the 
 next step.
 
 Add to Config
 ==================
 
-Now in myconfig.py, set the mask and color file::
+Now in myconfig.py, set the mask, testmask, and color file::
 
   system_params['maskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
+  system_params['testMaskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy'
   user_params['colorNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
 
 Note that the last parameter is to the user_params - the framework knows nothing about the coloring.
@@ -380,6 +424,8 @@ all the imports work and the syntax is correct::
 
 The config file does a pretty-print of the two dictionaries defined.
 
+.. _runlocal:
+
 ***********************************
 Run Software 
 ***********************************
@@ -388,7 +434,9 @@ Now you are ready to run the software. To test using a few cores on your local m
 
   mpiexec -n 4 parCorAnaDriver -c myconfig.py -n 100
 
-This should run without error. 
+This should run without error. Even though we are only running on 100 events, the viewer will be
+gathering 100 (delays) * 32 * 388 * 185 (cspad dimensions) * 8 (float64) = 1,837,568,000 bytes, 
+or close to 2GB.
 
 ***********************************
 Results
@@ -409,8 +457,7 @@ In /system, one finds::
   /system/color_ndarrayCoords Dataset
   /system/mask_ndarrayCoords Dataset 
 
-The first two are the output of the Python module pprint on the system_params and
-user_params dictionaries after evaluating the config file.
+The first two are the system_params and user_params dictionaries from the config file.
 
 The latter two are the mask and color ndarrays specified in the system_params.
 
@@ -430,5 +477,74 @@ UserG2 module writes, for example::
   /user/G2_results_at_539/IP/delay_000001 Dataset {32, 185, 388}
   /user/G2_results_at_539/IP/delay_000002 Dataset {32, 185, 388}
 
+*******************
+Plotting
+*******************
+To do plots, set the following values in the config file::
+
+  user_params['psmon_plot'] = True
+  system_params['h5output'] = None
+
+in the config file and run the software again. In the output, one should see outupt similar to::
+
+  2015-05-08 14:39:16,214 - viewer-rnk:2 - INFO - Run cmd: psplot --logx -s psana1501 -p 12301 MULTI
+
+The command::
+
+  psplot --logx -s psana1501 -p 12301 MULTI
+
+or something similar is what one runs to see the plots. The host (psana1501 in above) will be 
+different when you run. It is the host that the viewer is on. The port can be changed by setting
+the option::
+
+  user_params['psmon_port'] = 12301
+
+in the config file.
+
+You may not want to use the --logx option if the delays are linearly spaced. If you use the 
+--logx option and get an error, it is a recent option that may not be in the current analysis
+release yet. Do::
+
+  newrel ana-current myrel
+  cd myrel
+  sit_setup
+  addpkg psmon HEAD
+  scons
+
+and try the command again.
+
+.. _runonbatch:
+
+*****************************
+Running on the Batch System
+*****************************
+When running on the batch system, for example online monitoring in xcs, one would do something like::
+
+  bsub -q psfehpriorq -I -n 150 parCorAnaDriver -c myconfig.py
+
+The -I option means interactive, so that the program output will go to the screen. This will let
+you see the psplot command. However all you need to know is what host the viewer is on, and this is
+typically the first host. Doing::
+  
+ bjobs -w
+
+Will show you what the first host is as well.
+
+*****************************
+Timing
+*****************************
+To see if you can keep up with live data, look at the output messages. You will see lines like
+
+TODO
+
+*****************************
+Testing
+*****************************
+see the testing page
+
+*****************************
+UserG2
+*****************************
+see the :ref:`usercode` section of the :ref:`framework` page.
 
 ..  LocalWords:  ParCorAna ParCorAnaRel cd kerboses

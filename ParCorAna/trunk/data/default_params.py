@@ -201,12 +201,6 @@ system_params['verbosity'] = 'INFO'
 system_params['numEvents'] = 0
 system_params['testNumEvents'] = 100
 
-######## elementsperworker #########
-# elementsperworker - 0 or None means all elements. This is a debugging/development switch only.
-# use the maskNdarrayCoords to control which elements are processed
-# this can be overriden on the command line
-system_params['elementsPerWorker'] = 0
-
 ##################################################
 ############ USER MODULE - G2 CONFIG #############
 user_params = {}
@@ -218,6 +212,9 @@ user_params['colorNdarrayCoords'] =  "see tutorial for documentation on this par
 user_params['saturatedValue'] = (1<<15)
 user_params['LLD'] = 1E-9
 user_params['notzero'] = 1E-5
+user_params['psmon_plot'] = False
+# to set a different port for psmon plotting, change this
+# user_params['psmon_port'] = 12301
 
 
 ##################

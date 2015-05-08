@@ -93,6 +93,8 @@ if __name__ == '__main__':
     pca.checkParams(system_params, user_params)
     numSystemParamKeys = len(system_params)
     if args.test_main or args.test_alt:
+        assert system_params['h5output'] is not None, "testing mode, but system_params['h5output'] is None"
+        assert system_params['testH5output'] is not None, "testing mode, but system_params['testH5output'] is None"
         system_params['numEvents'] = system_params['testNumEvents']
         system_params['maskNdarrayCoords'] = system_params['testMaskNdarrayCoords']
 
@@ -113,8 +115,10 @@ if __name__ == '__main__':
         "only one of the options --test_main --test_alt and cmp can be set at one time"
 
     if args.cmp:
-        frameWorkFile = system_params['h5output']
-        testFile = system_params['testH5output']
+        assert system_params['h5output'] is not None, "h5output not specified in system_params. Cannot compare"
+        assert system_params['testH5output'] is not None, "testh5output not specified in system_params. Cannot compare"
+        frameWorkFile = pca.formatFileName(system_params['h5output'])
+        testFile = pca.formatFileName(system_params['testH5output'])
         cmd = "cmpParCorAnaH5OutputPy %s %s" % (frameWorkFile, testFile)
         assert os.path.exists(frameWorkFile), "h5 output file from framework (not testalt): %s doesn't exist. Can't run cmd: %s" % \
             (frameWorkFile, cmd)

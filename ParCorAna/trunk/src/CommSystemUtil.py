@@ -5,6 +5,8 @@ import logging
 import time
 import datetime
 import glob
+from mpi4py import MPI
+import sys
 
 def formatFileName(fname):
     '''Looks for %T in a file and %C. Replaces them with 

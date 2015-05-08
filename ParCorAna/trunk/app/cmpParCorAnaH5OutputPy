@@ -4,6 +4,7 @@ import sys
 import argparse
 import numpy as np
 import h5py
+import ParCorAna as corAna
 
 def partitionSets(A,B):
   both = set(A).intersection(set(B))

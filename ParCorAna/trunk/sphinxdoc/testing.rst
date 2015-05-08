@@ -6,8 +6,10 @@
 ################
 
 The framework provides support for testing the correlation calculation
-and viewer publishing. The user provides an alternative calculation.
-The results of these two calculations are then compared.
+and viewer publishing. The user provides an alternative calculation/viewer publishing
+function. The results of these two calculations are then compared.
+Often it is easiest to re-use the same viewer publishing and just implement a 
+different workerCalc function.
 
 When comparing results of the two calculations, it is important to make sure
 they get the same input. The UserG2 module can modify the input to the 
@@ -22,6 +24,7 @@ That is, the alternative calcuation is not something that deals with
 the stored data through the WorkerData class in the framework. It
 simply receives all the data at once, with sorted timecodes and counters.
 It can implement a simpler, slower, more straightforward calculation.
+We will see an example below in the alttest_ section.
 
 For testing purposes, it is not neccessary to compare results on all the
 pixels in the detector. Users should produce a testing mask file that 
@@ -30,136 +33,101 @@ identifies a small number of pixels, say 10-100, for testing.
 Next we go over the steps for testing.
 
 
-Alternative Test Calculation and Viewer Publish
+Testing Steps
 ==================================================
 
-The UserG2 class has the callback: 
-The alternative calculation is a callback method of the UserG2 class
-that the framework calls when in testing mode. What it returns should be
-in the same format as the workerCalc callback. The same viewerPublish callback
-is used for both the alternatitve testing calculation and the the saIn testing mode, the 
-framework uses three options from the system_params dictionary that 
-support testing
+* override the function *calcAndPublishForTestAlt* in the UserG2 class, example below.
+* set  *testh5output* in system_params in the config file to the output file for the alternative testing calculation
+* set  *testNumEvents* in the system_params in the config file to the number of events to test with
+* set *testMaskNdarrayCoords* in the system_params in the config file to the testing mask file
 
- *testh5output*
-   the output file for the alternative testing calculation
+Finally, one does::
 
- *testNumEvents*
+  mpiexec -n 4 parCorAnaDriver -c myconfig.py -n 100 --test_main
 
- *testMaskNdarrayCoords*
+To run the usual calculation with the testing parameters. Then::
 
-  
+  parCorAnaDriver -c myconfig.py -n 100 --test_alt
 
-  that The system_params dictionary in the config file includes options forthe user n
-framework takes care of producing the The framework supports testing has a mechanism in place to test the code.
-The idea is that one writes a separate function that does the
-correlation calculation in a straightforward fashion. This
-code will be run outside of the MPI framework. The results
-of this code and the framework code can then be compared.
+to run the alternative calculation. Note that the alternative calculation is *not* run in MPI. 
 
-A difficult part of this approach is ensuring that both bodies of
-code go through the same steps on the data. One wants to make sure
-that the same filtering of events and adjustments to the detector
-data are made. This code already lives in the UserG2 methods, so 
-it was decided that the testing function be a method of the UserG2
-class as well.
+Finally, one does::
 
-Here are the steps:
+  parCorAnaDriver -c myconfig.py -n 100 --cmp
 
-  * Make a small mask file for testing.
-  * Add the test function to your UserG2 (an example is provided).
-  * set the system test parameters.
-  * use the parCorAnaDriver test_usr option to run the simpler user test code on 
-    the test mask, the output will be the testh5output system parameter.
-  * use the parCorAnaDriver test_fwk option to run the framework on the test mask
-    the output will be the typical h5output system parameter.
-  * use the parCorAnaDriver cmp option to compare the two hdf5 files.
-
-Make a Small Mask File
-=======================
-
-One shouldn't need to test on too many pixels for testing purposes. The framework
-has a spot for a separate mask file used for testing - this mask should only select
-a few pixels. To make the mask, one option is to use the roicon tool that is part of
-psana. Another is to work by hand. For instance, 
-after running the parCorAnaMaskColorTool, one has a simple mask and average in 
-both ndarrayCoords and imageCoords as numpy .npy files. We could read the average 
-image file into a Python session, look at it, and select some small square that
-looks interesting to use for our test. Below is an example::
-
-  import numpy as np
-  import matplotlib.pyplot as plt
-  avgImg=np.load('xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_avg_imageCoords.npy')
-  plt.imshow(avgImg)
-  A=avgImg[205:215,203:213]
-  plt.imshow(A, interpolation='none')
-  B=np.zeros(avgImg.shape, np.int8)
-  B[205:215,203:213]=1
-  fout = file('xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_imageCoords.npy','w')
-  np.save(fout,B)
-  fout.close()
-
-Then one could convert from image coords to ndarray coords with the command::
-
-  parCorAnaMaskColorTool --img2ndarr -i xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_imageCoords.npy -o xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy --iX xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_iX.npy --iY xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_iY.npy --force
-
-Now one has a mask that will only process 100 pixels, so testing will go much quicker.
-
-Write the Test Code
-====================
- 
-In your package, ParCorAnaUserG2, make a file::
-
-  ParCorAnaUserG2/src/G2Test.py
-
-Write a class that looks like::
-
-  class G2Test(object):
-      '''This does a slow computation over the data for testing purposes.
-  
-      
-      '''
-      def __init__(self,system_params, user_params):
-          self.dset = system_params['dataset']
-          self.numevents = system_params['numevents']
-          self.psanaOptions = system_params['psanaOptions']
-          self.calibOutKey = system_params['ndarrayCalibOutKey']
-          self.outputArrayType = system_params['outputArrayType']
-          self.srcString = system_params['src']
-          mask = np.load(system_params['mask_ndarrayCoords']) == 1
-          self.color = np.load(user_params['color_ndarrayCoords'])
-          assert self.mask.shape == self.color.shape
-          self.delays = system_params['delays']
-          self.system_params = system_params
-          self.user_params = user_params
-  
-      def run(self):
-          data, eventTimesWithDetectorData = self.gatherDataAndEventTimes()
-          sortedCounters, newDataOrder = getSortedCountersAtHertz(eventTimesWithDetectorData, hertz=120)
-          sortedData = data[newDataOrder]
-          print "read through data"
-          self.calcNormalizedG2Terms(sortedCounters, sortedData)
-  
-          # write results to h5 file
-          lastCounter = sortedCounters[-1]
-          h5file = h5py.File(self.h5output, 'w')
-          ParCorAna.writeConfig(h5file, self.system_params, self.user_params)
-          userGroup = h5file.create_group('user')
-          counts = np.array([self.counts[delay] for delay in self.delays],np.int64)
-          thisDelayGroup = H5Output.writeDelayCounts(userGroup, lastCounter, self.delays, counts)
-          ParCorAna.writeToH5Group(thisDelayGroup, self.name2delay2ndarray)
-  
-          h5file.close()
-   
+which compares the two h5output files defined in the config file. This runs a separate tool - 
+cmpParCorAnaH5OutputPy which is part of the ParCorAna package.
 
 
-Set the System Test Parameters
-===============================
+.. _alttest:
 
-In the config.py file::
+G2Common Example
+=================
+This function is as follows::
 
-  system_params['testMaskNdarrayCoords'] = xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy
-  system_params['testH5output'] = 'test_g2calc_cspad2x2_xcsi0314-r0178.h5'
+    def calcAndPublishForTestAltHelper(self,sortedEventIds, sortedData, h5GroupUser, startIdx):
+        '''This implements the alternative test calculation in a way that is suitable for the sub classes
+        
+        The Incremental will always go through the data from the start, so startingIndex should
+        be 0. However the atEnd and Windowed will only work through the last numEvents of 
+        data, so startingIndex should be that far back.
+        '''
+        G2 = {}
+        IP = {}
+        IF = {}
+        counts = {}
+        assert len(sortedData.shape)==2
+        assert sortedData.shape[0]==len(sortedEventIds)
+        assert startIdx < len(sortedEventIds), "startIdx > last index into data"
+        numPixels = sortedData.shape[1]
+        for delay in self.delays:
+            counts[delay]=0
+            G2[delay]=np.zeros(numPixels)
+            IP[delay]=np.zeros(numPixels)
+            IF[delay]=np.zeros(numPixels)
+
+        self.mp.logInfo("UserG2.calcAndPublishForTestAltHelper: starting double loop")
+
+        for idxA, eventIdA in enumerate(sortedEventIds):
+            if idxA < startIdx: continue
+            counterA = eventIdA['counter']
+            for idxB in range(idxA+1,len(sortedEventIds)):
+                counterB = sortedEventIds[idxB]['counter']
+                delay = counterB - counterA
+                if delay == 0:
+                    print "warning: unexpected - same counter twice in data - idxA=%d, idxB=%d" % (idxA, idxB)
+                    continue
+                if delay not in self.delays: 
+                    continue
+                counts[delay] += 1
+                dataA = sortedData[idxA,:]
+                dataB = sortedData[idxB,:]
+                G2[delay] += dataA*dataB
+                IP[delay] += dataA
+                IF[delay] += dataB
+
+        self.mp.logInfo("calcAndPublishForTestAlt: finished double loop")
+
+        name2delay2ndarray = {}
+        for nm,delay2masked in zip(['G2','IF','IP'],[G2,IF,IP]):
+            name2delay2ndarray[nm] = {}
+            for delay,masked in delay2masked.iteritems():
+                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float64)
+                name2delay2ndarray[nm][delay][self.maskNdarrayCoords] = masked[:]
+            
+        saturatedElements = np.zeros(self.maskNdarrayCoords.shape, np.int8)
+        saturatedElements[self.maskNdarrayCoords] = self.saturatedElements[:]
+
+        lastEventTime = {'sec':sortedEventIds[-1]['sec'],
+                         'nsec':sortedEventIds[-1]['nsec'],
+                         'fiducials':sortedEventIds[-1]['fiducials'],
+                         'counter':sortedEventIds[-1]['counter']}
+
+        countsForViewerPublish = np.zeros(len(counts),np.int)
+        for idx, delay in enumerate(self.delays):
+            countsForViewerPublish[idx]=counts[delay]
+        self.viewerPublish(countsForViewerPublish, lastEventTime, 
+                           name2delay2ndarray, saturatedElements, h5GroupUser)
 
 
   

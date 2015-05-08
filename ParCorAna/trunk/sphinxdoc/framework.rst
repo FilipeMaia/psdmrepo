@@ -2,78 +2,16 @@
 .. _framework:
 
 ################
- Documentation
+ Framework
 ################
 
-Here we include more details on the using the Framework. 
-Recall from the tutorial that the user writes a Python config file 
-that defines two dictionaries
+Here we include more details on the Framework. 
+The :ref:`configfile` section of the :ref:`tutorial` page covers all the details about the two dictionaries
 
   * system_params
   * user_params
 
-First we go over what to set in these dictionaries.
-
-**************************
-system_params
-**************************
-The system_params dictionary must define the following keys
-  
-  **dataset**
-    what experiment/run to process, as well as index, live, or shared memory mode
-  **src**, **psanaType**
-    what detector data to scatter to the workers.
-    determines the dimensions of NDArray in the domain of the user function **F**.
-  **psanaOptions**, **outputArrayType**, **ndarrayProducerOutKey**, **ndarrCalibOutKey**
-    all of these parameters define the psana configuration used. This is 
-    intended to load and configure a calibration module.  The system provides a function for setting this up
-    that uses the psana module ImgAlgos.NDArrCalib. Users can add options to the calibration, specify
-    no calibration, or load their own modules here.
-  **workerStoreDtype**
-    to save space, workers could store float32 or possibly int16. They need to return
-    results in float64.
-  **maskNdarrayCoords** 
-    a  mask file to exclude elements from worker calculation
-  **testMaskNdarrayCoords** 
-    a separate mask file for testing, should have no more than 100 pixels on.
-  **numServers**
-    how many servers to use in the system, most all other ranks are workers. 
-    Typically 6 can keep up with live data. Use less for testing.
-  **serverHosts**
-    typically None, but can be set to specify hosts from which servers are chosen
-  **times**
-    how many times to store, the size of the **T** in the **T x NDArray** domain 
-    for the function **F** (though the size of T is fixed, the times stored can change
-    as the framework works through the data. T is a rolling buffer.
-  **update**
-    how frequently to have the workers calculate and update the viewer. This is in units of events.
-    At 120 hz, set this to 12000 to publish results every 100 seconds.
-  **delays**
-    the **D** in the D x NDArray range for the function **F**. It is an integer array of 
-    delay values, typically set on a logarithmic scale.
-  **userClass**
-    the Python class from which to instantiate the user module object. This must have all
-    the callbacks described below. It carries out the correlation calculation.
-  **h5output**
-    output filename. Can be None in which case no h5output file is created.
-  **testh5output** 
-    output file for alternative test function of userClass when running the frameing in the alternate test mode.
-  **overwrite**
-    True if it is Ok to overwrite existing output file. 
-  **verbosity**
-    can print debug info if desired. Reports on progress of all MPI communication for each event.
-  **numEvents**, **testNumEvents**
-    for testing and doing shorter runs, one can set these to nonzero values.
-  **elementsPerWorker**
-    for testing and doing shorter runs, override mask and specify a few elements for each worker
-
-**************************
-user_params
-**************************
-user_params defines any options the user module needs. For example with G2, a 
-color file to compute several delay curves for different nodes.
-
-
+that must be defined in the config file.
 
 **************************
 Mask File
@@ -87,6 +25,31 @@ Mask File
 * The tool parCorAnaMaskColorTool can help users produce this file, and convert from ndarray
   shape to image shape. Often a mask is created in image space, but it is best to create the color
   file in ndarray space and simply view it in image space.
+
+.. _usercode:
+
+************
+WorkerData
+************
+The framework stores new data that is scattered from the servers to the workers.
+It uses a class called WorkerData. WorkerData must provide an interface to the data
+so users can quickly go through it in time order, and quickly look up data with a 
+specific time delay or offset from a given piece of data. 
+
+The framework maintains a rolling buffer of the data. The size of this is controlled 
+in the system_params. Default is to store 50,000 times and compute delays up to 25,000. 
+
+DAQ data can come out of order, and can be missing times, or have gaps, ie, one will
+have data at the 120hz counter values of 1,2,4 but might never get 3. Moreover the data may
+have arrived in the order 1,4,2. While the framework maintains a sorted list of the 
+times, it does not move the detector data around. That is if one were to go through the
+data array of WorkerData in order, you would look at data from 120hz counter times 1,4,2. 
+However one does not do this, WorkerData provides an interface that lets you go through 
+the times in order, and  look up specific times. It then gives you the correct index 
+into the data array. 
+
+We will see how to use this interface in the G2atEnd_, G2IncrementalAccumulator_, G2IncrementalWindowed_ 
+sections below.
 
 **************************
 User Code
@@ -104,27 +67,23 @@ These roles are
     workers for the viewer.
   * **master** the master coordinates which server scatters data to the workers and when the workers send results to the viewer.
 
-The file
+The file::
 
   ParCorAna/src/UserG2.py 
 
-provides an example of carrying out the G2 calculation. It is carried out in three ways. One of these
-is a testing method. The other two calculate G2 either during the update, or in an ongoing fashion.
-This is implemented in three classes,
+provides an example of carrying out the G2 calculation. It is carried out in three ways and provides
+a testing method. This is implemented in several classes covered in the sections 
+G2atEnd_, G2IncrementalAccumulator_, G2IncrementalWindowed_ below.
 
-  **G2Common** 
-    implements the testing function and common functionality to the ongoing and at end calculations
-  **G2atEnd** 
-    a straightforward calculation of the G2 terms right before the viewer is updated. Does O(T*n) work
-    during viewer update, where T is the amount of data, and n is the number of delays
-  **G2onGoing** 
-    This keeps terms of the G2 calculation up to date as data comes in. It does O(n) work during each
-    event, and O(T) work at the end.
+Initialization
+===================
+A UserG2 class is initalized as follows::
 
-The framework maintains a rolling buffer of the data. The size of this is controlled in the system_params. 
-Default is to store 50,000 times and compute delays up to 25,000. If one processes data with 100,000 events, the
-G2atEnd calculation will not include any of the data from the first 50,000 events, during the final update. However
-the G2onGoing will.
+    def __init__(self, user_params, system_params, mpiParams, testAlternate):
+
+that is it takes the two params dict, mpiParams which includes a logger, and a flag to say if the 
+alternative test is being done.
+
 
 =====================
 Callbacks
@@ -223,23 +182,111 @@ viewerPublish(counts, lastEventTime, name2delay2ndarray, int8array, h5UserGroup)
   the gathered arrays, the gathered int array, and a h5py group into the h5output file to write to.
 
 
+G2Common
+============
+This is a base or super class which does the following
+
+* defines the array names, G2, IF and IP
+* gets the delays
+* provides a helper function calcAndPublishForTestAltHelper that is used by the super classes for the alternative test
+* all of the viewer code/callbacks (gets color file in viewerInit, in viwerPublish, forms delay curves and either
+  writes to the h5file, or plots).
+
+G2atEnd
+==========
+This does all its work in workerCalc, O(T*D) work, where T is the number of Times, and D the number of delays.
+Here is the code, showing how to work with the WorkerData class::
+
+    def workerCalc(self, workerData):
+        assert not workerData.empty(), "UserG2.workerCalc called on empty data"
+        maxStoredTime = workerData.maxTimeForStoredData()
+        
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            for tmA, xIdxA in workerData.timesDataIndexes():
+                tmB = tmA + delay
+                if tmB > maxStoredTime: break
+                xIdxB = workerData.tm2idx(tmB)
+                timeNotStored = xIdxB is None
+                if timeNotStored: continue
+                intensities_A = workerData.X[xIdxA,:]
+                intensities_B = workerData.X[xIdxB,:]
+                self.counts[delayIdx] += 1
+                self.G2[delayIdx,:] += intensities_A * intensities_B
+                self.IP[delayIdx,:] += intensities_A
+                self.IF[delayIdx,:] += intensities_B
+
+        return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
+
+G2IncrementalAccumulator
+==========================
+This does the G2 calculation by doing O(D) work on each event (where D is the number of delays). 
+It does this by keeping the G2 calculation up to date when new data comes in Here is the main code::
+
+    def workerAfterDataInsert(self, tm, xInd, workerData):
+        maxStoredTime = workerData.maxTimeForStoredData()
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            tmEarlier = tm - delay
+            xIndEarlier = workerData.tm2idx(tmEarlier)
+            earlierLaterPairs=[]
+            if xIndEarlier is not None:
+                earlierLaterPairs.append((xIndEarlier, xInd))
+            tmLater = tm + delay
+            xIndLater = workerData.tm2idx(tmLater)
+            if xIndLater is not None:
+                earlierLaterPairs.append((xInd, xIndLater))
+            for earlierLaterPair in earlierLaterPairs:
+                idxEarlier, idxLater = earlierLaterPair
+                intensitiesFirstTime = workerData.X[idxEarlier,:]
+                intensitiesLaterTime = workerData.X[idxLater,:]
+                self.G2[delayIdx,:] += intensitiesFirstTime * intensitiesLaterTime
+                self.IP[delayIdx,:] += intensitiesFirstTime
+                self.IF[delayIdx,:] += intensitiesLaterTime
+                self.counts[delayIdx] += 1
+
+G2IncrementalWindowed
+======================
+As new data comes in and overwrites old data, this removes the effect of the old data. 
+It derives from G2IncrementalAccumulator, doing the same thing that it does during the
+workerAfterDataInsert function, but it also overrides workerBeforeDataRemove as follows::
+
+    def workerBeforeDataRemove(self, tm, xInd, workerData):
+        maxStoredTime = workerData.maxTimeForStoredData()
+        for delayIdx, delay in enumerate(self.delays):
+            if delay > maxStoredTime: break
+            earlierLaterPairs = []
+            tmEarlier = tm - delay
+            xIndEarlier = workerData.tm2idx(tmEarlier)
+            if xIndEarlier is not None:
+                earlierLaterPairs.append((xIndEarlier, xInd))
+            tmLater = tm + delay
+            xIndLater = workerData.tm2idx(tmLater)
+            if xIndLater is not None:
+                earlierLaterPairs.append((xInd, xIndLater))
+            for earlierLaterPair in earlierLaterPairs:
+                idxEarlier, idxLater = earlierLaterPair
+                intensitiesEarlier = workerData.X[idxEarlier,:]
+                intensitiesLater = workerData.X[idxLater,:]
+                assert self.counts[delayIdx] > 0, "G2IncrementalWindowed.workerBeforeDataRemove - about to remove affect at delay=%d but counts=0" % delay
+                self.counts[delayIdx] -= 1
+                self.G2[delayIdx,:] -= intensitiesEarlier * intensitiesLater
+                self.IP[delayIdx,:] -= intensitiesEarlier
+                self.IF[delayIdx,:] -= intensitiesLater
+
 **************************
 Launching Jobs
 **************************
 
-For testing locally 
+See the section :ref:`runlocal` and :ref:`runonbatch` of the :ref:`tutorial` page 
+for the basics.
 
-  mpiexec -n 4 parCorAnaDriver -c myconfig.py
-
-To use some command line options, 
+To use some command line options, one could do
 
   mpiexec -n 4 parCorAnaDriver -c myconfig.py -v debug -n 300 -o myout.h5 --overwrite
 
-To run in the offline batch job:
+To run against data on the ana file system in the psanaq, while saving the output to
+a file, one could do:
 
   bsub -q psanaq -a mympi -n 30 -o g2calc_%J.out parCorAnaDriver -c myconfig.py -n 1000
-
-To run in live mode, or shared memory mode
-
-  TODO
 
