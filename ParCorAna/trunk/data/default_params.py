@@ -207,20 +207,6 @@ system_params['testNumEvents'] = 100
 # this can be overriden on the command line
 system_params['elementsPerWorker'] = 0
 
-##### parallel job allocation #####
-# below are parameters that the system will use to figure out the 
-# command to use to launch the job - MOVE INTO DRIVER
-#system_params['GB_per_host'] = 23.53   
-# there are a few hosts out there with 19.59GB - psana1116 in psanaq, psana1305 in psfehq
-# number_hosts_in_queue = {'psanaq':40,        # 941GB
-#                         'psfehpriorq':16,   # 372GB 
-#                         'psnehpriorq':16}   # 376GB 
-#system_params['slots_per_host'] = 12
-#system_params['number_hosts_in_queue'] = 40
-
-# system_params['queue'] = 'psanaq' # put None for local
-# system_params['bsubCmd'] = None  # let the system construct bsub_cmd
-
 ##################################################
 ############ USER MODULE - G2 CONFIG #############
 user_params = {}
