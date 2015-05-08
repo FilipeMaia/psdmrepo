@@ -33,7 +33,6 @@ shift $(( OPTIND - 1 ))
 OPTIND=1
 
 REQ_NODES=$*
-#PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --allow --holdoff 60 --ignore ^D^C"
 PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --holdoff 60 --ignore ^D^C"
 
 rec_psana101=(
@@ -82,7 +81,8 @@ case $(hostname) in
 esac
 
 # set pcds release to get proper python version
-. /reg/g/psdm/bin/sit_setup.sh dm-current
+echo "Using release ${1:-dm-current}"
+. /reg/g/psdm/bin/sit_setup.sh ${1:-dm-current}
 
 # get abspath of mvr and cd to workdir
 cd $(dirname $0)
