@@ -179,7 +179,7 @@ system_params['userClass'] = UserG2.G2atEnd
 # filename.
 
 system_params['h5output'] = 'g2calc_%s-r%4.4d.h5' % (experiment, run)
-system_params['testh5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
+system_params['testH5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
 
 
 # example of using %T and %C, note the %% in the value to get one % in the string after 
