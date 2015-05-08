@@ -14,6 +14,7 @@ Tag: V01-03-13
 2015
 - Close JobInfo (python lsf c-api) if none were found. Otherwise connection to lsf server is not 
   properly closed (stuck in CLOSE_WAIT) which caused the ic-controller-mon to run out of file descriptors. 
+- smalldata support for irods registration 
 	
 Tag: V01-03-12 
 2015-03-10 Wilko Kroeger
