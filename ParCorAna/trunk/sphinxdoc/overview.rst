@@ -10,6 +10,7 @@ The framework does the following:
   * scatters it to workers
   * gather results from workers
   * manages an hdf5 output file
+  * provides a testing mechanism
 
 The framework identifies different mpi ranks as
   * workers - these handle a subset of the detector pixels and 
@@ -17,17 +18,18 @@ The framework identifies different mpi ranks as
   * servers - these get data using psana and call user code to filter
     and pre-process events
   * viewer - consolidates correlation results from workers, calls user
-    code to plots or save results to disk
+    code to plot or save results to disk
   * master - synchronizes various parts of the framework, no user code involved
 
 The user provides the following:
   * a mask file identifying the detector elements to process
+  * a smaller mask file for testing (optional)
   * a user module that runs on servers, workers and the viewer. This module:
 
     * calculates correlations for the pixels assigned to each worker
     * plots or saves gathered results in the viewer
     * optionally filters/pre-processes events in the servers
-    * optionally provides a testing mask file, and testing function
+    * optionally provides an alternative testing calculation
 
 
 **********************
@@ -81,7 +83,7 @@ The second part is counts for each of the delays::
   D x 1  delay counts    (array of int64)
                         
 For this output counts, `counts[d]` is the number of pairs of times 
-in T that are have a delay of d between them. A counts entry can be zero 
+in T that have a delay of d between them. A counts entry can be zero 
 for a delay that has not been seen yet in the data.
 
 The third output for F is a general array::
@@ -89,8 +91,8 @@ The third output for F is a general array::
   DetetectorNDArray1     (array datatype=int8)
   
 which applications can use for a variety of purposes. The intended application is
-to record saturated pixels, pixels whose calibrated value that when over a threshold 
-at some point and should thus be excluded from the presented results.
+to record saturated pixels. A saturated pixel is a pixel that should be excluded from
+the correlation calculation because its value went over a threshold.
 
 **********************
  Parallelization
@@ -115,3 +117,4 @@ To use this framework, the user does the following,
   * launch an MPI job
 
 We will go through these steps in the tutorial that follows.
+

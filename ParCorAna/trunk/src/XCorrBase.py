@@ -12,6 +12,7 @@ import h5py
 from ParCorAna.WorkerData import WorkerData
 import ParCorAna.Timing as Timing
 import ParCorAna.CommSystemUtil as CommSystemUtil
+import ParCorAna as corAna
 from EventIter import EventIter
 
 #################################
@@ -277,17 +278,18 @@ class XCorrBase(object):
         self.gatheredInt8array = np.zeros(self.totalMaskedElements, np.int8)
         assert len(self.gatheredInt8array) == sum(self.gatherOneNDArrayCounts), "gathered_int8array len != expected"
 
+        self.h5output = None
         if self.system_params['h5output'] is not None:
-            h5output = self.system_params['h5output']
-            self.h5inprogress = self.system_params['h5output'] + '.inprogress'
-            if os.path.exists(h5output):
+            self.h5output = corAna.formatFileName(self.system_params['h5output'])
+            self.h5inprogress = self.h5output + '.inprogress'
+            if os.path.exists(self.h5output):
                 if self.system_params['overwrite']:
                     if os.path.exists(self.h5inprogress):
-                        raise Exception("h5output file %s specified with overwrite, but the inprogress file, %s exists. You must remove this file." % (h5output, self.h5inprogress))
-                    os.unlink(h5output)
-                    self.mp.logInfo("overwrite=True, removed file=%s" % h5output)
+                        raise Exception("h5output file %s specified with overwrite, but the inprogress file, %s exists. You must remove this file." % (self.h5output, self.h5inprogress))
+                    os.unlink(self.h5output)
+                    self.mp.logInfo("overwrite=True, removed file=%s" % self.h5output)
                 else:
-                    raise Exception("h5output file %s specified but that file exists. Set params overwrite to True to overwrite it." % self.system_params['h5output'])
+                    raise Exception("h5output file %s specified but that file exists. Set params overwrite to True to overwrite it." % self.h5output)
             if os.path.exists(self.h5inprogress):
                 raise Exception("inprogress file for given h5output: %s exists. System will not overwrite even with --overwrite. Delete file before running" % self.h5inprogress)
             self.h5file = h5py.File(self.h5inprogress,'w')
@@ -308,9 +310,9 @@ class XCorrBase(object):
             del self.h5GroupFramework
             self.h5file.close()
             del self.h5file
-            assert not os.path.exists(self.system_params['h5output']), "ERROR: h5output file %s has been created since program started. Cannot move the inprogress file: %s to replace it. Output is in the inprogress file" % \
-                (self.system_params['h5output'], self.h5inprogress)
-            shutil.move(self.h5inprogress, self.system_params['h5output'])
+            assert not os.path.exists(self.h5output), "ERROR: h5output file %s has been created since program started. Cannot move the inprogress file: %s to replace it. Output is in the inprogress file" % \
+                (self.h5output, self.h5inprogress)
+            shutil.move(self.h5inprogress, self.h5output)
 
     def storeNewWorkerData(self, counter):
         assert self.mp.isWorker, "storeNewWorkerData called for non-worker"

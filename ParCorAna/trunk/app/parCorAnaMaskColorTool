@@ -23,6 +23,7 @@ This will produce the files, all numpy arrays
   xpptut13-r1437_XppGon_0_Cspad_0_avg_ndarrCoords.npy   # average of first 50 cspad, in ndarray coordinates
   xpptut13-r1437_XppGon_0_Cspad_0_avg_imageCoords.npy   # ndarray average converted to image
   xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy  # mask in ndarray coords, all 1
+  xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy  # testmask in ndarray coords, only 10 pixels are on
   xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy  # mask converted to image
   xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy # example color file in ndarray coordinates
   xpptut13-r1437_XppGon_0_Cspad_0_color_imageCoords.npy # color file converted to image
@@ -34,6 +35,9 @@ as well as these files, which are used to convert from img <-> ndarray coords
 
 Note the basename, xpptut13-r1437_XppGon_0_Cspad_0, that is generated. One can specify a 
 different basename with --basename or -b option.
+
+The testmask selects 10 pixels that are stored consecutively. One of these pixels has an
+intensity at the 95th percentile.
 
 The last two files, iX and iY, from PSCalib.GeometryAccess, are shaped as ndarrays, and contain the 
 mapping from ndarray to image. iX specifies the image row for each ndarray element, likewise iY specifies 
@@ -115,7 +119,9 @@ if __name__ == "__main__":
                              args.basename,
                              args.geom,
                              args.debug,
-                             args.force)
+                             args.force,
+                             numTestPixels=10,
+                             verboseForTestPixels=True)
     elif args.plotimg:
         assert args.input, "for plotimg: must specify input file"
         assert os.path.exists(args.input), "plotimg: input file %s doesn't exist" % args.input

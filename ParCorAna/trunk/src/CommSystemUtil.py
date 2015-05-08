@@ -2,7 +2,48 @@
 '''
 import math
 import logging
+import time
+import datetime
+import glob
 
+def formatFileName(fname):
+    '''Looks for %T in a file and %C. Replaces them with 
+
+     %T  -> yyyymmddhhmmss (year, month, day, hour, minute, second)
+     %C  -> look at files on disk - use next one up counter
+    '''
+    splitT = fname.split('%T')
+    assert len(splitT)<=2, "Doesn't make sense to have more than one %%T in fname: %s" % fname
+    if len(splitT)==2:
+        dt=datetime.datetime.fromtimestamp(time.time())
+        timestamp='%4.4d%2.2d%2.2d%2.2d%2.2d%2.2d' % (dt.year, dt.month, dt.day, dt.hour, dt.minute, dt.second)
+        fname = timestamp.join(splitT)
+    splitC = fname.split('%C')
+    assert len(splitC)<=2, "Doesn't make sense to have more than one %%C in fname: %s" % fname
+    if len(splitC)<2: return fname
+    beforeC,afterC = splitC
+    globmatch = fname.replace('%C','*')
+    globfiles = glob.glob(globmatch)
+    curCounters = []
+    for globfname in globfiles:
+        counterMatch = globfname[len(beforeC):-len(afterC)]
+        try:
+            counter = int(counterMatch)
+            if counter >=0 and counter <= 999:
+                curCounters.append(counter)
+            else:
+                pass
+                # there is other stuff in here, could be a timestamp that looks like a big int
+        except ValueError:
+            pass
+    if len(curCounters)==0:
+        nextCounter=0
+    else:
+        nextCounter = max(curCounters)+1
+    fname = beforeC + ("%3.3d" % nextCounter) + afterC
+    return fname
+
+            
 def checkCountsOffsets(counts, offsets, n):    
     '''Makes sure that the counts and offsets partition n. 
     

@@ -61,6 +61,62 @@ def unindent(x):
     minLeadingSpaces = min(allLeadingSpaces)
     return '\n'.join([ln[minLeadingSpaces:] for ln in lns])
 
+class FormatFileName( unittest.TestCase ) :
+
+    def setUp(self) :
+    	""" 
+    	Method called to prepare the test fixture. This is called immediately 
+    	before calling the test method; any exception raised by this method 
+    	will be considered an error rather than a test failure.  
+    	"""
+        self.longMessage = True
+        destDirBase = AppDataPath(os.path.join("ParCorAna","testingDir")).path()
+        self.tempDestDir = tempfile.mkdtemp(dir=destDirBase)
+
+    def tearDown(self) :
+        """
+        Method called immediately after the test method has been called and 
+        the result recorded. This is called even if the test method raised 
+        an exception, so the implementation in subclasses may need to be 
+        particularly careful about checking internal state. Any exception raised 
+        by this method will be considered an error rather than a test failure. 
+        This method will only be called if the setUp() succeeds, regardless 
+        of the outcome of the test method. 
+        """
+        shutil.rmtree(self.tempDestDir, ignore_errors=True)
+        
+    def test_formatFileName(self):
+        fname = os.path.join(self.tempDestDir, "file.h5")
+        fname_w_T = os.path.join(self.tempDestDir, "file_%T.h5")
+        fname_w_C = os.path.join(self.tempDestDir, "file_%C.h5")
+        fname_other = os.path.join(self.tempDestDir, "file_jnk.h5")
+
+        self.assertEqual(corAna.formatFileName(fname),fname)
+
+        tmfname = corAna.formatFileName(fname_w_T)
+        os.system('touch %s' % tmfname)
+        self.assertNotEqual(tmfname,fname)        
+                                              # %C 2015 05 05 16 19 59
+        self.assertEqual(len(tmfname),len(fname_w_T)-2   +4 +2 +2 +2 +2 +2, msg="tmfname=%s" % tmfname)
+
+        os.system('touch %s' % fname)
+        os.system('touch %s' % tmfname)
+
+        c0 = corAna.formatFileName(fname_w_C)
+
+        self.assertNotEqual(c0,fname)
+        self.assertEqual(c0, fname_w_C.replace('%C','000'))
+        os.system('touch %s' % c0)
+
+        c1 = corAna.formatFileName(fname_w_C)
+        self.assertEqual(c1, fname_w_C.replace('%C','001'))
+
+        os.system('touch %s' % c1)
+        os.system('touch %s' % fname_other)
+
+        c2 = corAna.formatFileName(fname_w_C)
+        self.assertEqual(c2, fname_w_C.replace('%C','002'))
+
 class ParCorAna( unittest.TestCase ) :
 
     def setUp(self) :
@@ -69,7 +125,7 @@ class ParCorAna( unittest.TestCase ) :
     	before calling the test method; any exception raised by this method 
     	will be considered an error rather than a test failure.  
     	"""
-        pass
+        self.longMessage = True
 
     def tearDown(self) :
         """
@@ -82,7 +138,7 @@ class ParCorAna( unittest.TestCase ) :
         of the outcome of the test method. 
         """
         pass
-
+        
     def test_parseDataSetString(self):
         '''test parseDataSetString function
         '''
@@ -141,6 +197,7 @@ class Cspad2x2( unittest.TestCase ) :
     	before calling the test method; any exception raised by this method 
     	will be considered an error rather than a test failure.  
     	"""
+        pass
         dataDir = os.path.join(ptl.getMultiFileDataDir(), 'test_013_xcsi0314')
         experiment = 'xcsi0314'
         run = 178  

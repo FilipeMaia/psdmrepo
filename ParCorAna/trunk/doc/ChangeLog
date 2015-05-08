@@ -11,11 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+	
 Tag: V00-00-06
 - remove XCorrWorkerBase and replace with WorkerData
 - add unit tests for 60 events of cspad2x2
 - add UserG2 for 3 methods - incremental accumulate, windowed, g2atend
-- update documenation and defaul_params.py
+- update documenation and default_params.py
+- add support for %T and %C in h5output file, with unit test
+- extend parCorAnaMaskColorTool to create testmask with 10 pixels on.
 	
 Tag: V00-00-05
 - implement WorkerData for incrememtal calculation

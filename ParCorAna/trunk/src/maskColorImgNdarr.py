@@ -1,6 +1,7 @@
 import os
 import sys
 import numpy as np
+import math
 import psana
 import ParCorAna
 import scipy.ndimage
@@ -38,28 +39,24 @@ def makeColorArray(array, numColors):
     20% will get 5.
 
     Returns array of same size with colors. 
-
-    We expect cases with issues, such as not all pixels getting assigned a color
-    (unassigned pixels are 0)
     '''
     assert numColors>0
-    coloredArray = np.zeros(array.shape, np.int32)
-    values = np.sort(array.flatten())
-    startIdx = 0
-    color = 1
-    if numColors>len(values):
-        numColors = len(values)
+    sortedInds = np.argsort(array.flatten())
+    N = len(sortedInds)
+    if numColors > N:
+        numColors = N
         print "warning: reduced numColors for small amount of data"
-    while color <= numColors:
-        endIdx = int(round(startIdx + len(values)/float(numColors)))
-        startIdx = min(len(values)-1,max(0,startIdx))
-        endIdx =  max(0, min(len(values)-1,endIdx))
-        startValue = values[startIdx]
-        endValue = values[endIdx]
-        thisColor = (array >= startValue) & (array <= endValue)
-        coloredArray[thisColor] = color
-        color += 1
-        startIdx = endIdx
+
+    coloredFlat = np.zeros(N, np.int32)
+    ind0 = 0
+    delta = max(1,int(math.floor(N/numColors)))
+    for color in range(1,numColors+1):
+        ind1=min(N,ind0+delta)
+        coloredFlat[sortedInds[ind0:ind1]]=color
+        ind0 = ind1
+    if ind1 < N:
+        coloredFlat[sortedInds[ind1:]]=numColors
+    coloredArray = coloredFlat.reshape(array.shape)
     return coloredArray
 
 def findImageGaps(iX, iY):
@@ -239,8 +236,27 @@ def makeNdarrImageMappingFor2D(shape2D):
         iY[:,y]=y
     return iX, iY
 
+def turnOnTestPixels(arr,avg, numPixels=10, verbose=False):
+    assert arr.shape == avg.shape
+    sortedInds = np.argsort(avg.flatten())
+    N = len(sortedInds)
+    assert N>0
+    ind0 = max(0,min(N-1,int(math.floor(.95*N))))
+    ind1 = ind0 + numPixels
+    if ind1 > N:
+        ind0 = max(0,ind0-(ind1-N))
+        ind1 = N
+    ind0 = max(0,ind0)
+    shapedIndicies = np.unravel_index(range(ind0,ind1),avg.shape)
+    arr[shapedIndicies]=1
+    if verbose:        
+        for k in range(len(shapedIndicies[0])):
+            inds=[indList[k] for indList in shapedIndicies]
+            print "turnOnTestPixels: Turned on index: (%s)" % ','.join(map(str,inds))
+
 def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300, 
-                     colors=6, basename=None, geom=None, debug=False, force=False):
+                     colors=6, basename=None, geom=None, debug=False, force=False,
+                     numTestPixels=10, verboseForTestPixels=False):
     #### helper function ####
     def makeBaseName(dsetstring, srcString):
         '''make a base name from the dataset string and source
@@ -290,11 +306,13 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     maskNdarrFname = basename + '_mask_ndarrCoords.npy'
     maskImgFname = basename + '_mask_imageCoords.npy'
 
+    testmaskNdarrFname = basename + '_testmask_ndarrCoords.npy'
+
     colorNdarrFname = basename + '_color_ndarrCoords.npy'
     colorImgFname = basename + '_color_imageCoords.npy'
 
     for fname in [iXfname, iYfname, avgNdarrFname, avgImgFname, 
-                  maskNdarrFname, maskImgFname, colorNdarrFname, colorImgFname]:
+                  maskNdarrFname, testmaskNdarrFname, maskImgFname, colorNdarrFname, colorImgFname]:
         assert (not os.path.exists(fname)) or force, "file %s exists. pass --force to overwrite" % fname
 
     if iX is not None and iY is not None:
@@ -391,6 +409,13 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     print "saving a mask"
     fout = file(maskNdarrFname,'w')
     np.save(fout, maskNdarr)
+    fout.close()
+
+    testmaskNdarr = np.zeros(ndarrAverage.shape,np.int8)
+    turnOnTestPixels(testmaskNdarr, ndarrAverage, numTestPixels, verboseForTestPixels)
+    print "saving a testmask"
+    fout = file(testmaskNdarrFname,'w')
+    np.save(fout, testmaskNdarr)
     fout.close()
 
     print "saving img mask"

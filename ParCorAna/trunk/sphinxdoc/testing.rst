@@ -5,10 +5,53 @@
  Testing
 ################
 
-************
-Testing
-************
-The framework has a mechanism in place to test the code.
+The framework provides support for testing the correlation calculation
+and viewer publishing. The user provides an alternative calculation.
+The results of these two calculations are then compared.
+
+When comparing results of the two calculations, it is important to make sure
+they get the same input. The UserG2 module can modify the input to the 
+correlation calculations. This happens through the server callbacks, and 
+the worker callback workerAdjustData. When the framework runs the 
+alternative testing calculation, it goes through all the data, calling these 
+callbacks at the appropriate times. All of the data is passed
+to the alternative testing calculation after the data has been
+processed.
+
+That is, the alternative calcuation is not something that deals with
+the stored data through the WorkerData class in the framework. It
+simply receives all the data at once, with sorted timecodes and counters.
+It can implement a simpler, slower, more straightforward calculation.
+
+For testing purposes, it is not neccessary to compare results on all the
+pixels in the detector. Users should produce a testing mask file that 
+identifies a small number of pixels, say 10-100, for testing. 
+
+Next we go over the steps for testing.
+
+
+Alternative Test Calculation and Viewer Publish
+==================================================
+
+The UserG2 class has the callback: 
+The alternative calculation is a callback method of the UserG2 class
+that the framework calls when in testing mode. What it returns should be
+in the same format as the workerCalc callback. The same viewerPublish callback
+is used for both the alternatitve testing calculation and the the saIn testing mode, the 
+framework uses three options from the system_params dictionary that 
+support testing
+
+ *testh5output*
+   the output file for the alternative testing calculation
+
+ *testNumEvents*
+
+ *testMaskNdarrayCoords*
+
+  
+
+  that The system_params dictionary in the config file includes options forthe user n
+framework takes care of producing the The framework supports testing has a mechanism in place to test the code.
 The idea is that one writes a separate function that does the
 correlation calculation in a straightforward fashion. This
 code will be run outside of the MPI framework. The results

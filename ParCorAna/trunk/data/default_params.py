@@ -19,19 +19,20 @@ system_params={}
 run = 1437
 experiment = 'xpptut13'
 
-# some other examples for testing
+system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
+
+# for online monitoring against live data, specify :live and the ffb directory, for example:
+# system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run) 
+
+# example for shared memory:
+# system_params['dataset'] = 'shmem=XCS:stop=no'
+
+# below are some datasets used for testing and development of ParCorAna
 # experiment = 'xcsc9114'; run=20  # this is for testing. No real signal, but a very long run to test performance
 # experiment = 'xcsi0314'; run=211  # 63k frames of epix, mask all but bottom quarter, run 214 is dark
 # experiment = 'xcsi0314'; run=177  # cspad2x2, dark is 179
 # experiment = 'xcsi0314'; run=178  # cspad2x2, dark is 179
 # experiment = 'xcs84213'; run=117  # this has CsPad.DataV2  # 40k - 60k
-
-system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
-
-# below, example where one specifies 
-# system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run)  # tutorial data for getting started
-
-# system_params['dataset'] = 'shmem=XCS:stop=no'     # when running on shared memory, may want to set h5 ouput to None for shmem
 
 ############### SRC TYPE PSANA CONFIG #################
 system_params['src']       = 'DetInfo(XppGon.0:Cspad.0)' # for tutorial data
@@ -48,7 +49,7 @@ system_params['psanaType'] = psana.CsPad.DataV2  # for tutorial data
 
 ############## PSANA CONFIG OPTIONS / OUTPUT ARRAY TYPE / OUTPUT KEY ##############
 # Create psana options to calibrate detector data. Uses the ParCorAna.makePsanaOptions 
-# utility function. One does:
+# utility function. 
 #
 #   * specify the type and src for the detector (above), 
 #   * specify output keys for the two modules (below)
@@ -74,7 +75,7 @@ system_params['psanaOptions'], \
 # an example of adding options to the psana configuration:
 # system_params['psanaOptions']['ImgAlgos.NDArrCalib.do_gain'] = True
 
-system_params['workerStoreDtype'] = np.float64  # The calibration system is creating ndarrays of
+system_params['workerStoreDtype'] = np.float32  # The calibration system is creating ndarrays of
               # double - or np.float64. Each worker stores a portion of this ndarray. To guarantee no 
               # loss of precision, workers should store results in the same data format - i.e, float64.
               # However for large detectors and long correlation types, this may require too much 
@@ -88,7 +89,8 @@ system_params['workerStoreDtype'] = np.float64  # The calibration system is crea
               # get down to 2 bytes. It is not reccommended that one use unsigned integers as calibration
               # can produce negative values. Note that the delay curves will always be calculated with float64
               # in order to avoid loss of precision with that calculation. Changing the worker_store_type 
-              # does not affect the precision of the delay curves.
+              # need not affect the precision of correlation calculations. One can convert the narrower
+              # stored values to float64 before calculating for a specific delay.
               #
               # The system will emit warnings if the calibrated ndarrays have to be truncated to fit
               # into a workerStoreDtype that is not np.float64.
@@ -106,49 +108,23 @@ system_params['maskNdarrayCoords'] = "see tutorial for documentation on this par
 system_params['testMaskNdarrayCoords'] = None
 
 ####### numservers serverHosts #################
-# The servers are responsible for working through the data. If they do a lot of 
-# processing of the detector data, such as complicated calibration, they can become a bottleneck.
-# Running several servers in parallel can increase performance. The 'numservers' parameter allows
-# users to increase the number of servers. When running from shared memory, only certain nodes have 
-# access to the data. In this case, users need to specify the names of these hosts. This is what the
-# 'serverHosts' parameter is for. 
+# The servers are responsible for working through the data, breaking up an ndarray of detector 
+# data, and scattering it to the workers. When developing, we usuaully specify 
+# one server. When analyzing data in live mode, we usually specify 6 servers, or however many
+# DAQ streams there are in the run. The framework sets things up so that each server only processes
+# one stream. As long as each server can run at 20hz it will keep up with live 120hz data. 
+# If you are analyzing xtcav data, then each server will process 2 or more streams. The framework 
+# outputs timing at the end which gives us an idea of how fast or slow the servers are.
+# Specifying more than 6 servers will not help, rather it will waste too many ranks on servers.
 #
-# There are limits on the number of servers on can use. These depend on the input mode specified in the
-# psana datasource string. When running in live mode, the most servers one can run is the number of 
-# distinct DAQ streams (usually six). When running in indexing mode, there is no limit, but more 
-# servers creates more I/O. Performance in index mode has not been evaluated. When running from shared 
-# memory, there is no I/O limit on the number of servers. 
+# In index mode, specifying more than six servers can help the servers run faster. However usually
+# the bottleneck will be with the workers, and more than six servers is not neccessary.
 #
-# The big limit on the number of servers is the balance of how many MPI ranks are servers vs. workers.
-# Ideally, one uses as many workers as possible, while using enough servers to read through the data.
-#
-# For testing locally, it is reccommended that you use 1 server. 
-#
-# When running in live mode on the batch farm, it is recommended that you use the same number of 
-# servers as you have DAQ streams. Most always this is 6. In addition, it is recommended that
-# you run an MPI job with at least 12 * (numservers-1) + 1 procs - or at least 61. The framework will choose
-# MPI ranks on distinct nodes when it can. It seems that having servers be on distinct nodes increases
-# performance. Presently, each psana node has 12 cores, once you use 61 cores you're job will cover at 
-# least 6 nodes.
-#
-# To see exactly how many DAQ streams you have, look at the files for your run. For example
-#
-#  ls -lrth /reg/d/psdm/xpp/xpptut13/xtc/*-r1437*.xtc
-
-#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 20  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s00-c00.xtc
-#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 21  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s02-c00.xtc
-#  -r--r-x---+ 1 psdatmgr ps-data 9.4G Oct 21  2013 /reg/d/psdm/xpp/xpptut13/xtc/e308-r1437-s01-c00.xtc
-#
-# Shows that there are only 3 streams for run 1437 of the xpp tutorial data. Note, there is a difference
-# between streams that are numbered at 80+ vs streams numbered less than 80. 80+ are control streams, and
-# streams less than 80 are DAQ streams. Do not count control streams, only count DAQ streams. For live
-# mode, do not use more streams than there are DAQ streams.
-
 system_params['numServers'] = 1
-system_params['serverHosts'] = 1
+system_params['serverHosts'] = None # system selects which hosts to use
 
-# when explicitly listing hosts, the number of hosts much agree with the number of servers
-# system_params['serverHosts'] = ['host1', 'host2']  # to explicitly set hosts, use a list of hostnames
+# explicitly listing hosts for servers is only useful when running against hared memory. The 
+# number of server hosts must aggree with the numServers parameter.
 
 # here are the hosts used for each instrument in shared memory mode
 # system_params['serverHosts'] = ['daq-amo-mon01', 'daq-amo-mon02', 'daq-amo-mon03'] 
@@ -166,7 +142,7 @@ system_params['serverHosts'] = 1
 system_params['times'] = 50000     # number of distinct times that each worker holds onto
 
 eventsPerMinute = 120*60
-numMinutes = 4
+numMinutes = 2
 system_params['update'] = eventsPerMinute*numMinutes  # update/viewer publish every n events. 
               # Set to 0 to only update at the end.
               # This is the number of events the system goes through before doing another viewer publish. Note - 
@@ -185,17 +161,32 @@ import ParCorAna.UserG2 as UserG2
 system_params['userClass'] = UserG2.G2atEnd
 
 ######## h5output, overwrite ########### 
-# The system will manage an h5output filename. This is not a file for collective
+# The system will optionally manage an h5output file. This is not a file for collective MPI
 # writes. Within the user code, only the viewer rank should write to the file. The viewer
-# will receive an open group to the file at run time.
-# In particular, for G2, the software will save the G2, IP IF 3D matrices, delays and counts to an h5 file.
-
-# set h5output to None if you do not want h5 output.
+# will receive an open group to the file at run time. 
+#
+# set h5output to None if you do not want h5 output - important to speed up online monitoring with 
+# plotting.
+#
 # The system will recognize %T in the filename and replaces it with the current time in the format
-# yyyymmddhhmmss. (year, month, day, hour, minute, second). It will also recognize %C for a one up counter.
-# When forming a string by "a-%d" % 3, one needs to use two % to  Add %%T into the string
+# yyyymmddhhmmss. (year, month, day, hour, minute, second). It will also recognize %C for a three
+# digit one up counter. When %C is used, it looks for all matching files on disk, selects the
+# one with the maximum counter value, and adds 1 to that for the h5output filename.
+#
+# Testing is built into the framework by allowing one to run an alternative calculation
+# that receives the same filtered and processed events at the main calculation. When the
+# alternative calcuation is run, the framework uses the testh5output argument for the
+# filename.
+
 system_params['h5output'] = 'g2calc_%s-r%4.4d.h5' % (experiment, run)
 system_params['testh5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
+
+
+# example of using %T and %C, note the %% in the value to get one % in the string after 
+# expanding experiment and run:
+
+# system_params['h5output'] = 'g2calc_%s-r%4.4d_%%T.h5' % (experiment, run)
+# system_params['h5output'] = 'g2calc_%s-r%4.4d_%%C.h5' % (experiment, run)
 
 ## overwrite can also be specified on the command line, --overwrite=True which overrides what is below
 system_params['overwrite'] = False   # if you want to overwrite an h5output file that already exists
@@ -227,8 +218,8 @@ system_params['elementsPerWorker'] = 0
 #system_params['slots_per_host'] = 12
 #system_params['number_hosts_in_queue'] = 40
 
-system_params['queue'] = 'psanaq' # put None for local
-system_params['bsubCmd'] = None  # let the system construct bsub_cmd
+# system_params['queue'] = 'psanaq' # put None for local
+# system_params['bsubCmd'] = None  # let the system construct bsub_cmd
 
 ##################################################
 ############ USER MODULE - G2 CONFIG #############
@@ -237,7 +228,7 @@ user_params = {}
 # the partition is a numpy array of int's. 0 and negative int's are ignored. int's that are positive
 # partition the elements. That is all elements with '1' form one delay curve, likewise all elements that are '2'
 # form another delay curve.
-user_params['colorNdarrayCoords'] =  "see __init__.py in ParCorAna/src for documentation on this file"
+user_params['colorNdarrayCoords'] =  "see tutorial for documentation on this parameter"
 user_params['saturatedValue'] = (1<<15)
 user_params['LLD'] = 1E-9
 user_params['notzero'] = 1E-5
