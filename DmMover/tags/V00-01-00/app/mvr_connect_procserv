@@ -1,0 +1,71 @@
+#!/bin/bash
+#
+# Find mover procServ ports on a host and connect to them
+# Usage:
+#      procserv_loop.sh [options] <mvrHost>
+#     
+#      options:   -f : check ffb hosts
+#                 -r : check for recorder movers
+#                 -l : list only procs, do not connect to procServ
+#                 -a : ask for quitting or skipping 
+# 
+# Examples:
+#           procserv_loop.sh psana101   
+#           procserv_loop.sh psana...  # use psana101, psana102,....               
+#
+
+procServs_host_port() {
+    # Use mvr_showprocs to find processes on remote host 
+
+    local mvr_host=${1:?}
+    local mvr_type=$2
+    local mvr_inst=$3
+    
+    if [[ ${mvr_type} = 'ana' ]] ; then
+        mvr_showprocs | egrep "^${mover_host}:" | awk ' $2 ~ /^psana/ {print $1$2":"$3}'
+    elif [[ ${mvr_type} = 'recorder' ]] ; then
+        mvr_showprocs | egrep "^${mover_host}:" | awk ' $2 !~ /^psana/ {print $1$2":"$3}'
+    else
+        mvr_showprocs -f -i ${mvr_inst} | grep ${mover_host} | awk ' int($3) == 30000  {print $1$2":"$3}'        
+    fi    
+}
+
+sel=ana
+while getopts :alf:r OPT; do
+    case $OPT in
+        a|+a) ask=1 ;;
+        f|+f) sel=ffb ; instr="$OPTARG" ;;
+        l|+l) listonly=1 ;;
+        r|+r) sel=recorder ;;
+        *)
+            sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit 2
+    esac
+done
+shift `expr $OPTIND - 1`
+OPTIND=1
+
+echo $#
+if [[ $# -eq 0 ]] && [[ ${sel} = "ffb" ]] ; then
+    mover_host=psana
+else
+    mover_host=${1:?}
+fi
+echo "Use: ${mover_host}  ${opt}"
+
+for tok in $( procServs_host_port ${mover_host} ${sel} ${instr:-none} ) ; do 
+    mvrhost=${tok%%:*}
+    port=${tok##*:}
+    srchost=${tok%:*}
+    srchost=${srchost#*:}
+    
+    echo " =================================================" 
+    echo " =======    ${mvrhost} ${port} ${srchost} "
+    
+    if [[ ${listonly:-0} -eq 0 ]] ; then
+        # May ask to exit
+        [[ ${ask:-0} -eq 1 ]] && { echo -n " [q]uit or [s]cip? " ; read iv; } \
+            && { [[ "${iv}" = 'q' ]] &&  break || [[ "${iv}" = 's' ]] &&  continue ; }
+        ssh -tt ${mvrhost} telnet 127.0.0.1 ${port}
+    fi    
+done

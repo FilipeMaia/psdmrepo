@@ -1,0 +1,542 @@
+#!@PYTHON@
+
+import sys
+import os
+import glob
+import stat
+import time
+import shutil
+import getopt
+import traceback
+import subprocess
+import argparse
+
+#import psdm.file_status as file_status
+import FileMgr.file_status as file_status
+import DmMover.db_access as db 
+
+
+_ws_conn    = "/reg/g/psdm/psdatmgr/datamigr/.filemgr-ws"
+_regdb_conn = "/reg/g/psdm/psdatmgr/regdb/.regdb-reader-conn"
+_no_experiment_   = -2
+_all_experiments_ = -1
+
+_print_header="""
+  ----------+-----------+---------------------------+-----------------------+---------+---------+--------------
+   exper_id | file type | file name                 | IN MIGRATION DATABASE | ON DISK | ON HPSS | size (check)
+  ----------+-----------+---------------------------+-----------------------+---------+---------+--------------"""
+
+def ws_conn_para(fname):
+    line = open(fname).readline().rstrip()
+    key_value = dict([x.split('=', 1) for x in line.split(';') if x])
+    return key_value['Url'], key_value['Uid'], key_value['Pwd']
+
+
+class XtcCleanLocal:
+    # static data
+    dictExp = { "amo":1, "sxr":1, "xpp":1, "cxi":1, "xcs":1, "mec":1 }
+    iConnectTimeOut = 3
+    
+    def __init__(self, sExpType, sExpName, iExpId, iCleanType, verbose, src_type='ffb'):
+        self.sExpType   = sExpType.lower()    
+        self.sExpName   = sExpName.lower()    
+        self.iExpId     = iExpId
+        self.iCleanType = iCleanType
+        self.verbose    = verbose
+        self.print_stat = False
+        self.ignore_disk_status = False
+        self.retry = False 
+        
+        self.minage = 4  # hours
+        self.nlastkeep = 10 
+
+        self.ftoDelete = {}   # path : [f1, ...., fn]
+        if src_type == 'ffb':
+            self.scan_path = "/reg/d/ffb/%s/%s/xtc" % (self.sExpType, self.sExpName)
+            self.scan_path_all = "/reg/d/ffb/%s" % self.sExpType 
+        elif src_type == 'dss':
+            self.scan_path = "/u2/pcds/pds/%s/e%d" % (self.sExpType, self.iExpId)
+            self.scan_path_all = "/u2/pcds/pds/%s" % (self.sExpType)
+        else:
+            raise VauleError("Unknown src_type %s", src_type)
+            
+
+    def no_check_ana_disk(self):
+        self.ignore_disk_status = True
+        print "WARNING Ignoring status of files on ana"
+
+    def run(self):
+        if not self.dictExp.has_key(self.sExpType):
+            print "Invalid Experiment Type: %s" % self.sExpType
+            return False
+
+        if not self.checkUser():
+            return False
+
+        if self.verbose:
+            print "Searching for xtc files..."
+
+        if self.iExpId == _all_experiments_:
+            self.run_path_wild(self.scan_path_all)
+        else:
+            self.run_path(self.scan_path, self.iExpId)
+
+                
+    def dateSorted(self):
+        """ Sort all files that can be deleted by access time """
+
+        sorted_files = []
+        for path,fl in self.ftoDelete.iteritems():
+            for f in fl:
+                p = os.path.join(path,f)
+                mtime = os.path.getmtime(p)
+                sorted_files.append((mtime,p))
+        sorted_files.sort()
+        return sorted_files
+
+    def sort_by_run(self, fl, keeplast=5, ageh=6.0):
+        """ Return a file list that is sorted by run-nr
+        Runs that are more recent than *ageh* (in hours) are removed.
+        *keeplast=N* selects the first N runs or all but the last N runs:
+          N>=0  all runs except the last N will be included in the list
+          N<0   the list will contain the first N runs
+        """
+
+        now = time.time()
+        runs = {}
+        runs_ignore = set()
+        for f in fl:
+            mt = (now - os.path.getmtime(f)) / 3600.
+            run_token = f.split('-')[1]
+            if not run_token[0] == 'r':
+                continue
+            run_nr = int(run_token[1:])
+            if mt < ageh:
+                runs_ignore.add(run_nr)
+            else:
+                runs.setdefault(run_nr,[]).append(f)
+                print f, run_token, run_nr, mt
+
+        sorted_runnr = runs.keys()
+        sorted_runnr.sort()
+        newDelList = []
+        if keeplast >= 0:
+            ind = len(sorted_runnr) - keeplast
+            ind = 0 if ind < 0 else ind
+        else:
+            ind = -keeplast
+
+        print "runnr's:", sorted_runnr, "ignore age:", runs_ignore, "index:", ind
+        print "runs selected:", sorted_runnr[:ind]
+        for run in sorted_runnr[:ind]:
+            if not run in runs_ignore:
+                newDelList.extend(runs[run])
+        return newDelList
+        
+    def filter_fileStatus(self, triplet,status):  
+        """ Filter function called to decide if a file can be removed """
+
+        #print triplet, status.size_bytes(), self.expected_size.get(triplet[2], -1)        
+        if self.expected_size:
+            size_match = status.size_bytes() == self.expected_size.get(triplet[2], -1)
+            check_size = True
+        else:
+            size_match = True
+            check_size = False
+
+        if  size_match and ( file_status.IN_MIGRATION_DATABASE in status.flags() ) and \
+                ( file_status.DISK in status.flags() or self.ignore_disk_status) and \
+                ( file_status.HPSS in status.flags() ):                
+            return True
+      
+        if not self.print_stat:
+            print _print_header
+            self.print_stat = True
+
+        print "   %8d | %9s | %25s |         %5s         |  %5s  |  %5s  | %s (%s)" % \
+            ( int(triplet[0]),triplet[1],triplet[2],
+              str(file_status.IN_MIGRATION_DATABASE in status.flags()),
+              str(file_status.DISK in status.flags()),
+              str(file_status.HPSS in status.flags()), size_match, check_size)
+        return False
+    
+    def run_path_wild(self, path):
+        """Find all *xtc files in the directories <path>/*/xtc and path/e* """
+        
+        pathstem = "%s/%s" % (path, self.sExpType)
+        try:
+            lPaths = glob.glob(pathstem + '*/xtc') 
+        except:
+            lPaths = []
+
+        if ( not lPaths ):
+            if self.verbose:
+                print "No experiment paths found in %s." % (path)
+            return True
+
+        for sPath in lPaths:
+            if self.verbose:
+                print "Try path %s" % (sPath)
+            self.run_path(sPath, _all_experiments_)
+
+        return True
+
+    # ----------------------------------------------------------------------  
+    def run_path(self, path, expid):
+        """ Find all xtc files in path and remove the ones that are eligible """
+        try:
+            os.chdir(path)
+            lFiles = glob.glob('*xtc')      
+        except:
+            lFiles = []
+    
+        if ( not lFiles ):
+            if not self.verbose:
+                print "No xtc files found in %s. Please verify the experiment type and id." % (path)
+            return True
+              
+        if self.verbose:
+            print "Found %d Files in %s" % (len(lFiles), path)      
+            print "  First File: " + lFiles[0]
+            print "              ............................"
+            print "   Last File: " + lFiles[-1] + "\n"
+    
+        lXtcStatusQuery = []
+        size_dict = {}
+        for sFile in lFiles:
+            if expid == _all_experiments_:
+                expid = int(sFile[1:].split('-')[0])
+            if expid != 0: 
+                lXtcStatusQuery.append((expid, 'xtc', sFile))      
+            size_dict[sFile] = os.path.getsize(sFile)
+        self.expected_size = size_dict
+
+        self.print_stat = False
+        url,user,pswd = ws_conn_para(_ws_conn)
+        fs = file_status.file_status(ws_login_user=user, ws_login_password=pswd)
+        lFilterdQuery = fs.filter(lXtcStatusQuery, self.filter_fileStatus)
+    
+        lDelFiles = []
+        max_request = 9999 
+        for n, triplet in enumerate(lFilterdQuery):
+            if n >= max_request:
+                break
+            lDelFiles.append(triplet[2])
+        self.ftoDelete[path] = lDelFiles
+        
+        newDelFiles = self.sort_by_run(lDelFiles, self.nlastkeep, self.minage)
+        print "Found %d eligible files. Attempt to rm %d files. Check file size entries=%d (true if >0)" % (
+            len(lDelFiles), len(newDelFiles), len(self.expected_size))
+        print "   Keep %d last files and age must be > %d hours" % (self.nlastkeep, self.minage) 
+        
+        self.rmFilesPath(path, newDelFiles)
+
+    # ----------------------------------------------------------------------
+    def doCleanup(self):
+        
+        for path, files in self.ftoDelete.iteritems:
+            if files:
+                self.rmFilesPath(path, files)
+
+    # ----------------------------------------------------------------------
+    def rmFilesPath(self, path, lDelFiles):
+        """ Clean up all files that are in ftoDelete
+        
+        lDelFiles is a list of file names.  
+        """ 
+        
+        # already changed to xtc directory
+
+        print "workdir", os.getcwd(), path 
+        if self.verbose or self.iCleanType != 0:      
+            print "Found/selected %d Files to be deleted in %s" % (len(lDelFiles), path)
+            if len(lDelFiles):
+                print "  First File: " + lDelFiles[0]
+                print "              ............................"
+                print "   Last File: " + lDelFiles[-1] + "\n"
+      
+        # only print the files but do not do the cleanup
+        if self.iCleanType == 0 or self.iCleanType > 2:
+            if self.verbose:
+                print "List complete. Use -c (--clean) or --force option to commit " \
+                    "the deletion of files."
+            return True
+
+        # cleanup but confirm once
+        if self.iCleanType == 1:
+            print "Are you sure to delete the above files? [yes/no] ",
+            sAns = sys.stdin.readline().strip().lower()
+            if sAns != "yes":
+                return True
+            print # Print an extra line, because the above input produced a line return
+
+      
+        # Keep record of files deleted in: deletedlistNN.txt
+        log_path = "/reg/g/psdm/psdatmgr/logs/mvr/%s/%s" % (self.sExpType, self.sExpName)
+        
+        rm_log_path = os.path.join(log_path, 'rmlog')
+        if not os.path.exists(rm_log_path):
+            os.makedirs(rm_log_path)
+        iDelNo = self.getDelNo(rm_log_path)
+        sFnDelList = os.path.join(rm_log_path, "deletedlist%02d.txt" % (iDelNo))
+        print "Generating Delete List %s" % (sFnDelList)
+
+        iNumXtcFilesDeleted = 0
+        for sFnDel in lDelFiles:
+            print "in rm", sFnDel, len(lDelFiles)
+        
+            iFail = os.system( "/bin/ls -l %s >> %s 2>&1" % (sFnDel, sFnDelList) )
+            if iFail != 0:
+                print "ls failed for xtc file %s" % sFnDel
+                continue  
+            
+            iFail = os.system( "/bin/rm -vf %s >> %s 2>&1" % (sFnDel, sFnDelList) )
+            if iFail != 0:
+                print "rm failed for xtc file %s" % sFnDel
+                continue
+
+            if os.path.exists(sFnDel):
+                print "  file still exists !!", sFnDel
+                if not self.retry:
+                    continue
+                iFail = 1 
+                for n, prefix in enumerate(('test', 'tesq', 'terd', 'tegh', 'teza', 'tezb', 'tezc', 'tesd')):
+                    #trg = "tmp/" + prefix + "_" + sFnDel
+                    trg = prefix + "_" + sFnDel
+                    print "  try", n, trg
+                    try:
+                        os.rename(sFnDel, trg)
+                    except OSError:
+                        print "  Move failed try another"
+                    else:
+                        os.rename(trg, sFnDel)
+                        iFail = os.system( "/bin/rm -vf %s >> %s 2>&1" % (sFnDel, sFnDelList) )
+                        if iFail != 0:
+                            print "  rm (N) failed for xtc file %s" % sFnDel
+                        break
+                if iFail != 0:
+                    continue
+
+            iNumXtcFilesDeleted += 1
+
+        iNumIdxFilesDeleted = 0
+        for sFnDel in lDelFiles:        
+            iFail = os.system( "/bin/ls -l index/%s.idx >> %s 2>&1" % (sFnDel, sFnDelList) )
+            if iFail != 0:
+                print "ls failed for index file index/%s.idx" % sFnDel
+                continue
+        
+            iFail = os.system( "/bin/rm -vf index/%s.idx >> %s 2>&1" % (sFnDel, sFnDelList) )
+            if iFail != 0:
+                print "rm failed for index file index/%s.idx" % sFnDel
+                continue
+        
+            iNumIdxFilesDeleted += 1
+               
+        if iNumXtcFilesDeleted != len(lDelFiles):
+            print "Error: Expected to delete %d xtc files, but in reality %d files deleted" % ( 
+                len(lDelFiles), iNumXtcFilesDeleted )
+        else:
+            print "%d xtc files deleted" % (iNumXtcFilesDeleted)
+
+        if iNumIdxFilesDeleted != len(lDelFiles):
+            print "Error: Expected to delete %d index files, but in reality %d files deleted" % ( 
+                len(lDelFiles), iNumIdxFilesDeleted )
+        else:
+            print "%d index files deleted" % (iNumIdxFilesDeleted)
+    
+    def getDelNo(self, path):
+        try:
+            lDelFiles = glob.glob(path + '/deleted*.txt')    
+            iTestDelNo = len(lDelFiles)    
+        except:
+            iTestDelNo    = 0
+        while True:
+            if not os.path.isfile( path + '/deletedlist%02d.txt' % (iTestDelNo)):
+                break
+            iTestDelNo += 1
+   
+        return iTestDelNo    
+  
+    def checkUser(self):
+        return True
+        sUserName = self.sExpType + "opr"
+        iId = int(os.popen( "/usr/bin/id -u " + sUserName ).read().strip())
+    
+        if os.geteuid() != iId:
+            print "You need to become %s to run this script." % (sUserName)
+            return False    
+
+        return True
+
+def getCurrentExperiment(instr):
+    """ Get the current active experiment ID for an instrument.
+
+    The instr name is converted to upper letters.
+    
+    Returns  (id,name) of the experiment;
+    >>> id,name = getCurrentExperiment('amo')
+    """
+
+    instr = instr.upper()
+    exp_id = _no_experiment_
+    exp_name = ''
+    
+    # Issue mysql command to get experiment ID
+    mysqlcmd = 'echo "select exper_id from expswitch WHERE exper_id IN ( SELECT experiment.id FROM experiment, instrument WHERE experiment.instr_id=instrument.id AND instrument.name=\''+instr+'\' ) ORDER BY switch_time DESC LIMIT 1" | /usr/bin/mysql -N -h psdb -u regdb_reader regdb'
+
+    p = subprocess.Popen([mysqlcmd],
+                         shell = True,
+                         stdin = subprocess.PIPE,
+                         stdout = subprocess.PIPE,
+                         stderr = subprocess.PIPE,
+                         close_fds = True)
+    out, err = subprocess.Popen.communicate(p)
+    
+    if len(err) == 0 and len(out) != 0:
+        exp_id = out.strip()
+    else:
+        if len(err) != 0: print "Unable to get current experiment ID from offline database: ", err
+        if len(out) == 0: print "No current experiment ID in offline database for experiment", instr
+        print "Try using -e | --exp option"
+        return (int(exp_id), exp_name)
+    
+    # Issue mysql command to get experiment name
+    mysqlcmd = 'echo "SELECT name FROM experiment WHERE experiment.id='+exp_id+'" | mysql -N -h psdb -u regdb_reader regdb'
+
+    p = subprocess.Popen([mysqlcmd],
+                         shell = True,
+                         stdin = subprocess.PIPE,
+                         stdout = subprocess.PIPE,
+                         stderr = subprocess.PIPE,
+                         close_fds = True)
+    out, err = subprocess.Popen.communicate(p)
+    
+    if len(err) == 0:
+        exp_name = out.strip()
+    else:
+        print "Unable to get current experiment name from offline database: ", err
+        
+    return (int(exp_id), exp_name)
+
+
+# ===========================================================================================
+
+usage="Cleanup xtc and index-xtc files from FFB nodes"
+help_epilog="""
+Clean-up Options
+----------------
+  1) List only (no --clean and no --force, this is the default)
+     only list files to be cleaned up
+  2) Cleanup with prompt (--clean)
+     cleanup but prompt before removing files
+  3) Force cleanup (--force) 
+     run the cleanup without prompt. The --clean arg is ignored if given,
+
+Select files/runs
+-----------------
+   -ageminh HOURS: Min age in hours. If a run is more recent then HOURS it will be skipped.
+   -keep N: If N>=0: the last N runs will not be removed. N applies to the runs that are older then 
+            HOURS.
+            If N<0: remove the oldest N runs. 
+"""
+
+    
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+
+    parser.add_argument("--instr", help="experiment type (instr)")
+    parser.add_argument("--name", metavar='EXP-NAME', default="", help="experiment name")
+    parser.add_argument("--exp", metavar='EXP-ID', type=int, help="experiment ID")
+    #parser.add_argument("--exp", metavar='EXP-ID', type=int, default=_no_experiment_, help="experiment ID")
+    parser.add_argument("--clean", default=False, action="store_true", 
+                        help="Run the cleanup, prompt for confirmantion")
+    parser.add_argument("--force", default=False, action="store_true", 
+                        help="Force cleanup without prompt (--clean is ignored)")
+    parser.add_argument("--verbose", default=False, action="store_true", help="print more output")
+    parser.add_argument("--quiet", default=False, action="store_true", help="print more output")
+    parser.add_argument("--all", default=False, action="store_true", help="find files in all experiment dirs")
+  
+    parser.add_argument("--nodiskcheck", default=False, action="store_true", 
+                        help="ignore status of files on ana storage")
+    parser.add_argument("--noretry", dest='retry', default=True, action="store_false", 
+                        help="don't retry file remove by moving a file temporarily")
+    parser.add_argument("--minageh", default=240, type=int, help="min age [hours] of a file")
+    parser.add_argument("--keep", default=5, type=int, help="keep last N runs")
+    parser.add_argument("--src", default="ffb", help="src type ffb or dss (default: %(default)s)")
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+    
+    # Clean-up Type
+    #    0: List all the files to be deleted, but no real action  (Default)
+    #    1: Run the clean-up, with a prompt for confirmation
+    #    2: Force the clean-up without prompt
+    clean_mode = 1 if args.clean else 0 
+    if args.force: clean_mode = 2
+    
+    # experiment-id
+
+    if not args.instr and args.name:
+        args.instr = args.name[:3]
+    if not args.instr:
+        print "Need --instr or --name"
+        return 2
+    
+    if args.all:
+        exp_id = _all_experiments_
+        print "--all currently not supported"
+        return 0
+    elif args.exp:
+        exp_id = args.exp
+        print "--exp (exp_id) currently not supported"
+        return 0
+    else:
+        #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn")
+        #db.select_db("/reg/g/psdm/psdatmgr/datamigr/.regdb-reader-conn")
+        db.select_db(_regdb_conn)
+        exp_tmp = db.name2id(args.name)
+        if exp_tmp == None:
+            print "Error getting exper-id from name"
+            return 
+        else:
+            exp_id = exp_tmp
+
+    # exp_id = _all_experiments_ if args.all else args.exp
+
+    args.verbose = not args.quiet
+    print "instr: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.instr, args.name, exp_id, 
+                                                                    clean_mode, args.verbose)
+
+    xtcCleanLocal = XtcCleanLocal(args.instr, args.name, exp_id, clean_mode, args.verbose, 
+                                  args.src)
+    if args.nodiskcheck:
+        xtcCleanLocal.no_check_ana_disk()
+
+    xtcCleanLocal.retry = args.retry
+    xtcCleanLocal.nlastkeep = args.keep
+    xtcCleanLocal.minage = args.minageh
+
+    xtcCleanLocal.run()
+    return 
+
+  
+# Main Entry
+if __name__ == "__main__":
+    iRet = 0
+    
+    try:
+        iRet = main()
+    except:
+        iRet = 101
+        print __file__ + ": %s" % (sys.exc_value)
+        print( "---- Printing program call stacks for debug ----" )
+        traceback.print_exc(file=sys.stdout)
+        print( "------------------------------------------------" )
+
+    
+    sys.exit(iRet)
