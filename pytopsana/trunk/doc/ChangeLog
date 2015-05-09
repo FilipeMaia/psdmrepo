@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2015-05-08 Mikhail S. Dubrovin
+- Add interface for geometry methods (PSAS-139)
+	
 Tag: V00-00-03
 2015-05-07 Mikhail S. Dubrovin
 - Add implementation of NDArrProducer* for all major detectors with examples in examples/ex_* (PSAS-139)

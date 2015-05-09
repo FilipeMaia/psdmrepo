@@ -5,7 +5,8 @@
 //-------------------
 using namespace pytopsana;
 
-typedef Detector::data_t data_t;
+typedef Detector::image_t image_t;
+typedef Detector::data_t  data_t;
 
 typedef pytopsana::Detector::pedestals_t     pedestals_t;    // float
 typedef pytopsana::Detector::pixel_rms_t     pixel_rms_t;    // float
@@ -39,6 +40,29 @@ ndarray<const uint16_t, 2>    (Detector::*pdata_5) (boost::shared_ptr<PSEvt::Eve
 ndarray<const uint16_t, 3>    (Detector::*pdata_6) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_uint16_3;
 
 ndarray<const uint8_t, 2>     (Detector::*pdata_7) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::data_uint8_2;
+
+//-------------------
+
+ndarray<const double, 1>     (Detector::*pgeo_1) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_coords_x;
+ndarray<const double, 1>     (Detector::*pgeo_2) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_coords_y;
+ndarray<const double, 1>     (Detector::*pgeo_3) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_coords_z;
+
+ndarray<const double, 1>     (Detector::*pgeo_4) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_areas;
+ndarray<const int, 1>        (Detector::*pgeo_5) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_mask_geo;
+
+ndarray<const unsigned, 1>   (Detector::*pgeo_6) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_indexes_x;
+ndarray<const unsigned, 1>   (Detector::*pgeo_7) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_indexes_y;
+
+double                       (Detector::*pgeo_8) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>) = &Detector::pixel_scale_size;
+
+
+//-------------------
+
+ndarray<const image_t, 2> (Detector::*img_0) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>, ndarray<const image_t, 1>) = &Detector::get_image;
+//ndarray<const float, 2> (Detector::*img_1) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>, ndarray<const float, 1>&) = &Detector::get_image_float;
+//ndarray<const double, 2> (Detector::*img_2) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>, ndarray<const double, 1>&) = &Detector::get_image_double;
+//ndarray<const int16_t, 2> (Detector::*img_3) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>, ndarray<const int16_t, 1>&) = &Detector::get_image_int16;
+//ndarray<const uint16_t, 2>  (Detector::*img_4) (boost::shared_ptr<PSEvt::Event>, boost::shared_ptr<PSEnv::Env>, ndarray<const uint16_t, 1>&) = &Detector::get_image_uint16;
 
 //-------------------
 
@@ -78,6 +102,15 @@ BOOST_PYTHON_MODULE(pytopsana_ext)
     .def("data_uint16_2",pdata_5)
     .def("data_uint16_3",pdata_6)
     .def("data_uint8_2", pdata_7)
+    .def("pixel_coords_x",  pgeo_1)
+    .def("pixel_coords_y",  pgeo_2)
+    .def("pixel_coords_z",  pgeo_3)
+    .def("pixel_areas",     pgeo_4)
+    .def("pixel_mask_geo",  pgeo_5)
+    .def("pixel_indexes_x", pgeo_6)
+    .def("pixel_indexes_y", pgeo_7)
+    .def("pixel_scale_size",pgeo_8)
+    .def("get_image",       img_0)
     .def("set_mode",       set_1)
     .def("set_print_bits", set_2)
     .def("set_def_value",  set_3)

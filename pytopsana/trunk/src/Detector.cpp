@@ -17,19 +17,23 @@
 #include "PSEvt/EventId.h"
 #include "PSEvt/Source.h"
 #include "PSCalib/CalibParsStore.h"
+#include "PSCalib/CalibFileFinder.h"
 
 //-------------------
 namespace pytopsana {
 
   typedef Detector::data_t data_t;
+  typedef Detector::image_t image_t;
 
 //----------------
 // Constructors --
 //----------------
 Detector::Detector (const PSEvt::Source& source, const unsigned& pbits)
   : m_calibpars(0)
+  , m_geometry(0)
   , m_source(source)
   , m_runnum(-1)
+  , m_runnum_geo(-1)
   , m_mode(0)
   , m_pbits(pbits)
   , m_vdef(0)
@@ -157,9 +161,46 @@ Detector::initCalibStore(PSEvt::Event& evt, PSEnv::Env& env)
 //-------------------
 
 void 
-Detector::initNDArrProducer(const PSEvt::Source& source)
+Detector::initGeometry(PSEvt::Event& evt, PSEnv::Env& env)
 {
-  if(!m_nda_prod) m_nda_prod = NDArrProducerStore::Create(source, m_mode, m_pbits, m_vdef); // universal access through the factory store
+  int runnum = ImgAlgos::getRunNumber(evt);
+  if(runnum == m_runnum_geo) return;
+  m_runnum_geo = runnum;
+
+  if(m_geometry) delete m_geometry;
+
+  m_calibdir = env.calibDir();
+
+  unsigned pbits_cff = (m_pbits & 2) ? 0xffff : 0;
+  PSCalib::CalibFileFinder calibfinder(m_calibdir, m_cgroup, pbits_cff);
+  std::string fname = calibfinder.findCalibFile(m_str_src, "geometry", m_runnum_geo);
+
+  if(m_pbits) {
+      std::stringstream ss;
+      ss << "in initGeometry(...):"
+         << "\nInstrument  : " << env.instrument()
+         << "\nCalib dir   : " << m_calibdir 
+         << "\nCalib group : " << m_cgroup 
+         << "\nCalib file  : " << fname 
+         << "\nData source : " << m_str_src
+         << "\nRun number  : " << m_runnum_geo 
+         << "\nPrint bits  : " << m_pbits 
+         << '\n';
+      
+      MsgLog(_name_(), info, ss.str());
+  }
+
+  unsigned pbits_ga = (m_pbits & 4) ? 0xffff : 0;
+  m_geometry = new PSCalib::GeometryAccess(fname, pbits_ga);
+}
+
+//-------------------
+//-------------------
+
+void 
+Detector::initNDArrProducer()
+{
+  if(!m_nda_prod) m_nda_prod = NDArrProducerStore::Create(m_source, m_mode, m_pbits, m_vdef); // universal access through the factory store
 }
 
 //-------------------
@@ -169,7 +210,7 @@ Detector::initNDArrProducer(const PSEvt::Source& source)
 
 ndarray<const int16_t, 1> Detector::data_int16_1(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_int16_1(*shp_evt, *shp_env);
 }
 
@@ -177,7 +218,7 @@ ndarray<const int16_t, 1> Detector::data_int16_1(boost::shared_ptr<PSEvt::Event>
 
 ndarray<const int16_t, 2> Detector::data_int16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_int16_2(*shp_evt, *shp_env);
 }
 
@@ -185,7 +226,7 @@ ndarray<const int16_t, 2> Detector::data_int16_2(boost::shared_ptr<PSEvt::Event>
 
 ndarray<const int16_t, 3> Detector::data_int16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_int16_3(*shp_evt, *shp_env);
 }
 
@@ -193,7 +234,7 @@ ndarray<const int16_t, 3> Detector::data_int16_3(boost::shared_ptr<PSEvt::Event>
 
 ndarray<const int16_t, 4> Detector::data_int16_4(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_int16_4(*shp_evt, *shp_env);
 }
 
@@ -201,7 +242,7 @@ ndarray<const int16_t, 4> Detector::data_int16_4(boost::shared_ptr<PSEvt::Event>
 
 ndarray<const uint16_t, 2> Detector::data_uint16_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_uint16_2(*shp_evt, *shp_env);
 }
 
@@ -209,7 +250,7 @@ ndarray<const uint16_t, 2> Detector::data_uint16_2(boost::shared_ptr<PSEvt::Even
 
 ndarray<const uint16_t, 3> Detector::data_uint16_3(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_uint16_3(*shp_evt, *shp_env);
 }
 
@@ -217,15 +258,145 @@ ndarray<const uint16_t, 3> Detector::data_uint16_3(boost::shared_ptr<PSEvt::Even
 
 ndarray<const uint8_t, 2> Detector::data_uint8_2(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->data_nda_uint8_2(*shp_evt, *shp_env);
 }
 
 //-------------------
 
+ndarray<const double, 1> Detector::pixel_coords_x(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const double* pX; 
+  const double* pY; 
+  const double* pZ; 
+  unsigned size;
+  m_geometry -> get_pixel_coords(pX, pY, pZ, size);
+  return make_ndarray(pX, size);
+}
+
+//-------------------
+
+ndarray<const double, 1> Detector::pixel_coords_y(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const double* pX; 
+  const double* pY; 
+  const double* pZ; 
+  unsigned size;
+  m_geometry -> get_pixel_coords(pX, pY, pZ, size);
+  return make_ndarray(pY, size);
+}
+
+//-------------------
+
+ndarray<const double, 1> Detector::pixel_coords_z(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const double* pX; 
+  const double* pY; 
+  const double* pZ; 
+  unsigned size;
+  m_geometry -> get_pixel_coords(pX, pY, pZ, size);
+  return make_ndarray(pZ, size);
+}
+
+//-------------------
+
+ndarray<const double, 1> Detector::pixel_areas(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const double* A;
+  unsigned   size;
+  m_geometry -> get_pixel_areas(A,size);
+  return make_ndarray(A, size);
+}
+
+//-------------------
+
+ndarray<const int, 1> Detector::pixel_mask_geo(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const int* mask;
+  unsigned   size;
+  unsigned   mbits=0377; // 1-edges; 2-wide central cols; 4-non-bound; 8-non-bound neighbours
+  m_geometry -> get_pixel_mask(mask, size, std::string(), 0, mbits);
+  return make_ndarray(mask, size);
+}
+
+//-------------------
+
+ndarray<const unsigned, 1> Detector::pixel_indexes_x(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+  const unsigned* iX;
+  const unsigned* iY; 
+  unsigned size;
+
+  //      const std::string ioname = "QUAD:V1";                                                            
+  //      const unsigned ioindex = 1;                                                                      
+  //      const double pix_scale_size_um = 109.92;                                                         
+  //      const int xy0_off_pix[] = {200,200};
+  //      geometry.get_pixel_coord_indexes(iX, iY, isize, ioname, ioindex, pix_scale_size_um, xy0_off_pix, do_tilt);
+
+  m_geometry -> get_pixel_coord_indexes(iX, iY, size);
+ 
+  return make_ndarray(iX, size);
+}
+
+//-------------------
+
+ndarray<const unsigned, 1> Detector::pixel_indexes_y(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const unsigned* iX;
+  const unsigned* iY; 
+  unsigned size;
+  m_geometry -> get_pixel_coord_indexes(iX, iY, size); 
+  return make_ndarray(iY, size);
+}
+
+//-------------------
+
+double Detector::pixel_scale_size(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
+{
+  initGeometry(*shp_evt, *shp_env);
+  return m_geometry -> get_pixel_scale_size ();
+}
+
+//-------------------
+
+ndarray<const image_t, 2>
+Detector::get_image(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env, ndarray<const image_t, 1> nda)
+{
+  initGeometry(*shp_evt, *shp_env);
+
+  const unsigned* iX;
+  const unsigned* iY; 
+  unsigned isize;
+  m_geometry -> get_pixel_coord_indexes(iX, iY, isize);
+
+  //std::cout << "Detector::get_image isize = " << isize << '\n';
+  //std::cout << "iX : "; for(int i=0; i<10; i++) std::cout << ' ' << iX[i]; std::cout << '\n';
+  //std::cout << "iY : "; for(int i=0; i<10; i++) std::cout << ' ' << iY[i]; std::cout << '\n';
+  //std::cout << "nda: "; for(int i=0; i<10; i++) std::cout << ' ' << nda[i]; std::cout << '\n';
+
+  return PSCalib::GeometryAccess::img_from_pixel_arrays(iX, iY, nda.data(), isize); 
+}
+
+//-------------------
+//-------------------
+//-------------------
+
 void Detector::print()
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->print();
 }
 
@@ -233,7 +404,7 @@ void Detector::print()
 
 void Detector::print_config(boost::shared_ptr<PSEvt::Event> shp_evt, boost::shared_ptr<PSEnv::Env> shp_env)
 {
-  initNDArrProducer(m_source);
+  initNDArrProducer();
   return m_nda_prod->print_config(*shp_evt, *shp_env);
 }
 
