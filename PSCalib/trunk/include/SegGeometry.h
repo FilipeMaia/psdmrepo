@@ -89,7 +89,7 @@ public:
   /// Returns pixel size in um for indexing
   virtual const pixel_coord_t pixel_scale_size() = 0;
 
-  /// Returns shape of the segment {rows, cols}
+  /// Returns pointer to the array of pixel areas normalized on minimal pixel area
   virtual const pixel_area_t* pixel_area_array() = 0;
 
   /// Returns pointer to the array of pixel size in um for AXIS

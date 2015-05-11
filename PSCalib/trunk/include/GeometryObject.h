@@ -43,7 +43,7 @@ namespace PSCalib {
 /**
  *  @ingroup PSCalib
  *
- *  @brief Class elementary building block for hierarchial geometry description
+ *  @brief Class supports elementary building block for hierarchial geometry description
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -67,18 +67,18 @@ namespace PSCalib {
  *  \n
  *  @code
  *    PSCalib::GeometryObject* geo = new PSCalib::GeometryObject(pname, 
- *  							       pindex,
- *  							       oname, 
- *  							       oindex,
- *  							       x0,    
- *  							       y0,    
- *  							       z0,    
- *  							       rot_z, 
- *  							       rot_y, 
- *  							       rot_x, 
- *  							       tilt_z,
- *  							       tilt_y,
- *  							       tilt_x );
+ *  							         pindex,
+ *  							         oname, 
+ *  							         oindex,
+ *  							         x0,    
+ *  							         y0,    
+ *  							         z0,    
+ *  							         rot_z, 
+ *  							         rot_y, 
+ *  							         rot_x, 
+ *  							         tilt_z,
+ *  							         tilt_y,
+ *  							         tilt_x );
  *  @endcode
  *
  *  @li Access methods

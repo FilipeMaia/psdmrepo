@@ -56,6 +56,22 @@ const size_t SegGeometryEpix100V1::IND_CORNER[NCORNERS] = {0, COLS-1, (ROWS-1)*C
 const size_t SegGeometryEpix100V1::ARR_SHAPE[2] = {ROWS, COLS};
 
 //----------------
+// Singleton stuff:
+
+//SegGeometryEpix100V1*
+SegGeometry* SegGeometryEpix100V1::m_pInstance = NULL; // init static pointer for singleton
+
+//SegGeometryEpix100V1*
+SegGeometry* SegGeometryEpix100V1::instance(const bool& use_wide_pix_center)
+{
+  if( !m_pInstance ) m_pInstance = new SegGeometryEpix100V1(use_wide_pix_center);
+  return m_pInstance;
+}
+
+//----------------
+
+
+//----------------
 // Constructors --
 //----------------
 

@@ -58,6 +58,25 @@ const double                     SegGeometryCspad2x1V1::UM_TO_PIX      = 1./PIX_
 const size_t SegGeometryCspad2x1V1::IND_CORNER[NCORNERS] = {0, COLS-1, (ROWS-1)*COLS, ROWS*COLS-1};
 const size_t SegGeometryCspad2x1V1::ARR_SHAPE[2] = {ROWS, COLS};
 
+
+
+//----------------
+// Singleton stuff:
+
+//SegGeometryCspad2x1V1*
+SegGeometry* SegGeometryCspad2x1V1::m_pInstance = NULL; // init static pointer for singleton
+
+//SegGeometryCspad2x1V1*
+SegGeometry* SegGeometryCspad2x1V1::instance(const bool& use_wide_pix_center)
+{
+  if( !m_pInstance ) m_pInstance = new SegGeometryCspad2x1V1(use_wide_pix_center);
+  return m_pInstance;
+}
+
+//----------------
+
+
+
 //----------------
 // Constructors --
 //----------------

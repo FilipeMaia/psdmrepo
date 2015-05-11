@@ -168,16 +168,7 @@ public:
   /// Conversion factor between um and pix 
   static const double UM_TO_PIX; //             = 1./50;
 
-  // Constructor
-
-  /**
-   *  @brief Fills-in the map of perfect segment coordinates, defined through the chip geometry.
-   *  @param[in] use_wide_pix_center Optional parameter can be used if the wide-pixel row coordinate is prefered to be in the raw center.
-   */
-  SegGeometryEpix100V1 (const bool& use_wide_pix_center=false);
-
-  /// Destructor
-  virtual ~SegGeometryEpix100V1 ();
+  //---------------------------
 
   /// Implementation of interface methods
 
@@ -225,7 +216,26 @@ public:
    */  
   virtual const pixel_mask_t* pixel_mask_array(const unsigned& mbits = 0377);
 
+  //---------------------------
+  // Singleton stuff:
+
+  static PSCalib::SegGeometry* instance(const bool& use_wide_pix_center=false);
+
 private:
+
+  // Constructor
+  /**
+   *  @brief Fills-in the map of perfect segment coordinates, defined through the chip geometry.
+   *  @param[in] use_wide_pix_center Optional parameter can be used if the wide-pixel row coordinate is prefered to be in the raw center.
+   */
+  SegGeometryEpix100V1 (const bool& use_wide_pix_center=false);
+
+  /// Destructor
+  virtual ~SegGeometryEpix100V1 ();
+
+  static PSCalib::SegGeometry* m_pInstance;
+
+  //---------------------------
 
   /// Generator of the pixel coordinate arrays.
   void make_pixel_coord_arrs ();

@@ -122,13 +122,15 @@ public:
   {
 	if (print_bits & 1) MsgLog("SegGeometryStore", info, "Segment geometry factory for " << segname);
 
-        if ( segname=="SENS2X1:V1" ) { return new PSCalib::SegGeometryCspad2x1V1(); }
+        //if ( segname=="SENS2X1:V1" ) { return new PSCalib::SegGeometryCspad2x1V1(); }
+        if ( segname=="SENS2X1:V1" ) { return PSCalib::SegGeometryCspad2x1V1::instance(); } // use singleton
 
         //if ( segname=="SENS2X1:V2" ) { return new PSCalib::SegGeometryCspad2x1V2(); }
 
         //if ( segname=="SENS2X1:V3" ) { return new PSCalib::SegGeometryCspad2x1V3(); }
 
-        if ( segname=="EPIX100:V1" ) { return new PSCalib::SegGeometryEpix100V1(); }
+        //if ( segname=="EPIX100:V1" ) { return new PSCalib::SegGeometryEpix100V1(); }
+        if ( segname=="EPIX100:V1" ) { return PSCalib::SegGeometryEpix100V1::instance(); } // use singleton
 
         if ( segname=="PNCCD:V1" ) { return new PSCalib::SegGeometryMatrixV1(512,512); }
 
