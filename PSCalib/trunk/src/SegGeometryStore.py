@@ -66,11 +66,11 @@ import sys
 
 #------------------------------
 
-from PSCalib.SegGeometryCspad2x1V1 import SegGeometryCspad2x1V1 
+from PSCalib.SegGeometryCspad2x1V1 import cspad2x1_one # SegGeometryCspad2x1V1 
 #from PSCalib.SegGeometryCspad2x1V2 import SegGeometryCspad2x1V2 
 #from PSCalib.SegGeometryCspad2x1V3 import SegGeometryCspad2x1V3 
-from PSCalib.SegGeometryEpix100V1 import SegGeometryEpix100V1 
-from PSCalib.SegGeometryMatrixV1 import SegGeometryMatrixV1 
+from PSCalib.SegGeometryEpix100V1 import epix2x2_one # SegGeometryEpix100V1 
+from PSCalib.SegGeometryMatrixV1 import segment_one # SegGeometryMatrixV1 
 
 #------------------------------
 class SegGeometryStore() :
@@ -84,13 +84,13 @@ class SegGeometryStore() :
 #------------------------------
 
     def Create(sp, segname='SENS2X1:V1', pbits=0 ) :
-        """ Factory method returns device dependent object with interface implementation  
+        """ Factory method returns device dependent SINGLETON object with interface implementation  
         """        
-        if segname=='SENS2X1:V1' : return SegGeometryCspad2x1V1(use_wide_pix_center=False)
+        if segname=='SENS2X1:V1' : return cspad2x1_one # SegGeometryCspad2x1V1(use_wide_pix_center=False)
         #if segname=='SENS2X1:V2' : return SegGeometryCspad2x1V2(use_wide_pix_center=False)
         #if segname=='SENS2X1:V3' : return SegGeometryCspad2x1V3(use_wide_pix_center=False)
-        if segname=='EPIX100:V1' : return SegGeometryEpix100V1(use_wide_pix_center=False)
-        if segname=='PNCCD:V1' :   return SegGeometryMatrixV1()
+        if segname=='EPIX100:V1' : return epix2x2_one # SegGeometryEpix100V1(use_wide_pix_center=False)
+        if segname=='PNCCD:V1' :   return segment_one # SegGeometryMatrixV1()
         return None
 
 #------------------------------

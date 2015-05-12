@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-40
+2015-05-12 Mikhail S. Dubrovin	
+- In SegGeometryStore.py use singletons for all sensor types SENS2X1:V1, EPIX100:V1, PNCCD:V1 (PSAS-147)
+	
 Tag: V00-02-39
 2015-05-11 Mikhail S. Dubrovin	
 - in GeometryObject - delete allocated memory for all non-top objects (PSAS-147).
