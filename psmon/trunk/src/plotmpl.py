@@ -230,8 +230,10 @@ class HistClient(PlotClient):
     def __init__(self, init_hist, datagen, info, rate=1, **kwargs):
         super(HistClient, self).__init__(init_hist, datagen, info, rate, **kwargs)
         # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
-        plot_args = arg_inflate_flat(1, self.correct_bins(init_hist.bins, init_hist.values), init_hist.values, init_hist.formats)
+        corrected_bins = self.correct_bins(init_hist.bins, init_hist.values)
+        plot_args = arg_inflate_flat(1, corrected_bins, init_hist.values, init_hist.formats)
         self.hists = self.ax.plot(*plot_args, drawstyle=config.MPL_HISTO_STYLE)
+        self.fill(corrected_bins, init_hist.values, init_hist.fills)
         self.formats = inflate_input(init_hist.formats, init_hist.values)
         self.set_aspect()
         self.set_xy_ranges()
@@ -242,7 +244,9 @@ class HistClient(PlotClient):
     def update_sub(self, data):
         if data is not None:
             # pyqtgraph needs a trailing bin edge that mpl doesn't so check for that
-            self.update_plot_data(self.hists, self.correct_bins(data.bins, data.values), data.values, data.formats, self.formats)
+            corrected_bins = self.correct_bins(data.bins, data.values)
+            self.update_plot_data(self.hists, corrected_bins, data.values, data.formats, self.formats)
+            self.fill(corrected_bins, data.values, data.fills)
             self.ax.relim()
             self.ax.autoscale_view()
         return self.hists
@@ -263,14 +267,26 @@ class HistClient(PlotClient):
             corrected_bins = []
             for bin, value in zip(inflate_input(bins, values), values):
                 if bin.size > value.size:
-                    corrected_bins.append(bin[:-1])
+                    corrected_bins.append(bin[1:])
                 else:
                     corrected_bins.append(bin)
             return corrected_bins
         elif bins.size > values.size:
-            return bins[:-1]
+            return bins[1:]
         else:
             return bins
+
+    def fill(self, corrected_bins, values, fills):
+        """
+        Adds fill for each histogram based on the boolean 'fills' parameter passed 
+        with the datagram.
+
+        Takes correct bins (single or list of), histogram values (single or list of), 
+        and fill configs (single or list of).
+        """
+        for bin, val, fill, hist in  arg_inflate_tuple(1, corrected_bins, values, fills, self.hists):
+            if fill:
+                self.ax.fill_between(bin, 0, val, color=hist.get_color(), alpha=config.MPL_HIST_ALPHA)
 
 
 class XYPlotClient(PlotClient):

@@ -292,16 +292,18 @@ class HistClient(PlotClient):
         self.hists = []
         self.formats = []
         self.add_legend(init_hist.leg_label, init_hist.leg_offset)
-        for bins, values, format_val, legend in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats, init_hist.leg_label):
+        for bins, values, format_val, fill_val, legend in arg_inflate_tuple(1, init_hist.bins, init_hist.values, init_hist.formats, init_hist.fills, init_hist.leg_label):
             cval = len(self.hists)
-            self.formats.append((format_val, cval))
+            fillLevel = 0 if fill_val else None
+            self.formats.append((format_val, fill_val, cval))
+            # can directly use 'self.plot_view.plot' instead once we upgrade to pyqtgraph
             hist = pg.PlotCurveItem(
                 x=bins,
                 y=values,
                 name=legend,
                 stepMode=True,
-                fillLevel=0,
-                **parse_fmt_hist(format_val, cval)
+                fillLevel=fillLevel,
+                **parse_fmt_hist(format_val, fill_val, cval)
             )
             self.plot_view.addItem(hist)
             self.hists.append(hist)
@@ -311,12 +313,13 @@ class HistClient(PlotClient):
         Updates the data in the histogram - none means their was no update for this interval
         """
         if data is not None:
-            for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats), self.formats)):
-                bins, values, new_format = data_tup
-                old_format, cval = format_tup
-                if new_format != old_format:
-                    self.formats[index] = (new_format, cval)
-                    hist.setData(x=bins, y=values, **parse_fmt_hist(new_format, cval))
+            for index, (hist, data_tup, format_tup) in enumerate(zip(self.hists, arg_inflate_tuple(1, data.bins, data.values, data.formats, data.fills), self.formats)):
+                bins, values, new_format, new_fill = data_tup
+                old_format, old_fill, cval = format_tup
+                if new_format != old_format or new_fill != old_fill:
+                    fillLevel = 0 if new_fill else None
+                    self.formats[index] = (new_format, new_fill, cval)
+                    hist.setData(x=bins, y=values, fillLevel=fillLevel, **parse_fmt_hist(new_format, new_fill, cval))
                 else:
                     hist.setData(x=bins, y=values)
         return self.hists

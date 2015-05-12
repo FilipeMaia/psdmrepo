@@ -169,7 +169,7 @@ def parse_fmt_xyplot(fmt_str, color_index=0):
     return fmt_dict
 
 
-def parse_fmt_hist(fmt_str, color_index=0):
+def parse_fmt_hist(fmt_str, fill=True, color_index=0):
     line = None
     fmt_dict = {}
     color, line_style, marker, marker_size = parse_fmt_str(fmt_str, color_index)
@@ -182,7 +182,10 @@ def parse_fmt_hist(fmt_str, color_index=0):
 
     # create a pen object for line if one is specified
     if line_style is not None:
-        line = pg.mkPen(config.PTQT_HIST_LINE_COLOR, style=line_style)
+        if fill:
+            line = pg.mkPen(config.PTQT_HIST_LINE_COLOR, style=line_style)
+        else:
+            line = pg.mkPen(color, style=line_style)
 
     # brush entry should always be present in the output
     fmt_dict['brush'] = color

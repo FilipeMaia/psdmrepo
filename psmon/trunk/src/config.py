@@ -49,3 +49,4 @@ MPL_LARGE_WIN = Resolution(32, 24)
 MPL_COLOR_PALETTE = 'hot'
 MPL_AXES_BKG_COLOR = 'w'
 MPL_HISTO_STYLE = 'steps-mid'
+MPL_HIST_ALPHA = 1.0
