@@ -170,13 +170,13 @@ class PlotClient(object):
         self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
 
     def cursor_hover_evt_sub(self, x_pos, y_pos):
-        self.info_label.setText('x=%d, y=%d' % (x_pos, y_pos), size='10pt')
+        self.info_label.setText('x=%.4f, y=%.4f' % (x_pos, y_pos), size='10pt')
 
     def cursor_hover_evt(self, evt):
         pos = evt[0]
         if self.plot_view.sceneBoundingRect().contains(pos):
             mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
-            self.cursor_hover_evt_sub(int(mouse_pos.x()), int(mouse_pos.y()))
+            self.cursor_hover_evt_sub(mouse_pos.x(), mouse_pos.y())
 
     def add_legend(self, leg_label, leg_offset):
         if leg_label is not None:
@@ -248,9 +248,28 @@ class ImageClient(PlotClient):
             if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
                 label_str = 'x=%d, y=%d, z=%d'
             else:
-                label_str = 'x=%d, y=%d, z=%.3f'
+                label_str = 'x=%d, y=%d, z=%.4f'
             self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
+    def cursor_hover_hevt_sub(self, z_val):
+            img_z, img_n = self.im.getHistogram()
+            index = np.searchsorted(img_z, z_val, side="right")-1
+            if 0 <= index < img_n.shape[0]:
+                z_low = img_z[index]
+                if index + 1 < img_n.shape[0]:
+                    z_high = img_z[index+1]
+                else:
+                    z_high = 2 * img_z[index] - img_z[index-1]
+                self.info_label.setText('z=(%.4f, %.4f), n=%d' % (z_low, z_high, img_n[index]), size='10pt')
+
+    def cursor_hover_evt(self, evt):
+        pos = evt[0]
+        if self.plot_view.sceneBoundingRect().contains(pos):
+            mouse_pos = self.plot_view.getViewBox().mapSceneToView(pos)
+            self.cursor_hover_evt_sub(mouse_pos.x(), mouse_pos.y())
+        elif self.cb.sceneBoundingRect().contains(pos):
+            mouse_pos = self.cb.vb.mapSceneToView(pos)
+            self.cursor_hover_hevt_sub(mouse_pos.y())
 
 class XYPlotClient(PlotClient):
     def __init__(self, init_plot, framegen, info, rate=1, **kwargs):
