@@ -13,6 +13,9 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <vector>
+#include <string>
+#include <set>
 
 //----------------------
 // Base Class Headers --
@@ -23,12 +26,11 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "psddl_psana/timetool.ddl.h"
-#include <vector>
+#include "TimeTool/EventDump.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include <string>
 
 //		---------------------
 // 		-- Class Interface --
@@ -91,6 +93,11 @@ protected:
   /// 'on' or 'off'. Users moduleParameter to report errors
   bool getIsOffFromOnOffKey(const std::string & moduleParameter, const std::string & key, Event & evt);
 
+  /// given a set of all the valid configuration keys, goes through the user specified 
+  /// configuration keys and identifies invalid keys (to help find typos in config files)
+  /// prints errors about invalid keys
+  void checkForInvalidConfigKeys(const std::set<std::string> &validConfigKeys) const;
+
 private:
   ndarray<unsigned,1> project(const ndarray<const uint16_t,2>&) const;
 
@@ -100,7 +107,6 @@ private:
   std::string m_put_key;  // Key for inserting results into Event
   std::string m_beam_on_off_key; // Key for user to override beam logic
   std::string m_laser_on_off_key; // Key for user to override laser logic
-  bool        m_put_ndarrays; // put size 1 ndarray's into Event rather than doubles
 
   std::string m_ipm_get_key;  // use this ipm threshold for detecting no beam
   double      m_ipm_beam_threshold;
@@ -169,7 +175,9 @@ private:
   int m_count;
 
   boost::shared_ptr<PSHist::HManager> m_hmgr;
+  TimeTool::EventDump m_eventDump;
 
+  std::set<std::string> m_validConfigKeys;
   };
 } // namespace TimeTool
 

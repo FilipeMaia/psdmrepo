@@ -11,6 +11,19 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2015-5-12 David Schneider
+- deprecate old style methods of reporting results (floats and ndarrays)
+  only add the TimeToolDataV2 object
+- introduce EventDump class to collect data from TimeTool.Analyze and put
+  in Event store
+- introduce PlotAnalyze python psana module to collect EventDump results
+  and interactively plot them
+- check for mispelled/unknown configuration keys, report as errors
+- Add examples/plot_analyze.py to demonstrate PlotAnalyze module
+- Dependency on psana V00-13-02 to use new Configureuable::configList that 
+  takes a default argument that is a vector (used to have to use a list for default)
+	
 Tag: V00-02-03
 2015-5-7 David Schneider
 - Add unit test. Read some test data outside of package, test against previously seen 

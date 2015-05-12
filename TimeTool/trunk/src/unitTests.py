@@ -57,6 +57,15 @@ class Analyze(unittest.TestCase):
             'TimeTool.Analyze.weights':'0.00940119 -0.00359135 -0.01681714 -0.03046231 -0.04553042 -0.06090473 -0.07645332 -0.09188818 -0.10765874 -0.1158105  -0.10755824 -0.09916765 -0.09032289 -0.08058788 -0.0705904  -0.06022352 -0.05040479 -0.04144206 -0.03426838 -0.02688114 -0.0215419  -0.01685951 -0.01215143 -0.00853327 -0.00563934 -0.00109415  0.00262359  0.00584445  0.00910484  0.01416929  0.0184887   0.02284319  0.02976289  0.03677404  0.04431778  0.05415214  0.06436626  0.07429347  0.08364909  0.09269116  0.10163601  0.10940983  0.10899065  0.10079016  0.08416471  0.06855799  0.05286105  0.03735241  0.02294275  0.00853613',
         }
         
+    @unittest.skip("interactive plotting example")
+    def test_plot(self):
+        psana.setConfigFile("")
+        self.psanaOptions['TimeTool.Analyze.eventdump']=True
+        self.psanaOptions['psana.modules'] += ' TimeTool.PlotAnalyze'
+        psana.setOptions(self.psanaOptions)
+        ds = psana.DataSource(self.datasource)
+        self.runThroughDataSourceAndCheckAnswers(ds)
+
     def test_basic(self):
         psana.setConfigFile("")
         psana.setOptions(self.psanaOptions)
@@ -65,6 +74,9 @@ class Analyze(unittest.TestCase):
         # time tool produced no result (for events 0-16 and event 18. If psalg or the TimeTool changes, it is reaonsable that these 
         # values will change, in which case the test should be modified. To modify the test, the line that prints these dictionaries
         # is commented out in the test below
+        self.runThroughDataSourceAndCheckAnswers(ds)
+
+    def runThroughDataSourceAndCheckAnswers(self,ds):
         timeToolAnswers = {
             17:{'amplitude':0.0098, 'nxt_amplitude':0.0049, 'position_fwhm':21.0986, 'ref_amplitude':525459.00, 'position_pixel':288.04},
             19:{'amplitude':0.0054, 'nxt_amplitude':0.0026, 'position_fwhm':30.0244, 'ref_amplitude':507888.00, 'position_pixel':352.72},
