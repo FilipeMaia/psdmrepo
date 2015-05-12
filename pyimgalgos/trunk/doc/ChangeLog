@@ -12,7 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
-
+Tag: V00-00-25
+2015-05-12 Mikhail S. Dubrovin
+- add apps in app/ merge_max_ndarrays merge_mask_ndarrays convert_npy_to_txt convert_txt_to_npy
+	
 Tag: V00-00-24
 2015-04-27 Mikhail S. Dubrovin
 - add directory data/scripts with test scripts (PSAS-34)
