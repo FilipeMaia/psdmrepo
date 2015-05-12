@@ -93,11 +93,18 @@ namespace PSCalib {
 GeometryObject::~GeometryObject ()
 {
   if (m_seggeom) delete m_seggeom;
-  if (p_xarr) delete [] p_xarr;
-  if (p_yarr) delete [] p_yarr;
-  if (p_zarr) delete [] p_zarr;
-  if (p_aarr) delete [] p_aarr;
-  if (p_marr) delete [] p_marr;
+
+  deallocate_memory();
+}
+
+//-------------------
+void GeometryObject::deallocate_memory()
+{
+  if (p_xarr) delete [] p_xarr; p_xarr=0;
+  if (p_yarr) delete [] p_yarr;	p_yarr=0;
+  if (p_zarr) delete [] p_zarr;	p_zarr=0;
+  if (p_aarr) delete [] p_aarr;	p_aarr=0;
+  if (p_marr) delete [] p_marr;	p_marr=0;
 }
 
 //-------------------
@@ -275,11 +282,7 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt, const bool do_eva
     // allocate memory for pixel coordinate arrays
     m_size = size;
     
-    if (p_xarr) delete [] p_xarr;
-    if (p_yarr) delete [] p_yarr;
-    if (p_zarr) delete [] p_zarr;
-    if (p_aarr) delete [] p_aarr;
-    if (p_marr) delete [] p_marr;
+    this->deallocate_memory();
     
     p_xarr = new double [m_size];
     p_yarr = new double [m_size];
@@ -332,6 +335,8 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt, const bool do_eva
     std::memcpy(&p_marr[ibase], pMch, sizech*sizeof(int));
 
     ibase += sizech;
+
+    (*it)->deallocate_memory();
   }
 
   if(ibase == PSCalib::SIZE2X2 && m_oname == "CSPAD2X2:V1") { 

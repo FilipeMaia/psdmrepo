@@ -300,6 +300,9 @@ public:
                  const double& dt_z = 0 
 		 );
 
+  /// Delete arrays with allocated memory, reset pointers to 0
+  void deallocate_memory();
+
 protected:
 
 private:

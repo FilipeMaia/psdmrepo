@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-39
+2015-05-11 Mikhail S. Dubrovin	
+- in GeometryObject - delete allocated memory for all non-top objects (PSAS-147).
+
 Tag: V00-02-38
 2015-05-11 Mikhail S. Dubrovin	
 - In SegGeometryStore use SegGeometryCspad2x1V1 and SegGeometryEpix100V1 as singletons to reduce memory consumption (PSAS-147)
