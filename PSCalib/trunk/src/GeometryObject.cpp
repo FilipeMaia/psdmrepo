@@ -278,7 +278,7 @@ void GeometryObject::evaluate_pixel_coords(const bool do_tilt, const bool do_eva
 
   unsigned size = get_size_geo_array();
 
-  if(size != m_size) {
+  if(p_xarr==0 || size != m_size) {
     // allocate memory for pixel coordinate arrays
     m_size = size;
     
