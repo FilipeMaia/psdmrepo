@@ -38,7 +38,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # here is an example setting up a fictional package
 
 pkg = "pyqtgraph"
-pkg_ver = "0.9.8"
+pkg_ver = "0.9.10"
 
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin("lib", '$PYTHON', "site-packages")
