@@ -11,8 +11,16 @@ Package author: Dan Damiani
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2015-05-11 Dan Damiani
+- Add a console app (psconsole) for talking to psmon servers.
+- Add legends for xyplot and 1d histograms.
+- Cli options for forcing log scale added to psplot.
+- Fill coloring is now configurable for 1d histograms.
+- Several bug fixes related to value-display mouseover tooltips.
+
 Tag: V00-01-07
-2014-02-02 Dan Damiani
+2015-02-02 Dan Damiani
 - Add user-definable axes for image plot
 
 Tag: V00-01-06
