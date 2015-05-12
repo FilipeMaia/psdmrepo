@@ -170,7 +170,7 @@ class PlotClient(object):
         self.fig_layout.layout.setRowStretchFactor(self.fig_layout.currentRow, val)
 
     def cursor_hover_evt_sub(self, x_pos, y_pos):
-        self.info_label.setText('x=%.4f, y=%.4f' % (x_pos, y_pos), size='10pt')
+        self.info_label.setText('x=%.5g, y=%.5g' % (x_pos, y_pos), size='10pt')
 
     def cursor_hover_evt(self, evt):
         pos = evt[0]
@@ -248,7 +248,7 @@ class ImageClient(PlotClient):
             if hasattr(z_val, 'dtype') and np.issubdtype(z_val, np.integer):
                 label_str = 'x=%d, y=%d, z=%d'
             else:
-                label_str = 'x=%d, y=%d, z=%.4f'
+                label_str = 'x=%d, y=%d, z=%.5g'
             self.info_label.setText(label_str % (x_pos, y_pos, z_val), size='10pt')
 
     def cursor_hover_hevt_sub(self, z_val):
@@ -260,7 +260,7 @@ class ImageClient(PlotClient):
                     z_high = img_z[index+1]
                 else:
                     z_high = 2 * img_z[index] - img_z[index-1]
-                self.info_label.setText('z=(%.4f, %.4f), n=%d' % (z_low, z_high, img_n[index]), size='10pt')
+                self.info_label.setText('z=(%.5g, %.5g), n=%d' % (z_low, z_high, img_n[index]), size='10pt')
 
     def cursor_hover_evt(self, evt):
         pos = evt[0]
