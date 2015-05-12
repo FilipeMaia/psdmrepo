@@ -16,17 +16,31 @@ LOG = logging.getLogger(__name__)
 
 
 class ClientInfo(object):
-    def __init__(self, server, port, buffer, rate, recvlimit, topic):
-        self.server = server
-        self.port = port
+    def __init__(self, data_socket_url, comm_socket_url, buffer, rate, recvlimit, topic, renderer):
+        self.data_socket_url = data_socket_url
+        self.comm_socket_url = comm_socket_url
         self.buffer = buffer
         self.rate = rate
         self.recvlimit = recvlimit
         self.topic = topic
+        self.renderer = renderer
 
 
 class PlotInfo(object):
-    def __init__(self, xrange=None, yrange=None, zrange=None, logx=False, logy=False, aspect=None, fore_col=None, bkg_col=None, interpol=None, palette=None, grid=False):
+    def __init__(
+        self,
+        xrange=config.APP_XRANGE,
+        yrange=config.APP_YRANGE,
+        zrange=config.APP_ZRANGE,
+        logx=config.APP_LOG,
+        logy=config.APP_LOG,
+        aspect=config.APP_ASPECT,
+        fore_col=config.APP_TEXT_COLOR,
+        bkg_col=config.APP_BKG_COLOR,
+        interpol=config.APP_IMG_INTERPOLATION,
+        palette=config.APP_PALETTE,
+        grid=config.APP_GRID
+    ):
         self.xrange = xrange
         self.yrange = yrange
         self.zrange = zrange
@@ -73,19 +87,49 @@ class ZMQPublisher(object):
         self.comm_offset = comm_offset
         self.initialized = False
 
-    def initialize(self, port, bufsize):
+    @property
+    def data_endpoint(self):
+        return self.data_socket.getsockopt(zmq.LAST_ENDPOINT)
+
+    @property
+    def comm_endpoint(self):
+        return self.comm_socket.getsockopt(zmq.LAST_ENDPOINT)
+
+    def initialize(self, port, bufsize, local):
         if self.initialized:
             LOG.debug('Publisher is already initialized - Nothing to do')
             return
 
         # set the hwm for the socket to the specified buffersize
-        LOG.debug('Publisher data socket buffer size set to %d', bufsize)
+        if LOG.isEnabledFor(logging.DEBUG):
+            LOG.debug('Publisher data socket buffer size set to %d', bufsize)
         self.data_socket.set_hwm(bufsize)
 
+        if local:
+            self._initialize_icp()
+        else:
+            self._initialize_tcp(port)
+
+    def send(self, topic, data):
+        if self.initialized:
+            self.data_socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
+            self.data_socket.send_pyobj(data)
+
+    def _initialize_icp(self):
+        try:
+            self.data_socket.bind_to_random_port('ipc://*')
+            self.comm_socket.bind_to_random_port('ipc://*')
+            self.initialized = True
+            LOG.info('Initialized publisher. Data socket %s, Comm socket: %s', str(self.data_endpoint), self.comm_endpoint)
+        except zmq.ZMQError:
+            LOG.warning('Unable to bind local sockets for publisher - disabling!')
+            raise
+    
+    def _initialize_tcp(self, port):
         offset = 0
         while offset < config.APP_BIND_ATTEMPT and not self.initialized:
             port_try = port + offset
-            result = self.attempt_bind(port_try)
+            result = self._attempt_bind(port_try)
             offset += result
             if result == 0:
                 output_str = 'Initialized publisher%s. Data port: %d, Comm port: %d'
@@ -102,53 +146,47 @@ class ZMQPublisher(object):
         if not self.initialized:
             LOG.warning('Unable to initialize publisher after %d attempts - disabling!' % offset)
 
-    def attempt_bind(self, port):
+    def _attempt_bind(self, port):
         try:
-            self.bind(self.data_socket, port)
+            self._bind(self.data_socket, port)
             try:
-                self.bind(self.comm_socket, port + self.comm_offset)
+                self._bind(self.comm_socket, port + self.comm_offset)
                 self.initialized = True
                 return 0
             except zmq.ZMQError:
                 # make sure to clean up the first bind which succeeded in this case
-                self.unbind(self.data_socket, port)
+                self._unbind(self.data_socket, port)
                 return 2
         except zmq.ZMQError as e:
             return 1
 
-    def send(self, topic, data):
-        if self.initialized:
-            self.data_socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
-            self.data_socket.send_pyobj(data)
-
-    def bind(self, sock, port):
+    def _bind(self, sock, port):
         sock.bind('tcp://*:%d' % port)
 
-    def unbind(self, sock, port):
+    def _unbind(self, sock, port):
         sock.unbind('tcp://*:%d' % port)
 
 
 class ZMQSubscriber(object):
-    def __init__(self, client_info, comm_offset=config.APP_COMM_OFFSET, connect=True):
+    def __init__(self, client_info, connect=True):
         self.client_info = client_info
         self.context = zmq.Context()
         self.data_socket = self.context.socket(zmq.SUB)
         self.data_socket.setsockopt(zmq.SUBSCRIBE, self.client_info.topic + config.ZMQ_TOPIC_DELIM_CHAR)
         self.data_socket.set_hwm(self.client_info.buffer)
         self.comm_socket = self.context.socket(zmq.REQ)
-        self.comm_offset = comm_offset
         self.connected = False
         if connect:
             self.connect()
 
     def connect(self):
         if not self.connected:
-            self.sock_init(self.data_socket, self.client_info.server, self.client_info.port)
-            self.sock_init(self.comm_socket, self.client_info.server, self.client_info.port + self.comm_offset)
+            self.sock_init(self.data_socket, self.client_info.data_socket_url)
+            self.sock_init(self.comm_socket, self.client_info.comm_socket_url)
             self.connected = True
 
-    def sock_init(self, sock, server, port):
-        sock.connect('tcp://%s:%d' % (server, port))
+    def sock_init(self, sock, con_str):
+        sock.connect(con_str)
 
     def data_recv(self, flags=0):
         topic = self.data_socket.recv(flags)

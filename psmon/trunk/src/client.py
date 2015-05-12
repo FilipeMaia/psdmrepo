@@ -62,7 +62,7 @@ def parse_cmdline():
         metavar='X_RANGE',
         type=float,
         nargs=2,
-        default=None,
+        default=config.APP_XRANGE,
         help='the fixed x range for any plots'
     )
 
@@ -72,7 +72,7 @@ def parse_cmdline():
         metavar='Y_RANGE',
         type=float,
         nargs=2,
-        default=None,
+        default=config.APP_YRANGE,
         help='the fixed y range for any plots'
     )
 
@@ -82,7 +82,7 @@ def parse_cmdline():
         metavar='Z_RANGE',
         type=float,
         nargs=2,
-        default=None,
+        default=config.APP_ZRANGE,
         help='the fixed z range for any plots'
     )
 
@@ -91,7 +91,7 @@ def parse_cmdline():
         '--aspect',
         metavar='ASPECT',
         type=float,
-        default=None,
+        default=config.APP_ASPECT,
         help='the aspect ratio for the plot'
     )
 
@@ -106,35 +106,35 @@ def parse_cmdline():
     parser.add_argument(
         '--bkg-color',
         metavar='BKG_COLOR',
-        default=None,
+        default=config.APP_BKG_COLOR,
         help='the background color for plots'
     )
 
     parser.add_argument(
         '--text-color',
         metavar='TEXT_COLOR',
-        default=None,
+        default=config.APP_TEXT_COLOR,
         help='the text color for plots'
     )
 
     parser.add_argument(
         '--palette',
         metavar='PALETTE',
-        default=None,
+        default=config.APP_PALETTE,
         help='the color palette to use for images'
     )
 
     parser.add_argument(
         '--logx',
         action='store_true',
-        default=False,
+        default=config.APP_LOG,
         help='show the x-axis in a logarithmic scale'
     )
 
     parser.add_argument(
         '--logy',
         action='store_true',
-        default=False,
+        default=config.APP_LOG,
         help='show the y-axis in a logarithmic scale'
     )
 
@@ -142,7 +142,7 @@ def parse_cmdline():
         '-g',
         '--grid',
         action='store_true',
-        default=False,
+        default=config.APP_GRID,
         help='show grid lines overlaid on plots'
     )
 
@@ -171,9 +171,16 @@ def parse_cmdline():
     return parser.parse_args()
 
 
-def mpl_client(renderer, client_info, plot_info):
-    render_mod = __import__('psmon.client%s'%renderer, fromlist=['main'])
+def mpl_client(client_info, plot_info):
+    render_mod = __import__('psmon.client%s'%client_info.renderer, fromlist=['main'])
     sys.exit(render_mod.main(client_info, plot_info))
+
+
+def spawn_process(client_info, plot_info, daemon=True):
+    proc = mp.Process(name='%s-client'%client_info.topic, target=mpl_client, args=(client_info, plot_info))
+    proc.daemon = daemon
+    proc.start()
+    return proc
 
 
 def main():
@@ -198,13 +205,15 @@ def main():
             grid=args.grid
         )
 
+        # creat the tcp socket urls from cli parameters
+        data_socket_url = 'tcp://%s:%d' % (args.server, args.port)
+        comm_socket_url = 'tcp://%s:%d' % (args.server, args.port+config.APP_COMM_OFFSET)
+
         proc_list = []
         for topic in args.topics:
-            client_info = app.ClientInfo(args.server, args.port, args.buffer, args.rate, args.recv_limit, topic)
-            proc = mp.Process(name='%s-client'%topic, target=mpl_client, args=(args.client, client_info, plot_info))
-            proc.daemon = True
+            client_info = app.ClientInfo(data_socket_url, comm_socket_url, args.buffer, args.rate, args.recv_limit, topic, args.client)
             LOG.info('Starting client for topic: %s', topic)
-            proc.start()
+            proc = spawn_process(client_info, plot_info)
             proc_list.append(proc)
     
         # wait for all the children to exit
