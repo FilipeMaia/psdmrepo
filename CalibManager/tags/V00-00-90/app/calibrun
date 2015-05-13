@@ -1,0 +1,89 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+
+"""Command line for dark run calibration 
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports
+#--------------------------------
+import sys
+import os
+from time import time, strftime, localtime
+#import matplotlib
+#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+
+from CalibManager.GlobalUtils import ready_to_start
+from CalibManager.CommandLineCalib import *
+
+from optparse import OptionParser
+
+#-----------------------------
+
+def input_options_parser() :
+    com_ex = '\nExample: %prog -e xppi0613 -d CSPAD,OPAL1000 -c ./calib -P -D -r 173'
+    com_x  = 'non-standard path to xtc directory(<INS>/<EXP>/xtc are required), ex: .mydir/xpp/xppi0613/xtc, or /reg/d/ffb/cxi/cxi12345/xtc' 
+    help_print_bits = '0-print nothing, +1-debug, +2-info, +4-warning, +8-error, +16-critical; default=036, minimal recommended=020'
+    
+    parser = OptionParser(description='%prog - command line calibration utility', usage='  %prog [options] args'+com_ex )
+    parser.add_option('-e', '--exp',         dest='exp',          default=None,  action='store', type='string', help='experiment name, ex.: cxi12345')
+    parser.add_option('-r', '--run',         dest='runnum',       default=None,  action='store', type='int',    help='run number')
+    parser.add_option('-n', '--num_events',  dest='num_events',   default=None,  action='store', type='int',    help='number of events to process')
+    parser.add_option('-s', '--skip_events', dest='skip_events',  default=None,  action='store', type='int',    help='number of events to skip before processing')
+    parser.add_option('-m', '--scan_events', dest='scan_events',  default=None,  action='store', type='int',    help='number of events to scan data and search for selected detector(s)')
+    parser.add_option('-f', '--event_code',  dest='event_code',   default=None,  action='store', type='int',    help='event code for dark event selection')
+    parser.add_option('-l', '--thr_rms_min', dest='thr_rms_min',  default=None,  action='store', type='float',  help='minimal threshold on rms for hot pixel mask evaluation (rms<thr - cold pixel)')
+    parser.add_option('-t', '--thr_rms',     dest='thr_rms',      default=None,  action='store', type='float',  help='maximal threshold on rms for hot pixel mask evaluation (rms>thr - hot pixel)')
+    parser.add_option('-v', '--runrange',    dest='runrange',     default=None,  action='store', type='string', help='validity run range, ex.: 123-567 or 123-end')
+    parser.add_option('-q', '--queue',       dest='queue',        default=None,  action='store', type='string', help='queue name, ex: psnehq, psfehq, psanacsq. If specified - run in batch')
+    parser.add_option('-w', '--workdir',     dest='workdir',      default=None,  action='store', type='string', help='work directory, ex: ./work')
+    parser.add_option('-c', '--calibdir',    dest='calibdir',     default=None,  action='store', type='string', help='non-standard path to calib directory, ex: ./calib')
+    parser.add_option('-x', '--xtcdir',      dest='xtcdir',       default=None,  action='store', type='string', help=com_x)
+    parser.add_option('-d', '--detector',    dest='detector',     default=None,  action='store', type='string', help='detector names separated by comma, ex:CSPAD,CSPAD2x2,PNCCD')
+    parser.add_option('-p', '--print_bits',  dest='print_bits',   default=036,   action='store', type='int',    help=help_print_bits)
+    parser.add_option('-P', '--process',     dest='process',      default=False, action='store_true',           help='process xtc files and produce calib files under the "work" directory')
+    parser.add_option('-D', '--deploy',      dest='deploy',       default=False, action='store_true',           help='deploy calibrated files under the "calib" directory')
+    parser.add_option('-L', '--loadcfg',     dest='loadcfg',      default=False, action='store_true',           help='load and use configuration parameters from file after "calibman"')
+
+    (opts, args) = parser.parse_args()
+    return (opts, args)
+ 
+#---------------------------------
+
+if __name__ == "__main__" :
+
+    appname = os.path.basename(sys.argv[0])
+
+    if not ready_to_start(check_bits=01, fatal_bits=01) :  #1,2,4 = old LUSTRE, Kerberos ticket,  AFS token
+        sys.exit('Not ready to start aplication %s yet...' % appname)
+
+    (opts, args) = input_options_parser()
+    list_args = args
+    dict_opts = vars(opts)
+
+    t0_sec  = time()
+    ts1  = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    print('%s Begin %s - the command line detector calibration utility using dark runs' % (ts1, appname))
+
+    CommandLineCalib(list_args, dict_opts)  #(*args, **opts)
+
+    ts2  = strftime('%Y-%m-%d %H:%M:%S', localtime())
+    msg = '%s End of %s, consumed time = %.3f(sec)' % (ts2, appname, time()-t0_sec)
+    sys.exit(msg)
+
+#---------------------------------
