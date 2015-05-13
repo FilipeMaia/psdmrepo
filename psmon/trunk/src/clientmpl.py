@@ -16,7 +16,19 @@ LOG = logging.getLogger(__name__)
 
 def main(client_info, plot_info):
     # initial all the socket connections
-    zmqsub = app.ZMQSubscriber(client_info)
+    try:
+        zmqsub = app.ZMQSubscriber(client_info)
+    except:
+        # send failure signal to parent
+        if signal is not None:
+            signal.send(False)
+            signal.close()
+        raise
+
+    # if signal pipe was given send started response to parent
+    if signal is not None:
+        signal.send(True)
+        signal.close()
 
     # grab an initial datagram from the server
     try:

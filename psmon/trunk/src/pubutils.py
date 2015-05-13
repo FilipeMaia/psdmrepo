@@ -35,7 +35,6 @@ class PublishManager(object):
         self.publisher = app.ZMQPublisher()
         self.reset_listener = app.ZMQListener(self.publisher.comm_socket)
         self.plot_opts = app.PlotInfo()
-        self.client_sleep = 0.5
         self.active_clients = {}
 
     @property
@@ -78,9 +77,7 @@ class PublishManager(object):
             topic,
             self.renderer
         )
-        self.active_clients[topic] = client.spawn_process(client_opts, self.plot_opts, self.daemon)
-        # sleep for a little bit so the client has a chance to connect before sending
-        self.active_clients[topic].join(self.client_sleep)
+        self.active_clients[topic] = client.spawn_process(client_opts, self.plot_opts, self.daemon, True)
 
     def init(self):
         """

@@ -171,15 +171,29 @@ def parse_cmdline():
     return parser.parse_args()
 
 
-def mpl_client(client_info, plot_info):
+def mpl_client(client_info, plot_info, signal=None):
     render_mod = __import__('psmon.client%s'%client_info.renderer, fromlist=['main'])
-    sys.exit(render_mod.main(client_info, plot_info))
+    sys.exit(render_mod.main(client_info, plot_info, signal))
 
 
-def spawn_process(client_info, plot_info, daemon=True):
-    proc = mp.Process(name='%s-client'%client_info.topic, target=mpl_client, args=(client_info, plot_info))
+def spawn_process(client_info, plot_info, daemon=True, wait_for_sig=False):
+    if wait_for_sig:
+        recv_conn, send_conn = mp.Pipe()
+        client_args = (client_info, plot_info, send_conn)
+    else:
+        client_args = (client_info, plot_info)
+
+    proc = mp.Process(name='%s-client'%client_info.topic, target=mpl_client, args=client_args)
     proc.daemon = daemon
     proc.start()
+
+    if wait_for_sig:
+        if recv_conn.recv():
+            LOG.debug('Received subscriber start success response from client for topic: %s'%client_info.topic)
+            # need wait a bit to ensure all socket connections are up
+            proc.join(.1)
+        else:
+            LOG.warn('Received subscriber start failure response from client for topic: %s'%client_info.topic)
     return proc
 
 
