@@ -245,7 +245,7 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def add_cfg_module_peds_aver_princeton (self, module='ImgAlgos.PrincetonImageProducer') :
+    def add_cfg_module_peds_aver_princeton (self, module='ImgAlgos.PrincetonImageProducer', ftype='metatxt') :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-princeton.cfg').path()
         mod_img_rec = '%s:%i' % (module, self.ind) # str( cp.bat_img_rec_mod.value()
         mod         = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
@@ -257,6 +257,7 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'FTYPE'                : str(ftype),
                          'THR_RMS_HOTPIX_MIN'   : str( cp.mask_rms_thr_min.value() ),
                          'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
                          'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),

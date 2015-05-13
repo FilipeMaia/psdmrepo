@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-05-13 Mikhail S. Dubrovin
+Tag: V00-00-90
+- Save Princeton calib files WITH metadata, modified: ConfigFileGenerator.py and psana-module-peds-aver-princeton.cfg (PSAS-6) 
+	
 2015-05-04 Mikhail S. Dubrovin
 Tag: V00-00-89
 - add parameter cp.mask_rms_thr_min and propagate it in calibman/calibrun code along with cp.mask_rms_thr (PSAS-6) 
