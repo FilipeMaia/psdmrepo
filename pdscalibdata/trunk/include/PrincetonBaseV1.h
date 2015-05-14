@@ -45,8 +45,10 @@ public:
   typedef double  	cmod_t;
 
   const static size_t   Ndim = 2; 
-  const static size_t   Rows = 1300; 
-  const static size_t   Cols = 1340; 
+  //const static size_t   Rows = 1300; 
+  //const static size_t   Cols = 1340; 
+  const static size_t   Rows = 0; // VARIABLE SHAPE DATA PARAMETERS WILL BE TAKEN FROM FILE METADATA
+  const static size_t   Cols = 0; // VARIABLE SHAPE DATA PARAMETERS WILL BE TAKEN FROM FILE METADATA
   const static size_t   Size = Rows*Cols; 
   const static size_t   SizeCM = 7; 
 
