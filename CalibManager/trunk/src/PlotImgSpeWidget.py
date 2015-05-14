@@ -66,9 +66,9 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
 
 def add_stat_text(axhi, weights, bins) :
     #mean, rms, err_mean, err_rms, neff = proc_stat(weights,bins)
-    mean, rms, err_mean, err_rms, neff, skew, kurt, err_err = proc_stat(weights,bins)
+    mean, rms, err_mean, err_rms, neff, skew, kurt, err_err, sum_w = proc_stat(weights,bins)
     pm = r'$\pm$' 
-    txt  = 'Mean=%.2f%s%.2f\nRMS=%.2f%s%.2f\n' % (mean, pm, err_mean, rms, pm, err_rms)
+    txt  = 'Entries=%d\nMean=%.2f%s%.2f\nRMS=%.2f%s%.2f\n' % (sum_w, mean, pm, err_mean, rms, pm, err_rms)
     txt += r'$\gamma1$=%.3f  $\gamma2$=%.3f' % (skew, kurt)
     #txt += '\nErr of err=%8.2f' % (err_err)
     xb,xe = axhi.get_xlim()     
@@ -128,7 +128,7 @@ def proc_stat(weights, bins) :
     err_err = math.sqrt( math.sqrt( var_4 ) )
     #print  'mean:%f, rms:%f, err_mean:%f, err_rms:%f, neff:%f' % (mean, rms, err_mean, err_rms, neff)
     #print  'skew:%f, kurt:%f, err_err:%f' % (skew, kurt, err_err)
-    return mean, rms, err_mean, err_rms, neff, skew, kurt, err_err
+    return mean, rms, err_mean, err_rms, neff, skew, kurt, err_err, sum_w
 
 #--------------------
 
