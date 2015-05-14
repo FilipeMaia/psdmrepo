@@ -22,8 +22,23 @@ class PublishError(Exception):
     pass
 
 
-class ClientInfo(object):
+class Info(object):
+    """
+    Basic info object that implements basic repr and str functions.
+    """
+    def __repr__(self):
+        return "%s(%r)" % (self.__class__, self.__dict__)
+
+    def __str__(self):
+        return "%s: %s" % (self.__class__.__name__, self.__dict__)
+
+
+class ClientInfo(Info):
+    """
+    The ClientInfo class is a container for psplot client configuration.
+    """
     def __init__(self, data_socket_url, comm_socket_url, buffer, rate, recvlimit, topic, renderer, daemon):
+        super(ClientInfo, self).__init__()
         self.data_socket_url = data_socket_url
         self.comm_socket_url = comm_socket_url
         self.buffer = buffer
@@ -34,7 +49,10 @@ class ClientInfo(object):
         self.daemon = daemon
 
 
-class PlotInfo(object):
+class PlotInfo(Info):
+    """
+    The PlotInfo class is a container for the plotting configuration of the psplot client.
+    """
     def __init__(
         self,
         xrange=config.APP_XRANGE,
@@ -49,6 +67,7 @@ class PlotInfo(object):
         palette=config.APP_PALETTE,
         grid=config.APP_GRID
     ):
+        super(PlotInfo, self).__init__()
         self.xrange = xrange
         self.yrange = yrange
         self.zrange = zrange

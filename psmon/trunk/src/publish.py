@@ -10,18 +10,18 @@ class _Publish(object):
     then replaces the module reference in sys.modules. 
 
     Attributes:
-    - local: Used to set the local publishing state of the module. If the local 
+     - local: Used to set the local publishing state of the module. If the local 
             flag of the publish module is set then all plots are published to 
             a client launched locally.
-    - disabled: Indicates if  autoconnection on send attempts for the publish 
+     - disabled: Indicates if  autoconnection on send attempts for the publish 
             module have been disabled.
-    - port: The tcp port to use for the ZMQ data connection.
-    - client_opts: An instance of the ClientInfo class that is used for 
+     - port: The tcp port to use for the ZMQ data connection.
+     - client_opts: An instance of the ClientInfo class that is used for 
             determining the configuration settings for ZMQ connections.
-    - plot_opts: An instance of the PlotInfo class used by local plotting 
+     - plot_opts: An instance of the PlotInfo class used by local plotting 
             clients when launched. Individual clients will not pick up changes 
             to the plot_opts made after they are spawned.
-    - active_clients: Dictionary of current local plot clients.
+     - active_clients: Dictionary of current local plot clients.
     """
     def __init__(
             self,
@@ -59,8 +59,8 @@ class _Publish(object):
         Publishes a data object to all clients suscribed to the topic.
 
         Arguments
-        - topic: The name of the topic to which the data is being published.
-        - data: The data object to be published to suscribers.
+         - topic: The name of the topic to which the data is being published.
+         - data: The data object to be published to suscribers.
         """
         if not self.initialized and not self.disabled:
             try:
@@ -95,17 +95,17 @@ class _Publish(object):
         Initializes the publish module.
 
         Optional arguments
-        - port: The tcp port number to use with the publish module.
-        - bufsize: The zmq buffer size to use with the publish module.
-        - local: When true all plots are published to a client launched locally.
+         - port: The tcp port number to use with the publish module.
+         - bufsize: The zmq buffer size to use with the publish module.
+         - local: When true all plots are published to a client launched locally.
         """
         if port is not None:
             self.port = port
         if bufsize is not None:
-            self.client_opts.bufsize = bufsize
+            self.client_opts.buffer = bufsize
         if local is not None:
             self.local = local
-        self._publisher.initialize(self.port, self.client_opts.bufsize, self.local)
+        self._publisher.initialize(self.port, self.client_opts.buffer, self.local)
         self._reset_listener.start()
         # turn off further autoconnect attempts
         self.disabled = True
@@ -122,7 +122,7 @@ class _Publish(object):
         Registers a message handler for recieving messages from suscribed clients.
 
         Arguments
-        - name: all messages sent from clients with this header will be handled by
+         - name: all messages sent from clients with this header will be handled by
         this message handler
 
         Returns a refernce to the newly created handler.
@@ -134,7 +134,7 @@ class _Publish(object):
         Returns a referenced to the named message handler.
 
         Arguments:
-        - name: the header string/identifier of the requested handler
+         - name: the header string/identifier of the requested handler
         """
         return self._reset_listener.message_handler.get(name)
 
