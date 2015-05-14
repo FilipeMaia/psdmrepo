@@ -7,8 +7,7 @@
 #     -d: run in background and write to log file
 #
 
-function msg()
-{
+function msg() {
     echo "$(date +'%Y%m%d %H:%M:%S') $*"
 }
 
@@ -36,7 +35,6 @@ fi
 maxt=20
 while [ 1 ] ; do
     
-    #res=$(iqstat -u psdatmgr | egrep -c '^([0-9]|No delayed)' ) 
     inq=$(iqstat -u psdatmgr | awk ' BEGIN {n=-1} ; /^[0-9]/ {n+=1} /^No delayed/ {n=0}; END {print n}')
     if [ $inq -lt 0 ] ; then
         echo "failed iqstat"
@@ -49,7 +47,7 @@ while [ 1 ] ; do
         ndiff=$(( $maxt - $inq ))
         msg "to submit $ndiff"
         
-        do_submit1 -n $ndiff --run 
+        dmt-submit -n $ndiff --run 
     fi
     sleep 300
 done
