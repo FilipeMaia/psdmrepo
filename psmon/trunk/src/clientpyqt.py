@@ -22,21 +22,9 @@ def set_color_opt(option, value):
              LOG.warning('Inavlid %s color for pyqtgraph: %s', option, value)
 
 
-def main(client_info, plot_info, signal=None):
-    # initial all the socket connections
-    try:
-        zmqsub = app.ZMQSubscriber(client_info)
-    except:
-        # send failure signal to parent
-        if signal is not None:
-            signal.send(False)
-            signal.close()
-        raise
-
-    # if signal pipe was given send started response to parent
-    if signal is not None:
-        signal.send(True)
-        signal.close()
+def main(client_info, plot_info):
+    # initialize all the socket connections
+    zmqsub = app.ZMQSubscriber(client_info)
 
     # grab an initial datagram from the server
     try:

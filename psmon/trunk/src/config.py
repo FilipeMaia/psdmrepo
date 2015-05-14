@@ -7,7 +7,7 @@ Resolution = namedtuple('Resolution', 'x y')
 RESET_REQ_HEADER = 'reset'
 RESET_REQ_STR = 'reset signal - %s'
 RESET_REP_STR = 'reset signal recieved from %s'
-ZMQ_TOPIC_DELIM_CHAR = '\0'
+ZMQ_TOPIC_DELIM_CHAR = '\x00'
 ### CONFIG KEYS FOR LOGGING ###
 LOG_BASE_NAME = __package__
 LOG_LEVEL = 'INFO'

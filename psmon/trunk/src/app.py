@@ -82,10 +82,15 @@ class MessageHandler(object):
 class ZMQPublisher(object):
     def __init__(self, comm_offset=config.APP_COMM_OFFSET):
         self.context = zmq.Context()
-        self.data_socket = self.context.socket(zmq.PUB)
+        self.data_socket = self.context.socket(zmq.XPUB)
         self.comm_socket = self.context.socket(zmq.REP)
+        self.proxy_send_socket = self.context.socket(zmq.PUB)
+        self.proxy_recv_socket = self.context.socket(zmq.SUB)
+        self.proxy_url = "inproc://send-proxy"
+        self.proxy_thread = threading.Thread(target=self._send_proxy)
         self.comm_offset = comm_offset
         self.initialized = False
+        self.cache = {}
 
     @property
     def data_endpoint(self):
@@ -105,29 +110,86 @@ class ZMQPublisher(object):
             LOG.debug('Publisher data socket buffer size set to %d', bufsize)
         self.data_socket.set_hwm(bufsize)
 
+        # set the data socket to verbose mode
+        self.data_socket.setsockopt(zmq.XPUB_VERBOSE, True)
+        # set the subscription filter on the proxy socket
+        self.proxy_recv_socket.setsockopt(zmq.SUBSCRIBE, "")
+
+        # set up the external communication sockets
         if local:
-            self._initialize_icp()
+            sock_bound = self._initialize_icp()
         else:
-            self._initialize_tcp(port)
+            sock_bound = self._initialize_tcp(port)
+
+        # connect the proxy_sockets if setup of other socks succeeded
+        if sock_bound:
+            try:
+                self.proxy_send_socket.bind(self.proxy_url)
+                self.proxy_recv_socket.connect(self.proxy_url)
+                # start the proxy receiver thread
+                self.proxy_thread.daemon = True
+                if not self.proxy_thread.isAlive():
+                    self.proxy_thread.start()
+                self.initialized = True
+                LOG.debug('Initialized publisher proxy socket with endpoint: %s'%self.proxy_url)
+            except zmq.ZMQError:
+                LOG.warning('Unable to bind proxy sockets for publisher - disabling!')
 
     def send(self, topic, data):
         if self.initialized:
-            self.data_socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
-            self.data_socket.send_pyobj(data)
+            self.proxy_send_socket.send(topic, zmq.SNDMORE)
+            self.proxy_send_socket.send_pyobj(data)
+
+    def _send_proxy(self):
+        # set up a poller for incoming data from proxy or subscrition messages
+        proxy_poller = zmq.Poller()
+        proxy_poller.register(self.proxy_recv_socket, zmq.POLLIN)
+        proxy_poller.register(self.data_socket, zmq.POLLIN)
+        while not self.proxy_recv_socket.closed and not self.data_socket.closed:
+            ready_socks = dict(proxy_poller.poll())
+            # if proxy socket has inbound data foward it to the data publisher
+            if self.proxy_recv_socket in ready_socks:
+                topic = self.proxy_recv_socket.recv()
+                data = self.proxy_recv_socket.recv_pyobj()
+                if LOG.isEnabledFor(logging.DEBUG):
+                    LOG.debug('Received data on proxy socket for topic: %s'%topic)
+                self.data_socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
+                self.data_socket.send_pyobj(data)
+                self.cache[topic] = data
+            # if the data socket has inbound data check for new subs
+            if self.data_socket in ready_socks:
+                topic_msg = self.data_socket.recv()
+                if topic_msg[0] == '\x01':
+                    if topic_msg[-1] != '\x00':
+                        if LOG.isEnabledFor(logging.WARN):
+                            LOG.warn('Received new subscription message for invalid topic - ignoring!')
+                    else:
+                        topic = topic_msg[1:-1]
+                        if LOG.isEnabledFor(logging.DEBUG):
+                            LOG.debug('Received subscription message for topic: %s'%topic)
+                        try:
+                            last_data = self.cache[topic]
+                            if LOG.isEnabledFor(logging.DEBUG):
+                                LOG.debug('Found cached message to resend for topic: %s'%topic)
+                            self.data_socket.send(topic + config.ZMQ_TOPIC_DELIM_CHAR, zmq.SNDMORE)
+                            self.data_socket.send_pyobj(last_data)
+                        except KeyError:
+                            if LOG.isEnabledFor(logging.DEBUG):
+                                LOG.debug('No cached message found for topic: %s'%topic)
 
     def _initialize_icp(self):
         try:
             self.data_socket.bind_to_random_port('ipc://*')
             self.comm_socket.bind_to_random_port('ipc://*')
-            self.initialized = True
             LOG.info('Initialized publisher. Data socket %s, Comm socket: %s', str(self.data_endpoint), self.comm_endpoint)
+            return True
         except zmq.ZMQError:
             LOG.warning('Unable to bind local sockets for publisher - disabling!')
-            raise
+            return False
     
     def _initialize_tcp(self, port):
         offset = 0
-        while offset < config.APP_BIND_ATTEMPT and not self.initialized:
+        while offset < config.APP_BIND_ATTEMPT:
             port_try = port + offset
             result = self._attempt_bind(port_try)
             offset += result
@@ -137,21 +199,22 @@ class ZMQPublisher(object):
                     LOG.info(output_str, '', port_try, port_try + self.comm_offset)
                 else:
                     LOG.warning(output_str, ' (alternate ports)', port_try, port_try + self.comm_offset)
+                return True
             elif result == 1:
                 LOG.warning('Unable to bind publisher to data port: %d', port_try)
             else:
                 LOG.warning('Unable to bind publisher to communication port: %d', (port_try+self.comm_offset))
 
         # some logging output on the status of the port initialization attempts
-        if not self.initialized:
-            LOG.warning('Unable to initialize publisher after %d attempts - disabling!' % offset)
+        LOG.warning('Unable to initialize publisher after %d attempts - disabling!' % offset)
+
+        return False
 
     def _attempt_bind(self, port):
         try:
             self._bind(self.data_socket, port)
             try:
                 self._bind(self.comm_socket, port + self.comm_offset)
-                self.initialized = True
                 return 0
             except zmq.ZMQError:
                 # make sure to clean up the first bind which succeeded in this case
