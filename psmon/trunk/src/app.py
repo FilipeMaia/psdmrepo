@@ -15,8 +15,15 @@ from psmon import config
 LOG = logging.getLogger(__name__)
 
 
+class PublishError(Exception):
+    """
+    Class for exceptions related to ZMQ message publishing errors.
+    """
+    pass
+
+
 class ClientInfo(object):
-    def __init__(self, data_socket_url, comm_socket_url, buffer, rate, recvlimit, topic, renderer):
+    def __init__(self, data_socket_url, comm_socket_url, buffer, rate, recvlimit, topic, renderer, daemon):
         self.data_socket_url = data_socket_url
         self.comm_socket_url = comm_socket_url
         self.buffer = buffer
@@ -24,6 +31,7 @@ class ClientInfo(object):
         self.recvlimit = recvlimit
         self.topic = topic
         self.renderer = renderer
+        self.daemon = daemon
 
 
 class PlotInfo(object):
@@ -137,6 +145,8 @@ class ZMQPublisher(object):
 
     def send(self, topic, data):
         if self.initialized:
+            if LOG.isEnabledFor(logging.DEBUG):
+                LOG.debug('Publishing data to topic: %s', topic)
             self.proxy_send_socket.send(topic, zmq.SNDMORE)
             self.proxy_send_socket.send_pyobj(data)
 

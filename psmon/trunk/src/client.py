@@ -176,9 +176,9 @@ def mpl_client(client_info, plot_info):
     sys.exit(render_mod.main(client_info, plot_info))
 
 
-def spawn_process(client_info, plot_info, daemon=True):
+def spawn_process(client_info, plot_info):
     proc = mp.Process(name='%s-client'%client_info.topic, target=mpl_client, args=(client_info, plot_info))
-    proc.daemon = daemon
+    proc.daemon = client_info.daemon
     proc.start()
 
     return proc
@@ -212,7 +212,7 @@ def main():
 
         proc_list = []
         for topic in args.topics:
-            client_info = app.ClientInfo(data_socket_url, comm_socket_url, args.buffer, args.rate, args.recv_limit, topic, args.client)
+            client_info = app.ClientInfo(data_socket_url, comm_socket_url, args.buffer, args.rate, args.recv_limit, topic, args.client, True)
             LOG.info('Starting client for topic: %s', topic)
             proc = spawn_process(client_info, plot_info)
             proc_list.append(proc)
