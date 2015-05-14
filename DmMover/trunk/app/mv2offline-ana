@@ -61,7 +61,7 @@ class ExperimentCache():
 
             # Target data path
             reg_ana_tb, cr_xtc_only, incl_instr_name, rootpath = trg_path(instrname)
-            logging.debug("anatb: %s crXtcOnly: %s inclInstr: %s rootpath: %s", 
+            logging.debug("anatbl: %s crXtcOnly: %s inclInstr: %s rootpath: %s", 
                           reg_ana_tb, cr_xtc_only, incl_instr_name, rootpath)
             datapath = rootpath if rootpath else db.getexp_datapath(expid)
             if not datapath:

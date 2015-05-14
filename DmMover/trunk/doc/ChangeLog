@@ -11,7 +11,14 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2015-
+- Added cleanup script for ioc nodes
+- create all missing xtc direcories, not just check if xtc exists
+- add startup script for smalldata mover 
+	
 Tag: V00-01-00
+2015-05-08
 - Imported data-mover code from git repo (PsdmTools)
 - added features to the experiment path creation to handle creating xtc files on the ffb 
   for recorder transfers.
