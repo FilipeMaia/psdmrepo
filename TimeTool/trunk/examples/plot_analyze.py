@@ -11,11 +11,10 @@ def plotAnalyzeExample(datasource=None, numEvents=0, EVR_BYKICK=162):
         datasource = 'exp=sxri0214:run=158:dir=%s' % DATADIR 
 
     timeToolDebugMessages='TimeTool.Analyze=debug'
-    if os.environ['MSGLOGCONFIG'].find('timeToolDebugMessages')<0:
-        if len(os.environ['MSGLOGCONFIG'].strip()):
-            os.environ['MSGLOGCONFIG'] += ';%s' % timeToolDebugMessages
-        else:
-            os.environ['MSGLOGCONFIG'] = timeToolDebugMessages
+    if os.environ.get('MSGLOGCONFIG','').find(timeToolDebugMessages)>=0:
+        os.environ['MSGLOGCONFIG'] += ';%s' % timeToolDebugMessages
+    else:
+        os.environ['MSGLOGCONFIG'] = timeToolDebugMessages
 
     psanaOptions = {
         ########## psana configuration #################

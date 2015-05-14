@@ -11,6 +11,10 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2015-5-13 David Schneider
+- fix bug in plot_analyze.py example
+	
 Tag: V00-03-00
 2015-5-12 David Schneider
 - deprecate old style methods of reporting results (floats and ndarrays)
