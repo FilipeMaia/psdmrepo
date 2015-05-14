@@ -11,6 +11,11 @@ Package author: Dan Damiani
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2015-05-14 Dan Damiani
+- Support for plotting directly from within one script (no
+  separate client script needed).
+
 Tag: V00-01-08
 2015-05-11 Dan Damiani
 - Add a console app (psconsole) for talking to psmon servers.
