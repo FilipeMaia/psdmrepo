@@ -1,0 +1,89 @@
+#!/bin/bash 
+
+##doc
+#  Check the status of the datamover processes
+#  
+#  stat_procs.sh action
+#   with the following  actions:
+#      stat: print procServ and corresponding mover script. 
+#            One line per found procServ. (default)        
+#      procs: list daq nodes for which a datamover is running
+#      procserv: list running procServ process and ports they listen on
+#      logs: show latest logs in the /u1/.... log directory used by procServ
+##end 
+
+
+mv2offline_procs() {
+    daq=$(ps -ef | egrep 'mv2offline-(pull|ana|ffb).py' | grep -v procServ | \
+        sed -e 's/.*\ \([^\ ]\+mv2offline[^\ ]\+\).*host \([a-z0-9\-]\+\).*/\2 \1/' | \
+        grep -v grep | sort )
+    
+    if [ $SNG_LINE -eq 1 ] ; then
+        echo $daq
+    else
+        echo $daq | xargs -n 2
+    fi
+}
+
+mv2offline_procServ() {
+    # print src-host and procServ port
+    
+    str=$(ps -ef | grep procServ | grep mv2 \
+        | sed -e 's/.* \([0-9]\+\) .* --host \([ipd][a-z0-9\-]\+\).*/\"\2 \1\"/' | sort)
+    eval res=($str)
+    if [ $SNG_LINE -eq 1 ] ; then
+        echo ${res[@]}
+    else
+        for e in "${res[@]}" ; do
+            echo $e
+        done
+    fi
+}
+
+mv2offline_status() {
+    found_pid=0
+    for pid in $(ps -ef | grep procServ | awk '/mv2/ {print $2}') ; do
+        found_pid=1
+        proc_opts=$(ps -p $pid -o args= | sed -e 's/.* \([0-9]\+\) .* --host \([dpi][a-z0-9\-]\+\).*/\2 \1/')
+        mvr_cmd=($(ps --ppid $pid -o etime= -o args= ))
+        cmd=${mvr_cmd[@]:2}
+        printf "%s %12s %s\n" "$proc_opts" "${mvr_cmd[0]}" "$cmd"
+    done
+    
+    [ $found_pid -eq 0 ] && echo "No procs found"
+    return 0
+}
+
+
+latest_logs() {
+    logdir=/u1/psdm/mvr/log
+    nodes=($(find $logdir -maxdepth 1 -name mv2offline.\* | egrep '[0-9]$' | \
+        sed -e 's/.*v2offline\.\([a-z]\+.*\)\.[0-9]\+/\1/' | sort -u))
+    for n in ${nodes[@]} ; do
+        most_recent=$(ls -t $logdir/mv2offline.${n}* | head -1)
+        echo $n $most_recent
+    done
+}
+
+SNG_LINE=0
+while getopts :s OPT; do
+    case $OPT in
+        s|+s) SNG_LINE=1 ;;
+        *)
+            echo "usage: ${0##*/} [+-s} [--] ARGS..."
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+
+case ${1:?} in
+    procs)  mv2offline_procs ;;
+    procserv) mv2offline_procServ ;;
+    stat) mv2offline_status ;;
+    logs) latest_logs ;;
+    *)
+        echo "Not implemented $1"
+        exit 1
+esac

@@ -1,0 +1,15 @@
+#!@PYTHON@
+
+#--------------------------------------------------------------------------
+# Description:
+#   Run unitTests for TimeTool package
+#   
+#------------------------------------------------------------------------
+
+
+import sys
+import unittest
+from TimeTool.unitTests import *
+        
+if __name__ == "__main__":
+    unittest.main(argv=[sys.argv[0],'-v'])

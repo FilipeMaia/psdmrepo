@@ -11,6 +11,10 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2015-
+- renamed tools to use common prefix (dmt)
+	
 Tag: V00-00-01
 2015-03-18 Wilko Kroeger
 - just created this template file, this entry is an example of the change log

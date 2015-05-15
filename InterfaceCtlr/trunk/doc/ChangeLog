@@ -10,10 +10,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-
+2015	
+- Added --force option to deactivate controller without checking if the pid still exists.
+	
 Tag: V01-03-13
-2015
+2015-05-08
 - Close JobInfo (python lsf c-api) if none were found. Otherwise connection to lsf server is not 
   properly closed (stuck in CLOSE_WAIT) which caused the ic-controller-mon to run out of file descriptors. 
+- smalldata support for irods registration 
 	
 Tag: V01-03-12 
 2015-03-10 Wilko Kroeger

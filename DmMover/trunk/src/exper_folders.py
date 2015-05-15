@@ -160,31 +160,38 @@ def create_exp_path(datatype, exp, instr, posix_grp, physpath, no_instr_path=Fal
     # create the sub-folder
 
     datapath = pjoin(exppath, datatype)
-    if os.path.exists(datapath):
-        return 0
 
-    if datatype in ('xtc', 'hdf5', 'usr'):
-        print "Create %s" %(datapath)
-        mkdir(datapath, 02750)
-        runcmd('setfacl -d -m user::rwx %s' %(datapath))
-        
-        if datatype == 'xtc':
-            for subdir in ('md5', 'index', 'smalldata', 'smalldata/md5'):
-                spath = pjoin(datapath, subdir)
+    if datatype == 'xtc':
+        if not os.path.exists(datapath):
+            print "Create %s" %(datapath)
+            mkdir(datapath, 02750)
+            runcmd('setfacl -d -m user::rwx %s' %(datapath))
+
+        for subdir in ('md5', 'index', 'smalldata', 'smalldata/md5'):
+            spath = pjoin(datapath, subdir)
+            if not os.path.exists(spath):
                 print "Create %s" %(spath)
                 mkdir(spath, 02750)
                 runcmd('setfacl -d -m user::r %s' %(spath))
                 runcmd('setfacl -m user::rwx %s' %(spath))
+        return 0
+
+    # Check all non xtc path 
+    if os.path.exists(datapath):
+        return 0
     
-    if datatype in ('scratch', 'ftc', 'res'): 
+    if datatype in ('hdf5', 'usr'):
+        print "Create %s" %(datapath)
+        mkdir(datapath, 02750)
+        runcmd('setfacl -d -m user::rwx %s' %(datapath))
+    elif datatype in ('scratch', 'ftc', 'res'): 
         print "Create %s" %(datapath)
         mkdir(datapath, 0770)
         runcmd('setfacl -d -m group:%s:rwx %s' %(group, datapath))
         runcmd('setfacl -m group:%s:rwx %s' %(group, datapath))
         runcmd('setfacl -d -m group:ps-%s:rwx %s' %(instr, datapath))
         runcmd('setfacl -m group:ps-%s:rwx %s' %(instr, datapath))
-
-    if datatype in ('calib', ):
+    elif datatype in ('calib', ):
         print "Create %s" %(datapath)
         mkdir(datapath, 0770)
         runcmd('setfacl -d -m group:ps-data:rwx %s' % (datapath))
@@ -202,3 +209,5 @@ def create_exp_path(datatype, exp, instr, posix_grp, physpath, no_instr_path=Fal
         runcmd('setfacl    -m user:%sopr:rx %s' %(instr, exppath))        
         runcmd('setfacl -d -m user:%sopr:rx %s' %(instr, datapath))
         runcmd('setfacl    -m user:%sopr:rx %s' %(instr, datapath))
+    else:
+        print "Unknown datatype for experiment path", datatype

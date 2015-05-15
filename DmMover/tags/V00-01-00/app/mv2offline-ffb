@@ -1,0 +1,462 @@
+#!/usr/bin/env python 
+
+import os
+import sys
+import getpass
+import time
+import logging
+import traceback
+from socket import gethostname
+from optparse import OptionParser
+
+import DmMover.db_access as db
+from DmMover.check_dest import check_destpath  
+from DmMover.mvrutils import network_name, rm_remote_file
+
+from DmMover.iocntrl import StdinCtrl
+
+db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrdb-conn"
+test_db_conn = "/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
+
+pjoin = os.path.join
+
+# global setup
+# release dir 
+
+__reldir = os.path.dirname(os.path.realpath(__file__))
+__rmcmd = os.path.join(__reldir, "rm_from_dss.sh")
+
+__bbcp_user = "psdatmgr"
+__bbcp_key = None
+
+__bbcp_remote = "ssh -x -a -oFallBackToRsh=no %I -l %U %H ionice -c2 -n7 /reg/g/pcds/pds/datamvr/bbcp-ssl" 
+__bbcpcmd = '/reg/g/pcds/pds/datamvr/bbcp-ssl -S "%s" -z -v -s 1 -R c=2  -P 15' % __bbcp_remote
+
+# ----------------------------------------------------------
+
+def bbcp_cmd(srchost, src, trg, options=""):
+    """ Create the bbcp command line argument """
+
+    if __bbcp_user:
+        srcurl = "%s@%s:%s" % (__bbcp_user, srchost, src)
+    else:
+        srcurl = "%s:%s" % (srchost, src)
+    
+    if __bbcp_key:
+        extra_options = "%s -i %s" % (options, __bbcp_key)
+    else:
+        extra_options = options
+        
+    return "%s %s %s %s" % (__bbcpcmd, extra_options, srcurl, trg)
+    
+
+class ExperimentInfo:
+    """ Parameters for an experiment """ 
+    def __init__(self, info, datapath, instrument, no_instr_path=False):
+        self.info = info
+
+        if no_instr_path:
+            self.exppath = exppath = pjoin(datapath, self.name)
+        else:
+            self.exppath = exppath = pjoin(datapath, instrument.lower(), self.name)
+
+        self.linkpath = pjoin('/reg/d/psdm', instrument, self.name)        
+        self.xtcpath = pjoin(exppath, 'xtc')
+        self.md5path = pjoin(exppath, 'xtc', 'md5')
+        self.indexpath = pjoin(exppath, 'xtc', 'index')
+        self.hdf5path = pjoin(exppath, 'hdf5')
+
+        self.check_path = True
+
+    def __getattr__(self, attr):
+        if attr in self.info:
+            return self.info[attr]
+        else:
+            raise AttributeError(attr)
+
+# ============================================================================
+    
+def _experiment_info(expid, instrument):
+    """ Get exeriment info. Create /red/d/psdm link for instrument 
+    
+    Return ExperimentInfo object.
+    """
+    experiment = db.getexp(expid)
+    if not experiment:
+        raise Exception, 'Cannot find an experiment for ID %s' %expid
+
+    # Target data path
+    datapath = "/brick1"
+
+    exper = ExperimentInfo(experiment, datapath, instrument, no_instr_path=True) 
+    return exper
+
+# ======================================================================
+
+def add4offline_migr(expid, trgfile, filetype):
+    """ add transfered file to offline data migration table """
+    localhost = gethostname()
+    (dirpath,fname) = os.path.split(trgfile)
+    logging.debug("add to ana table %d %s %s %s %s", expid, localhost, filetype, fname, dirpath)
+    db.file4offline(expid, localhost, filetype, fname, dirpath)
+
+
+# ======================================================================
+
+def do_copy_xtc(transfer, exper, file_type=None, do_rm=False):    
+    """ Transfer xtc from online to offline """
+
+    srchost = network_name(transfer['host'])
+    basefilename = transfer['file']
+    srcfile =  pjoin(transfer['dirpath'], basefilename)    
+    trgpath = exper.xtcpath
+    trgfile = pjoin(trgpath, basefilename)
+    inprogress = trgfile + '.inprogress'
+    trgmd5 = pjoin(exper.md5path, basefilename) + '.md5'
+    indexfile = pjoin(exper.indexpath, basefilename) + '.idx'
+
+    now = time.time()
+
+    # check if any of the files already exists and rename if so
+    
+    for dstcheck in trgfile, inprogress, trgmd5, indexfile:
+        if (os.path.isfile(dstcheck)):
+            dstrenamed = "%s.%f" %  (dstcheck, now)
+            logging.warning('Destination exists, rename %s to %s', dstcheck, dstrenamed)
+            os.rename(dstcheck, dstrenamed)
+        logging.debug("filename %s", dstcheck)
+    
+    # do transfer of xtc 
+
+    logging.info("Transfer Start %s %s %s", basefilename, srchost, trgfile) 
+    cmd = bbcp_cmd(srchost, srcfile, inprogress, "-E %%md5=%s" % trgmd5)
+    logging.debug("bbcp cmd: %s", cmd)
+    #return
+    db.file_migration_start(exper.id, basefilename)
+    status = os.system(cmd)
+
+    if status == 0:
+        os.rename(inprogress, trgfile)
+        os.chmod(trgfile, 0440) # Revisit (ideally done by bbcp)
+        cmd = 'chgrp ps-data %s' % trgfile
+        os.system(cmd)
+        db.file_migration_stop(exper.id, basefilename)
+        add4offline_migr(exper.id, trgfile, file_type)
+        if do_rm:
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
+    else:
+        db.file_migration_stop(exper.id, basefilename, "b%d" % status)
+        logging.error('Copy failed rc=%d', status)
+        #raise Exception, 'Error %d while copying %s' % (status, srcfile)
+
+    return status
+
+# ================================================================================
+
+def do_copy_index(transfer, exper, file_type=None, do_rm=False, mark_lost=False):
+    """ Transfer xtc and xtc.idx file from online to offline """
+
+    basefilename = transfer['file']
+    srcfile = pjoin(transfer['dirpath'], basefilename)    
+    trgfile = pjoin(exper.indexpath, basefilename)
+    srchost = network_name(transfer['host'])
+
+    now = time.time()
+
+    # check if any of the files already exists and rename if so
+
+    if (os.path.isfile(trgfile)):
+        dstrenamed = "%s.%f" %  (trgfile, now)
+        logging.warning('Destination exists, rename %s to %s', trgfile, dstrenamed)
+        os.rename(trgfile, dstrenamed)
+              
+    # do transfer of index file
+
+    logging.info("Transfer Start %s %s %s", basefilename, srchost, trgfile) 
+    cmd = bbcp_cmd(srchost, srcfile, trgfile)
+    logging.debug("bbcp cmd: %s", cmd)
+    #return
+    db.file_migration_start(exper.id, basefilename)
+    status = os.system(cmd)
+
+    if status == 0:
+        # if success mark done and rename 
+        os.chmod(trgfile, 0440) # Revisit (ideally done by bbcp)
+        cmd = 'chgrp ps-data %s' % trgfile
+        os.system(cmd)
+        db.file_migration_stop(exper.id, basefilename)
+        add4offline_migr(exper.id, trgfile, file_type)
+        if do_rm:
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
+    else:
+        # else mark as failed
+        db_status = "" if  mark_lost else  "i%d" % status
+        db.file_migration_stop(exper.id, basefilename, db_status)
+        logging.error('Error %d (%s) while copying index file', status, db_status)
+        #raise Exception, 'Error %d while copying %s' % (status, srcfile)
+
+    return status
+
+# =========================================================================
+
+class StopCtrl:
+    def __init__(self, use_ctrl):
+        if use_ctrl:
+            self.ctrl = StdinCtrl(name="pull2offline")
+            self.ctrl.start()
+        else:
+            self.ctrl = None
+
+    def exit_if_requested(self):        
+        if self.ctrl and self.ctrl.stopnow():
+            self.exit_program()
+
+    def exit_program(self):
+        sys.exit(0)
+        
+# =========================================================================
+
+def transfer_loop(transfer_files, experiments, options, ctrl):
+    """ file to tranfer. 
+    
+    The transfer_files has the list of all files to copy including index files. If 
+    there is a index-file for an xtc file the index file is copied after the xtc 
+    and only if the xtc succeeded.
+    """
+
+    # dss nr
+    dssstr = None 
+    if options.dssnr >= 0:
+        dssstr = "dss%02d" % options.dssnr
+        logging.debug("use dss nr %s", dssstr)
+
+    # list of xtc files and index files to transfer
+    xtc_files = set()
+    index_files = {}
+    for transfer in transfer_files:
+        filestem = transfer['file'].split('.')[0]
+        if transfer['file_type' ] == 'xtc':
+            xtc_files.add(filestem)
+        elif transfer['file_type' ] == 'xtc.idx':
+            index_files[filestem] = transfer
+
+    # loop over all files.
+    failed_transfer = False
+    for transfer in transfer_files:
+        
+        # ---------------------------------------------
+        # apply extra selection for files to transfer
+        
+        if options.runnr:
+            run_token = "r%04d" % options.runnr
+            if transfer['file'].split('-')[1] != run_token:
+                continue
+
+
+        if options.dirpath and transfer['dirpath'] != options.dirpath:
+            continue
+
+        # select dss node if requested
+        if dssstr and not transfer['host'].endswith(dssstr):
+            #logging.debug("reject dss nr %s", transfer['host'])
+            continue
+        
+        # experiment info 
+        # might to be re-read as values (e.g.: exppath could be changed)
+        expid = transfer['exper_id']
+        instr = transfer['instrument']['name']
+        if not expid in experiments:
+            experiments[expid] = _experiment_info(expid, instr)
+        exper = experiments[expid]
+
+        if options.exper and exper.name != options.exper:
+            continue
+
+        # ------------------------------------------------------------
+        # match xtc with corresponding index file and do the transfer 
+
+        file_type = transfer['file_type' ]
+        filestem = transfer['file'].split('.')[0]
+
+        # If there is a xtc file for an index file skip the index file but
+        # transfer it after the xtc has been transfered
+        index_for_xtc = None
+        if file_type == 'xtc.idx':
+            if filestem in xtc_files:
+                logging.debug("xtc found for index file %s skip", filestem)
+                continue
+        elif file_type == 'xtc':
+            index_for_xtc = index_files.get(filestem, None)
+        
+        if options.listonly:
+            show_tranfer(transfer, experiments)
+            if index_for_xtc:
+                show_tranfer(index_for_xtc, experiments)
+            continue
+
+        if exper.check_path:
+            # check/set dest path and permissions, sets xtc-path
+            check_destpath(exper, instr, ffb=True)
+            exper.check_path = False
+        
+        if file_type == 'xtc':
+            rc = do_copy_xtc(transfer, exper, file_type=file_type, do_rm=options.rm)
+            if rc != 0:
+                failed_transfer = True
+            elif index_for_xtc:
+                ctrl.exit_if_requested()
+                do_copy_index(index_for_xtc, exper, file_type='xtc.idx', do_rm=options.rm)
+        elif file_type == 'xtc.idx':
+            rc = do_copy_index(transfer, exper, file_type=file_type, do_rm=options.rm, mark_lost=options.marklost)
+            if rc != 0:
+                failed_transfer = True
+
+        if options.onlyone:
+            logging.warning("end transfers onlyone requested")
+            return
+        
+    if failed_transfer:
+        time.sleep(10)
+
+        
+# =========================================================================
+
+def show_tranfer(transfer, experiments):
+
+    exp = experiments[transfer['exper_id']]
+    print "Exp: %s %s (%d) host: %s file: %-27s path: %s %s" % (
+        transfer['instrument']['name'], exp.name, exp.id, transfer['host'], transfer['file'],
+        transfer['dirpath'], exp.exppath)
+    print "   xtc-path:", exp.xtcpath, "idx-path:",  exp.indexpath
+
+def convert_time(tstr, default=10800):
+    scale_map = {'h' : 3600, 'm' : 60}
+    if tstr[-1].isdigit():
+        return int(tstr)
+    scale = scale_map.get(tstr[-1].lower(), 0)
+    if scale == 0:
+        print "Use default convertime"
+        return default
+    else:
+        return int(tstr[:-1]) * scale
+    
+        
+
+# =========================================================================
+    
+def main(argv=None):
+
+    parser = OptionParser()
+
+    parser.add_option("--host", help="online host")
+    parser.add_option("--instr", help="instrument name")
+    parser.add_option("--exper", help="experiment name")
+    parser.add_option("--dssnr", type="int", default=-1, help="dss nodes nr to accept data")
+    parser.add_option("--dirpath", help="online dirpath")
+    parser.add_option("--runnr", type="int", default=0, help="run number")
+    parser.add_option("--nolostidx", dest="marklost", action="store_false", default=True,
+                      help="do not mark idx file as lost if tranfer failed")
+    parser.add_option("--listonly", action="store_true", default=False,
+                      help="list only files found, no transfer")
+    parser.add_option("--onetime", action="store_true", default=False, 
+                      help="run only onetime")
+    parser.add_option("--onlyone", action="store_true", default=False, 
+                      help="run onetime and do only one transfer")
+    parser.add_option("--rm", action="store_true", default=False, 
+                      help="remove file on the src host")
+    parser.add_option("--ctrl", action="store_true", default=False, 
+                      help="Use stdin for control")
+   
+    parser.add_option("--testdb", metavar="PWDFILE", action="store_true", default=False, help="use testdb")
+    parser.add_option("--querywait", type='int', default=3, 
+                      help="wait between query for new transfers")
+    parser.add_option("--idle", default='1h', 
+                      help="If no files are found within idle, slow query for new files")
+    parser.add_option("-v", "--verbose", action="count", default=0, 
+                      help="debug level e.g: -v, -vv")
+    
+    if argv:
+        (options, args) = parser.parse_args(argv)
+    else:
+        (options, args) = parser.parse_args()
+
+    # logger
+    log_levels = [logging.WARNING, logging.INFO, logging.DEBUG]    
+    if options.verbose >= len(log_levels):
+        options.verbose = len(log_levels) - 1
+  
+    logging.basicConfig(level=log_levels[options.verbose], format='%(levelname)-8s %(message)s')
+
+    if options.testdb:
+        db.select_db(test_db_conn)
+        logging.warning("use test db")
+    else:
+        db.select_db(db_conn)
+        logging.warning("use production db")
+
+    logging.info("Use database %s %s %s", db.__user, db.__host, db.__dmtable)
+    logging.info("rm script %s", __rmcmd)
+    logging.warning("Remove files %s (mark-lost %s)", options.rm, options.marklost)
+
+    # the StopCtrl will read commands from stdin
+    ctrl = StopCtrl(options.ctrl)
+
+    maxwait = options.querywait
+    longwait = 20
+    idletime = convert_time(options.idle)
+    logging.info("timeouts: query-wait %d longwait %d idle %d", maxwait, longwait, idletime)
+
+    experiments = {}
+    if options.instr:
+        options.instr = options.instr.upper()
+
+    last_time_found = time.time() - idletime - 1
+    last_no_files = 0
+    while True :
+        check = time.time()
+        try:
+            transfer_files = db.files2migrate(options.instr, options.host)
+            if transfer_files:
+                logging.info("Found %d files (more filter may apply)", len(transfer_files))
+                last_time_found = check
+                if maxwait != options.querywait:
+                    maxwait = options.querywait
+                    logging.warning("wait time set normal %d", maxwait)
+            else:
+                if check - last_no_files > 300:
+                    last_no_files = check
+                    logging.info("No files found %s", time.strftime("%Y%m%d %H:%M:%S"))
+                else:
+                    logging.debug("No files found %s", time.strftime("%Y%m%d %H:%M:%S"))
+                if (check - last_time_found) > idletime and maxwait != longwait:
+                    maxwait = longwait
+                    logging.warning("wait time set slow %d", maxwait)
+            transfer_loop(transfer_files, experiments, options, ctrl)
+        except Exception, msg:
+            print 'Received exception: ', msg
+            traceback.print_exc()
+            time.sleep(60)
+
+        if options.onetime or options.onlyone:
+            break
+        wait = check + maxwait - time.time()
+        if wait > 0:
+            time.sleep(wait)
+
+                
+
+            
+# =====================================================
+
+if __name__ == "__main__":
+
+    main()
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,229 @@
+#!/bin/bash
+# 
+# Check the experiment folders on a dss node.
+#
+# Usage:  
+#      dss_instr_acls [-a] [-d] [-e] [-f] [-u] [-s]   
+#      
+#      -a: set acl for instrument dir (instrdir must exist)
+#      -s: set the acls as sudo. Without this option it will only print the 
+#          command. 
+#      -u: show disk usage and #files of /u2/
+#      -d: check and correct the instr directory acl's
+#      -e: check and correct the experiment directories acl's
+#      -f: check and correct the xtc and idx file acls.
+#   Default: -d -e -u
+#
+# Examples:
+#    dss-host% dss_instr_acls -d -e        (check the instr/exper directories and print what needs to be done)  
+#    dss-host% dss_instr_acls -d -e -f -s  (check the directories and files and correct acls)  
+#    dss-host% dss_instr_acls -u           (show disk usage)
+#    
+# If the command is run via ssh and -s is used specify the ssh -t option to get a pseudo tty:
+# % ssh -t <host>  dss_instr_acls -s -d -u -f      
+#
+
+
+instr_acl=(
+    user::rwx
+    group::r-x
+    other::r-x
+    default:user::rwx
+    default:user:psdatmgr:rwx
+    default:group::r-x
+    default:mask::rwx
+    default:other::r-x
+)
+
+exp_acl=(
+    user::rwx
+    user:psdatmgr:rwx
+    group::r-x
+    mask::rwx
+    other::r-x
+    default:user::rwx
+    default:user:psdatmgr:rwx
+    default:group::r-x
+    default:mask::rwx
+    default:other::r-x
+)
+
+
+function debug() {
+    if [[ ${DEBUG} -eq 1 ]] ; then
+        echo $*
+    fi
+}
+
+function set_acl() {
+    [[ "${as_sudo}" != "echo" ]] && echo "cmd: setfacl " "$@"
+    ${as_sudo} setfacl "$@"
+}      
+ 
+
+function comp_acl() {
+    local path="$1"
+    local acl_type="$2"
+
+    acls=($(getfacl --omit-header  --absolute-names --no-effective "$1" ))
+    if [[ ${acl_type:-instr} == 'instr' ]] ; then 
+        ref_acl=(${instr_acl[@]}) 
+    else 
+        ref_acl=(${exp_acl[@]})
+    fi
+    let miss_ref=0
+    for ref in ${ref_acl[@]} ; do
+        f=1
+        for found in ${acls[@]} ; do
+            [[ "${found}" == "${ref}" ]] && f=0
+        done
+        let miss_ref=${miss_ref}+${f}
+    done
+    if [[ ${miss_ref} -gt 0 ]] ; then    
+        echo "Failed acls $1 $2 ${miss_ref}"
+        return 1
+    else
+        return 0
+    fi
+}
+
+function set_instr_acl() {
+    local path=$1
+    for acl in ${instr_acl[@]} ; do
+        if [[ "${acl%%:*}" = "default" ]] ; then
+            [[ "${acl/default:user:://}" != ${acl} ]] && continue
+            set_acl -d -m ${acl#default:} $path 
+        fi
+    done
+}
+
+
+function has_mode() {
+    for m in ${MODE[@]} ; do
+        [[ ${m} == $1 ]] && return 0
+    done
+    return 1
+}
+
+
+
+function acls_instrdir() {
+    local path=$1
+    default_psdatmgr=$(getfacl --absolute-names ${path} | egrep 'default:user:psdatmgr')
+    if [[ ${default_psdatmgr} != 'default:user:psdatmgr:rwx' ]] ; then
+        echo "missing perm ${path} ${default_psdatmgr}"
+        set_acl -d -m user:psdatmgr:rwx ${path}
+    else
+        echo "Checked instr dir $path (no error)"
+    fi
+
+}
+
+function set_fileacl() {
+    local path=$1
+    shopt -s nullglob
+    let nfiles=0
+    for fn in ${path}/e*/e*xtc  ${path}/e*/index/e*idx ; do
+        let nfiles=${nfiles}+1
+        if ! getfacl --absolute-names ${fn} | egrep '^user:psdatmgr:rw' > /dev/null ; then   
+            let nerror=${nerror}+1
+            set_acl -m user:psdatmgr:rw ${fn}
+            #break
+        fi
+    done
+    echo "Checked ${nfiles} files acls, bad: ${nerror}"
+}
+
+function acls_experdir() {
+    local path=$1
+    shopt -s nullglob
+    let ndirs=0
+    let nerror=0
+    for exp in ${path}/e* ${path}/e*/index ; do
+        comp_acl $exp 'exp'
+
+        let def_user_ok=0
+        let user_ok=0
+        let def_mask_ok=0
+        let mask_ok=0
+        acls=$(getfacl --absolute-names $exp | egrep -v '^#')
+        for acl in ${acls} ; do
+            [[ "${acl}" = "default:user:psdatmgr:rwx" ]] && def_user_ok=1
+            [[ "${acl}" = "user:psdatmgr:rwx" ]] && user_ok=1 
+            [[ "${acl}" = "default:mask::rwx" ]] && def_mask_ok=1
+            [[ "${acl}" = "mask::rwx" ]] && mask_ok=1 
+        done
+
+        let ndirs=${ndirs}+1
+        #echo ${exp} ${user_ok} ${def_user_ok}       
+        [[ ${def_user_ok} -eq 0 ]] && set_acl -d -m user:psdatmgr:rwx ${exp} && let nerror=${nerror}+1
+        [[ ${user_ok} -eq 0 ]] && set_acl -m user:psdatmgr:rwx ${exp} && let nerror=${nerror}+1
+        [[ ${def_mask_ok} -eq 0 ]] && set_acl -d -m mask::rwx ${exp} && let nerror=${nerror}+1
+        [[ ${mask_ok} -eq 0 ]] && set_acl -m mask::rwx ${exp} && let nerror=${nerror}+1
+    done
+    echo "Checked ${ndirs} exper dirs error ${nerror}"
+}
+
+function status_u2() {
+    df_res=($(df -h /u2/ | grep -v Filesystem))
+    nfiles=$(find /u2/ -type f | wc -l)
+    used_per=${df_res[4]}
+    used_per=${used_per/\%/}
+
+    echo "SPACE ${host} nFiles: ${nfiles} Used%: ${used_per} total: ${df_res[1]} free: ${df_res[3]}"
+} 
+
+
+email_addr=wilko
+as_sudo=echo
+
+declare -a MODE 
+DEBUG=0
+while getopts :asdefuv OPT; do
+    case $OPT in
+        s|+s) as_sudo=sudo ;;
+        a|+a) MODE[4]=instracl ;; 
+        d|+d) MODE[0]=instrdir ;; 
+        e|+e) MODE[1]=experdir ;; 
+        f|+f) MODE[2]=files ;;
+        u|+u) MODE[3]=space ;;
+        v|+v) DEBUG=1 ;;
+        *)
+            sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+[[ ${#MODE[@]} -eq 0 ]] && MODE=(instrdir experdir space)
+
+debug "Selected ${#MODE[@]} modes (${MODE[@]})"
+
+readonly rootdir=/u2/pcds/pds
+instr=$(hostname | cut -d '-' -f2)
+host=$(hostname -s)
+host=""
+instrdir=${rootdir}/${instr}
+
+
+if has_mode "instracl" ; then
+    set_instr_acl ${instrdir}
+fi
+
+if has_mode "space" ; then
+    status_u2
+fi
+
+if has_mode "instrdir" ; then
+    comp_acl ${instrdir} 'instr'
+    acls_instrdir ${instrdir}
+fi
+
+if has_mode "experdir" ; then
+    acls_experdir ${instrdir}
+fi
+
+if has_mode "files" ; then
+    set_fileacl ${instrdir}
+fi

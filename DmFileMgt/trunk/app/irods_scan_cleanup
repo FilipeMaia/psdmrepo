@@ -1,0 +1,166 @@
+#!/usr/bin/env python 
+#
+# Cleanup files with size mismatch in irods and ondisk
+# see also --help option
+#
+
+import os
+import glob
+import string
+import argparse
+import time
+
+def time_str(secs):
+    t = time.localtime(secs)
+    return time.strftime("%Y-%m-%d %H:%M:%S", t)
+
+def reverse_readline(filename, buf_size=8192):
+    """a generator that returns the lines of a file in reverse order"""
+    with open(filename) as fh:
+        segment = None
+        offset = 0
+        fh.seek(0, os.SEEK_END)
+        total_size = remaining_size = fh.tell()
+        while remaining_size > 0:
+            offset = min(total_size, offset + buf_size)
+            fh.seek(-offset, os.SEEK_END)
+            buffer = fh.read(min(remaining_size, buf_size))
+            remaining_size -= buf_size
+            lines = buffer.split('\n')
+            # the first line of the buffer is probably not a complete line so
+            # we'll save it and append it to the last line of the next buffer
+            # we read
+            if segment is not None:
+                lines[-1] += segment
+            segment = lines[0]
+            for index in range(len(lines) - 1, 0, -1):
+                yield lines[index]
+        yield segment
+
+
+class ScannedFiles:
+    """ get files with size mismatch from the last scan in the 
+    irods_scan log file.
+
+    >>> fl = ScannedFiles(<fname>)
+    >>> for f in fl.files:
+    >>>    print f['object']
+    The keys are "resource, replica, object, path"
+    """
+
+    def __init__(self, fname):
+        self.files = []
+        self._read(fname)
+
+    def _read(self, fname):
+        last_scan = 0
+        for line in reverse_readline(fname):
+            if line.startswith("--- Time"):
+                last_scan += 1
+                #print line.rstrip(), last_scan
+            else:
+                if last_scan == 1: 
+                    if line.startswith("size mismatch:"):
+                        self.mismatch_line(line)
+                if last_scan > 1:
+                    break 
+                
+        # assume file is not irods_scan log
+        if last_scan == 0: 
+            for line in reverse_readline(fname):
+                if line.startswith("size mismatch:"):
+                    self.mismatch_line(line)
+
+    def mismatch_line(self, line):
+        """ split 'size mismatch:' line into key/value pairs """ 
+        info = {}
+        for token in line[14:].split():
+            if token.find('=') > 0:
+                key,value = token.split('=', 1)
+                info[key] = value
+        self.files.append(info)
+
+
+usage="check files with wrong size and remove them from irods"
+help_epilog="""
+Get files with size mismatch between irods and disk from the irods_scan log file. 
+List the file in irods and all files on disk (including .bck files). The tool will 
+then unregister the file form irods (unregister will not remove the files from disk). 
+Only hdf5 files are considered (for xtc files an error is printed).
+
+The files will not be re-registered to irods by %(prog)s this needs to be done by 
+another tools.
+"""
+
+irods_scan_file = "/reg/g/psdm/psdatmgr/ic/log/irods-scan.log"
+
+def main():
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    parser.add_argument("--noask", dest='ask', action="store_false", default=True, 
+                        help="unregister the file from irods without asking")
+    parser.add_argument("--list", dest='listonly', action="store_true", default=False, 
+                        help="only list files")
+    parser.add_argument("--norm", dest='do_rm', action="store_false", default=True, 
+                        help="check files but do not unregister them from irods")
+    parser.add_argument("--find", help="select only files with pathnames (on disk) that contains %(dest)s")
+    parser.add_argument("logfile", nargs='?', default=irods_scan_file, help="results from irods-scan")
+
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    scan = ScannedFiles(args.logfile)
+    print "Found", len(scan.files), "files in", args.logfile
+
+    for info in scan.files:
+        if args.find:
+            if info['path'].find(args.find) < 0:
+                #print "Ignore", info['path']
+                continue
+        
+        if args.listonly:
+            print info['object']
+            continue
+
+        # xtc files need special treatment
+        if info['object'].endswith('.xtc'):
+            print "Found xtc file skip", info['object']
+            continue
+
+        # find files on disk 
+        ll = glob.glob(info['path'] + '*')
+        ll.sort()
+        # and in irods
+        irname = info['object']
+        print "----", irname
+        rc = os.system("ils -l " + irname)
+        if rc != 0:
+            print "not in irods"
+            continue
+
+
+        for f in ll:
+            mtime = time_str(os.path.getmtime(f))
+            size = os.path.getsize(f)
+            print mtime, size, f
+            
+        if args.ask:
+            inp = raw_input("remove from irods?")
+        else:
+            inp = 'y'
+
+        if args.do_rm and inp == 'y':
+            print "unregister from irods"
+            cmd = "irm -U " + irname
+            print cmd
+            os.system(cmd)
+        if inp == 'q':
+            return
+
+
+if __name__ == "__main__":
+    main()

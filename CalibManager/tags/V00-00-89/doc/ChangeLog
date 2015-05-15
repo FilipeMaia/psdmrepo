@@ -1,0 +1,608 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#  $Revision$
+#
+# Description:
+#  ChangeLog file for package CalibManager
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+2015-05-04 Mikhail S. Dubrovin
+Tag: V00-00-89
+- add parameter cp.mask_rms_thr_min and propagate it in calibman/calibrun code along with cp.mask_rms_thr (PSAS-6) 
+	
+2015-04-17 Mikhail S. Dubrovin
+Tag: V00-00-88
+- app/calibrun - return check LUSTRE version on start-up
+
+2015-04-17 Mikhail S. Dubrovin
+Tag: V00-00-87
+- add live mode for ffb, fix info messages about batch queue and farm (PSAS-6)
+- app/calibrun - add comment about ffb
+	       - do not check LUSTRE version on start-up
+- ConfigFileGenerator - add in dataset defenition ":dir=..." for non-standard directory and ":live" for ffb.
+- BatchJobPedestals - use command "psana -c <config-file.cfg>" with files defined inside. Fixes xtc/file (missing slash).
+- CommandLineCalib - extend status message when batch is running.
+- ConfigParametersForApp - add list of farms and dictionary for {queue:farm}
+- fix info messages about batch system
+
+2015-04-09 Mikhail S. Dubrovin
+Tag: V00-00-86
+- in *.py replace ==None -> is None, !=None -> is not None
+	
+2015-03-30 Mikhail S. Dubrovin
+Tag: V00-00-85
+- in Frame add method setBoarderVisible
+- add GUIAlignment, and widget wrapper GUIROIMask  (PSAS-6, PSAS-11)
+- replace "!= None" with "is not None" in many modules.
+- In many modules use class Frame in stead of QFrame.
+- in GUITabs, GUIConfig, GUIFileManager, GUIGeometry add self.gui_win.setVisible(True) in order to make visible widgets defined as Frame.
+	
+2015-03-12 Mikhail S. Dubrovin
+Tag: V00-00-84
+- add option to select dark events in any run using event code filter (PSAS-122)
+    - add data/scripts/psana-module-event-code-filter.cfg
+    - app/calibrun - add option -f
+    - CommandLineCalib - add parameter event_code
+    - ConfigParametersForApp - add parameter bat_dark_sele
+    - GUIConfigPars - add editable field for cp.bat_dark_sele
+    - ConfigFileGenerator - add filling of the cfg file for module ImgAlgos.EventCodeFilter
+	
+2015-03-10 Mikhail S. Dubrovin
+Tag: V00-00-83
+- app/calibrun, CommandLineCalib - add optional parameter -m - number of events to scan data and search for selected detector(s) (PSAS-6)
+
+2015-03-09 Mikhail S. Dubrovin
+Tag: V00-00-82
+- Add dark rate calibration support for Andor camera (PSAS-6, PSAS-121)
+	- modify ConfigParametersForApp, ConfigFileGenerator, RegDBUtils
+	- add data/scripts/psana-module-peds-aver-andor.cfg
+	
+2015-01-22 Mikhail S. Dubrovin
+Tag: V00-00-81
+- ConfigParametersForApp.py - get default example files from /reg/g/psdm/detector/alignment/cspad/... (PSAS-10)
+	
+2015-01-20 Mikhail S. Dubrovin
+Tag: V00-00-80
+- ConfigParametersForApp.py - change list of queues - set psnehprioq as default (PSAS-6)
+	
+2015-01-16 Mikhail S. Dubrovin
+Tag: V00-00-79
+- GUIMaskEditor - re-implement in GUI algorithm of the command-line (roicon) mask processing PSAS-6, PSAS-10, PSAS-11 
+	
+2015-01-14 Mikhail S. Dubrovin
+Tag: V00-00-78
+- GUIDarkList - protection against creation of the list of dark files for tutorial directories like xpptut13 (PSAS-6).
+app/roicon - Use new algorithm to generate ndarray for mask: [mask_roi[r,c] for r,c in zip(iX, iY)] (PSAS-10)
+	
+2015-01-13 Mikhail S. Dubrovin
+Tag: V00-00-77
+- app/roicon - extend I/O to work with *.npy files (PSAS-10) 
+
+2015-01-06 Mikhail S. Dubrovin
+Tag: V00-00-76
+- src/GlobalUtils.py - add support for non-standard (2,185,388) shape of cspad2x2 numpy array
+
+2014-12-11 Mikhail S. Dubrovin
+Tag: V00-00-75
+- add Frame.py, re-factoring GUIHelp.py (PSAS-6)
+	
+2014-11-24 Mikhail S. Dubrovin
+Tag: V00-00-74
+- add app/roicon - polishing command line interface, add craetion of image from file with ndarray (PSAS-10)
+
+2014-11-21 Mikhail S. Dubrovin
+Tag: V00-00-73
+- add app/roicon - for conversion of the ROI mask into ndarray using geometry calib file (PSAS-10)
+
+2014-11-11 Mikhail S. Dubrovin
+Tag: V00-00-72
+- ConfigParametersForApp - use Camera::CalibV1 calibration type for Fccd960 in stead of Fccd960::CalibV1 (PSAS-44)
+
+2014-11-11 Mikhail S. Dubrovin
+Tag: V00-00-71
+- FileDeployer.py, ConfigFileGenerator.py, BatchLogScanParser.py - fix problem with generation of list of calib types (PSAS-6)
+	
+2014-11-10 Mikhail S. Dubrovin
+Tag: V00-00-70
+- data/scripts/psana-module-peds-aver-camera.cfg, ConfigFileGenerator.py - for Fccd960 use outtype='int' to account for gain bits (PSAS-44)
+	
+2014-10-05 Mikhail S. Dubrovin
+Tag: V00-00-69
+- ConfigParametersForApp - support for Epix100a: add 'geometry', update default list of sources (PSAS-7, PSAS-11)
+- RegDBUtils - allow 'NoDetector' in source name, for example in 'NoDetector.0:Epix100a.0'
+
+2014-10-05 Mikhail S. Dubrovin
+Tag: V00-00-68
+- BatchLogScanParser, ConfigParametersForApp, FileDeployer.py - use calibtypes from config pars in stead of evaluation from source (PSAS-6)
+	
+2014-10-03 Mikhail S. Dubrovin
+Tag: V00-00-67
+- ConfigParametersForApp, ConfigFileGenerator add support for Epix100a (see PSAS-6, PSAS-7)
+
+2014-10-24 Mikhail S. Dubrovin
+Tag: V00-00-66
+- ConfigParametersForApp.py, GUIDarkListItem.py - switch back to usage of unicode chars for shrinc/expand buttons
+	
+2014-10-16 Mikhail S. Dubrovin
+Tag: V00-00-65
+- PlotImgSpeWidget.py - print image intensity along with coursor coordinates in coursor motion
+
+2014-10-16 Mikhail S. Dubrovin
+Tag: V00-00-64
+- OpticAlignmentCspad* - add in all output geometry files the line with detector position relative to IP
+- ConfigParametersForApp, ConfigFileGenerator add support for Fccd960
+	
+2014-10-03 Mikhail S. Dubrovin
+Tag: V00-00-63
+- in OpticAlignmentCspad*.py - add option parser for manual processing of metrology files
+
+2014-10-01 Mikhail S. Dubrovin
+Tag: V00-00-62
+- OpticAlignmentCspad2x2V1.py - fix segment rotation angles 0 -> 180
+
+2014-09-26 Mikhail S. Dubrovin
+Tag: V00-00-61
+- add OpticAlignmentCspadV2.py, OpticAlignmentCspad2x2V1.py
+- add OpticAlignmentCspadMethods.py to collect common methods for cspad alignment in superclass
+- GUIMetrology.py - integrate CspadV2(xpp) and Cspad2x2V1 in calibman
+
+2014-09-23 Mikhail S. Dubrovin
+Tag: V00-00-60
+- ConfigParametersForApp, ConfigFileGenerator add support for Epix and Epix10k
+- add scripts/psana-module-peds-aver-camera.cfg with parameter ftype to save metatxt
+	
+2014-07-07 Mikhail S. Dubrovin
+Tag: V00-00-59
+- CommandLineCalib.py - fix default calibdir
+	
+2014-07-03 Mikhail S. Dubrovin
+Tag: V00-00-58
+- GUIMaskEditor, plims, PlotImgSpeButtons - cosmetic improvements of titles, comments, etc.
+	
+Tag: V00-00-57
+2014-07-02 Mikhail S. Dubrovin
+- GUIInsExpDirDet - on Browse protect selection of non-"calib" directory
+	
+Tag: V00-00-56
+2014-07-01 Mikhail S. Dubrovin
+- GUIConfigPars - add field for number of events to scan
+- ConfigParametersForApp add cp.bat_dark_scan
+- ConfigFileGenerator use cp.bat_dark_scan in make_psana_cfg_file_for_peds_scan(...)
+- in FileDeployer - add method addHistoryRecordOnDelete(...)
+- in GUIFileManagerGroupControl.py and GUIFileManagerSingleControl.py add record in hystory file on delete
+	
+Tag: V00-00-55
+2014-06-30 Mikhail S. Dubrovin
+- ConfigFileGenerator - all camera-type detector (Tm6740, Opal#000, OrcaFl40) files will be saved with metadata
+
+Tag: V00-00-54
+2014-06-30 Mikhail S. Dubrovin
+- ConfigParametersForApp, ConfigFileGenerator add support for OrcaFl40
+- ConfigFileGenerator, scripts/psana-module-peds-aver-camera.cfg add parameter ftype to save metatxt
+
+Tag: V00-00-53
+2014-06-27 Mikhail S. Dubrovin
+- by request from Jason Koglin
+  in app/calibrun add -L which allows to load parameters from config file created by app/calibman
+  By default major parameters need to be specified.
+	
+Tag: V00-00-52
+2014-06-23 Mikhail S. Dubrovin
+- OpticAlignmentCspadV1 - fix quad rotation default angles, add default xy-offsets
+	
+Tag: V00-00-51
+2014-06-22 Mikhail S. Dubrovin
+- PlotImgSpeButtons - extend file search pattern for file browser
+	
+Tag: V00-00-50
+2014-06-19 Mikhail S. Dubrovin
+- OpticAlignmentCspadV1 - fix typo in geometry title
+- ConfigParametersForApp - add comma in the list of srcs_cspad
+	
+Tag: V00-00-49
+2014-06-17 Mikhail S. Dubrovin
+- in app/plims change the list of options
+- in PlotImgSpe - transfer parameters
+- in PlotImgSpeButtons add ArrFileExchange for Load button
+	
+Tag: V00-00-48
+2014-06-13 Mikhail S. Dubrovin
+- cleanup misleading messages in BatchJobPedestals.py and CommandLineCalib.py
+
+Tag: V00-00-47
+2014-06-10 Mikhail S. Dubrovin
+- in GUIFileManagerGroupControl & GUIFileManagerSingleControl protect from copy of the HISTORY file
+
+Tag: V00-00-46
+2014-06-03 Mikhail S. Dubrovin
+- in app/calibrun add option -x for non-standard xtc directory
+- for app/calibrun get rid of RegDB; try : self.print_list_of_sources_from_regdb() ...
+- add CxiDs2.0:Cspad.0 in the self.srcs_cspad in ConfigParametersForApp.py
+	
+Tag: V00-00-45
+2014-06-03 Mikhail S. Dubrovin
+- FileNameManager add path_metrology_text_def(self)
+- GUIMetrology stop processing if the input xlsx or text file is missing
+	
+Tag: V00-00-44
+2014-06-02 Mikhail S. Dubrovin
+- GUIMetrology.py - check that Convert procedure does not change user defined file  
+	chenged fnm.path_metrology_text() and fnm.path_metrology_text_def()
+- replace unicode symbols by * and ^.
+- in src/OpticAlignmentCspadV1.py transport detector and exp(instrument) name to "geometry" comments
+	
+Tag: V00-00-43
+2014-05-05 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
+Tag: V00-00-42
+2014-04-30 Mikhail S. Dubrovin	
+- PlotImgSpe* - now use persistent (saved in config pars) range of intensity
+- GUIRunRange.py is renamed to GUIRange.py. 
+- Many modules were modified for GUIRange and its methods.
+- add GUIRangeIntensity.py as a chield class for GUIRange.
+	
+Tag: V00-00-41
+2014-04-25 Mikhail S. Dubrovin	
+- CommandLineCalib - print command line in log for book-keeping, change print order for detectors
+- GUIFileManagerGroupControl - implement group delete button action 
+- GUIExpCalibDir - always update the list of experiments for drop-down menu in exp. selection GUI
+- in GlobalUtils add msg_and_status_of_queue(queue) and use it in BatchJobPedestals, CommandLineCalib, and GUIExpCalibDir
+	
+2014-04-21 Mikhail S. Dubrovin	
+- BatchJobPedestals fix name in dump: fnm.path_peds_scan_batch_log() -> fnm.path_peds_aver_batch_log()
+- PackageVersions - for rel >= ana-0.10.16: as a package version use revision No and tag
+- GUIConfigPars	- use text_rev_and_tag_for_all_packages() for info dump about package versions
+	
+Tag: V00-00-40 for release ana-0.10.16
+2014-04-21 Mikhail S. Dubrovin	
+- PackageVersions - for now commented depencency from other packages 
+	CSPadPixCoords ImgAlgos pdscalibdata PSCalib
+- CommandLineCalib - do not dump log-file if it is not available (not-produced yet)
+- cosmetic improvement of printed statements for command mode.
+- FileDeployer - do not deploy non-existent input files
+	
+Tag: V00-00-39
+2014-04-21 Mikhail S. Dubrovin	
+- psvn mktxtprop doc/ChangeLog
+- psvn mktxtprop app/* (svn propset svn:keywords app/*)
+- BatchJobPedestals - continue normal batch job processing if AFS token is missing 	
+- PackageVersions - as a package version use revision No. in stead of tag
+- app/calibrun, calibman - do not check AFS token and Kerberos ticket
+	
+Tag: V00-00-38	
+2014-04-18 Mikhail S. Dubrovin	
+- add src/SvnProps.py, SvnPropsViewer.py, also set properties:
+	svn propset svn:keywords "Revision" src/SvnProps.py
+
+Tag: V00-00-37	
+2014-04-17 Mikhail S. Dubrovin	
+- ALL modules - fill correct Revision: and Id: values;
+	- see ~/.subversion/config - uncomment: enable-auto-props = yes
+	- psvn mktxtprop CalibManager/src/*.py - add properties to files
+- in GlobalUtils and NotificationDB use $Revision var. in stead of psvn tags <pkg> 
+	
+Tag: V00-00-36	
+2014-04-17 Mikhail S. Dubrovin	
+- in calibrun, CommandLineCalib, and Logger re-direct all outputh in the Logger
+- in Logger - add print_bits parameter to control paralel output on termins.
+- in GUIRunRange.setParams(...) - add default init. of pars
+	
+Tag: V00-00-35	
+2014-04-16 Mikhail S. Dubrovin	
+- in CommandLineCalib - pass all printout through self.log(...), use print_bits, submit in logger.
+- in app/calibrun cosmetic - add time, time-stamps, process name in messages
+- add NotificationDBForCL as subclass of NotificationDB adjusted for calibrun
+- adjust NotificationDB in order to use it as superclass
+	
+Tag: V00-00-34	
+2014-04-15 Mikhail S. Dubrovin	
+- in ThreadCheckNewXtcFiles add protection against sending signal when experiment name has changed
+	
+Tag: V00-00-33	
+2014-04-15 Mikhail S. Dubrovin	
+- Command line calibration is implemented in full design scale:
+- in CommandLineCalib and BatchJobPedestals add interactive mode for command line calibration
+- in ConfigFileGenerator remove duplicatin of module description for cspad
+- in GUIDarkControlBar replace run range edit-fields by the GUIRunRange widget
+- in GUIRunRange emit signal when any of run range fields is changed
+
+Tag: V00-00-32
+2014-04-14 Mikhail S. Dubrovin
+- cleanup edi_from in in GUIFileManagerGroupControl
+	
+Tag: V00-00-31
+2014-04-14 Mikhail S. Dubrovin
+- in GUIFileManagerGroup add slider to change GUIDirTree-window hor-size (in order to see long file names)
+- in CalibFileFinder remove run number 0 from the list_of_ends (protection against "0-0" range)
+- in GUIDarkListItemRun, GUIFileManagerGroupControl, and GUIFileManagerSingleControl
+	use widget GUIRunRange. Cleanup old stuff.
+- in GUIRunRange.getRunRange() 
+	- do not strip ALL '0' for run 0 (protection against "-end.data" file name).
+        - add protection if run_begin > run_end (red-color, warniong message, and begin-begin at return)  
+- move common deployment methods from GUIDarkListItemRun.py to FileDeployer.py (needs them for command line)
+- add src/CommandLineCalib.py and app/calibrun - new command-line calibration
+- in GUIDarkList.onItemClick - get and use correct list of parameters for 
+	widg.updateButtons(self.type, self.comment, self.xtc_in_dir)
+- in GUIConfig, GUIMetrology - cosmetic tuning of window size
+- in GUIDarkListItem add getStrRunNum(), getRunNum()
+	
+Tag: V00-00-30
+2014-04-07 Mikhail S. Dubrovin
+- in PackageVersions fix hangout at tmp files cleanup
+- in PlotImg* separate log scales for X, Y
+- GUIMetrology is ready for CSPADV1 processing
+- in GUIDarkList* 
+	- do not show "Go" button for missing on disk xtc files,
+        - update the comment field on run item
+
+Tag: V00-00-29
+2014-04-03 Mikhail S. Dubrovin
+- New version of pyqt does not allow to redefine graphical backend after 
+    app = QtGui.QApplication(sys.argv)
+  so, now it is necessary to re-define backend in the app/calibman
+- whenever matplotlib is used with pyqt, in stead of 
+    if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
+  now use:
+    if __name__ == "__main__" :
+        import matplotlib
+        matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+- remove import matplotlib form modules which does not need it but had it due to copy and pased.
+
+Tag: V00-00-28
+2014-04-03 Mikhail S. Dubrovin
+- xppopr complained that the list of runs was not updated for newly created xtc files...
+	- Igor fixed RegDB experiment_info.experiment_runs(ins, exp), where update did not work 
+	- in GUIDarkList add automatic update of the list of runs when new xtc file is available 
+- in app/calibman add thread worker to check new xtc files
+- add ThreadCheckNewXtcFiles - new thread worker which checks new xtc files
+- in GUIDarkListItemRun - add update of the run item comment
+  with associate propagation of parameters from GUIDarkList to GUIDarkListItem
+- in GUIMetrology begin to work on integration of the cspad optic metrology data processing 
+	
+Tag: V00-00-27
+2014-04-02 Mikhail S. Dubrovin
+- moved OpticAlignmentCspadV1.py in this project but not use it yet  
+- in NotificationDB - do not submit records from myself
+- in GUIDarkControlBar - add "Update list" button in GUIDark
+	
+Tag: V00-00-26
+2014-03-25 Mikhail S. Dubrovin
+- in BatchJobPedestals.submit_batch_for_peds_aver(...) add protections:
+	- if LSF is down
+	- if selected detector(s) is(are) not found in xtc scan log parsing.
+
+Tag: V00-00-25
+2014-03-17 Mikhail S. Dubrovin
+- in PackageVersions add clean-up tmp files
+- in ConfigFileGenerator and scripts/psana-scan.cfg use SKIP events for scan as for data
+- in GUIDarkControlBar - update list of files when run_num_max is entered
+	
+Tag: V00-00-24
+2014-03-16 Mikhail S. Dubrovin
+- add PackageVersions.py in order to get package versions in background subprocesses,
+  swap appropriate methods for new one.
+- in app/calibman add protection in case of launching on the node with old version of lustre driver
+	
+Tag: V00-00-23
+2014-03-14 Mikhail S. Dubrovin
+- add GUIFileManager* etc for group file management
+A       src/GUIFileManagerGroupControl.py
+A       src/GUIFileManagerSingle.py
+A       src/GUIFileManagerSingleControl.py
+A       src/GUIExpCalibDir.py
+A       src/GUIFileManagerGroup.py
+A       src/GUIDirTree.py
+		
+Tag: V00-00-22
+2014-03-11 Mikhail S. Dubrovin
+- add NotificationDB
+- in GUIConfigPars add the button to print package tags in the tab of Config Parameters
+	
+Tag: V00-00-21
+2014-03-07 Mikhail S. Dubrovin
+- in GUIDarkMoreOpts.py set invisible the check box for additional options
+- in FileNameManager.py path_hotpix_mask() set explicit format for threshold in file name: mask-hot-thr-%.2fADU.txt
+	
+Tag: V00-00-20
+2014-03-07 Mikhail S. Dubrovin
+- in data/scripts/* set print_bits = 221 (in stead of 93) to print auto-threshold iterations
+- in ConfigParametersForApp decrease the batch job submission time interval from 100 to 30 sec.
+	
+Tag: V00-00-19
+2014-03-07 Mikhail S. Dubrovin
+- in FileDeployer change command "cp" -> "cat", command "mv" -> "cat" and "rm"
+	in order to deploy files with calib directory ACL permissions
+- in GUIDarkControlBar self.cbx_deploy_hot.pixsetVisible(False) - set invisible
+- in self.mask_rms_thr: set default threshold on rms = 0 - automatic definition of threshold for hot pixels
+- by default pixel_status will be saved .... cp.dark_deploy_hotpix   =... True 
+- in GUIFileManagerSelect update status after Copy, Move, and Delete; cp.guistatus.updateStatusInfo()
+	
+Tag: V00-00-18
+2014-03-04 Mikhail S. Dubrovin
+- in GUIDarkList.py uncommented widg.updateButtons() at list update
+- change color of Stop button to yellow
+	
+Tag: V00-00-17
+2014-03-01 Mikhail S. Dubrovin
+- fix problem with list buttons update; in GUIDarkList self.dict_guidarklistitem  ={} -> .clear()
+- in GUIInsExpDirDet request to clear list for butExp and butInst, but not for butDet 
+	
+Tag: V00-00-16
+2014-02-28 Mikhail S. Dubrovin
+- add protection in evaluation of statistcal values for plots
+- in BatchJobPedestals add hardwired option, which can be used for damaged data... #self.opt = ' -o psana.l3t-accept-only=0' 
+- split(' ') -> split() in order to remove all blanks
+- Use char_expand = u'\u25BC', which is defined on psanacs... comps
+- In ana/calibman add check of AFS token before starting application using GlobalUtils.check_token()
+	
+2014-02-24 Mikhail S. Dubrovin
+- keep chasing the bug for non-updating buttons
+M       src/CalibFileFinder.py - add protection for empty list;  if len(list_of_cfiles)>0 :
+M       src/FileDeployer.py    - replace HOST -> HOSTNAME
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/BatchJobPedestals.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py
+	
+Tag: V00-00-15
+2014-02-13 Mikhail S. Dubrovin
+- Generation of the large number of list items with embedded widget is slow in python.
+  Some optimization can be done if for each run number a single item and widget is generated once
+  and saved in the dictionary:
+  + the self.list in GUIDarkList now is treated as a singleton object
+  + all new item objects in the list are added once and saved in the dictionary run_num:(item,wigg)
+M       src/GUIInsExpDirDet.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+	
+Tag: V00-00-14
+2014-02-12 Mikhail S. Dubrovin
+- add run range in GUIDarkControlBar to speed-up generation of list gui in GUIDarkList 
+- in PlotImgSpeWidget add statistics box
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py	
+
+Tag: V00-00-13
+2014-02-08 Mikhail S. Dubrovin
+- in FileDeployer.py add "comment" in history record
+- in GUIDarkListItemRun.py etc. add deployment of "pixel_rms" type of files at Dark processing
+- add parameters and buttons for hot pixel mask thresholds on rms and average min/max 
+	
+Tag: V00-00-12
+2014-02-07 Mikhail S. Dubrovin
+- add GUI for Metrology processing
+	- xlsx to text conversion
+	- to do: processing of the text file 
+- add empty GUI for Geometry
+- pnCCD pedestals calculation for image (FullFrame) is replaced by ndarr [4,512,512] 
+M       src/GUITabs.py
+A       src/xlsx_parser.py
+A       src/GUIMetrology.py
+A       src/GUIGeometry.py
+M       src/ConfigParametersForApp.py
+M       src/GUIMaskEditor.py
+M       src/FileNameManager.py
+M       src/ConfigFileGenerator.py
+A  +    data/scripts/psana-module-peds-aver-pnccd-ndarr.cfg
+A       data/scripts/psana-module-peds-aver-pnccd-img.cfg
+D       data/scripts/psana-module-peds-aver-pnccd.cfg
+
+Tag: V00-00-11
+2014-01-13 Mikhail S. Dubrovin
+- minor corrections in window titles and sizes...
+
+Tag: V00-00-10
+2014-01-10 Mikhail S. Dubrovin
+- ImgAlgos.ImgAverage is replaced by ImgAlgos.NDArrAverage in files
+M       src/ConfigFileGenerator.py
+M       data/scripts/psana-module-peds-aver-princeton.cfg
+M       data/scripts/psana-module-peds-aver-pnccd.cfg
+M       data/scripts/psana-module-peds-aver-camera.cfg
+- Deploy hot-pixel mask, 
+- In GUIConfigPars.py add more parameters for hot-pixel mask evaluation.
+M       data/scripts/psana-module-peds-aver-cspad-with-mask.cfg
+M       src/GUIConfig.py
+M       src/GUIDarkMoreOpts.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIConfigPars.py
+M       src/ConfigParametersForApp.py
+M       src/ConfigFileGenerator.py
+M       src/GUIDarkControlBar.py
+	
+Tag: V00-00-09
+2013-12-17 Mikhail S. Dubrovin
+- modules src/CSPAD2x2Image.py CSPADImage.py moved to PyCSPadImage
+- in CalibFileFinder, GlobalUtils - fixed problems with printing run range
+- in GUIStatus.py changed status window font to fixed size
+- in GUIMaskEditor.py get array using self.img_arr = gu.get_image_array_from_file(self.path)
+
+Tag: V00-00-08
+2013-12-16 Mikhail S. Dubrovin
+- in status window implementer output of sorted calibration files with actual run range
+- add CalibFileFinder - analog of cpp class
+- add data/scripts/psana-module-peds-aver-cspad-with-mask.cfg 
+	and modify ConfigFileGenerator, FileNameManager, BatchJobPedestals, etc. in order to 
+	calculate hot pixel masks for cspads in dark runs.
+
+2013-12-12 Mikhail S. Dubrovin
+- in GUIFileManagerSelect.py add Move button/command
+	
+Tag: V00-00-07
+2013-12-12 Mikhail S. Dubrovin
+- Tuning of the GUIFileManager features;
+  - apply copy command through FileDeployer with record to the hystory file.
+  - show GUIStatus depending on type of tab: "Dark"-pedestals, "File Manager" - all calib types 
+  - add more default file extensions for GUIFileBrowser, do not restric opening of any file...
+	
+Tag: V00-00-06
+2013-12-07 Mikhail S. Dubrovin
+- improve logistics of buttons in GUIInsExpDirDet, GUIStatus.py, GUIDarkListItemRun.py
+- add src/GUIFileManager.py, src/GUIFileManagerSelect.py
+	
+Tag: V00-00-05
+2013-11-27 Mikhail S. Dubrovin
+- refactoring DarkList... classes for correct widget resizing.
+- enable/disable "Go" button for scan at submission
+- check that Go/Stop/Deploy button status is updated properly.
+
+Tag: V00-00-04
+2013-11-26 Mikhail S. Dubrovin
+- add more icons in data/icons/
+- add app/plims for "standalone" plotting procedure
+- in PlotImgSpe add buttons
+	Load - to load any array and 
+	Diff - to see diffetence between current and image array from file
+
+Tag: V00-00-03
+2013-11-22 Mikhail S. Dubrovin
+- add popup window for confirmation of sources before deployment
+- fix problem with missing non-automatic call of resizeEvent
+- add saving history file
+- add auto-create work directory
+- change file permissions after its saving
+	
+Tag: V00-00-02
+2013-11-19 Mikhail S. Dubrovin
+- It was found that RegDB returns sources which are missing in xtc...
+- combined access to scanned xtc with RegDB, RegDB is used only when 
+	scan log is not yet available.
+
+2013-11-18 Mikhail S. Dubrovin
+- code of many modules is significantly changed in order to
+	have dark image averaging for any set of detectors simultaneously.
+
+2013-11-05 Mikhail S. Dubrovin
+- add access to DB on data files 
+A       src/RegDBUtils.py
+A       src/GUIPopupChecklist.py
+A       src/GUIDarkControlBar.py
+	
+Tag: V00-00-01
+2013-10-06 Mikhail S. Dubrovin
+- works for pedestals and mask editor
+
+2013-07-15 Mikhail S. Dubrovin
+- create this package on dubrovin@psdev106:
+cd /reg/neh/home1/dubrovin/LCLS
+newrel ana-current CalibManager-v01
+cd CalibManager-v01
+newpkg CalibManager
+psvn newpkg CalibManager
+addpkg CalibManager
+
+#--------------------

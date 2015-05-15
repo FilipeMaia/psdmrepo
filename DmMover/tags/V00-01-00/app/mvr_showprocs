@@ -1,0 +1,78 @@
+#!/bin/bash
+#
+# Show data-mover processes. Show the host the mover runs on
+# and the src host from which data are transferred.
+#
+# Usage:  mvr_showprocs [options] [action]
+#   options:
+#     -f  : show ffb movers (default is movers running on psanaNNN)
+#     -s  : ping host
+#     -D  : debug
+#     -h  : this help
+#     -i <instr>: show only movers for <instr>
+#   actions:
+#      stat:     print procServ and corresponding mover script. 
+#                One line per found procServ. (default)        
+#      procs:    list daq nodes for which a datamover is running
+#      procserv: list running procServ process and ports they listen on
+#      logs:     show latest logs in the /u1/.... log directory used by procServ
+# 
+# Examples   
+#     show all procs on psanaNNN nodes
+#       % mvr_showprocs
+#     show procs for xpp ffb movers
+#       % mvr_showprocs -i xpp -f 
+#     show running procServ command 
+#       % mvr_showprocs procserv
+#
+
+debug() {
+    [ $DEBUG -gt 0 ] && echo $*
+}
+
+ping_status() {
+    local hostlist=$1
+    echo $hostlist
+    for host in $(egrep '^[a-z]' ${hostlist}) ; do
+        ping -c 1 -w 1 -q ${host} &> /dev/null
+        echo "$? ${host}"
+    done
+}
+
+
+DEBUG=0
+hostlistdir=/reg/g/psdm/psdatmgr/etc/config
+hostlist=${hostlistdir}/mvr_all
+while getopts :Dhfsi: OPT; do
+    case $OPT in
+        f|+f) hostlist=${hostlistdir}/ffbhosts ;;
+        D|+D) DEBUG=1 ;;
+        s|+s) do_ping=1 ;;
+        i|+i) sel_instr="$OPTARG" 
+            hostlist=${hostlistdir}/ffbhosts ;;
+        *|h|+h) 
+            sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit ;;
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+#src_env=". /reg/g/psdm/etc/sit_env.sh dm-current"
+cmd=$(readlink -e $(dirname $0))/mvr_procs
+[[ $? -ne 0 ]] && echo "Failed to get path for cmd" && exit 1
+
+if [ ${sel_instr} ] ; then
+    hlist=$(grep $sel_instr $hostlist | xargs | tr ' ' ',')
+else
+    hlist=^$hostlist
+fi
+
+if [[ ${do_ping:-0} -eq 1 ]] ; then
+    ping_status ${hostlistdir}/ffbhosts
+    exit
+fi
+
+debug $cmd $hlist
+echo "    host       data-src  port   mvr-elap  mvr command"
+pdsh -t 15 -u 10 -w ${hlist} "${cmd}  ${1:-stat}"

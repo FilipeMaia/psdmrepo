@@ -56,7 +56,7 @@ disks=( /reg/data/ana01/ /reg/data/ana03/  /reg/data/ana04/
 treg=$(date +%s)
 
 for d in ${disks[@]} ; do
-    res=($(df -kP $d | grep -v "Filesystem"))
+    res=($(df -t lustre -kP $d | grep -v "Filesystem"))
     used=${res[2]}
     avail=${res[3]}
     fs=$(basename $d)
@@ -64,6 +64,10 @@ for d in ${disks[@]} ; do
     if [[ -z "${used}" ]] || [[ -z "${avail}" ]] ; then
         echo "File System error" 1>&2
         continue
+    fi
+    if [[ $(( ${used:-0} + ${avail:-0} )) -le 1 ]] ; then
+	echo "Wrong sizes" 1>&2
+	continue
     fi
     
     echo "insert into fs_mon_stat SELECT id,${treg},${used},${avail} FROM fs_mon_def WHERE fs_mon_def.group = 'ana' and fs_mon_def.name = '${fs}';"

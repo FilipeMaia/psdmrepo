@@ -66,11 +66,13 @@ def _checkProcess(pid):
 #  Application class definition --
 #---------------------------------
 
+epilog = """ WARNING: Only use the force option as a lasrt resort. Be sure that the active controller exited """
+
 class ICStatus ( AppBase ) :
 
     def __init__ ( self ) :
 
-        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]", description = epilog )
 
         self._parser.add_option ( '-d', "--conn-string",
                                   action="store", dest="conn_string", default=_conn_str,
@@ -84,6 +86,9 @@ class ICStatus ( AppBase ) :
                                   action="store", dest="password", default=None,
                                   help="specify user password (no password by default)" )
 
+        self._parser.add_option ( '-f', "--force",
+                                  action="store_true", default=False,
+                                  help="force controller cleanup if controller host doesn't match local host. SEE WARNING")
 
     def _run ( self ) :
 
@@ -112,7 +117,7 @@ class ICStatus ( AppBase ) :
         if len(controllers) > 1:
             self.error("More than one active controller instance found.")
             return 2
-            
+        
         info = controllers[0]
         if info['host'] == host:
 
@@ -125,7 +130,14 @@ class ICStatus ( AppBase ) :
                 self.info("Process %s is not running, updating database.", pid)
                 db.deactivate_controller(info['id'])
                 db.exit_controller(info['id'])
-
+        else:
+            self.warning("Active controller host (%s) doesn't match current host (%s)", info['host'], host)
+            if self._options.force:
+                db.deactivate_controller(info['id'])
+                db.exit_controller(info['id'])
+            else:
+                self.warning("Use --force to cleanup controller (But only if you are sure the controller is not running")
+                                
 
 #
 #  run application when imported as a main module
