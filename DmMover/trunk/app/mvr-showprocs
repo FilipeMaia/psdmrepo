@@ -62,7 +62,7 @@ shift $(( OPTIND - 1 ))
 OPTIND=1
 
 #src_env=". /reg/g/psdm/etc/sit_env.sh dm-current"
-cmd=$(readlink -e $(dirname $0))/mvr_procs
+cmd=$(readlink -e $(dirname $0))/mvr-procs
 [[ $? -ne 0 ]] && echo "Failed to get path for cmd" && exit 1
 
 if [ ${sel_instr} ] ; then
