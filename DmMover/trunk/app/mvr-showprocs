@@ -3,7 +3,7 @@
 # Show data-mover processes. Show the host the mover runs on
 # and the src host from which data are transferred.
 #
-# Usage:  mvr_showprocs [options] [action]
+# Usage:  mvr-showprocs [options] [action]
 #   options:
 #     -f  : show ffb movers (default is movers running on psanaNNN)
 #     -s  : ping host
@@ -19,11 +19,11 @@
 # 
 # Examples   
 #     show all procs on psanaNNN nodes
-#       % mvr_showprocs
+#       % mvr-showprocs
 #     show procs for xpp ffb movers
-#       % mvr_showprocs -i xpp -f 
+#       % mvr-showprocs -i xpp -f 
 #     show running procServ command 
-#       % mvr_showprocs procserv
+#       % mvr-showprocs procserv
 #
 
 debug() {

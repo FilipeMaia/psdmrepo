@@ -15,18 +15,18 @@
 #
 
 procServs_host_port() {
-    # Use mvr_showprocs to find processes on remote host 
+    # Use mvr-showprocs to find processes on remote host 
 
     local mvr_host=${1:?}
     local mvr_type=$2
     local mvr_inst=$3
     
     if [[ ${mvr_type} = 'ana' ]] ; then
-        mvr_showprocs | egrep "^${mover_host}:" | awk ' $2 ~ /^psana/ {print $1$2":"$3}'
+        mvr-showprocs | egrep "^${mover_host}:" | awk ' $2 ~ /^psana/ {print $1$2":"$3}'
     elif [[ ${mvr_type} = 'recorder' ]] ; then
-        mvr_showprocs | egrep "^${mover_host}:" | awk ' $2 !~ /^psana/ {print $1$2":"$3}'
+        mvr-showprocs | egrep "^${mover_host}:" | awk ' $2 !~ /^psana/ {print $1$2":"$3}'
     else
-        mvr_showprocs -f -i ${mvr_inst} | grep ${mover_host} | awk ' int($3) == 30000  {print $1$2":"$3}'        
+        mvr-showprocs -f -i ${mvr_inst} | grep ${mover_host} | awk ' int($3) == 30000  {print $1$2":"$3}'        
     fi    
 }
 
