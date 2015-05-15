@@ -14,8 +14,10 @@
 
 
 mv2offline_procs() {
-    daq=$(ps -ef | egrep 'mv2offline-(pull|ana|ffb).py' | grep -v procServ | \
-        sed -e 's/.*\ \([^\ ]\+mv2offline[^\ ]\+\).*host \([a-z0-9\-]\+\).*/\2 \1/' | \
+    set -f
+    daq=$(ps -ef | egrep 'mv2offline-(pull|ana|ffb)' | grep -v procServ | \
+        sed -n -e 's/.*\ \([^\ ]\+mv2offline[^\ ]\+\).*host \([a-z0-9\-]\+\).*/\2 \1/p' \
+               -e 's/.*\ \([^\ ]\+mv2offline[^\ ]\+\).*dirpath \([/\*a-z0-9\-]\+\).*/\2 \1/p' | \
         grep -v grep | sort )
     
     if [ $SNG_LINE -eq 1 ] ; then
@@ -23,13 +25,17 @@ mv2offline_procs() {
     else
         echo $daq | xargs -n 2
     fi
+    set +f
 }
 
 mv2offline_procServ() {
+    # print data-src and procServ-port
+    set -f
     # print src-host and procServ port
-    
     str=$(ps -ef | grep procServ | grep mv2 \
-        | sed -e 's/.* \([0-9]\+\) .* --host \([ipd][a-z0-9\-]\+\).*/\"\2 \1\"/' | sort)
+        | sed -n -e 's/.* \([0-9]\+\) .* --host \([ipd][a-z0-9\-]\+\).*/\"\2 \1\"/p' \
+                 -e 's/.* \([0-9]\+\) .* --dirpath \([/*a-z0-9\-]\+\).*/\"\2 \1\"/p' | sort)
+    
     eval res=($str)
     if [ $SNG_LINE -eq 1 ] ; then
         echo ${res[@]}
@@ -38,31 +44,33 @@ mv2offline_procServ() {
             echo $e
         done
     fi
+    set +f
 }
 
 mv2offline_status() {
+    # some cmd args might contain wild characters "*", turn of globbing
+    set -f
     found_pid=0
     for pid in $(ps -ef | grep procServ | awk '/mv2/ {print $2}') ; do
         found_pid=1
-        proc_opts=$(ps -p $pid -o args= | sed -e 's/.* \([0-9]\+\) .* --host \([dpi][a-z0-9\-]\+\).*/\2 \1/')
-        mvr_cmd=($(ps --ppid $pid -o etime= -o args= ))
-        cmd=${mvr_cmd[@]:2}
+        proc_opts="$(ps -p $pid -o args= | \
+            sed -n -e 's/.* \([0-9]\+\) .* --host \([dpi][a-z0-9\-]\+\).*/\2 \1/p' \
+                   -e 's/.* \([0-9]\+\) .* --dirpath \([/*a-z0-9\-]\+\).*/\2 \1/p')"
+        mvr_cmd=($(ps --ppid $pid -o etime= -o args=))
+        cmd="${mvr_cmd[@]:2}"
         printf "%s %12s %s\n" "$proc_opts" "${mvr_cmd[0]}" "$cmd"
     done
     
     [ $found_pid -eq 0 ] && echo "No procs found"
+    set +f
     return 0
 }
 
 
 latest_logs() {
     logdir=/u1/psdm/mvr/log
-    nodes=($(find $logdir -maxdepth 1 -name mv2offline.\* | egrep '[0-9]$' | \
-        sed -e 's/.*v2offline\.\([a-z]\+.*\)\.[0-9]\+/\1/' | sort -u))
-    for n in ${nodes[@]} ; do
-        most_recent=$(ls -t $logdir/mv2offline.${n}* | head -1)
-        echo $n $most_recent
-    done
+    find ${logdir} -maxdepth 1 -name mv2offline.\* | \
+        sed  '/.*\.[0-9T]\+/d' | sort -u
 }
 
 SNG_LINE=0

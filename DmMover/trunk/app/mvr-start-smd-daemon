@@ -110,5 +110,5 @@ for info in ${nodes[@]} ; do
     debug "$(pwd)"
     
     extra_opts="--logfile ${logfile} --name $(basename ${logfile}) ${port}"
-    ${TEST} ${PROCSERV} ${extra_opts} ${cmd} --onetime "--${seltype}" "${selopt}" --mode ${mode} ${cmd_opts} 
+    ${TEST} ${PROCSERV} ${extra_opts} ${cmd} "--${seltype}" "${selopt}" --mode ${mode} ${cmd_opts} 
 done

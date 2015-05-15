@@ -43,13 +43,16 @@ ping_status() {
 DEBUG=0
 hostlistdir=/reg/g/psdm/psdatmgr/etc/config
 hostlist=${hostlistdir}/mvr_all
-while getopts :Dhfsi: OPT; do
+while getopts :Dhfsi:n: OPT; do
     case $OPT in
         f|+f) hostlist=${hostlistdir}/ffbhosts ;;
         D|+D) DEBUG=1 ;;
         s|+s) do_ping=1 ;;
         i|+i) sel_instr="$OPTARG" 
             hostlist=${hostlistdir}/ffbhosts ;;
+        n|+n) hostlist=/tmp/procs_$(uuidgen)
+            echo "${OPTARG}" | tr ',' ' ' | xargs -n 1 > ${hostlist}
+            ;;
         *|h|+h) 
             sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
             exit ;;
@@ -63,9 +66,9 @@ cmd=$(readlink -e $(dirname $0))/mvr_procs
 [[ $? -ne 0 ]] && echo "Failed to get path for cmd" && exit 1
 
 if [ ${sel_instr} ] ; then
-    hlist=$(grep $sel_instr $hostlist | xargs | tr ' ' ',')
+    hlist=$(grep ${sel_instr} ${hostlist} | xargs | tr ' ' ',')
 else
-    hlist=^$hostlist
+    hlist=^${hostlist}
 fi
 
 if [[ ${do_ping:-0} -eq 1 ]] ; then
@@ -73,6 +76,8 @@ if [[ ${do_ping:-0} -eq 1 ]] ; then
     exit
 fi
 
-debug $cmd $hlist
+debug ${cmd} ${hlist}
 echo "    host       data-src  port   mvr-elap  mvr command"
 pdsh -t 15 -u 10 -w ${hlist} "${cmd}  ${1:-stat}"
+
+[[ "${hostlist:0:11}" = "/tmp/procs_" ]] && [[ -e ${hostlist} ]] && rm ${hostlist} 
