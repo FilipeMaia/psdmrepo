@@ -186,7 +186,7 @@ private:
         m_ncols  = shape[m_ndim-1];
         m_nrows  = shape[m_ndim-2];
 	m_nsegs  = (m_ndim>2) ? nda.size()/m_ncols/m_nrows : 1;
-	m_stride = (m_ndim>2) ? strides[m_ndim-3] : 1;
+	m_stride = (m_ndim>2) ? strides[m_ndim-3] : m_ncols*m_nrows;
 
 	if (m_print_bits & 256) {
             std::stringstream ss; ss << "Input parameters:";
@@ -338,6 +338,7 @@ private:
 
             //ndarray<const T,2> nda_raw(&data[seg*m_stride], shape);
 	    //====================================
+	    
             ndarray<T,2> nda_raw(shape);
 
             const T* p_data = &nda.data()[seg*m_stride];
