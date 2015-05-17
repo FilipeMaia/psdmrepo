@@ -2,6 +2,7 @@
 #include <boost/python.hpp>
 #include <ndarray/ndarray.h>
 #include <algorithm>
+#include "AreaDetHist.h"
 
 
 // Wrappers for functions that use non-const references
@@ -469,4 +470,9 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
 		     "a fixed fraction to the average."
 		     );
   
+  boost::python::class_<AreaDetHist>("AreaDetHist", boost::python::init<ndarray<double,3>,int,int>())
+    .def_readwrite("histogram",&AreaDetHist::histogram)
+    .def("update",&AreaDetHist::update)
+    .def("getHist",&AreaDetHist::getHist)
+    ;
 }
