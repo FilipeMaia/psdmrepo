@@ -200,7 +200,7 @@ public:
 	    , const unsigned print_bits=0377 );
 
   /// Destructor
-  ~NDArrIOV1 (){}
+  ~NDArrIOV1 (){ delete p_nda; }
 
   unsigned int ndim() const { return NDIM; }
 
