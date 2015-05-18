@@ -177,11 +177,7 @@ namespace {
     return avg;         
   }  
 
-};
-
-
-
-
+}; //namespace
 
 
 BOOST_PYTHON_MODULE(pypsalg_cpp)
@@ -470,9 +466,24 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
 		     "a fixed fraction to the average."
 		     );
   
-  boost::python::class_<AreaDetHist>("AreaDetHist", boost::python::init<ndarray<double,3>,int,int>())
-    .def_readwrite("histogram",&AreaDetHist::histogram)
-    .def("update",&AreaDetHist::update)
-    .def("getHist",&AreaDetHist::getHist)
+  static const char AreaDetClassDoc[] =
+    "Class to manage histogramming of area detector ADU values";
+  static const char AreaDetCtorDoc[] =
+    "Arguments:\n"
+    "- a 3 dimensional numpy array of doubles\n"
+    "- int: lower limit of histogram\n"
+    "- int: upper limit of histogram\n"
+    "- bool: indicating whether to find isolated photons (default False)\n"
+    "- double: threshold that the pixel should be above all neighbors\n"
+    "  (valid only if the findIsolatedPhotons set to True)";
+  static const char AreaDetUpdateDoc[] =
+    "Arguments:\n"
+    "- a 3 dimensional numpy array of doubles that will be used\n"
+    "  to update histogram";
+  static const char AreaDetGetDoc[] =
+    "No arguments.  Return histogram as numpy array.";
+  boost::python::class_<pypsalg::AreaDetHist>("AreaDetHist", AreaDetClassDoc, boost::python::init<ndarray<double,3>,int,int,bool,double>(AreaDetCtorDoc))
+    .def("update",&pypsalg::AreaDetHist::update, AreaDetUpdateDoc)
+    .def("get",&pypsalg::AreaDetHist::get, AreaDetGetDoc)
     ;
 }
