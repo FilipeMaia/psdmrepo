@@ -120,12 +120,13 @@ std::string GenericCalibPars<TBASE>::getCalibFileName (const CALIB_TYPE& calibty
   std::string fname = std::string();
   if (m_calibDir != std::string()) {
 
-      PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_groupName, m_prbits_cff);
+    //PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_groupName, m_prbits_cff);
+      PSCalib::CalibFileFinder calibfinder(m_calibDir, m_groupName, m_prbits_cff);
 
-      if (m_source == std::string())
-          fname = calibfinder -> findCalibFile(m_src, map_type2str[calibtype], m_runNumber);
+      if (m_source.empty()) // == std::string())
+          fname = calibfinder.findCalibFile(m_src, map_type2str[calibtype], m_runNumber);
       else
-          fname = calibfinder -> findCalibFile(m_source, map_type2str[calibtype], m_runNumber);
+          fname = calibfinder.findCalibFile(m_source, map_type2str[calibtype], m_runNumber);
   }
 
   if( m_print_bits & 4 ) MsgLog(m_name, info, "Use calibration parameters from file: " << fname);
@@ -407,6 +408,13 @@ void GenericCalibPars<TBASE>::printCalibPars()
 template <typename TBASE> 
 GenericCalibPars<TBASE>::~GenericCalibPars ()
 {
+    delete m_pedestals;
+    delete m_pixel_status;
+    delete m_pixel_gain;
+    delete m_pixel_mask;
+    delete m_pixel_bkgd;
+    delete m_pixel_rms;
+    delete m_common_mode;
   //delete [] m_data; 
 }
 
