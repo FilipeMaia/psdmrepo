@@ -156,6 +156,8 @@ class CommandLineCalib () :
 	self.deploy      = self.opts['deploy'] 
         self.instr_name  = self.exp_name[:3]
 
+        self.timeout_sec = cp.job_timeout_sec.value()
+
         cp.str_run_number.setValue(self.str_run_number)
         cp.exp_name      .setValue(self.exp_name)
         cp.instr_name    .setValue(self.instr_name)
@@ -200,6 +202,7 @@ class CommandLineCalib () :
         + '\n     num_events    : %d' % self.num_events\
         + '\n     skip_events   : %d' % self.skip_events\
         + '\n     scan_events   : %d' % self.scan_events\
+        + '\n     timeout_sec   : %d' % self.timeout_sec\
         + '\n     thr_rms_min   : %f' % self.thr_rms_min\
         + '\n     thr_rms       : %f' % self.thr_rms\
         + '\n     process       : %s' % self.process\
@@ -272,7 +275,8 @@ class CommandLineCalib () :
 
         sum_dt=0
         dt = 10 # sec
-        for i in range(50) :
+        nloops = timeout_sec / dt
+        for i in range(nloops) :
             sleep(dt)
             sum_dt += dt
             status = self.bjpeds.status_for_peds_files_essential()

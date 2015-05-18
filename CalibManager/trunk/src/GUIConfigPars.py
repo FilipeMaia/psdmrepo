@@ -72,11 +72,12 @@ class GUIConfigPars ( Frame ) :
         self.lab_dark_start = QtGui.QLabel('Event start:') 
         self.lab_dark_end   = QtGui.QLabel('end:') 
         self.lab_dark_scan  = QtGui.QLabel('scan:') 
+        self.lab_timeout    = QtGui.QLabel('t-out, sec:') 
         self.lab_rms_thr_min= QtGui.QLabel('Threshold RMS MIN, ADU:') 
         self.lab_rms_thr    = QtGui.QLabel('MAX:') 
         self.lab_min_thr    = QtGui.QLabel('Threshold MIN, ADU:') 
         self.lab_max_thr    = QtGui.QLabel('MAX:') 
-        self.lab_dark_sele  = QtGui.QLabel('Selector evt code:') 
+        self.lab_dark_sele  = QtGui.QLabel('Event code:') 
 
         self.but_show_vers  = QtGui.QPushButton('Soft Vers')
         self.but_lsf_status = QtGui.QPushButton('LSF status')
@@ -84,6 +85,7 @@ class GUIConfigPars ( Frame ) :
         self.edi_dark_start = QtGui.QLineEdit( str( cp.bat_dark_start.value() ) )
         self.edi_dark_end   = QtGui.QLineEdit( str( cp.bat_dark_end.value()) )
         self.edi_dark_scan  = QtGui.QLineEdit( str( cp.bat_dark_scan.value()) )
+        self.edi_timeout    = QtGui.QLineEdit( str( cp.job_timeout_sec.value()) )
         self.edi_dark_sele  = QtGui.QLineEdit( str( cp.bat_dark_sele.value()) )
         self.edi_rms_thr_min= QtGui.QLineEdit( str( cp.mask_rms_thr_min.value()) )
         self.edi_rms_thr    = QtGui.QLineEdit( str( cp.mask_rms_thr.value()) )
@@ -93,6 +95,7 @@ class GUIConfigPars ( Frame ) :
         self.edi_dark_start .setValidator(QtGui.QIntValidator(0,9999999,self))
         self.edi_dark_end   .setValidator(QtGui.QIntValidator(1,9999999,self))
         self.edi_dark_scan  .setValidator(QtGui.QIntValidator(1,9999999,self))
+        self.edi_timeout    .setValidator(QtGui.QIntValidator(1,9999999,self))
         self.edi_dark_sele  .setValidator(QtGui.QIntValidator(-256,256,self))
         self.edi_rms_thr_min.setValidator(QtGui.QDoubleValidator(0,65000,3,self))
         self.edi_rms_thr    .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
@@ -122,6 +125,8 @@ class GUIConfigPars ( Frame ) :
         self.grid.addWidget(self.edi_dark_end,      self.grid_row+5, 4)
         self.grid.addWidget(self.lab_dark_scan,     self.grid_row+5, 5)
         self.grid.addWidget(self.edi_dark_scan,     self.grid_row+5, 6)
+        self.grid.addWidget(self.lab_timeout,       self.grid_row+5, 7)
+        self.grid.addWidget(self.edi_timeout,       self.grid_row+5, 8)
         self.grid.addWidget(self.lab_rms_thr_min,   self.grid_row+6, 0)
         self.grid.addWidget(self.edi_rms_thr_min,   self.grid_row+6, 1, 1, 4)
         self.grid.addWidget(self.lab_rms_thr,       self.grid_row+6, 3)
@@ -149,6 +154,7 @@ class GUIConfigPars ( Frame ) :
         self.connect( self.edi_dark_start,   QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkStart )
         self.connect( self.edi_dark_end,     QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkEnd )
         self.connect( self.edi_dark_scan,    QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkScan )
+        self.connect( self.edi_timeout,      QtCore.SIGNAL('editingFinished()'),  self.onEdiTimeOut )
         self.connect( self.edi_dark_sele,    QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkSele )
         self.connect( self.edi_rms_thr_min,  QtCore.SIGNAL('editingFinished()'),  self.onEdiRmsThrMin )
         self.connect( self.edi_rms_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiRmsThr )
@@ -200,6 +206,7 @@ class GUIConfigPars ( Frame ) :
         self.lab_dark_start   .setStyleSheet (cp.styleLabel)
         self.lab_dark_end     .setStyleSheet (cp.styleLabel)
         self.lab_dark_scan    .setStyleSheet (cp.styleLabel)
+        self.lab_timeout      .setStyleSheet (cp.styleLabel)
         self.lab_dark_sele    .setStyleSheet (cp.styleLabel)
         self.lab_rms_thr_min  .setStyleSheet (cp.styleLabel)
         self.lab_rms_thr      .setStyleSheet (cp.styleLabel)
@@ -217,6 +224,7 @@ class GUIConfigPars ( Frame ) :
         self.lab_dark_start  .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_end    .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_scan   .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_timeout     .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_sele   .setAlignment (QtCore.Qt.AlignRight)
         self.lab_rms_thr_min .setAlignment (QtCore.Qt.AlignRight)
         self.lab_rms_thr     .setAlignment (QtCore.Qt.AlignRight)
@@ -231,13 +239,14 @@ class GUIConfigPars ( Frame ) :
         self.edi_dark_start  .setFixedWidth(80)
         self.edi_dark_end    .setFixedWidth(80)
         self.edi_dark_scan   .setFixedWidth(80)
+        self.edi_timeout     .setFixedWidth(80)
         self.edi_dark_sele   .setFixedWidth(80)
         self.edi_rms_thr_min .setFixedWidth(80)
         self.edi_rms_thr     .setFixedWidth(80)
         self.edi_min_thr     .setFixedWidth(80)
         self.edi_max_thr     .setFixedWidth(80)
-        self.but_show_vers   .setFixedWidth(100)
-        self.but_lsf_status  .setFixedWidth(100)
+        self.but_show_vers   .setFixedWidth(80)
+        self.but_lsf_status  .setFixedWidth(80)
 
 
     def setParent(self,parent) :
@@ -343,6 +352,12 @@ class GUIConfigPars ( Frame ) :
         str_value = str( self.edi_dark_scan.displayText() )
         cp.bat_dark_scan.setValue(int(str_value))      
         logger.info('Set the number of events to scan: %s' % str_value, __name__ )
+
+
+    def onEdiTimeOut(self):
+        str_value = str( self.edi_timeout.displayText() )
+        cp.job_timeout_sec.setValue(int(str_value))      
+        logger.info('Job execution timout, sec : %s' % str_value, __name__ )
 
 
     def onEdiDarkSele(self):
