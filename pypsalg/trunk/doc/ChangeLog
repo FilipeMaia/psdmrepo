@@ -11,6 +11,10 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2015-05-18 Christopher O'Grady
+Add in Chuck's area-detector histogramming (AreaDetHist).
+
 Tag: V00-01-04
 2015-04-03 Ankush Mitra
 Added missing psalg functions.  Hit finder, rolling average, and other added.  
