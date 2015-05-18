@@ -473,7 +473,7 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
     "- a 3 dimensional numpy array of doubles\n"
     "- int: lower limit of histogram\n"
     "- int: upper limit of histogram\n"
-    "- bool: indicating whether to find isolated photons (default False)\n"
+    "- bool: indicating whether to find isolated photons\n"
     "- double: threshold that the pixel should be above all neighbors\n"
     "  (valid only if the findIsolatedPhotons set to True)";
   static const char AreaDetUpdateDoc[] =
