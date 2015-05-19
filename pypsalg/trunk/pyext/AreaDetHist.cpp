@@ -127,7 +127,7 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[2] = calib_data[i][j-1][k-1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val-_minAduGap, pixelInd);
+			_insertHistElement(val, pixelInd);
 		}
 		pixelInd++;
 	}
