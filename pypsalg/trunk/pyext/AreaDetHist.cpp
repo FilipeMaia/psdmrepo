@@ -39,6 +39,7 @@ void AreaDetHist::_fillHistogram(ndarray<double,3> calib_data) {
   }
 }
 
+// Calculates whether val is greater than its neighbors by at least minAduGap
 int isIsolated(double val, double minAduGap, std::vector<double> *neighbors) {
 	int result = 1;
 	std::vector<double>::iterator p;
@@ -51,6 +52,7 @@ int isIsolated(double val, double minAduGap, std::vector<double> *neighbors) {
 	return result;
 }
 
+// Increment counter on histogram
 void AreaDetHist::_insertHistElement(double x, int pixelInd) {
 	int val = (int) round(x);   
 	if ( val >= _valid_min && val <= _valid_max ) { // in range
