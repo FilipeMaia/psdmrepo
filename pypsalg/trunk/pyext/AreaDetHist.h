@@ -3,6 +3,7 @@
 
 #include "ndarray/ndarray.h"
 #include <boost/shared_ptr.hpp>
+#include <stdint.h>
 
 namespace pypsalg {
 
