@@ -20,8 +20,7 @@ class AreaDetHist {
  private:
   void _fillHistogram(ndarray<double,3> calib_data);
   void _insertHistElement(double x, int pixelInd);
-  ndarray<uint32_t,2> _histogram; // per-pixel histogram (Size x histLength)
-  //ndarray<uint32_t,2> _photonMap; // per-pixel ADU to photons (Size x histLength)
+  ndarray<uint32_t,2> _histogram; // per-pixel histogram (numPixels x histLength)
 
   int _valid_min;
   int _valid_max;
