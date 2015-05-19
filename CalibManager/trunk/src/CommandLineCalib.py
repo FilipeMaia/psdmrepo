@@ -275,7 +275,7 @@ class CommandLineCalib () :
 
         sum_dt=0
         dt = 10 # sec
-        nloops = timeout_sec / dt
+        nloops = self.timeout_sec / dt
         for i in range(nloops) :
             sleep(dt)
             sum_dt += dt

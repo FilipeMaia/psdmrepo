@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-05-13 Mikhail S. Dubrovin
+Tag: V00-00-93
+- CommandLineCalib.py - fix bug timeout_sec -> self.timeout_sec (PSAS-6)
+	
 2015-05-18 Mikhail S. Dubrovin
 Tag: V00-00-92
 - add parameter cp.job_timeout_sec for calibrun and its configuration in GUIConfigPars (PSAS-6) 
