@@ -10,6 +10,8 @@
 //
 //------------------------------------------------------------------------
 
+#define __STDC_LIMIT_MACROS
+
 //-----------------------
 // This Class's Header --
 //-----------------------
@@ -19,6 +21,7 @@
 // C/C++ Headers --
 //-----------------
 #include <cfloat>
+#include <limits.h>
 #include <fstream>
 #include <iterator>
 #include <algorithm>
@@ -37,6 +40,7 @@
 #include "psddl_psana/opal1k.ddl.h"
 #include "psddl_psana/timetool.ddl.h"
 #include "ndarray/ndarray.h"
+#include "PSCalib/CalibParsStore.h"
 
 #include <iomanip>
 #include <fstream>
@@ -129,6 +133,34 @@ namespace {
     ndarray<const int32_t, 1> m_projected_sideband;
     ndarray<const int32_t, 1> m_projected_reference;
   };
+
+  // TODO: move to psalg
+  void local_rolling_average(const ndarray<const uint16_t,2> &newArray, 
+                             ndarray<double,2> &accumulatedArray, 
+                             double newFraction,
+                             const std::string &loggerName) {
+    if (accumulatedArray.empty()) {
+      accumulatedArray = ndarray<double,2>(newArray.shape());
+      for (unsigned row = 0; row < newArray.shape()[0]; ++row) {
+        for (unsigned col = 0; col < newArray.shape()[1]; ++col) {
+          accumulatedArray[row][col] = double(newArray[row][col]);
+        }
+      }
+    } else {
+      if ((newArray.shape()[0] != accumulatedArray.shape()[0]) or 
+          (newArray.shape()[1] != accumulatedArray.shape()[1])) {
+        MsgLog(loggerName, error, "newArray shape != accumArray shape");
+      }
+      for (unsigned row = 0; row < newArray.shape()[0]; ++row) {
+        for (unsigned col = 0; col < newArray.shape()[1]; ++col) {
+          double oldVal = accumulatedArray[row][col];
+          accumulatedArray[row][col] = (1.0-newFraction)*oldVal + newFraction * newArray[row][col];
+        }
+      }
+      
+    }
+  }
+
 }
 
 
@@ -321,8 +353,14 @@ Analyze::Analyze (const std::string& name)
     }
   }
 
+  m_use_calib_db_ref = config("use_calib_db_ref",false);
+  m_validConfigKeys.insert("use_calib_db_ref");
+
   std::string ref_load  = configStr("ref_load");
   if (!ref_load.empty()) {
+    if (m_use_calib_db_ref) {
+      MsgLog(name, fatal, name << ": ref_load and use_calib_db_ref confict, both are set.");
+    }
     std::ifstream s(ref_load.c_str());
     std::vector<double> ref;
     while(s.good()) {
@@ -581,6 +619,66 @@ Analyze::beginJob(Event& evt, Env& env)
 void 
 Analyze::beginRun(Event& evt, Env& env)
 {
+  if (m_use_calib_db_ref) {
+
+    // get run number
+    shared_ptr<EventId> eventId = evt.get();
+    int run = 0;
+    if (eventId.get()) {
+      run = eventId->run();
+    } else {
+      MsgLog(name(), warning, name() << ": Looking up refernce in calibration database. Cannot determine run number, will use 0.");
+    }
+
+    // get Pds::Src from configuration Source
+    boost::shared_ptr<PSEvt::AliasMap> amap = env.aliasMap();
+    if (not amap) {
+      MsgLog(name(), fatal, name() << ": could not get alias map from env");
+    }
+    Source::SrcMatch srcMatch = m_get_key.srcMatch(*amap);
+    Pds::Src src(srcMatch.src());
+
+    // get calibration parameters
+    std::string calib_dir = env.calibDir();
+    MsgLog(name(), trace, name() << ": Using " << calib_dir << " for calibration database");
+    std::string group = "Camera::CalibV1";
+    const int maxPrintBits = 0xFF;
+    PSCalib::CalibPars* calibpars = PSCalib::CalibParsStore::Create(calib_dir, group, src, 
+                                                                    run, maxPrintBits);
+    if (not calibpars) {
+      MsgLog(name(), fatal, name() << ": failed to create CalibPars object");
+    }
+
+    const PSCalib::CalibPars::pedestals_t* ped_data = calibpars->pedestals();
+    if (not ped_data) {
+      MsgLog(name(), fatal, name() << ": use_calib_db_ref has been specified,"
+             << " but no pedestals were obtained from the calibration database "
+             << "for this run: " << run << ". Look in: " << calib_dir << "/"
+             << group  << "/" << src);
+    }
+
+    size_t rank = calibpars->ndim(PSCalib::PEDESTALS);
+    const PSCalib::CalibPars::shape_t * shape = calibpars->shape(PSCalib::PEDESTALS);
+
+    if (rank != 2) {
+      MsgLog(name(), fatal, name() << ": unexpected, size of pedestals is not two. It is" << rank);
+    }
+    if ((shape[0] != 1024) and (shape[1] != 1024)) {
+      MsgLog(name(), warning, name() << 
+             ": unexpected, shape of calibration pedestals for ref avg is " <<
+             "not 1024 x 1024, it is " << shape[0] << " x " << shape[1]);
+    }
+    double avg = 0.0;
+    m_ref_frame_avg = make_ndarray<double>(shape[0], shape[1]);
+    for (unsigned row = 0; row < shape[0]; ++row) {
+      for (unsigned col = 0; col < shape[1]; ++col) {
+        avg += *ped_data;
+        m_ref_frame_avg[row][col] = *ped_data++;
+      }
+    }
+    MsgLog(name(), info, "pedestal average val: " << avg/double(shape[0]*shape[1]));
+    delete calibpars;
+  }
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -686,6 +784,8 @@ Analyze::event(Event& evt, Env& env)
   ndarray<const int32_t,1> ref;
   unsigned pdim = m_projectX ? 1:0;
 
+  ndarray<const uint16_t,2> frameData;
+
   if (m_analyze_projections) {
     shared_ptr<Psana::TimeTool::DataV2> tt = evt.get(m_get_key);
     if (tt.get()) {
@@ -722,33 +822,33 @@ Analyze::event(Event& evt, Env& env)
 
     m_pedestal = frame->offset();
     
-    ndarray<const uint16_t,2> f = frame->data16();
+    frameData = frame->data16();
 
     bool lfatal=false;
     for(unsigned i=0; i<2; i++) {
-      if (m_sig_roi_hi[i] >= f.shape()[i]) {
+      if (m_sig_roi_hi[i] >= frameData.shape()[i]) {
         lfatal |= (m_projectX == (i==0));
         MsgLog(name(), warning, 
                name() << ": signal " << (i==0 ? 'Y':'X') << " upper bound ["
                << m_sig_roi_hi[i] << "] exceeds frame bounds ["
-               << f.shape()[i] << "].");
-        m_sig_roi_hi[i] = f.shape()[i]-1;
+               << frameData.shape()[i] << "].");
+        m_sig_roi_hi[i] = frameData.shape()[i]-1;
       }
-      if (m_sb_roi_hi[i] >= f.shape()[i]) {
+      if (m_sb_roi_hi[i] >= frameData.shape()[i]) {
         lfatal |= (m_projectX == (i==0));
         MsgLog(name(), warning, 
                name() << ": sideband " << (i==0 ? 'Y':'X') << " upper bound ["
                << m_sb_roi_hi[i] << "] exceeds frame bounds ["
-               << f.shape()[i] << "].");
-        m_sb_roi_hi[i] = f.shape()[i]-1;
+               << frameData.shape()[i] << "].");
+        m_sb_roi_hi[i] = frameData.shape()[i]-1;
       }
-      if (m_ref_roi_hi[i] >= f.shape()[i]) {
+      if (m_ref_roi_hi[i] >= frameData.shape()[i]) {
         lfatal |= (m_projectX == (i==0));
         MsgLog(name(), warning, 
                name() << ": reference " << (i==0 ? 'Y':'X') << " upper bound ["
                << m_ref_roi_hi[i] << "] exceeds frame bounds ["
-               << f.shape()[i] << "].");
-        m_ref_roi_hi[i] = f.shape()[i]-1;
+               << frameData.shape()[i] << "].");
+        m_ref_roi_hi[i] = frameData.shape()[i]-1;
       }
     }
     if (lfatal)
@@ -762,7 +862,7 @@ Analyze::event(Event& evt, Env& env)
       MsgLog(name(), fatal, name() << ": signal ROI has a 0-length width or height. Set sig_roi_x and sig_roi_y config parameters.");
     }
     m_eventDump.arrayROI(m_sig_roi_lo, m_sig_roi_hi, pdim, "_sig", evt);
-    sig = psalg::project(f, 
+    sig = psalg::project(frameData, 
                          m_sig_roi_lo, 
                          m_sig_roi_hi,
                          m_pedestal, pdim);
@@ -772,7 +872,7 @@ Analyze::event(Event& evt, Env& env)
     //
     if (use_sb_roi) {
       m_eventDump.arrayROI(m_sb_roi_lo, m_sb_roi_hi, pdim, "_sb", evt);
-      sb = psalg::project(f, 
+      sb = psalg::project(frameData, 
                           m_sb_roi_lo , 
                           m_sb_roi_hi,
                           m_pedestal, pdim);
@@ -782,8 +882,8 @@ Analyze::event(Event& evt, Env& env)
     //  Calculate reference correction
     //
     if (use_ref_roi) {
-      m_eventDump.arrayROI(m_ref_roi_lo, m_ref_roi_hi, pdim, "_sig", evt);
-      ref = psalg::project(f, 
+      m_eventDump.arrayROI(m_ref_roi_lo, m_ref_roi_hi, pdim, "_ref", evt);
+      ref = psalg::project(frameData, 
                            m_ref_roi_lo , 
                            m_ref_roi_hi,
                            m_pedestal, pdim);
@@ -838,12 +938,24 @@ Analyze::event(Event& evt, Env& env)
     m_eventDump.returnReason(evt,"fails_proj_cut");
     return;
   }
-  
+
+  bool setInitial = setInitialReferenceIfUsingCalibirationDatabase(use_ref_roi, pdim);
+  if (setInitial and !nobeam) {
+    // Below we dump the ref_frame_avg when there is nobeam. 
+    // Here we dump if beam and it was just set.
+    m_eventDump.frameRef(m_ref_frame_avg, evt);
+  }
+
   if (nobeam) {
     MsgLog(name(), trace, name() << ": Updating reference.");
     psalg::rolling_average(ndarray<const double,1>(use_ref_roi? refd:sigd),
                            m_ref_avg, m_ref_avg_fraction);
-    
+
+    if (m_eventDump.doDump()) {
+      MsgLog(name(), warning, name() << ": need to update frameRef for eventdump, but not implemented (does not affect answers)");
+      local_rolling_average(frameData, m_ref_frame_avg, m_ref_avg_fraction, name());
+      m_eventDump.frameRef(m_ref_frame_avg, evt);
+    }
     //
     //  If we are analyzing one event against all references,
     //  copy the cached signal and apply this reference;
@@ -965,6 +1077,50 @@ Analyze::event(Event& evt, Env& env)
     MsgLog(name(), trace, name() << " no peaks, no data");
     m_eventDump.returnReason(evt, "no_peaks");
   }
+}
+
+bool 
+Analyze::setInitialReferenceIfUsingCalibirationDatabase(bool use_ref_roi, unsigned pdim) {
+  if (not m_use_calib_db_ref) return false;
+  if (0 != m_ref_avg.size()) return false;
+  if (use_ref_roi) {
+    MsgLog(name(), warning, name() << ": use_ref_roi is set, and use_calib_db_ref is true. not implemented");
+    return false;
+  }
+
+  ndarray<uint16_t,2> ref_frame_avg_uint16(m_ref_frame_avg.shape());
+  for (unsigned row = 0; row < m_ref_frame_avg.shape()[0]; row++) {
+    for (unsigned col = 0; col < m_ref_frame_avg.shape()[1]; col++) {
+      double origVal = m_ref_frame_avg[row][col];
+      uint16_t uintVal = uint16_t(origVal);
+      if ((origVal > UINT16_MAX) or (origVal < 0)) {
+        MsgLog(name(), warning, name() << ": ref_frame_avg[" << row << "][" << col << "] has value outside 16 bit unsigned integer bounds. Clamping");
+        if (origVal > UINT16_MAX) {
+          uintVal = UINT16_MAX;
+        } else if (origVal < 0) {
+          uintVal = 0;
+        }
+      }
+      ref_frame_avg_uint16[row][col] = uintVal;
+    }
+  }
+
+  ndarray<const uint16_t,2> ref_frame_avg_const_uint16(ref_frame_avg_uint16);
+
+  //                               psalg::project(       ndarray<const short int, 2u>&, unsigned int [2], unsigned int [2], unsigned int&, unsigned int&)'
+  // static ndarray<const int, 1u> psalg::project(const ndarray<const short unsigned int, 2u>&, const unsigned int*, const unsigned int*, unsigned int, unsigned int)
+
+  ndarray<const int,1> ref_avg = psalg::project(ref_frame_avg_const_uint16, 
+                              m_sig_roi_lo, 
+                              m_sig_roi_hi,
+                              m_pedestal, pdim);
+  
+  m_ref_avg  = ndarray<double,1>(ref_avg.shape());
+  for (unsigned i = 0; i < ref_avg.shape()[0]; ++i) {
+    m_ref_avg[i]=double(ref_avg[i]);
+  }
+
+  return true;
 }
  
 /// Method which is called at the end of the calibration cycle

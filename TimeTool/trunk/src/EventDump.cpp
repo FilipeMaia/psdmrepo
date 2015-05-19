@@ -26,6 +26,13 @@ void EventDump::laserBeamStatus(bool nobeam, bool nolaser, PSEvt::Event &evt)
   evt.put(data, m_keyPrefix + "_nobeam_nolaser");
 }
 
+void EventDump::frameRef(const ndarray<double, 2> &arr, PSEvt::Event &evt) {
+  if (not m_doDump) return;
+  if (arr.empty()) return;
+  boost::shared_ptr< ndarray<double, 2> > arrPtr = boost::make_shared<ndarray<double, 2> >(arr.data_ptr(), arr.shape());
+  evt.put(arrPtr, m_keyPrefix + "_frameref");
+}
+
 void EventDump::sigSbRef(const ndarray<const int32_t,1> &sig, const ndarray<const int32_t,1> &sb, const ndarray<const int32_t,1> &ref, PSEvt::Event &evt)
 {
   if (not m_doDump) return;

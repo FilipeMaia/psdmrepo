@@ -153,6 +153,10 @@ private:
   //
   std::string m_ref_store; // store reference to text file
 
+  bool m_use_calib_db_ref; // load initial reference from calibration;
+  ndarray<double,2> m_ref_frame_avg; // initial pedestal loaded, then updated if plotting with eventdump
+  bool setInitialReferenceIfUsingCalibirationDatabase(bool use_ref_roi, unsigned pdim);
+
   unsigned m_pedestal;
 
   class DumpH {
@@ -178,6 +182,7 @@ private:
   TimeTool::EventDump m_eventDump;
 
   std::set<std::string> m_validConfigKeys;
+
   };
 } // namespace TimeTool
 

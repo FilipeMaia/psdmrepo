@@ -28,6 +28,7 @@ namespace TimeTool {
 class EventDump {
  public:
   EventDump();
+  bool doDump() { return m_doDump; }
 
   /// unless init is called, all other functions do nothing
   void init(const std::string &keyPrefix);
@@ -37,6 +38,9 @@ class EventDump {
 
   /// put signal, sideband and reference in event (if init has been called, otherwise return)
   void sigSbRef(const ndarray<const int32_t,1> &sig, const ndarray<const int32_t,1> &sb, const ndarray<const int32_t,1> &ref, PSEvt::Event &evt);
+
+  /// put reference frame in
+  void frameRef(const ndarray<double, 2> &arr, PSEvt::Event &evt);
 
   /// put return reason in event (if init has been called, otherwise return)
   void returnReason(PSEvt::Event &evt, const std::string &reason);

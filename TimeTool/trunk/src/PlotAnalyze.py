@@ -35,6 +35,10 @@ class PlotAnalyze(object):
         self.returnReasonKey = self.ttPutKey + "_return"
         self.noLaserNoBeamKey = self.ttPutKey + "_nolaser_nobeam"
 
+        self.frameRefKey = self.ttPutKey + "_frameref"
+
+        self.lastFrameRef = None
+
         self.sigKey = self.ttPutKey + "_sig"
         self.sbKey = self.ttPutKey + "_sb"
         self.refKey = self.ttPutKey + "_ref"
@@ -70,6 +74,9 @@ class PlotAnalyze(object):
             return
 
         frameData = evt.get(psana.Camera.FrameV1, self.frameSource).data16()
+        lastFrameRef = evt.get(psana.ndarray_float64_2, self.frameRefKey)
+        if lastFrameRef is not None:
+            self.lastFrameRef = lastFrameRef        
 
         sig = evt.get(psana.ndarray_int32_1, self.sigKey)
         sb = evt.get(psana.ndarray_int32_1, self.sbKey)
@@ -102,7 +109,10 @@ class PlotAnalyze(object):
 
         plt.figure(self.figNumber)
         plt.clf()
-        plt.imshow(frameData)
+        if self.lastFrameRef is not None:
+            plt.imshow(frameData.astype(np.float64) - self.lastFrameRef)
+        else:
+            plt.imshow(frameData)
         plt.hold(True)
         if sig_roilo_roihi_pdim is not None:
             add_roi(plt, sig_roilo_roihi_pdim, 'r', 'sig')
@@ -113,7 +123,10 @@ class PlotAnalyze(object):
         if ref_roilo_roihi_pdim is not None:
             add_roi(plt, ref_roilo_roihi_pdim, 'y', 'ref')
         plt.legend()
-        plt.title("frame data: " + ttReturnReason)
+        if self.lastFrameRef is not None:
+            plt.title("frame data - reference. evt_status=" + ttReturnReason )
+        else:
+            plt.title("frame data. evt_status=" + ttReturnReason)
         plt.draw()
 
         plt.figure(self.figNumber+1,(8,12))

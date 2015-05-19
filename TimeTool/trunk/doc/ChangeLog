@@ -11,6 +11,18 @@ Package author: Matthew J. Weaver
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-03
+2015-5-19 David Schneider
+- Add option "TimeTool.Analyze.use_calib_db_ref=1" to read reference from 
+  calibration database.	JIRA PSAS-149. Also, when eventdump=1, maintain
+  a background reference frame that we pass on to EventDump for plotting.
+- add example refCalibExample.py
+  
+	
+Tag: V00-03-02
+2015-5-14 David Schneider
+- fix bug: eventdump feature was labeling ref_roi as _sig.
+	
 Tag: V00-03-01
 2015-5-13 David Schneider
 - fix bug in plot_analyze.py example
