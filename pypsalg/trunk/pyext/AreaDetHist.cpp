@@ -39,11 +39,11 @@ void AreaDetHist::_fillHistogram(ndarray<double,3> calib_data) {
   }
 }
 
-int isIsolated(double val, std::vector<double> *neighbors) {
+int isIsolated(double val, double minAduGap, std::vector<double> *neighbors) {
 	int result = 1;
 	std::vector<double>::iterator p;
 	for (p = neighbors->begin(); p != neighbors->end(); p++) {
-		if (val < *p) {
+		if (val-minAduGap < *p) {
 			result = 0;
 			break;
 		}
@@ -70,14 +70,14 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 	const unsigned int Segs = arrayShape[0];
 	const unsigned int Rows = arrayShape[1];
 	const unsigned int Cols = arrayShape[2];
-//std::cout << "shape:" << Segs << "," << Rows << "," << Cols << std::endl;
-	// corner of detector (3 pixel neighborhood)
+
 	double val = 0;
     int result = 0;
 	int pixelInd = 0;
 	unsigned int j = 0;
 	unsigned int k = 0;
 
+	// corner of detector (3 pixel neighborhood)
 	int numNeighbors = 3;
     std::vector<double> neighbors(numNeighbors);
 	for (unsigned int i = 0; i < Segs; i++) {
@@ -88,8 +88,7 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[0] =	calib_data[i][j+1][k];
 		neighbors[1] =	calib_data[i][j][k+1];
 		neighbors[2] =	calib_data[i][j+1][k+1];		
-		result = isIsolated(val-_minAduGap, &neighbors);
-//std::cout << "isIsolated: " << result << "," << val << "," << neighbors[0] << "," << neighbors[1] << "," << neighbors[2] << std::endl;
+		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
 			_insertHistElement(val, pixelInd);
 		}
@@ -101,9 +100,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[0] = calib_data[i][j+1][k];
 		neighbors[1] = calib_data[i][j][k-1];
 		neighbors[2] = calib_data[i][j+1][k-1];
-		result = isIsolated(val, &neighbors);
+		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val-_minAduGap, pixelInd);
+			_insertHistElement(val, pixelInd);
 		}
 		pixelInd++;
 
@@ -114,9 +113,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[0] = calib_data[i][j][k+1];
 		neighbors[1] = calib_data[i][j-1][k];
 		neighbors[2] = calib_data[i][j-1][k+1];
-		result = isIsolated(val, &neighbors);
+		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val-_minAduGap, pixelInd);
+			_insertHistElement(val, pixelInd);
 		}
 		pixelInd++;
 
@@ -126,17 +125,16 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[0] = calib_data[i][j][k-1];
 		neighbors[1] = calib_data[i][j-1][k];
 		neighbors[2] = calib_data[i][j-1][k-1];
-		result = isIsolated(val, &neighbors);
+		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
 			_insertHistElement(val-_minAduGap, pixelInd);
 		}
 		pixelInd++;
 	}
 
-
+	// side of detector (5 pixel neighborhood)
 	numNeighbors = 5;
     neighbors.resize(numNeighbors);
-	// side of detector (5 pixel neighborhood)
 	for (unsigned int i = 0; i < Segs; i++) {
 		// Upper edge
 		j = 0;
@@ -147,9 +145,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[2] = calib_data[i][j+1][t-1];
 			neighbors[3] = calib_data[i][j+1][t];
 			neighbors[4] = calib_data[i][j+1][t+1];
-			result = isIsolated(val, &neighbors);
+			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val-_minAduGap, pixelInd);
+				_insertHistElement(val, pixelInd);
 			}
 			pixelInd++;
 		}
@@ -163,9 +161,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[2] = calib_data[i][j-1][t-1];
 			neighbors[3] = calib_data[i][j-1][t];
 			neighbors[4] = calib_data[i][j-1][t+1];
-			result = isIsolated(val, &neighbors);
+			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val-_minAduGap, pixelInd);
+				_insertHistElement(val, pixelInd);
 			}
 			pixelInd++;
 		}
@@ -179,9 +177,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[2] = calib_data[i][t+1][k+1];
 			neighbors[3] = calib_data[i][t][k+1];
 			neighbors[4] = calib_data[i][t+1][k+1];
-			result = isIsolated(val, &neighbors);
+			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val-_minAduGap, pixelInd);
+				_insertHistElement(val, pixelInd);
 			}
 			pixelInd++;
 		}
@@ -195,9 +193,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[2] = calib_data[i][t+1][k-1];
 			neighbors[3] = calib_data[i][t][k-1];
 			neighbors[4] = calib_data[i][t+1][k-1];
-			result = isIsolated(val, &neighbors);
+			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val-_minAduGap, pixelInd);
+				_insertHistElement(val, pixelInd);
 			}
 			pixelInd++;
 		}
@@ -218,9 +216,9 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[5] = calib_data[i][j+1][k-1];
 		neighbors[6] = calib_data[i][j+1][k];
 		neighbors[7] = calib_data[i][j+1][k+1];
-		result = isIsolated(val, &neighbors);
+		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val-_minAduGap, pixelInd);
+			_insertHistElement(val, pixelInd);
 		}
 		pixelInd++;
 	}
