@@ -455,8 +455,7 @@ def main():
                         help="Run the cleanup, prompt for confirmantion")
     parser.add_argument("--force", default=False, action="store_true", 
                         help="Force cleanup without prompt (--clean is ignored)")
-    parser.add_argument("--verbose", default=False, action="store_true", help="print more output")
-    parser.add_argument("--quiet", default=False, action="store_true", help="print more output")
+    parser.add_argument("--quiet", dest='verbose', default=True, action="store_false", help="quiet output")
     parser.add_argument("--all", default=False, action="store_true", help="find files in all experiment dirs")
   
     parser.add_argument("--nodiskcheck", default=False, action="store_true", 
@@ -508,7 +507,6 @@ def main():
 
     # exp_id = _all_experiments_ if args.all else args.exp
 
-    args.verbose = not args.quiet
     print "instr: %s  name: %s  eid: %d  clean: %d  verbose: %s" % (args.instr, args.name, exp_id, 
                                                                     clean_mode, args.verbose)
 
