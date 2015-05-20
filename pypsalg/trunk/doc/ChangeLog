@@ -11,6 +11,10 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2015-05-18 Christopher O'Grady
+Some bug fixes from Chuck for AreaDetHist.
+
 Tag: V00-01-07
 2015-05-18 Christopher O'Grady
 Include <stdint.h> for RHEL6.
