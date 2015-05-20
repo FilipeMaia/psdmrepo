@@ -482,6 +482,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_gain'
            ,'pixel_rms'
            ,'common_mode'
+           ,'geometry'
             ]
 
         self.const_types_camera = [
