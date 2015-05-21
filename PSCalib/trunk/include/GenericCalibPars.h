@@ -244,9 +244,13 @@ private:
   unsigned      m_prbits_type;
   unsigned      m_prbits_cff;
   std::string   m_name;
+  size_t        m_size;
+  size_t        m_size_cm;
 
   // Assuming path: /reg/d/psdm/AMO/amoa1214/calib/PNCCD::CalibV1/Camp.0:pnCCD.1/pedestals/1-end.data
   std::string   m_fname;
+
+  const CalibPars::pedestals_t* p_peds;
 
   typedef pdscalibdata::NDArrIOV1<CalibPars::pedestals_t,   TBASE::Ndim> NDAIPEDS;
   typedef pdscalibdata::NDArrIOV1<CalibPars::pixel_gain_t,  TBASE::Ndim> NDAIGAIN;

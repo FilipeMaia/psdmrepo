@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-43
+2015-05-18 Mikhail S. Dubrovin	
+- GenericCalibPars - change methods size() and shape() - return work even for non-loaded, but available constants (PSAS-148)
+	
 Tag: V00-02-42
 2015-05-18 Mikhail S. Dubrovin	
 - GenericCalibPars.cpp - improve memory management is destructor (PSAS-148)

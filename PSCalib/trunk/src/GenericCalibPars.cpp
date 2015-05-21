@@ -105,6 +105,8 @@ void GenericCalibPars<TBASE>::init()
   m_common_mode  = 0;
   m_pixel_status = 0; 
   m_name = std::string("GenericCalibPars");
+  m_size         = 0;
+  m_size_cm      = 0;
 
   if( m_print_bits & 1 ) printInputPars();
   if( m_print_bits & 16) printCalibTypes(); // method from superclass
@@ -143,11 +145,13 @@ template <typename TBASE>
 const CalibPars::pedestals_t*
 GenericCalibPars<TBASE>::pedestals()
 {
+  //std::cout << "TEST: GenericCalibPars<TBASE>::pedestals()\n";
   if (m_pedestals == 0) {
       std::string fname = getCalibFileName(PEDESTALS);
       //cout << "T: pedestals: " << fname << " size()=" << size() << '\n';
-      if (size()) m_pedestals = new NDAIPEDS(fname, shape(), pedestals_t(0), m_prbits_type);
+      if (m_size) m_pedestals = new NDAIPEDS(fname, shape(), pedestals_t(0), m_prbits_type);
       else        m_pedestals = new NDAIPEDS(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pedestals->get_ndarray().data();
 }
@@ -163,8 +167,9 @@ GenericCalibPars<TBASE>::pixel_status()
       const CalibPars::shape_t* p_sha = shape();
       //cout << "T: pixel_status: " << fname << " size()=" << size() << '\n';
       //cout << "T: shape_nda() : [" << p_sha[0] << "," << p_sha[1] << "]\n";
-      if (size()) m_pixel_status = new NDAISTATUS(fname, p_sha, pixel_status_t(1), m_prbits_type);
+      if (m_size) m_pixel_status = new NDAISTATUS(fname, p_sha, pixel_status_t(1), m_prbits_type);
       else        m_pixel_status = new NDAISTATUS(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pixel_status->get_ndarray().data();
 }
@@ -177,8 +182,9 @@ GenericCalibPars<TBASE>::pixel_gain()
 {
   if (m_pixel_gain == 0) {
       std::string fname = getCalibFileName(PIXEL_GAIN);
-      if (size()) m_pixel_gain = new NDAIGAIN(fname, shape(), pixel_gain_t(1), m_prbits_type);
+      if (m_size) m_pixel_gain = new NDAIGAIN(fname, shape(), pixel_gain_t(1), m_prbits_type);
       else        m_pixel_gain = new NDAIGAIN(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pixel_gain->get_ndarray().data();
 }
@@ -191,8 +197,9 @@ GenericCalibPars<TBASE>::pixel_mask()
 {
   if (m_pixel_mask == 0) {
       std::string fname = getCalibFileName(PIXEL_MASK);
-      if (size()) m_pixel_mask = new NDAIMASK(fname, shape(), pixel_mask_t(1), m_prbits_type);
+      if (m_size) m_pixel_mask = new NDAIMASK(fname, shape(), pixel_mask_t(1), m_prbits_type);
       else        m_pixel_mask = new NDAIMASK(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pixel_mask->get_ndarray().data();
 }
@@ -205,8 +212,9 @@ GenericCalibPars<TBASE>::pixel_bkgd()
 {
   if (m_pixel_bkgd == 0) {
       std::string fname = getCalibFileName(PIXEL_BKGD);
-      if (size()) m_pixel_bkgd = new NDAIBKGD(fname, shape(), pixel_bkgd_t(0), m_prbits_type);
+      if (m_size) m_pixel_bkgd = new NDAIBKGD(fname, shape(), pixel_bkgd_t(0), m_prbits_type);
       else        m_pixel_bkgd = new NDAIBKGD(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pixel_bkgd->get_ndarray().data();
 }
@@ -219,8 +227,9 @@ GenericCalibPars<TBASE>::pixel_rms()
 {
   if (m_pixel_rms == 0) {
       std::string fname = getCalibFileName(PIXEL_RMS);
-      if (size()) m_pixel_rms = new NDAIRMS(fname, shape(), pixel_rms_t(1), m_prbits_type);
+      if (m_size) m_pixel_rms = new NDAIRMS(fname, shape(), pixel_rms_t(1), m_prbits_type);
       else        m_pixel_rms = new NDAIRMS(fname, m_prbits_type);
+      m_size = size();
   }
   return m_pixel_rms->get_ndarray().data();
 }
@@ -235,6 +244,7 @@ GenericCalibPars<TBASE>::common_mode()
       std::string fname = getCalibFileName(COMMON_MODE);
       ndarray<const CalibPars::common_mode_t,1> nda = make_ndarray(TBASE::cmod_base(), TBASE::SizeCM); // see PrincetonBaseV1
       m_common_mode = new NDAICMOD(fname, nda, m_prbits_type);
+      m_size_cm = TBASE::SizeCM;
   }
   return m_common_mode->get_ndarray().data();
 }
@@ -254,7 +264,9 @@ template <typename TBASE>
 const size_t
 GenericCalibPars<TBASE>::size(const CALIB_TYPE& calibtype)
 { 
-  const size_t size_nda = (calibtype!=COMMON_MODE) ? size_of_ndarray() : TBASE::SizeCM;
+  //std::cout << "TEST: GenericCalibPars<TBASE>::size()\n";
+  if (calibtype == COMMON_MODE) return TBASE::SizeCM;
+  const size_t size_nda = size_of_ndarray();
   return (size_nda) ? size_nda : TBASE::size_base();
 }
 
@@ -265,9 +277,10 @@ const CalibPars::shape_t*
 //const unsigned*
 GenericCalibPars<TBASE>::shape(const CALIB_TYPE& calibtype)
 { 
+  //std::cout << "TEST: GenericCalibPars<TBASE>::shape()\n";
   const size_t size_nda = size(calibtype);
 
-  if(calibtype==COMMON_MODE) {
+  if(calibtype == COMMON_MODE) {
     *m_shape_cmode = size_nda;
     return m_shape_cmode;
    }
@@ -287,9 +300,11 @@ GenericCalibPars<TBASE>::size_of_ndarray()
   else if (m_pixel_mask  ) return m_pixel_mask  ->get_ndarray().size();
   else if (m_pixel_bkgd  ) return m_pixel_bkgd  ->get_ndarray().size();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().size();
+  else p_peds = pedestals(); // defines m_pedestals
+
+  if      (m_pedestals   ) return m_pedestals   ->get_ndarray().size();
 
   if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SIZE of non-loaded ndarray"); 
-  //return TBASE::Size;
   return TBASE::size_base();
 }
 
@@ -306,7 +321,10 @@ GenericCalibPars<TBASE>::shape_of_ndarray()
   else if (m_pixel_mask  ) return m_pixel_mask  ->get_ndarray().shape();
   else if (m_pixel_bkgd  ) return m_pixel_bkgd  ->get_ndarray().shape();
   else if (m_pixel_rms   ) return m_pixel_rms   ->get_ndarray().shape();
- 
+  else p_peds = pedestals(); // defines m_pedestals
+
+  if      (m_pedestals   ) return m_pedestals   ->get_ndarray().shape();
+
   if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SHAPE of non-loaded ndarray");
   return TBASE::shape_base();
 }
@@ -408,6 +426,8 @@ void GenericCalibPars<TBASE>::printCalibPars()
 template <typename TBASE> 
 GenericCalibPars<TBASE>::~GenericCalibPars ()
 {
+    if( m_print_bits & 2 ) MsgLog(m_name, info, "DESTRUCTOR is called...");
+
     delete m_pedestals;
     delete m_pixel_status;
     delete m_pixel_gain;
