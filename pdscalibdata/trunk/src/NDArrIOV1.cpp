@@ -42,7 +42,7 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   , m_ctor(0)
 {
   init();
-  m_size = 1; // actual size is loaded from metadata
+  m_size = 0; // actual size is loaded from metadata
   //m_shape = 0;
 }
 
@@ -89,6 +89,15 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
 //-----------------------------
 
 template <typename TDATA, unsigned NDIM>
+NDArrIOV1<TDATA, NDIM>::~NDArrIOV1()
+{
+  if(m_print_bits & 2) MsgLog(__name__(), info, "DESTRUCTOR is called for ctor:" << m_ctor << ", fname=" << m_fname);
+  delete p_nda;
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::init()
 {
   if( m_print_bits & 2 ) {
@@ -104,6 +113,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 {
     // if file is not available - create default ndarray
     if ((!file_is_available()) && m_ctor>0) { 
+        if( m_print_bits & 4 ) MsgLog(__name__(), warning, "Use default calibration parameters.");
         create_ndarray(true);
         m_status=std::string("loaded default");
         return; 
@@ -148,13 +158,13 @@ template <typename TDATA, unsigned NDIM>
 bool NDArrIOV1<TDATA, NDIM>::file_is_available()
 {
   if(m_fname.empty()) {
-    if( m_print_bits & 4 ) MsgLog(__name__(), warning, "File name IS EMPTY! Use default calibration parameters.");
+    if( m_print_bits & 4 ) MsgLog(__name__(), warning, "File name IS EMPTY!");
     return false;
   }
 
   std::ifstream file(m_fname.c_str());
   if(!file.good()) {
-    if( m_print_bits & 8 ) MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST! Use default calibration parameters.");
+    if( m_print_bits & 8 ) MsgLog(__name__(), warning, "File: " << m_fname << " DOES NOT EXIST!");
     return false;
   }
   file.close();
@@ -234,6 +244,7 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
 {
+    if (p_nda) delete p_nda; // prevent memory leak
     // shape should already be available for
     // m_ctor = 0 - from parsing input file header,
     // m_ctor = 1,2 - from input pars
@@ -309,6 +320,10 @@ NDArrIOV1<TDATA, NDIM>::get_ndarray(const std::string& fname)
 
   if (!p_nda) load_ndarray();
   if (!p_nda) MsgLog(__name__(), error, "ndarray IS NOT LOADED! Check file: " << m_fname );
+
+  //std::cout << "TEST in get_ndarray(...):";
+  //if (p_nda) std::cout << *p_nda << '\n';
+
   return *p_nda;
 }
 
@@ -332,7 +347,10 @@ void NDArrIOV1<TDATA, NDIM>::print()
 template <typename TDATA, unsigned NDIM>
 void NDArrIOV1<TDATA, NDIM>::print_file()
 {
-    if (! file_is_available() ) return;
+    if (! file_is_available() ) {
+      MsgLog(__name__(), warning, "print_file() : file " << m_fname << " is not available!");
+      return;
+    }
 
     MsgLog(__name__(), info, "print_file()\nContent of the file: " << m_fname);
 
