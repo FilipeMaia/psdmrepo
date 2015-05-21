@@ -37,6 +37,7 @@ class _Publish(object):
         self.port = port
         self._publisher = app.ZMQPublisher()
         self._reset_listener = app.ZMQListener(self._publisher.comm_socket)
+        self._spawner = client.spawn_process
         self.client_opts = app.ClientInfo(
             None,
             None,
@@ -85,10 +86,10 @@ class _Publish(object):
         """
         Spawns a local client listening to the specified topic.
         """
-        client_opts.data_socket_url = self._publisher.data_endpoint
-        client_opts.comm_socket_url = self._publisher.comm_endpoint
-        client_opts.topic = topic
-        self.active_clients[topic] = client.spawn_process(client_opts, self.plot_opts)
+        self.client_opts.data_socket_url = self._publisher.data_endpoint
+        self.client_opts.comm_socket_url = self._publisher.comm_endpoint
+        self.client_opts.topic = topic
+        self.active_clients[topic] = self._spawner(self.client_opts, self.plot_opts)
 
     def init(self, port=None, bufsize=None, local=None):
         """
