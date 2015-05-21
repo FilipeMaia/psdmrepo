@@ -10,7 +10,6 @@ def add_roi(plt, roilo_roihi_pdim, pltarg, name):
     pdim = roilo_roihi_pdim[4]
     ymin,xmin = roilo
     ymax,xmax = roihi
-    print "roi for %s: xlim=[%d,%d] yim=[%d,%d] pdim=%d" % (name, xmin, xmax, ymin,ymax, pdim)
     plt.plot([xmin,xmin,xmax,xmax,xmin],
              [ymin,ymax,ymax,ymin,ymin], pltarg, label=name+'_roi')
 
@@ -38,6 +37,7 @@ class PlotAnalyze(object):
         self.frameRefKey = self.ttPutKey + "_frameref"
 
         self.lastFrameRef = None
+        self.lastRefAvg = None
 
         self.sigKey = self.ttPutKey + "_sig"
         self.sbKey = self.ttPutKey + "_sb"
@@ -90,7 +90,9 @@ class PlotAnalyze(object):
         sbc =  evt.get(psana.ndarray_float64_1, self.sbcKey)
 
         ref_avg = evt.get(psana.ndarray_float64_1, self.refAvgKey)
-        
+        if ref_avg is not None:
+            self.lastRefAvg = ref_avg
+
         sigd = evt.get(psana.ndarray_float64_1, self.sigdKey)
 
         qwf = evt.get(psana.ndarray_float64_1, self.qwfKey)
@@ -116,8 +118,6 @@ class PlotAnalyze(object):
         plt.hold(True)
         if sig_roilo_roihi_pdim is not None:
             add_roi(plt, sig_roilo_roihi_pdim, 'r', 'sig')
-        else:
-            print "no signal roi"
         if sb_roilo_roihi_pdim is not None:
             add_roi(plt, sb_roilo_roihi_pdim, 'c', 'sb')
         if ref_roilo_roihi_pdim is not None:
@@ -156,8 +156,8 @@ class PlotAnalyze(object):
         if ref is not None:
             plt.plot(ref, label='ref')
         plt.hold(True)
-        if ref_avg is not None:
-            plt.plot(ref_avg, label='ref_avg')
+        if self.lastRefAvg is not None:
+            plt.plot(self.lastRefAvg, label='ref_avg')
         plt.legend()
         plt.title('ref')
 

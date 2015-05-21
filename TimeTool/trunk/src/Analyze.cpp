@@ -676,7 +676,7 @@ Analyze::beginRun(Event& evt, Env& env)
         m_ref_frame_avg[row][col] = *ped_data++;
       }
     }
-    MsgLog(name(), info, "pedestal average val: " << avg/double(shape[0]*shape[1]));
+    MsgLog(name(), info, "** Successfully loaded pedestal file for initial Reference. Average pedestal value: " << avg/double(shape[0]*shape[1]));
     delete calibpars;
   }
 }
@@ -866,6 +866,7 @@ Analyze::event(Event& evt, Env& env)
                          m_sig_roi_lo, 
                          m_sig_roi_hi,
                          m_pedestal, pdim);
+    m_eventDump.array(sig, evt, "_sig");
     
     //
     //  Calculate sideband correction
@@ -876,6 +877,7 @@ Analyze::event(Event& evt, Env& env)
                           m_sb_roi_lo , 
                           m_sb_roi_hi,
                           m_pedestal, pdim);
+      m_eventDump.array(sb, evt, "_sb");
     }
 
     //
@@ -890,8 +892,6 @@ Analyze::event(Event& evt, Env& env)
     }
   }
   
-  m_eventDump.sigSbRef(sig, sb, ref, evt);
-
   ndarray<double,1> sigd = make_ndarray<double>(sig.shape()[0]);
   ndarray<double,1> refd = make_ndarray<double>(sig.shape()[0]);
 
@@ -952,9 +952,9 @@ Analyze::event(Event& evt, Env& env)
                            m_ref_avg, m_ref_avg_fraction);
 
     if (m_eventDump.doDump()) {
-      MsgLog(name(), warning, name() << ": need to update frameRef for eventdump, but not implemented (does not affect answers)");
       local_rolling_average(frameData, m_ref_frame_avg, m_ref_avg_fraction, name());
       m_eventDump.frameRef(m_ref_frame_avg, evt);
+      m_eventDump.array(use_ref_roi?refd:sigd, evt, "_ref");
     }
     //
     //  If we are analyzing one event against all references,
@@ -1003,8 +1003,8 @@ Analyze::event(Event& evt, Env& env)
   }
   
   m_count++;
-
   m_eventDump.array(m_ref_avg, evt, "_ref_avg");
+
   //
   //  Divide by the reference
   //
@@ -1106,9 +1106,6 @@ Analyze::setInitialReferenceIfUsingCalibirationDatabase(bool use_ref_roi, unsign
   }
 
   ndarray<const uint16_t,2> ref_frame_avg_const_uint16(ref_frame_avg_uint16);
-
-  //                               psalg::project(       ndarray<const short int, 2u>&, unsigned int [2], unsigned int [2], unsigned int&, unsigned int&)'
-  // static ndarray<const int, 1u> psalg::project(const ndarray<const short unsigned int, 2u>&, const unsigned int*, const unsigned int*, unsigned int, unsigned int)
 
   ndarray<const int,1> ref_avg = psalg::project(ref_frame_avg_const_uint16, 
                               m_sig_roi_lo, 
