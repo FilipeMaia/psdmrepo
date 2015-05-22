@@ -208,7 +208,9 @@ class ImageClient(PlotClient):
         self.im.set_clim(self.info.zrange)
         self.cb = self.figure.colorbar(self.im, ax=self.ax)
         self.set_cb_col()
-        self.set_aspect(init_im.aspect_lock, init_im.aspect_ratio)
+        self.aspect_lock = init_im.aspect_lock
+        self.aspect_ratio = init_im.aspect_ratio
+        self.set_aspect(self.aspect_lock, self.aspect_ratio)
         self.set_xy_ranges()
         self.set_log_scale()
 
@@ -217,6 +219,10 @@ class ImageClient(PlotClient):
         Updates the data in the image - none means their was no update for this interval
         """
         if data is not None:
+            if self.aspect_lock != data.aspect_lock or self.aspect_ratio != data.aspect_ratio:
+                self.aspect_lock = data.aspect_lock
+                self.aspect_ratio = data.aspect_ratio
+                self.set_aspect(self.aspect_lock, self.aspect_ratio)
             self.im.set_data(data.image)
         return self.im
 

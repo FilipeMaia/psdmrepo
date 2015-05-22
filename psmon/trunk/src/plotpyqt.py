@@ -131,7 +131,7 @@ class PlotClient(object):
         if axis_title is not None:
             self.plot_view.setLabel(axis_name, text=axis_title, units=axis_units, unitPrefix=axis_unit_prefix)
 
-    def set_aspect(self, ratio):
+    def set_aspect(self, lock, ratio):
         """
         Set the ascept ratio of the viewbox of the plot/image to the specified ratio.
 
@@ -148,7 +148,7 @@ class PlotClient(object):
             ratio = 1.0 / ratio
 
         if self.info.xrange is None and self.info.yrange is None:
-            self.plot_view.getViewBox().setAspectLocked(lock=True, ratio=ratio)
+            self.plot_view.getViewBox().setAspectLocked(lock=lock, ratio=ratio)
 
     def set_xy_ranges(self):
         if self.info.xrange is not None:
@@ -196,8 +196,9 @@ class ImageClient(PlotClient):
         super(ImageClient, self).__init__(init_im, framegen, info, rate, **kwargs)
         self.im_pos = init_im.pos
         self.im_scale = init_im.scale
-        if init_im.aspect_lock:
-            self.set_aspect(init_im.aspect_ratio)
+        self.aspect_lock = init_im.aspect_lock
+        self.aspect_ratio = init_im.aspect_ratio
+        self.set_aspect(self.aspect_lock, self.aspect_ratio)
         self.set_grid_lines(False)
         self.im = pg.ImageItem(image=init_im.image.T, border=config.PYQT_BORDERS)
         if self.im_pos is not None:
@@ -232,6 +233,10 @@ class ImageClient(PlotClient):
         Updates the data in the image - none means their was no update for this interval
         """
         if data is not None:
+            if self.aspect_lock != data.aspect_lock or self.aspect_ratio != data.aspect_ratio:
+                self.aspect_lock = data.aspect_lock
+                self.aspect_ratio = data.aspect_ratio
+                self.set_aspect(self.aspect_lock, self.aspect_ratio)
             self.im.setImage(data.image.T, autoLevels=False)
             if data.pos is not None and data.pos != self.im_pos:
                 self.im.setPos(*data.pos)
