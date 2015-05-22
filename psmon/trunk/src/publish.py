@@ -111,13 +111,6 @@ class _Publish(object):
         # turn off further autoconnect attempts
         self.disabled = True
 
-    def reset(self):
-        """
-        Resets the publish module to an uninitialized state. All socket 
-        connections are closed and the port bindings released.
-        """
-        pass
-
     def register_handler(name, **kwargs):
         """
         Registers a message handler for recieving messages from suscribed clients.
