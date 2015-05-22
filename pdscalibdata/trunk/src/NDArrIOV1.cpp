@@ -104,6 +104,7 @@ void NDArrIOV1<TDATA, NDIM>::init()
     MsgLog(__name__(), info, "ctor:" << m_ctor << ", fname=" << m_fname);
     print();
   }
+  m_status = NDArrIOV1<TDATA, NDIM>::UNDEFINED;
 }
 
 //-----------------------------
@@ -115,7 +116,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
     if ((!file_is_available()) && m_ctor>0) { 
         if( m_print_bits & 4 ) MsgLog(__name__(), warning, "Use default calibration parameters.");
         create_ndarray(true);
-        m_status=std::string("loaded default");
+        m_status = NDArrIOV1<TDATA, NDIM>::DEFAULT; // std::string("used default");
         return; 
     }
 
@@ -129,7 +130,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
     std::ifstream in(m_fname.c_str());
     if (not in.good()) { 
         MsgLogRoot(error, "Failed to open file: "+m_fname); 
-	m_status=std::string("file is unreadable");
+	m_status = NDArrIOV1<TDATA, NDIM>::UNREADABLE; // std::string("file is unreadable");
         return;
     }
   
@@ -149,7 +150,19 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
 
     //close file
     in.close();
-    m_status=std::string("loaded from file");
+    m_status = NDArrIOV1<TDATA, NDIM>::LOADED; // std::string("loaded from file");
+}
+
+//-----------------------------
+
+template <typename TDATA, unsigned NDIM>
+std::string NDArrIOV1<TDATA, NDIM>::str_status()
+{
+  if      (m_status == NDArrIOV1<TDATA, NDIM>::LOADED)     return std::string("loaded from file");
+  else if (m_status == NDArrIOV1<TDATA, NDIM>::DEFAULT)    return std::string("used default");
+  else if (m_status == NDArrIOV1<TDATA, NDIM>::UNREADABLE) return std::string("file is unreadable");
+  else if (m_status == NDArrIOV1<TDATA, NDIM>::UNDEFINED)  return std::string("undefined...");
+  else                                                     return std::string("unknown...");
 }
 
 //-----------------------------
@@ -381,7 +394,7 @@ void NDArrIOV1<TDATA, NDIM>::print_ndarray()
     std::stringstream smsg; 
     smsg << "Print ndarray<" << strDataType<TDATA>() 
          << "," << ndim()
-         << "> of sise=" << p_nda->size()
+         << "> of size=" << p_nda->size()
          << ":\n" << *p_nda;
     MsgLog(__name__(), info, smsg.str());
 }
@@ -398,7 +411,7 @@ std::string NDArrIOV1<TDATA, NDIM>::str_ndarray_info()
     std::stringstream smsg; 
     smsg << "ndarray<" << std::setw(8) << std::left << strDataType<TDATA>() 
          << "," << ndim()
-         << "> of sise=" << p_nda->size()
+         << "> of size=" << p_nda->size()
          << ":";
     TDATA* it = p_nda->data();
     for( unsigned i=0; i<min(size_t(10),p_nda->size()); i++ ) smsg << " " << *it++; smsg << " ...";

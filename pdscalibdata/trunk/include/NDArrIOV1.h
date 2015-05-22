@@ -175,6 +175,7 @@ public:
   typedef TDATA data_t;
   typedef unsigned shape_t;
 
+  enum STATUS { LOADED=1, DEFAULT, UNREADABLE, UNDEFINED };
 
   /// Constructors have different default initialization
   /**
@@ -222,7 +223,10 @@ public:
   //ndarray<const TDATA, NDIM>& get_ndarray(const std::string& fname = std::string());
 
   /// returns string with status of calibration constants
-  std::string& str_status() { return m_status; }
+  std::string str_status();
+
+  /// returns enumerated status of calibration constants
+  STATUS status() { return m_status; }
 
   /// returns string with info about ndarray
   std::string str_ndarray_info();
@@ -264,7 +268,7 @@ private:
   shape_t     m_shape[NDIM];
   std::string m_str_type;
   DATA_TYPE   m_enum_type;
-  std::string m_status;
+  STATUS      m_status;
 
   TDATA* p_data;
 
