@@ -14,7 +14,6 @@ import RegDB.experiment_info as regdb
 col_start = "\033[0;36m"
 col_stop = "\033[0m"
 
-
 _conn_str = "file:/reg/g/psdm/psdatmgr/datamigr/.mvrtestdb-conn"
 
 def construct_file_path(options):
@@ -34,17 +33,23 @@ def status_query(args, conn):
     cursor = conn.cursor()
     if args.status in ('wait', 'done'):
         stat = args.status.upper()
+        statsel = "AND status = '%s'" % stat
+    elif args.status == 'all':
+        statsel = ""
+    else:
+        return 
 
-        if args.dm or ( not args.dmana):
-            cursor.execute("""SELECT * FROM data_migration WHERE exper_id = %s AND status = %s""", (args.expid,stat))
-            for row in cursor.fetchall():
-                print " | ".join(map(str,row))
+    if args.dm or ( not args.dmana):
+        query = "SELECT * FROM data_migration WHERE exper_id = %s %s" % (args.expid,statsel)
+        cursor.execute(query)
+        for row in cursor.fetchall():
+            print " | ".join(map(str,row)), "dm"
             
-        if args.dmana or ( not args.dm):
-            cursor.execute("""SELECT * FROM data_migration_ana WHERE exper_id = %s AND status = %s""", \
-                           (args.expid,stat))
-            for row in cursor.fetchall():
-                print "%s%s%s" % (col_start, " | ".join(map(str,row)), col_stop)
+    if args.dmana or ( not args.dm):
+        query = "SELECT * FROM data_migration_ana WHERE exper_id = %s %s" % (args.expid,statsel)
+        cursor.execute(query)
+        for row in cursor.fetchall():
+            print "%s%s %s%s" % (col_start, " | ".join(map(str,row)), 'dmana', col_stop)
 
 
 def do_list_cmd(args, conn):
@@ -82,6 +87,20 @@ def do_set_cmd(args, conn):
     conn.commit()
 
 
+def do_addfile_cmd(args, conn):
+    """ Add an entry to the file table """
+
+    fn = construct_file_path(args)
+    now_ns = long(time.time()) * 1E9
+    sql_cmd="INSERT into FILE VALUES(%d,%d,%d,%d,%d,'%s','%s')" % (
+        args.expid, args.runnr, args.stream, args.chunk, now_ns,
+        args.src_host, fn)
+    print sql_cmd
+    cursor = conn.cursor()
+    cursor.execute(sql_cmd)
+    conn.commit()
+
+
 # =======================================================================================================
 
 
@@ -102,6 +121,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=usage, epilog=epilog)
     parser.add_argument("--expid", type=int, default=18, help="experiment id (default: 18 amodaq09")
+    parser.add_argument("--color", default=False, action="store_true", help="do not use colors")
     
     subparsers = parser.add_subparsers(help='commands', dest="parser_name")
 
@@ -128,6 +148,7 @@ def main():
     add_parser.add_argument("chunk", type=int, help="chunck")
     add_parser.add_argument("src_host", help="src host")
     add_parser.add_argument("src_path", help="src_path includes filename (basename)")
+    add_parser.set_defaults(func=do_addfile_cmd)
 
     # A add run command
     set_parser = subparsers.add_parser('set', 
@@ -143,24 +164,17 @@ def main():
     db = DbConnection(conn_string=_conn_str)
     conn = db.connection()
 
+
+    if not args.color:
+        global col_start
+        global col_stop
+        col_stop = col_start = ""
+
+
     print "exper-id", args.expid, "(%s)" % regdb.id2name(args.expid)
 
     args.func(args, conn)
     
-
-    return
-
-
-    if args.parser_name == 'add':
-        fn = construct_file_path(args)
-        now_ns = long(time.time()) * 1E9
-        sql_cmd="INSERT into FILE VALUES(%d,%d,%d,%d,%d,'%s','%s')" % (
-            args.expid, args.runnr, args.stream, args.chunk, now_ns,
-            args.src_host, fn)
-        print sql_cmd
-        cursor = conn.cursor()
-        cursor.execute(sql_cmd)
-        conn.commit()
 
 
 if __name__ == "__main__":
