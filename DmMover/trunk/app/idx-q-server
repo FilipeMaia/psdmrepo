@@ -30,7 +30,7 @@ class CreateIdxFilesApp(AppBase):
         
         jqueue = JobQueue("/u1/psdm/srv_idx/db")
         jexe = LsfIdxJobs(release="/reg/neh/home1/wilko/release_dev/git/data_mover", \
-                          cmd="idx_create")
+                          cmd="idx-create")
         
         wait_file = "/u1/psdm/srv_idx/WAIT"
         while True:

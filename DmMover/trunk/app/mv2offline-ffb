@@ -24,7 +24,7 @@ pjoin = os.path.join
 # release dir 
 
 __reldir = os.path.dirname(os.path.realpath(__file__))
-__rmcmd = os.path.join(__reldir, "rm_from_dss.sh")
+__rmcmd = os.path.join(__reldir, "mvr-rm-dss")
 
 __bbcp_user = "psdatmgr"
 __bbcp_key = None
