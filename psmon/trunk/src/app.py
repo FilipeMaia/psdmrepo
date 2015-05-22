@@ -151,11 +151,12 @@ class ZMQPublisher(object):
         # connect the proxy_sockets if setup of other socks succeeded
         if sock_bound:
             try:
-                self.proxy_send_socket.bind(self.proxy_url)
-                self.proxy_recv_socket.connect(self.proxy_url)
-                # start the proxy receiver thread
-                self.proxy_thread.daemon = True
+                # if the proxy thread is not already running start it
                 if not self.proxy_thread.isAlive():
+                    self.proxy_send_socket.bind(self.proxy_url)
+                    self.proxy_recv_socket.connect(self.proxy_url)
+                    self.proxy_thread.daemon = True
+                    # start the proxy receiver thread
                     self.proxy_thread.start()
                 self.initialized = True
                 LOG.debug('Initialized publisher proxy socket with endpoint: %s'%self.proxy_url)
@@ -164,6 +165,8 @@ class ZMQPublisher(object):
 
     def send(self, topic, data):
         if self.initialized:
+            if topic.startswith(config.APP_RESERVED_TOPIC):
+                raise PublishError('Cannot publish data to internally reserved topic: %s'%topic)
             if LOG.isEnabledFor(logging.DEBUG):
                 LOG.debug('Publishing data to topic: %s', topic)
             self.proxy_send_socket.send(topic, zmq.SNDMORE)
