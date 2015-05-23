@@ -218,7 +218,7 @@ public:
 
 class IndexEvent : public IndexFiducial {
 public:
-  enum {MaxEpicsSources=4};
+  enum {MaxEpicsSources=6};
   // the code would be neater if this was a vector, but I think it would
   // be less performant as well, hence the hardwired number. - cpo
   EpicsInfo einfo[MaxEpicsSources];
@@ -626,6 +626,9 @@ private:
       int i=0;
       // put the latest epics offsets in the official table
       for (vector<EpicsInfo>::iterator it = einfo.begin(); it != einfo.end();  ++it) {
+        if (i>=IndexEvent::MaxEpicsSources)
+          MsgLog(logger, fatal,"Too many epics sources: " << i+1 <<
+                 ". Max allowed: " << IndexEvent::MaxEpicsSources);
         itev->einfo[i]=*it; // would be neater with vector, but less performant, I believe
         i++;
       }

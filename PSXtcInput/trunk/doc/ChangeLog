@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-16
+2015-05-22 Christopher O'Grady
+- Add bounds checking for number of epics sources, and
+  increased max value, after learning that opal cameras
+  can look like epics sources when in timetool mode.
+	
 Tag: V00-15-15
 2015-03-5 David Schneider
 - JIRA issue PSAS-85, add live mode support
