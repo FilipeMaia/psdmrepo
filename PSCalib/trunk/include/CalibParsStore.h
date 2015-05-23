@@ -131,7 +131,7 @@ public:
            const unsigned long& runnum,       //  10
            unsigned             print_bits=255 )
   {
-	unsigned prbits = (print_bits & 8) ? 40 : 0;
+	unsigned prbits = (print_bits & 8) ? 255 : 0;
 
 	/*
         if ( str_src.find(":Cspad.") != std::string::npos ) {

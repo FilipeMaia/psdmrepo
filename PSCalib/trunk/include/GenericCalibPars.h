@@ -181,6 +181,8 @@ public:
   virtual const size_t   size (const CALIB_TYPE& calibtype=PEDESTALS);
   virtual const shape_t* shape(const CALIB_TYPE& calibtype=PEDESTALS);
 
+  virtual const int      status(const CALIB_TYPE& calibtype);
+
   virtual const CalibPars::pedestals_t*    pedestals(); 
   virtual const CalibPars::pixel_gain_t*   pixel_gain();
   virtual const CalibPars::pixel_mask_t*   pixel_mask();
@@ -212,9 +214,6 @@ public:
 
 private:
 
-  /// dynamically generated 1-d shape for 1-d common mode array
-  shape_t* m_shape_cmode;
-
   /// Initialization, common for all constructors
   void init();
 
@@ -229,10 +228,6 @@ private:
   /// Request to load all calib pars for printCalibParsStatus() and printCalibPars()
   void loadAllCalibPars();
 
-//------------------
-// Static Members --
-//------------------
-
   // Data members for regular constructor 
   std::string   m_calibDir;
   std::string   m_groupName;
@@ -246,6 +241,9 @@ private:
   std::string   m_name;
   size_t        m_size;
   size_t        m_size_cm;
+
+  /// dynamically generated 1-d shape for 1-d common mode array
+  shape_t* m_shape_cm;
 
   // Assuming path: /reg/d/psdm/AMO/amoa1214/calib/PNCCD::CalibV1/Camp.0:pnCCD.1/pedestals/1-end.data
   std::string   m_fname;

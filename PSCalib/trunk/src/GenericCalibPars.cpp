@@ -105,8 +105,8 @@ void GenericCalibPars<TBASE>::init()
   m_common_mode  = 0;
   m_pixel_status = 0; 
   m_name = std::string("GenericCalibPars");
-  m_size         = 0;
-  m_size_cm      = 0;
+  m_size         = TBASE::size_base();
+  m_size_cm      = TBASE::SizeCM;
 
   if( m_print_bits & 1 ) printInputPars();
   if( m_print_bits & 16) printCalibTypes(); // method from superclass
@@ -145,7 +145,8 @@ template <typename TBASE>
 const CalibPars::pedestals_t*
 GenericCalibPars<TBASE>::pedestals()
 {
-  //std::cout << "TEST: GenericCalibPars<TBASE>::pedestals()\n";
+  if(m_print_bits & 64) MsgLog(m_name, info, "GenericCalibPars<TBASE>::pedestals()");
+
   if (m_pedestals == 0) {
       std::string fname = getCalibFileName(PEDESTALS);
       //cout << "T: pedestals: " << fname << " size()=" << size() << '\n';
@@ -164,10 +165,10 @@ GenericCalibPars<TBASE>::pixel_status()
 {
   if (m_pixel_status == 0) {
       std::string fname = getCalibFileName(PIXEL_STATUS);
-      const CalibPars::shape_t* p_sha = shape();
+      //const CalibPars::shape_t* p_sha = shape();
       //cout << "T: pixel_status: " << fname << " size()=" << size() << '\n';
       //cout << "T: shape_nda() : [" << p_sha[0] << "," << p_sha[1] << "]\n";
-      if (m_size) m_pixel_status = new NDAISTATUS(fname, p_sha, pixel_status_t(1), m_prbits_type);
+      if (m_size) m_pixel_status = new NDAISTATUS(fname, shape(), pixel_status_t(1), m_prbits_type);
       else        m_pixel_status = new NDAISTATUS(fname, m_prbits_type);
       m_size = size();
   }
@@ -264,10 +265,11 @@ template <typename TBASE>
 const size_t
 GenericCalibPars<TBASE>::size(const CALIB_TYPE& calibtype)
 { 
-  //std::cout << "TEST: GenericCalibPars<TBASE>::size()\n";
+  if(m_print_bits & 64) MsgLog(m_name, info, "GenericCalibPars<TBASE>::size()");
+
   if (calibtype == COMMON_MODE) return TBASE::SizeCM;
-  const size_t size_nda = size_of_ndarray();
-  return (size_nda) ? size_nda : TBASE::size_base();
+  size_t s = TBASE::size_base();
+  return (s) ? s : size_of_ndarray();
 }
 
 //----------------
@@ -277,15 +279,43 @@ const CalibPars::shape_t*
 //const unsigned*
 GenericCalibPars<TBASE>::shape(const CALIB_TYPE& calibtype)
 { 
-  //std::cout << "TEST: GenericCalibPars<TBASE>::shape()\n";
-  const size_t size_nda = size(calibtype);
+  if(m_print_bits & 64) MsgLog(m_name, info, "GenericCalibPars<TBASE>::shape()");
 
   if(calibtype == COMMON_MODE) {
-    *m_shape_cmode = size_nda;
-    return m_shape_cmode;
-   }
+    //*m_shape_cm = size_nda;
+    *m_shape_cm = TBASE::SizeCM;
+    return m_shape_cm;
+  }
 
-  return (size_nda) ? shape_of_ndarray() : TBASE::shape_base(); 
+  // If the base size and shape pre-defined:
+  if (TBASE::size_base()) return TBASE::shape_base();
+
+  // If shape is generated dynamically from input file:
+
+  //const size_t size_nda = size(calibtype);
+  //return (size_nda) ? shape_of_ndarray() : TBASE::shape_base(); 
+  return shape_of_ndarray();
+}
+//----------------
+
+template <typename TBASE> 
+const int
+GenericCalibPars<TBASE>::status(const CALIB_TYPE& calibtype)
+{ 
+  if(m_print_bits & 64) MsgLog(m_name, info, "GenericCalibPars<TBASE>::status()");
+
+  // CALIB_TYPE is defined in PSCalib::CalibPars
+  // STATUS and status(calibtype) are defined in pdscalibdata::NDArrIOV1
+
+  if( calibtype == PEDESTALS    && m_pedestals   ) return (int)m_pedestals   -> status();
+  if( calibtype == PIXEL_STATUS && m_pixel_status) return (int)m_pixel_status-> status();
+  if( calibtype == PIXEL_GAIN   && m_pixel_gain  ) return (int)m_pixel_gain  -> status();
+  if( calibtype == PIXEL_MASK   && m_pixel_mask  ) return (int)m_pixel_mask  -> status();
+  if( calibtype == PIXEL_BKGD   && m_pixel_bkgd  ) return (int)m_pixel_bkgd  -> status();
+  if( calibtype == PIXEL_RMS    && m_pixel_rms   ) return (int)m_pixel_rms   -> status();
+  if( calibtype == COMMON_MODE  && m_common_mode ) return (int)m_common_mode -> status();
+
+  return 0;
 }
 
 //----------------
@@ -304,7 +334,8 @@ GenericCalibPars<TBASE>::size_of_ndarray()
 
   if      (m_pedestals   ) return m_pedestals   ->get_ndarray().size();
 
-  if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SIZE of non-loaded ndarray"); 
+  if(m_print_bits) MsgLog(m_name, warning, "CAN'T RETURN SIZE of ndarray. "
+                          << "For variable shape camera at least one of calib files should be available."); 
   return TBASE::size_base();
 }
 
@@ -325,7 +356,8 @@ GenericCalibPars<TBASE>::shape_of_ndarray()
 
   if      (m_pedestals   ) return m_pedestals   ->get_ndarray().shape();
 
-  if( m_print_bits & 2 ) MsgLog(m_name, warning, "CAN'T RETURN SHAPE of non-loaded ndarray");
+  if(m_print_bits) MsgLog(m_name, warning, "CAN'T RETURN SHAPE of ndarray. "
+                          << "For variable shape camera at least one of calib files should be available.");
   return TBASE::shape_base();
 }
 
@@ -344,10 +376,12 @@ void GenericCalibPars<TBASE>::printInputPars()
       	  << "\n m_source     = " << m_source 
       	  << "\n m_runNumber  = " << m_runNumber 
       	  << "\n m_print_bits = " << m_print_bits
+	  << "\n size         = " << m_size
+	  << "\n size_cm      = " << m_size_cm
       	  << "\nDetector base configuration parameters:"
-	  << "\n Ndim = " << TBASE::Ndim
-          << "\n Shape = [" << str_shape() << "]";
+	  << "\n Ndim  = " << TBASE::Ndim;
     }
+    std::cout << "\n Shape = [" << str_shape() << "]\n";
       //std::string str = map_type2str[PEDESTALS];
       //std::cout << "map_type2str[PEDESTALS] = " << str << '\n';
 }
@@ -358,9 +392,11 @@ template <typename TBASE>
 std::string GenericCalibPars<TBASE>::str_shape()
 {
     std::stringstream smsg; 
+    const CalibPars::shape_t* sh = shape();
+
     for (unsigned i=0; i<TBASE::Ndim; i++) {
-        if (i) smsg << "," << shape()[i];
-        else   smsg << shape()[i];
+        if (i) smsg << "," << sh[i];
+        else   smsg << sh[i];
     }
     return smsg.str();
 }
@@ -426,7 +462,7 @@ void GenericCalibPars<TBASE>::printCalibPars()
 template <typename TBASE> 
 GenericCalibPars<TBASE>::~GenericCalibPars ()
 {
-    if( m_print_bits & 2 ) MsgLog(m_name, info, "DESTRUCTOR is called...");
+    if( m_print_bits & 64 ) MsgLog(m_name, info, "DESTRUCTOR is called...");
 
     delete m_pedestals;
     delete m_pixel_status;

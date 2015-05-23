@@ -86,6 +86,9 @@ public:
   /// Returns shape of the ndarray with calibration parameters
   virtual const shape_t* shape(const CALIB_TYPE& calibtype=PEDESTALS);
 
+  /// Returns status of the ndarray with calibration parameters
+  virtual const int status(const CALIB_TYPE& calibtype); // =PEDESTALS);
+
   /// Returns the pointer to array with pedestals 
   virtual const pedestals_t* pedestals();
 

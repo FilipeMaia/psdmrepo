@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-44
+2015-05-22 Mikhail S. Dubrovin	
+- CalibPars - add virtual method status. (for PSAS-139)
+- CalibParsStore - prbits=40 -> 255
+- GenericCalibPars - m_shape_cmode -> m_shape_cm, add implementation for method status, improve logic for size() and shape()
+	
 Tag: V00-02-43
 2015-05-18 Mikhail S. Dubrovin	
 - GenericCalibPars - change methods size() and shape() - return work even for non-loaded, but available constants (PSAS-148)

@@ -118,6 +118,21 @@ CalibPars::common_mode()
 }
 
 //-----------------------------
+const int CalibPars::status(const CALIB_TYPE& calibtype)  // calibtype = PEDESTALS
+{ 
+  default_msg("status(CALIB_TYPE&)");
+
+  if( calibtype == PEDESTALS    ) return 0;
+  if( calibtype == PIXEL_STATUS ) return 0;
+  if( calibtype == PIXEL_RMS    ) return 0;
+  if( calibtype == PIXEL_GAIN   ) return 0;
+  if( calibtype == PIXEL_MASK   ) return 0;
+  if( calibtype == PIXEL_BKGD   ) return 0;
+  if( calibtype == COMMON_MODE  ) return 0;
+  return 0;
+}
+
+//-----------------------------
 void 
 CalibPars::printCalibPars()
 {
