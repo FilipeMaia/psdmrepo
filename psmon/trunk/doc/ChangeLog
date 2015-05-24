@@ -11,6 +11,10 @@ Package author: Dan Damiani
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-10
+2015-05-24 Dan Damiani
+- Bug fix for plotting directly from within one script
+
 Tag: V00-01-09
 2015-05-14 Dan Damiani
 - Support for plotting directly from within one script (no
