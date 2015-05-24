@@ -1,0 +1,17 @@
+#!/bin/bash
+
+usage() {
+     /usr/bin/env python -m "psmon.console" -h
+}
+
+while getopts "hsp" OPTION
+do
+    case $OPTION in
+    h)
+        usage
+        exit 1
+        ;;
+    esac
+done
+
+ipython --no-banner --no-confirm-exit -i -m "psmon.console" -- $@
