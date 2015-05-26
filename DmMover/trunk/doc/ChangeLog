@@ -11,13 +11,14 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-01-01
+Tag: V00-02-00
 2015-
 - Added cleanup script for ioc nodes
 - create all missing xtc direcories, not just check if xtc exists
 - add startup script for smalldata mover 
 - Handle wildcard in mover --dirpath selection (for small data) when obtaining process status (mvr_showprocs) 
 - started to rename apps using dash instead of underscore
+- renamed 
 	
 Tag: V00-01-00
 2015-05-08

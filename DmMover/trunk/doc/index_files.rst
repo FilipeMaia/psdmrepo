@@ -13,19 +13,19 @@ and adds them to the queue.
 Tools
 =====
 
-idx_q_server 
+idx-q-server 
 ------------
 Service that submits request to batch. Runs as daemon controlled by supervisord.
 
-idx_failed_regdb
+idx-failed-regdb
 ----------------
 create missing idx files that failed the transfer by a data-mover
 
-idx_q_cmd 
+idx-q-cmd 
 ---------
 command line tool to add request and list status.
 
-idx_create
+idx-create
 ----------
 Script that creates an idx file from a xtc file.
 

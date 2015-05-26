@@ -20,7 +20,7 @@ function run_cmd() {
 }
 
 
-readonly cr_folder=dm_create_folders
+readonly cr_folder=dm-create-folders
 
 wait_time=120
 while getopts :dlow: OPT; do
