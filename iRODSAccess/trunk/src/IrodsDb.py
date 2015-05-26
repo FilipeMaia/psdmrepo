@@ -118,6 +118,47 @@ class IrodsDb ( object ) :
 
         return res
 
+
+    def updateAtime(self, atimes, resc='lustre-resc'):
+        """Stores atime for files in iRODS. Takes a list of tuples,
+        first element of a tuple is full path name of the file in iRODS,
+        second is the atime as an integer. Returns the list of tuples,
+        first element is iRODS path name, second element is a number of 
+        the replicas which have been updated.
+        
+        Example of usage:
+        
+        checksums = [ 
+            ('/psdm-zone/psdm/XPP/xppcom10/hdf5/xppcom10-r0001.h5', 1234567899),
+            ('/psdm-zone/psdm/XPP/xppcom10/hdf5/xppcom10-r0002.h5', 1323232333),
+            ]
+        idb = IrodsDb()
+        res = idb.updateAtime( checksums )
+        for path, count in res :
+            print "%d replicas updated for %s" % (count, path)        
+        """
+
+        res = []
+
+        cursor = self._conn.cursor();
+        for path, atime in atimes:
+            
+            atimeStr = "%011d" % atime
+            coll, obj = os.path.split(path)
+            #print coll, obj, atimeStr
+            
+            q = """UPDATE r_coll_main c, r_data_main d 
+                SET d.data_expiry_ts=%s
+                WHERE c.coll_name=%s AND c.coll_id=d.coll_id AND d.data_name=%s AND resc_name=%s"""
+            cursor.execute( q, (atimeStr, coll, obj, resc) )
+            count = cursor.rowcount
+
+            res.append( (path, count) )
+
+        cursor.execute("commit")
+
+        return res
+
 #
 #  In case someone decides to run this module
 #

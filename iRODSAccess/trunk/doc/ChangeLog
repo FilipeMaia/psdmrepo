@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-01-02
+2015-05-26 Wilko Kroeger
+- Added function to update the data_expiry_ts filed for data objects in irods
+
+	
+Tag: V00-01-02
 2013-05-09 Andy Salnikov
 - Dbconnection class is in DbTool package now
 
