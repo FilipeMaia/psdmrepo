@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag:
+2015- Wilko Kroeger
+- added functions to RegDb to query the datapath for an experiment
+	
 Tag: V00-02-10
 2015-04-28 Igor Gaponenko
 - Started implementing the new version of the Data Retention Policy

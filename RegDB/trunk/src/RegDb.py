@@ -220,7 +220,7 @@ class RegDb ( object ) :
         
         cursor = self._conn.cursor()
         if param:
-            
+
             # parameter name is specified, find that param only
             q = """SELECT p.val FROM experiment_param p, experiment e, instrument i
                 WHERE p.exper_id = e.id AND e.instr_id = i.id 
@@ -294,3 +294,32 @@ class RegDb ( object ) :
             AND param=%s"""
         cursor.execute(q, (instr, exper, param))
         
+
+    # 
+
+    def get_all_datapath(self, instr=None, datapath=None):
+        """ Get (datapath, experiment-name, instrument-name) for selected instrument and/or
+        particular datapath. 
+        """
+
+        cursor = self._conn.cursor()
+        
+        q = """ SELECT p.val, e.name, i.name FROM experiment e, instrument i, experiment_param p WHERE 
+                p.param = 'DATA_PATH' AND p.exper_id = e.id AND e.instr_id = i.id"""
+        param = []
+        if instr:
+            q += " AND i.name=%s"
+            param.append(instr.upper())
+        if datapath:
+            q += " AND p.val like %s"
+            param.append(datapath + '%')
+
+        if param:
+            cursor.execute(q, param)
+        else:
+            cursor.execute(q)
+
+        return cursor.fetchall()
+
+    def get_datapath(self, instr, exper):        
+        return self.get_experiment_param(instr, exper, param="DATA_PATH")
