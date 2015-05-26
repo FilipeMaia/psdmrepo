@@ -11,6 +11,12 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2015-05-26 Wilko Kroeger
+- added tools to set atime for files in irods
+- renamed apps  using dash instead of underscore
+	
+	
 Tag: V00-00-01
 2015-04-24 Wilko Kroeger
 - just created this template file, this entry is an example of the change log
