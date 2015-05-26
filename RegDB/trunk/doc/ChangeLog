@@ -11,8 +11,8 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag:
-2015- Wilko Kroeger
+Tag: V00-02-11
+2015-05-26 Wilko Kroeger
 - added functions to RegDb to query the datapath for an experiment
 	
 Tag: V00-02-10
