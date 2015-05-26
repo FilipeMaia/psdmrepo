@@ -10,8 +10,8 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag V01-
-2015	
+Tag V01-03-14	
+2015-05-26
 - Added --force option to deactivate controller without checking if the pid still exists.
 	
 Tag: V01-03-13
