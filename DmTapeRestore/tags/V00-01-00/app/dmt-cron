@@ -1,0 +1,53 @@
+#!/bin/bash 
+#
+# Simple daemon that submits restore requests.
+# Usage:
+#     ./simple_restored [-d]
+#
+#     -d: run in background and write to log file
+#
+
+function msg() {
+    echo "$(date +'%Y%m%d %H:%M:%S') $*"
+}
+
+
+while getopts :d OPT; do
+    case $OPT in
+        d|+d) deamon=1 ;;
+        *)  
+            sed -n -e '2,/^[^#]\|^$/ p' $0
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+
+if [[ ${deamon:=0} -eq 1 ]] ; then
+    logfile=/u1/psdatmgr/irods_restore/restore.log
+    [[ -e ${logfile} ]] && mv ${logfile} ${logfile}.$(date +%Y%m%dT%H%M%S)
+    echo "Use log file ${logfile} and run deamon"
+    nohup $0 &>${logfile} "" & 
+    exit 
+fi
+
+maxt=20
+while [ 1 ] ; do
+    
+    inq=$(iqstat -u psdatmgr | awk ' BEGIN {n=-1} ; /^[0-9]/ {n+=1} /^No delayed/ {n=0}; END {print n}')
+    if [ $inq -lt 0 ] ; then
+        echo "failed iqstat"
+        sleep 300
+        continue
+    fi
+    msg "next check  $inq" 
+    
+    if [[ ${inq:-$maxt} -lt ${maxt} ]] ; then
+        ndiff=$(( $maxt - $inq ))
+        msg "to submit $ndiff"
+        
+        dmt-submit -n $ndiff --run 
+    fi
+    sleep 300
+done

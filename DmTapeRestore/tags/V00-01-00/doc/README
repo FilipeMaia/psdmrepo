@@ -1,0 +1,18 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package DmTapeRestore
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Brief description:
+==================
+
+Tools for restoring files from HPSS
+
+Detailed description:
+=====================
+

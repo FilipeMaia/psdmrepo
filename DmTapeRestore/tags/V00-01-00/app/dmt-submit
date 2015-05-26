@@ -1,0 +1,174 @@
+#!/usr/bin/env python 
+
+
+import os 
+import sys 
+import pwd
+import time 
+import argparse
+import logging
+from logging.handlers import SMTPHandler
+
+
+import DmTapeRestore.dbrestore as db
+import DmMover.experiment 
+import DmMover.exper_folders
+
+mail_srv = "psmail.pcdsn"
+
+class TimeMailFilter(logging.Filter):
+    """ Send only one mail within a time period """
+    def __init__(self, notime=8*3600, semfile=None):
+        self.log_date = semfile if semfile else "/tmp/wk_test_log_mail"
+        self.no_mail = notime 
+
+    def filter(self, record):    
+        try:
+            mtime = os.path.getmtime(self.log_date)
+        except OSError:
+            open(self.log_date, 'w')
+            return True 
+        
+        now = time.time()
+        print mtime, now, self.no_mail 
+        if mtime > (now - self.no_mail):
+            print "llll"
+            return False
+        else:
+            os.utime(self.log_date, None)
+            return True
+
+
+
+class CreateTrgDir:
+    """ Create missing directories for restoring files """
+    
+    def __init__(self, logger=None):
+        self.dir_status = {}
+
+    def create(self, iname, expid):
+        """ create target directory and experiment dir. 
+        iname is the irods name of a file. 
+        """
+        
+        path_token = iname.lstrip('/').split('/')
+        filepath = os.path.join("/reg/d/psdm", path_token[2].lower(), *path_token[3:5])
+        expname = os.path.basename(filepath)
+        
+        return self._path_exists(filepath, expid, createpath=True)
+        
+
+    def _path_exists(self, filepath, expid, createpath=False):
+        """ check path and create if missing """
+
+        if filepath in self.dir_status:
+            return self.dir_status[filepath]
+
+        if os.path.exists(filepath):
+            if os.path.islink(filepath):
+                self.dir_status[filepath] = True
+            else:                
+                self.dir_status[filepath] = False
+        else:
+            if createpath:
+                self.create_dir(expid)
+                self._path_exists(filepath,expid,createpath=False)
+            else:
+                self.dir_status[filepath] = False
+            
+        return self.dir_status[filepath]
+        
+    def create_dir(self, expid):
+        """ Create the missing folders for an experiment """
+        exp = DmMover.experiment.Experiment(expid=expid)
+        print "Create dir for", exp.name, exp.instr, exp.datapath
+        DmMover.exper_folders.check_all_destpath(exp)
+        
+        #if self.logger:
+        #    self.logger.info("Created dir for %s", exp.name)
+        
+
+
+class SubmitRestore:
+
+    def __init__(self):
+        parser = argparse.ArgumentParser()
+        parser.add_argument('-n', '--nfiles', type=int, default=1, help="files to submit")
+        parser.add_argument('--run', action='store_true')        
+        parser.add_argument('sel', nargs='?', help="select name")
+        self.args = parser.parse_args()
+
+        self.trgdir = CreateTrgDir()
+        
+        self.logger = logging.getLogger('restore')        
+        self.logger.setLevel(logging.DEBUG)
+
+        formatter = logging.Formatter('%(asctime)s %(name)s %(levelname)s %(message)s', 
+                                      datefmt="%Y%m%d %H:%M:%S")
+        ch = logging.StreamHandler(stream=sys.stderr)
+        ch.setFormatter(formatter)
+        ch.setLevel(self.logger.getEffectiveLevel())
+        self.logger.addHandler(ch)
+        
+        user = pwd.getpwuid(os.getuid())[0] 
+        self.logger.info("user %s %s", user, self.__class__.__name__)
+        eh = SMTPHandler(mail_srv, 'wilko@slac.stanford.edu', 
+                         'wilko@slac.stanford.edu', "restore ERROR")
+        semfile = "/tmp/mail_sem_%s_%s" % (user, self.__class__.__name__)
+        eh.addFilter(TimeMailFilter(notime=60, semfile=semfile))
+        eh.setFormatter(formatter)
+        eh.setLevel(logging.ERROR)
+        self.logger.addHandler(eh)
+
+
+    def run(self):
+        submitted = set()
+        for req in db.files_with_status(db.RECEIVED):
+            iname = req['irods_filepath']
+            
+            if not self.trgdir.create(iname, req['exper_id']):
+                self.logger.error("Missing dir %s", iname) 
+                continue
+
+            if self.args.sel and iname.find(self.args.sel) == -1:
+                continue
+
+            self.logger.info("req status %s, %s, Eid=%s", req['status'], iname, req['exper_id'])
+
+            # test only do not submit runs    
+            if not self.args.run:
+                self.logger.info("No runs were submitted use --run")
+                continue
+
+            if iname in submitted:
+                self.logger.warning("File already submitted %s", iname)
+                continue
+                
+            # submit request
+            rc = os.system("/reg/neh/home1/psdatmgr/bin/irestore %s" % iname )
+            if rc != 0:
+                self.logger.error("irestore failed %s", iname)
+                continue
+            
+            db.set_submitted(iname)
+            submitted.add(iname) 
+            self.logger.info("submitted %s", iname)
+            
+            self.args.nfiles -= 1
+            if self.args.nfiles <= 0:
+                self.logger.warning("Max files reached")
+                break
+
+        self.logger.info("files submitted %d", len(submitted))
+
+
+
+if __name__ == "__main__":
+
+    app = SubmitRestore()
+
+    try:
+        app.run()
+    except Exception as e:
+        app.logger.critical("restore Exception: %s", e)
+        time.sleep(60)
