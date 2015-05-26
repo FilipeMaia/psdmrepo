@@ -1,0 +1,154 @@
+#!/usr/bin/env python
+#
+# Remove xtc, smd.xtc and idx files from ioc-recorder node. 
+#
+#
+
+import os
+import sys
+import time 
+import argparse
+
+import FileMgr.file_status as file_status
+
+allstatus = {}
+_header_printed = False
+_print_header="""
+--------+----------------------------+-------+---------+---------+--------------+--------------
+ exp_id | file name                  | IN DB | ON DISK | ON HPSS |   REM SIZE   |   LOC SIZE          
+--------+----------------------------+-------+---------+---------+--------------+--------------"""
+
+def filter_fileStatus(triplet, status):
+    """ Filter function called to decide if a file can be purged from disk """
+    global allstatus
+    allstatus[triplet[2]] = status
+    return False
+
+def printfile(id, type, name, mig, disk, hpss, s1, s2):
+    global _header_printed
+    if not _header_printed:
+        _header_printed = True
+        print _print_header
+    print "%7s | %26s | %5s |  %5s  |  %5s  | %12d | %12d" % \
+        ( id, name, mig, disk, hpss, s1, s2)
+
+def exp_id_from_fn(fn):
+    """ extract experiment if from filename """
+    return fn.split('-')[0][1:]
+
+# delete xtc or smd.xtc files. For xtc files the idx files are also removed
+def delete_files(fn, verbose):
+    
+    os.unlink(fn)
+    if verbose:
+        print "rm", fn
+
+    if fn.endswith('.smd.xtc'):
+        return
+
+    dpath, bname = os.path.split(fn)
+    idxfn = os.path.join(dpath, 'index', bname) + '.idx' 
+    try:
+        os.unlink(idxfn)
+    except OSError:
+        print "index file not removed", e
+        
+    if verbose:
+        print "rm", idxfn
+
+def main():
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("rootdir", help="rootpath that contains the data directories (e.g.: /u2/REC)")
+    parser.add_argument("--nmax", default=-1, type=int, help="Remove at most nmax files")
+    parser.add_argument("--minageh", default=1, type=int, help="min age of file before it can be removed")
+    parser.add_argument("--clean", default=False, action="store_true", help="Run the cleanup (def: list-only")
+    parser.add_argument("-v", "--verbose", default=False, action="store_true", help="verbose")
+    args = parser.parse_args()
+    
+
+    # create a list with files to purge from disk. For every file the 
+    # triplet (experiment_id,file_type,file_name) is needed
+    f_to_query = []
+    fullpath = []
+    age = time.time() - (args.minageh * 3600)
+    debug = args.verbose
+    smalldata_count = 0
+    for dir, subdir, files in os.walk(args.rootdir):
+        for fn in files:
+            name = os.path.join(dir, fn)
+            if fn.endswith(".xtc"):
+                if fn.endswith(".smd.xtc"):
+                    ftype = 'xtc/smalldata'
+                    # small data cleanup doesn't work currentl
+                    #smalldata_count += 1
+                    #continue
+                else:
+                    ftype = 'XTC'
+                    
+                # checkage:
+                if os.path.getmtime(name) > age:
+                    print "skip to new", name
+                    continue
+
+                exp_id = exp_id_from_fn(fn)
+                if exp_id == '000' or exp_id == '001':
+                    printfile("%7d" % int(exp_id), 'xtc', fn, str(False), str(False), str(False),
+                              0, os.stat(name).st_size)
+                else:
+                    f_to_query.append((exp_id_from_fn(fn), ftype, fn))
+                    fullpath.append(os.path.join(dir, fn))
+            elif fn.endswith('xtc.idx'):
+                # check if corresponding xtc is still on disk
+                if not os.path.exists(name[:-3]):
+                    # add xtc to file to cleanup list which will cause the idx file cleanup
+                    pass
+            else:
+                if debug:
+                    printfile("skip  ", '', fn, str(False), str(False), str(False), 0, os.stat(name).st_size)
+    
+
+    # web-services used for getting the file status
+    fs = file_status.file_status(ws_login_user='psdm_reader', ws_login_password='pcds')
+    
+    # for every entry in f_to_query the function filter_fileStatus is called. It decides 
+    # if a file can be purged. Returns a list with all files that passed the filter, in
+    # this case, none.
+    f_purge = fs.filter(f_to_query, filter_fileStatus)
+    
+    f_purge = []
+    for triplet, path in zip(f_to_query, fullpath):
+        status = allstatus[triplet[2]]
+        if (( file_status.IN_MIGRATION_DATABASE in status.flags() ) and
+            ( file_status.DISK in status.flags() ) and
+            ( file_status.HPSS in status.flags() ) and
+            ( path[-4:] == ".idx" or os.stat(path).st_size == status.size_bytes() )):
+            f_purge.append(path)
+        else:
+            printfile("c%6d" % int(triplet[0]),triplet[1],triplet[2],
+                      str(file_status.IN_MIGRATION_DATABASE in status.flags()),
+                      str(file_status.DISK in status.flags()),
+                      str(file_status.HPSS in status.flags()),
+                      status.size_bytes(), os.stat(path).st_size)
+    print "-------------------------------"
+
+    # f_purge contains only those files that are eligible for purging
+    
+    if args.clean:
+        print "\n ===> Files to purge "
+        for n, path in enumerate(f_purge):
+            if args.nmax >= 0 and n >= args.nmax:
+                break
+
+            print "Removing", n, path
+            delete_files(path, args.verbose)
+    else:
+        print "\n===== WARNING files to purge: ", len(f_purge),  "(but listonly)" 
+        
+    if smalldata_count > 0:
+        print "===== ERROR: NO SMALLDATA CLEANUP ", smalldata_count, "(files) ==========="
+        
+    
+# Main Entry
+if __name__ == "__main__":
+    main()
