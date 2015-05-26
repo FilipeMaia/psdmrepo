@@ -1,0 +1,106 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package iRODSAccess
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-03
+2015-05-26 Wilko Kroeger
+- Added function to update the data_expiry_ts filed for data objects in irods
+	
+Tag: V00-01-02
+2013-05-09 Andy Salnikov
+- Dbconnection class is in DbTool package now
+
+Tag: V00-01-01
+2013-05-09 Andy Salnikov
+- switch to AppUtils.AppBase as base class for python application
+
+Tag: V00-01-00
+2013-04-11 Andy Salnikov
+- few updates related to SCGI server (mod_scgi in particular)
+- we are switching to mod_scgi instead of mod_wsgi, services will run
+  outside apache now from our standard accout, location of few files
+  has changed because of that so config needs update
+- mod_scgi does not set SCRIPT_NAME correctly, I'm adding new middleware 
+  which takes care of this
+
+Tag: V00-00-16
+2012-08-07 Andy Salnikov
+- forgot to remove print statement
+
+Tag: V00-00-15
+2012-08-07 Andy Salnikov
+- IrodsClient has new methods fileInfo(), queue(), replicate()
+- web service adds /replica and /queue controllers, DELETE /files
+  is now DELETE /replica
+
+Tag: V00-00-14
+2012-08-02 Andy Salnikov
+- on all errors return text/plain body containg error message
+
+Tag: V00-00-13
+2012-08-01 Andy Salnikov
+- abort() does not like unicode strings, replace with regular strings
+
+Tag: V00-00-12
+2012-08-01 Andy Salnikov
+- IrodsClient has new removeObj() and removeColl() methods
+- adding DELETE method to files controller
+
+Tag: V00-00-11
+2011-03-08 Andy Salnikov
+- irods-scan now reports mismatched file sizes and problems accessing
+  files (such as access protection problems).
+
+Tag: V00-00-10
+2010-10-04 Andy Salnikov
+- added application irods-scan which prints the list of the orphaned 
+  objects in the iRODS
+
+Tag: V00-00-09
+2010-07-22 Andy Salnikov
+- added IrodsDb module
+
+Tag: V00-00-07
+2009-11-30 Andy Salnikov
+- run numbers from hdf5 files did not work
+
+Tag: V00-00-06
+2009-11-25 Andy Salnikov
+- protection added in files controller
+
+Tag: V00-00-05
+2009-11-25 Andy Salnikov
+- updated web service's runs controller to reflect new structure of 
+  irods directories
+
+Tag: V00-00-04
+2009-09-15 Andy Salnikov
+- irods_model.py: forgot to import codes module
+- resources.py: add URL to each object returned from /resources
+- runs.py: instead of irods.zone define new configuration parameter
+  called irods.run_data_path which is a prefix for area where 
+  experimental run data is stored
+- runs.py: run information is returned as a list of objects instead of 
+  single object, new object contains fields run and files.
+
+Tag: V00-00-03
+2009-09-01 Andy Salnikov
+- added support for reading user name/password from external file
+
+Tag: V00-00-01
+2009-08-10 Andrei Salnikov
+- Initial import into repository
+
+Tag: V00-00-02
+2009-08-11 Andrei Salnikov
+- for files and runs controllers added the URI to the returned objects
+
