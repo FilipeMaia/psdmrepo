@@ -1,0 +1,419 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RegDB
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-11
+2015-05-26 Wilko Kroeger
+- added functions to RegDb to query the datapath for an experiment
+	
+Tag: V00-02-10
+2015-04-28 Igor Gaponenko
+- Started implementing the new version of the Data Retention Policy
+application (PSDH-42, PSWA-47).
+
+Tag: V00-02-09
+2015-04-16 Igor Gaponenko
+- reduced a list of POSIX groups reported by the library (PSWA-1)
+- added an iterator of file entries created by the DAQ as a more
+efficient way of browsing through a large collection of entries.
+This was needed to implement a new File Migration Monitor (PSDH-34)
+
+Tag: V00-02-08
+2015-03-05 Igor Gaponenko
+- extended Python API to allow fetching attribute class names for
+a run (PSDH-25)
+
+Tag: V00-02-07
+2015-03-05 Igor Gaponenko
+- DAQ detectors migration (PSDH-25)
+- extend the summary page for reporting HDF5 requests across
+experiments (PSWA-36)
+
+Tag: V00-02-06
+2015-02-26 Igor Gaponenko
+- disable POSIX group management for 'ps-data'
+- fixed a bug preventing members of  members of instrument-specific
+super-groups 'ps-<instr>-sci' from managing groups: 'ps-<instr>'
+and 'ps-<instr>-elog'
+- upgraded Web service ws/ManageGroupMembers.php to report 'status'
+and 'update' time in low case. This is for the sake of compatibility
+with new Web apps.
+- updated application AutoTranslate2HDF5.php as per JIRA PSWA-32
+
+Tag: V00-02-05
+2014-12-19 Igor Gaponenko
+- following a migration of Web services as per JIRA issue PSDH-20
+- moved forward the ata Policy Retention dates evaluator
+
+Tag: V00-02-04
+2014-12-08 Igor Gaponenko
+- minor changes in CSS (fonts)
+
+Tag: V00-02-03
+2014-10-10 Igor Gaponenko
+- implemented a simple Web service named 'ping' to be used for testing
+access to the Web services
+
+Tag: V00-02-02
+2014-10-03 Igor Gaponenko
+- bug fix in method RegDBFile::data_migration_file
+- migration of the HDF5 translation services
+- allowing group management authorizations for special POSIX groups ps-<instr>-elog
+- updating Storage Policy manager to include recent and comming months
+- a new Web service for allocating run numbers (JIRA ticket PSWA-4)
+
+Tag: V00-02-01
+2014-05-16 Igor Gaponenko
+- added method RegDBInstrument::experiments() to select experiments in a scope of an instrument
+- added method is_facility() and operator_uid() to class RegDBExperiment
+- allowed non-standard group 'xpptst14' for the group management
+
+Tag: V00-02-00
+2014-04-30 Igor Gaponenko
+- moved javascript libraries to package webfwk/
+- migrated the LDAP client to reply on the openldap configuration of teh Web server's machine
+
+Tag: V00-01-26
+2014-04-02 Igor Gaponenko
+- fixed a bug in the python module RegDB.experiment_info to always begin a new transaction when making queries
+
+Tag: V00-01-25
+2014-03-22 Igor Gaponenko
+- added group management support for 'ps-las'
+
+Tag: V00-01-24
+2014-03-05 Igor Gaponenko
+- added a function to the Switch
+
+Tag: V00-01-23
+2014-01-31 Igor Gaponenko
+- a bug fix in class RegDB
+
+Tag: V00-01-22
+2013-12-13 Igor Gaponenko
+- modifications needed by the Portal refactoring
+
+Tag: V00-01-21
+2013-12-05 Igor Gaponenko
+- extended Python module experiment_info with function unique_detector_names()
+
+
+Tag: V00-01-20
+2013-11-01 Igor Gaponenko
+- added indexes for the data migration tables
+- extended error reporting in two Web services to support new version of the Portal
+- moved forward in time (for the next 6 months) with the StoragePolicyManager
+
+Tag: V00-01-19
+2013-10-23 Igor Gaponenko
+- reinforced Python module experiment_info to throw an exception
+for wrong user parameters
+- minor changes in the SimpleTapeMOnitor Web application to display a summary table for
+file restore requests
+
+Tag: V00-01-18
+2013-10-17 Igor Gaponenko
+- simplified interface to the calibration runs in Python module experiment_info
+
+Tag: V00-01-17
+2013-10-17 Igor Gaponenko
+- performance improvements in Python module experiment_info
+- extended moduld experiment_info with a function fetching calibration runs
+
+Tag: V00-01-16
+2013-10-14 Igor Gaponenko
+- extended Python interface to allow retrieving run attributes
+
+Tag: V00-01-15
+2013-10-11 Igor Gaponenko
+- added support for external (user) experiments
+
+Tag: V00-01-14
+2013-08-14 Igor Gaponenko
+- added function detectors() to src/experiment_info. The function will return
+names of detectors configured in DAQ for the specified experiment and a run
+
+Tag: V00-01-13
+2013-07-25 Igor Gaponenko
+- relaxed rules for the names of experiments
+- added 6 special groups for instrument scientists: ps-amo-sci, etc.
+
+Tag: V00-01-12
+2013-07-10 Igor Gaponenko
+- extended data migration tables and the trigger by one extra column
+allowing an efficient indexing of data bsed on the file status.
+
+Tag: V00-01-11
+2013-06-12 Igor Gaponenko
+- updated src/experiment_info to support stations and added a function to get
+runs of an experiment
+- added group authorizations support for dia* experiments
+- added a class method RegDbExperiment::is_standard() to differentiate between normal and other
+types of experiments
+
+Tag: V00-01-10
+2013-04-23 Igor Gaponenko
+- finalized support for DSS/FFB
+- updated Storage Policies for the new range of runs
+- test graph based on SVG library d3.
+
+Tag: V00-01-09
+2013-03-07 Igor Gaponenko
+- added MySQL table schema to support two-staged data migration: DSS -> FFB -> ANA
+- added PHP library classes to support NERSC migration and a Web application NERSCMigrationMonitor.php
+
+Tag: V00-01-08
+2013-02-21 Igor Gaponenko
+- added MySQL table schema to keep track of file migration to NERSC
+
+Tag: V00-01-07
+2013-02-20 Igor Gaponenko
+- storage policy related updates
+
+Tag: V00-01-06
+2013-01-28 Igor Gaponenko
+- extended support for experiment names to allow: <instr>c<NN><YYY> and <instr>s<NN><YYY>
+- fixed a bug in the HDF auto-translation requestor Web Service
+
+Tag: V00-01-05
+2012-12-20 Igor Gaponenko
+- added support for FFB auto-translation
+
+Tag: V00-01-04
+2012-12-20 Andy Salnikov
+- make second argument of RegDb.get_experiments() method optional, if not
+  specified then return full list of experiments
+
+Tag: V00-01-03
+2012-12-10 Igor Gaponenko
+- support mobile DAQ
+
+Tag: V00-01-02
+2012-11-08 Igor Gaponenko
+- extended Experiment Switch schema to support multiple DAQ 'stations' per instrument
+- fixed TABs in some files
+
+Tag: V00-01-01
+2012-10-11 Igor Gaponenko
+- improved implementation of the SimpleTApeMOnitor application
+- extended database schema to support FFB data migration
+
+Tag: V00-01-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-00-49
+2012-08-14 Igor Gaponenko
+- fixed a bug in teh RegDbDataMigrationFile class
+- added support for the new data retenton policy
+
+Tag: V00-00-48
+2012-07-08 Igor Gaponenko
+- extended MySQL schema to support Fast Feed Back (FFB) data recording
+
+Tag: V00-00-47
+2012-07-08 Igor Gaponenko
+- extended support for the data migration
+
+Tag: V00-00-44
+2012-05-21 Igor Gaponenko
+- JQuery, JQuery UI migration
+
+Tag: V00-00-43
+2012-04-23 Igor Gaponenko
+- extended Python module experiment_info with a function returning a list
+of files created by the DAQ system in a context of an experiemnt and a run
+- added a unit test for the module
+
+Tag: V00-00-42
+2012-04-09 Igor Gaponenko
+- added Python module experiment_info.py
+
+Tag: V00-00-41
+2012-02-27 Andy
+- added few more methods to Python RegDb class
+
+Tag: V00-00-40
+2011-12-08 Igor Gaponenko
+- updated database schema: doc/RegDB_DataMigration_schema.sql in order to support
+the 'pull' mode (DAQ to OFFLINE files migration).
+
+Tag: V00-00-39
+2011-11-29 Andy Salnikov
+- added method RegDb.find_experiment_by_name() which returns experiment
+  information given instrument and experiment names
+
+Tag: V00-00-38
+2011-11-16 Igor Gaponenko
+- migrated to NetBeans IDE
+
+Tag: V00-00-37
+2011-11-16 Igor Gaponenko
+- SQL schema changed in the Data Migration table to allow registering files which are
+ready to be migrated but which haven't been tried (to be migrated) yet.
+
+Tag: V00-00-36
+2011-10-28 Igor Gaponenko
+- changed a bug in the newely introduced schema
+
+Tag: V00-00-35
+2011-10-28 Igor Gaponenko
+- fixed a bug in PHP class method RegDB::instance()
+- added and extended schema for database table regdb.file which now has two additional
+columns storing a host name where a file is open and directory path to the file
+on that host.
+
+Tag: V00-00-34
+2011-10-10 Andy Salnikov
+- added method RegDb.last_experiment_switch() which returns latest active 
+  experiment
+
+Tag: V00-00-33
+2011-09-22 Igor Gaponenko
+- added MySQL schema for table 'data_migration' which is meant to be used
+by the ONLINE-to-Lustre file migration process to report various events.
+
+Tag: V00-00-32
+2011-09-07 Igor Gaponenko
+- implemented the 'Data Path' Web interface and the corresponding Web service
+to allow a single point of view onto physical locations where experimental
+data are stored by the ONLIN-to-OFFLINE migration script.
+
+Tag: V00-00-31
+2011-07-01 Igor Gaponenko
+- reimplemented the GROPUP management service to report operations to
+a specially designed Logger from AuthDB.
+
+Tag: V00-00-30
+2011-06-30 Igor Gaponenko
+- implemented logging of group management operations for LDAP
+
+Tag: V00-00-29
+2011-06-10 Igor Gaponenko
+- fixed a logic flaw in the authorization test method
+
+Tag: V00-00-28
+2011-05-15 Igor Gaponenko
+- automated algorithm for discovering most common special groups to replace
+the static list
+
+Tag: V00-00-27
+2011-05-13 Igor Gaponenko
+- added more special groups
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: V00-00-26
+2011-02-25 Igor Gaponenko
+- added SQL schema for experiment switch tables
+- bug fixes
+
+Tag: V00-00-25
+2010-07-28 Igor Gaponenko
+- more efficient implementation of RegDBConnection::find_user_account()
+which now avoids browsing through all known POSIX groups
+- added support for managing POSIX groups
+
+Tag: V00-00-23
+2010-07-20 Igor Gaponenko
+- extended input methods of the RegDBHtml utility class to allow disabling inputs
+- fully implemented LDAP group management
+
+Tag: V00-00-22
+2010-05-28 Igor Gaponenko
+- bug fix in RegDBHtml utility class
+- LDAP interfaces migration (yet to be fully completed)
+
+Tag: V00-00-20
+2010-04-26 Igor Gaponenko
+- a bug fix in CreateInstrument class
+- added a new test (see web/tests/ directory) to report parameters
+of the PHP installation
+
+Tag: V00-00-19
+2010-03-26 Igor Gaponenko
+- a bug fix in the CreateExperiment service
+
+Tag: V00-00-18
+2010-01-04 Igor Gaponenko
+- changes in the PHP HTML generator
+
+Tag: V00-00-17
+2009-11-14 Igor Gaponenko
+- added Python module RegDb and a simplified Python interface to the database
+for ONLINE applications
+
+Tag: V00-00-16
+2009-10-28 Igor Gaponenko
+- added fine grain methods for searching records in LDAP. These operations
+were needed for a more efficient implementation of some authorization
+operations.
+
+Tag: V00-00-15
+2009-10-27 Igor Gaponenko
+- reimplemented the PHP connection class to use persistent MySQL connections
+- added a support for locations & facilities (as alternatives for instruments
+and experiments)
+
+Tag: V00-00-14
+2009-10-12 Igor Gaponenko
+- added 'logout' to the Web app interface. It works only for WebAuth.
+
+Tag: V00-00-13
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+- added AuthDB protection for RegDB Web app
+- improved view for POSIX groups
+
+Tag: V00-00-12
+2009-09-28 Igor Gaponenko
+- extended PHP API to allow searching LDAP users
+
+Tag: V00-00-11
+2009-08-28 Igor Gaponenko
+- protect RegDB Web App and relevant Web services from unauthorized
+modifications (of the database) by unauthenticated users.
+- fix bugs
+
+Tag: V00-00-10
+2009-08-20 Igor Gaponenko
+- correctly implemented LDAP interface for PHP apps
+- spell checked Welcome.html
+
+Tag: V00-00-09
+2009-08-18 Igor Gaponenko
+- refactored menus in the RegDB Web app to get the same look and feel as
+for other web apps
+- temporarily relaxed the new experiment registration method due to
+a bug in the LDAP client code (PHP).
+
+Tag: V00-00-08
+2009-08-13 Igor Gaponenko
+- important correctons in PHP code dealing with LDAP
+
+Tag: V00-00-07
+2009-08-11 Igor Gaponenko
+- refactored the global configuration
+
+Tag: V00-00-03
+2009-07-18 Igor Gaponenko
+- extended PHP library
+
+Tag: V00-00-01
+2009-06-29 Igor Gaponenko
+- the first complete implementation of the application. This includes:
+the database schema (MySQL Workbench project, SQL initialization script and
+schema images in the PNG format), and two Web applications, one based on
+plain static HTML is meant to be used for low-level testings, and the "dynamic"
+one employs AJAX and PHP technologies.
