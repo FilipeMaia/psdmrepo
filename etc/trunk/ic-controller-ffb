@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # Shell script which runs a manages a bunch of controllers
 #
@@ -6,7 +6,8 @@
 #
 
 # release directory
-release=/reg/g/psdm/sw/releases/current
+#release=/reg/g/psdm/sw/releases/current
+release=/reg/neh/home1/wilko/release_dev/data_mgr
 #release=/reg/neh/home/salnikov/releases/ic-0.4.8
 
 # database options
@@ -14,41 +15,53 @@ conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn
 
 # config section names to read from database
 #config="calib-data compress group-time no-split pazlib live-mode"
-config="calib-data compress group-time split-scan pazlib live-mode"
+##config="calib-data compress group-time split-scan pazlib live-mode modules"
+config="compress no-split xtc-lustre calib-data pazlib live-mode modules"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
 
+
+prog=ic-controller-split
+pidfile=/var/run/ic-controller/ic-controlleri-ffb.pid
+
 # ===================================================================
 
 usage () {
-  echo "Usage: $(basename $0) [options]"
-  echo "  Options:"
-  echo "    -h        - print this message"
-  echo "    -n number - number of translators, def: $translators"
-  echo "    -r path   - release directory, def: $release"
-  echo "    -p path   - PID file path, def: none"
+    echo "Usage: $(basename $0) [options]"
+    echo "  Options:"
+    echo "    -h        - print this message"
+    echo "    -n number - number of translators, def: $translators"
+    echo "    -r path   - release directory, def: $release"
+    echo "    -p path   - PID file path, def: none"
 }
 
 while getopts hn:r:p: c ; do
-  case $c in
-    h) usage ; exit 0 ;;
-    r) release="$OPTARG" ;;
-    p) pidfile="$OPTARG" ;;
-    \?) usage ; exit 2 ;;
-  esac
+    case $c in
+	h) usage ; exit 0 ;;
+	r) release="$OPTARG" ;;
+	p) pidfile="$OPTARG" ;;
+	\?) usage ; exit 2 ;;
+    esac
 done
 shift `expr $OPTIND - 1`
 
 # allow world access
 umask 022
 
+echo  "Starting ${prog}: "
+pid=$(cat "${pidfile}" 2>/dev/null)
+if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+    echo "already running, pid=${pid}"
+    exit 
+fi
+
 # create log dir
-test -d "$logdir" || mkdir -p "$logdir" || exit 2
+test -d "${logdir}" || mkdir -p "${logdir}" || exit 2
 
 # redirect output
-time=`date +%Y%m%dT%H%M%S`
-log="$logdir/ic-controller-ffb/ic-controller-$time-`hostname`.log"
+time=$(date +%Y%m%dT%H%M%S)
+log="${logdir}/ic-controller-ffb/ic-controller-$time-$(hostname).log"
 
 test -h "$release" && sym=" -> $(readlink $release)"
 echo "Running from release $release$sym" >> "$log"
@@ -63,13 +76,14 @@ cd "$release"
 # set config options
 config_opt=""
 for c in $config ; do
-	config_opt="$config_opt -c $c"
+    config_opt="$config_opt -c $c"
 done
 
-ic-controller -d "file:${conn_file}" $config_opt -l "$log" -v -v &
+which ${prog}
+${prog} -d "file:${conn_file}" $config_opt -l "${log}" -v -v &
 pid=$!
 
 # store PID
-test -n "$pidfile" && echo $pid >"$pidfile"
+#test -n "$pidfile" && echo ${pid} >"$pidfile"
 
 exit

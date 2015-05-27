@@ -60,7 +60,7 @@ cd "${release}"
 # set config options
 config_opt=""
 for c in $config ; do
-	config_opt="${config_opt} -c ${c}"
+    config_opt="${config_opt} -c ${c}"
 done
 
 ic-controller-psana -d "file:${conn_file}" ${config_opt} -l "${log}" -v -v &

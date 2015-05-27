@@ -5,11 +5,11 @@
 
 
 # release directory
-#release=/reg/neh/home1/wilko/releases/ic-testing
-release=dm-0.9.0
+release=/reg/neh/home1/wilko/releases/ic-testing
+# release=dm-0.9.1
 
 # database options
-conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn
+conn_file=file:/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn
 
 # config section names to read from database
 config="compress no-split xtc-lustre calib-data lsf live-mode"
@@ -56,12 +56,13 @@ test -d "${logdir}" || mkdir -p "${logdir}" || exit 2
 time=$(date +%Y%m%dT%H%M%S)
 log="${logdir}/ic-controller-mon/ic-controller-${time}-$(hostname).log"
 
+# Set release env
+. /reg/g/psdm/bin/sit_setup.sh ${release}
+
+
 echo "Running from release ${release}" >> "${log}"
 type ${prog} >> "${log}"
 echo "Using configurations ${config}" >> "${log}"
-
-# Set release env
-. /reg/g/psdm/bin/sit_setup.sh ${release}
 
 # set config options
 config_opt=""
@@ -73,4 +74,4 @@ pid=$$
 # store PID
 [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
 
-exec ${prog} -d "file:${conn_file}" ${config_opt} -l "${log}" -v -v
+exec ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v
