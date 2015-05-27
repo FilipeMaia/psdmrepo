@@ -22,18 +22,22 @@ pidfile=/reg/g/psdm/psdatmgr/var/ic-controller/ic-controller-mon.pid
 # ===================================================================
 
 usage () {
-    echo "Usage: $(basename $0) [options]"
-    echo "  Options:"
-    echo "    -h        - print this message"
-    echo "    -r path   - release name or directory, def"
-    echo "    -p path   - PID file path, def: none"
+    cat <<EOF
+Usage: $(basename $0) [options]
+  Options:
+    -h        - print this message
+    -e        - start controller using exec
+    -r path   - release name or directory
+    -p path   - PID file path, def: none
+EOF
 }
 
-while getopts hr:p: c ; do
+while getopts her:p: c ; do
     case $c in
         h) usage ; exit 0 ;;
         r) release="$OPTARG" ;;
         p) pidfile="$OPTARG" ;;
+        e) doexec=1 ;;
         \?) usage ; exit 2 ;;
     esac
 done
@@ -70,8 +74,14 @@ for c in $config ; do
     config_opt="${config_opt} -c ${c}"
 done
 
-pid=$$ 
-# store PID
-[[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
 
-exec ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v
+if [[ ${doexec:-0} -eq 1 ]] ; then
+    pid=$$ 
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exec ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v
+else
+    ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v &
+    pid=$!
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exit
+fi

@@ -18,18 +18,22 @@ prog=ic-auto-translate
 # ===================================================================
 
 usage () {
-    echo "Usage: $(basename $0) [options]"
-    echo "  Options:"
-    echo "    -h        - print this message"
-    echo "    -r path   - release directory, def: $release"
-    echo "    -p path   - PID file path, def: none"
+    cat <<EOF
+Usage: $(basename $0) [options]
+  Options:
+    -h        - print this message
+    -e        - start controller using exec
+    -r path   - release name or directory
+    -p path   - PID file path, def: none
+EOF
 }
 
-while getopts hr:p: c ; do
+while getopts her:p: c ; do
     case $c in
         h) usage ; exit 0 ;;
         r) release="$OPTARG" ;;
         p) pidfile="$OPTARG" ;;
+        e) doexec=1 ;;
         \?) usage ; exit 2 ;;
     esac
 done
@@ -53,8 +57,14 @@ echo "Running from release ${release}"
 type ${prog} 
 
 
-PYTHONUNBUFFERED=x ${cmd} -v -v ${no_ffb} &
-pid=$!
-[[ -n "${pidfile}" ]] && echo ${pid} > "${pidfile}"
 
-exit
+if [[ ${doexec:-0} -eq 1 ]] ; then
+    pid=$$ 
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exec PYTHONUNBUFFERED=x ${cmd} -v -v ${no_ffb} 
+else
+    PYTHONUNBUFFERED=x ${cmd} -v -v ${no_ffb} &
+    pid=$!
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exit
+fi
