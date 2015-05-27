@@ -6,12 +6,14 @@
 #
 
 # release directory
-release=/reg/g/psdm/sw/releases/dm-current
+release=dm-current
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
 
 no_ffb="-O AMO -O CXI -O MEC -O MOB -O SXR"
+
+prog=ic-auto-translate
 
 # ===================================================================
 
@@ -44,19 +46,15 @@ time=$(date +%Y%m%dT%H%M%S)
 log="${logdir}/ic-controller/ic-auto-translate-${time}-$(hostname).log"
 exec >"${log}" 2>&1
 
-test -h "${release}" && sym=" -> $(readlink ${release})"
-echo "Running from release ${release}${sym}"
-
-# have to be in release directory
-cd "${release}"
-
 # run setup script, it should guess everything based on the current directory
-. /reg/g/psdm/bin/sit_setup.sh
+. /reg/g/psdm/bin/sit_setup.sh "${release}"
 
-PYTHONUNBUFFERED=x ic-auto-translate -v -v ${no_ffb} &
+echo "Running from release ${release}"
+type ${prog} 
+
+
+PYTHONUNBUFFERED=x ${cmd} -v -v ${no_ffb} &
 pid=$!
-
-# store PID
-test -n "${pidfile}" && echo ${pid} >"${pidfile}"
+[[ -n "${pidfile}" ]] && echo ${pid} > "${pidfile}"
 
 exit
