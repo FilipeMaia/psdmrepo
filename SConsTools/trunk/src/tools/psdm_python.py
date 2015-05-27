@@ -12,7 +12,7 @@ def generate(env):
     # be careful what you use in the code below
     #**************************************************
     
-    prefix = pjoin(env['SIT_EXTERNAL_SW'], "python/2.7.2", env['SIT_ARCH_BASE_OPT'])
+    prefix = pjoin(env['SIT_EXTERNAL_SW'], "python/2.7.10", env['SIT_ARCH_BASE_OPT'])
     version = "2.7"
     libdir = "lib"
     
