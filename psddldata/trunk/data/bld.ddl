@@ -595,7 +595,7 @@
 
   /* Projection of spectrum onto energy axis 
      PV TBD */
-  uint32_t _hproj[@self._width] -> hproj; 
+  int32_t _hproj[@self._width] -> hproj; 
 
   /* Peak position array, length given by nPeaks
      PV: TBD */
