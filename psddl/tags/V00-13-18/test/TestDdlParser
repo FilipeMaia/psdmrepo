@@ -1,0 +1,330 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script TestDdlParser...
+#
+#------------------------------------------------------------------------
+
+"""Unit tests for DDL parser classes.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@version $Id$ 
+
+@author Andy Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import unittest
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from psddl import HddlLex
+from psddl import HddlYacc
+
+#---------------------
+# Local definitions --
+#---------------------
+
+ddl1 = """\
+@include "other.ddl" [[headers("header.h")]];
+@package Package  {
+/*
+  Comment
+*/
+@type Type
+  [[type_id(Id_Type, 0)]]
+  [[value_type]]
+{
+  Pds.Clock _c -> c;
+}
+}
+"""
+
+#  This are the tokens we expect from above input (token type, token value, line number)
+ddl1_tokens = [
+    ("INCLUDE",     "@include",     1),
+    ("STRING",      "other.ddl",    1),
+    ("L2BRACKET",   "[[",           1),
+    ("IDENTIFIER",  "headers",      1),
+    ("(",           "(",            1),
+    ("STRING",      "header.h",     1),
+    (")",           ")",            1),
+    ("R2BRACKET",   "]]",           1),
+    (";",           ";",            1),
+    ("PACKAGE",     "@package",     2),
+    ("IDENTIFIER",  "Package",      2),
+    ("{",           "{",            2),
+    ("TYPE",        "@type",        6),
+    ("IDENTIFIER",  "Type",         6),
+    ("L2BRACKET",   "[[",           7),
+    ("IDENTIFIER",  "type_id",      7),
+    ("(",           "(",            7),
+    ("IDENTIFIER",  "Id_Type",      7),
+    (",",           ",",            7),
+    ("NUMBER",      (0, '0'),       7),
+    (")",           ")",            7),
+    ("R2BRACKET",   "]]",           7),
+    ("L2BRACKET",   "[[",           8),
+    ("IDENTIFIER",  "value_type",   8),
+    ("R2BRACKET",   "]]",           8),
+    ("{",           "{",            9),
+    ("IDENTIFIER",  "Pds",          10),
+    (".",           ".",            10),
+    ("IDENTIFIER",  "Clock",        10),
+    ("IDENTIFIER",  "_c",           10),
+    ("RARROW",      "->",           10),
+    ("IDENTIFIER",  "c",            10),
+    (";",           ";",            10),
+    ("}",           "}",            11),
+    ("}",           "}",            12),
+    ]
+
+ddl2 = """\
+@h5schema Schema {
+  @dataset ds1;
+  @dataset ds2 {
+    @attribute attr1;
+    @attribute Type attr2;
+  }
+}  
+"""
+
+ddl3 = """\
+@h5schema Schema {
+  @dataset ds0;
+  @dataset ds1[][];
+  @dataset ds2 {
+    @attribute attr0;
+    @attribute attr1[][][][][];
+    @attribute Type attr2[100];
+  }
+}  
+"""
+
+
+#-------------------------------
+#  Unit test class definition --
+#-------------------------------
+
+class TestDdlParser ( unittest.TestCase ) :
+
+    def setUp(self) :
+        pass
+    
+    def tearDown(self) :
+        pass
+
+    def test_lex(self):
+        '''
+        Test of tokenizer on short input file.
+        '''
+        
+        lex = HddlLex.HddlLex()
+        lexer = lex.lexer
+        lexer.input(ddl1)
+        
+        count = 0
+        while True:
+            t = lexer.token()
+            if t is None: break
+            #print (t.type, t.value, t.lineno)
+            self.assertTupleEqual((t.type, t.value, t.lineno), ddl1_tokens[count])
+            count += 1
+
+    def test_parser1(self):
+        '''
+        Test of parser on short input
+        '''
+
+        parser = HddlYacc.HddlYacc(debug=0)
+        tree = parser.parse(ddl1, 'string')
+
+        for key in ('includes', 'declarations'): self.assertIn(key, tree)
+        
+        includes = tree['includes']
+        self.assertEqual(len(includes), 1)
+        
+        include = includes[0]
+        for key in ('name', 'tags', 'pos'): self.assertIn(key, include)
+        self.assertEqual(include['name'], 'other.ddl')
+        self.assertTupleEqual(include['pos'][0], (1,1))
+
+        tags = include['tags']
+        self.assertEqual(len(tags), 1)
+
+        tag = tags[0]
+        for key in ('name', 'args', 'pos'): self.assertIn(key, tag)
+        self.assertEqual(tag['name'], 'headers')
+        self.assertTupleEqual(tag['args'], ('header.h',))
+        self.assertTupleEqual(tag['pos'][0], (1,1))
+
+        declarations = tree['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        package = declarations[0]
+        
+        for key in ('decl', 'name', 'declarations', 'tags', 'pos'): self.assertIn(key, package)
+        self.assertEqual(package['decl'], 'package')
+        self.assertEqual(package['name'], 'Package')
+        self.assertEqual(package['tags'], [])
+        self.assertTupleEqual(package['pos'][0], (2, 12))
+
+        declarations = package['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        type = declarations[0]
+
+        for key in ('decl', 'name', 'declarations', 'tags', 'pos', 'base'): self.assertIn(key, type)
+        self.assertEqual(type['decl'], 'type')
+        self.assertEqual(type['name'], 'Type')
+        self.assertIsNone(type['base'])
+        self.assertTupleEqual(type['pos'][0], (6, 11))
+
+        tags = type['tags']
+        self.assertEqual(len(tags), 3)  # comment adds as a tag
+
+        tag = tags[0]
+        for key in ('name', 'args', 'pos'): self.assertIn(key, tag)
+        self.assertEqual(tag['name'], 'type_id')
+        self.assertTupleEqual(tag['pos'][0], (7, 7))
+
+        tag = tags[1]
+        for key in ('name', 'args', 'pos'): self.assertIn(key, tag)
+        self.assertEqual(tag['name'], 'value_type')
+        self.assertTupleEqual(tag['pos'][0], (8, 8))
+
+        declarations = type['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        member = declarations[0]
+
+        for key in ('decl', 'name', 'tags', 'pos', 'method', 'bitfields', 'shape', 'type'): self.assertIn(key, member)
+        self.assertEqual(member['decl'], 'member')
+        self.assertEqual(member['name'], '_c')
+        self.assertEqual(member['method'], 'c')
+        self.assertIsNone(member['shape'])
+        self.assertIsNone(member['bitfields'])
+        self.assertEqual(member['tags'], [])
+        self.assertTupleEqual(member['pos'][0], (10, 10))
+
+
+    def test_parser2(self):
+        '''
+        Test of parser on HDF5 schema
+        '''
+
+        parser = HddlYacc.HddlYacc(debug=0)
+        tree = parser.parse(ddl2, 'string')
+
+        for key in ('includes', 'declarations'): self.assertIn(key, tree)
+        
+        includes = tree['includes']
+        self.assertEqual(len(includes), 0)
+        
+        declarations = tree['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        schema = declarations[0]
+        
+        for key in ('decl', 'name', 'tags', 'pos', 'declarations'): self.assertIn(key, schema)
+        self.assertEqual(schema['decl'], 'h5schema')
+        self.assertEqual(schema['name'], 'Schema')
+        self.assertEqual(schema['tags'], [])
+        self.assertTupleEqual(schema['pos'][0], (1, 7))
+
+        datasets = schema['declarations']
+        self.assertEqual(len(datasets), 2)
+        
+        ds = datasets[0]
+        for key in ('decl', 'name', 'tags', 'pos', 'attributes', 'type'): self.assertIn(key, ds)
+        self.assertEqual(ds['decl'], 'h5ds')
+        self.assertEqual(ds['name'], 'ds1')
+        self.assertEqual(ds['tags'], [])
+        self.assertIsNone(ds['type'])
+        self.assertTupleEqual(ds['pos'][0], (2, 2))
+
+        ds = datasets[1]
+        for key in ('decl', 'name', 'tags', 'pos', 'attributes', 'type'): self.assertIn(key, ds)
+        self.assertEqual(ds['decl'], 'h5ds')
+        self.assertEqual(ds['name'], 'ds2')
+        self.assertEqual(ds['tags'], [])
+        self.assertIsNone(ds['type'])
+        self.assertTupleEqual(ds['pos'][0], (3, 6))
+
+        attributes = ds['attributes']
+        self.assertEqual(len(attributes), 2)
+        
+        attr = attributes[0]
+        for key in ('decl', 'name', 'tags', 'pos', 'type'): self.assertIn(key, attr)
+        self.assertEqual(attr['decl'], 'h5attr')
+        self.assertEqual(attr['name'], 'attr1')
+        self.assertEqual(attr['tags'], [])
+        self.assertIsNone(attr['type'])
+        self.assertTupleEqual(attr['pos'][0], (4, 4))
+
+        attr = attributes[1]
+        for key in ('decl', 'name', 'tags', 'pos', 'type'): self.assertIn(key, attr)
+        self.assertEqual(attr['decl'], 'h5attr')
+        self.assertEqual(attr['name'], 'attr2')
+        self.assertEqual(attr['tags'], [])
+        self.assertIsNotNone(attr['type'])
+        self.assertTupleEqual(attr['pos'][0], (5, 5))
+
+    def test_parser3(self):
+        '''
+        Test of parser on HDF5 schema with shape specification
+        '''
+
+        parser = HddlYacc.HddlYacc(debug=0)
+        tree = parser.parse(ddl3, 'string')
+
+        declarations = tree['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        schema = declarations[0]
+        datasets = schema['declarations']
+        self.assertEqual(len(datasets), 3)
+        
+        ds = datasets[0]
+        self.assertIsNone(ds['shape'])
+
+        ds = datasets[1]
+        self.assertEqual(ds['shape'], 2)
+
+        ds = datasets[2]
+        self.assertIsNone(ds['shape'])
+        attributes = ds['attributes']
+        self.assertEqual(len(attributes), 3)
+        
+        attr = attributes[0]
+        self.assertIsNone(attr['shape'])
+
+        attr = attributes[1]
+        self.assertEqual(attr['shape'], 5)
+
+        attr = attributes[2]
+        self.assertEqual(attr['shape'], ['100'])
+
+#
+#  run unit tests when imported as a main module
+#
+if __name__ == "__main__":
+    unittest.main()

@@ -1,0 +1,184 @@
+:
+:  Library of Jinja2 templates for Pds2PsanaDispatch backend
+:
+:  Lines starting with colon are comments, except for special '::::template::::'
+:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: macros
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Implementation of constructor. 
+:  
+:  Parameters for this template:
+:    type  - instance of Type class
+:    base  - full name of base class
+:    memberinit - list of attribute initializations
+:    initcode - lines of code going inside constructor body
+:
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+{{type.name}}{{TMPL}}::{{type.name}}(const boost::shared_ptr<const XtcType>& xtcPtr
+{%- if type.xtcConfig -%}
+, const boost::shared_ptr<const Config>& cfgPtr
+{%- endif -%}
+{%- if type.size.value is none -%}
+, size_t xtcSize
+{%- endif -%}
+)
+  : {{base}}()
+  , m_xtcObj(xtcPtr)
+$ if type.xtcConfig:
+  , m_cfgPtr(cfgPtr)
+$ endif
+$ for init in memberinit:
+  , {{init}}
+$ endfor
+{
+$ for init in initcode:
+{{init}}
+$ endfor
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_init_ndarray
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Initialization of ndarray attribute in constructor. 
+:  
+:  Parameters for this template:
+:    attr         - instance of Attribute type
+:    pdstypename  - attribute type name in pdsdata
+:    psanatypename  - attribute type name in psana
+:    attrtypens     - namespace of the attribute type
+:    cfg          - optional, expression which gives config instance if needed
+:    cvt          - optional, conversion method
+:
+$ set rank = attr.shape.dims|length
+  {
+    typedef ndarray<{{psanatypename}}, {{rank}}> NDArray;
+    typedef ndarray<const {{pdstypename}}, {{rank}}> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->{{attr.accessor.name}}({{cfg}});
+    {{attr.name}}_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = {{attr.name}}_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+$ if cvt:
+      *out = {{cvt}}(*it);
+$ else:
+      *out = *it;
+$ endif
+    }
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: fwd_method_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Implementation of the forwarding method. 
+:  
+:  Parameters for this template:
+:    type     - instance of Type class
+:    name     - method name
+:    typedecl - return type declaration
+:    args     - argument declaration
+:    passargs - arguments passed to the downstream method
+:    cvt      - inf true then conversion is needed
+:
+
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+{{typedecl}} {{type.name}}{{TMPL}}::{{name}}({{argdecl}}) const {
+$ if cvt:
+  return pds_to_psana(m_xtcObj->{{name}}({{passargs}}));
+$ else
+  return m_xtcObj->{{name}}({{passargs or ''}});
+$ endif
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: abs_type_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Declaration of implementation for abstract type.
+:  
+:  Parameters for this template:
+:    type  - instance of Type class
+:    psanatypename - full name of base class
+:    pdstypename - full name of XTC class
+:    pdstypename - full name of XTC class
+:    declarations - list of method declarations
+:    members - list of member declarations
+:
+
+{% if type.xtcConfig %}
+template <typename Config>
+{% endif %}
+class {{type.name}} : public {{psanatypename}} {
+public:
+  typedef {{pdstypename}} XtcType;
+  typedef {{psanatypename}} PsanaType;
+  {{type.name}}(const boost::shared_ptr<const XtcType>& xtcPtr
+{%- if type.xtcConfig -%}
+, const boost::shared_ptr<const Config>& cfgPtr
+{%- endif -%}
+{%- if type.size.value is none -%}
+, size_t xtcSize
+{%- endif -%}
+);
+  virtual ~{{type.name}}();
+$ for decl in declarations:
+  {{decl}}
+$ endfor
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+$ if type.xtcConfig:
+  boost::shared_ptr<const Config> m_cfgPtr;
+$ endif
+$ for member in members:
+  {{member}}
+$ endfor
+};
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: shape_meth_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Implementation for shape method.
+:  
+:  Parameters for this template:
+:    type  - instance of Type class
+:    attr  - instance of Attribute class
+:
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+std::vector<int> {{type.name}}{{TMPL}}::{{attr.shape_method}}() const
+{
+  std::vector<int> shape;
+  shape.reserve({{attr.shape.dims|length}});
+$ set attr0 = attr.name
+$ for s in attr.shape.dims:
+  shape.push_back({{attr0}}.size());
+$ set attr0 = attr0 ~ '[0]'
+$ endfor
+  return shape;
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_pds_to_psana
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Implementation declaration of enum conversion method.
+:  
+:
+{{psanatype}} pds_to_psana({{pdstype}} e)
+{
+  return {{psanatype}}(e);
+}
+
