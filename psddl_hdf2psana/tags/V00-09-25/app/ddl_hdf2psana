@@ -1,0 +1,40 @@
+#!@PYTHON@
+
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
+
+programDescription = '''
+script to run the hdf5 and hdf5-dispatch DDL back end to produce the DDL generated 
+for the psddl_hdf2psanaTranslator package.
+'''
+
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc','smldata'],
+                                                          includeHdf=True,
+                                                          includeDecl=False)
+    filesForDispatch = []
+    for pkg, subdict in pkgdict.iteritems():
+        ddlFile = subdict['ddlfile']
+        h5schemaFile = subdict['h5schema']
+        filesForDispatch.append(ddlFile)
+        if len(h5schemaFile)>0:
+            filesForDispatch.append(h5schemaFile)
+        cmd = psddlCmdStart + ' -b hdf5 -I data -E psddl_hdf2psana/include -O psddl_hdf2psana/src'
+        cmd += ' -i psddl_hdf2psana -t psddl_hdf2psana'
+        cmd += (' -B psana-inc:psddl_psana -B psana-ns:Psana %s %s' % (ddlFile, h5schemaFile))
+        if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+        sys.stdout.flush()
+        res = subprocess.call(cmd,shell=True)
+        assert res == 0, "error with call: %s, res=%s\n" % (cmd, res)
+            
+    dispatchCmd = psddlCmdStart + ' -b hdf5-dispatch -I data'
+    dispatchCmd += ' -e psddl_hdf2psana/include/dispatch.h -o psddl_hdf2psana/src/dispatch.cpp'
+    dispatchCmd += ' -i psddl_hdf2psana -t psddl_hdf2psana -B psana-ns:Psana '
+    dispatchCmd += ' '.join(filesForDispatch)
+    
+    if verbose: sys.stdout.write("executing:\n%s\n" % dispatchCmd)
+    sys.stdout.flush()
+    sys.exit(subprocess.call(dispatchCmd, shell=True))
