@@ -1,0 +1,339 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package XtcInput
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-10-15
+2015-05-28 David Schneider
+- fix bug with evicting streams JIRA Issue PSAS-154
+
+Tag: V00-10-14
+2015-04-20 David Schneider
+- Adjust trace log message for SharedFile. Add file descriptor to trackdown file
+  exhaustion bugs.
+
+Tag: V00-10-13
+2015-03-05 David Schneider
+- JIRA issue PSAS-85, add live mode support
+	
+Tag: V00-10-12
+2015-03-03 David Schneider
+- small data JIRA issue PSAS-85
+- update XtcFileName with boolean flag for small data. 
+  some constructors take additional parameter about small
+  contains logic for distinguishing small data file (ends with .smd.xtc)
+  contains logic to return large xtc filename from small (strip out .smd)	
+  change sort order so all small xtc come before large xtc
+- Note: live mode not implemented yet - LiveFilesDB only looks for large xtc files
+
+Tag: V00-10-11
+2015-02-12 David Schneider
+- add parameter PSXtcInput.XtcInputModule.runLiveTimeout to get psana to wait for 
+  new runs in live mode. JRIA issue PSAS-108
+
+Tag: V00-10-10
+2014-11-24 David schneider
+- add check for corrupted xtc to address JIRA issue PSAS-71
+
+Tag: V00-10-09
+2014-09-18 David schneider
+- adjust debug printout
+
+Tag: V00-10-08
+2014-09-16 David Schneider
+- reduce debug verbosity
+
+Tag: V00-10-07
+2014-09-02 David Schneider
+- change jump options from second event to third event. Allows psana to
+  process both beginRun and Configure before jump. Then user modules can
+  get a valid run number in beginRun
+
+Tag: V00-10-06
+2014-08-28 David Schneider
+- Give new DgramReader argument default value for backward compatibility.
+  New argument broke build with O2OTranslator
+
+Tag: V00-10-05
+2014-08-27 David Schneider
+- add feature: jump to arbitrary offsets in xtc files before second event. 
+  DgramReader takes new argument: firstEventAfterConfigure
+  This percolates down to other classes in the package.
+  New class XtcFilesPosition describes file offsets before second event.
+
+Tag: V00-10-04
+2014-08-08 David Schneider
+- add file offset field to XtcInput::Dgram
+- have psana record file offset for standard xtcinput (not indexing)
+  presently information not used by other packages 
+- change a declaration from char * to const char * to fix rhel6 warning
+
+Tag: V00-10-03
+2014-08-01 David Schneider
+- discard L1Accept's that have 0x1FFFF as the fiducial. jira ticket PSAS-13
+ 
+Tag: V00-10-02
+2014-07-22 David Schneider
+- add backward compatible XtcStreamDgIter constructor for package PSXtcQC
+- also add backward compatiable DgramReader constructor - though doesn't 
+  appear to be needed
+	
+
+Tag: V00-10-01
+2014-07-18 David Schneider
+- create artificial tag to try to bypass svn protect tags hook
+
+Tag: V00-10-00
+2014-07-18 David Schneider
+- trac ticket:279 merge control and DAQ streams into the same event
+  Introduce StreamDgram, keep track of L1Block number
+  Introduce fiducial/second based comparisons
+  Rework XtcStreamMerger
+	
+Tag: V00-09-13
+2014-05-13 Christopher O'Grady
+- add Dgram::operator< so indexing can sort non-event datagrams
+  in time order
+
+Tag: V00-09-11
+2014-03-12 Igor Gaponenko
+- added support for filtering on stream ranges
+
+Tag: V00-09-10
+2014-03-11 Andy
+- improve handling of EOF while reading datagram payload
+
+Tag: V00-09-09
+2014-02-26 Andy
+- add XtcFilterTypeIdSrc filter class for filtering XTC contents
+
+Tag: V00-09-08
+2014-01-06 Andy Salnikov
+- XtcChunkDgIter::next() - add protection for corrupted headers, checks 
+  extent size of the top-most XTC and raises exception if size is 
+  lower that size of XTC header
+
+Tag: V00-09-07
+2013-11-07 David Schneider
+- add convenience function to DgHeader
+
+Tag: V00-09-06
+2013-07-21 Andy Salnikov
+- update test applications for changes in CmdLine interfaces
+
+Tag: V00-09-05
+2013-07-05 Andy Salnikov
+- raise an exception when dataset makes empty list of files
+
+Tag: V00-09-04
+2013-06-10 Andy Salnikov
+- implement simple exception transport for datagram queue
+
+Tag: V00-09-03
+2013-05-22 Andy Salnikov
+- update doxygen comments
+
+Tag: V00-09-02
+2013-05-10 Andy Salnikov
+- DgHeader.cpp: add more info to debug message
+
+Tag: V00-09-01
+2013-04-05 Andy Salnikov
+- XtcIterator was missing a protection from XTC contaier having damage
+  IncompleteContribution
+
+Tag: V00-09-00
+2013-03-29 Andy Salnikov
+- add support for one-stream input of Xtc files
+
+Tag: V00-08-03
+2013-03-04 Andy Salnikov
+- fixing doxygen comments fo XtcStreamMerger constructor
+
+Tag: V00-08-02
+2013-03-02 Andy Salnikov
+- update tests for changes in API
+
+Tag: V00-08-01
+2013-03-01 Andy Salnikov
+- re-apply changes in V00-07-03, make tag for nightly builds
+
+Tag: V00-08-00
+2013-03-01 Andy Salnikov
+- undo V00-07-03 to make a tag for ana-0.7.x
+- after introduction of read-ahead for headers current file name 
+  does not make sense anymore
+  - removed XtcStreamDgIter::m_file member and method 
+    XtcStreamDgIter::chunkName()
+  - added DgHeader::path() method which should be used instead 
+    of XtcStreamDgIter::chunkName()
+  - replace boost::filesystem::path with XtcFileName in DgHeader
+  - XtcFileName adds extension() method
+  - XtcStreamDgIter::next() return Dgram object instead of Dgram::ptr
+
+Tag: V00-07-03
+2013-02-12 Andy Salnikov
+- use new Dataset functionality to find the list of files instead of
+  own algorithm
+
+Tag: V00-07-02
+2013-01-21 Andy Salnikov
+- bug fix in implementation of Shared file, assumed live data even 
+  when file extension was not inprogress
+
+Tag: V00-07-01
+2013-01-17 Andy Salnikov
+- implemented initial algorithm for header sorting in XtcStreamDgIter
+- fixed all tests
+- added new test for header sorting (test/XtcReadAheadTest.cpp)
+
+Tag: V00-07-00
+2013-01-16 Andy Salnikov
+- preparing for datagram read-ahead and sorting, for now introduce
+  new class DgHeader that will be used in read-ahead
+- split XtcStreamDgIter into three classes: SharedFile, DgHeader and
+  same XtcStreamDgIter. XtcStreamDgIter now returns DgHeader instead 
+  of whole datagram. DgHeader reads datagram when requested. Both
+  XtcStreamDgIter and DgHeader used SharedFile class for reading.
+- maximum datagram size removed from interfaces (constructors), there 
+  is one internal limit on datagram size (256MB) used for checking 
+  against header corruption
+- there are no changes in the order of datagrams yet, all results should
+  be identical to what we had before
+
+Tag: V00-06-06
+2012-10-11 Andy Salnikov
+- if live database contains no info about files then RunFileIterLive 
+  throws exception instead of returning empty "EOF" histogram
+
+Tag: V00-06-05
+2012-07-29 Andy Salnikov
+- if the queue is full and terminate is called on DgramReader thread
+  it will hang forever trying to push one more datagram into a queue,
+  fix by removing all datagrams first before adding EOD datagram
+
+Tag: V00-06-04
+2012-07-27 Andy Salnikov
+- small fixes to doxygen comments
+
+Tag: V00-06-03
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-06-02
+2012-07-17 Andy Salnikov
+- fix a comment
+
+Tag: V00-06-01
+2012-07-15 Andy Salnikov
+- generate exception when expected live files are not there
+
+Tag: V00-06-00
+2012-07-12 Andy Salnikov
+- live reading implementation more or less complete, simple tests run OK
+
+Tag: V00-05-02
+2012-07-10 Andy Salnikov
+- forgot to update unit test for new MergeMode enums
+
+Tag: V00-05-01
+2012-07-09 Andy Salnikov
+- mergeMode() method also accepts "old" enum names
+
+Tag: V00-05-00
+2012-07-09 Andy Salnikov
+- a bit of redesign, split iterators into iterators over datagrams
+  and iterators over files
+- iteration over files has two implementation, first is based on static 
+  list of input files as before, second uses database as the source of 
+  live data; second implementation is not tested yet
+
+Tag: V00-04-01
+2012-06-22 Andy Salnikov
+- forgot to update tests to use new class names
+
+Tag: V00-04-00
+2012-06-22 Andy Salnikov
+- renamed XtcDgIterator class into XtcChunkDgIter, XtcDechunk into
+  XtcStreamDgIter
+- updated comments in few places
+
+Tag: V00-03-01
+2012-06-21 Andy Salnikov
+- implementing live mode for XtcDgIterator
+- new test app test/XtcDgIteratorTest.cpp
+
+Tag: V00-03-00
+2012-06-20 Andy Salnikov
+- updated XtcDgIterator to use unbuffered IO, first step to support
+  reading live data
+
+Tag: V00-02-02
+2012-06-19 Andy Salnikov
+- XtcFileName gets a constructor which takes experiemnt id, run number,
+  stream and chunk numbers
+- added also unit tests for the above constructor
+- XtcDgIterator::next allocates minimum necessary space for datagram,
+  not maximum allowed size
+
+Tag: V00-02-01
+2012-03-05 Andy Salnikov
+- adding XtcFilter classes to filter datagram contents, right now only
+  one filtering option exists (XtcFilterTypeId class) based on TypeId
+
+Tag: V00-02-00
+2012-01-27 Andy Salnikov
+- improved handling of out-of-order transitions
+
+Tag: V00-01-02
+2011-04-01 Andy Salnikov
+- change logging level for few messages
+
+Tag: V00-01-01
+2011-03-31 Andy Salnikov
+- XtcStreamMerger::next - last change introduced a bug, fixed now
+- XtcIterator.cpp: trying to find a workaround for some weird cases 
+  with CsPad::ElementV2 reading when nested XTC object indicated larger
+  data size than its containing XTC container.
+
+Tag: V00-01-00
+2011-03-29 Andy Salnikov
+- add support for extracting run number from datagrams stored in a queue
+- Dgram is now a class instead of namespace, instances contain pointer 
+  to Pds::Dgram and XtcFileName.
+- XtcStreamMerge::next() returns Dgram object
+- DgramQueue class stores Dgram objects
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- fix compilation issue after merge with V00-00-03
+
+Tag: V00-00-04
+2011-03-20 Andy Salnikov
+- added smart pointer typedef for datagram class and couple of utility
+  methods to manage datagram memory.
+- changed all users of datagram class to use smart pointer class instead
+  of bare pointer
+
+Tag: V00-00-03
+2011-02-16 Andy Salnikov
+- stop throwing exceptions at premature EOF, printing error message is 
+  sufficient.
+
+Tag: V00-00-02
+2011-01-26 Andy Salnikov
+- returned XtcIterator back to translator package
+- XtcIterator class is now a simple tree-traversal iterator which 
+  returns one XTC object at a time
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- Moved some common classes for XTC reading here from O2OTranslator
