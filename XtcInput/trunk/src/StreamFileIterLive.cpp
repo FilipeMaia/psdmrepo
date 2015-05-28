@@ -150,7 +150,8 @@ StreamFileIterLive::next()
         if (m_stream == -3) {
 
           // evict streams which do not fall into any range in the dataset specification
-          for (Streams::const_iterator s_it = m_streams.begin(); s_it != m_streams.end(); ++ s_it) {
+          Streams::iterator s_it = m_streams.begin();
+          while (s_it != m_streams.end()) {
             bool evict = true ;
             for (IData::Dataset::Streams::const_iterator ds_s_it = m_ds_streams.begin(); ds_s_it != m_ds_streams.end(); ++ ds_s_it) {
               if (ds_s_it->first <= *s_it && *s_it <= ds_s_it->second) {
@@ -160,7 +161,11 @@ StreamFileIterLive::next()
             }
             if (evict) {
               MsgLog(logger, debug, "Stream filtering mode, excluding stream number: " << *s_it);
-              m_streams.erase(*s_it);
+              Streams::iterator toErase = s_it;
+              ++s_it;
+              m_streams.erase(toErase);
+            } else {
+              ++s_it;
             }
           }
 

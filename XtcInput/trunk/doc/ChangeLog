@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-15
+2015-05-28 David Schneider
+- fix bug with evicting streams JIRA Issue PSAS-154
+
 Tag: V00-10-14
 2015-04-20 David Schneider
 - Adjust trace log message for SharedFile. Add file descriptor to trackdown file
