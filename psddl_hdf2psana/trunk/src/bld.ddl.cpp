@@ -2806,7 +2806,7 @@ uint32_t BldDataSpectrometerV1_v0::nPeaks() const {
   if (not m_ds_data) read_ds_data();
   return uint32_t(m_ds_data->nPeaks);
 }
-ndarray<const uint32_t, 1> BldDataSpectrometerV1_v0::hproj() const {
+ndarray<const int32_t, 1> BldDataSpectrometerV1_v0::hproj() const {
   if (m_ds_hproj.empty()) read_ds_hproj();
   return m_ds_hproj;
 }
@@ -2826,7 +2826,7 @@ void BldDataSpectrometerV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataSpectrometerV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 void BldDataSpectrometerV1_v0::read_ds_hproj() const {
-  m_ds_hproj = hdf5pp::Utils::readNdarray<uint32_t, 1>(m_group, "hproj", m_idx);
+  m_ds_hproj = hdf5pp::Utils::readNdarray<int32_t, 1>(m_group, "hproj", m_idx);
 }
 void BldDataSpectrometerV1_v0::read_ds_peakPos() const {
   if (not m_group.hasChild("peakPos")) {
@@ -2860,7 +2860,7 @@ void make_datasets_BldDataSpectrometerV1_v0(const Psana::Bld::BldDataSpectromete
   {
     typedef __typeof__(obj.hproj()) PsanaArray;
     const PsanaArray& psana_array = obj.hproj();
-    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), psana_array.shape()[0]);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int32_t>::stored_type(), psana_array.shape()[0]);
     hdf5pp::Utils::createDataset(group, "hproj", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {

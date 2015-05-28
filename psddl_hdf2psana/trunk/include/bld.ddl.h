@@ -1020,7 +1020,7 @@ public:
   virtual double com() const;
   virtual double integral() const;
   virtual uint32_t nPeaks() const;
-  virtual ndarray<const uint32_t, 1> hproj() const;
+  virtual ndarray<const int32_t, 1> hproj() const;
   virtual ndarray<const double, 1> peakPos() const;
   virtual ndarray<const double, 1> peakHeight() const;
   virtual ndarray<const double, 1> FWHM() const;
@@ -1029,7 +1029,7 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Bld::ns_BldDataSpectrometerV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
-  mutable ndarray<const uint32_t, 1> m_ds_hproj;
+  mutable ndarray<const int32_t, 1> m_ds_hproj;
   void read_ds_hproj() const;
   mutable ndarray<const double, 1> m_ds_peakPos;
   void read_ds_peakPos() const;

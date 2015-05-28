@@ -11,6 +11,9 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-25
+2015-5-28 David Schneider
+- update to pdsdata 8.2.9 with BldDataSpectrometerV1 hproj int32 fix, JIRA PSAS-151
 	
 Tag: V00-09-24
 2015-5-1 David Schneider
