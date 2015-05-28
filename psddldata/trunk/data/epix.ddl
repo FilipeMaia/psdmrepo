@@ -1013,7 +1013,7 @@
   [[type_id(Id_EpixElement, 2)]]
   [[pack(2)]]
   [[config(Config100aV1)]]
-//  [[config(ConfigSV1)]]
+  [[config(ConfigSV1)]]
 {
   uint32_t _first {
     uint8_t _vc:2 -> vc;
