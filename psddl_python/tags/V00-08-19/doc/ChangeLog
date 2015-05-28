@@ -1,0 +1,346 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_python
+#------------------------------------------------------------------------
+
+Package author: Joseph S. Barrera
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-08-18
+2015-5-28 David Schneider
+- update to pdsdata 8.2.9 with BldDataSpectrometerV1 hproj int32 fix, JIRA PSAS-151
+
+Tag: V00-08-18
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
+Tag: V00-08-17
+2015-2-23 David Schneider
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+
+Tag: V00-08-16
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+
+Tag: V00-08-15
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103.
+
+Tag: V00-08-14
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
+Tag: V00-08-13
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
+Tag: V00-08-12
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+
+Tag: V00-08-11
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with:
+  Evr::IOConfigV2
+
+Tag: V00-08-10
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+
+Tag: V00-08-09
+2014-07-03 David Schneider
+- regenerate for new pdsdata/psddldata with BldEBeamV6
+
+Tag: V00-08-08
+2014-06-14 David Schneider
+- regenerate whole thing from psddldata V01-00-10
+- trac ticket #309
+
+Tag: V00-08-07
+2014-05-05 David
+- regenerate for psddldata V01-00-09
+- trac ticket #300
+
+Tag: V00-08-06
+2014-05-02 David
+- regenerate for psddldata V01-00-08
+- trac ticket #295
+
+Tag: V00-08-05
+2014-04-29 David
+- convert ndarray<const T,R> to non-writeable numpy array.
+- trac ticket #291
+
+Tag: V00-08-04
+2014-03-10 David
+- regenerate whole thing from psddldata V01-00-06
+- trac ticket #278
+
+Tag: V00-08-03
+2014-03-10 David
+- regenerate whole thing from psddldata V01-00-05
+- trac ticket #277
+
+Tag: V00-08-02
+2014-03-04 Andy
+- regenerate whole thing from psddldata V01-00-04
+- trac ticket #276
+
+Tag: V00-08-01
+2014-02-11 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+
+Tag: V00-08-00
+2014-10-13 Andy Salnikov
+- Converter: interace need a little change to work better with aliases
+
+Tag: V00-07-00
+2013-12-22 Andy Salnikov
+- regenerate whole thing from psddldata V01-00-00 with psddl V00-13-00
+
+Tag: V00-06-07
+2013-12-19 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-56
+- new epix package
+
+Tag: V00-06-06
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-54
+
+Tag: V00-06-05
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-53
+- new type Evr::SrcConfigV1
+
+Tag: V00-06-04
+2013-12-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-50
+- new epixsampler package
+
+Tag: V00-06-03
+2013-11-12 Andy Salnikov
+- small improvement to ddl_* script
+
+Tag: V00-06-02
+2013-11-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-47 with psddl V00-12-04
+- new rayonix package
+- ipimb.Config types have new method
+
+Tag: V00-06-01
+2013-10-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-45 with psddl V00-08-18
+
+Tag: V00-06-00
+2013-09-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
+
+Tag: V00-05-09
+2013-08-14 Andy Salnikov
+- fix policy for methods returning reference to non-copyable type
+
+Tag: V00-05-08
+2013-08-14 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-30
+
+Tag: V00-05-07
+2013-07-18 David Schneider
+- Suppressing C++ signature in docstrings for Python wrappers.
+
+Tag: V00-05-06
+2013-07-17 David Schneider
+- Added docstrings to classes and methods.  docstrings come from DDL comments.
+
+Tag: V00-05-05
+2013-07-17 David Schneider
+- Regenerating python wrappers with version and TypeId exported. Adding 
+  a unit test for enum and constant exporting into the python wrappers.
+	
+Tag: V00-05-04
+2013-07-10 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-29
+- one missing const added to imp package
+
+Tag: V00-05-03
+2013-07-10 David Schneider
+- exporting enums and constants from the pstypes into the python wrappers.
+	
+Tag: V00-05-02
+2013-05-22 Andy Salnikov
+- fixing doxygen comments
+
+Tag: V00-05-01
+2013-05-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-28
+
+Tag: V00-05-00
+2013-05-21 Andy Salnikov
+- re-designing Python-C++ conversion a bit to support 2-way ndarray 
+  conversion between Python and C++
+- __typeid__ method is gone from Python classes, now conversion will 
+  be based on Python type of the objects
+
+Tag: V00-04-13
+2013-05-15 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-27
+
+Tag: V00-04-12
+2013-04-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-26
+
+Tag: V00-04-11
+2013-03-29 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-24
+
+Tag: V00-04-10
+2013-03-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-15
+
+Tag: V00-04-09
+2013-03-14 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-14
+
+Tag: V00-04-08
+2013-03-10 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-11
+
+Tag: V00-04-07
+2013-03-04 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-10
+
+Tag: V00-04-06
+2013-03-04 Andy Salnikov
+- small change in cspad DDL, re-generate everything from psddldata V00-04-09
+
+Tag: V00-04-05
+2013-03-02 Andy Salnikov
+- generated stuff has include boost/python.hpp at the top to suppress 
+  compilation warnings
+- couple of files include Python.h for the same reason
+
+Tag: V00-04-04
+2013-02-26 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-07
+
+Tag: V00-04-03
+2013-02-26 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-06
+
+Tag: V00-04-02
+2013-02-12 Andy Salnikov
+- no wrapper classes generated anymore, use shared_ptr as holders
+- headers disappeared
+
+Tag: V00-04-01
+2013-02-07 Andy Salnikov
+- converters' convert() method now return PyObject instead of boost object
+- getTypeName() method is not needed in converters, removed
+- replace generated converter classes with couple of template classes
+- __typeid__ method implementation is also made template
+
+Tag: V00-04-00
+2013-02-06 Andy Salnikov
+- lots of changes everywhere:
+- Getters renamed to Converters, there are no differences anymore between
+  event and env converters, converters are only converting data between
+  c++ and python, they do not care about event
+- GetterMap renamed to ConverterMap and reimpemented completely based on
+  type_info and Pds::TypeId; no more strings/templates
+- vector stuff disappeared
+- generator does not generate _Wrapper classes for value types, for these 
+  boost already does what we need
+- lifetime management should be done correctly now for all types and 
+  ndarray too
+- something else that I forgot
+
+Tag: V00-03-03
+2013-02-05 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-03
+
+Tag: V00-03-02
+2013-02-05 Andy Salnikov
+- upgrading to pdsdata V06-01-04
+- regenerate whole thing from psddldata V00-04-02
+
+Tag: V00-03-01
+2013-02-04 Andy Salnikov
+- upgrading to pdsdata V06-01-02
+- regenerate whole thing from psddldata V00-04-01
+
+Tag: V00-03-00
+2013-01-31 Andy Salnikov
+- simplify getter and getter map
+- fix the names of the classes
+- classes are created inside correct module structure
+
+Tag: V00-02-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays for array data
+
+Tag: V00-01-09
+2013-01-26 Andy Salnikov
+- moved all generated stuff here from psana_python
+- fix for ddl_python script
+
+Tag: V00-01-08
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- regenerate whole thing from psddldata V00-03-15
+
+Tag: V00-01-07
+2012-11-15 Andy Salnikov
+- upgrading to pdsdata V05-01-00
+- regenerate whole thing from psddldata V00-03-13
+
+Tag: V00-01-06
+2012-11-08 Andy Salnikov
+- upgrading to pdsdata V04-05-00
+- regenerate whole thing from psddldata V00-03-12
+
+Tag: V00-01-05
+2012-10-23 Andy Salnikov
+- upgrading to pdsdata V04-02-07
+- regenerate whole thing from psddldata V00-03-11
+
+Tag: V00-01-04
+2012-10-10 Andy Salnikov
+- fix for version number in BldDataGMDV0
+
+Tag: V00-01-03
+2012-10-08 Andy Salnikov
+- upgrading to pdsdata V04-02-01
+- regenerate whole thing from psddldata V00-03-09
+
+Tag: V00-01-02
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- regenerate whole thing from psddldata V00-03-08
+
+Tag: V00-01-01
+2012-09-24 Andy Salnikov
+- rearrange includes to get rid of the compilation warnings
+- commented-out dead code for the same reason
+
+Tag: V00-01-00
+2012-09-11 Andy Salnikov
+- all content of this package should be in psddl_python namespace, not Psana
+
+Tag: V00-00-02
+2012-07-24 Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-00-01
+2012-07-08 Joseph S. Barrera
+	- Initial checkin
