@@ -574,6 +574,7 @@ void createWrappers(PyObject* module) {
   }
   detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const double, 1>();
+  detail::register_ndarray_to_numpy_cvt<const int32_t, 1>();
 
 } // createWrappers()
 } // namespace Bld
