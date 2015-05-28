@@ -963,7 +963,7 @@ public:
   virtual uint32_t nPeaks() const = 0;
   /** Projection of spectrum onto energy axis 
      PV TBD */
-  virtual ndarray<const uint32_t, 1> hproj() const = 0;
+  virtual ndarray<const int32_t, 1> hproj() const = 0;
   /** Peak position array, length given by nPeaks
      PV: TBD */
   virtual ndarray<const double, 1> peakPos() const = 0;
