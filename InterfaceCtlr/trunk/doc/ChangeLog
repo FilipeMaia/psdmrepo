@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag
+2015
+- added CreateIDB_v2.sql to create controller database (used for iface_db_dqm)
+	
 Tag V01-03-14	
 2015-05-26
 - Added --force option to deactivate controller without checking if the pid still exists.
