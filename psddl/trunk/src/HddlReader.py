@@ -194,9 +194,18 @@ class HddlReader ( object ) :
         # stack (LIFO) of file names currently in processing
         self.location = []  
 
+        # list of devel types encountered
+        self.develTypes = []
+    
     #-------------------
     #  Public methods --
     #-------------------
+
+    def _isDevelType(self, typename, pkg):
+        for develType in self.develTypes:
+            if develType['typeName']==typename and pkg.fullName()==develType['pkgName']:
+                return True
+        return False
 
     def _processed(self, file):
         ''' 
@@ -375,7 +384,9 @@ class HddlReader ( object ) :
 
         # check tag names
         self._checktags(typedict, ['value_type', 'devel', 'config_type', 'config', 'pack', 'no_sizeof', 'external', 'type_id', 'cpp_name', 'doc'])
-        if _hasDevelTag(typedict) and not self.parseDevelTypes: return
+        if _hasDevelTag(typedict):
+            self.develTypes.append({'pkgName':pkg.fullName(), 'typeName':typedict['name']})
+            if not self.parseDevelTypes: return
         # every type must have a name
         typename = typedict['name']
         
@@ -980,6 +991,9 @@ class HddlReader ( object ) :
                     raise _error(self.location[-1], _lineno(tag), msg)
                 cfgtype = pkg.lookup(str(cfg), Type)
                 if not cfgtype:
+                    if not self.parseDevelTypes and self._isDevelType(str(cfg), pkg):
+                        print >>sys.stderr, "Warning: %s type=%s, DEVEL type=%s in config list is being omitted" % (pkg, typedict['name'], cfg)
+                        continue
                     msg = "Failed to resolve name of a config type '{0}'".format(cfg)
                     raise _error(self.location[-1], _lineno(tag), msg)
                 cfgtypes.append(cfgtype)

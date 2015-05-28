@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-18
+2015-5-28 David
+- When running the ddl compiler and the -d switch to include devel types has
+  not been given, skip a type in the config list if it is a DEVEL type.
+  update to JIRA Issue PSAS-42
+
 Tag: V00-13-17
 2015-2-4 David Schneider
 - update ddl wrapper common code. No need to update DAQ. JIRA issue PSAS-103
