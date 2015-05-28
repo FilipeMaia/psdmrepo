@@ -394,7 +394,7 @@ uint32_t BldDataSpectrometerV1::nPeaks() const {
 }
 
 
-ndarray<const uint32_t, 1> BldDataSpectrometerV1::hproj() const {
+ndarray<const int32_t, 1> BldDataSpectrometerV1::hproj() const {
   return m_xtcObj->hproj(m_xtcObj);
 }
 

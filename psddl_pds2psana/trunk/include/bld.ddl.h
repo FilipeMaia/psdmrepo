@@ -199,7 +199,7 @@ public:
   virtual double com() const;
   virtual double integral() const;
   virtual uint32_t nPeaks() const;
-  virtual ndarray<const uint32_t, 1> hproj() const;
+  virtual ndarray<const int32_t, 1> hproj() const;
   virtual ndarray<const double, 1> peakPos() const;
   virtual ndarray<const double, 1> peakHeight() const;
   virtual ndarray<const double, 1> FWHM() const;
