@@ -42,6 +42,7 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.ConnectAlias import connect_alias
 
 #---------------------
 # Local definitions --
@@ -61,7 +62,8 @@ class ICStatus ( AppBase ) :
 
         self._parser.add_option ( '-d', "--conn-string",
                                   action="store", dest="conn_string", default=_conn_str,
-                                  help="database connection string", metavar="CONN_STRING" )
+                                  help="database connection string or alias (def, mon, dqm)",
+                                  metavar="CONN_STRING" )
 
         self._parser.add_option ( '-u', "--user",
                                   action="store", dest="user", default=None,
@@ -124,7 +126,12 @@ class ICStatus ( AppBase ) :
             return 2
 
         # create database instance
-        conn = DbConnection( conn_string=self._options.conn_string, 
+        conn_string = connect_alias(self._options.conn_string)
+        if not conn_string:
+            print "Don't have a proper connection string", self._options.conn_string
+            return 0
+        
+        conn = DbConnection( conn_string=conn_string, 
                              user=self._options.user,
                              passwd=self._options.password,
                              timeout = 0 )

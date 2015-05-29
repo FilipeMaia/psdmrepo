@@ -44,6 +44,7 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.ConnectAlias import connect_alias
 from RegDB.RegDb import RegDb
 
 #---------------------
@@ -358,11 +359,13 @@ class ICCommand ( AppBase ) :
         return True. Return False otherwise."""
         
         if self.__conn : return self.__conn
-
-        self.__conn = DbConnection( conn_string=self._options.conn_string, 
-                                    user=self._options.user,
-                                    passwd=self._options.password,
-                                    timeout=0 )
+        
+        conn_string = connect_alias(self._options.conn_string)
+        if not conn_string:
+            print "Don't have a proper connection string", self._options.conn_string
+            return 0
+        self.__conn = DbConnection(conn_string=conn_string, user=self._options.user,
+                                   passwd=self._options.password, timeout=0 )
         return self.__conn
 
 

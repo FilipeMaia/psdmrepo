@@ -1,0 +1,355 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ic-controller 6249 2013-05-09 21:59:26Z salnikov@SLAC.STANFORD.EDU $
+#
+# Description:
+#  Interface Controller.
+#
+#------------------------------------------------------------------------
+
+"""Interface Controller for Photon Science Data Management.
+
+This is the Interface Controller that monitors filesets created by the online system.
+It creates a translator process to translate the fileset into HDF5 and enters the 
+translated file into iRODS. rt
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: ic-controller 6249 2013-05-09 21:59:26Z salnikov@SLAC.STANFORD.EDU $
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$Revision: 6249 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import signal
+import socket
+import time
+import fnmatch
+import traceback
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.Config import Config
+from InterfaceCtlr.TranslatorJobDqm import TranslatorJob
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from LusiTime.Time import Time
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_CONN_STR = "file:/reg/g/psdm/psdatmgr/ic/.icdb-dqm-conn"
+
+def _sig2int(signum, frame):
+    # convert signals to SIGINT
+    raise KeyboardInterrupt()
+    
+
+#--------------------------
+# Specialized exceptions --
+#--------------------------
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class Controller ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ (self, installLogger = True, usage = "usage: %prog [options]" )
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_CONN_STR,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-c', "--config",
+                                  action="append", dest="config", default=[],
+                                  help="specify configuration section in the database", metavar="STRING" )
+
+        self._parser.add_option ( '-l', "--log",
+                                  action="store", dest="log", default=None,
+                                  help="log file name", metavar="PATH" )
+
+        self._parser.add_option ("--onetime", action="store_true", default=False,
+                                 help="Make only one pass through")
+
+
+        # other instance variables
+        self._db = None
+        self._controller = None
+        self._config = Config()
+        self._config_counter = 0
+
+    # ==========================================
+    # Run the controller after installing logger. 
+    # See AppBase class for details.
+    # ==========================================
+
+    def _run ( self ) :
+        
+        self.run_once = 1 if self._options.onetime else -1 
+        # send everything to log file
+        logname = self._options.log
+        if logname :
+            logdir = os.path.dirname(logname)
+            if logdir and not os.path.isdir(logdir):
+                try:
+                    os.makedirs(logdir)
+                except OSError, e:
+                    self.error("Failed to create log directory: %s", str(e))
+                    return e.errno
+            try:
+                # redirect output, append to file
+                fd = os.open( logname, os.O_WRONLY|os.O_CREAT|os.O_APPEND, 0666 )
+                os.dup2(fd, 1)
+                os.dup2(fd, 2)
+            except OSError, e:
+                self.error("Failed to redirect log: %s", str(e))
+                return e.errno
+
+        # if this throws then we are done
+        self.__init_controller()
+
+        try:
+            # do even loop
+            self.loop()
+        finally:
+            # prepare to exit, we may be in some bad state so try to cleanup
+            # as much as we can be prepare to just shutdown
+            self.info ("Stopping controller #%d", self._controller.id)
+            try:
+                self.info ("Try to clean up the database")
+                self._db.exit_controller(self._controller.id)
+                self._db.deactivate_controller(self._controller.id)
+            except Exception, ex:
+                self.error("Database cleanup failed: ", str(ex))
+        
+    def loop(self):
+        # Look for filesets with a certain status 
+
+        # start infinite loop
+        while not self._test_exit_controller() :
+            
+            try:
+                # re-read configurations
+                self._read_config()
+                
+                activeOnly = self._config.get('active-exp-only', default=False)
+
+                # get loop delay from configuraiton, limit its range
+                loopDelay = self._config.get('loop-delay', default=20)
+                if loopDelay < 1: loopDelay = 1
+                if loopDelay > 180: loopDelay = 180
+
+
+                # get the list of filesets being translated
+                filesets = self._db.get_filesets(('PENDING', 'RUN', 'SUSPENDED'), self._controller.instruments, activeOnly)
+                for fs in filesets:
+
+                    # TranslatorJob needs to have non-Null jobid, otherwise it will try to start new job
+                    if fs.translator is None:
+                        self.warning("Missing translator job for PENDING/RUN/SUSPENDED fileset")
+                        continue
+                    
+                    logger = self
+                    job = TranslatorJob(fs, self._db, self._config, logger, fs.translator)
+
+                    # this method will do the rest
+                    stat = job.check()
+                    if stat is not None: self.trace('Job %d finished with status %s', fs.jobid, stat )
+                    
+
+                # try to find new fileset, currently we expect filesets with status WAIT which 
+                # should have all corresponding files or filesets with status  WAIT_FILES for 
+                # which we need to find the files on disk
+                # check if there are filesets with Initial_Entry and find files for it
+                filesets = self._db.get_filesets('WAIT_FILES', self._controller.instruments, activeOnly)
+                for fs in filesets:
+                    # check the files
+                    if fs.xtc_files :
+                        self.error ('expecting empty fileset: %s', fs)
+                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
+                    else :
+                        files = self.__find_files( fs )
+                        if not files :
+                            self.error ('could not find files for fileset: %s', fs)
+                            self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
+                        else :
+                            self._db.add_files (fs.id, 'XTC', files)
+                            self._db.change_fileset_status (fs.id, 'WAIT')
+
+
+                # now try to see if there is a fileset with files
+                # We want to limit job submission rate to 1Hz, so if there are jobs to 
+                # submit then submit the first one (with the highest priority) and
+                # sleep for 1 second, otherwise sleep for loopDelay seconds and retry.
+                # also do not submit more than loopDelay jobs at once
+
+                filesets = self._db.get_filesets('WAIT', self._controller.instruments, activeOnly)                
+                timeout = loopDelay
+                for fs in filesets[:loopDelay]:
+                    # must have some files associated
+                    if not fs.xtc_files :
+                        self.error ('expecting non-empty fileset: %s', fs)
+                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
+                    else:
+                        # Found a new fileset to translate
+                        self.trace('found new fileset %s', fs)
+    
+                        # start new job
+                        logger = self
+                        job = TranslatorJob(fs, self._db, self._config, logger)
+    
+                        time.sleep(1)
+                        timeout -= 1
+   
+         
+                # Nothing to do, sleep, look for work again
+                if timeout > 0: time.sleep(timeout)
+                break
+            except KeyboardInterrupt:
+                self.info ("Received interrupt signal, exiting.")
+                break
+
+            except Exception, ex :
+                # all other exceptions are trapped
+                self.error( "Exception caught in main loop: %s", str(ex) )
+                self.error( "Exception info: %s", traceback.format_tb(sys.exc_info()[2]) )
+
+                # wait until dust settles
+                time.sleep(60)
+
+
+    # ========================
+    # Init Controller instance
+    # ========================
+
+    def __init_controller ( self ) :
+
+        """Perform multiple operations to initialize the controller:
+        1) Connect to the database.
+        2) Find our translator output uri in the translator_nodes table.
+        3) Insert an entry in the interface_controller table.
+        4) read config data from database and store in self._config
+
+        """
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password )
+        self._db = InterfaceDb( conn, self ) 
+
+        # define new controller instance
+        host = socket.getfqdn(socket.gethostname())
+        self._controller = self._db.new_controller( host, self._options.log )
+
+        self.info ("Successful init_controller %d on host %s started %s", self._controller.id, host, Time.now() )
+        if self._controller.instruments :
+            self.info ("List of instruments accepted: %s", self._controller.instruments )
+        else :
+            self.info ("All instruments accepted")
+            
+
+    # =========================================
+    # read complete configuration from database
+    # =========================================
+
+    def _read_config (self):
+
+        # read from database, only print info first time around
+        self._config = self._db.read_config( self._options.config, self._config_counter == 0 )
+        self._config_counter += 1
+
+
+    def _test_exit_controller(self):
+        """test if controller needs to exit, swallow database (or any) exceptions"""        
+        try:
+            if self.run_once == 0:
+                return True
+            elif self.run_once > 0:
+                self.run_once = 0
+            return self._db.test_exit_controller(self._controller.id)
+        except:
+            return False
+
+    # =========================================================
+    # Find the files in filesystem corresponding to the fileset
+    # =========================================================
+    
+    def __find_files( self, fs ) :
+
+        instr = fs.instrument
+        exper = fs.experiment
+        
+        if self._config.get('live-mode', instr, exper, 0):
+            #in live mode use dataset name as input to translator
+            ds = self._config.get('dataset', instr, exper, "exp=%(experiment)s:run=%(run_number)d:live", fs.__dict__)
+            return [ds]
+        else:
+            xtc_root = self._config.get( 'xtc-location-root', instr, exper )
+            if not xtc_root :
+                self.error( 'configuration parameter xtc-location-root not defined, check -c options and config_def table' )
+                return []
+            xtc_name_pattern = self._config.get( 'xtc-name-pattern', instr, exper )
+            if not xtc_name_pattern :
+                self.error( 'configuration parameter xtc-name-pattern not defined, check -c options and config_def table' )
+                return []
+    
+            # interpolate with the fileset parameters
+            xtc_root = xtc_root % fs.__dict__
+    
+            # look into this directory and all its subdirectories (1 level only)
+            files = [ os.path.join(xtc_root, f) for f in os.listdir( xtc_root ) ]
+            subdirs = [ f for f in files if os.path.isdir(f) ]
+    
+            # find all files matching a pattern
+            pattern = xtc_name_pattern % fs.__dict__
+            files = []
+            for sdir in [xtc_root]+subdirs :
+                flist = fnmatch.filter ( os.listdir(sdir), pattern )
+                files += [os.path.join(sdir,f) for f in flist]
+    
+            return files
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = Controller()
+    rc = app.run()
+    sys.exit(rc)

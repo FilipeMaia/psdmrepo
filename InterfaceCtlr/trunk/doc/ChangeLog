@@ -13,6 +13,8 @@ reverse time order.
 Tag
 2015
 - added CreateIDB_v2.sql to create controller database (used for iface_db_dqm)
+- added controller (dqm) for generating data-summary
+- ic-status, ic-command accept alias for connection string: -d [def|mon|dqm]
 	
 Tag V01-03-14	
 2015-05-26
