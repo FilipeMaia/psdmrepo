@@ -1,0 +1,64 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ChangeLog 8463 2014-06-24 01:53:04Z cpo@SLAC.STANFORD.EDU $
+#
+# Description:
+#  ChangeLog file for package xtcav
+#------------------------------------------------------------------------
+
+Package author: Alvaro Sanchez-Gonzalez
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-09
+2014-05-29 Christopher O'Grady
+- Missed one of the calls to CalibrationPaths.
+
+Tag: V00-00-08
+2014-05-28 Christopher O'Grady
+- Fix GenerateDarkBackground.py and GenerateLasingOffReference.py
+  to pass env() instead of datasource to CalibrationPaths()
+
+Tag: V00-00-07
+2014-02-27 Christopher O'Grady
+- Add interface ShotToShotCharacterization::SetEnv, which
+  can be used like SetDataSource, but is usable from modules
+
+Tag: V00-00-06
+2014-02-26 Christopher O'Grady
+- Support ebeamv7
+
+Tag: V00-00-05
+2014-02-23 Christopher O'Grady
+- From Alvaro: Solved bug making the inter bunch delay function fail
+  for vectors with an odd number of elements
+
+Tag: V00-00-04
+2014-02-20 Christopher O'Grady
+- The latest changes from Alvaro:
+- Island separation improved to better discard islands coming from noise, 
+  and make it more robust in the determination of number of bunches.
+- Improved method to extract the delay: Now it does a fit around the 
+  maximum current
+- New method to extract the delay between the bunches, documented in the 
+  file.
+
+Tag: V00-00-03
+2014-12-05 Christopher O'Grady
+- The latest changes from Alvaro:
+- Included python-docstrings for the relevant classes/methods/functions 
+- Done some cleanup from the repo of some old files that were not longer 
+  in use.
+- Added a few more retrieval functions to the ShotToShotCharacterization 
+  class, all of them follow the format where the last argument is a flag 
+  telling whether it was possible to retrieve the data
+- Solved minor bugs.
+
+Tag: V00-00-02
+2014-10-24 Christopher O'Grady
+- Move Dark/LasingOff scripts from app/ to examples/
+
+Tag: V00-00-01
+2014-10-24 Christopher O'Grady
+- Initial tag
