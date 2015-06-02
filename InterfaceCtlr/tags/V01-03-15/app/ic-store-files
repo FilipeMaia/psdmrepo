@@ -1,0 +1,292 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-store-files...
+#
+#------------------------------------------------------------------------
+
+"""Script that stores all files from offline storage to File Manager.
+
+This script should be run at regular intervals.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import fnmatch
+import time
+
+osp = os.path
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.FileMgrIrods import FileMgrIrods
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+
+def select_dirtype(dirs):
+    requested_dirs = set(dirs.split(",")) if dirs else None
+    def do_select(dirtype):
+        if not  requested_dirs:
+            return True
+        if dirtype in requested_dirs:
+            return True
+        else:
+            return False
+
+    return do_select
+
+
+class ICStoreFiles ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="interface database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-c', "--config",
+                                  action="append", dest="config", default=[],
+                                  help="specify configuration section in the database", metavar="STRING" )
+
+        self._parser.add_option ( '-i', "--instr",
+                                  action="store", dest="instr", default=None,
+                                  help="select instrument to scan" )
+        
+        self._parser.add_option ( '-e', "--expr",
+                                  action="store", dest="expr", default=None,
+                                  help="select experiment to scan" )
+
+        self._parser.add_option ( "--usr",
+                                  action="store_true", dest="findusr", default=False,
+                                  help="Look for usr/ dir" )
+
+        self._parser.add_option ( "--dirtype", 
+                                  action="store", dest="dirtype", default=None,
+                                  help="directory type to scan (xtc, hdf5, usr)" )
+
+        self._parser.add_option ( "--maxreg",
+                                  type='int', dest='maxreg', default=-1,
+                                  help="max number of files to register (<0: all found)" )
+
+        self._parser.add_option ( "--ageh",
+                                  type='int', dest='ageh', default=0,
+                                  help="min age (mtime) of file before it will be registered" )
+
+        self._parser.add_option ( "--listonly",
+                                  action="store_true", default=False,
+                                  help="listonly missing files, do not register files" )
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+	
+        # setup databases
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password )
+        db = InterfaceDb( conn, self ) 
+
+        # get the options from database
+        config = db.read_config( self._options.config, False )
+
+        # get regdb 
+        regdb_conn_str = config.get('regdb-conn')
+        regdb_conn = DbConnection( conn_string=regdb_conn_str )
+        
+        # instantiate file manager
+        if not config.get('filemanager-irods-command') :
+            self.error("filemanager-irods-command is not defined, use -c option to define" )
+            return 2            
+        file_mgr = FileMgrIrods( config.get('filemanager-irods-command'), config, self._log )
+
+        # get the list of experiments from regdb
+        if self._options.expr:
+            sel_extra = "and e.name = '%s'" % self._options.expr
+        elif self._options.instr:
+            sel_extra = "and i.name = '%s'" % self._options.instr.upper()
+        else:
+            sel_extra = ""
+        
+        q = "select i.name, e.name from instrument i, experiment e where i.id = e.instr_id %s" % sel_extra
+        cursor = regdb_conn.cursor()
+        cursor.execute( q )
+        experiments = [ tuple(row) for row in cursor.fetchall() ]
+
+        self.file_ageh, self.do_load = self._options.ageh, self._options.maxreg
+        print self.file_ageh, self.do_load
+
+        scan_dir = select_dirtype(self._options.dirtype)
+        try:
+            # check all experiments
+            for instr, exp in experiments :
+                
+                self.info( "Processing experiment %s:%s scan usr-dir %s", instr, exp, self._options.findusr )
+                parm = dict ( instrument=instr, instrument_lower=instr.lower(), experiment=exp )
+                
+                # usr/ files. Do not process xtc or hdf5
+                if self._options.findusr:
+                    src_dir =  config.get('experiment-usr-dir', subs=parm)
+                    dst_coll = config.get('filemanager-usr-dir', subs=parm)
+                    pattern = '[!.]*'
+                    for usr_dir, usr_coll in self.walk_usr_dir(src_dir, dst_coll):
+                        self.process_dir(usr_dir, pattern, usr_coll, file_mgr, no_link=True)
+                    continue  # Only scan usr dirs
+                
+                # XTC files first
+                if scan_dir('xtc'):
+                    if config.get('experiment-xtc-dir') and config.get('filemanager-xtc-dir'):
+                        src_dir = config.get('experiment-xtc-dir', subs=parm)
+                        pattern = config.get('xtc-name-pattern', default='%(experiment)s-*.xtc', subs=parm)
+                        dst_coll = config.get('filemanager-xtc-dir', subs=parm)
+                    
+                        self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                else:
+                    self.info( "Skipping xtc directories")
+                    
+
+                # HDF files
+                if scan_dir('hdf5'):
+                    if config.get('experiment-hdf5-dir') and config.get('filemanager-hdf5-dir'):
+                        src_dir = config.get('experiment-hdf5-dir', subs=parm)
+                        pattern = config.get('hdf5-name-pattern', default='%(experiment)s-*.h5', subs=parm)
+                        dst_coll = config.get('filemanager-hdf5-dir', subs=parm)
+                    
+                        self.process_dir (src_dir, pattern, dst_coll, file_mgr)
+                else:
+                    self.info( "Skipping hdf5 directories")
+
+        except StandardError, exc:
+            self.error( "Processing failed: %s", exc )
+            return 1
+
+
+    def process_dir (self, src_dir, pattern, dst_coll, file_mgr, no_link=False):
+        """ find files in a directory and try to register the ones that match
+        pattern.
+
+        Files with whitespaces are rejected.
+        """
+
+        listonly = self._options.listonly
+        list_only_status = "listonly" if listonly else ""
+
+        dst_filelist = None
+        if os.path.isdir(src_dir) and self.do_load != 0:
+
+            self.debug( "Processing %s/%s -> %s", src_dir, pattern, dst_coll )
+        
+            mtime_max = time.time() - self.file_ageh * 3600.
+            for filename in os.listdir( src_dir ) :
+                if self.do_load == 0:
+                    return
+
+                fpath = os.path.join(src_dir, filename)
+                self.debug( "checking path %s", fpath )
+                
+                # skip directories
+                if os.path.isdir(fpath) : 
+                    self.debug( "- path is a directory" )
+                    continue
+                if no_link and os.path.islink(fpath):
+                    self.error( "- path is a link %s", fpath )
+                    continue
+                if not os.path.exists(fpath):
+                    self.error("path missing %s", fpath)
+                    continue
+
+                if fnmatch.fnmatch(filename, pattern) and filename.find(" ") == -1:
+
+                    # first time around get the list of files already in iRODS
+                    if dst_filelist is None :
+                        dst_filelist = file_mgr.listdir( dst_coll )
+                        dst_filelist = set(dst_filelist)
+                        self.debug("Files in iRODS already: %s", dst_filelist)
+                                            
+                    if filename in dst_filelist :
+                        self.debug( "- file is in file manager already" )
+                    else :
+                        if os.path.getmtime(fpath) > mtime_max:
+                            self.debug( "- file to recent" )
+                        else:
+                            # store the file
+                            self.debug( "+ file is not in file manager %s" % list_only_status )
+                            dst_path = dst_coll + '/' + filename
+                            if not listonly:
+                                file_mgr.storeFile ( fpath, dst_path )
+                            else:
+                                self.warning( "+ file not added (listonly) %s" % fpath )
+                            self.do_load -= 1
+                else:
+                    self.debug( "- No match %s", filename)
+        
+
+    def walk_usr_dir(self, src_dir, src_coll):
+        """ Find all subdirectories that have data files """
+        
+        for usr_dir,dir_names,fnames in os.walk(src_dir):
+            if len(fnames) > 0:
+                usr_coll = osp.join(src_coll,osp.relpath(usr_dir, src_dir))
+                yield usr_dir, osp.normpath(usr_coll)
+
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStoreFiles()
+    rc = app.run()
+    sys.exit(rc)

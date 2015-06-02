@@ -1,0 +1,238 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-config...
+#
+#------------------------------------------------------------------------
+
+"""Script to manage configuration parameters in IC database.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andy Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+_usage = "usage: %prog [options] [section [parameter [value [type description]]]]"
+_descr = """
+This script manages configuration parameters in interface controller 
+database. If no arguments provided it will print complete list of 
+configuration section and parameters. If only a section name is given it 
+will print  parameters in given section, if parameter name is given then 
+it will print information about specific parameter. If section, parameter, 
+and value are given but no type or description then --update option must be 
+used as well to change value of the existing parameter. If all arguments 
+are present then new parameter will be added to database. Type argument 
+should be one of the strings "String", "Integer", "Float", or "Date/Time". 
+If option --delete is given then corresponding parameter or section will be 
+removed from database.
+"""
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICConfig ( AppBase ) :
+
+    def __init__ (self) :
+
+        AppBase.__init__ (self, installLogger = True, usage = _usage, description = _descr)
+
+        self._parser.add_option ('-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING")
+
+        self._parser.add_option ('-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name")
+
+        self._parser.add_option ('-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)")
+
+        self._parser.add_option ("--delete",
+                                  action="store_true", dest="delete", default=False,
+                                  help="delete specified option or section")
+
+        self._parser.add_option ("--update",
+                                  action="store_true", dest="replace", default=False,
+                                  help="update specified option instead of adding new")
+
+        self._parser.add_option ('-i', "--instrument",
+                                  action="store", dest="instrument", default=None,
+                                  help="option only applies to given instrument")
+
+        self._parser.add_option ('-e', "--experiment",
+                                  action="store", dest="experiment", default=None,
+                                  help="option only applies to given experiment")
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check options
+        if self._options.delete and not self._args:
+            self._parser.error("Option -d requires at least section name")
+        if self._options.delete and self._options.replace:
+            self._parser.error("Option -d and -r are incompatible")
+        if self._options.replace and len(self._args) < 3:
+            self._parser.error("Option -r requires section, option, and value arguments")
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password,
+                             timeout = 0 )
+        cursor = conn.cursor()
+
+        if len(self._args) <= 2 and not self._options.delete:
+
+            # print sections/options            
+            q = "SELECT section, param, value, type, description, instrument, experiment FROM config_def WHERE 1"
+            qpar = []
+            if self._args:
+                q += " AND section = %s"
+                qpar.append(self._args[0])
+            if len(self._args) > 1:
+                q += " AND param = %s"
+                qpar.append(self._args[1])
+            if self._options.instrument:
+                q += " AND instrument = %s"
+                qpar.append(self._options.instrument)
+            if self._options.experiment:
+                q += " AND experiment = %s"
+                qpar.append(self._options.experiment)
+            q += " ORDER BY section, param, instrument, experiment"
+    
+            cursor.execute(q, qpar)
+            
+            # print results
+            cursection = None
+            for row in cursor.fetchall():
+
+                section = row[0]            
+                if section != cursection:
+                    if cursection is not None: print
+                    print "[%s]" % section
+                    cursection = section
+
+                self._printOption(*row[1:])
+
+        elif len(self._args) in [1,2] and self._options.delete:
+            
+            # delete specified section
+            q = "DELETE FROM config_def WHERE section = %s"
+            qpar = self._args[:]
+            if len(self._args) > 1:
+                q += " AND param = %s"
+            if self._options.instrument:
+                q += " AND instrument = %s"
+                qpar.append(self._options.instrument)
+            if self._options.experiment:
+                q += " AND experiment = %s"
+                qpar.append(self._options.experiment)
+            cursor.execute(q, qpar)
+        
+        elif len(self._args) == 3:
+            
+            # section, option and value given, this can be done only in replace mode
+            if not self._options.replace:
+                self._parser.error("Type and description are required without -r option")
+
+            # update parameter if it exists
+            q = "UPDATE config_def SET value = %s WHERE section = %s AND param = %s"
+            qpar = [self._args[2], self._args[0], self._args[1]]
+            if self._options.instrument:
+                q += " AND instrument = %s"
+                qpar.append(self._options.instrument)
+            if self._options.experiment:
+                q += " AND experiment = %s"
+                qpar.append(self._options.experiment)
+
+            cursor.execute(q, qpar)
+            if not cursor.rowcount: 
+                print >>sys.stderr, "No such option or value unchanged for %s.%s" % (self._args[0], self._args[1])
+                return 2
+
+        elif len(self._args) == 5:
+            
+            # all parameters there, this can be done only in create mode
+            if self._options.replace:
+                self._parser.error("Type and description cannot be used with -r option")
+
+            # create parameter 
+            columns = ['section', 'param', 'value', 'type', 'description', 'instrument', 'experiment']
+            qpar = self._args + [self._options.instrument, self._options.experiment]
+            valstr = ','.join(["%s"] * len(columns))
+            q = "INSERT  INTO config_def (%s) VALUES (%s)" % (','.join(columns), valstr)
+
+            cursor.execute(q, qpar)
+
+        else:
+            
+            self._parser.error("invalid combination of command line arguments and options")
+
+        # if we changed anything now it's good time to commit
+        conn.connection().commit()
+
+    def _printOption(self, param, value, type, description, instrument, experiment):
+        """Print value of a single parameter"""
+
+        if self._options.verbose:
+            print "%s = {" % param
+            print "    value = \"%s\"" % value
+            print "    type = %s" % type
+            if description is not None: print "    description = \"%s\"" % description
+            if instrument is not None: print "    instrument = %s" % instrument
+            if experiment is not None: print "    experiment = %s" % experiment
+            print "}"
+        else:
+            comments = "type=%s" % type
+            if instrument is not None: comments += " instr=%s" % instrument
+            if experiment is not None: comments += " exp=%s" % experiment
+            print "%s = \"%s\"\t# %s" % (param, value, comments)
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICConfig()
+    rc = app.run()
+    sys.exit(rc)

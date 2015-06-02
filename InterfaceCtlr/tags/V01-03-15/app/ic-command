@@ -1,0 +1,399 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ICCommand.
+#
+#------------------------------------------------------------------------
+
+"""Script for interacting with the Interface Controller database.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$
+
+@author Robert C. Sass
+"""
+
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+from optparse import OptionParser
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+from InterfaceCtlr.ConnectAlias import connect_alias
+from RegDB.RegDb import RegDb
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+#--------------------------------
+# Application class definition --
+#--------------------------------
+
+class ICCommand ( AppBase ) :
+
+    # ===========
+    # constructor
+    # ===========
+
+    def __init__ ( self ) :
+
+        usage = "usage: %prog [options] command [options] [arguments]"
+        descr = "Type '%prog help' to see the list of availble commands."
+        parser = OptionParser(usage=usage, description=descr)
+        AppBase.__init__ (self, installLogger = True,
+                            usage = usage, description=descr)
+
+        # Add application options, see optparse module for details -------------
+        #
+        self._parser.disable_interspersed_args()
+        
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self.__conn = None
+        self.__icdb = None
+        self.__regdb = None
+
+        self.__cmd_handlers = {}
+        self.__cmd_order = []
+
+        # Register command handlers for known command --------------------------
+        #
+        self.__add_handler('help', "Print usage information", self.cmd_help)
+        self.__add_handler('translate',"Make new translation request", self.cmd_translate )
+        self.__add_handler('remove', "Remove fileset(s) from the database", self.cmd_remove )
+        self.__add_handler('active', "Display active experiments", self.cmd_active)
+        self.__add_handler('activate', "Activate experiment", self.cmd_activate)
+        self.__add_handler('deactivate', "Deactivate experiment", self.cmd_deactivate)
+        self.__add_handler('cstop', "Send stop signal to controller", self.cmd_cstop)
+        self.__add_handler('stop', "Stop running job or remove from database", self.cmd_stop)
+        self.__add_handler('set_status', "Update request status", self.cmd_set_status)
+
+
+    # =========================================================================
+    # Command handlers are registered in the dictionary. There is a separate list
+    # to specify an order in which the command information is reported by
+    # the tool.
+    # =========================================================================
+    
+    def __add_handler(self, command, description, handler):
+        self.__cmd_handlers[command] = {
+            'DESCRIPTION':description,
+            'HANDLER':handler
+        }
+        self.__cmd_order.append(command)
+
+    # ============================================================
+    # Run the whole thing after parsing the command argunments and
+    # installing logger. See AppBase class for details.
+    # ============================================================
+
+    def _run ( self ) :
+
+        # Print the list of supported commands if none is given ----------------
+        #
+        if not self._args :
+            self.cmd_help('help', self._args)
+            return 0
+
+        # Get the command name,  connect to the server (unless we're -----------
+        #  dealing with the command which doesn't need this) and invoke
+        # the corresponding handler.
+        #
+        command = self._args[0]
+        if command not in self.__cmd_handlers:
+            self._parser.error("unknown command: %s" % command)
+            return 2
+
+        self.trace( "command: %s: arguments: %s" % (command, str(self._args[1:])))
+
+        return self.__cmd_handlers[command]['HANDLER'](command, self._args[1:])
+
+    # ===========================================
+    # Print the information on supported commands
+    # ===========================================
+
+    def cmd_help ( self, command, args ) :
+
+        self._parser.print_usage()
+
+        print "List of available commands:"
+        max_len = max([len(n) for n in self.__cmd_order])
+        for name in self.__cmd_order:
+            print "    %-*s  %s" % (max_len, name, self.__cmd_handlers[name]['DESCRIPTION'])
+
+        print self._parser.expand_prog_name("\nType '%prog -h' to see the list of global options.")
+        print self._parser.expand_prog_name("\nType '%prog <command> -h' to see the list of command options and arguments.")
+        print
+
+        return 0
+
+    # ===================
+    # Translate a fileset
+    # ===================
+
+    def cmd_translate ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] instrument experiment run_num [files ...]" % command
+        descr = "Adds translation request to the queue"
+        parser = OptionParser(usage=usage, description=descr)
+        parser.add_option('-r', "--re-translate", action='store_true', default=False, 
+                          help="allows re-submission of requests for the same run")
+        parser.add_option('-w', "--priority", type='int', default=0, 
+                          help="sets the priority of the request")
+        parser.add_option('-t', "--data-type", default="DATA", 
+                          help="sets run data type, default: DATA")
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) < 3:
+            parser.error("Three or more positional arguments required")
+
+        instr      = args[0]
+        exper      = args[1]
+        runnum     = int(args[2])
+        xtcfiles   = args[3:]
+
+        # check instrument/experiment names
+        if not self.regdb().find_experiment_by_name(instr, exper):
+            parser.error("Instrument or experiment does not exist: %s:%s" % (instr, exper))
+
+        if xtcfiles:
+            status = 'WAIT'
+        else:
+            status = 'WAIT_FILES'
+        self.icdb().new_fileset ( instr, exper, runnum, options.data_type, xtcfiles, 
+                                  priority=options.priority, duplicate=options.re_translate, status=status )
+        
+        return 0
+
+    # ===============
+    # Remove filesets
+    # ===============
+
+    def cmd_remove ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] [instrument experiment [run_num]]" % command
+        descr = "Deletes translation request from queue"
+        parser = OptionParser(usage=usage, description=descr)
+        parser.add_option('-i', "--id", type='int', default=None, help="Delete request with given ID")
+        (options, args) = parser.parse_args(cmdargs)
+
+        if options.id is not None:
+            if args: parser.error("No arguments expected with -i option")
+            self.icdb().remove_fileset_id(options.id)
+        else:
+            if len(args) not in [2,3]:
+                parser.error("Two or three positional argument required without -i option")
+    
+            instr = args[0]
+            exper = args[1]
+            runnum = None
+            if len(args) > 2 :
+                try:
+                    runnum = int(args[2])
+                except ValueError, ex:
+                    parser.error("Run number must be integer: "+args[2])
+    
+            self.icdb().remove_fileset ( instr, exper, runnum )
+        
+        return 0
+
+    # =======================
+    # Show active experiments
+    # =======================
+
+    def cmd_active ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options]" % command
+        descr = "Prints the list of currently active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if args:
+            parser.error("No arguments expected")
+
+        for instr, exp, since in self.icdb().active_experiments() :
+            print "%-6s %s" %(instr, exp)
+        
+        return 0
+
+    # ===================
+    # Activate experiment
+    # ===================
+
+    def cmd_activate ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] instrument experiment" % command
+        descr = "Adds one experiment to the list of active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 2:
+            parser.error("Two positional arguments are required")
+
+        self.icdb().activate_experiment(*args)
+        
+        return 0
+
+    # =====================
+    # Deactivate experiment
+    # =====================
+
+    def cmd_deactivate ( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s [options] instrument experiment" % command
+        descr = "Removes experiment from the list of active experiments"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 2:
+            parser.error("Two positional arguments are required")
+
+        self.icdb().deactivate_experiment(*args)
+        
+        return 0
+
+
+    # ===============
+    # Stop controller
+    # ===============
+
+    def cmd_cstop( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s controller-id" % command
+        descr = "Signals that controller with specified ID should stop gracefully"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 1:
+            parser.error("One positional argument is required")
+
+        self.icdb().controller_stop(int(args[0]))
+        
+        return 0
+
+
+    # ===============
+    # Stop translation
+    # ===============
+
+    def cmd_stop( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s request-id" % command
+        descr = "Stop request, either kill a job or remove request from database"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 1:
+            parser.error("One positional argument is required")
+
+        self.icdb().stop_fileset_id(int(args[0]))
+        
+        return 0
+
+
+    # =====================
+    # Change request status
+    # =====================
+
+    def cmd_set_status( self, command, cmdargs ) :
+
+        usage = "usage: %%prog %s request-id new-status" % command
+        descr = "Change the status of request, use with care, potentially dangerous"
+        parser = OptionParser(usage=usage, description=descr)
+        (options, args) = parser.parse_args(cmdargs)
+
+        if len(args) != 2:
+            parser.error("Two positional arguments are required")
+
+        self.icdb().change_fileset_status(int(args[0]), args[1])
+        
+        return 0
+
+
+    # =================
+    # Server connection
+    # =================
+
+    def connection(self):
+
+        """Connect to the database if the connection has not been established
+        yet. In case of success initialize a connection handle and
+        return True. Return False otherwise."""
+        
+        if self.__conn : return self.__conn
+        
+        conn_string = connect_alias(self._options.conn_string)
+        if not conn_string:
+            print "Don't have a proper connection string", self._options.conn_string
+            return 0
+        self.__conn = DbConnection(conn_string=conn_string, user=self._options.user,
+                                   passwd=self._options.password, timeout=0 )
+        return self.__conn
+
+
+    def icdb(self) :
+    
+        if self.__icdb : return self.__icdb
+        
+        self.__icdb = InterfaceDb( self.connection() )
+        return self.__icdb
+
+
+    def regdb(self) :
+    
+        if self.__regdb : return self.__regdb
+
+        # get regdb connection string from database
+        config = self.icdb().read_config([])
+        regdbConnStr = config.get("regdb-conn")
+        
+        self.__regdb = RegDb(DbConnection(conn_string=regdbConnStr))
+        return self.__regdb
+
+
+# ==============================================
+# Run application when imported as a main module
+# ==============================================
+
+if __name__ == "__main__" :
+    app = ICCommand()
+    rc = app.run()
+    sys.exit(rc)
