@@ -1705,6 +1705,48 @@ class H5Output( unittest.TestCase ) :
 
         mpiTest.cleanup()
 
+    def test_evKeyFilter(self):
+        '''
+        Test data is prepared from xpph6015 run 155. This has Camera::FrameV1 from four places.
+        Test data includes these three datagrams:
+        
+        fid=125514 - stream 2
+        fid=125520 - stream 0,80
+        fid=125523 - stream 0,80,81
+
+        # creation of the test data
+        import psana_test.psanaTestLib as ptl
+        ptl.copyToMultiTestDir('xpph6015',155,1,1,'/reg/g/psdm/data_test/multifile/test_016_xpph6015',[125514, 125520, 125523],True)
+
+        # the 4 sources for FrameV1:
+
+        EventKey(type=Psana::Camera::FrameV1, src=DetInfo(XppEndstation.0:Opal1000.0), alias="opal_0")
+        EventKey(type=Psana::Camera::FrameV1, src=DetInfo(XppSb4Pim.1:Tm6740.1), alias="yag3")
+        EventKey(type=Psana::Camera::FrameV1, src=DetInfo(XrayTransportDiagnostic.0:Opal1000.0), alias="xtcav")
+        EventKey(type=Psana::Camera::FrameV1, src=DetInfo(XrayTransportDiagnostic.0:OrcaFl40.0), alias="FEE_Spec")
+        
+        '''
+        cmd = 'psana -m Translator.H5Output'
+        openTmpFile = tempfile.NamedTemporaryFile(prefix='tmp_test_evKeyFilter', suffix='.h5', 
+                                                  dir='.', delete=True)
+        outputFile = openTmpFile.name
+        print outputFile
+        del openTmpFile
+        cmd += ' -o Translator.H5Output.output_file=' 
+        cmd += outputFile
+        cmd += ' -o Translator.H5Output.overwrite=1'
+        cmd += ''' -o 'Translator.H5Output.eventkey_filter=exclude Frame__xtcav Frame__yag3' '''
+        cmd += ' exp=xpph6015:run=155:dir=/reg/g/psdm/data_test/multifile/test_016_xpph6015'
+        ptl.cmdTimeOut(cmd, 5*60)
+        f=h5py.File(outputFile)
+        FrameTypeGroup = f['/Configure:0000/Run:0000/CalibCycle:0000/Camera::FrameV1']
+        srcs = set(FrameTypeGroup.keys())
+        expected = set()
+        expected.add('XrayTransportDiagnostic.0:OrcaFl40.0')
+        expected.add('XppEndstation.0:Opal1000.0')
+        self.assertEqual(srcs, expected)
+        os.unlink(outputFile)
+
     def test_epics(self):
         '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.
         '''

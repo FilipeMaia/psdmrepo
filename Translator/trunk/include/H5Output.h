@@ -128,12 +128,14 @@ protected:
   // this is for closing the file during an Event exception
   void closeH5FileDueToEventException();
 
-  bool srcIsFiltered(const Pds::Src &);
+  bool srcIsFiltered(const Pds::Src &src);
   bool keyIsFiltered(const std::string &key);
+  bool fullEventKeyIsFiltered(const std::type_info *typeInfoPtr, const Pds::Src &src, const std::string &key);
 
   // returns true is type filter is exclude psana - caller should set epics to no if so
   bool filterHdfWriterMap();
   void initializeSrcAndKeyFilters(PSEnv::Env &env);
+  void initializeEventKeyFilter(PSEnv::Env &env);
   std::string eventPosition();
 
   /// returns true if C++ type is an ndarray that the system can translate
@@ -197,12 +199,16 @@ private:
 
   bool m_includeAllSrc;
   bool m_includeAllKey;
+  bool m_includeAllEventKey;
 
   bool m_srcFilterIsExclude;
   bool m_keyFilterIsExclude;
+  bool m_eventkeyFilterIsExclude;
 
   std::vector<PSEvt::Source::SrcMatch> m_psevtSourceFilterList;
   std::set<std::string> m_keyFilterSet;
+  typedef std::vector< std::pair<PSEvt::Source::SrcMatch, std::string> > SrcKeyList; 
+  std::map<const std::type_info *, SrcKeyList>  m_eventKeyFilters;
 
   EpicsH5GroupDirectory::EpicsStoreMode m_storeEpics;
 
@@ -223,6 +229,7 @@ private:
   bool m_unknown_src_ok;
   std::list<std::string> m_type_filter;
   std::list<std::string> m_key_filter; 
+  std::list<std::string> m_eventkey_filter; 
 
   std::vector<PSEvt::Source> m_SourceFilterList;
 

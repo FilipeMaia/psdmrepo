@@ -480,6 +480,10 @@ std::string H5Output::readConfigParameters() {
   m_src_filter = configListReportIfNotDefault("src_filter", include_all);
   remainingConfigKeys.remove("src_filter");
   
+  // typesrckey filter parameters
+  m_eventkey_filter = configListReportIfNotDefault("eventkey_filter", include_all);
+  remainingConfigKeys.remove("eventkey_filter");
+  
   m_unknown_src_ok = configReportIfNotDefault("unknown_src_ok",false);
   remainingConfigKeys.remove("unknown_src_ok");
 
@@ -617,6 +621,52 @@ bool H5Output::filterHdfWriterMap() {
     }
   }
   return isPsanaExclude;
+}
+
+void H5Output::initializeEventKeyFilter(PSEnv::Env &env) {
+  set<string> eventKeyFilterSet;
+  parseFilterConfigString("eventkey_filter", m_eventkey_filter,
+                          m_eventkeyFilterIsExclude, m_includeAllEventKey, eventKeyFilterSet);
+  for (set<string>::iterator pos = eventKeyFilterSet.begin(); pos != eventKeyFilterSet.end(); ++pos) {
+    string curArg = *pos;
+    size_t firstSepPos = curArg.find("__");
+    if (firstSepPos == string::npos) {
+      MsgLog(logger, fatal, "No separator, __ found in eventkey_filter arg: " << curArg);
+    }
+    string typeAlias = curArg.substr(0,firstSepPos);
+    string srcStr, keyStr;
+    curArg = curArg.substr(firstSepPos+2);
+    size_t secondSepPos = curArg.find("__");
+    if (secondSepPos == string::npos) {
+      srcStr = curArg;
+    } else {
+      srcStr = curArg.substr(0,secondSepPos);
+      keyStr = curArg.substr(secondSepPos+2);
+    }
+    MsgLog(logger, trace, "eventkeyfilter: type=" << typeAlias << " src=" << srcStr << " key=" << keyStr);
+    TypeAliases::Alias2TypesMap alias2types = m_typeAliases.alias2TypesMap();
+    if (alias2types.find(typeAlias) == alias2types.end()) {
+      MsgLog(logger, fatal, "eventkeyfilter: type=" << typeAlias << " is not known. Use a Translator type alias - see default config file for list.");
+    }
+    TypeAliases::TypeInfoSet types = alias2types[typeAlias];
+    for (TypeAliases::TypeInfoSet::iterator typePos = types.begin(); typePos != types.end(); ++typePos) {
+      if (m_eventKeyFilters.find(*typePos) == m_eventKeyFilters.end()) {
+        m_eventKeyFilters[*typePos]=SrcKeyList();
+      }
+      PSEvt::Source source(srcStr);
+      try {
+        PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(env.aliasMap()));
+        m_eventKeyFilters[*typePos].push_back(std::pair<PSEvt::Source::SrcMatch, std::string>(srcMatch, keyStr));
+      } catch (PSEvt::Exception &) {
+        if (m_unknown_src_ok) {
+          MsgLog(logger, warning, "unknown src " << srcStr << " in eventkey_filter set - ignoring");
+        } else {
+          MsgLog(logger, fatal, "unknown src " << srcStr << " in eventkey_filter set - check spelling. " << std::endl
+                 << " To proceed anyways, add the option 'unknown_src_ok=True' to the Translator configuration");
+        }
+      }
+    }
+  }
 }
 
 void H5Output::initializeSrcAndKeyFilters(PSEnv::Env &env) {
@@ -776,6 +826,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   init();
   boost::shared_ptr<EventId> eventId = evt.get();
   initializeSrcAndKeyFilters(env);
+  initializeEventKeyFilter(env);
   m_configureGroupDir.setAliasMap(env.aliasMap());
   m_calibStoreGroupDir.setAliasMap(env.aliasMap());
   m_calibCycleGroupDir.setAliasMap(env.aliasMap());
@@ -875,15 +926,16 @@ Pds::Damage H5Output::getDamageForEventKey(const EventKey &eventKey,
   return damage;
 }
 
-/// see's if eventKey has been filtered through the type, source, or key filters.
+/// see's if eventKey has been filtered through the type, source, key, or eventkey filters.
 /// optionally checks if it should be skipped in lieu of a calibrated key.
 //  The calibration check should be done for event data, but not for config
 //  data.  If checkForCalibratedKey is true, a calibrated key is looked for in evt.
 //  Returns a null HdfWriter if:
 //             there is no writer for this type
-//             the src for the eventKey is filtered
+//             the src for the eventKey is filtered and it has no key string
 //             the type for the eventKey is filtered
 //             the key is for std::string or ndarray and the key for this EventKey is filtered
+//             the full event key is filtered
 //             the type is one of the special calibrated types, a calibrated version 
 //               of the key exists, and we are not storing uncalibrated data
 
@@ -913,6 +965,10 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(PSEvt::E
       MsgLog(logger,DBGLVL,"key is filtered for " << eventKey << ", filtering.");
       return nullHdfWriter;
     }
+  }
+  if (fullEventKeyIsFiltered(typeInfoPtr, src, key)) {
+    MsgLog(logger,DBGLVL,"Filtering " << eventKey << " due to eventkey_filter");
+    return nullHdfWriter;
   }
   if (m_skip_calibrated and (stripPrefixKey == m_calibration_key)) {
     if ((hasVlenPrefix) and (not m_h5groupNames->isNDArray(typeInfoPtr))) {
@@ -1406,7 +1462,7 @@ void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
     calibWriter = boost::make_shared<HdfWriterNewDataFromEvent>(*calibWriterNew,"calib-store");
     bool replacedType = hdfWriters.replace(calibType, calibWriter, CalibStoreType);
     if (replacedType) {
-      MsgLog(logger, warning, "calib type " << TypeInfoUtils::typeInfoRealName(calibType)
+      MsgLog(logger, warning, "calib type " << PSEvt::TypeInfoUtils::typeInfoRealName(calibType)
              << " already has writer, OVERWRITING");
     }
   }
@@ -1425,7 +1481,7 @@ void H5Output::removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
     if (not removed) {
       MsgLog(logger, warning, "Removed type from calibStore writeres, but type was "
              << " not present. Type = " 
-             << TypeInfoUtils::typeInfoRealName(calibType));
+             << PSEvt::TypeInfoUtils::typeInfoRealName(calibType));
     }
   }
 }
@@ -1487,19 +1543,19 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
           env.calibStore().proxyDict()->get(calibStoreType,PSEvt::Source(src),"",NULL);
       } catch (const std::runtime_error &except) {
         MsgLog(logger,error,"Error retreiving data for " 
-               << TypeInfoUtils::typeInfoRealName(calibStoreType)
+               << PSEvt::TypeInfoUtils::typeInfoRealName(calibStoreType)
                << " error is: " << except.what() 
                << " skipping and going to next calibStore entry");
         continue;
       }
       if (calibStoreData) {
         MsgLog(logger, DBGLVL, " got calib store data for type " 
-               << TypeInfoUtils::typeInfoRealName(calibStoreType) 
+               << PSEvt::TypeInfoUtils::typeInfoRealName(calibStoreType) 
                << " for " << calibEventKey);
         boost::shared_ptr<HdfWriterFromEvent> hdfWriter = m_hdfWriters.find(calibStoreType);
         if (not hdfWriter) {
           MsgLog(logger,TRACELVL,"No HdfWriter found for calibStore type: " 
-                 << TypeInfoUtils::typeInfoRealName(calibStoreType));
+                 << PSEvt::TypeInfoUtils::typeInfoRealName(calibStoreType));
           continue;
         }
         PSEvt::EventKey calibStoreEventKey(calibStoreType, src, "");
@@ -1551,7 +1607,7 @@ void H5Output::lookForAndStoreCalibData(PSEvt::Event &evt, PSEnv::Env &env, hdf5
         }
       } else {
         MsgLog(logger, DBGLVL, " DID NOT get calib store data for type " 
-               << TypeInfoUtils::typeInfoRealName(calibStoreType) 
+               << PSEvt::TypeInfoUtils::typeInfoRealName(calibStoreType) 
                << " for " << calibEventKey);
       }
     }
@@ -1742,6 +1798,28 @@ bool H5Output::keyIsFiltered(const string &key) {
   string afterPrefix;
   bool retVal = ::keyIsFiltered(key, m_includeAllKey, m_keyFilterIsExclude, m_keyFilterSet);
   return retVal;
+}
+
+bool H5Output::fullEventKeyIsFiltered(const std::type_info *typeInfoPtr, const Pds::Src &src, const std::string &key) {
+  if (m_includeAllEventKey) return false;
+  bool eventKeyInList = false;
+  std::map<const std::type_info *, SrcKeyList>::iterator typePos = m_eventKeyFilters.find(typeInfoPtr);
+  if (typePos != m_eventKeyFilters.end()) {
+    SrcKeyList &srcKeyList = typePos->second;
+    for (SrcKeyList::iterator pos = srcKeyList.begin(); pos != srcKeyList.end(); ++pos) {
+      if (pos->first.match(src) and (pos->second == key)) {
+        eventKeyInList = true;
+        break;
+      }
+    }
+  }
+  if ((not eventKeyInList) and (not m_eventkeyFilterIsExclude)) {
+    return true;
+  }
+  if (eventKeyInList and m_eventkeyFilterIsExclude) {
+    return true;
+  }
+  return false;
 }
 
 bool H5Output::srcIsFiltered(const Pds::Src &src) {
