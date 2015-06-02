@@ -10,8 +10,8 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag
-2015
+Tag V01-03-15
+2015-06-02
 - added CreateIDB_v2.sql to create controller database (used for iface_db_dqm)
 - added controller (dqm) for generating data-summary
 - ic-status, ic-command accept alias for connection string: -d [def|mon|dqm]
