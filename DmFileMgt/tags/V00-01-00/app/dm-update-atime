@@ -1,0 +1,147 @@
+#!@PYTHON@
+
+import glob
+import logging
+import argparse
+import subprocess 
+
+from os.path import basename, join, getatime
+
+from RegDB.RegDb import RegDb
+from DbTools.DbConnection import DbConnection
+
+from iRODSAccess.IrodsDb import IrodsDb
+
+
+REGDB_CONN_STR = 'file:/reg/g/psdm/psdatmgr/regdb/.regdb-reader-conn'
+IRODS_CONN_STR = "file:/reg/g/psdm/psdatmgr/irods/.irodsdb-conn"
+
+
+def find_files_in_irods_colls(irods_coll):
+    """ Query irods for all files whose collection matches irods_coll.
+    irods_coll can contain wildcards (% or _).
+
+    yields (irods_filename, irods_atime, data_path) 
+    """
+
+#    query = "iquest --no-page \"%%s/%%s %%s %%s\" " \
+#            "\"SELECT COLL_NAME,DATA_NAME,DATA_PATH,DATA_EXPIRY WHERE COLL_NAME = '%s' and DATA_RESC_NAME = 'lustre-resc'\" " % irods_coll 
+    
+    query = "iquest --no-page \"%%s/%%s %%s %%s\" " \
+            "\"SELECT COLL_NAME,DATA_NAME,DATA_PATH,DATA_EXPIRY WHERE COLL_NAME like '%s' and DATA_RESC_NAME = 'lustre-resc'\" " % irods_coll 
+    
+    try:
+        sts = subprocess.check_output(query, shell=True)
+    except subprocess.CalledProcessError:
+        return
+
+    for line in sts.split("\n"):
+        tok = line.split()
+        if not tok:
+            continue
+        ntok = len(tok)
+        if ntok == 2:
+            iobj,objpath,atime = tok[0],tok[1],0
+        elif ntok == 3:
+            iobj,objpath,atime = tok[0],tok[1],int(tok[2])
+        else:
+            continue
+        yield iobj, atime, objpath
+        
+    
+def update_experiment(instr, exper_glob, data_type, path=None, update=True):
+    """ Find all disk files in irods whose collection matches the exper_glob expression
+    and update their atime.  
+    
+    Update all xtc files for cxi with experiments from 2014
+    >>> update_experiment('cxi', 'cxi____14', 'xtc')
+    """ 
+
+    irods_coll = "/psdm-zone/psdm/%s/%s/%s" % (instr.upper(), exper_glob, data_type)
+
+    to_update = []
+    n_current = 0
+    n_all = 0 
+    for ifn, iatime, data_path in find_files_in_irods_colls(irods_coll):
+        n_all += 1
+        atime = int(getatime(data_path)) + 100000000
+        if atime > iatime:
+            #if len(to_update) < 5000:
+            to_update.append((ifn, atime))
+        else:
+            logging.debug("Current %s %d %d", ifn , iatime, atime)
+            n_current += 1
+    
+    if update and len(to_update) > 0:
+        idb = IrodsDb(connStr=IRODS_CONN_STR)
+        res = idb.updateAtime(to_update, 'lustre-resc')
+
+        for ifn, status in res:
+            print "Updated %s n %d" % (ifn, status)
+        
+    print "Files not updated", n_current, "files updated", len(to_update), "(all %d)" % n_all
+
+
+# =====================================================================================================================
+
+usage="Update the atime for files on disk in irods"
+help_epilog="""
+The arguments <instr> and <exper> are used to select the experiments that will be updated.
+If <exper> is not given all experiments for an instrument will be updated.
+
+Examples:
+     %% %(prog)s --xtc --hdf5 cxi cxi___14   (update all cxi experiments from 2014)
+     %% %(prog)s --xtc --hdf5 amo amog1215   (update specific experiment)
+
+     %% %(prog)s --xtc  amo             (update all amo experiments, xtc files only)
+     %% %(prog)s --xtc  amo amo_____    (update all amo experiments, equal to the previous example)
+
+"""
+
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument("--xtc",  dest="type_xtc", action='store_true', default=False, help="update xtc files")
+    parser.add_argument("--hdf5",  dest="type_hdf5", action='store_true', default=False, help="update hdf5 files")
+    parser.add_argument("--noupdate",  dest="update", action='store_false', default=True, 
+                        help="Check all files but DONOT update the atime in irods")
+    parser.add_argument("--verbose", "-v", action='count', default=0)
+    parser.add_argument('instr', help="instrument") 
+    parser.add_argument('exper', nargs='?', help="experiment selection, can contain wild cards ()") 
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+       
+    log_levels = [logging.INFO, logging.DEBUG]
+    args.verbose = min(args.verbose, len(log_levels)-1)
+    logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
+                        datefmt="%Y%m%d %H:%M:%S")
+ 
+    conn = DbConnection(conn_string=REGDB_CONN_STR)
+    regdb = RegDb(conn)
+    
+    if not args.exper:
+        args.exper = args.instr.lower() + 5*'_'
+
+    if args.exper.find('_') > 0 or args.exper.find('%') > 0:
+        print "Instr: %s  exper search: %s  update-irods: %s" % (args.instr, args.exper, args.update)
+    else:
+        print "Instr: %s  exper search: %s  update-irods: %s  exper-datapath: %s" % (
+            args.instr, args.exper, args.update, regdb.get_datapath(args.instr.upper(), args.exper))
+
+
+    
+
+    if args.type_xtc:
+        update_experiment(args.instr, args.exper, 'xtc', update=args.update)
+    if args.type_hdf5:
+        update_experiment(args.instr, args.exper, 'hdf5', update=args.update)
+
+    
+if __name__ == "__main__":
+    main()
+    
+

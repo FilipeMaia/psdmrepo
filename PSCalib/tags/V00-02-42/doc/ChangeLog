@@ -1,0 +1,436 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSCalib
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-42
+2015-05-18 Mikhail S. Dubrovin	
+- GenericCalibPars.cpp - improve memory management is destructor (PSAS-148)
+	
+Tag: V00-02-41
+2015-05-12 Mikhail S. Dubrovin	
+- GeometryObject.cpp - fix memory management in method evaluate_pixel_coords() (PSAS-147)
+	
+Tag: V00-02-40
+2015-05-12 Mikhail S. Dubrovin	
+- In SegGeometryStore.py use singletons for all sensor types SENS2X1:V1, EPIX100:V1, PNCCD:V1 (PSAS-147)
+	
+Tag: V00-02-39
+2015-05-11 Mikhail S. Dubrovin	
+- in GeometryObject - delete allocated memory for all non-top objects (PSAS-147).
+
+Tag: V00-02-38
+2015-05-11 Mikhail S. Dubrovin	
+- In SegGeometryStore use SegGeometryCspad2x1V1 and SegGeometryEpix100V1 as singletons to reduce memory consumption (PSAS-147)
+	
+Tag: V00-02-37
+2015-04-09 Mikhail S. Dubrovin	
+- in *.py replace !=None -> is not None, ==None -> is None 
+
+Tag: V00-02-36
+2015-04-07 Mikhail S. Dubrovin	
+- GenericCalibPars.cpp - set default pixel_bkgd to 0,
+- CalibPars.cpp- add map_type2str[PIXEL_BKGD].
+
+Tag: V00-02-35
+2015-04-07 Mikhail S. Dubrovin	
+- CalibPars, CalibParsStore, GenericCalibPars - add support for calibration types pixel_mask, pixel_bkgd
+- CalibParsStore add method Create(... std::string& str_src, ...);
+- CalibFileFinder.cpp/h add method trancateSourceName.
+- CalibPars, GenericCalibPars add input parameters CALIB_TYPE in methods ndim(.), size(.), shape(.) 
+
+Tag: V00-02-34
+2015-03-20 Mikhail S. Dubrovin	
+- GeometryObject - delete and make new array pointers only if array size is changing (PSAS-11)
+	
+2015-03-10 Mikhail S. Dubrovin	
+- GeometryAccess - add ref_img_from_pixel_arrays method which returns image as a reference to memeber data (PSAS-11)
+
+Tag: V00-02-33
+2015-02-20 Mikhail S. Dubrovin	
+- CalibFileFinder.py - in method findCalibFileadd add protection for run numbers > 9999 (PSAS-111)
+	
+Tag: V00-02-32
+2015-02-17 Mikhail S. Dubrovin	
+- In GeometryAccess, GeometryObject, SegGeometryMatrixV1 - improve memory management (PSAS-34)
+- In GeometryObject add parameter do_eval in get_pixel_coords(...) and evaluate_pixel_coords(...)
+
+Tag: V00-02-31
+2015-02-12 Mikhail S. Dubrovin	
+- GeometryObject - add method get_geo_pars (PSAS-11)
+	
+Tag: V00-02-30
+2015-01-23 Mikhail S. Dubrovin	
+- GeometryObject.det_shape(...) - comment print for debugging
+- SegGeometryMatrixV1.cpp - in pixel_mask_array(...) fix logical bug (order of logical operations)
+- SegGeometryMatrixV1.py - for matrix-like coordinate system have to use ymesh, xmesh = np.meshgrid(y,x)
+	
+Tag: V00-02-29
+2015-01-22 Mikhail S. Dubrovin	
+- add SegGeometryMatrixV1.py/ccp/h - add PNCCD in SegGeometryStore (PSAS-94)
+	
+Tag: V00-02-28
+2015-01-09 Mikhail S. Dubrovin	
+- GeometryObject (C++) - fix minor issue with update of coordinate eveluation
+
+Tag: V00-02-27
+2015-01-09 Mikhail S. Dubrovin	
+- GeometryAccess & GeometryObject (C++ & py) - propagate do-tilt parameter 
+	from get_pix_coords and get_pix_coord_indexes to transform_geo_coord_arrays (PSAS-11)
+
+Tag: V00-02-26
+2014-11-21 Mikhail S. Dubrovin	
+- GeometryAccess.py in img_from_pixel_arrays(iX, iY, W=None, ...) add protection for W=None (PSAS-11)
+	
+Tag: V00-02-25
+2014-11-15 Mikhail S. Dubrovin	
+- GenericCalibPars.cpp - replace BASE::Size with BASE::size_base() (PSAS-67)
+
+Tag: V00-02-24
+2014-11-13 Mikhail S. Dubrovin	
+- CalibParsStore.h - extend conditional output prbits up to 255
+- GenericCalibPars.cpp - improve conditional output (PSAS-44)
+	
+Tag: V00-02-23
+2014-11-11 Mikhail S. Dubrovin	
+- CalibParsStore.h, GenericCalibPars.cpp - improve all info-printout under control of print_bits (PSAS-44)
+	
+Tag: V00-02-22
+2014-11-06 Mikhail S. Dubrovin	
+- GeometryAccess(.cpp and .py) - in file input add protection for non-complete comment string (PSAS-11)
+
+Tag: V00-02-21
+2014-11-05 Mikhail S. Dubrovin	
+- In CalibParsStore.h, GenericCalibPars.cpp - add support for Epix100a (PSAS-7)
+	
+Tag: V00-02-20
+2014-11-04 Mikhail S. Dubrovin	
+- Add geometry support for Epix100 (see PSAS-11)
+- SegGeometryCspad2x1V1.py - move common methods to SegGeometry.py, improve self-documentation
+- add SegGeometryEpix100V1(.py, .cpp, .h)
+- in SegGeometryStore(.py, .h) add SegGeometryEpix100V1
+- test/ex_seg_geometry_store.cpp - updated for epix100
+	
+Tag: V00-02-19
+2014-10-17 Mikhail S. Dubrovin	
+- GeometryObject - shuffle cspad2x2 pixel only if size==2*185*388 and oname=="CSPAD2X2V1"
+
+Tag: V00-02-18
+2014-10-07 Mikhail S. Dubrovin
+- GeometryAccess.py - improve documentation for Sphinx 
+	
+Tag: V00-02-17
+2014-10-02 Mikhail S. Dubrovin
+- In GeometryObject - add global methods det_shape(arr), data2x2ToTwo2x1(arr2x2), two2x1ToData2x2(arrTwo2x1)
+	- now methods return ndarrays through det_shape(arr), which shaffles pixels for cspad2x2
+	- add test plot of cspad2x2 in ex_geometry_access.cpp and GeometryAccess.py
+- add GlobalMethods.h
+	
+Tag: V00-02-16
+2014-09-30 Mikhail S. Dubrovin
+- In SegGeometry.(py,h), SegGeometryCspad2x1V1.(py,h,cpp) add method pixel_mask_array(mbits=0377), update example in *.py 
+- In GeometryObject, GeometryAccess.(py,h,cpp) add methods get_pixel_mask(...), set_geo_pars(...), move_geo(...), tilt_geo(...) 
+- GeometryAccess.py add method get_psf()
+- update examples in test/ex_geometry_access.cpp and GeometryAccess.py
+	
+Tag: V00-02-15
+2014-09-12 Mikhail S. Dubrovin
+- in GeometryAccess add methods save_pars_in_file(path), set_print_bits(pbits)
+- in GeometryObject add methods str_data()
+- update test/examples in GeometryAccess.py and test/ex_geometry_access.cpp
+	
+Tag: V00-02-14
+2014-09-09 Mikhail S. Dubrovin
+- in GeometryAccess.h - improve doxygen documentation
+
+Tag: V00-02-13
+2014-09-02 Mikhail S. Dubrovin
+- in src/GeometryAccess.cpp - explicit conversion from double to unsigned
+
+Tag: V00-02-12
+2014-08-27 Mikhail S. Dubrovin
+- in SegGeometry*.py, Geometry*.py, and CalibFileFinder.py add Sphinx documentation of interfaces
+	
+Tag: V00-02-11
+2014-08-19 Mikhail S. Dubrovin
+- in test/ex_geometry_access.cpp and GeometryAccess.py change test files location after summer shutdown
+- in SegGeometry.py update comments
+
+Tag: V00-02-10
+2014-08-13 Mikhail S. Dubrovin
+- in PSCalib/ex_geometry_access add test of methods get_pixel_coord_indexes(...), img_from_pixel_arrays(...)
+- update doxy-doc inn GeometryAccess.h
+2014-08-12 Mikhail S. Dubrovin
+- in GeometryAccess.py add methods get_pixel_coord_indexes(...), img_from_pixel_arrays(...)
+2014-08-11 Mikhail S. Dubrovin
+- in GeometryObject and GeometryAccess add methods for get_pixel_scale_size(...) and complete implementation for pixel area
+	
+Tag: V00-02-09
+2014-08-08 Mikhail S. Dubrovin
+- move python modules from pyimgalgos to PSCalib for 
+        GeometryObject.py, GeometryAccess.py
+	SegGeometry.py, SegGeometryStore.py ,SegGeometryCspad2x1V1.py
+
+Tag: V00-02-08
+2014-08-08 Mikhail S. Dubrovin
+- in SegGeometryCspad2x1V1 - move definition of static const parameters from *.h to *.cpp 
+
+Tag: V00-02-07
+2014-08-06 Mikhail S. Dubrovin
+- segment geometry is defined through the static factory method, add access to pixel areas
+- add SegGeometry - interface, 
+- add SegGeometryCspad2x1V1 - implementation for cspad2x1
+- add SegGeometryStore - factory,  test/ex_seg_geometry_store.cpp
+- remove PixCoords2x1V2
+	
+Tag: V00-02-06
+2014-07-30 Mikhail S. Dubrovin
+- move modules PixCoords2x1V2, GeometryAccess.h, GeometryObject.h, and test/ex_geometry_access from ImgAlgos to PSCalib
+
+Tag: V00-02-05
+2014-07-03 Mikhail S. Dubrovin
+- in CalibParsStore.h, GenericCalibPars.h, GenericCalibPars.cpp - add calibration for variable size ndarrays 
+	
+Tag: V00-02-04
+2014-06-26 Mikhail S. Dubrovin
+- add CalibFileFinder.py - analogous to src/CalibFileFinder.cpp for pythonic-psana modules
+
+Tag: V00-02-03
+2014-05-28 Mikhail S. Dubrovin
+- in CSPadCalibPars - use print_bits to control warning messages
+
+Tag: V00-02-02
+2014-05-24 Mikhail S. Dubrovin
+- fix ex_princeton_calib_pars
+	
+Tag: V00-02-01
+2014-05-23 Mikhail S. Dubrovin
+- New generic algorithms for access to calibration parameters are implemented;
+- remove PrincetonCalibPars
+- add GenericCalibPars
+- in CalibParsStore use GenericCalibPars for all implemented detectors;
+	CsPad, CsPad2x2, Pnccd, Princeton, Andor, Opal1000, Opal4000
+- To add new detector "Det":
+	1) pdscalibdata/DetBaseV1.h
+	2) in PSCalib/src/GenericCalibPars.cpp add
+             #include "pdscalibdata/DetBaseV1.h"
+             ...
+	     template class PSCalib::GenericCalibPars<pdscalibdata::Opal4000BaseV1>;
+	3) in PSCalib/include/CalibParsStore.h add
+             #include "pdscalibdata/DetBaseV1.h"
+             ...
+             return new PSCalib::GenericCalibPars<pdscalibdata::DetBaseV1>(calibdir, type_group, src, runnum, prbits);
+	
+Tag: V00-01-26
+2014-05-21 Mikhail S. Dubrovin
+- add test/ex_princeton_calib_pars.cpp, PrincetonCalibPars
+- add CalibPars.cpp for default virtual methods
+- add PrincetonCalibPars and insert it in CalibParsStore.h
+2014-05-13 Mikhail S. Dubrovin
+- in CalibFileFinder use the same constructor for default parameter print_bits 
+
+Tag: V00-01-25
+2014-05-06 Mikhail S. Dubrovin
+- in SvnProps.py (to get rid of nightly complains) move global class attributes under __init__
+
+Tag: V00-01-24
+2014-04-29 Mikhail Dubrovin
+- ALL modules: edit comments and correct doxy documentation
+	
+Tag: V00-01-23
+2014-04-18 Mikhail Dubrovin
+- ALL modules: psvn mktxtprop PSCalib/src/*.py - add properties to files
+- add src/SvnProps.py
+	
+Tag: V00-01-22
+2014-03-28 Mikhail S. Dubrovin
+- add SegmentGeometry.h - abstract class for interface description
+
+Tag: V00-01-21
+2014-03-04 Mikhail S. Dubrovin
+- in CalibPars (in order to compile in RHEL6) add #include <stdint.h> // for uint8_t, uint16_t etc.
+	
+Tag: V00-01-20
+2014-03-03 Mikhail S. Dubrovin
+- add CSPad2x2CalibIntensity and CSPadCalibIntensity to access cspad and cspad2x2 calibration parameters
+- add examples in test/ex_cspad2x2_calib_intensity.cpp, test/ex_cspad_calib_intensity.cpp
+- modify factory class include/CalibParsStore.h to account for cspad and cspad2x2
+	
+Tag: V00-01-19
+2014-02-08 Mikhail S. Dubrovin
+- in PnccdCalibPars, CalibPars, and CalibParsStore include new type of constants PnccdPixelRmsV1
+	
+Tag: V00-01-18
+2014-02-07 Mikhail S. Dubrovin
+- cosmetic edition for doxygen documentation
+	
+Tag: V00-01-17
+2014-02-06 Mikhail S. Dubrovin
+- in CalibPars.h get all calibration types from pdscalibdata::Pnccd*V1::pars_t
+
+Tag: V00-01-16
+2014-02-05 Mikhail S. Dubrovin
+- add superclass CalibPars.h
+- now PnccdCalibPars is derived from class CalibPars
+- add static factory CalibParsStore.h
+	
+Tag: V00-01-15
+2014-01-29 Mikhail S. Dubrovin
+- add new class for pnCCD with example: PnccdCalibPars, test/ex_pnccd_calib_pars.cpp
+- in CalibFileFinder add parameter print_bits to control verbosity
+	
+Tag: V00-01-14
+2013-12-18 Andy
+- forgot to add unit test to svn
+
+Tag: V00-01-13
+2013-12-17 Andy
+- CalibFileFinder: bug fix for ordering of the intervals with common start
+- adding unit test for CalibFileFinder
+
+Tag: V00-01-12
+2013-09-17 Mikhail S. Dubrovin
+- improve doxigen documentation, add description of interfaces in CSPadCalibPars and CSPad2x2CalibPars
+- improve test modules test/ex_cspad_calib_pars.cpp and test/ex_cspad2x2_calib_pars.cpp
+- add methods for mapping of the calibration type status
+
+Tag: V00-01-11
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
+Tag: V00-01-10
+2013-08-30 Mikhail S. Dubrovin
+- in ex_cspad2x2_calib_pars.cpp and src/CSPad2x2CalibPars.cpp switch to /tutXXX directory for examples
+
+Tag: V00-01-09
+2013-06-07 Mikhail S. Dubrovin
+- improve interface for CSPadCalibPars and CSPad2x2CalibPars constructor
+	
+Tag: V00-01-08
+2013-04-03 Mikhail S. Dubrovin
+- add two new calib types for center_global and rotation_global
+	
+Tag: V00-01-07
+2013-03-13 Mikhail S. Dubrovin
+- for CSPad2x2CalibPars return backward compatible method containing std::string m_str_src in order to run test/ex_cspad2x2_calib_pars.cpp
+
+Tag: V00-01-06
+2013-03-13 Mikhail S. Dubrovin
+- in CSPadCalibPars and CSPad2x2CalibPars std::string m_str_src -> Pds::Src m_src;
+
+Tag: V00-01-05
+2013-03-08 Mikhail S. Dubrovin
+- add CSPad2x2CalibPars and example in test/ex_cspad2x2_calib_pars.cpp
+
+Tag: V00-01-04
+2013-03-01 Mikhail S. Dubrovin
+- in CSPadCalibPars add beam_vector and beam_intersect types
+- add default constants in default constructor for all types.
+	
+Tag: V00-01-03
+2012-05-10 Mikhail S. Dubrovin
+- in CSPadCalibPars.cpp 
+  Add warning message and abort() if the calibration file is not found.
+  DEFAULT CONSTANTS ARE NOT PROVIDED YET !!!!!!!!!!!!!!!!! IN MY TO DO LIST....
+	
+Tag: V00-01-02
+2012-05-01 Andy Salnikov
+- upgrading to boost 1.49.0, some return types have changed in 
+  boost::filesystem
+
+Tag: V00-01-01
+2012-03-17 Mikhail S. Dubrovin
+- in CSPadCalibPars.cpp the printout is commented
+	
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- in CalibFileFinder class moved source argument to findCalibFile()
+  method instead of constructor, more convenient for use.
+- added exceptions classes, exception is thrown when somebody passes
+  source address which is not DetInfo
+
+Tag: V00-00-05
+2011-09-01 Andy Salnikov
+- pass run number to CalibFileFinder::findCalibFile() method by
+  value instead of by reference
+
+Tag: V00-00-04
+2011-08-09 Mikhail S. Dubrovin
+- change float -> double
+
+Tag: V00-00-03
+2011-08-08 Andy Salnikov
+- moved test app from app/ to test/, disable unit tests running
+- added @addtogroup to all headers to generate separate module for this 
+  package in doxygen documentation
+
+Tag: V00-00-02
+2011-08-05 Mikhail S. Dubrovin
+- Class CSPadCalibPars provides access to the calibration parameters 
+  for CSPad geometry.
+
+Tag: V00-00-01
+2011-07-21 Mikhail S. Dubrovin
+
+-----------------------------------------------------------------------
+	
+- Class PSCalib/CalibFileFinder is created with central method 
+  CalibFileFinder::findCalibFile(...) which similar to the 
+  CsPadCalibV1Cvt::findCalibFile(...) from O2OTranslator/CsPadCalibV1Cvt
+  All necessary parameters should be specified at constructor initialization.
+	
+- add example PSCalib/app/ex_calib_file_finder.cpp
+
+	
+2011-07-11 Mikhail S. Dubrovin	
+
+Description of calibration subdirectories:
+------------------------------------------
+https://confluence.slac.stanford.edu/display/PCDS/CsPad+calibration+in+translator
+
+
+Package created on on psdev:
+----------------------------
+cd LCLS/
+newrel ana-current PSCalib-V00
+cd PSCalib-V00/
+sit_setup
+newpkg PSCalib
+mkdir PSCalib/src
+mkdir PSCalib/app
+mkdir PSCalib/include
+psvn newpkg PSCalib
+addpkg PSCalib
+	
+cp $SIT_RELDIR/ana-current/O2OTranslator/src/CsPadCalibV1Cvt.cpp    PSCalib/src/
+cp $SIT_RELDIR/ana-current/O2OTranslator/include/CsPadCalibV1Cvt.h  PSCalib/include/
+
+Change names, edit these files, add applications for test etc.
+
+svn add PSCalib/include/
+svn add PSCalib/src/
+svn add PSCalib/app/
+...
+	
+svn update
+svn status PSCalib
+svn commit -m "Work in progress." PSCalib
+
+List tags:
+----------
+psvn tags PSCalib
+
+Create new tag:
+---------------
+cd PSCalib
+svn update
+psvn tag V00-00-01
+==================

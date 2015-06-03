@@ -6,12 +6,13 @@
 # 
 
 
-. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/release_dev/data_mover
+# needs to be run from release
+. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/dm-prod-head
 
 export RUNUSER="/sbin/runuser $1 -s /bin/bash --preserve-environment -c"
 # cleanup tm[ folder 
 $RUNUSER "cd $2/../tmp; find . -type f -mtime +3 -exec rm -vf '{}' ';'"
 
 # cleanup daq xtc files
-$RUNUSER "iocxtccleanup --clean $2"
+$RUNUSER "iocxtccleanup --verbose --minageh 36 --clean $2"
 

@@ -1,0 +1,87 @@
+#!/bin/bash
+#
+# Shell script to start the monitoring controller
+#
+
+
+# release directory
+release=/reg/neh/home1/wilko/releases/ic-testing
+# release=dm-0.9.1
+
+# database options
+conn_file=file:/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn
+
+# config section names to read from database
+config="compress no-split xtc-lustre calib-data lsf live-mode"
+
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+prog=ic-controller-mon
+pidfile=/reg/g/psdm/psdatmgr/var/ic-controller/ic-controller-mon.pid
+
+# ===================================================================
+
+usage () {
+    cat <<EOF
+Usage: $(basename $0) [options]
+  Options:
+    -h        - print this message
+    -e        - start controller using exec
+    -r path   - release name or directory
+    -p path   - PID file path, def: none
+EOF
+}
+
+while getopts her:p: c ; do
+    case $c in
+        h) usage ; exit 0 ;;
+        r) release="$OPTARG" ;;
+        p) pidfile="$OPTARG" ;;
+        e) doexec=1 ;;
+        \?) usage ; exit 2 ;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+# allow world access
+umask 022
+
+echo  "Starting ${prog}: "
+pid=$(cat "${pidfile}" 2>/dev/null)
+if [ -n "${pid}" -a -d /proc/${pid} ] ; then
+    echo "already running, pid=${pid}"
+    exit 
+fi
+
+# create log dir
+test -d "${logdir}" || mkdir -p "${logdir}" || exit 2
+
+# redirect output
+time=$(date +%Y%m%dT%H%M%S)
+log="${logdir}/ic-controller-mon/ic-controller-${time}-$(hostname).log"
+
+# Set release env
+. /reg/g/psdm/bin/sit_setup.sh ${release}
+
+
+echo "Running from release ${release}" >> "${log}"
+type ${prog} >> "${log}"
+echo "Using configurations ${config}" >> "${log}"
+
+# set config options
+config_opt=""
+for c in $config ; do
+    config_opt="${config_opt} -c ${c}"
+done
+
+
+if [[ ${doexec:-0} -eq 1 ]] ; then
+    pid=$$ 
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exec ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v
+else
+    ${prog} -d "${conn_file}" ${config_opt} -l "${log}" -v -v &
+    pid=$!
+    [[ -n "${pidfile}" ]] && echo "${pid}" >  "${pidfile}"
+    exit
+fi

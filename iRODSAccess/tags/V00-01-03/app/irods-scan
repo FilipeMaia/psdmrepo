@@ -1,0 +1,158 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script irods-scan...
+#
+#------------------------------------------------------------------------
+
+"""Script which scans iRODS directories and reports which physical 
+files are missing. 
+
+Returns 
+     0 if all files exist,
+    ENOENT if some files do not exist,
+    EINVAL for incorrect argument.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import errno
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from iRODSAccess.IrodsClient import IrodsClient
+from iRODSAccess.Connection import Connection
+import irods
+from irods_error import *
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class irodsScan ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] irods-obj ..." )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-r', "--recursive", action="store_true", 
+                                  default=False, help="scan recursively" )
+        self._parser.add_option ( '-R', "--resource",  
+                                  default="", help="resource name" )
+        self._parser.add_option ( '-c', "--command", action="store_true", 
+                                  default=False, help="print commands to remove orphan files" )
+        self._parser.add_option ( '-n', "--no-print", action="store_true", 
+                                  default=False, help="do not print, only return code" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See AppBase class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if not self._args :
+            self._parser.error("one or more collection name required")
+            return 2
+
+        # prepare iRODS connection
+        conn = Connection()
+        client = IrodsClient(conn)
+
+        stat = 0
+
+        # process all arguments
+        for coll in self._args :
+
+            self.trace("processing collection "+coll)
+            
+            # get all files
+            files = client.files(coll, self._options.recursive)
+            if files is None :
+                if not self._options.no_print:
+                    self.error("Collection %s does not exist", coll)
+                return errno.EINVAL
+            
+            for obj in files :
+                if obj['type'] != 'object' : continue
+                if self._options.resource and obj['resource'] != self._options.resource : continue
+                self.trace("checking object %s", obj)
+
+                # check that file exists
+                path = obj['path']
+                try:
+
+                    st = os.stat(path)
+                    # it exists, check file size
+                    self.trace("irods size=%d, disk size=%d", obj['size'], st.st_size)
+                    if obj['size'] != st.st_size :
+                        self.dump('size mismatch', obj)
+                        stat = errno.ENOENT
+
+                except OSError,ex:
+
+                    if ex.errno != errno.ENOENT:
+                        
+                        self.dump(ex.strerror , obj)
+                        
+                    else:
+                        
+                        # stat failed, file does not exist
+                        stat = errno.ENOENT
+                        if not self._options.no_print:
+                            if self._options.command:
+                                print "irm -U -n %(replica)s %(collName)s/%(name)s" % obj
+                            else :
+                                self.dump('missing file', obj)
+                            
+                except Exception, ex:
+                    
+                    print "Exception:", ex
+                    
+                        
+        return stat
+
+
+    def dump(self, msg, obj):
+        msg += ": resource=%(resource)s replica=%(replica)s object=%(collName)s/%(name)s path=%(path)s" % obj
+        print msg
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = irodsScan()
+    rc = app.run()
+    sys.exit(rc)

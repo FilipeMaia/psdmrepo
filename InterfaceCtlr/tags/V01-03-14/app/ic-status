@@ -1,0 +1,236 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script ic-status...
+#
+#------------------------------------------------------------------------
+
+"""Script to display status information for the controller.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from DbTools.DbConnection import DbConnection
+from InterfaceCtlr.InterfaceDb import InterfaceDb
+
+#---------------------
+# Local definitions --
+#---------------------
+
+_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class ICStatus ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options]" )
+
+        self._parser.add_option ( '-d', "--conn-string",
+                                  action="store", dest="conn_string", default=_conn_str,
+                                  help="database connection string", metavar="CONN_STRING" )
+
+        self._parser.add_option ( '-u', "--user",
+                                  action="store", dest="user", default=None,
+                                  help="override default user name" )
+
+        self._parser.add_option ( '-p', "--password",
+                                  action="store", dest="password", default=None,
+                                  help="specify user password (no password by default)" )
+
+        self._parser.add_option ( '-s', "--system",
+                                  action="store_true", dest="system", default=None,
+                                  help="show system status (running controllers)" )
+
+        self._parser.add_option ( '-e', "--experiment",
+                                  action="store", dest="experiment", default=None,
+                                  help="limit display to particular instrument:experiment" )
+
+        self._parser.add_option ( '-Q', "--queue",
+                                  action="store_true", dest="queue", default=False,
+                                    help="show queued jobs" )
+
+        self._parser.add_option ( '-R', "--run",
+                                  action="store_true", dest="running", default=False,
+                                    help="show running jobs (including suspended)" )
+
+        self._parser.add_option ( '-D', "--done",
+                                  action="store_true", dest="done", default=False,
+                                    help="show completed jobs (including failed)" )
+
+        self._parser.add_option ( '-F', "--failed",
+                                  action="store_true", dest="failed", default=False,
+                                    help="show failed jobs" )
+
+        self._parser.add_option ( '-S', "--success",
+                                  action="store_true", dest="success", default=False,
+                                    help="show successfully completed jobs" )
+
+        self._parser.add_option ( '-l', "--last",
+                                  action="store_true", dest="last", default=False,
+                                    help="only show last processing" )
+        
+        self._parser.add_option ( '-t', "--time",
+                                  action="store_true", dest="time_order", default=False,
+                                  help="sort results by time order" )
+
+        self._parser.add_option ( '-n', "--no-header",
+                                  action="store_false", dest="print_header", default=True,
+                                  help="do not print table headers" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if self._args :
+            self._parser.error("unexpected arguments")
+            return 2
+
+        # create database instance
+        conn = DbConnection( conn_string=self._options.conn_string, 
+                             user=self._options.user,
+                             passwd=self._options.password,
+                             timeout = 0 )
+
+        if self._options.system:
+
+            # print system state
+            db = InterfaceDb(conn)
+            controllers = db.controller_status()
+            if controllers:
+                fmt = '%6s  %-32s  %-8s  %-19s  %6s  %s'
+                if self._options.print_header :
+                    print fmt % ('ID', 'Host', 'Status', 'Time', 'PID', 'Instruments')
+                    print '--------------------------------------------------------------------------------------------'
+                data = [ (d['id'], d['host'], d['status'], d['stopped'] or d['started'], d['pid'], d.get('instruments',[])) for d in controllers ]
+                data.sort()
+                for d in data :
+                    instr = d[5]
+                    instr = ', '.join(instr)
+                    d = d[:5] + (instr,) 
+                    print fmt % d
+            else:
+                print "No active controller defined"
+                    
+            return 0
+        
+        # build query
+        vars = ()
+        if self._options.last :
+            
+            subq = "SELECT instrument, experiment, run_number, max(created) AS last FROM fileset"
+            if self._options.experiment :
+                words = self._options.experiment.split(':', 1)
+                if len(words) == 1 :
+                    subq += " WHERE experiment=%s"
+                    vars += (words[0],)
+                else :
+                    subq += " WHERE instrument=%s AND experiment=%s"
+                    vars += (words[0], words[1])
+            subq += " GROUP BY run_number, instrument, experiment"
+ 
+            q = """SELECT fs.instrument, fs.experiment, fs.run_number, 
+                          stat.name as status, fs.id, IFNULL(tr.jobid,0), fs.priority, fs.created
+                FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, 
+                    fileset_status_def stat, (""" +subq+ """) flast
+                WHERE fs.instrument=flast.instrument AND fs.experiment=flast.experiment 
+                AND fs.run_number=flast.run_number AND fs.created=flast.last
+                AND stat.id=fs.fk_fileset_status  
+            """
+            
+        else :
+            
+            q = """SELECT fs.instrument, fs.experiment, fs.run_number, 
+                          stat.name as status, fs.id, IFNULL(tr.jobid,0), fs.priority, fs.created
+                FROM fileset fs LEFT OUTER JOIN translator_process tr ON tr.id = fs.translator_id, fileset_status_def stat
+                WHERE stat.id=fs.fk_fileset_status 
+            """
+        
+            if self._options.experiment :
+                words = self._options.experiment.split(':', 1)
+                if len(words) == 1 :
+                    q += " AND fs.experiment=%s "
+                    vars += (words[0],)
+                else :
+                    q += " AND fs.instrument=%s AND fs.experiment=%s "
+                    vars += (words[0], words[1])
+        
+        states = []
+        if self._options.queue : states += ['QUEUE']
+        if self._options.running : states += ['RUN']
+        if self._options.done : states += ['DONE', 'FAIL']
+        if self._options.failed : states += ['FAIL']
+        if self._options.success : states += ['DONE']
+        if states:
+            q += " AND stat.job_state IN (%s)" % (','.join(['%s']*len(states)),)
+            vars += tuple(states)
+
+        if self._options.time_order:
+            q += " ORDER BY fs.created"
+        else:
+            q += " ORDER BY fs.instrument, fs.experiment, fs.run_number, fs.created"
+
+
+        # execute query
+        self.trace( "query: %s" % q)
+        self.trace( "query vars: %s" % (vars,) )
+        cursor = conn.cursor()
+        cursor.execute( q, vars )
+
+        # dump it
+        count = 0
+        rows = cursor.fetchmany()
+        while rows :
+            for row in rows :
+                if self._options.print_header and count % 30 == 0 :
+                    print "------------------------------------------------------------------------------------"
+                    print "Instr. Experiment    Run Status      RequestId    JobID Priority Create Time"
+                    print "------------------------------------------------------------------------------------"
+                print "%-6s %-12s %4d %-12s %8d %8d %8d %-16s" % tuple( row )
+                count += 1
+            rows = cursor.fetchmany()
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = ICStatus()
+    rc = app.run()
+    sys.exit(rc)

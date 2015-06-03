@@ -1,0 +1,23 @@
+#!/bin/bash 
+
+# Run data-summary-tool
+#
+# Usage:
+#    data-summary-tool <release> <options>
+
+
+# first argument is the release to run the translator from  
+rel=$1
+shift 1 
+. /reg/g/psdm/bin/sit_setup.sh $rel 
+
+opt=$(echo $@ | tr -d "'") 
+echo "Rank: ${OMPI_COMM_WORLD_RANK} Options: $opt"
+
+
+# env variables
+#export LD_PRELOAD=libpazlib.so
+#export PAZLIB_MAX_THREADS=8
+#export MSGLOGCONFIG="CalibDataProxy=trace"
+
+exec data-summary-tool ${opt}

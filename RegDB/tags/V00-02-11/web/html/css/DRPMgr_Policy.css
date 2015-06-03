@@ -1,0 +1,42 @@
+#drpmgr-policy {
+    padding:    0px;
+}
+#drpmgr-policy > #tabs {
+    padding-top:        0px;
+    background:         0;
+    font-size:          11px;
+}
+#drpmgr-policy > #tabs > ul {
+    background:         #f5f8f9 url(images/ui-bg_inset-hard_100_f5f8f9_1x100.png) 50% 50% repeat-x;
+}
+#drpmgr-policy > #tabs > ul > li {
+    border-radius:      0 !important;
+}
+
+#drpmgr-policy > #tabs > .panel {
+    border-left:        1px solid #c0c0c0;
+    padding:            10px 10px 10px 20px;
+    background-color:   #ffffff;
+    font-size:          12px;
+}
+#drpmgr-policy .info {
+    color:  maroon;
+}
+#drpmgr-policy .info#info {
+    font-size:          18px;
+}
+#drpmgr-policy table thead td.table_cell {
+    white-space: nowrap;
+}
+#drpmgr-policy table > tbody > tr > td.definition {
+    white-space: normal !important;
+}
+#drpmgr-policy table > tbody > tr > td.definition {
+    max-width:  320px;
+}
+#drpmgr-policy .buttons {
+    margin-left:    20px;
+}
+#drpmgr-policy .buttons button[name="update"] img {
+    width:          11px;
+}

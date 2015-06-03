@@ -1,0 +1,131 @@
+#!/bin/bash --norc
+#
+#  mv2offline-recorder-daemon [-T] [node] 
+#
+
+function node_requested() {
+    # check if a allowed node ($1) is requested. return 0 if true
+    for req in ${REQ_NODES} ; do
+        req=${req#daq-}
+        [[ ${req} = ${1} ]] && return 0
+    done
+    return 1
+}
+
+function debug() {
+    if [ ${DEBUG} -eq 1 ] ; then
+        echo $*
+    fi
+}
+
+TEST=
+DEBUG=0
+while getopts :Td OPT; do
+    case $OPT in
+        T|+T) TEST=echo ;;
+        d|+d) DEBUG=1 ;;
+        *)
+            echo "usage: ${0##*/} [+-T} [--] ARGS..."
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+REQ_NODES=$*
+PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --holdoff 60 --ignore ^D^C"
+
+rec_psana101=(
+    ioc-cxi-rec01::1
+    ioc-fee-rec01::2 
+    ioc-fee-rec02::3
+    ioc-fee-rec03::4 
+    ioc-fee-rec04::5 
+    ioc-sxr-rec01::6 
+)
+rec_psana102=(
+    ioc-xcs-rec01::7 
+    ioc-xcs-rec02::8 
+    ioc-xcs-rec03::9 
+    ioc-xpp-rec01::11 
+    ioc-xpp-rec02::12 
+)
+rec_psana103=(
+    psana103::30::ffb-local
+    ioc-xrt-rec01::13 
+    ioc-xrt-rec02::14 
+    ioc-xrt-rec03::15 
+    ioc-xrt-rec04::16 
+    ioc-xrt-rec05::17 
+    ioc-und-rec01::18::ioc-ffb 
+)
+recorders=( ${rec_psana101[@]} ${rec_psana102[@]} ${rec_psana103[@]} )
+
+# check for duplicates and assign recorder to mover nodes
+nunique=$(echo ${recorders[@]} | xargs -n 1 | sed -e 's/:.*//' | sort -u | wc -l)
+portsunique=$(echo ${recorders[@]} | xargs -n 1 | sed -e 's/.*://' | sort -u | wc -l)
+if [[ ${nunique} -ne ${#recorders[@]} ]] || [[ ${portsunique} -ne ${#recorders[@]} ]] ; then
+    echo "Duplicate host or port found"
+    echo ${recorders[@]} | xargs -n 1 
+    exit 1
+fi
+if echo ${recorders[@]} | xargs -n 1 | grep -v '::' ; then
+    echo "No '::' exit" && exit 1
+fi
+
+case $(hostname) in
+    psana101)  nodes="${rec_psana101[@]}" ;;
+    psana102)  nodes="${rec_psana102[@]}" ;;
+    psana103)  nodes="${rec_psana103[@]}" ;;
+    *)  nodes="" ;;
+esac
+
+# set pcds release to get proper python version
+echo "Using release ${1:-dm-current}"
+. /reg/g/psdm/bin/sit_setup.sh ${1:-dm-current}
+
+# get abspath of mvr and cd to workdir
+cd $(dirname $0)
+reldir=$(pwd)
+cmd=${reldir}/mv2offline-ana.py
+if ! cd /u1/psdm/mvr/log ; then
+    echo "Could not cd to workdir /u1/psdm/mvr/log"
+    exit 1
+fi
+
+
+let baseport=30900
+for node_port in ${nodes} ; do
+    
+    tok=(${node_port//:/ })
+    node=${tok[0]}
+    port=$(( ${baseport} + ${tok[1]} ))
+    mode=${tok[2]:-local}
+
+    # check if only selected nodes should be started 
+    if [ $# -gt 0 ] && ! node_requested ${node} ; then
+        continue
+    fi
+    
+    logfile=/u1/psdm/mvr/log/mv2offline.${node}
+    if [[ -e ${logfile} ]] && [[ "${TEST}" = "" ]]; then
+        mv_name=${logfile}.$(date +%Y%m%dT%H%M%S)
+        echo ${logfile} ${mv_name}
+        mv ${logfile} ${mv_name}
+    fi
+
+    case "${mode}" in
+        ioc-ffb)   cmd_opts="--mode ioc-ffb -v --ireg --failidx" ;;
+        local)     cmd_opts="--mode local -v --ireg --failidx"  ;;
+        ffb-local) cmd_opts="--mode ffb-local -v --ireg" ;;
+        *) 
+            echo "Unknown mode"
+            continue ;;
+    esac
+    debug "node: $node port: $port mode: $mode  cmd-opts: ${cmd_opts}"
+    debug "$(pwd)"
+
+    extra_opts="--logfile ${logfile} --name $(basename ${logfile}) ${port}"
+    ${TEST} ${PROCSERV} ${extra_opts} ${cmd} --host ${node} ${cmd_opts} 
+done
+

@@ -1,0 +1,87 @@
+#!/usr/bin/env python 
+
+
+import os 
+import sys 
+import argparse
+from datetime import datetime
+
+import DmTapeRestore.trgdir as trgdir
+import DmTapeRestore.dbrestore as db
+
+import RegDB.experiment_info as regdb
+
+
+def rec_info():
+    """ Get all files in the recieve state and sort by exper """
+
+    trg = trgdir.CheckTrgDir()
+    max_long = long(sys.maxsize)
+    received_exp = {}
+    for req in db.files_with_status(db.RECEIVED):
+        eid = req['exper_id']
+        req_time = long(req['requested_time'])
+        (n,tmin,tmax) = received_exp.setdefault(eid, [0,max_long,0])
+        
+        received_exp[eid][0] = n + 1 
+        if req_time > tmax:
+            received_exp[eid][2] = req_time 
+        if req_time < tmin:
+            received_exp[eid][1] = req_time 
+
+        trg.check_for_dir(trgdir.iname2cdir(req['irods_filepath']))
+        #if eid in received_exp:
+        #    received_exp[eid] += 1
+        #else:
+        #    received_exp[eid] = 1
+
+
+    for eid, values in received_exp.iteritems():
+        (nfiles, tmin_ns, tmax_ns) = values
+        tmin = datetime.fromtimestamp(tmin_ns/1000000000)
+        tmax = datetime.fromtimestamp(tmax_ns/1000000000)
+        print "%s %4d  %s    %s" % (regdb.id2name(eid), nfiles, tmin, tmax)
+
+    # show missing dirs
+    for folder, stat in trg.status():
+        if not stat:
+            print "Missing", folder, stat
+
+
+
+#iname = '/psdm-zone/psdm/XCS/xcsc0113/xtc/e230-r0004-s03-c00.xtc'
+#db.set_status(db.DONE, iname)
+
+# ['status', 'irods_filepath', 'file_type', 'runnum', 'requested_uid', 'irods_dst_resource', 'requested_time', 'exper_id', 'irods_src_resource']
+
+
+
+def main():
+
+    status = {'sub' : db.SUBMITTED, 'rec' : db.RECEIVED, 'done' : db.DONE, 'fail' : db.FAILED}
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--listrec", action='store_true', help="status to query")
+    parser.add_argument("stat", choices = status.keys(), default='sub', nargs='?',
+                        help="status to query")
+    
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    # print for each experiment how many files are in RECEIVED state
+    if args.listrec:
+        rec_info()
+        return 
+
+
+    for req in db.files_with_status(status[args.stat]):
+        iname = req['irods_filepath']
+        print req['status'], iname,  "EID=%d" % req['exper_id']
+    
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,4 @@
+- first version of controller for DQM (data-summary service)
+- added connection alias to ic-status/ic-command
+- added openmpi package. Needed for controller (mon, dqm).
+

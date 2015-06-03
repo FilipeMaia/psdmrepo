@@ -1,0 +1,508 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package InterfaceCtlr
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag V01-03-14	
+2015-05-26
+- Added --force option to deactivate controller without checking if the pid still exists.
+	
+Tag: V01-03-13
+2015-05-08
+- Close JobInfo (python lsf c-api) if none were found. Otherwise connection to lsf server is not 
+  properly closed (stuck in CLOSE_WAIT) which caused the ic-controller-mon to run out of file descriptors. 
+- smalldata support for irods registration 
+	
+Tag: V01-03-12 
+2015-03-10 Wilko Kroeger
+- Added controller for monitoring translation
+	
+Tag: V01-03-11
+2014-07-30 Wilko Kroeger
+- The controller will accept an absolute path for the config file
+
+Tag: V01-03-10
+2014-07-14 Wilko Kroeger
+- Allow to set the resource a file is stored in irods (FileMgrIrods)
+- Register an index file (xtc.idx type) in the irods resource specified by the key 
+  irodsIdxResource in the fm-irods section (FileMgrRegister)
+	
+Tag: V01-03-09
+2014-07-11 Igor Gaponenko
+- forcing the Translator job to dump the configuration file into STDOUT
+in TranslatorJobPsana.py
+
+Tag: V01-03-07
+2014-06-12 Igor Gaponenko
+- configuring psana modules of the Translator via a configuration file rather than
+by passing a list of modules in the command line. Fetching the configuration
+file location from the database.
+
+Tag: V01-03-06
+2014-05-21 Wilko Kroeger
+- allow ic-store-files to scan files in <exp>/usr directories. When the usr is scanned
+  the hdf5 and xtc folders will be ignored.
+- Added option to ignore files whose mtime is more recent than n-hours.
+- A few more extra option to ic-store-files.
+
+Tag: V01-03-05
+2014-04-30 Wilko Kroeger
+- Added new ic-controller that uses psana for the xtc to hdf5 translation 
+	
+Tag: V01-03-03
+2013-06-13 Andy Salnikov
+- small fix in error message generated when irods registration fails
+
+Tag: V01-03-02
+2013-05-09 Andy Salnikov
+- DbConnection class is in DbTools package now
+
+Tag: V01-03-01
+2013-05-09 Andy Salnikov
+- switch to AppUtils.AppBase as base class for python application
+- remove LusiPyApp mentioning everywhere
+
+Tag: V01-03-00
+2013-04-11 Andy Salnikov
+- few updates related to SCGI server (mod_scgi in particular)
+- we are switching to mod_scgi instead of mod_wsgi, services will run
+  outside apache now from our standard accout, location of few files
+  has changed because of that so config needs update
+- mod_scgi does not set SCRIPT_NAME correctly, I'm adding new middleware 
+  which takes care of this
+
+Tag: V01-02-00
+2013-04-08 Andy Salnikov
+- add support for auto-registration of files after job is complete
+- enable job killing for unfinished jobs 
+
+Tag: V01-01-00
+2013-04-01 Andy Salnikov
+- auto-translation script modified to accomodate new FFB system
+
+Tag: V01-00-27
+2013-03-23 Andy Salnikov
+- fix in ic-controller: FAIL_NOFILES status string was used instead of 
+  FAIL_NOINPUT
+
+Tag: V01-00-26
+2013-01-18 Andy Salnikov
+- few fixes to ic-auto-translate app to make FFB submission work
+
+Tag: V01-00-25
+2012-12-20 Andy Salnikov
+- update ic-auto-translate script to support FFB controller
+- same script now runs automatic submission for both FFB and
+  regular controllers
+
+Tag: V01-00-24
+2012-11-21 Andy Salnikov
+- get rid of some uses of list:o2o-extra-options configuration options, 
+  list: options do not mix well with the experiment override
+
+Tag: V01-00-23
+2012-10-11 Andy Salnikov
+- improvement on the web page to show status of the controller
+
+Tag: V01-00-22
+2012-08-07 Andy Salnikov
+- web stuff: add config file for test database
+
+Tag: V01-00-21
+2012-08-06 Andy Salnikov
+- web stuff: clear up mess with different renderers
+
+Tag: V01-00-20
+2012-08-06 Andy Salnikov
+- web stuff: update one of 401 messages which was missing message body
+
+Tag: V01-00-19
+2012-08-06 Andy Salnikov
+- updated web service to include operations on configuration table
+
+Tag: V01-00-18
+2012-08-04 Andy Salnikov
+- adding class FileMgrRegister which can be used to register files in irods
+
+Tag: V01-00-17
+2012-07-20 Andy Salnikov
+- changes to web stuff:
+  - add web/production-ffb.ini which defines configuration for icws-ffb app
+  - web/icws/model/icdb_model.py: return LSF jobid from exp_requests() method 
+
+Tag: V01-00-16
+2012-07-20 Andy Salnikov
+- support for self-move mode when translator moves files itself
+
+Tag: V01-00-15
+2012-07-18 Andy Salnikov
+- make loop delay configurable parameter
+
+Tag: V01-00-14
+2012-07-17 Andy Salnikov
+- adding support for live data translation
+
+Tag: V01-00-13
+2012-04-27 Andy Salnikov
+- make active experiment optional when selecting datasets from database,
+  by default it selects any experiment but if option "active-exp-only"
+  is set then only active experiments will be translated
+
+Tag: V01-00-12
+2012-02-27 Andy Salnikov
+- changed ic-auto-translate to use regdb for AUTO flag instead of config file
+- regDb interface changed, needs update in TranslatorJob
+
+Tag: V01-00-11
+2011-12-11 Andy Salnikov
+- fix formatting of shutil.Error exceptions
+
+Tag: V01-00-10
+2011-12-09 Andy Salnikov
+- add set_status command to ic-command
+
+Tag: V01-00-09
+2011-12-08 Andy Salnikov
+- when non-empty option "hdf-backup-suffix" is present in configuration 
+  and the destination HDF5 already exist it will be renamed by adding
+  a suffix (from option) to its name. Good value for suffix is may be
+  "-%(current_time)s.bck". If option does not exist or non-empty then
+  new files are left in subdirectory as before.
+
+Tag: V01-00-08
+2011-12-08 Andy Salnikov
+- few fixes to file move procedure
+
+Tag: V01-00-07
+2011-12-07 Andy Salnikov
+- copy HDF files to temporary directory first inside final directory
+  (if not already there) and then rename to final location
+
+Tag: V01-00-06
+2011-12-04 Andy Salnikov
+- use shutil.move to copy the resulting hdf files instead of os.rename
+
+Tag: V01-00-05
+2011-11-29 Andy Salnikov
+- testing web service with recent changes, couple of small issues fixed
+
+Tag: V01-00-04
+2011-11-29 Andy Salnikov
+- LSF.py and TranslatorJob.py: added protection when LSF is not 
+  accessible
+- ic-command and web service: added check for instrument/experiment 
+  name in regdb
+
+Tag: V01-00-03
+2011-11-04 Andy Salnikov
+- ic-status and ic-ws-status now display JobID column
+- icws service returns jobid data for requests
+- ic-command has 'cstop' command to stop controller
+
+Tag: V01-00-02
+2011-10-26 Andy Salnikov
+- code in icws web service was still using old status names
+
+Tag: V01-00-01
+2011-10-26 Andy Salnikov
+- implementation of the priorities in the new batch system
+
+Tag: V01-00-00
+2011-10-12 Andy Salnikov
+- new implementation of the controller based on LSF batch system
+- many changes, can't document all here, some background info is here:
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/105
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/106
+  
+Tag: V00-07-11
+2011-09-13 Andy Salnikov
+- add option to set LD_PRELOAD envvar for translator from configuration
+
+Tag: V00-07-10
+2011-08-17 Andy Salnikov
+- finally convert ic-store-files script to use new style config object
+- improve logic for situation when 'ils' returns error code, if the server
+  is not reachable then just terminate
+
+Tag: V00-07-09
+2010-11-16 Andy Salnikov
+- added support for --calib-dir translator option
+
+Tag: V00-07-08
+2010-11-04 Andy Salnikov
+- changed default connection string for utilities which talk to mysql,
+  they now look for the file with the string by default
+- changed slightly the output generated by ic-status, add option -t 
+  to order by time only
+
+Tag: V00-07-07
+2010-10-07 Andy Salnikov
+- header of the output table from 'ic-ws-status -l' was wrong
+
+Tag: V00-07-06
+2010-10-07 Andy Salnikov
+- one more message in ic-auto-translate
+
+Tag: V00-07-05
+2010-10-07 Andy Salnikov
+- new script ic-auto-translate which check online databases for new runs,
+  check that all files have been copied from new runs and sends a 
+  translation request
+- doc/st.AutoTranslate - init.d script for ic-auto-translate
+
+Tag: V00-07-04
+2010-10-06 Andy Salnikov
+- fix for PSDM Trac ticket #46 - crash of translator thread when accessing
+  resulting HDF5 file 
+
+Tag: V00-07-03
+2010-09-19 Andy Salnikov
+- updated web service to return list of instruments per in /system resources
+- ic-ws-status -s prints instrument list
+- init script creates run directory and enables psdatmgr write access to it
+
+Tag: V00-07-02
+2010-09-13 Andy Salnikov
+- few small changes to web service:
+  - GET /system/id will return error 404 for non-existent id
+  - /exp/... did not return log file URL, fixed
+
+Tag: V00-07-01
+2010-09-06 Andy Salnikov
+- config bug fix
+
+Tag: V00-07-00
+2010-08-31 Andy Salnikov
+- add support for dedicated nodes on per-instrument basis
+  - database has new table node2instr which links translator nodes 
+    with the list of the instrument names
+  - if the list of instruments in the above table is not empty then 
+    the node processes requests only from that instrument
+- add support for experiment specific configuration 
+  - config_def table has two additional fields - instrument and 
+    experiment. If their values are NULL then they apply to all 
+    experiments, otherwise they only apply to specific instrument or
+    experiment overwriting less specific values
+
+Tag: V00-06-01
+2010-08-12 Andy Salnikov
+- add support for  
+
+Tag: V00-06-00
+2010-08-12 Andy Salnikov
+- add support for priority requests 
+
+Tag: V00-05-04
+2010-07-21 Andy Salnikov
+- add option -r to ic-ws-translate to control re-translation requests 
+
+Tag: V00-05-03
+2010-07-21 Andy Salnikov
+- add force flag to ic-ws-translate, let people to re-translate runs
+  that failed for some reason
+- add protection for failed mkdir for HDF5 files, will return H5Dir_Error
+
+Tag: V00-05-02
+2010-07-15 Andy Salnikov
+- adding ic-ws-status and ic-ws-translate utilities
+
+Tag: V00-05-01
+2010-06-28 Andy Salnikov
+- add support for looking at log files from controller and translators
+- log file names are store in the database
+- web service now has /log controller which shows logs as text of 
+  formatted and colored html
+
+Tag: V00-05-00
+2010-06-07 Andy Salnikov
+- adding web service for interface controller
+
+Tag: V00-04-07
+2010-06-06 Andy Salnikov
+- InterfaceDb has new method controller_status() to be used by 
+  web services
+- new script ic-cleanup to be run as a cron job
+
+Tag: V00-04-06
+2010-05-27 Andy Salnikov
+- ic-store-files: catch all exceptions, protection is needed when 
+  directory listing fails because of access rights 
+
+Tag: V00-04-04
+2010-03-25 Andy Salnikov
+- o2o-translate options changed, updating caller code
+
+Tag: V00-04-03
+2009-12-10 Andy Salnikov
+- new ic-commands to manage active experiments
+
+Tag: V00-04-02
+2009-12-04 Andy Salnikov
+- add support for instrument_lower configuration parameter
+
+Tag: V00-04-01
+2009-11-20 Andy Salnikov
+- ic-command: add command to remove fileset
+
+Tag: V00-04-00
+2009-11-13 Andy Salnikov
+- significant refactoring
+  - removed DbConnection class, moved to LusiPython package
+  - database connection parameters can be specified via the connection
+    string or file name containing connection string
+  - InterfaceDb class now uses decorators for locking and transaction
+    control in the methods
+  - new method new_fileset() in InterfaceDb, replaces the code in 
+    ic-command, to be used by online module too
+- new module online_iface, now contains single function new_fileset()
+  to be used by online script to register new filesets
+
+Tag: V00-03-14
+2009-11-04 Andy Salnikov
+- added --last option to ic-status script
+
+Tag: V00-03-13
+2009-11-01 Andy Salnikov
+- factored-out database connection class DbConnection used by 
+  several other classes now
+- new script ic-store-files which browses data directories and 
+  stores files which are not in iRODS yet, to be run as a cron 
+  job at regular intervals
+- removed all references to subprocess module
+
+Tag: V00-03-12
+2009-10-31 Andy Salnikov
+- support for configuration updates: re-read configuration 
+  from database on every iteration (10 seconds)
+- added table to the database active_exp which contains active
+  experiments, experiments not in this table are not processed
+- FileMgrIrods: replaced subprocess.call with os.spawn, subprocess
+  module has bug(s) in Python2.4 which make it loosing the track
+  of the running processes
+- add ic-status script which displays processing status for 
+  filesets
+
+Tag: V00-03-11
+2009-10-28 Andy Salnikov
+- many changes:
+  - HDF files are created in a temporary directory and then 
+    moved to the destination directory
+  - can override output file name in configuration
+
+Tag: V00-03-10
+2009-10-13 Andy Salnikov
+- add config option 'list:o2o-extra-options' to add arbitrary options
+
+Tag: V00-03-09
+2009-10-13 Andy Salnikov
+- sleep -> time.sleep
+
+Tag: V00-03-08
+2009-10-09 Andy Salnikov
+- small bug fix
+
+Tag: V00-03-07
+2009-10-09 Andy Salnikov
+- st.Controller: runuser as group ps-data
+- support for list: type configuration in database
+
+Tag: V00-03-06
+2009-10-09 Andy Salnikov
+- small fixes
+- added support for md-odbc-options-file configuration
+- select from files should only look for XTC files
+
+Tag: V00-03-05
+2009-10-08 Andy Salnikov
+- commented out everything in test/CreateFilesets
+
+Tag: V00-03-04
+2009-09-25 Andy Salnikov
+- updated st.Controller script
+
+Tag: V00-03-03
+2009-09-24 Andy Salnikov
+- controller can run multiple translators now, maximum number is
+  controlled by the command line option, default is 1
+- every translator runs in a separate thread, all translator logic
+  has been moved to TranslatorThread class
+- files table has been changed, there is now new field 'archive_dir'
+  which contains the file manager directory where the file was 
+  archived (or NULL)
+- fk_fileset_status field was dropped from files table
+- we also store produced HDF5 files in the files table to see if the 
+  file was correctly archived
+
+Tag: V00-03-02
+2009-09-20 Andy Salnikov
+- couple of small fixes
+
+Tag: V00-03-01
+2009-09-18 Andy Salnikov
+- renamed applications:
+  Controller -> ic-controller
+  OnlineScript -> ic-command
+  OnlineSim -> ic-online-sim
+- st.Controller moved to doc/
+
+Tag: V00-03-00
+2009-09-18 Andy Salnikov
+- Small scale refactoring, Controller is split into three separate
+  classes: 
+  - src/InterfaceDb.py responsible for all database staff
+  - src/FileMgrIrods.py which does all iRODS interaction
+  - app/Controller - pure driver functions
+- some parameters are coming from database now (config_def table), many
+  parameters controlling iRODS interaction are already defined
+- added support for storing XTC files in iRODS
+- mysql user name and password can be read from a file now 
+
+Tag: V00-01-00
+2009-03-30 Robert C. Sass
+- Initial insertion of MySQL workbench file.
+
+Tag: V00-01-01
+2009-05-07 Robert C. Sass
+- Replace MySQL workbench file and add generated .sql file to create database.
+
+Tag: V00-01-02
+2009-05-20 Robert C. Sass
+- Replace MySQL workbench file and add generated .sql file to create database.
+
+Tag: V00-01-03
+2009-05-25 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-25-May-2009.sql file 
+to create database. Update all test sql scripts. Basic functionality of all
+store procedures tested. Can't get dynamic SQL to work in a stored procedure
+so test_get_def_id.sql is just a shell.
+
+Tag: V00-01-04
+2009-06-10 Robert C. Sass
+- Relace MySQL workbench file and add generated CreateIDB-10-Jun-2009.sql file. Changes 
+to database, stored procedures, test*.sql and OnlineSim to reflect changes from last meeting. 
+The fileset now has an experiment, run type and run number that are unverified. 
+File type becomes an enum in the filename table.
+
+Tag: V00-01-05
+2009-07-06 Robert C. Sass
+- Release latest dated/named version of all files. Next release will have single names and just for production.
+
+Tag: V00-02-00
+2009-07-13 Robert C. Sass
+- Remove all dated filenames
+
+Tag: V00-02-01
+2009-07-27 Robert C. Sass
+- Various fixes and code cleanup.
+
+Tag: V00-02-02
+2009-08-08-05 Robert C. Sass
+First "production" release with all known features including checking for the 
+kill fields and only logging to a file.

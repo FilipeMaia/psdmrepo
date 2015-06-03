@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package DmMover
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Brief description:
+==================
+
+Tools to migrate the daq data fron online to offline. 
+
+Detailed description:
+=====================
+
+This package contains the data-mover that transfer the data from the dss->ffb->offline.

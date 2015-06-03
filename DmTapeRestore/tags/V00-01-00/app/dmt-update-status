@@ -1,0 +1,82 @@
+#!/usr/bin/env python 
+
+
+import os 
+import sys 
+import argparse
+import subprocess
+
+import DmTapeRestore.dbrestore as db
+
+
+psdm_prefix = len("/psdm-zone/psdm/")
+
+
+def files_in_queue():
+    
+    cmd = "/reg/neh/home1/psdatmgr/bin/iqstatw"
+
+    res = subprocess.check_output(cmd)
+    in_queue = set( tok.split()[-1] for tok in res.splitlines() if len(tok) > 1 )
+    return in_queue
+
+def file_on_disk(iname):
+    
+    regpath = os.path.join("/reg/d/psdm/", iname[psdm_prefix:])
+    if os.path.exists(regpath):
+        print "F ondisk", regpath
+    elif os.path.exists("%s.fromtape" % regpath):
+        print "F stagefile ", regpath
+    else:
+        print "F notrace", regpath, iname 
+        
+
+
+def main():
+
+    status = {'sub' : db.SUBMITTED, 'rec' : db.RECEIVED, 'done' : db.DONE, 'fail' : db.FAILED}
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--run', action='store_true')
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    
+    irods_queue = files_in_queue()
+    #print "--- Check files in queue"
+    #for i in irods_queue:
+    #    file_on_disk(i)
+
+    # find all submitted files 
+    
+    
+    print "--- check submitted files "
+    done, active = 0,0 
+    for req in db.files_with_status(db.SUBMITTED):
+        iname = req['irods_filepath']
+        #if iname.find('cxi') == -1 and iname.find('xcs') == -1:
+        #    continue
+
+        check_cmd = "ils -l %s | grep lustre-resc > /dev/null" % iname
+        #print check_cmd
+        rc = os.system(check_cmd)
+        
+        if rc == 0:
+            done += 1
+            print "DONE set", iname
+            db.set_status(db.DONE, iname)
+        else:
+            active += 1
+            if iname in irods_queue:
+                print "File in queue", iname 
+            else:
+                print "request lost", iname 
+                file_on_disk(iname)
+
+    print done, active
+
+if __name__ == "__main__":
+    main()

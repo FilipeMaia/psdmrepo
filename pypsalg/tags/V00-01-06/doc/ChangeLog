@@ -1,0 +1,79 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ChangeLog 8463 2014-06-24 01:53:04Z cpo@SLAC.STANFORD.EDU $
+#
+# Description:
+#  ChangeLog file for package pypsalg
+#------------------------------------------------------------------------
+
+Package author: Ankush Mitra
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-06
+2015-05-18 Christopher O'Grady
+Fix docstring for findIsolatedPhotons
+
+Tag: V00-01-05
+2015-05-18 Christopher O'Grady
+Add in Chuck's area-detector histogramming (AreaDetHist).
+
+Tag: V00-01-04
+2015-04-03 Ankush Mitra
+Added missing psalg functions.  Hit finder, rolling average, and other added.  
+Only missing function is psalgs commond mode subtraction algorithm. 
+Documentation strings are also included
+	
+Tag: V00-01-03
+2015-02-23 Christopher O'Grady
+- Add values method to histogram axis, to be used for plotting.
+
+Tag: V00-01-02
+2014-12-10 Christopher O'Grady
+- TJ's latest find_blobs.  Includes some optional keyword arguments to
+  discard small blobs.  Fix some bugs in hist2d.
+
+Tag: V00-01-01
+2014-12-10 Christopher O'Grady
+- Change order of hist2d arguments to match hist1d
+
+Tag: V00-01-00
+2014-11-24 Ankush Mitra
+- python interface to C psalg functions and native python functions
+        => takes advantage of BOOST python converters defined in psana_python
+        => Uses BOOST to wrap native C/C++ functions for PYTHON
+- Removed  ScaleByN, chi2, and pypsalg_c native Python C API files
+- added example file
+	
+Tag: V00-00-07
+2014-10-29 Christopher O'Grady
+- Throttle warning messages in find_blobs.py.  Fix missing imports
+  and add 2D histogram in Histogram.py
+
+Tag: V00-00-06
+2014-10-03 Christopher O'Grady
+- Fix bug in AngularIntegrationM where centers were not set correctly
+  (caused a crash)
+
+Tag: V00-00-05
+2014-09-29 Christopher O'Grady
+- Fix bug pointed out by zxing where in TwosComplement mode
+  the datachannel value should be cast to an int16.
+
+Tag: V00-00-04
+2014-09-19 Christopher O'Grady
+- Add "run" to gsc interface so user knows object must
+  be recreated every run
+
+Tag: V00-00-03
+2014-09-19 Christopher O'Grady
+- Add some code to convert Gsc16ai device output to voltages
+
+Tag: V00-00-02
+2014-08-17 Christopher O'Grady
+- Add TJ's blob finder
+
+Tag: V00-00-01
+2014-06-25 Christopher O'Grady
+- First tag of Ankush's pypsalg
