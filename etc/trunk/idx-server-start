@@ -5,5 +5,5 @@
 
 . /reg/g/psdm/bin/sit_setup.sh dm-current
 
-exec idx_q_server --maxrun 10 --wait 60
+exec idx-q-server --maxrun 10 --wait 60
 

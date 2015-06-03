@@ -2,8 +2,11 @@
 
 
 #. /reg/g/psdm/bin/sit_setup.sh dm-current 
-. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/dm-prod-head
+#. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/dm-prod-head
+. /reg/g/psdm/bin/sit_setup.sh dm-current
 
-which  dm_active_exp_folders
-exec dm_active_exp_folders -w 60
+type dm-active-exp-folders
+exec dm-active-exp-folders -w 60
+#which  dm_active_exp_folders
+#exec dm_active_exp_folders -w 60
 
