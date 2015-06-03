@@ -16,8 +16,8 @@ AreaDetHist::AreaDetHist (ndarray<double,3> calib_data, int valid_min,
   _rows = arrayShape[1];
   _cols = arrayShape[2];
   _numPixPerSeg = _rows*_cols;
-  _histogram4D = make_ndarray<uint32_t>(_segs,_rows,_cols,_histLength);
-  for (ndarray<uint32_t,4>::iterator p = _histogram4D.begin(); p != _histogram4D.end(); p++) {
+  _histogram = make_ndarray<uint32_t>(calib_data.size(),_histLength); // doesn't guarantee zeros
+  for (ndarray<uint32_t,2>::iterator p = _histogram.begin(); p != _histogram.end(); p++) {
     *p = 0;
   }
 }
@@ -96,7 +96,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[2] =	calib_data[i][j+1][k+1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val, i, j, k);
+			pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, k);
+			_insertHistElement(val, pixelInd);
 		}
 
 		// Upper right corner
@@ -107,7 +108,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[2] = calib_data[i][j+1][k-1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val, i, j, k);
+			pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, k);
+			_insertHistElement(val, pixelInd);
 		}
 
 		// Lower left corner
@@ -119,7 +121,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[2] = calib_data[i][j-1][k+1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val, i, j, k);
+			pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, k);
+			_insertHistElement(val, pixelInd);
 		}
 
 		// Lower right corner
@@ -130,7 +133,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[2] = calib_data[i][j-1][k-1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val, i, j, k);
+			pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, k);
+			_insertHistElement(val, pixelInd);
 		}
 	}
 
@@ -149,7 +153,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[4] = calib_data[i][j+1][t+1];
 			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val, i, j, t);
+				pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, t);
+				_insertHistElement(val, pixelInd);
 			}
 		}
 
@@ -164,7 +169,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[4] = calib_data[i][j-1][t+1];
 			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val, i, j, t);
+				pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, t);
+				_insertHistElement(val, pixelInd);
 			}
 		}
 
@@ -179,7 +185,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[4] = calib_data[i][t+1][k+1];
 			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val, i, t, k);
+				pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, t, k);
+				_insertHistElement(val, pixelInd);
 			}
 		}
 
@@ -194,7 +201,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 			neighbors[4] = calib_data[i][t+1][k-1];
 			result = isIsolated(val, _minAduGap, &neighbors);
 			if (result) {
-				_insertHistElement(val, i, t, k);
+				pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, t, k);
+				_insertHistElement(val, pixelInd);
 			}
 		}
 	}
@@ -216,7 +224,8 @@ void AreaDetHist::update(ndarray<double,3> calib_data)
 		neighbors[7] = calib_data[i][j+1][k+1];
 		result = isIsolated(val, _minAduGap, &neighbors);
 		if (result) {
-			_insertHistElement(val, i, j, k);
+			pixelInd = getPixelIndex(_numPixPerSeg, _cols, i, j, k);
+			_insertHistElement(val, pixelInd);
 		}
 	}
 	}
