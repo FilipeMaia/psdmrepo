@@ -1,0 +1,48 @@
+MAJOR CHANGE:
+- Python upgraded from version 2.7.2 to 2.7.10 (PSRT-52)
+
+psana
+- TimeTool: option to read initial reference from calibration pedestal
+  file (PSAS-149)
+- pdscalibdata: NDArrIOV1 - improve messages (PSAS-148), use enumerated
+  m_status in stead of string, updated method str_status() (PSAS-139).
+- PSCalib: CalibPars - add virtual method status.
+  CalibParsStore: prbits=40 -> 255. (PSAS-139);
+  GenericCalibPars - m_shape_cmode -> m_shape_cm, add implementation for
+  method status, improve logic for size() and shape().
+- Detector: in development, see for details ChangeLog.
+- BldDataSpectrometerV1: fix hproj member to be a int32 instead
+  of a uint32 (PSAS-151) various packages
+- psddl: handle DEVEL types better (recent comment on PSAS-58)
+- CorAna: set forgotten tag V00-00-22: in *.py replace != None -> is not None,
+  == None -> is None
+- psana/psana_python: allow users to register python module, or list of
+  modules, in python DataSource constructor, using "module" keyword.
+- Translator: add option eventkey_filter for fine grain control of data
+  filtering (PSAS-155)
+- CalibManager: ConfigFileGenerator - add :stream=0-79: in dataset
+  description (PSAS-6)
+
+External Packages
+- pdsdata: update to 8.2.9 to get fix to BldDataSpectrometerV1 (PSAS-151)
+- The ana release now uses the same pdsdata that the DAQ does, with
+  the "in Development" types from pdsdata, however they continue to
+  be hidden in the ana releases.
+- spyder: updated to version 2.2.5 (from 2.2.1)
+
+New Packages:
+- pytopsana: is renamed to Detector
+- DataSummary: customized data quality monitoring tool
+
+Bugs fixed:
+- CalibManager: CommandLineCalib.py - fix bug
+  timeout_sec -> self.timeout_sec (PSAS-6)
+- pypsalg: fix histogram filling in AreaDetHist.cpp
+- PSCalib: GenericCalibPars - change methods size() and shape() - return
+  works even for non-loaded, but available constants (PSAS-148)
+- PSXtcInput: Do bounds checking on numbers of epics sources in
+  indexing mode, and increase max number for 4 to 6
+- psmon: fix crash when using display in "local" mode
+- xtcav: pass env to CalibrationPaths method instead of datasource.
+- XtcInput: handle stream filtering properly (PSAS-154) causes monitoring
+  translator to fail in fast index mode
