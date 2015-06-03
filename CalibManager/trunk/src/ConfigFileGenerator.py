@@ -81,10 +81,10 @@ class ConfigFileGenerator :
             #return self.list_of_path_to_xtc_files_for_run()
             xtcdir = fnm.path_to_xtc_dir() # './myxtc/xpp/xppi0613/xtc/'
             live = ':live' if 'ffb' in xtcdir else ''
-            return 'exp=%s:run=%d:xtc:dir=%s%s' % (cp.exp_name.value(), int(cp.str_run_number.value()), xtcdir, live)
+            return 'exp=%s:run=%d:stream=0-79:xtc:dir=%s%s' % (cp.exp_name.value(), int(cp.str_run_number.value()), xtcdir, live)
 
         else :
-            return 'exp=%s:run=%d:xtc' % (cp.exp_name.value(), int(cp.str_run_number.value()))
+            return 'exp=%s:run=%d:stream=0-79:xtc' % (cp.exp_name.value(), int(cp.str_run_number.value()))
 
 #-----------------------------
 

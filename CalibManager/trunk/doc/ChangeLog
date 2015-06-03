@@ -12,6 +12,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-06-02 Mikhail S. Dubrovin
+Tag: V00-00-95
+- ConfigFileGenerator - add :stream=0-79: in dataset description (PSAS-6)
+
 2015-05-20 Mikhail S. Dubrovin
 Tag: V00-00-94
 - ConfigParametersForApp.py - add type geometry in the list of types for pnccd.
