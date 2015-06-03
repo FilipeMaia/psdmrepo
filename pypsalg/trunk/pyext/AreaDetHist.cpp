@@ -5,6 +5,7 @@
 
 namespace pypsalg {
 
+// Constructor
 AreaDetHist::AreaDetHist (ndarray<double,3> calib_data, int valid_min,
                           int valid_max, bool findIsolated, double minAduGap) :
   _valid_min(valid_min),_valid_max(valid_max),
@@ -22,26 +23,28 @@ AreaDetHist::AreaDetHist (ndarray<double,3> calib_data, int valid_min,
   }
 }
 
+// Destructor
 AreaDetHist::~AreaDetHist () {}
 
-ndarray<uint32_t, 4> AreaDetHist::get() {return _histogram4D;}
+// Returns histogram
+ndarray<uint32_t, 2> AreaDetHist::get() {return _histogram;}
 
+// Fills histogram in a standard way using under/overflow stored at the first/last elements.
 void AreaDetHist::_fillHistogram(ndarray<double,3> calib_data) {
+  int pixelInd = 0;
   int val;
-  // fill histograms given calibrated data
-  for (unsigned int i = 0; i < _segs; i++) {
-  for (unsigned int j = 0; j < _rows; j++) {
-  for (unsigned int k = 0; k < _cols; k++) {
-	val = (int) round(calib_data[i][j][k]);
+  // fill histogram
+  for (ndarray<double,3>::iterator p = calib_data.begin();
+       p != calib_data.end(); p++) {
+    val = (int) round(*p);   
     if ( val >= _valid_min && val <= _valid_max ) { // in range
-      _histogram4D[ i ][ j ][ k ][ val-_valid_min+1 ] += 1;
+      _histogram[ pixelInd ][ val-_valid_min+1 ] += 1;
     } else if ( val > _valid_max ) { // too large
-      _histogram4D[ i ][ j ][ k ][ _histLength-1 ] += 1;
+      _histogram[ pixelInd ][ _histLength-1 ] += 1;
     } else { // too small
-      _histogram4D[ i ][ j ][ k ][ 0 ] += 1;
+      _histogram[ pixelInd ][ 0 ] += 1;
     }
-  }
-  }
+    pixelInd++;
   }
 }
 
@@ -64,22 +67,24 @@ unsigned int getPixelIndex(const unsigned int numPixPerSeg, const unsigned int C
 }
 
 // Increment counter on histogram
-void AreaDetHist::_insertHistElement(double x, int seg, int row, int col) {
+void AreaDetHist::_insertHistElement(double x, int pixelInd) {
 	int val = (int) round(x);   
 	if ( val >= _valid_min && val <= _valid_max ) { // in range
-		_histogram4D[ seg ][ row ][ col ][ val-_valid_min+1 ] += 1;
+		_histogram[ pixelInd ][ val-_valid_min+1 ] += 1;
 	} else if ( val > _valid_max ) { // too large
-		_histogram4D[ seg ][ row ][ col ][ _histLength-1 ] += 1;
+		_histogram[ pixelInd ][ _histLength-1 ] += 1;
 	} else { // too small
-		_histogram4D[ seg ][ row ][ col ][ 0 ] += 1;
+		_histogram[ pixelInd ][ 0 ] += 1;
 	}
 }
 
+// Update the histograms given calib_data
 void AreaDetHist::update(ndarray<double,3> calib_data)
 {
   if (_findIsolated) {
 	double val = 0;
     int result = 0;
+	int pixelInd = 0;
 	unsigned int j = 0;
 	unsigned int k = 0;
 
