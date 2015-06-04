@@ -13,7 +13,7 @@ mailcmd=~wilko/repo/Utils/SendMail
 
 tmpfile=/tmp/ffb_check_$(uuidgen)
 
-mvr_showspaceffb all df 2>&1 | sort  &> ${tmpfile}
+mvr-showspaceffb all df 2>&1 | sort  &> ${tmpfile}
 echo "Ran on $(hostname) $(date +'%Y%m%d %H:%M:%S')" >> ${tmpfile}
 
 ${mailcmd} -s "ffb disk space" -a wilko -f ${tmpfile}
