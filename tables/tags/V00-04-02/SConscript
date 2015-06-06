@@ -1,0 +1,45 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package tables
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "tables"
+pkg_ver = "3.0.0f"
+pkg_dir = "3.0.0f"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+BINDIR = "bin"
+LINKPY = pkg
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
+
+# numexpr is needed by tables
+pkg = "numexpr"
+pkg_ver = "2.2.2b"
+pkg_dir = "2.2.2b"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_dir)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+del BINDIR
+LINKPY = pkg
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())
