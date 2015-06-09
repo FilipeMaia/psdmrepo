@@ -1,0 +1,353 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psana_examples
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-05-01
+2015-06-09 David Schneider
+- Update DumpEpics.cpp example to cover getting data array for waveforms. JIRA PSAS-158
+
+Tag: V00-05-00
+2015-04-08 David Schneider
+- Adapt to new API for histogram manager. JIRA PSAS-131
+
+Tag: V00-04-22
+2014-11-03 Mikhail Dubrovin
+- DumpEpix.cpp - add support for new types Psana::Epix::Config100aV1 and Psana::Epix::ElementV2
+	
+Tag: V00-04-21
+2014-09-23 Mikhail Dubrovin
+- DumpEpix.cpp - improve output format
+
+Tag: V00-04-20
+2014-09-23 Mikhail Dubrovin
+- update DumpEpix.cpp for Epix::Config10KV1 and Epix::Asic10kConfigV1 
+	
+Tag: V00-04-19
+2014-08-08 David Schneider
+- update DumpDgram to work with offsets in XtcInput::DgramList
+
+Tag: V00-04-18
+2014-07-18 David Schneider
+- add DumpDgram to show how to work with XtcInput::DgramList
+  trac ticket:279
+	
+Tag: V00-04-17
+2014-06-14 David Schneider
+- update DumpBld.cpp for BldDataFEEGasDetEnergyV1
+
+Tag: V00-04-16
+2014-04-30 Mikhail Dubrovin
+- DumpDamage.h - fix doxygen documentation problem
+
+Tag: V00-04-15
+2014-03-21 Mikhail Dubrovin
+- in DumpPimax change comment from Princeton::FrameV1 to Pimax::FrameV1
+	
+Tag: V00-04-14
+2014-03-17 Mikhail Dubrovin
+- add DumpPimax, tested for exp=amob5114:run=16
+- in DumpOceanOptics.cpp add ConfigV2 and DataV2
+
+Tag: V00-04-13
+2014-03-10 David Schneider
+- DumpBld: dump EBeamV5
+
+Tag: V00-04-12
+2014-02-26 David Schneider
+- fixed DumpDamage so that its documentation will be added to the group
+
+Tag: V00-04-11
+2014-02-12 David Schneider
+- updated for psddldata V01-00-03
+- DumpPartition and dump_partition
+- DumpDamage - add dump about src only, split event damage
+
+Tag: V00-04-10
+2014-01-17 Andy Salnikov
+- DumpAndor: default source was for Acqiris
+
+Tag: V00-04-09
+2014-01-13 Andy Salnikov
+- DumpAcqiris: source was hardcoded
+
+Tag: V00-04-08
+2013-12-19 Andy Salnikov
+- add C++ and python examples for epix
+
+Tag: V00-04-07
+2013-12-16 David Schneider
+- add C++ module DumpDamage
+
+Tag: V00-04-06
+2013-12-02 Andy Salnikov
+- add C++ modules DumpEpixSampler and DumpRayonix
+- add Python module dump_epixsampler
+
+Tag: V00-04-05
+2013-10-07 Andy Salnikov
+- add C++ modules for Alias and L3T
+- add control.ConfigV3 class to C++ DumpControl module
+- add bld.BldDataEBeamV4 class to C++ DumpBld module
+- add bld.BldDataSpectrometerV0 class to C++ DumpBld module
+- add python modules for Alias, L3T, and Evr
+
+Tag: V00-04-04
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
+Tag: V00-04-03
+2013-05-22 Andy Salnikov
+- fix dump_imp.py
+
+Tag: V00-04-02
+2013-05-22 Andy Salnikov
+- few mods to Imp examples
+
+Tag: V00-04-01
+2013-05-21 Andy Salnikov
+- adding examples for Imp classes
+
+Tag: V00-04-00
+2013-05-01 Andy Salnikov
+- modify Python examples to use new convention for configuration data access
+
+Tag: V00-03-17
+2013-04-26 Andy Salnikov
+- add ConfigV5 to DumpCsPad
+
+Tag: V00-03-16
+2013-03-29 Andy Salnikov
+- small improvements in DumpAcqTdc
+
+Tag: V00-03-15
+2013-03-28 Andy Salnikov
+- small improvements in DumpAcqiris
+
+Tag: V00-03-14
+2013-03-27 Andy Salnikov
+- DumpEpics now prints list of aliases in beginCalibCycle()
+
+Tag: V00-03-13
+2013-03-27 Andy Salnikov
+- dump more info for cspad and cspad2x2
+
+Tag: V00-03-12
+2013-03-25 Andy Salnikov
+- DumpPrinceton: convert some values to integers before printing
+
+Tag: V00-03-11
+2013-03-24 Andy Salnikov
+- DumpEncoder: added ConfigV2
+
+Tag: V00-03-10
+2013-03-23 Andy Salnikov
+- small update to DumpFccd
+
+Tag: V00-03-09
+2013-03-22 Andy Salnikov
+- small update to DumpFli
+
+Tag: V00-03-08
+2013-03-22 Andy Salnikov
+- add new module DumpGsc16ai
+
+Tag: V00-03-07
+2013-03-22 Andy Salnikov
+- add new module DumpOceanOptics
+
+Tag: V00-03-06
+2013-03-22 Andy Salnikov
+- in DumpUsdUsb print status info 
+
+Tag: V00-03-05
+2013-03-21 Andy Salnikov
+- fix default source string in DumpUsdUsb module
+
+Tag: V00-03-04
+2013-02-26 Andy Salnikov
+- update SumpScPad for a small change in Convig classes interfaces
+
+Tag: V00-03-03
+2013-02-05 Andy Salnikov
+- added few more modules for new classes and update existing modules
+
+Tag: V00-03-02
+2013-02-04 Andy Salnikov
+- Ipimb::Config::diodeGain() method was renamed to capacitorValue, fixing
+  the code which used it
+
+Tag: V00-03-01
+2013-01-30 Andy Salnikov
+- removed unnecessary .get() on smart pointers
+
+Tag: V00-03-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays for array data
+- ndarray has operator<<(ostream) now, use it do dump array data
+
+Tag: V00-02-16
+2012-11-28 Andy Salnikov
+- change in Source constructor
+
+Tag: V00-02-15
+2012-11-15 Andy Salnikov
+- add BldDataGMDV0 and BldDataGMDV1 to DumpBld module
+
+Tag: V00-02-14
+2012-11-08 Andy Salnikov
+- dump hex damage mask for bld ebeam classes
+- add princeton::ConfigV4 class
+
+Tag: V00-02-13
+2012-09-28 Andy Salnikov
+- DumpControl.cpp: fix for the code which prints labes
+
+Tag: V00-02-12
+2012-09-28 Andy Salnikov
+- update examples with new classes from pdsdata V04-01-00
+
+Tag: V00-02-11
+2012-07-06 Andy Salnikov
+- add new module DumpQuartz
+- change DumpPnccd to dump FullFrameV1 class
+
+Tag: V00-02-10
+2012-06-22 Andy Salnikov
+- EvrData.EventCodeV5: one member method was incorrectly named
+
+Tag: V00-02-09
+2012-06-07 Andy Salnikov
+- DumpTimepix.cpp: add comment about Timepix::DataV1 class 
+
+Tag: V00-02-08
+2012-06-03 Andy Salnikov
+- added code to dump new type CsPad::ConfigV4
+
+Tag: V00-02-07
+2012-05-11 Andy Salnikov
+- added code to dump new type Princeton::ConfigV3
+- added code to dump new type EvrData::ConfigV6
+
+Tag: V00-02-06
+2012-03-27 Andy Salnikov
+- added code to dump new type BldDataEBeamV3
+
+Tag: V00-02-05
+2012-03-14 Andy Salnikov
+- added code to dump new type TimePix::ConfigV2
+
+Tag: V00-02-04
+2012-02-18 Andy Salnikov
+- added code to dump new type TimePix::DataV2
+- updated Ipimb Config code to dump diodeGain() contents
+
+Tag: V00-02-03
+2012-02-06 Andy Salnikov
+- add new module DumpCsPad2x2 which dumps all cspad2x2 classes
+- removed MiniElementV1 from DumpCsPad
+
+Tag: V00-02-02
+2012-01-20 Andy Salnikov
+- more details printed in DumpControl module
+
+Tag: V00-02-01
+2012-01-12 Andy Salnikov
+- adding DumpTimepix module
+
+Tag: V00-02-00
+2011-12-09 Andy Salnikov
+- migrating to ndarray for adrray data
+
+Tag: V00-01-05
+2011-10-04 Andy Salnikov
+- DumpCsPad now prints common_mode from new schema and some data from images
+
+Tag: V00-01-04
+2011-09-12 Andy Salnikov
+- DumpCsPad can now dump MiniElementV1 objects
+- DumpBld can now dump Bld::BldDataPimV1 objects
+
+Tag: V00-01-03
+2011-08-22 Andy Salnikov
+- modified DumpPrinceton to recognize ConfigV2 objects
+
+Tag: V00-01-02
+2011-06-29 Andy Salnikov
+- update EBeamHist module to use new PSHist histogramming
+
+Tag: V00-01-01
+2011-06-16 Andy Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-01-00
+2011-05-21 Andy Salnikov
+- Module interface changed, all subclasses need update; 
+  now all methods have Event argument.
+
+Tag: V00-00-13
+2011-05-07 Andy Salnikov
+- fix parameter name in DumpBld
+
+Tag: V00-00-12
+2011-04-26 Andy Salnikov
+- extended DumpAcqiris module to make waveforms() usage example
+
+Tag: V00-00-11
+2011-04-14 Andy Salnikov
+- new module EBeamHist to test histogramming
+
+Tag: V00-00-10
+2011-04-05 Andy Salnikov
+- insert missing newline in DumpEpics output
+
+Tag: V00-00-09
+2011-04-01 Andy Salnikov
+- make things more uniform
+- use module name for logger name, remove explicit logger name
+- added data/DumpAll.cfg config file which uses all modules from this
+  package
+
+Tag: V00-00-08
+2011-04-01 Andy Salnikov
+- added DumpEncoder, DumpEvr, DumpFccd, DumpIpimb, DumpLusi, DumpOpal1k,
+  DumpPnccd, DumpPrinceton, DumpPulnix modules
+
+Tag: V00-00-07
+2011-03-31 Andy Salnikov
+- added DumpCamera, DumpControl, DumpCsPad modules
+
+Tag: V00-00-06
+2011-03-30 Andy Salnikov
+- adding DumpAcqTdc module
+- removed data/Module1.cfg
+
+Tag: V00-00-05
+2011-03-28 Andy Salnikov
+- added DumpEpics module
+
+Tag: V00-00-04
+2011-03-23 Andy Salnikov
+- modified examples to work with Source class instead of Pds::Src
+
+Tag: V00-00-03
+2011-03-21 Andy Salnikov
+- removed Module1 module
+- added DumpAcqiris and DumpBld examples
+
+Tag: V00-00-02
+2011-01-26 Andy Salnikov
+- fixed event() arguments
+
+Tag: V00-00-01
+2010-09-28 Andy Salnikov
+- first commit, just one non-functional example module which I use
+  for development
