@@ -61,8 +61,10 @@ public:
   
 protected:
 
-private:
+  // demo getting pv data array, useful for waveform pv's
+  std::string dumpPvDataArray(const PSEnv::EpicsStore &estore, const std::string &pvName);
 
+private:
   // Data members
 
 };

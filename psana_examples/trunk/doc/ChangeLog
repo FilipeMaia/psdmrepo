@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2015-06-09 David Schneider
+- Update DumpEpics.cpp example to cover getting data array for waveforms. JIRA PSAS-158
+
 Tag: V00-05-00
 2015-04-08 David Schneider
 - Adapt to new API for histogram manager. JIRA PSAS-131
