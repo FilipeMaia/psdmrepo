@@ -24,13 +24,11 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-//#include "pdscalibdata/PnccdBaseV1.h" // Segs, Rows, Cols etc.
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "ndarray/ndarray.h"
-//#include "pdsdata/psddl/pnccd.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -177,25 +175,40 @@ public:
 
   enum STATUS { LOADED=1, DEFAULT, UNREADABLE, UNDEFINED };
 
-  /// Constructors have different default initialization
   /**
-   *  @brief creates an object which holds the file name and pointer (0 before load) to ndarray.
-   *  File name can be passed later in the get_ndarray(fname) method, but print_file() and print_ndarray() 
+   *  @brief Three constructors provide different default initialization.
+   *  Each of them create an object which holds the file name and pointer (0 before load) to ndarray.
+   *  File name can be specified later in the get_ndarray(fname) method, but print_file() and print_ndarray()
    *  methods will complain about missing file name until it is specified.
+   */ 
+
+
+  /**
+   *  @brief Constructor with missing default initialization. Empty ndarray will be returned if constants from file can not be loaded.
+   *  @param[in] fname std::string file name
+   *  @param[in] print_bits unsigned bit-word to control verbosity
+   */ 
+  NDArrIOV1 ( const std::string& fname
+	    , const unsigned print_bits=0377 );
+
+  /**
+   *  @brief Constructor with default ndarray of specified shape filled by a single value.
    *  @param[in] fname std::string file name
    *  @param[in] shape_def default shape of the ndarray (is used for shape crosscheck at readout and in case of missing file or metadata)
    *  @param[in] val_def value to fill all data elements by default(in case of missing file or metadata)
    *  @param[in] print_bits unsigned bit-word to control verbosity
    */ 
-
-  NDArrIOV1 ( const std::string& fname
-	    , const unsigned print_bits=0377 );
-
   NDArrIOV1 ( const std::string& fname
 	    , const shape_t* shape_def
 	    , const TDATA& val_def=TDATA(0) 
 	    , const unsigned print_bits=0377 );
 
+  /**
+   *  @brief Constructor with externally defined default ndarray.
+   *  @param[in] fname std::string file name
+   *  @param[in] default ndarray, which will be returned if file is missing 
+   *  @param[in] print_bits unsigned bit-word to control verbosity
+   */ 
   NDArrIOV1 ( const std::string& fname
 	    , const ndarray<const TDATA, NDIM>& nda_def
 	    , const unsigned print_bits=0377 );
@@ -203,38 +216,39 @@ public:
   /// Destructor
   ~NDArrIOV1 ();
 
+  /// Returns number of dimensions of ndarray.
   unsigned int ndim() const { return NDIM; }
 
   /// Access methods
-  /// prints recognized templated parameters
+  /// prints recognized templated parameters.
   void print();
 
-  /// prints input file line-by-line 
+  /// Prints input file line-by-line.
   void print_file();
 
-  /// load (if necessary) ndarray from file and print it
+  /// Loads (if necessary) ndarray from file and print it.
   void print_ndarray();
 
-  /// load (if necessary) ndarray from file and returns it
+  /// Loads (if necessary) ndarray from file and returns it.
   /**
    *  @param[in] fname std::string file name
    */ 
   ndarray<TDATA, NDIM>& get_ndarray(const std::string& fname = std::string());
   //ndarray<const TDATA, NDIM>& get_ndarray(const std::string& fname = std::string());
 
-  /// returns string with status of calibration constants
+  /// Returns string with status of calibration constants.
   std::string str_status();
 
-  /// returns enumerated status of calibration constants
+  /// Returns enumerated status of calibration constants.
   STATUS status() { return m_status; }
 
-  /// returns string with info about ndarray
+  /// Returns string with info about ndarray.
   std::string str_ndarray_info();
 
-  /// returns string of shape
+  /// Returns string of shape.
   std::string str_shape();
 
-  /// Save ndarray in file with metadata internal and external comments
+  /// Static method to save ndarray in file with internal metadata and external comments
   /**
    *  @param[in] nda ndarray to save in file
    *  @param[in] fname std::string file name to save ndarray
@@ -257,6 +271,7 @@ private:
   std::string m_fname;
   TDATA       m_val_def;
   const ndarray<const TDATA, NDIM>& m_nda_def;
+  ndarray<TDATA, NDIM> m_nda_empty;
   unsigned    m_print_bits;
   unsigned    m_count_str_data;
   unsigned    m_count_str_comt;

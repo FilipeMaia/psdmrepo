@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-34
+2015-06-05 Mikhail S. Dubrovin	
+- NDArrIOV1::get_ndarray - return empty ndarray in stead of zero-pointer, a lot of cosmetic changes.
+	
 Tag: V00-05-33
 2015-05-22 Mikhail S. Dubrovin	
 - NDArrIOV1 - use enumerated m_status in stead of string, updated method str_status() (for PSAS-139).

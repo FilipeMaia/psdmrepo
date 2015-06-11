@@ -65,7 +65,6 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   //for(unsigned i=0; i<c_ndim; ++i) m_shape[i] = shape_def[i];
   //cout << "TIOV1: shape_def : [" << shape_def[0] << "," << shape_def[1] << "]\n";
   //cout << "TIOV1: m_shape   : [" << m_shape[0] << "," << m_shape[1] << "]\n";
-
 }
 
 //-----------------------------
@@ -120,7 +119,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
         return; 
     }
 
-    if( m_print_bits & 1 ) MsgLog(__name__(), info, "Load file " << m_fname);
+    if( m_print_bits & 1 ) MsgLog(__name__(), info, "Load file \"" << m_fname << "\"");
 
     m_count_str_data = 0;
     m_count_str_comt = 0;
@@ -129,7 +128,7 @@ void NDArrIOV1<TDATA, NDIM>::load_ndarray()
     // open file
     std::ifstream in(m_fname.c_str());
     if (not in.good()) { 
-        MsgLogRoot(error, "Failed to open file: "+m_fname); 
+        if(m_print_bits) MsgLog(__name__(), error, "Failed to open file: \"" + m_fname + "\""); 
 	m_status = NDArrIOV1<TDATA, NDIM>::UNREADABLE; // std::string("file is unreadable");
         return;
     }
@@ -239,7 +238,7 @@ void NDArrIOV1<TDATA, NDIM>::parse_str_of_comment(const std::string& str)
 	        << " is different from expected " << m_shape[dim] 
                 << " in file " << m_fname
 	        << "\nCheck that calibration file has expected shape and data...";
-           MsgLogRoot(warning, smsg.str());
+           MsgLog(__name__(), warning, smsg.str());
            throw std::runtime_error(smsg.str());
 	   // override or not ?
 	   //m_shape[dim] = val;
@@ -332,8 +331,10 @@ NDArrIOV1<TDATA, NDIM>::get_ndarray(const std::string& fname)
   }
 
   if (!p_nda) load_ndarray();
-  if (!p_nda) MsgLog(__name__(), error, "ndarray IS NOT LOADED! Check file: " << m_fname );
-
+  if (!p_nda) {
+    if(m_print_bits) MsgLog(__name__(), error, "ndarray IS NOT LOADED! Check file: \"" << m_fname <<"\"");
+    return m_nda_empty;
+  }
   //std::cout << "TEST in get_ndarray(...):";
   //if (p_nda) std::cout << *p_nda << '\n';
 
@@ -369,7 +370,7 @@ void NDArrIOV1<TDATA, NDIM>::print_file()
 
     // open file
     std::ifstream in(m_fname.c_str());
-    if (not in.good()) { MsgLogRoot(error, "Failed to open file: "+m_fname); return; }
+    if (not in.good()) { MsgLog(__name__(), error, "Failed to open file: "+m_fname); return; }
   
     // read and dump all fields
     //std::string s; while(in) { in >> s; cout << s << " "; }
@@ -454,7 +455,10 @@ void NDArrIOV1<TDATA, NDIM>::save_ndarray(const ndarray<const TDATA, NDIM>& nda,
 
     // open file
     std::ofstream out(fname.c_str());
-    if (not out.good()) { MsgLogRoot(error, "Failed to open output file: " + fname); return; }
+    if (not out.good()) { 
+       if(print_bits) MsgLog(__name__(), error, "Failed to open output file: " + fname); 
+       return; 
+    }
   
     // write comments if available
     if (!vcoms.empty()) {
