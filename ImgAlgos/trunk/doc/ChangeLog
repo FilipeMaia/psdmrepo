@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-88
+2015-06-08 Mikhail S. Dubrovin
+- add class CommonModeCorrection, which is used to apply CommonMode algorithms (PSAS-139)
+	
 Tag: V00-03-87
 2015-05-16 Mikhail S. Dubrovin
 - NDArrDropletFinder.h - fix bug in evaluation of m_stride for NDim=2
