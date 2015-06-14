@@ -1,0 +1,377 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSXtcInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-15-17
+2015-06-13 Christopher O'Grady
+- Add delete _idxrun in Index::~Index().  Caused people to
+  run out of file descriptors when opening many DataSource's.
+	
+Tag: V00-15-16
+2015-05-22 Christopher O'Grady
+- Add bounds checking for number of epics sources, and
+  increased max value, after learning that opal cameras
+  can look like epics sources when in timetool mode.
+	
+Tag: V00-15-15
+2015-03-5 David Schneider
+- JIRA issue PSAS-85, add live mode support
+	
+Tag: V00-15-14
+2015-03-3 David Schneider
+- small data JIRA issue PSAS-85
+- extend XtcInputModuleBase for small data
+  detect live mode, 
+  construct and use SmallDataProxy for every smd datagram
+- fillEvent - was adding control stream datagrams to the event twice, and the
+  dispatch was catching the duplicate key exception - change code to add control
+  stream datagrams once
+	
+Tag: V00-15-13
+2015-02-17 Christopher O'Grady
+- Fix bug where software was looking for a configure transition
+  in the second chunk of an ioc recorder stream.
+
+Tag: V00-15-12
+2015-02-12 David Schneider
+- add parameter PSXtcInput.XtcInputModule.runLiveTimeout to get psana to wait for 
+  new runs in live mode. JRIA issue PSAS-108
+
+Tag: V00-15-11
+2015-02-02 Christopher O'Grady
+- Fix bug that was preventing IOC recorder EPICS data from getting into the
+  eventstore:  send all IOC configure transitions together with the
+  DAQ configure. Add correct XtcFileName objects to XtcInput::Dgram
+  creation, so XtcInputModuleBase can handle the different configure
+  datagrams correctly.
+
+Tag: V00-15-10
+2015-01-28 Christopher O'Grady
+- Generate a fatal error when data is analyzed that has different
+  archiving rates for different epics variables (unsupported by
+  indexing).  This can be changed into a warning if the user
+  sets allow-corrupt-epics in the [psana] section of the cfg file.
+
+Tag: V00-15-09
+2014-11-26 David Schneider
+- Fix bug introduced in V00-14-00 which causes psana to hang on empty xtc file - see JIRA Issua PSAS-74
+
+Tag: V00-15-08
+2014-11-13 Christopher O'Grady
+- Switch to protected accessor functions to override features not
+  supported by XtcInputModuleBase.  Add warning messages.
+
+2014-11-12 Christopher O'Grady
+- Disable some XtcInputModuleBase features not supported by indexing.
+  No tag until Dimosthenis confirms it fixes the problem he observes.
+
+Tag: V00-15-07
+2014-11-06 Christopher O'Grady
+- Handle case where last calibcycle in a run has no events.
+	
+Tag: V00-15-06
+2014-11-03 Christopher O'Grady
+- Fix a bug in the access to calibcycle times: multiple
+  streams' calibcycles were being included in the list.
+  To avoid duplicates, reduced it to just one stream's
+  calibcycles (since they are all identical).
+	
+Tag: V00-15-05
+2014-10-21 Christopher O'Grady
+- Change behavior of indexing to provide access to first
+  run's configure transition at module beginJob time.
+	
+Tag: V00-15-04
+2014-09-02 David Schneider
+- Change options from second event to third event to allow modules to process
+  original beginRun and determine run number if needed. New options are
+        PSXtcInput.third_event_jump_offsets
+        PSXtcInput.third_event_jump_filenames
+	
+Tag: V00-15-03
+2014-09-03 Christopher O'Grady
+- Fix bug where it was possible to go past the end of the
+  idxcalib array when looking for the array-offsets of the
+  first event in each calibcycle.
+
+Tag: V00-15-02
+2014-08-27 David Schneider
+- add config file options to set xtc file offsets before reading second event
+  options are: PSXtcInput.second_event_jump_offsets  
+	       PSXtcInput.second_event_jump_filenames
+  each option should be a list with the same number of elements.
+- minor change to XtcInputModuleBase.cpp.
+
+
+Tag: V00-15-01
+2014-08-20 Christopher O'Grady
+- Add ability to get EventTime's for a user-selectable calib cycle
+
+Tag: V00-15-00
+2014-07-18 David Schneider
+- Control stream support: trac ticket #279. Look for matching dgrams for an
+  event. Use rough second and fiducial match.
+- add methods to fill event/env from dgram list. control vs DAQ and transition
+  type affects fill.
+- do not clear AliasMap, merge aliases, trac ticket #314
+- API change: store XtcInput::DgramList rather than Pds::Dgram in Event
+- new [psana] config parameter: first_control_stream  (defaults to 80)
+- new [psana] config parameter: max_stream_clock_diff (defaults to 85)
+  this is max difference in seconds.
+
+Tag: V00-14-10
+2014-07-18 Christopher O'Grady
+- Fix/simplify timestamp sorting.  Previous code failed on
+  xppi0414 run 61.
+
+Tag: V00-14-09
+2014-07-18 Christopher O'Grady
+- Add Index::end method to allow user to indicate when they
+  are done with accessing a file randomly (sends an EndRun transition)
+
+Tag: V00-14-08
+2014-06-23 Christopher O'Grady
+- Handle large events more intelligently (previously would crash if
+  event exceeded maximum size).  Also fix bug where
+  if an index file was missing, it was still in the xtc file list.
+  Now those two lists of files should be more "synchronized".
+
+Tag: V00-14-07
+2014-06-16 David Schneider
+- keep counter for events to pass to epicsStore.store function:
+  Allows epicsStore to save later pv from multiple IOC recorders
+  Allows Translator to translate timetool pvs, trac ticket #310
+
+Tag: V00-14-06
+2014-06-13 Christopher O'Grady
+- Fix a crash when jumping to last event in a file.
+
+Tag: V00-14-05
+2014-05-13 Christopher O'Grady
+- Add support for ioc recorder streams that are integrated
+  with the DAQ.  If an index file is not found, now a warning
+  is just printed (before it used to be fatal).
+
+Tag: V00-14-04
+2014-05-13 Christopher O'Grady
+- Forgot to commit two of the files.  Try again.
+
+Tag: V00-14-03
+2014-05-13 Christopher O'Grady
+- Change to use new EventTime object for index event selection.
+  (allows use of fiducial in timestamp comparison).
+  Eliminate some indexing-related exceptions and use fatal MsgLog instead.
+  Search for configure/beginrun transitions better (previously
+  assumed they were the first and second transition in a chunk0).
+  Fix case with multiple EpicsArch generators where an older non-event
+  datagram could incorrectly overwrite the values from a newer
+  non-event datagram.
+
+Tag: V00-14-01
+2014-04-25 Christopher O'Grady
+- move creation of DamageMap object.  Fixes crash when multiple
+  event-datagrams are returned by the DgramSource (previously
+  evnt.put(DamageMap) would have been called multiple times)
+	
+Tag: V00-14-00
+2014-04-16 Christopher O'Grady
+- many changes to support xtc indexing
+	
+Tag: V00-13-00
+2014-03-13 Andy Salnikov
+- get run number from BeginRun transition's env field
+
+Tag: V00-12-01
+2014-03-11 Andy Salnikov
+- implement skipping of the Map datagrams if it is the first datagram 
+  in a file 
+
+Tag: V00-12-00
+2014-02-26 Andy Salnikov
+- some redesign/refactoring to simplify multi-process psana implementation
+- new concept of datagram source and new interface for it (IDatagramSource)
+- XtcInputModuleBase now uses IDatagramSource to abstract datagram iteration
+- damage policy code moved to a separate class (DamagePolicy) which can
+  be reused by other modules
+- DgramSourceFile is an implementation of IDatagramSource which reads data 
+  from XTC files (actually from datagram reader queue)
+
+Tag: V00-11-00
+2014-01-13 Andy Salnikov
+- alias support: input module fills alias map 
+
+Tag: V00-10-02
+2013-11-07 David Schneider
+- update XtcEventId to work with PSEvt V00-07-03
+- add DamageMap to Event, populate with xtc damage
+- add configurable DamagePolicy to decide when to store damaged xtc
+
+Tag: V00-10-01
+2013-10-24 Andy Salnikov
+- use datagram header data (env) to filter L3T events
+
+Tag: V00-10-00
+2013-10-07 Andy Salnikov
+- adding support for filtering rejected L3T events
+- rejected events are rejected by default, option psana.l3t-accept-only=0
+  can be used to get back to pass-all mode
+
+Tag: V00-09-03
+2013-10-02 Andy Salnikov
+- one method name changed in Epics::ConfigV1 class
+
+Tag: V00-09-02
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
+Tag: V00-09-01
+2013-05-22 Andy Salnikov
+- cleaning up doxygen comments
+
+Tag: V00-09-00
+2013-04-23 Andy Salnikov
+- split XtcInputModule into two classes, base class XtcInputModuleBase
+  will be also used by shmem input module
+
+Tag: V00-08-01
+2013-03-15 Andy Salnikov
+- small changes in epics classes interfaces
+
+Tag: V00-08-00
+2013-03-14 Andy Salnikov
+- EventId class adds ticks() method to the interface
+
+Tag: V00-07-00
+2013-02-12 Andy Salnikov
+- use correct instance of configuration service to get parameters
+- some parameters have to read in constructor, they may change by the 
+  time of beginJob()
+
+Tag: V00-06-00
+2013-01-16 Andy Salnikov
+- XtcInput interfaces changed, fixing dependencies here
+
+Tag: V00-05-00
+2012-09-11 Andy Salnikov
+- EventId interface defines new methods, implement them here in XtcEventId
+
+Tag: V00-04-03
+2012-07-12 Andy Salnikov
+- DgramReader constructor changed, updating dependencies
+
+Tag: V00-04-02
+2012-07-09 Andy Salnikov
+- MergeMode moved to a separate file, update dependencies
+
+Tag: V00-04-01
+2012-07-06 Andy Salnikov
+- changed default max datagram size to 128MB
+
+Tag: V00-04-00
+2012-05-01 Andy Salnikov
+- populate EpicsStore with aliases when converting Epics::ConfigV1
+
+Tag: V00-03-01
+2012-03-27 Andy Salnikov
+- added event data conversion for Configure transition, there are some
+  "event-like" data objects such as BLD
+
+Tag: V00-03-00
+2012-03-12 Andy Salnikov
+- add option "skip-epics" to XtcInputModule, default is true, if set to 
+  false than all EPICS-only datagrams are passed to framework as well
+
+Tag: V00-02-00
+2012-03-08 Andy Salnikov
+- add datagram object to event in all transition types including configure
+- need to pass event object to beginJob/endJob, interface change 
+
+Tag: V00-01-02
+2012-02-06 Andy Salnikov
+- XtcInputModule will now skip events that contain EPICS data only,
+  EPICS data in environment is still updated from those skipped events.
+- This is done to better support event filtering
+
+Tag: V00-01-01
+2012-01-27 Andy Salnikov
+- Pds::ClockTime array in XtcInputModule class was default-initialized 
+  which left ClockTime members uninitialized
+
+Tag: V00-01-00
+2011-10-04 Andy Salnikov
+- implemented event skipping and max event number
+
+Tag: V00-00-13
+2011-10-04 Andy Salnikov
+- XtcInputModule now adds EventId and datagram objects to the event in
+  beginRun and beginCalibCyle, run number can be extracted in beginRun()
+
+Tag: V00-00-12
+2011-06-17 Andy Salnikov
+- changed default datagram size to 32MB
+
+Tag: V00-00-11
+2011-05-06 Andy Salnikov
+- improve doxygenated comments
+
+Tag: V00-00-10
+2011-03-31 Andy Salnikov
+- XtcInputModule: added some debugging info
+
+Tag: V00-00-09
+2011-03-29 Andy Salnikov
+- XtcInputModule sets correct run number in the Event ID
+
+Tag: V00-00-08
+2011-03-28 Andy Salnikov
+- Unconfigure transition does not stop job, multiple configures
+  possible (warning will be printed if more than one).
+
+Tag: V00-00-07
+2011-03-28 Andy Salnikov
+- XtcInputModule now fills epicsstore with EPICS data
+
+Tag: V00-00-06
+2011-03-22 Andy Salnikov
+- implemented merging of the control transitions
+
+Tag: V00-00-05
+2011-03-20 Andy Salnikov
+- added implementation of the event ID class
+
+Tag: V00-00-04
+2011-01-31 Andy Salnikov
+- renamed this package to PSXtcInput
+- use ErrSvc::Issue for exceptions' base class
+
+Tag: V00-00-03
+2011-01-27 Andy Salnikov
+- fix properties on files
+
+Tag: V00-00-02
+2011-01-27 Andy Salnikov
+- added exception classes
+- started implementation of the event filling part
+
+Tag: V00-00-01
+2011-01-26 Andy Salnikov
+- retag with standard tag, good for nightly
+
+Tag: andy-20110126-02
+2011-01-26 Andy Salnikov
+- moved common classes to new package XtcInput
+
+Tag: andy-20110126-01
+2011-01-26 Andy Salnikov
+- copied few classes from translator
+- added XtcInputModule class
+- common classes will probably be moved to XtcInput package
