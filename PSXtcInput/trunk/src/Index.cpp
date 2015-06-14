@@ -751,6 +751,7 @@ Index::Index(const std::string& name, std::queue<DgramPieces>& queue) : Configur
 void Index::allowCorruptEpics() {_allowCorruptEpics = true;}
 
 Index::~Index() {
+  delete _idxrun;
   delete _rmap;
 }
 

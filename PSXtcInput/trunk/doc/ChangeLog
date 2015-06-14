@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-15-17
+2015-06-13 Christopher O'Grady
+- Add delete _idxrun in Index::~Index().  Caused people to
+  run out of file descriptors when opening many DataSource's.
+	
 Tag: V00-15-16
 2015-05-22 Christopher O'Grady
 - Add bounds checking for number of epics sources, and
