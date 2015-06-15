@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-06
+2015-06-15 Mikhail Dubrovin
+- LogBookGrabber_qt - is added to this package, add files:
+	app/LogBookGrabber_qt
+	src/LogBookWebService.py
+	doc/README-LogBookGrabber_qt
+- in LogBookGrabber_qt - add features requested by Silke (PSAS-70)
+
 Tag: V01-00-05
 2015-04-16 Igor Gaponenko
 - finalized DAQ detectors migration (PSDH-25, PSWA-37)
