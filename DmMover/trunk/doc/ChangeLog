@@ -10,9 +10,16 @@ Package author: Wilko Kroeger
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-
+Tag: V00-02-01
+2015-06-16
+- removed wrong bbcp user name
+- use boolean flag to mark a transfer as failed (instead of "" err-msg)
+- allow to map ioc nfs name to local name (/u2/...) for fee-ioc-rec02
+- add new mover mode to do direct ioc to ffb transfers (ffb or to ana)
+- bbcp configuration is more explicit (api change)
+	
 Tag: V00-02-00
-2015-
+2015-05-26
 - Added cleanup script for ioc nodes
 - create all missing xtc direcories, not just check if xtc exists
 - add startup script for smalldata mover 

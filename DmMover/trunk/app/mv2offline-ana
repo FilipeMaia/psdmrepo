@@ -29,7 +29,6 @@ pjoin = os.path.join
 
 irods = IrodsRegisterFile()
 mover = BbcpCmd()
-mover.user = 'wilko'
 trg_path = None    # function that returns the trgpath for instrument
 
 
@@ -184,9 +183,8 @@ def do_copy_index(transfer, exper, file_type=None, mark_failed=False):
             add4offline_migr(exper.id, trgfile, file_type)
     else:
         # set error or mark file as FAIL
-        db_status = "" if  mark_failed else "i%d" % status
-        db.file_migration_stop(exper.id, basefilename, db_status)
-        logging.error('Error %d while copying index file', status)
+        db.file_migration_stop(exper.id, basefilename, "i%d" % status, mark_failed)
+        logging.error('Error %d while copying index file (mark-failed %s)', status, mark_failed)
 
     return status
 
@@ -244,6 +242,13 @@ def transfer_loop(transfer_files, experiments, options, ctrl):
     xtc_files = set()
     index_files = {}
     for transfer in transfer_files:
+        if options.ioclocal and transfer['host'] == "ioc-fee-rec02":
+            replace_path = "/reg/d/cameras/ioc-fee-rec02"
+            if transfer['dirpath'].startswith(replace_path):
+                print options.ioclocal, transfer['host'] 
+                transfer['dirpath'] = "/u2/REC" + transfer['dirpath'][28:]
+                logging.warning("New path %s", transfer['dirpath'])
+
         filestem = transfer['file'].split('.')[0]
         if transfer['file_type' ] in ('xtc', 'smd.xtc'):
             xtc_files.add(filestem)
@@ -280,11 +285,11 @@ def transfer_loop(transfer_files, experiments, options, ctrl):
 
         if options.exper and exper.name != options.exper:
             continue
-
+        
         # ------------------------------------------------------------
         # match xtc with corresponding index file and do the transfer 
 
-        file_type = transfer['file_type' ]
+        file_type = transfer['file_type']
         filestem = transfer['file'].split('.')[0]
 
         # If there is a xtc file for an index file skip the index file but
@@ -351,20 +356,20 @@ def main(argv=None):
 
     parser = OptionParser()
 
-    
     parser.add_option("--smd", default=False, action="store_true", help="select small-data-files")
     parser.add_option("--host", help="select only files that originate on host")
     parser.add_option("--instr", default="", help="select on instrument names (comma seperated)")
     parser.add_option("--exper", help="select on experiment name")
     parser.add_option("--dssnr", type="int", default=-1, help="dss nodes nr to accept data")
     parser.add_option("--dirpath", help="select on file path")
+    parser.add_option("--ioclocal", action="store_true", default=False, help="use local path on ioc instead of nfs")
 
     parser.add_option("--ireg", action="store_true", default=False, help="register xtc (incl. smd.xtc) files in irods")
     parser.add_option("--iregidx", action="store_true", default=False, help="register xtc.idx files in irods")
     parser.add_option("--noidx",  action="store_true", default=False, help="Do not transfer index files")
     parser.add_option("--failidx", dest="fail_idx", action="store_true", default=False,
                       help="Mark idx files as lost if they could not be transferred")
-    parser.add_option("--mode", choices=('dss-ffb', 'ioc-ffb', 'ffb-offline', 'ffb-local', 'local'), 
+    parser.add_option("--mode", choices=('dss-ffb', 'ioc-ffb', 'ioclocal-ffb', 'ffb-offline', 'ffb-local', 'ioc-offline', 'local'), 
                       help="transfer mode: ffb-offline or local")
     parser.add_option("--nopath", action="store_true", default=False, help="Do not check/create path")
 
@@ -420,25 +425,33 @@ def main(argv=None):
     # select migration table and bbcp command options
 
     global trg_path
-    if options.mode == 'ffb-offline':
+    if options.mode == 'ffb-offline':                  # ffb_b->ana
         db.table_dm_ana()
-        mover.config_ffb_offline()
+        mover.config(remote=True, realtime=False)
         trg_path = trgpath_param(options.mode)
-    elif options.mode == 'ffb-local':
+    elif options.mode == 'ffb-local':                  # ffb_g->ana
         db.table_dm_ana()
-        mover.config_local_offline()
+        mover.config(remote=False, realtime=False)
         trg_path = trgpath_param(options.mode)
-    elif options.mode == 'ioc-ffb':
+    elif options.mode == 'ioc-ffb':                    # ioc_n->ffb_b
         db.table_dm()
-        mover.config_local_offline()
+        mover.config(remote=False, realtime=True)
         trg_path = trgpath_param(options.mode, "/reg/d/ffb")
-    elif options.mode == 'dss-ffb':
+    elif options.mode == 'ioclocal-ffb':               # ioc_u->ffb_g
         db.table_dm()
-        mover.config_dss_ffb()
+        mover.config(remote=True, realtime=True)
+        trg_path = trgpath_param(options.mode, "/reg/d/ffb")
+    elif options.mode == 'dss-ffb':                    # dss->ffb_b 
+        db.table_dm()
+        mover.config(remote=True, realtime=True)
         trg_path = trgpath_param(options.mode, "/brick1")
-    elif options.mode == 'local':
+    elif options.mode == 'ioc-offline':                # ioc_u->ana 
         db.table_dm()
-        mover.config_local_offline()
+        mover.config(remote=True, realtime=True)
+        trg_path = trgpath_param(options.mode)
+    elif options.mode == 'local':                      # ioc_n->ana
+        db.table_dm()
+        mover.config(remote=False, realtime=True)
         trg_path = trgpath_param(options.mode)
     else:
         logging.error("Wrong mode %s -> exit", options.mode)

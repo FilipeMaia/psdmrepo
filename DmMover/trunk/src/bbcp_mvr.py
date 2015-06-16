@@ -21,20 +21,18 @@ class BbcpCmd(object):
         self.trg = gethostname()
 
 
-    def config_local_offline(self):
-        # src data read from a local file system (e.g.: nfs). Use realtime transfer.
-        self.local_transfer = True
-        self.bbcpcmd = "%s -v -P 15 -R c=2 -s 1" % self.bbcp
+    def config(self, remote, realtime):
+        """ Configure the bbcp command to copy data from remote/local source and 
+        use realtime mode """
 
-    def config_ffb_offline(self):
-        # transfer from ffb to offline. No realtime as the file is complete 
-        self.local_transfer = False
-        self.bbcpcmd = "%s -S \"%s\"  -z -v -s 1 -p -P 15" % (self.bbcp, self.bbcp_remote)
-
-    def config_dss_ffb(self):
-        # transfer dss to ffb
-        self.local_transfer = False
-        self.bbcpcmd = "%s -S \"%s\"  -z -v -s 1 -R c=2 -P 15" % (self.bbcp, self.bbcp_remote)
+        self.local_transfer = not remote
+        ropt = "-R c=2 " if realtime else ""
+            
+        print remote, realtime
+        if remote:
+            self.bbcpcmd = "{} -S \"{}\" {}-z -P 15 -v -s 1".format(self.bbcp,self.bbcp_remote,ropt)
+        else:
+            self.bbcpcmd = "{} {}-P 15 -v -s 1".format(self.bbcp,ropt)
         
     def print_config(self):
         print "Local-trans:", self.local_transfer, "bbcp-user:", self.user, " key:", self.ssh_key

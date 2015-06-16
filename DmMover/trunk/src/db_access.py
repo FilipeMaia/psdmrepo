@@ -188,12 +188,12 @@ def file_migration_start(exper_id, fn):
 #  if error_msg='' mark file as FAIL
 # --------------------------------------------------
 
-def file_migration_stop(exper_id, fn, error_msg=None):
+def file_migration_stop(exper_id, fn, error_msg=None, mark_failed=False):
     now = __now_64()
     if error_msg is None:
         error_msg_sql = ", error_msg=NULL, status='DONE'"
-    elif error_msg == "":
-        error_msg_sql = ", error_msg='', status='FAIL'"
+    elif mark_failed:
+        error_msg_sql = ", error_msg=NULL, status='FAIL'"
     else:
         error_msg_sql = ", error_msg='%s'" % __escape_string(error_msg)
             

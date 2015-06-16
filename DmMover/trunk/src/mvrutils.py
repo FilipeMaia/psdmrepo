@@ -46,7 +46,7 @@ def trgpath_param(mode, path=None):
         #  (register_to_ana_tb, create_xtc_only, instr_in_trg_path, rootpath)
         if mode == "dss-ffb":
             return (True, True, False, path)
-        elif mode == "ioc-ffb":
+        elif mode in ("ioc-ffb", "ioclocal-ffb"):
             if instr.upper() in ('AMO', 'CXI', 'MEC', 'SXR', 'XCS', 'XPP'):
                 return (True, True, True, path)
             else:
