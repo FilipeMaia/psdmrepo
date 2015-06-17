@@ -45,8 +45,6 @@ class MoverCfg(object):
         for opt,val in cfg:
             if opt == "mode":
                 self.mode = "--mode {}".format(val)
-            elif opt == "smd":
-                print val
             else:
                 self.__setattr__(opt, val)
 
@@ -149,8 +147,11 @@ def main():
             continue
                     
         # Check procServ port 
+
+        print "==== ", mover.name
+
         if args.check_port and int(mover.port) in pp:
-            print "Port is already open, mover {} not started ".format(mover.port)
+            print "  Port is already open, mover {} not started ".format(mover.port)
             if not args.test:
                 continue
 
@@ -158,7 +159,7 @@ def main():
         cmd = mover.mvr_cmd()
 
         if args.test:
-            print cmd
+            print "  List", cmd
         else:
             rc = os.system(cmd)
             print rc
