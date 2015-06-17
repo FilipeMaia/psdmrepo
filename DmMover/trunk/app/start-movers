@@ -6,8 +6,9 @@ import time
 import ConfigParser
 import argparse
 import psutil
-
 import socket
+
+from datetime import datetime
 
 
 def which(program):
@@ -51,6 +52,9 @@ class MoverCfg(object):
             if not self.sel:
                 self.sel = "--host {}".format(self.name) 
             
+    def procserv_logfile(self):
+        return "{0.logdir}/mv2offline.{0.name}".format(self)
+
     def mvr_cmd(self):
 
         cmd_abspath = which(self.cmd)
@@ -97,6 +101,18 @@ class Config(object):
     def movers(self):
         for mvr in self._movers:
             yield mvr
+
+# ====================================================================================
+
+
+def move_logfile(fn):
+
+    if os.path.isfile(fn):
+        newfn = "{0}.{1}".format(fn, datetime.now().strftime("%Y%m%dT%H%M%S"))
+        os.rename(fn, newfn)
+        print "Renamed log to {}".format(newfn)
+    else:
+        print "log {} didn't exist yet".format(fn)
 
 # ====================================================================================
 
@@ -154,13 +170,13 @@ def main():
             print "  Port is already open, mover {} not started ".format(mover.port)
             if not args.test:
                 continue
-
-
+                
         cmd = mover.mvr_cmd()
 
         if args.test:
             print "  List", cmd
         else:
+            move_logfile(mover.procserv_logfile())
             rc = os.system(cmd)
             print rc
     
