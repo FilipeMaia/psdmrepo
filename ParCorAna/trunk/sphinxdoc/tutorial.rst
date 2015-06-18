@@ -23,8 +23,8 @@ these commands::
   # now identify the most recent tag of ParCorAna
   psvn tags ParCorAna
 
-  # suppose the last tag in the Vnn-nn-nn series is V00-00-06, then do
-  addpkg ParCorAna V00-00-06
+  # suppose the last tag in the Vnn-nn-nn series is V00-00-08, then do
+  addpkg ParCorAna V00-00-08
   scons
 
 .. _configfile:
@@ -78,6 +78,15 @@ live mode. For example::
 
 This will start processing xtc files as soon as they appear on the ffb - usually a few seconds behind the shot.
 Further by running with 6 servers on psfehq (see below), one should be able to keep up with reading the data.
+
+If the DAQ streams for the run are not numbered 0-n, and you are using several servers to keep up with the 
+data, you will need to explicitly list the streams. For example, if you are collecting from three DAQ streams
+numbered 1,2 and 5, and also recording xtcav and other IOC's in stream 80 and 81 (and you need the IOC data
+when deciding what events to include in the G2 calculation) one would do::
+
+  system_params['dataset'] = 'exp=%s:run=%d:live:stream=1,2,5,80,81:dir=/reg/d/ffb/xpp/xpptut13' % (experiment, run) 
+Then set numservers (below) to 3 for the three DAQ streams, 1,2 and 5. Note, if you do not need the
+IOC streams for the G2 calculation, do not include them, it will speed up processing.
 
 These parameters::
 
@@ -480,12 +489,15 @@ UserG2 module writes, for example::
 *******************
 Plotting
 *******************
-To do plots, set the following values in the config file::
+To do plots, set the following in the config file::
 
   user_params['psmon_plot'] = True
+
+When plotting, you may not want to produce the h5output as well. If so, also set::
+
   system_params['h5output'] = None
 
-in the config file and run the software again. In the output, one should see outupt similar to::
+When running with the psmon_plot parameter to True, In the output, one should see outupt similar to::
 
   2015-05-08 14:39:16,214 - viewer-rnk:2 - INFO - Run cmd: psplot --logx -s psana1501 -p 12301 MULTI
 

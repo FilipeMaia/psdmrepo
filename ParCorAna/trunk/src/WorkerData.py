@@ -152,7 +152,7 @@ class WorkerData(object):
         if timeIndForNewData < self._timeAfterEndIdx:
             self.numOutOfOrder += 1
             if timeIndForNewData == self._timeStartIdx and self.wrappedX:
-                self.logger.warning("addData: filled X and new data with tm=%d is earlier then all stored data. Dropping data.")
+                self.logger.warning("addData: X has already been filled but new data with tm=%d is earlier then all stored data. Dropping data." % timeIndForNewData)
                 return
             # we are committed to storing this data.
             # slide down to make room for it.

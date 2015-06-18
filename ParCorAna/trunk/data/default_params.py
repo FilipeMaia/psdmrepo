@@ -14,18 +14,10 @@ import ParCorAna
 system_params={}
 
 ######## dataset ########### 
-# specify the experiment/run. This is used to define the dataset, and h5output file.
+# specify the experiment/run.  This is used to define the dataset, and h5output file.
 
 run = 1437
 experiment = 'xpptut13'
-
-system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
-
-# for online monitoring against live data, specify :live and the ffb directory, for example:
-# system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run) 
-
-# example for shared memory:
-# system_params['dataset'] = 'shmem=XCS:stop=no'
 
 # below are some datasets used for testing and development of ParCorAna
 # experiment = 'xcsc9114'; run=20  # this is for testing. No real signal, but a very long run to test performance
@@ -33,6 +25,22 @@ system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run)
 # experiment = 'xcsi0314'; run=177  # cspad2x2, dark is 179
 # experiment = 'xcsi0314'; run=178  # cspad2x2, dark is 179
 # experiment = 'xcs84213'; run=117  # this has CsPad.DataV2  # 40k - 60k
+
+# when setting the dataset, explicitly set the stream if the DAQ streams are not 0-n, see below for example
+system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
+
+# for online monitoring against live data, specify :live and the ffb directory, for example:
+# system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run) 
+
+# when using numservers > 1, set it to exactly the number of DAQ streams (usually 6). If doing
+# a run with a different arrangement of streams, explictly list them, for example:
+# system_params['dataset'] = 'exp=%s:run=%d:live:stream=1,2,5,80,81:dir=/reg/d/ffb/xcs/xcs84213' % (experiment, run)# and set numservers (below) to 3 
+
+# note, the use of explicitly setting stream. If you set numservers to the  - the system cannot figure out the streams
+
+# example for shared memory, however working against shared memory is not tested:
+# system_params['dataset'] = 'shmem=XCS:stop=no'
+
 
 ############### SRC TYPE PSANA CONFIG #################
 system_params['src']       = 'DetInfo(XppGon.0:Cspad.0)' # for tutorial data

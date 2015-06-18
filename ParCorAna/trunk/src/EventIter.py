@@ -91,17 +91,18 @@ class EventIter(object):
                 logger.warning("multiple servers in h5 mode, servers will handle the same events")
             elif (not self.isIndex) and (not self.isShmem):
                 assert self.isXtc, "dataset string: %s does not appear to be xtc" % dataSourceString
-                if 'streams' in datasetParts:
-                    streams = datasetParts['streams']
+                if 'stream' in datasetParts:
+                    streams = datasetParts['stream']
                     daqStreams = [stream for stream in streams if stream < 80]
                     ctrlStreams = [stream for stream in streams if stream >= 80]
                 else:
                     daqStreams = range(80)
                     ctrlStreams = range(80,160)
                 thisServerDaqStreams = [daqStreams[k] for k in range(self.serverNumber, len(daqStreams), numServers)]
+                assert len(thisServerDaqStreams)>0, "This server (number=%d) has no DAQ streams to process. set config parmeter numservers <= number of DAQ streams (streams < 80)" % self.serverNumber
                 thisServerStreams = thisServerDaqStreams + ctrlStreams
                 thisServerStreams.sort()
-                dataSourceString = PsanaUtil.changeDatasetStreams(dataSourceString, thisServerDaqStreams)
+                dataSourceString = PsanaUtil.changeDatasetStreams(dataSourceString, thisServerStreams)
                 logger.debug("server %d of %d, changed streams. new dataset=%s" % (self.serverNumber, numServers, dataSourceString))
         self.dataSourceString = dataSourceString
 
@@ -171,7 +172,11 @@ class EventIter(object):
         assert not self.called, "cannot call EventIter dataGenerator twice"
         self.called = True
 
-        ds = psana.DataSource(self.dataSourceString)
+        try:
+            ds = psana.DataSource(self.dataSourceString)
+        except RuntimeError,e:
+            self.logger.error("RuntimeError creating datasource for string: %s" % self.dataSourceString)
+            raise e
         
         if self.isIndex:
             evtStride = len(self.servers)

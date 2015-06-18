@@ -23,7 +23,6 @@ Contents:
    tutorial
    framework
    testing
-   userg2
    architecture
 
 ############

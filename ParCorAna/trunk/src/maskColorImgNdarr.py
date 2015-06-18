@@ -184,7 +184,23 @@ def img2ndarr(img, iX, iY):
     numRows, numCols = img.shape
     ndarrShape = iX.shape
     ndarr = np.zeros(ndarrShape, img.dtype)
-    ndarr[:] = img[iX.flatten(), iY.flatten()].reshape(ndarr.shape)
+    iX_flat = iX.flatten()
+    iY_flat = iY.flatten()
+    if np.min(iX_flat) < 0:
+        sys.stderr.write("WARNING: img2ndarr: iX has %d values < 0, clamping to 0\n" % np.sum(iX_flat<0))
+        iX_flat[iX_flat < 0]=0
+    if np.min(iY_flat) < 0:
+        sys.stderr.write("WARNING: img2ndarr: iY has %d values < 0, clamping to 0\n" % np.sum(iY_flat<0))
+        iY_flat[iY_flat < 0]=0
+    if np.max(iX_flat) >= img.shape[0]:
+        sys.stderr.write("WARNING: img2ndarr: iX has %d values >= img.shape[0]=%d, clamping to %d\n" % \
+                         (np.sum(iX_flat >= img.shape[0]), img.shape[0], img.shape[0]-1))
+        iX_flat[iX_flat >= img.shape[0]]=img.shape[0]-1
+    if np.max(iY_flat) >= img.shape[1]:
+        sys.stderr.write("WARNING: img2ndarr: iY has %d values >= img.shape[1]=%d, clamping to %d\n" % \
+                         (np.sum(iY_flat >= img.shape[1]), img.shape[1], img.shape[1]-1))
+        iY_flat[iY_flat >= img.shape[1]]=img.shape[1]-1
+    ndarr[:] = img[iX_flat, iY_flat].reshape(ndarr.shape)
     return ndarr
 
 __psana2DTypeLists=[psana.Epix.Element,

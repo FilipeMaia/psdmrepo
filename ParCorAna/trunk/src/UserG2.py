@@ -82,9 +82,9 @@ class G2Common(object):
         '''Callback from the EventIter class. After serverEventOk (above) 
         
         servers calls this to allow user code to validate the event based on the dataArray.
-        Return None to say the event should not be processed, or the oringial dataArray
-        if it is Ok. Optionally, one can make a copy of the dataArray, modify it, and return
-        the copy.
+        Return None to say the event should not be processed.
+        Return the oringial dataArray to say the event should be processed.
+        Optionally, one can make a copy of the dataArray, modify it, and return the copy.
         '''
         return dataArray
 
@@ -136,7 +136,7 @@ class G2Common(object):
         Return:
           None
         '''
-        raise Exception("workerBeforeDataRemove.workerAfterDataInsert not implemented: use sub class")
+        raise Exception("G2Common.workerAfterDataInsert not implemented: use sub class")
 
     def workerAdjustData(self, data):
         '''called before data added to WorkerData.X - allows filtering/cleaning of data
@@ -452,6 +452,9 @@ class G2IncrementalAccumulator(G2Common):
         # Pass allWorkers=True to have all workers log the message.
         # it is a good idea to include the class and method at the start of log messages
         self.mp.logInfo("G2IncrementalAccumulator: object initialized")
+
+    def workerBeforeDataRemove(self, tm, xInd, workerData):
+        pass
 
     def workerAfterDataInsert(self, tm, xInd, workerData):
         maxStoredTime = workerData.maxTimeForStoredData()

@@ -669,7 +669,7 @@ class RunMaster(object):
 
             # check to display message
             eventsSinceLastDataRateMsg = self.numEvents - numEventsAtLastDataRateMsg
-            if eventsSinceLastDataRateMsg > 2400: # about 20 seconds of data at 120hz
+            if eventsSinceLastDataRateMsg > 1200: # about 10 seconds of data at 120hz
                 curTime = time.time()
                 dataRateHz = eventsSinceLastDataRateMsg/(curTime-timeAtLastDataRateMsg)
                 self.logger.info("Current data rate is %.2f Hz. %d events processed" % (dataRateHz, self.numEvents))

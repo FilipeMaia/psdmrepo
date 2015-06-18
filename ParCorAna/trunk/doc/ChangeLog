@@ -11,6 +11,17 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+- fix bugs with handling stream in dataset, need to specify streams for 
+  non-standard streams, can't specify more servers than DAQ streams
+- fix bug in UserG2, did not implement beforeData for incremental
+- adjust documentation a bit
+- take out userg2 page from sphinxdoc
+- add modules to src	
+- add code to parCorAnaMaskColorTool to check for geometry information that is
+  wrong - on the tutorial data it returned iX, iY that were one pixel greater
+  then the image size - image producer must have changed - now the geometry 
+  file is out of sync?
 	
 Tag: V00-00-06
 - remove XCorrWorkerBase and replace with WorkerData

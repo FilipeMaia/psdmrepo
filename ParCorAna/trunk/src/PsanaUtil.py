@@ -49,9 +49,9 @@ def changeDatasetStreams(dataset, newStreams):
     if dataset.find('stream=')<0:
         dataset += ':stream=%s' % (','.join(map(str,newStreams),))
     else:
-        beforeStream, afterStream = dataSourceString.split('stream=')
+        beforeStream, afterStream = dataset.split('stream=')
         afterParts = afterStream.split(':')
-        afterParts[0] = ','.map(str,newStreams)
+        afterParts[0] = ','.join(map(str,newStreams))
         afterStream = ':'.join(afterParts)
         dataset = 'stream='.join([beforeStream,afterStream])
     return dataset
@@ -74,11 +74,6 @@ def parseDataSetString(dataset):
       One potential point of confusion, shmem defaults to False in the dict if not provided, 
       but will be a string if it is
     '''
-    spaceSplit = dataset.split()
-    commaSplit = dataset.split(',')
-    assert len(spaceSplit)==1 and len(commaSplit)==1, ("parseDataSetString only implemented for a " + \
-                            "single string, not space or comma separated list of files")
-
     parts = dataset.split(':')
     keyValues = {}
     for part in parts:
