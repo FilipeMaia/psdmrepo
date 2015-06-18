@@ -132,10 +132,10 @@ if __name__ == '__main__':
     else:
         # synchronize everything before launching
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 before MI_Barrier preceding mainRoutine")
+            sys.stdout.write("parCorAnaDriver rank=0 before MI_Barrier preceding mainRoutine\n")
             sys.stdout.flush()
         MPI.COMM_WORLD.Barrier()
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 after MI_Barrier, calling mainRoutine")
+            sys.stdout.write("parCorAnaDriver rank=0 after MI_Barrier, calling mainRoutine\n")
             sys.stdout.flush()
         sys.exit(mainRoutine(system_params=system_params, user_params=user_params, test_alt=args.test_alt))
