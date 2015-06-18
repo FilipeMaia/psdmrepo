@@ -47,7 +47,7 @@ def setCommandLineOverrideArguments(args, system_params):
       system_params (dict): the system parameters to potential overwrite/modify
     '''
     if args.verbosity is not None:
-        system_params['verbosity'] = verbosity
+        system_params['verbosity'] = args.verbosity
     
     for arg, dictkey, argtype in zip([args.numevents, args.h5output, args.dataset, args.numServers], \
                                      ['numEvents','h5output', 'maskFile', 'dataset', 'numServers'], \
@@ -130,4 +130,12 @@ if __name__ == '__main__':
         sys.stderr.write('cmp stderr=\n%s\n'%e)
         sys.exit(retcode)
     else:
+        # synchronize everything before launching
+        if MPI.COMM_WORLD.rank == 0:
+            sys.stdout.write("parCorAnaDriver rank=0 before MI_Barrier preceding mainRoutine")
+            sys.stdout.flush()
+        MPI.COMM_WORLD.Barrier()
+        if MPI.COMM_WORLD.rank == 0:
+            sys.stdout.write("parCorAnaDriver rank=0 after MI_Barrier, calling mainRoutine")
+            sys.stdout.flush()
         sys.exit(mainRoutine(system_params=system_params, user_params=user_params, test_alt=args.test_alt))

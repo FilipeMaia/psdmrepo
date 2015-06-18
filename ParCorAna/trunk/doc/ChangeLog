@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+NextTag:
+- add MPI_Barrier with output to driver to check for MPI problems 
+	
 Tag: V00-00-07
 - fix bugs with handling stream in dataset, need to specify streams for 
   non-standard streams, can't specify more servers than DAQ streams
