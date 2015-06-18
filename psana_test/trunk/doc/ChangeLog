@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-29
+2015-6-18 David Schneider
+- add function cmdTimeOutWithReturnCode() to psanaTestLib
+
 Tag: V00-08-28
 2015-5-1 David Schneider
 - update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144

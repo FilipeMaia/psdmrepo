@@ -93,10 +93,10 @@ def alarm_handler(signum, frame):
 
 ###########################################################
 # testing functions
-def cmdTimeOut(cmd,seconds=5*60):
+def cmdTimeOutWithReturnCode(cmd,seconds=5*60):
     '''Runs cmd with seconds timeout - raising exceptoin Alarm if timeout is hit.
     warning: runs cmd with shell=True, considered a security hazard.
-    Returns stdout, stderr for command. stderr has had blank links removed.
+    Returns stdout, stderr, returncodefor command. stderr has had blank links removed.
     '''
     signal.signal(signal.SIGALRM, alarm_handler)
     signal.alarm(seconds)
@@ -107,7 +107,15 @@ def cmdTimeOut(cmd,seconds=5*60):
     except Alarm:
         raise Alarm("cmd: %s\n took more than %d seconds" % (cmd, seconds))
     e = [ln for ln in e.split('\n') if len(ln.strip())>0]
-    return o,'\n'.join(e)
+    return o, '\n'.join(e), p.returncode
+    
+def cmdTimeOut(cmd,seconds=5*60):
+    '''Runs cmd with seconds timeout - raising exceptoin Alarm if timeout is hit.
+    warning: runs cmd with shell=True, considered a security hazard.
+    Returns stdout, stderr for command. stderr has had blank links removed.
+    '''
+    o,e,retcode = cmdTimeOutWithReturnCode(cmd,seconds)
+    return o,e
     
 def expandSitRoot():
     sit_root_envvar = '$SIT_ROOT'
