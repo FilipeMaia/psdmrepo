@@ -1,0 +1,46 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: template!SConscript! 8 2008-10-08 22:35:33Z salnikov $
+#
+# Description:
+#  SConscript file for package freetype
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+import os
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+freetype_ver = "2.4.0"
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "freetype", freetype_ver, "$SIT_ARCH")
+
+INCDIR = "include/freetype2/freetype"
+LIBDIR = "lib"
+BINDIR = "bin"
+PKGLIBS = "freetype"
+LINKLIBS = "libfreetype.so*"
+standardExternalPackage('freetype', **locals())
+
+# Post fix up is needed to set up proper include directories
+# and headers
+
+env = DefaultEnvironment()
+
+geninc = str(Dir(env.subst("$ARCHINCDIR")))
+
+prefix = pjoin(os.path.dirname(str(Dir(env.subst(PREFIX)))), env['SIT_ARCH_BASE_OPT'])
+
+ft2build_h        = pjoin(prefix, "include", "ft2build.h")
+geninc_ft2build_h = pjoin(geninc, "ft2build.h")
+
+if not os.path.islink(geninc_ft2build_h):  os.symlink(ft2build_h, geninc_ft2build_h)
+
