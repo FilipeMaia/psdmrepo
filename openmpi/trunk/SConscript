@@ -22,7 +22,7 @@ import os
 #
 
 pkg = 'openmpi'
-pkg_ver = '1.8.1a'
+pkg_ver = '1.8.6'
 
 PREFIX = '/'.join(["$SIT_ROOT", "sw", "external", pkg, pkg_ver, "$SIT_ARCH"])
 
