@@ -213,7 +213,7 @@ class XtcCleanLocal:
 
         self.print_stat = False
         url,user,pswd = ws_conn_para(_ws_conn)
-        fs = file_status.file_status(ws_login_user=user, ws_login_password=pswd)
+        fs = file_status.file_status(ws_base_url=url, ws_login_user=user, ws_login_password=pswd) 
         lFilterdQuery = fs.filter(lXtcStatusQuery, self.filter_fileStatus)
     
         lDelFiles = []
