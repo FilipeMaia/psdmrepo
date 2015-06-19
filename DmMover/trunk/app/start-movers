@@ -2,108 +2,16 @@
 
 
 import os
-import time
-import ConfigParser
 import argparse
 import psutil
-import socket
 
 from datetime import datetime
 
+from DmMover.mvrcfg import Config
 
-def which(program):
-    def is_exe(fpath):
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
-    fpath, fname = os.path.split(program)
-    if fpath:
-        if is_exe(program):
-            return program
-    else:
-        for path in os.environ["PATH"].split(os.pathsep):
-            path = path.strip('"')
-            exe_file = os.path.join(path, program)
-            if is_exe(exe_file):
-                return exe_file
-
-    return None
 
 
 # ====================================================================================
-
-
-class MoverCfg(object):
-
-    def __init__(self, name):
-        self.name = name
-        self.opts = ""
-        self.sel = None
-        self.smd = False
-        self.release = None 
-
-    def set_config(self, cfg):
-
-        for opt,val in cfg:
-            if opt == "mode":
-                self.mode = "--mode {}".format(val)
-            else:
-                self.__setattr__(opt, val)
-
-            if not self.sel:
-                self.sel = "--host {}".format(self.name) 
-            
-    def procserv_logfile(self):
-        return "{0.logdir}/mv2offline.{0.name}".format(self)
-
-    def mvr_cmd(self):
-
-        cmd_abspath = which(self.cmd)
-        cmd = (
-            "{0.procserv_cmd} {0.procserv_args} "
-            "-L {0.logdir}/mv2offline.{0.name} -n {0.name} "
-            "{0.port} "
-            "{1} {0.sel} {0.mode} {0.options}".format(self, cmd_abspath) 
-            )
-        return cmd 
-
-
-# ====================================================================================
-
-
-class Config(object):
-
-    def __init__(self, cfgfile):
-
-        self._movers = []
-
-        config = ConfigParser.SafeConfigParser()
-        config.read(cfgfile) 
-        
-        ports = [ config.get(section,'port') for section in config.sections()]
-        if len(ports) != len(set(ports)):
-            print "Found duplicate ports", ports
-            return
-
-        localhost = socket.gethostname()    
-        for section in config.sections():
-            if not config.has_option(section, "host"):
-                print "Missing host in section", section
-                continue
-                
-            if localhost != config.get(section, "host"):
-                continue
-
-            mvr = MoverCfg(section)
-            mvr.set_config(config.items(section))
-            self._movers.append(mvr)
-
-
-    def movers(self):
-        for mvr in self._movers:
-            yield mvr
-
-# ====================================================================================
-
 
 def move_logfile(fn):
 
@@ -113,6 +21,22 @@ def move_logfile(fn):
         print "Renamed log to {}".format(newfn)
     else:
         print "log {} didn't exist yet".format(fn)
+
+# ====================================================================================
+
+
+def list_all_movers(cfg_fn, args):
+
+    config = Config(cfg_fn, False)
+
+    for mover in config.movers():
+        if args.names and mover.name not in args.names:
+            continue
+
+        # Check procServ port
+
+        print mover.name, mover.port, mover.host, mover.mode.replace("--mode","")
+
 
 # ====================================================================================
 
@@ -134,6 +58,8 @@ def main():
 
     parser.add_argument("--cfg", choices=CFG_GROUP.keys(), help="config file or alias")
     parser.add_argument("--cfgfn", help="config file or alias")
+    parser.add_argument("--list", action="store_true", default=False,
+                        help="list all movers")    
     parser.add_argument("--test","-T", action="store_true", default=False,
                         help="test only, mover is not started")
     parser.add_argument("--force", dest="check_port",action="store_false", default=True,
@@ -148,10 +74,20 @@ def main():
     except SystemExit:
         return 0
 
+
+
+
     cfg_fn = CFG_GROUP.get(args.cfg, None) if args.cfg else args.cfgfn
     if not cfg_fn or not os.path.exists(cfg_fn):
         print "No config file", cfg_fn
-    
+        return
+
+        
+    if args.list:
+        list_all_movers(cfg_fn, args)
+        print "No movers have been started"
+        return 
+        
     config = Config(cfg_fn)
 
     b = psutil.net_connections()
