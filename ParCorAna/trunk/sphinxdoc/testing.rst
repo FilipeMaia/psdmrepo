@@ -37,23 +37,32 @@ Testing Steps
 ==================================================
 
 * override the function *calcAndPublishForTestAlt* in the UserG2 class, example below.
-* set  *testh5output* in system_params in the config file to the output file for the alternative testing calculation
-* set  *testNumEvents* in the system_params in the config file to the number of events to test with
-* set *testMaskNdarrayCoords* in the system_params in the config file to the testing mask file
+* set *system_params['testNumEvents']* in the config file to the number of events to test with
+* set *system_params['testMaskNdarrayCoords']* in the config file to the testing mask file
+* set *system_params['h5output']* in the config file to the output file when you run the framework on the testing mask and testing number of events above
+* set *system_params['testh5output']* in the config file to the output file for the alternative testing calculation
+* set *system_params['update']* to 0 to just get results saved after going through the test number of events
+* set *user_params['psmon_plot']* to False
 
 Finally, one does::
 
-  mpiexec -n 4 parCorAnaDriver -c myconfig.py -n 100 --test_main
+  mpiexec -n 4 parCorAnaDriver -c myconfig.py --test_main
 
-To run the usual calculation with the testing parameters. Then::
+This creates the *h5output* argument using the testing mask and running on the testNumEventsTo run the usual calculation with the testing parameters. One could run this in on the batch system. Then::
 
-  parCorAnaDriver -c myconfig.py -n 100 --test_alt
+  parCorAnaDriver -c myconfig.py --test_alt
 
 to run the alternative calculation. Note that the alternative calculation is *not* run in MPI. 
 
-Finally, one does::
+Finally, there is a tool to compare the results. Currently, this tool requires a later version of the psana_test
+package then is in the release. First do::
 
-  parCorAnaDriver -c myconfig.py -n 100 --cmp
+  addpkg psana_test V00-08-29
+  scons
+
+Then one can compare the two h5 files with the command::
+
+  parCorAnaDriver -c myconfig.py --cmp
 
 which compares the two h5output files defined in the config file. This runs a separate tool - 
 cmpParCorAnaH5OutputPy which is part of the ParCorAna package.
