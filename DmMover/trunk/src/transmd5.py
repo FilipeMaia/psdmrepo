@@ -38,7 +38,7 @@ def read_bbcp_checksum(lfn, anapath=True,chkext='md5'):
     return  chk_value, chk_type, size
 
 
-def comp_bbcp_checksum(lfn, quiet=False, pfn_prefix=None):
+def comp_bbcp_checksum(lfn, verbose=False, pfn_prefix=None):
     """ Comapre checksums for the ffb and ana file copy using 
     the md5 files that were created by the transfers.  
     
@@ -64,8 +64,8 @@ def comp_bbcp_checksum(lfn, quiet=False, pfn_prefix=None):
 
     st_size = (ana_size == ffb_size) and ana_size >= 0
     st = ana_chksum == ffb_chksum
-    if not quiet:
-        print "stat (cksum, size, disk) %s, %s, %s(%s)  %s %s, %s %s %s" % (
+    if verbose:
+        print "status: cksum={} size={} disk={} calcMd5={} Values: {} {}, {} {} {}".format(
             ana_chksum == ffb_chksum, st_size, disk_comp, pfn_prefix != None,
             ana_chksum, ffb_chksum, ana_size, ffb_size, lfn)
         

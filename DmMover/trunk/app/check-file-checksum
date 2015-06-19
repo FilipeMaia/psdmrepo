@@ -30,7 +30,7 @@ def main():
 
     parser = argparse.ArgumentParser(description=usage, epilog=epilog)
     
-    parser.add_argument("--quiet", action="store_true", help="Quiet, only print final stats")
+    parser.add_argument("-v","--verbose", action="store_true", default=False, help="Verbose printouts")
     parser.add_argument("--disk", action="store_true", 
                         help="checksum the files from the cmdline and compare")
     parser.add_argument("fnames", nargs='+', help="xtc file names either on ffb or ana")
@@ -51,7 +51,7 @@ def main():
         prefix = os.path.join("/", *ptoken[:3]) if args.disk else None
         # lfn: /<instr>/<exp>/xtc/... 
         lfn = os.path.join("/", *ptoken[3:])
-        stat = comp_bbcp_checksum(lfn, args.quiet, pfn_prefix=prefix)
+        stat = comp_bbcp_checksum(lfn, args.verbose, pfn_prefix=prefix)
         if stat:
             n_good += 1
         else:
