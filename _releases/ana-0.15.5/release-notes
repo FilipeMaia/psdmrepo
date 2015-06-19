@@ -1,0 +1,18 @@
+Algorithms:
+- Detector: minor fixes in Python documentation
+
+Tools:
+- LogBook: LogBookGrabber_qt - is added to this package, add features
+  requested by users (PSAS-70)
+
+Bug fixes:
+- psana: in PSXtcInput fix leak of file descriptors when many DataSource's
+  were created in index mode.
+- xtcav: Fix phase calculation which could cause a crash in
+  some events.
+
+External packages:
+- matplotlib: upgraded to version 1.4.3 (PSRT-59)
+- tables: upgraded to version 3.2.0  (PSRT-59)
+- freetype: included version 2.4.0 into the release due to version
+  incompatibility problems with RHEL5 ( (PSRT-59)
