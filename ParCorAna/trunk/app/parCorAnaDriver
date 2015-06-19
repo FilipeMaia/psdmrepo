@@ -50,10 +50,14 @@ def setCommandLineOverrideArguments(args, system_params):
         system_params['verbosity'] = args.verbosity
     
     for arg, dictkey, argtype in zip([args.numevents, args.h5output, args.dataset, args.numServers], \
-                                     ['numEvents','h5output', 'maskFile', 'dataset', 'numServers'], \
+                                     ['numEvents','   h5output',     'dataset',    'numServers'], \
                                      [int,int,str,str,str, int]):
         if arg is not None:
             system_params[dictkey]=argtype(arg)
+            if MPI.COMM_WORLD.rank==0:
+                sys.stdout.write("Override config file parameter %s with value %s\n" % \
+                                 (dictkey, arg))
+                sys.stdout.flush()
 
     if args.overwrite:
         system_params['overwrite'] = True
@@ -132,10 +136,10 @@ if __name__ == '__main__':
     else:
         # synchronize everything before launching
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 before MI_Barrier preceding mainRoutine\n")
+            sys.stdout.write("parCorAnaDriver rank=0 before MPI_Barrier preceding mainRoutine\n")
             sys.stdout.flush()
         MPI.COMM_WORLD.Barrier()
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 after MI_Barrier, calling mainRoutine\n")
+            sys.stdout.write("parCorAnaDriver rank=0 after MPI_Barrier, calling mainRoutine\n")
             sys.stdout.flush()
         sys.exit(mainRoutine(system_params=system_params, user_params=user_params, test_alt=args.test_alt))

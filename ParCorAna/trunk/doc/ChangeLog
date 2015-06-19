@@ -11,8 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-NextTag:
+Tag: V00-00-08:
 - add MPI_Barrier with output to driver to check for MPI problems 
+- make %C increase in h5 output file if there is a .inprogress file
+- fix bug with overriding numServers through command line
+- improve documentation
 	
 Tag: V00-00-07
 - fix bugs with handling stream in dataset, need to specify streams for 

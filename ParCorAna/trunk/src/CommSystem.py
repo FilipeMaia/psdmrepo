@@ -743,7 +743,11 @@ class RunWorker(object):
 
     def run(self):
         lastTime = {'sec':0, 'nsec':0, 'fiducials':0, 'counter':0}
+        numEvents = 0
         while True:
+            numEvents += 1
+            if numEvents % 1201 == 1200:
+                pass
             self.logger.debug("CommSystem.run: before Bcast from master")
             if self.wrapped:
                 self.workerWaitForMasterBcastWrapped()

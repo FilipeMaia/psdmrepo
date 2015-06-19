@@ -13,6 +13,8 @@ def formatFileName(fname):
 
      %T  -> yyyymmddhhmmss (year, month, day, hour, minute, second)
      %C  -> look at files on disk - use next one up counter
+
+    ignore .inprogress when adding counters
     '''
     splitT = fname.split('%T')
     assert len(splitT)<=2, "Doesn't make sense to have more than one %%T in fname: %s" % fname
@@ -25,7 +27,9 @@ def formatFileName(fname):
     if len(splitC)<2: return fname
     beforeC,afterC = splitC
     globmatch = fname.replace('%C','*')
-    globfiles = glob.glob(globmatch)
+    globfilesA = glob.glob(globmatch)
+    globfilesB = glob.glob(globmatch+'.inprogress')
+    globfiles = globfilesA = [fname[0:-11] for fname in globfilesB]
     curCounters = []
     for globfname in globfiles:
         counterMatch = globfname[len(beforeC):-len(afterC)]
