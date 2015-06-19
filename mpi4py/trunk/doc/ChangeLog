@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2015-06-19 Igor Gaponenko
+- changed to version 1.3.1c built against openmpi 1.8.6
+
 Tag: V00-00-04
 2014-12-12 Igor Gaponenko
 - changed to version 1.3.1b built against openmpi 1.8.1a w/o multiple threading support
