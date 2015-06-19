@@ -61,7 +61,7 @@ from poster.streaminghttp import register_openers
 # Local non-exported definitions --
 #----------------------------------
 
-default_ws_base_url       = 'https://pswww/pcdsn/ws-auth'  # this may change, so it's better not to rely on this at all
+default_ws_base_url       = 'https://pswww.slac.stanford.edu/pcdsn/ws-auth'  # this may change, so it's better not to rely on this at all
 default_ws_login_user     = pwd.getpwuid(os.geteuid())[0]  # assume current logged user
 default_ws_login_password = ''
 
