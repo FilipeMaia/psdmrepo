@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09:
+- fix bug with overriding system_parms via command line arguments
+- improve error/diagnostic messages
+	
 Tag: V00-00-08:
 - add MPI_Barrier with output to driver to check for MPI problems 
 - make %C increase in h5 output file if there is a .inprogress file

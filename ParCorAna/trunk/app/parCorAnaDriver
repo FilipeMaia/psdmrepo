@@ -8,6 +8,7 @@ import logging
 import numpy as np
 import psana_test.psanaTestLib as ptl
 import ParCorAna as pca
+import time
 
 programDescription = '''
 parallel detector correletation analysis.
@@ -50,10 +51,15 @@ def setCommandLineOverrideArguments(args, system_params):
         system_params['verbosity'] = args.verbosity
     
     for arg, dictkey, argtype in zip([args.numevents, args.h5output, args.dataset, args.numServers], \
-                                     ['numEvents','   h5output',     'dataset',    'numServers'], \
-                                     [int,int,str,str,str, int]):
+                                     ['numEvents',    'h5output',    'dataset',    'numServers'], \
+                                     [int,            str,           str,           int]):
         if arg is not None:
-            system_params[dictkey]=argtype(arg)
+            try:
+                system_params[dictkey]=argtype(arg)
+            except:
+                if MPI.COMM_WORLD.rank==0:
+                    sys.stderr.write("ERROR: tried to set system_params key='%s' to value='%s' as type %s but failed\n" % (dictkey, arg, argtype))
+                raise
             if MPI.COMM_WORLD.rank==0:
                 sys.stdout.write("Override config file parameter %s with value %s\n" % \
                                  (dictkey, arg))
@@ -136,10 +142,12 @@ if __name__ == '__main__':
     else:
         # synchronize everything before launching
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 before MPI_Barrier preceding mainRoutine\n")
+            t0 = time.time()
+            sys.stdout.write("parCorAnaDriver rank=0 before first Collective MPI call (MPI_Barrier). If no output follows, there is a problem with the cluster.\n")
             sys.stdout.flush()
         MPI.COMM_WORLD.Barrier()
         if MPI.COMM_WORLD.rank == 0:
-            sys.stdout.write("parCorAnaDriver rank=0 after MPI_Barrier, calling mainRoutine\n")
+            dt = time.time()-t0
+            sys.stdout.write("parCorAnaDriver rank=0 after first collective MPI call. Elapsed time: %.2f sec\n" % dt)
             sys.stdout.flush()
         sys.exit(mainRoutine(system_params=system_params, user_params=user_params, test_alt=args.test_alt))
