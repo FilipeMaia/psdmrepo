@@ -317,7 +317,7 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
     assert psanaType in type2params, "makePsanaOptions does not know what modules to use for type: %s" % psanaType
     ndarrProducer = type2params[psanaType]['NDArrProducer']
 
-    dim2array = dict([(dim,eval('psana.ndarray_float64_%d'%dim)) for dim in range(1,7)])
+    dim2array = dict([(dim,eval('psana.ndarray_float32_%d'%dim)) for dim in range(1,7)])
     outArrDims = type2params[psanaType]['outArrDims']
     assert outArrDims in dim2array, "internal error: no array type defined for dim=%s" % outArrDims
     outArrayType = dim2array[outArrDims]
@@ -334,7 +334,7 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
     psanaOptions[ndarrProducer+'.key_out'] = ndarrayOutKey
 
     # specify output type for ndarray producer
-    psanaOptions[ndarrProducer+'.outtype']='double'
+    psanaOptions[ndarrProducer+'.outtype']='float'
 
     # specify fullsize for ndarray producers that go as data (for consistency, user can mask out pixels)
     psanaOptions[ndarrProducer+'.is_fullsize']= 'True'
@@ -350,6 +350,7 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
         psanaOptions['ImgAlgos.NDArrCalib.source'] = srcString
         psanaOptions['ImgAlgos.NDArrCalib.key_in'] = ndarrayOutKey
         psanaOptions['ImgAlgos.NDArrCalib.key_out'] = ndarrayCalibOutKey
+        psanaOptions['ImgAlgos.NDArrCalib.outtype'] = 'float'
 
         # specify calibrations to do
         psanaOptions['ImgAlgos.NDArrCalib.do_peds'] = True    #  pedestals subtracted if available in calib store
@@ -374,6 +375,7 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
         psanaOptions['ImgAlgos.NDArrImageProducer.source'] = srcString
         psanaOptions['ImgAlgos.NDArrImageProducer.key_in'] = imageInputKey
         psanaOptions['ImgAlgos.NDArrImageProducer.key_out'] = imageOutKey
+        psanaOptions['ImgAlgos.NDArrImageProducer.type_out'] = 'float'
         outArrayType = dim2array[2]
 
     return psanaOptions, outArrayType

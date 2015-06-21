@@ -163,21 +163,21 @@ class XCorrBase(object):
         return EventIter(self.dataSourceString,
                          self.mp.rank,
                          self.mp.serverRanks,
-                         self,
+                         self.userObj,
                          self.system_params,
                          self.mp.maskNdarrayCoords.shape,
                          self.mp.logger,
                          self.numEvents)
 
-    def serverWorkersScatter(self, serverFullDataArray = None, serverWorldRank = None):
+    def serverWorkersScatter(self, detectorData1Darray = None, serverWorldRank = None):
         '''called from both server and worker ranks for the scattering of the data.
 
         When called from the server, args are
-        serverFullDataArray - darray of float32
+        detectorData1Darray - ndarray of float32, 1D, already masked out
         serverWorldRank     - must be None.
 
         When called from the worker, args are
-        serverFullDataArray  - None
+        detectorData1Darray  - None
         serverWorldRank      - the server rank, as received from the master in EVT message
         '''
         if serverWorldRank is None:
@@ -190,17 +190,14 @@ class XCorrBase(object):
         serverRankInComm = serverWorkersDict['serverRankInComm']
         workerRanksInCommDict = serverWorkersDict['workerRanksInCommDict']
         if self.mp.isServer:
-            if self.logger.isEnabledFor(logging.DEBUG):
-                assert serverFullDataArray is not None, "XCorrBase server expected data but got None"
-                assert serverFullDataArray.dtype == self.detectorData1Darray.dtype, "XCorrBase server data dtype != expected dtype"
-                assert serverFullDataArray.dtype == np.float32, "data array must be float32 to correspond to MPI.FLOAT"
-                assert len(self.detectorData1Darray) == sum(counts), "counts for scatter is wrong"
-                assert counts[serverRankInComm] == 0, "server count for scatter is not zero"
-                self.logger.debug('XCorrBase.serverWorkersScatter: server is sending data with first elem=%r' % serverFullDataArray[self.mp.maskNdarrayCoords].flatten()[0])
+#            if self.logger.isEnabledFor(logging.DEBUG):
+            assert detectorData1Darray is not None, "XCorrBase server expected data but got None"
+            assert detectorData1Darray.dtype == np.float32, "XCorrBase server data dtype != expected dtype"
+            assert len(detectorData1Darray) == sum(counts), "counts for scatter is wrong"
+            assert counts[serverRankInComm] == 0, "server count for scatter is not zero"
+            self.logger.debug('XCorrBase.serverWorkersScatter: server is sending data with first elem=%r' % detectorData1Darray[0])
                 
-            self.detectorData1Darray[:] = serverFullDataArray[self.mp.maskNdarrayCoords]
-#            self.detectorData1Darray[:] = serverFullDataArray.reshape(32*185*388) #[self.mp.maskNdarrayCoords]
-            sendBuffer = self.detectorData1Darray
+            sendBuffer = detectorData1Darray
             recvBuffer = self.serverScatterReceiveBuffer
         elif self.mp.isWorker:
             sendBuffer = None
@@ -228,6 +225,11 @@ class XCorrBase(object):
         self.detectorData1Darray = np.empty(self.mp.totalElements, np.float32)
         self.serverScatterReceiveBuffer = np.zeros(0,dtype=np.float32)
         self.userObj.serverInit()
+
+    def copyOurMaskedDataForScatter(self, dataArray):
+        '''expects ndarray of float32
+        '''
+        self.detectorData1Darray[:] = dataArray[self.mp.maskNdarrayCoords]
 
     def initDelayAndGather(self):
         gatherOneNDArrayCounts = [self.mp.workerWorldRankToCount[rank] for rank in self.mp.workerRanks]

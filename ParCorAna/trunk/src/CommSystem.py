@@ -382,8 +382,9 @@ class RunServer(object):
         masterRank: rank of master
         logger:     Python logging logger
     '''
-    def __init__(self,dataIter, comm, rank, masterRank, logger):
+    def __init__(self, dataIter, xCorrBase, comm, rank, masterRank, logger):
         self.dataIter = dataIter
+        self.xCorrBase = xCorrBase
         self.comm = comm
         self.rank = rank
         self.masterRank = masterRank
@@ -408,9 +409,9 @@ class RunServer(object):
         abortFromMaster = False
 
         dataGen = self.dataIter.dataGenerator()
-
         t0 = None
         for datum in dataGen:
+            self.xCorrBase.copyOurMaskedDataForScatter(datum.dataArray)
             self.recordTimeToGetData(startTime=t0, endTime=time.time())
             sec, nsec, fiducials = datum.eventId()
             sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
@@ -428,7 +429,8 @@ class RunServer(object):
                            source=self.masterRank)
             if receiveOkForWorkersBuffer.isSendToWorkers():
                 self.logger.debug("CommSystem.run: After Recv. is Send to workers")
-                self.dataIter.sendToWorkers(datum)
+                self.xCorrBase.serverWorkersScatter(detectorData1Darray=self.xCorrBase.detectorData1Darray, 
+                                                    serverWorldRank=None)
 
             elif receiveOkForWorkersBuffer.isAbort():
                 self.logger.debug("CommSystem.run: After Recv. Abort")
@@ -717,12 +719,12 @@ class RunWorker(object):
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
     def serverWorkersScatterWrapped(self, serverWorldRank):
-        self.xCorrBase.serverWorkersScatter(serverFullDataArray=None,
+        self.xCorrBase.serverWorkersScatter(detectorData1Darray=None,
                                      serverWorldRank = serverWorldRank)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
     def serverWorkersScatterNotWrapped(self, serverWorldRank):
-        self.xCorrBase.serverWorkersScatter(serverFullDataArray=None,
+        self.xCorrBase.serverWorkersScatter(detectorData1Darray=None,
                                      serverWorldRank = serverWorldRank)
 
     @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
@@ -882,8 +884,8 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
         if mp.isServer:            
             xCorrBase.serverInit()
             eventIter = xCorrBase.makeEventIter()
-            runServer = RunServer(eventIter, 
-                                  mp.comm, mp.rank, mp.masterRank, logger)
+            runServer = RunServer(eventIter, xCorrBase,
+                                  mp.comm, mp.rank, mp.masterRank, xCorrBase.logger)
             runServer.run()
             reportTiming = True
             timingNode = 'SERVER'

@@ -12,9 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-10:
-- change from float64 to float32 to speed up scatter and gather
-  Introduces change in UserG2 code for users	
+- optimizations to get to real time with full cspad Jira PSAS-162:
+-- change from float64 to float32 to speed up scatter and gather
+-- specify 'float' type for psana NDArray modules
+-- move server copy of masked pixels so it doesn't block workers
+- This introduces change in UserG2 code for users	
 - fix bug with formatFileName and %C
+- start to undo circular inclusions of ParCorAna in src files
 	
 Tag: V00-00-09:
 - fix bug with overriding system_parms via command line arguments

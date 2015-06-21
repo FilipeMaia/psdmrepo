@@ -2,7 +2,7 @@ import psana
 import numpy as np
 from pprint import pprint
 import StringIO
-import ParCorAna.PsanaUtil as PsanaUtil
+import PsanaUtil
 
 class EventData(object):
     '''Object returned by EventIter. 
@@ -57,7 +57,7 @@ class EventIter(object):
           # wortk with datum.sec, nsec and dataArray
     '''
     def __init__(self,dataSourceString, rank, servers, 
-                 xCorrBaseObj, system_params, ndarrayShape, logger, numEvents=None):
+                 userObj, system_params, ndarrayShape, logger, numEvents=None):
 
         if numEvents is None:
             numEvents = 0
@@ -69,8 +69,7 @@ class EventIter(object):
         self.system_params = system_params
         self.ndarrayShape = ndarrayShape
         self.logger = logger
-        self.xCorrBaseObj = xCorrBaseObj
-        self.userObj = xCorrBaseObj.userObj
+        self.userObj = userObj
 
         psanaOptions = system_params['psanaOptions']
         psana.setOptions(psanaOptions)
@@ -139,12 +138,9 @@ class EventIter(object):
              (dataArray.shape, self.ndarrayShape))
 
         dataArray = self.userObj.serverFinalDataArray(dataArray, evt)
-        if dataArray is not None:
+        if dataArray is not None and dataArray.dtype != np.float32:
             dataArray = dataArray.astype(np.float32)
         return dataArray # may be None, or modified copy
-
-    def sendToWorkers(self, datum):
-        self.xCorrBaseObj.serverWorkersScatter(serverFullDataArray = datum.dataArray)
 
     def abortFromMaster(self):
         pass

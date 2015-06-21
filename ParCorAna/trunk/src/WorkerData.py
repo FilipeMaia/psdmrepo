@@ -1,5 +1,5 @@
 import numpy as np
-import ParCorAna as pca
+import Exceptions
 
 class WorkerData(object):
     '''provide access to worker data.
@@ -107,7 +107,7 @@ class WorkerData(object):
         indexInsideView = (tmIndex >= self._timeStartIdx) and (tmIndex < self._timeAfterEndIdx)
         if indexInsideView:
             if currentFilledTimesView[tmIndex] == tm:
-                raise pca.WorkerDataDuplicateTime(tm)
+                raise Exceptions.WorkerDataDuplicateTime(tm)
         return tmIndex
 
     def _nextXPosition(self, tm):
@@ -120,7 +120,7 @@ class WorkerData(object):
         if self.wrappedX:
             earliestTime, earliestXidx = self._timesXInds[self._timeStartIdx, :]
             if tm <= earliestTime:
-                raise pca.WorkerDataNextTimeIsEarliest(tm)
+                raise Exceptions.WorkerDataNextTimeIsEarliest(tm)
             return earliestXidx
         else:
             xIndForNewData = self._nextXIdx
@@ -146,7 +146,7 @@ class WorkerData(object):
 
         try:
             timeIndForNewData = self._nextTimePosition(tm)
-        except pca.WorkerDataDuplicateTime:
+        except Exceptions.WorkerDataDuplicateTime:
             if self.isFirstWorker:
                 self.logger.warning("addData: duplicated time=%d, skipping" % tm)
                 self.numDupTimes += 1
@@ -162,7 +162,7 @@ class WorkerData(object):
 
         try:
             xIndForNewData = self._nextXPosition(tm)
-        except pca.WorkerDataNextTimeIsEarliest:
+        except Exceptions.WorkerDataNextTimeIsEarliest:
             self.logger.error("WorkerData.AddData: unexpected, already checking for earliest time in filled case, tm=%d, skipping" % tm)
             return
             
