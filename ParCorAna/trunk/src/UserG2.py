@@ -99,11 +99,11 @@ class G2Common(object):
 
         ## define the output arrays returned by this worker
         # G2 = sum I_i * I_j 
-        self.G2 = np.zeros((self.numDelays, self.numElementsWorker), np.float)
+        self.G2 = np.zeros((self.numDelays, self.numElementsWorker), np.float32)
         # IP = sum I_i
-        self.IP = np.zeros((self.numDelays, self.numElementsWorker), np.float)
+        self.IP = np.zeros((self.numDelays, self.numElementsWorker), np.float32)
         # IF = sum I_j
-        self.IF = np.zeros((self.numDelays, self.numElementsWorker), np.float)
+        self.IF = np.zeros((self.numDelays, self.numElementsWorker), np.float32)
         # set to 1 when a element arrives that is saturated
         self.saturatedElements = np.zeros(self.numElementsWorker, np.int8)
         # counts, how many pairs of times for each delays
@@ -175,7 +175,7 @@ class G2Common(object):
         
           namedArrays - a dictionary, keys are the names returned in fwArrayNames, 
                         i.e, 'G2', 'IF', 'IP'. Values are all numpy arrays of shape
-                        (D x numElementsWorker) dtype=np.float64
+                        (D x numElementsWorker) dtype=np.float32
         
           counts - a 1D array of np.int64, length=numElementsWorker
         
@@ -252,7 +252,7 @@ class G2Common(object):
         for nm,delay2masked in zip(['G2','IF','IP'],[G2,IF,IP]):
             name2delay2ndarray[nm] = {}
             for delay,masked in delay2masked.iteritems():
-                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float64)
+                name2delay2ndarray[nm][delay]=np.zeros(self.maskNdarrayCoords.shape, np.float32)
                 name2delay2ndarray[nm][delay][self.maskNdarrayCoords] = masked[:]
             
         saturatedElements = np.zeros(self.maskNdarrayCoords.shape, np.int8)
@@ -339,7 +339,7 @@ class G2Common(object):
         delayCurves = {}
         for color in self.colors:
             if self.color2numElements[color] > 0:
-                delayCurves[color] = np.zeros(len(counts), np.float)
+                delayCurves[color] = np.zeros(len(counts), np.float32)
         
         ndarrayShape = self.color_ndarrayCoords.shape
         saturated_ndarrayCoords = int8ndarray
@@ -361,16 +361,16 @@ class G2Common(object):
             assert IP.shape == ndarrayShape, "UserG2.viewerPublish: IP.shape=%s != expected=%s" % \
                 (IP.shape, ndarrayShape)
             
-            G2 /= float(delayCount)
-            IF /= float(delayCount)
-            IP /= float(delayCount)
+            G2 /= np.float32(delayCount)
+            IF /= np.float32(delayCount)
+            IP /= np.float32(delayCount)
 
             final = G2 / (IP * IF)
 
             for color, colorNdarrayInd in self.color2ndarrayInd.iteritems():
                 numElementsThisColor = self.color2numElements[color]
                 if numElementsThisColor>0:
-                    average = np.sum(final[colorNdarrayInd]) / float(numElementsThisColor)
+                    average = np.sum(final[colorNdarrayInd]) / np.float32(numElementsThisColor)
                     delayCurves[color][delayIdx] = average
 
         counter120hz = lastEventTime['counter']

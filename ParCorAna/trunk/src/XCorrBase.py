@@ -173,7 +173,7 @@ class XCorrBase(object):
         '''called from both server and worker ranks for the scattering of the data.
 
         When called from the server, args are
-        serverFullDataArray - ndarray of float64
+        serverFullDataArray - darray of float32
         serverWorldRank     - must be None.
 
         When called from the worker, args are
@@ -193,12 +193,13 @@ class XCorrBase(object):
             if self.logger.isEnabledFor(logging.DEBUG):
                 assert serverFullDataArray is not None, "XCorrBase server expected data but got None"
                 assert serverFullDataArray.dtype == self.detectorData1Darray.dtype, "XCorrBase server data dtype != expected dtype"
-                assert serverFullDataArray.dtype == np.float64, "data array must be float64 to correspond to MPI.DOUBLE"
+                assert serverFullDataArray.dtype == np.float32, "data array must be float32 to correspond to MPI.FLOAT"
                 assert len(self.detectorData1Darray) == sum(counts), "counts for scatter is wrong"
                 assert counts[serverRankInComm] == 0, "server count for scatter is not zero"
                 self.logger.debug('XCorrBase.serverWorkersScatter: server is sending data with first elem=%r' % serverFullDataArray[self.mp.maskNdarrayCoords].flatten()[0])
-
+                
             self.detectorData1Darray[:] = serverFullDataArray[self.mp.maskNdarrayCoords]
+#            self.detectorData1Darray[:] = serverFullDataArray.reshape(32*185*388) #[self.mp.maskNdarrayCoords]
             sendBuffer = self.detectorData1Darray
             recvBuffer = self.serverScatterReceiveBuffer
         elif self.mp.isWorker:
@@ -212,7 +213,7 @@ class XCorrBase(object):
         comm.Scatterv([sendBuffer,
                        counts,
                        offsets,
-                       MPI.DOUBLE],
+                       MPI.FLOAT],
                       recvBuffer,
                       root = serverRankInComm)
         comm.Barrier()
@@ -224,8 +225,8 @@ class XCorrBase(object):
 
 
     def serverInit(self):
-        self.detectorData1Darray = np.empty(self.mp.totalElements, np.float)
-        self.serverScatterReceiveBuffer = np.zeros(0,dtype=np.float)
+        self.detectorData1Darray = np.empty(self.mp.totalElements, np.float32)
+        self.serverScatterReceiveBuffer = np.zeros(0,dtype=np.float32)
         self.userObj.serverInit()
 
     def initDelayAndGather(self):
@@ -249,7 +250,7 @@ class XCorrBase(object):
         worldRank = self.mp.rank
         scatterCount = self.mp.workerWorldRankToCount[worldRank]
         thisWorkerStartElement = self.mp.workerWorldRankToOffset[worldRank]
-        self.workerScatterReceiveBuffer = np.zeros(scatterCount,dtype=np.float)
+        self.workerScatterReceiveBuffer = np.zeros(scatterCount,dtype=np.float32)
         self.initDelayAndGather()
         self.userObj.workerInit(scatterCount)
         self.elementsThisWorker = scatterCount
@@ -263,7 +264,7 @@ class XCorrBase(object):
     def viewerInit(self):
         self.initDelayAndGather()
 
-        self.gatheredFlatNDArrays = dict((name,np.zeros(self.numDelays*self.totalMaskedElements, np.float)) \
+        self.gatheredFlatNDArrays = dict((name,np.zeros(self.numDelays*self.totalMaskedElements, np.float32)) \
                                          for name in self.arrayNames)
 
         gatheredMsgParts =['gathered_%s.shape=%s' % (nm, self.gatheredFlatNDArrays[nm].shape) \
@@ -326,6 +327,7 @@ class XCorrBase(object):
         for nm, array in name2array.iteritems():
             assert array.shape == (self.numDelays, self.elementsThisWorker,), "user workerCalc array %s has wrong shape. shape is %s != %s" % \
                                  (nm, array.shape, (self.elementsThisWorker,))
+            assert array.dtype == np.float32, "workerCalc array=%s does not have type np.float32, it is %r" % array.dtype
         assert counts.dtype == np.int64, "user workerCalc counts array does not have dtype=np.int64"
         assert counts.shape == (self.numDelays,), "user workerCalc counts array shape=%s != (%d,)" % \
             (counts.shape, (self.numDelays,))
@@ -376,17 +378,17 @@ class XCorrBase(object):
         if self.isViewerOrFirstWorker: 
             self.logger.debug('XCorrBase.viewerWorkersUpdate: before Gatherv between workers and viewer of results. counter=%r' % counter)
         if self.mp.isViewer:
-            sendBuffer = np.zeros(0,np.float)
+            sendBuffer = np.zeros(0,np.float32)
             for nm in self.arrayNames:
                 gatherArray = self.gatheredFlatNDArrays[nm]
                 receiveBuffer = gatherArray
                 self.logger.debug('XCorrBase.viewerWorkersUpdate: before Gatherv for %s. sendbuf.shape=%r sendbuf.dtype=%r recvbuf.shape=%r recvbuf.dtype=%r gatherAllDelayCounts=%r gatherAllDelayOffsets=%r' % \
                                   (nm, sendBuffer.shape, sendBuffer.dtype, receiveBuffer.shape, receiveBuffer.dtype, self.gatherAllDelayCounts, self.gatherAllDelayOffsets))
-                self.mp.viewerWorkersComm.Gatherv(sendbuf=[sendBuffer, MPI.DOUBLE],
+                self.mp.viewerWorkersComm.Gatherv(sendbuf=[sendBuffer, MPI.FLOAT],
                                                   recvbuf=[receiveBuffer,
                                                            (self.gatherAllDelayCounts,
                                                             self.gatherAllDelayOffsets),
-                                                           MPI.DOUBLE],
+                                                           MPI.FLOAT],
                                                   root = self.mp.viewerRankInViewerWorkersComm)
                 self.mp.viewerWorkersComm.Barrier()
                 self.logger.debug('XCorrBase.viewerWorkersUpdate: after Gatherv and Barrier for %s' % nm)
@@ -404,15 +406,15 @@ class XCorrBase(object):
             self.logger.debug('XCorrBase.viewerWorkersUpdate: after Gatherv and Barrier for gatheredInt8array')
 
         elif self.mp.isWorker:
-            receiveBuffer = np.zeros(0,np.float)
+            receiveBuffer = np.zeros(0,np.float32)
             for nm in self.arrayNames:
                 gatherArray = name2array[nm]
                 sendBuffer = gatherArray
                 self.mp.logDebug('before Gatherv for %s. sendbuf.shape=%r sendbuf.dtype=%r recvbuf.shape=%r recvbuf.dtype=%r' % \
                                  (nm, sendBuffer.shape, sendBuffer.dtype, receiveBuffer.shape, receiveBuffer.dtype))
-                self.mp.viewerWorkersComm.Gatherv(sendbuf=[sendBuffer,MPI.DOUBLE],
+                self.mp.viewerWorkersComm.Gatherv(sendbuf=[sendBuffer,MPI.FLOAT],
                                                   recvbuf=[receiveBuffer, 
-                                                           MPI.DOUBLE],
+                                                           MPI.FLOAT],
                                                   root = self.mp.viewerRankInViewerWorkersComm)
                 self.mp.viewerWorkersComm.Barrier()
                 if self.mp.isFirstWorker: self.logger.debug('XCorrBase.viewerWorkersUpdate: after Gatherv for %s and Barrier' % nm)
@@ -460,8 +462,8 @@ class XCorrBase(object):
         for delayIdx, delay in enumerate(self.delays):
             # for each delay, fill out these flattened arrays of the masked elements
             for nm in self.arrayNames:
-                name2delay2ndarray[nm][delay] = np.zeros(ndarrayShape, np.float)
-                flatMaskedFromAllWorkers = np.zeros(self.totalMaskedElements, np.float)
+                name2delay2ndarray[nm][delay] = np.zeros(ndarrayShape, np.float32)
+                flatMaskedFromAllWorkers = np.zeros(self.totalMaskedElements, np.float32)
 
                 for workerIdx, workerRank in enumerate(self.mp.workerRanks):
                     workerCount = self.mp.workerWorldRankToCount[workerRank]

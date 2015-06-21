@@ -14,7 +14,7 @@ class WorkerData(object):
     INVALID_INDEX = -1
 
     def __init__(self, logger, isFirstWorker, numTimes, numDataPointsThisWorker, 
-                 storeDtype=np.float64, addRemoveCallbackObject=None):
+                 storeDtype=np.float32, addRemoveCallbackObject=None):
         self.numTimes = numTimes
         self.isFirstWorker = isFirstWorker
 

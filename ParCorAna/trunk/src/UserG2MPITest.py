@@ -85,11 +85,11 @@ class G2MPITest(object):
 
         ## define the output arrays returned by this worker
         # G2 = sum I_i * I_j 
-        self.G2 = np.ones((self.numDelays, self.numElementsWorker), np.float)
+        self.G2 = np.ones((self.numDelays, self.numElementsWorker), np.float32)
         # IP = sum I_i
-        self.IP = np.ones((self.numDelays, self.numElementsWorker), np.float)
+        self.IP = np.ones((self.numDelays, self.numElementsWorker), np.float32)
         # IF = sum I_j
-        self.IF = np.ones((self.numDelays, self.numElementsWorker), np.float)
+        self.IF = np.ones((self.numDelays, self.numElementsWorker), np.float32)
         # set to 1 when a element arrives that is saturated
         self.saturatedElements = np.zeros(self.numElementsWorker, np.int8)
         # counts, how many pairs of times for each delays

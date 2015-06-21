@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10:
+- change from float64 to float32 to speed up scatter and gather
+  Introduces change in UserG2 code for users	
+- fix bug with formatFileName and %C
+	
 Tag: V00-00-09:
 - fix bug with overriding system_parms via command line arguments
 - improve error/diagnostic messages

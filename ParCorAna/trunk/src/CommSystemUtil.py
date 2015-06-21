@@ -29,7 +29,7 @@ def formatFileName(fname):
     globmatch = fname.replace('%C','*')
     globfilesA = glob.glob(globmatch)
     globfilesB = glob.glob(globmatch+'.inprogress')
-    globfiles = globfilesA = [fname[0:-11] for fname in globfilesB]
+    globfiles = globfilesA + [fname[0:-11] for fname in globfilesB]
     curCounters = []
     for globfname in globfiles:
         counterMatch = globfname[len(beforeC):-len(afterC)]

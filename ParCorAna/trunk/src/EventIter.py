@@ -139,6 +139,8 @@ class EventIter(object):
              (dataArray.shape, self.ndarrayShape))
 
         dataArray = self.userObj.serverFinalDataArray(dataArray, evt)
+        if dataArray is not None:
+            dataArray = dataArray.astype(np.float32)
         return dataArray # may be None, or modified copy
 
     def sendToWorkers(self, datum):
