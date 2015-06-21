@@ -193,7 +193,7 @@ class MPI_Communicators:
             (" mask contains %d distinct values" % len(maskValues))
         assert 1 in maskValues, "The mask does not have the value 1, it is all 0. Elements marked with 1 are processed"
         self.totalElements = np.sum(mask_flat)
-        self.maskNdarrayCoords = maskNdarrayCoords == 1
+        self.maskNdarrayCoords = maskNdarrayCoords == 1 # is is important to convert mask to array of bool, np.bool
 
         if self.logger.isEnabledFor(logging.DEBUG):
             self.logDebug("MPIParams.setMask: loaded and stored mask with shape=%s elements included=%d excluded=%s" % \

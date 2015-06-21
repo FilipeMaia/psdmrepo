@@ -135,9 +135,11 @@ class WorkerData(object):
             if self.wrappedX or self._nextXIdx == self.X.shape[0]:
                 return True
             return False
+
         if filled(self) and tm <= self.minTimeForStoredData():
             if self.isFirstWorker:
-                self.logger.warning("filled X and received time=%d <= first time=%d, skipping" % (tm, self.minTimeForStoredData()))
+                self.logger.warning("filled X and received time=%d <= first time=%d, skipping" % \
+                                    (tm, self.minTimeForStoredData()))
             return
 
         self._growTimesIfNeeded()
@@ -151,7 +153,7 @@ class WorkerData(object):
                 return
         if timeIndForNewData < self._timeAfterEndIdx:
             self.numOutOfOrder += 1
-            if timeIndForNewData == self._timeStartIdx and self.wrappedX:
+            if timeIndForNewData == self._timeStartIdx and self.wrappedX and self.isFirstWorker:
                 self.logger.warning("addData: X has already been filled but new data with tm=%d is earlier then all stored data. Dropping data." % timeIndForNewData)
                 return
             # we are committed to storing this data.

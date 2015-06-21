@@ -78,6 +78,7 @@ def divideAmongWorkers(dataLength, numWorkers):
       returns offsets=[0,4,8]
               counts=[4,4,3]    
     '''
+    assert numWorkers > 0, "dividAmongWorkers - numWorkers is <= 0"
     k = int(math.floor(dataLength / numWorkers))
     r = dataLength % numWorkers
     offsets=[]
