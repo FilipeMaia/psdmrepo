@@ -217,6 +217,7 @@ user_params = {}
 # partition the elements. That is all elements with '1' form one delay curve, likewise all elements that are '2'
 # form another delay curve.
 user_params['colorNdarrayCoords'] =  "see tutorial for documentation on this parameter"
+user_params['colorFineNdarrayCoords'] =  "see tutorial for documentation on this parameter"
 user_params['saturatedValue'] = (1<<15)
 user_params['LLD'] = 1E-9
 user_params['notzero'] = 1E-5

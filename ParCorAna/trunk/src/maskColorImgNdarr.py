@@ -30,29 +30,29 @@ def arrIndexListsToPoints(indexLists):
         points.append(thisPoint)
     return points
 
-def makeColorArray(array, numColors):
+def makeColorArray(array, numColor):
     '''An example of making a color array based on intensity of values. 
-    That is, if numColors=5, the bottom 20% of array will get 1, and the top
+    That is, if numColor=5, the bottom 20% of array will get 1, and the top
     20% will get 5.
 
     Returns array of same size with colors. 
     '''
-    assert numColors>0
+    assert numColor>0
     sortedInds = np.argsort(array.flatten())
     N = len(sortedInds)
-    if numColors > N:
-        numColors = N
-        print "warning: reduced numColors for small amount of data"
+    if numColor > N:
+        numColor = N
+        print "warning: reduced numColor for small amount of data"
 
     coloredFlat = np.zeros(N, np.int32)
     ind0 = 0
-    delta = max(1,int(math.floor(N/numColors)))
-    for color in range(1,numColors+1):
+    delta = max(1,int(math.floor(N/numColor)))
+    for color in range(1,numColor+1):
         ind1=min(N,ind0+delta)
         coloredFlat[sortedInds[ind0:ind1]]=color
         ind0 = ind1
     if ind1 < N:
-        coloredFlat[sortedInds[ind1:]]=numColors
+        coloredFlat[sortedInds[ind1:]]=numColor
     coloredArray = coloredFlat.reshape(array.shape)
     return coloredArray
 
@@ -268,7 +268,7 @@ def turnOnTestPixels(arr,avg, numPixels=10, verbose=False):
             print "turnOnTestPixels: Turned on index: (%s)" % ','.join(map(str,inds))
 
 def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300, 
-                     colors=6, basename=None, geom=None, debug=False, force=False,
+                     color=6, finecolor=18, basename=None, geom=None, debug=False, force=False,
                      numTestPixels=10, verboseForTestPixels=False):
     #### helper function ####
     def makeBaseName(dsetstring, srcString):
@@ -324,8 +324,12 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     colorNdarrFname = basename + '_color_ndarrCoords.npy'
     colorImgFname = basename + '_color_imageCoords.npy'
 
+    finecolorNdarrFname = basename + '_finecolor_ndarrCoords.npy'
+    finecolorImgFname = basename + '_finecolor_imageCoords.npy'
+
     for fname in [iXfname, iYfname, avgNdarrFname, avgImgFname, 
-                  maskNdarrFname, testmaskNdarrFname, maskImgFname, colorNdarrFname, colorImgFname]:
+                  maskNdarrFname, testmaskNdarrFname, maskImgFname, 
+                  colorNdarrFname, colorImgFname, finecolorNdarrFname, finecolorImgFname]:
         assert (not os.path.exists(fname)) or force, "file %s exists. pass --force to overwrite" % fname
 
     if iX is not None and iY is not None:
@@ -337,7 +341,7 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
             for imagePos, ndarrList in manyToOne.iteritems():
                 points = arrIndexListsToPoints(ndarrList)
                 points = [','.join(map(str,point)) for point in points]
-                print "image pixel = %r  has ndarray elements = (%s)" % (imagePos, '), ('.join(points))
+#                print "image pixel = %r  has ndarray elements = (%s)" % (imagePos, '), ('.join(points))
         else:
             print "INFO: all ndarr elements are mapped to a unique image pixel"
         imageGaps = findImageGaps(iX, iY)
@@ -348,7 +352,7 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
                 msg = '  gap:'
                 for point in arrIndexListsToPoints(gap):
                     msg += ' (%s)' % ','.join(map(str,point))
-                print msg
+ #               print msg
         print "*** done analyzing ndarr -> img mapping. Computing average. ***"
 
     # make a psana configuration to load ndarray producer and ndarrCalib to go through
@@ -437,7 +441,7 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     fout.close()
     
     print "making ndarr color file and saving"
-    ndarrColor = makeColorArray(ndarrAverage, colors)
+    ndarrColor = makeColorArray(ndarrAverage, color)
     fout = file(colorNdarrFname, 'w')
     np.save(fout, ndarrColor)
     fout.close()
@@ -447,6 +451,17 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     np.save(fout, ndarr2img(ndarrColor, iX, iY))
     fout.close()
     
+    print "making ndarr finecolor file and saving"
+    finendarrColor = makeColorArray(ndarrAverage, finecolor)
+    fout = file(finecolorNdarrFname, 'w')
+    np.save(fout, ndarrColor)
+    fout.close()
+
+    print "saving to img"
+    fout = file(finecolorImgFname, 'w')
+    np.save(fout, ndarr2img(finendarrColor, iX, iY))
+    fout.close()
+
 def plotImageFile(inputFile):
     assert isinstance(inputFile,str) and len(inputFile)>0, "invalid input file"
     img = np.load(inputFile)

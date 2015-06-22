@@ -344,6 +344,15 @@ for grouping different ranks. More on this in the next section::
 
   user_params['colorNdarrayCoords'] = 'colorfile.npy' # not created yet
 
+Fine Color/Bin/Label File
+----------------------
+This is a another parameter that the UserG2 needs. It is a color file that is used to 
+replace classes of pixels with their average value. This is applied to the IP and IF matricies
+before forming the final G2 curves. Note, these modified IP and IF matrices are used for calculating
+the G2 delay curves, the modified IP/IF are not saved to the hdf5 file::
+
+  user_params['colorFineNdarrayCoords'] = 'filnColorfile.npy' # not created yet
+
 Filtering Parameters
 -----------------------
 Often G2 calculations need to adjust/filter the data. The UserG2 module sets several 
@@ -369,8 +378,10 @@ will be covered in section XXX???
 ***************************
 The system requires a mask file that identifies the pixels to process.
 Reducing the number of pixels processed can be the key to fast feedback during an experiment.
-A userClass for correlation analysis will usually use a 'color' file to label
-pixels to average together. In addition to the mask file for analyzing data, 
+A userClass for correlation analysis will typically use two 'color' files to label
+pixels to average together. The first, a coarser one, is used to average pixels for the
+final delay curves. The second, a finer one, is used to replace classes of pixels with their
+average value before forming the delay curves. In addition to the mask file for analyzing data, 
 users should produce a testmask file for testing their compution. 
 This file should only compute on a few (10-100) pixels.
 
@@ -382,16 +393,18 @@ format required. To read the tools help do::
 
 (Another tool to look at is roicon, also part of the analysis release). The command::
 
-  parCorAnaMaskColorTool --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 300 -c 6
+  parCorAnaMaskColorTool --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 300 -c 6 --finecolor 18
 
-Will produce a mask, testmask, and color file suitable for this tutorial::
+Will produce a mask, testmask, color and fineColor file suitable for this tutorial::
 
   xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy  
   xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy  
   xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy 
+  xpptut13-r1437_XppGon_0_Cspad_0_finecolor_ndarrCoords.npy 
 
 Note that our input will be ndarr files, not image files. The mask file is only  0 or 1. It is 1
 for pixels that we **INCLUDE**. The color file uses 6 colors (since we gave the -c 6 option to the tool. 
+The finecolor file will have 18 colors (since we used the --finecolor 18 option).
 As an example, these colors bin pixels based on intensity. In practice users will want to bin pixels
 based on other criteria.
 

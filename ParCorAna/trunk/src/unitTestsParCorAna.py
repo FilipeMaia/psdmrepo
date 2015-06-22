@@ -206,13 +206,16 @@ class Cspad2x2( unittest.TestCase ) :
         maskFileBaseName = '%s-r%d_XcsEndstation_0_Cspad2x2_0_mask_ndarrCoords.npy' % (experiment, run)
         testMaskFileBaseName = '%s-r%d_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy' % (experiment, run)
         colorFileBaseName =  '%s-r%d_XcsEndstation_0_Cspad2x2_0_color_ndarrCoords.npy' % (experiment, run)
+        finecolorFileBaseName =  '%s-r%d_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy' % (experiment, run)
         maskFile = os.path.join(maskColorDir, maskFileBaseName)
         testMaskFile = os.path.join(maskColorDir, testMaskFileBaseName)
         colorFile = os.path.join(maskColorDir, colorFileBaseName)
+        finecolorFile = os.path.join(maskColorDir, finecolorFileBaseName)
 
         assert os.path.exists(maskFile), "mask file %s doesn't exist" % maskFile
         assert os.path.exists(testMaskFile),  "test maskfile %s doesn't exist" % testMaskFile
-        assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorkFile
+        assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorFile
+        assert os.path.exists(finecolorFile),  "fine color file %s doesn't exist" % finecolorFile
 
         numServers = 1
         
@@ -292,6 +295,7 @@ class Cspad2x2( unittest.TestCase ) :
 
         user_params = {{}}
         user_params['colorNdarrayCoords'] = '{colorFile}'
+        user_params['colorFineNdarrayCoords'] = '{finecolorFile}'
         user_params['saturatedValue'] = (1<<15)
         user_params['LLD'] = 1E-9
         user_params['notzero'] = 1E-5
@@ -317,6 +321,7 @@ class Cspad2x2( unittest.TestCase ) :
         check that the input files haven't changed
         '''
         md5sums={'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_color_ndarrCoords.npy':     'dad6ebe25b364eeea4114c036b54ea4c',
+                 'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy': '764cbf1c997f811097c034f0398a38ed',
                  'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_mask_ndarrCoords.npy':      '9b8ade01f93fc087228c15cad9944856', 
                  'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy':  '282715e77fb5e4247a6b0851f3b244ea', 
                  'e524-r0178-s00-c00.xtc':                                                          'b73a43ee4393c8c793d430f951cad021', 

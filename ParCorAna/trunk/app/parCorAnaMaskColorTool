@@ -16,7 +16,7 @@ to prepare this input, and visualize it, in image coordinates (always a 2D array
 
 An example of usage: 
 
-  %s --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 50 -c 6
+  %s --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 50 -c 6 --finecolor 18
 
 This will produce the files, all numpy arrays
 
@@ -27,6 +27,8 @@ This will produce the files, all numpy arrays
   xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy  # mask converted to image
   xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy # example color file in ndarray coordinates
   xpptut13-r1437_XppGon_0_Cspad_0_color_imageCoords.npy # color file converted to image
+  xpptut13-r1437_XppGon_0_Cspad_0_finecolor_ndarrCoords.npy # example fine color file in ndarray coordinates
+  xpptut13-r1437_XppGon_0_Cspad_0_finecolor_imageCoords.npy # fine color file converted to image
 
 as well as these files, which are used to convert from img <-> ndarray coords
 
@@ -81,7 +83,8 @@ Errors arise if the file is not deployed. The -g --geom option can be used to sp
 
 if __name__ == "__main__":
     defNumAvg=300
-    defNumColors=6
+    defNumColor=6
+    defNumFineColor=18
     parser = argparse.ArgumentParser(description=description, epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--start', action='store_true', help="create avg/mask/color .npy files, and .npy files to convert between img and ndarr", default=False)
     parser.add_argument('--img2ndarr', action='store_true', help="convert image .npy file to ndarray .npy file", default=False)
@@ -94,7 +97,8 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--psanaType', type=str, help="psana type for detector.", default=None)
     parser.add_argument('-s', '--src', type=str, help="detector src string.", default=None)
     parser.add_argument('-n', '--numForAverage', type=int, help="number of events to average (default=%d)" % defNumAvg, default=defNumAvg)
-    parser.add_argument('-c', '--colors', type=int, help="number of colors to use (default=%d)" % defNumColors, default=defNumColors)
+    parser.add_argument('-c', '--color', type=int, help="number of colors to use (default=%d)" % defNumColor, default=defNumColor)
+    parser.add_argument('--finecolor', type=int, help="number of fine  colors to use (default=%d)" % defNumFineColor, default=defNumFineColor)
     parser.add_argument('-b', '--basename', type=str, help="basename for output files", default=None)
     parser.add_argument('-i', '--input', type=str, help="input file for conversions.", default=None)
     parser.add_argument('-o', '--output', type=str, help="output file for conversions.", default=None)
@@ -115,7 +119,8 @@ if __name__ == "__main__":
                              psanaTypeStr,
                              args.src,
                              args.numForAverage,
-                             args.colors,
+                             args.color,
+                             args.finecolor,
                              args.basename,
                              args.geom,
                              args.debug,

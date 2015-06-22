@@ -282,13 +282,24 @@ class G2Common(object):
         colorFile = self.user_params['colorNdarrayCoords']        
         assert os.path.exists(colorFile), "user_params['colorNdarrayCoords']=%s not found" % colorFile
         self.color_ndarrayCoords = np.load(colorFile)
+
+        finecolorFile = self.user_params['colorFineNdarrayCoords']        
+        assert os.path.exists(finecolorFile), "user_params['colorFineNdarrayCoords']=%s not found" % finecolorFile
+        self.finecolor_ndarrayCoords = np.load(finecolorFile)
+
         self.maskNdarrayCoords = maskNdarrayCoords
         assert np.issubdtype(self.color_ndarrayCoords.dtype, np.integer), "color array does not have an integer type."
+        assert np.issubdtype(self.finecolor_ndarrayCoords.dtype, np.integer), "finecolor array does not have an integer type."
         assert self.maskNdarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
             (self.maskNdarrayCoords.shape, self.color_ndarrayCoords.shape)
         self.colors = [color for color in set(self.color_ndarrayCoords.flatten()) if color > 0]
         self.colors.sort()
         self.numColors = len(self.colors)
+
+        self.finecolors = [color for color in set(self.finecolor_ndarrayCoords.flatten()) if color > 0]
+        self.finecolors.sort()
+        self.finenumColors = len(self.colors)
+
         # set up a dictionary that maps each color to a logical index array (in ndarray coords) of
         # what elements are part of that color. Use the mask to take out masked elements.
         self.color2ndarrayInd = {}
@@ -300,8 +311,19 @@ class G2Common(object):
             self.color2ndarrayInd[color] = logicalThisColor
             self.color2numElements[color] = np.sum(logicalThisColor)
 
-        self.mp.logInfo("UserG2.viewerInit: colorfile contains colors=%s. Number of elements in each color: %s" % \
-                        (self.colors, [self.color2numElements[c] for c in self.colors]))
+        # set up a dictionary that maps each finecolor to a logical index array (in ndarray coords) of
+        # what elements are part of that color. Use the mask to take out masked elements.
+        self.finecolor2ndarrayInd = {}
+        self.finecolor2numElements = {}
+        for finecolor in self.finecolors:
+            logicalThisFineColor = self.finecolor_ndarrayCoords == finecolor
+            # take out masked elements
+            logicalThisFineColor[np.logical_not(self.maskNdarrayCoords)] = False
+            self.finecolor2ndarrayInd[finecolor] = logicalThisFineColor
+            self.finecolor2numElements[finecolor] = np.sum(logicalThisFineColor)
+
+        self.mp.logInfo("UserG2.viewerInit: finecolorfile contains finecolors=%s. Number of elements in each color: %s" % \
+                        (self.finecolors, [self.finecolor2numElements[c] for c in self.finecolors]))
 
         self.plot = self.user_params['psmon_plot']
         if self.plot:
@@ -330,7 +352,7 @@ class G2Common(object):
                              name2delay2ndarray['G2'][2] will be the ndarray of G2 calcluations for
                              the G2 term.
          int8ndarray: gathered int8 array from all the workers, the pixels they found to be saturated.
-         h5GroupUser:  either None, or a valid h5py Group to write results into the h5file
+         h5GroupUser: either None, or a valid h5py Group to write results into the h5file
         '''
 
         assert len(counts) == len(self.delays), "UserG2.viewerPublish: len(counts)=%d != len(delays)=%d" % \
