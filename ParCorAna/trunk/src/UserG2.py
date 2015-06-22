@@ -21,6 +21,19 @@ import psmon.config as psmonConfig
 import psmon.publish as psmonPublish
 import psmon.plots as psmonPlots
 
+def replaceSubsetsWithAverage(A, subsetDict):
+    '''Takes a matrix, and a dictionary  of logical indicies for
+    the matrix. Replaces each logicalIndex of values with its average.
+    '''
+    avgA = np.zeros(A.shape, A.dtype)
+    for key,subsetInd in subsetDict.iteritems():
+        assert subsetInd.shape == A.shape, "replaceSubsetsWithAverage: subset for key=%r has shape=%r != orig shape=%r" % \
+            (key, subsetInd.shape, orig.shape)
+        assert subsetInd.dtype == np.bool, "replaceSubsetsWithAverage: subset for key=%r does not have type np.bool" % \
+            (key,)
+        avgA[subsetInd] = np.average(A[subsetInd])
+    return avgA
+
 ####################################
 class G2Common(object):
     '''
@@ -292,6 +305,9 @@ class G2Common(object):
         assert np.issubdtype(self.finecolor_ndarrayCoords.dtype, np.integer), "finecolor array does not have an integer type."
         assert self.maskNdarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
             (self.maskNdarrayCoords.shape, self.color_ndarrayCoords.shape)
+        assert self.maskNdarrayCoords.shape == self.finecolor_ndarrayCoords.shape, "mask.shape=%s != finecolor.shape=%s" % \
+            (self.maskNdarrayCoords.shape, self.finecolor_ndarrayCoords.shape)
+
         self.colors = [color for color in set(self.color_ndarrayCoords.flatten()) if color > 0]
         self.colors.sort()
         self.numColors = len(self.colors)
@@ -383,11 +399,15 @@ class G2Common(object):
             assert IP.shape == ndarrayShape, "UserG2.viewerPublish: IP.shape=%s != expected=%s" % \
                 (IP.shape, ndarrayShape)
             
+            
             G2 /= np.float32(delayCount)
             IF /= np.float32(delayCount)
             IP /= np.float32(delayCount)
 
-            final = G2 / (IP * IF)
+            fineColorAvg_IF = replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
+            fineColorAvg_IP = replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
+
+            final = G2 / (fineColorAvg_IP * fineColorAvg_IF)
 
             for color, colorNdarrayInd in self.color2ndarrayInd.iteritems():
                 numElementsThisColor = self.color2numElements[color]
