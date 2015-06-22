@@ -1,0 +1,171 @@
+#!@PYTHON@
+
+import os
+import sys
+import argparse
+import numpy as np
+
+import ParCorAna.maskColorImgNdarr as mct
+
+
+progname =  os.path.basename(sys.argv[0])
+
+description='''Tool to produce numpy arrays in image and ndarray coords for mask and color input to ParCorAna.
+ParCorAna requires a mask and color file in ndarr coordinates (which could be a 3D array). Users may want 
+to prepare this input, and visualize it, in image coordinates (always a 2D array).
+
+An example of usage: 
+
+  %s --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 50 -c 6
+
+This will produce the files, all numpy arrays
+
+  xpptut13-r1437_XppGon_0_Cspad_0_avg_ndarrCoords.npy   # average of first 50 cspad, in ndarray coordinates
+  xpptut13-r1437_XppGon_0_Cspad_0_avg_imageCoords.npy   # ndarray average converted to image
+  xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy  # mask in ndarray coords, all 1
+  xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy  # testmask in ndarray coords, only 10 pixels are on
+  xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy  # mask converted to image
+  xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy # example color file in ndarray coordinates
+  xpptut13-r1437_XppGon_0_Cspad_0_color_imageCoords.npy # color file converted to image
+
+as well as these files, which are used to convert from img <-> ndarray coords
+
+  xpptut13-r1437_XppGon_0_Cspad_0_iX.npy
+  xpptut13-r1437_XppGon_0_Cspad_0_iY.npy
+
+Note the basename, xpptut13-r1437_XppGon_0_Cspad_0, that is generated. One can specify a 
+different basename with --basename or -b option.
+
+The testmask selects 10 pixels that are stored consecutively. One of these pixels has an
+intensity at the 95th percentile.
+
+The last two files, iX and iY, from PSCalib.GeometryAccess, are shaped as ndarrays, and contain the 
+mapping from ndarray to image. iX specifies the image row for each ndarray element, likewise iY specifies 
+the column. The shape of the image is 
+
+  numRows = max(iX)+1 
+  numColumns = max(iY)+1. 
+
+Assuming you have read iX and iY into numpy arrays, a simple mapping to convert to an image is
+
+  image[iX.flatten(),iY.flatten()] = ndarr.flatten()[:]
+
+likewise
+ 
+  ndarr[:] = image[iX.flatten(),iY.flatten()].reshape(ndarr.shape)
+
+will convert back. Note, due to the tilt of detector segments relative to one another, iX, iY is not
+a 'perfect' mapping - meaning two things:
+  
+  some image pixels get two ndarray elements mapped to it (2-1 issue)
+  some image pixels, that are in the midst of detector pixels, are not mapped (gaps)
+
+Presently the tool takes some time to report on these issues. 
+
+If possible, it is best to do analysis with the ndarr and just visualize image files. For mask editing,
+this is usually not possible. Once a user has prepared a mask file in image coordinates, it is neccessary
+to convert it back to ndarr coords. As an alternative to the Python code above, this can be done with the 
+command
+
+  %s --img2ndarr -i xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy -o myNdarray.npy --iX=xpptut13-r1437_XppGon_0_Cspad_0_iX.npy --iY=xpptut13-r1437_XppGon_0_Cspad_0_iX.npy
+
+where you specify input, output, iX and iY files.
+
+Full options:
+''' % (progname, progname)
+
+epilog='''Note
+The tool requires a geometry file to be deployed to the standard calibration directory.
+Errors arise if the file is not deployed. The -g --geom option can be used to specify a geometry file.
+'''
+
+if __name__ == "__main__":
+    defNumAvg=300
+    defNumColors=6
+    parser = argparse.ArgumentParser(description=description, epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--start', action='store_true', help="create avg/mask/color .npy files, and .npy files to convert between img and ndarr", default=False)
+    parser.add_argument('--img2ndarr', action='store_true', help="convert image .npy file to ndarray .npy file", default=False)
+    parser.add_argument('--ndarr2img', action='store_true', help="convert ndarray .npy file to image .npy file", default=False)
+    parser.add_argument('--plotimg', action='store_true', help="plot an image file. Specify -i option as well")
+    parser.add_argument('-d', '--dataset', type=str, help="dataset string. ", default=None)
+    parser.add_argument('--debug', action='store_true', help="debugging output", default=False)
+    parser.add_argument('--iX', type=str, help="iX file for image <-> ndarr conversion")
+    parser.add_argument('--iY', type=str, help="iY file for image <-> ndarr conversion")
+    parser.add_argument('-t', '--psanaType', type=str, help="psana type for detector.", default=None)
+    parser.add_argument('-s', '--src', type=str, help="detector src string.", default=None)
+    parser.add_argument('-n', '--numForAverage', type=int, help="number of events to average (default=%d)" % defNumAvg, default=defNumAvg)
+    parser.add_argument('-c', '--colors', type=int, help="number of colors to use (default=%d)" % defNumColors, default=defNumColors)
+    parser.add_argument('-b', '--basename', type=str, help="basename for output files", default=None)
+    parser.add_argument('-i', '--input', type=str, help="input file for conversions.", default=None)
+    parser.add_argument('-o', '--output', type=str, help="output file for conversions.", default=None)
+    parser.add_argument('-g', '--geom', type=str, help="geometry file.", default=None)
+    parser.add_argument('-f', '--force', action='store_true', help="force overwrite if file exists.", default=False)
+
+    args = parser.parse_args()
+
+    assert args.plotimg or args.start or args.img2ndarr or args.ndarr2img, "must specify one of --plotimg, --start, --img2ndarr or --ndarr2img. Use the --help option for help."
+    assert 1==sum(map(int,[args.plotimg,args.start,args.img2ndarr,args.ndarr2img])), "must specify only one of --plotimg, --start, --img2ndarr and --ndarr2img"
+
+    if args.start:
+        assert args.dataset is not None, "with --start must specify dataset"
+        assert args.psanaType is not None, "with --start must specify psana type"
+        assert args.src is not None, "with --start must specify src"
+        psanaTypeStr = args.psanaType
+        mct.makeInitialFiles(args.dataset,
+                             psanaTypeStr,
+                             args.src,
+                             args.numForAverage,
+                             args.colors,
+                             args.basename,
+                             args.geom,
+                             args.debug,
+                             args.force,
+                             numTestPixels=10,
+                             verboseForTestPixels=True)
+    elif args.plotimg:
+        assert args.input, "for plotimg: must specify input file"
+        assert os.path.exists(args.input), "plotimg: input file %s doesn't exist" % args.input
+        mct.plotImageFile(args.input)
+
+    elif args.img2ndarr:
+        assert args.input, "for img2ndarr: must specify input file"
+        assert args.output, "for img2ndarr: must specify output file"
+        assert os.path.exists(args.input), "img2ndarr: input file %s doesn't exist" % args.input
+        if os.path.exists(args.output) and not args.force:
+            raise Exception("img2ndarr: output file %s exists. use --force to overwrite" % args.output)
+        assert args.iX, "for img2ndarr: must specify iX file"
+        assert args.iY, "for img2ndarr: must specify iY file"
+        assert os.path.exists(args.iX), "iX file=%s doesn't exist" % args.iX
+        assert os.path.exists(args.iY), "iY file=%s doesn't exist" % args.iY
+        inputImage = np.load(args.input)
+        iX = np.load(args.iX)
+        iY = np.load(args.iY)
+        outNdarr = mct.img2ndarr(inputImage, iX, iY)
+        fout = file(args.output,'w')
+        np.save(fout,outNdarr)
+        fout.close()
+
+    elif args.ndarr2img:
+        assert args.input, "for ndarr2img: must specify input file"
+        assert args.output, "for ndarr2img: must specify output file"
+        assert os.path.exists(args.input), "ndarr2img: input file %s doesn't exist" % args.input
+        if os.path.exists(args.output) and not args.force:
+            raise Exception("ndarr2img: output file %s exists. use --force to overwrite" % args.output)
+        assert args.iX, "for ndarr2img: must specify iX file"
+        assert args.iY, "for ndarr2img: must specify iY file"
+        assert os.path.exists(args.iX), "iX file=%s doesn't exist" % args.iX
+        assert os.path.exists(args.iY), "iY file=%s doesn't exist" % args.iY
+        inputNdarr = np.load(args.input)
+        iX = np.load(args.iX)
+        iY = np.load(args.iY)
+        outImage = mct.ndarr2img(inputNdarr, iX, iY)
+        fout = file(args.output,'w')
+        np.save(fout,outImage)
+        fout.close()
+
+
+###### testing commands
+# python maskColor.py --start -d 'exp=xpptut13:run=1437' -t psana.CsPad.DataV2 -s 'DetInfo(XppGon.0:Cspad.0)' -n 50 -c 6 --force
+# python maskColor.py --img2ndarr -i xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy -o maskNdarr.npy --iX xpptut13-r1437_XppGon_0_Cspad_0_iX.npy --iY xpptut13-r1437_XppGon_0_Cspad_0_iY.npy
+# python maskColor.py --ndarr2img -i maskNdarr.npy -o maskImg.npy --iX xpptut13-r1437_XppGon_0_Cspad_0_iX.npy --iY xpptut13-r1437_XppGon_0_Cspad_0_iY.npy
+# python maskColor.py --plotimg -i xpptut13-r1437_XppGon_0_Cspad_0_mask_imageCoords.npy
