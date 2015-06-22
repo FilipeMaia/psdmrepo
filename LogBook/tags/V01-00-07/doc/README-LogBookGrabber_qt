@@ -1,0 +1,45 @@
+
+2015-05-15 Files LogBookGrabber_qt.py and LogBookWebService.py added to the package LogBook
+
+##-----------------------------
+
+Date: Tue, 9 Apr 2013 14:11:46 -0700
+From: "Gaponenko, Igor" <gapon@slac.stanford.edu>
+To: "Dubrovin, Mikhail" <dubrovin@slac.stanford.edu>
+Cc: "Gaponenko, Igor" <gapon@slac.stanford.edu>
+Subject: e-log Grabber
+
+Here is how to run the latest version of the Grabber:
+
+setenv PYTHONPATH ${PYTHONPATH}:/reg/g/pcds/pds/grabber/lib/python2.7/site-packages
+
+python /reg/g/pcds/pds/grabber/bin/LogBookGrabber_wTags.py -i AMO -e amodaq14 -u amoopr -p pcds -w https://pswww.slac.stanford.edu/ws-auth
+
+The first step isn't required if you run it from the OFFLINE environment. It's only needed for the DAQ.
+
+        Igor
+
+
+MY COMMAND: 
+
+/reg/g/pcds/pds/grabber/bin/LogBookGrabber_qt.py -i AMO:0 -e amodaq14 -u amoopr -p pcds -w https://pswww.slac.stanford.edu/ws-auth -f config-my.txt -c command-for-child-message
+
+/reg/g/pcds/pds/grabber/bin/LogBookGrabber_qt.py -i AMO:0 -e amodaq14 -u amoopr -w https://pswww.slac.stanford.edu/ws-auth
+
+
+TEST command for XPP:
+./LogBookGrabber_qt.py -i XPP:0 -e xppdaq12 -u xppopr -w https://pswww.slac.stanford.edu/ws-auth
+
+Usage of DB:
+./LogBookGrabber_qt.py 5
+
+
+XPP opr command:
+/reg/neh/operator/xppopr/bin/xppeloggrabber
+
+Deployment directory:
+/reg/g/pcds/pds/grabber/bin
+
+##-----------------------------
+
+
