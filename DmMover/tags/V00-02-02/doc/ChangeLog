@@ -1,0 +1,83 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package DmMover
+#------------------------------------------------------------------------
+
+Package author: Wilko Kroeger
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-02
+2015-06-22
+- Nicer formatting when printing bbcp checksum comparison.  
+- Made mvrcfg module. start-movers allows to just list all movers found in cfg.
+	
+Tag: V00-02-01
+2015-06-16
+- removed wrong bbcp user name
+- use boolean flag to mark a transfer as failed (instead of "" err-msg)
+- allow to map ioc nfs name to local name (/u2/...) for fee-ioc-rec02
+- add new mover mode to do direct ioc to ffb transfers (ffb or to ana)
+- bbcp configuration is more explicit (api change)
+	
+Tag: V00-02-00
+2015-05-26
+- Added cleanup script for ioc nodes
+- create all missing xtc direcories, not just check if xtc exists
+- add startup script for smalldata mover 
+- Handle wildcard in mover --dirpath selection (for small data) when obtaining process status (mvr_showprocs) 
+- started to rename apps using dash instead of underscore
+- renamed 
+	
+Tag: V00-01-00
+2015-05-08
+- Imported data-mover code from git repo (PsdmTools)
+- added features to the experiment path creation to handle creating xtc files on the ffb 
+  for recorder transfers.
+- Add tool to compare checksums created by ffb and ana movers.
+- Added option to set acl for the instr-dir on a dss node.
+- Support for smalldata
+	
+	
+Tag: V00-00-06
+2015-01-21
+- Changed the interface to dm_create_folders. Allow to create path for single experiments and
+  specifying the datapath and scratchpath.
+- Added tools to list mover processes on data mover hosts.
+- Added tool to check u2 and acls of instrument directory on dss node.
+	
+Tag: V00-00-03
+2014-10-29
+- Use idx-queue for idx files that could not be transferred by the data movers. 
+- Added tool to show ffb disk space
+- Write ffb cleanup logs to nfs
+- Don't exit if experiment directories creation failed (PSDH-9).
+	
+Tag: V00-00-03
+2014-09-29
+- In function *check_all_destpath* added argument to select directories that should be created.
+- Various improvements to *dm_create_folders*. Create only certain dirs if
+  *allexp* option is used. Allow to select experiments. 
+- Use redirect to a logfile when creating active experiments missing folders only if requested.  
+- Extended *ffbxtcclean* to remove files from a dss node (using *--src* option).
+  Check that the file size agrees with the one in irods.
+	
+Tag: V00-00-02
+2014-07-14
+- added tool to create missing experiment directories for active experiemnts
+  or all experiments obtained from regdb. (dm_create_folders)
+- daemon script that checks and creates missing folders for active experiments.
+  (dm_active_exp_folders)
+	
+	
+Tag: V00-00-01
+2014-05-22 Wilko Kroeger
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
