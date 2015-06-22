@@ -10,6 +10,12 @@ Package author: Wilko Kroeger
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-02-02
+2015-06-22
+- Nicer formatting when printing bbcp checksum comparison.  
+- Made mvrcfg module. start-movers allows to just list all movers found in cfg.
+	
 Tag: V00-02-01
 2015-06-16
 - removed wrong bbcp user name
