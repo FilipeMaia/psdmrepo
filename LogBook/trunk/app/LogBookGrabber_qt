@@ -2634,18 +2634,21 @@ from optparse import OptionParser
 def input_options_parser() :
 
     msg_usg  = '  %prog [options] args\n'\
-             + 'Example: /reg/g/pcds/pds/grabber/bin/%prog -i AMO:0 -e amodaq14 -u amoopr -w https://pswww.slac.stanford.edu/ws-auth'
+             + 'Example: %prog -i AMO:0 -e amodaq14 -u amoopr'
+    #         + 'Example: /reg/g/pcds/pds/grabber/bin/%prog -i AMO:0 -e amodaq14 -u amoopr -w https://pswww.slac.stanford.edu/ws-auth'
+
+    url_def = 'https://pswww.slac.stanford.edu/ws-auth'
 
     msg_descrip  = '%prog - grabs any selected window on terminal or its part and submits it with message to ELog'
     
     parser = OptionParser(description=msg_descrip, usage=msg_usg)
     parser.add_option('-i', '--ins', dest='inssta', default=None,   action='store', type='string', help='the name of an instrument and station <INS>[:<station-number>]')
-    parser.add_option('-e', '--exp', dest='exp',    default=None,   action='store', type='string', help='the name of some specific experiment')
-    parser.add_option('-w', '--url', dest='url',    default=None,   action='store', type='string', help='the base URL of the LogBook web service')
+    parser.add_option('-e', '--exp', dest='exp',    default=None,   action='store', type='string', help='the name of experiment')
+    parser.add_option('-w', '--url', dest='url',    default=url_def,action='store', type='string', help='the base URL of LogBook web service, default = %s' % url_def)
     parser.add_option('-c', '--cmd', dest='cmd',    default=None,   action='store', type='string', help='the command for child message')
-    parser.add_option('-f', '--cfg', dest='cfname', default=None,   action='store', type='string', help='the file name with configuration parameters')
+    parser.add_option('-f', '--cfg', dest='cfname', default=None,   action='store', type='string', help='the file name with configuration parameters (by default is not used)')
     parser.add_option('-u', '--usr', dest='usr',    default=None,   action='store', type='string', help='the user name to connect to the web service')
-    parser.add_option('-p', '--pas', dest='pas',    default='pcds', action='store', type='string', help='the password to connect to the web service')
+    parser.add_option('-p', '--pas', dest='pas',    default='pcds', action='store', type='string', help='the password to connect to the web service (by default is used for opr accounts)')
     #parser.add_option('-v', '--verbose',      dest='verb',    default=True, action='store_true',           help='allows print on console')
     #parser.add_option('-q', '--quiet',        dest='verb',                  action='store_false',          help='supress print on console')
 

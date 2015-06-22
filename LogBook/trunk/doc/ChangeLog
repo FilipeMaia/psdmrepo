@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-07
+2015-06-22 Mikhail Dubrovin
+- LogBookGrabber_qt - use default url parameter, fix usage for -h option (PSAS-70)
+
 Tag: V01-00-06
 2015-06-15 Mikhail Dubrovin
 - LogBookGrabber_qt - is added to this package, add files:
