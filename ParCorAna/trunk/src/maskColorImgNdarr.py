@@ -3,14 +3,11 @@ import sys
 import numpy as np
 import math
 import psana
-import ParCorAna
 import scipy.ndimage
 from PSCalib.CalibFileFinder import CalibFileFinder
 from PSCalib.GeometryAccess import GeometryAccess, img_from_pixel_arrays
 import scipy.ndimage as ndimage
-
-import matplotlib.pyplot as plt
-plt.ion()
+import PsanaUtil
 
 def debugOut(flag, msg):
     if flag:
@@ -149,7 +146,7 @@ class NoGeomFile(Exception):
 def getGeometryFile(dsetstring, srcString, typeString):
     dataRoot = '/reg/d/psdm'
     assert os.path.exists(dataRoot), "data base directory=%s does not exist" % dataRoot
-    dsetParts = ParCorAna.parseDataSetString(dsetstring)
+    dsetParts = PsanaUtil.parseDataSetString(dsetstring)
     calibDir = os.path.join(dataRoot, dsetParts['instr'], dsetParts['exp'], 'calib')
     assert os.path.exists(calibDir), "The experiment calib directory: %s doesn't exist" % calibDir
     typeNamespace = typeString.split('psana.')[1].split('.')[0]
@@ -358,7 +355,7 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     # events and make an average
     ndarray_out_key = "ndarray"
     calib_out_key = "calibrated"
-    psanaOptions, outArrayType = ParCorAna.makePsanaOptions(srcString, 
+    psanaOptions, outArrayType = PsanaUtil.makePsanaOptions(srcString, 
                                                             psanaType,
                                                             ndarray_out_key,
                                                             calib_out_key)
@@ -455,6 +452,8 @@ def plotImageFile(inputFile):
     img = np.load(inputFile)
     imgMin = np.min(img)
     normImage = 1.0 + img - imgMin
+    import matplotlib.pyplot as plt
+    plt.ion()
     plt.imshow(np.log(normImage), interpolation='none')
     plt.draw()
     raw_input("hit enter to end")

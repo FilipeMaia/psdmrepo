@@ -1,6 +1,5 @@
 import os
 import numpy as np
-import ParCorAna
 import psana
 import logging
 import psmon.config as psmonConfig

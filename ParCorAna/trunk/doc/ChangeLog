@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12:
+- move import of matplotlib.plt to remove warning message about fork()
+-- Jira PSAS-163
+	
 Tag: V00-00-11:
 - optimizations to get to real time with full cspad Jira PSAS-162:
 -- change from float64 to float32 to speed up scatter and gather
