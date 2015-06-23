@@ -1,4 +1,4 @@
-### system
+## system
 from mpi4py import MPI
 import os
 import numpy as np
@@ -417,7 +417,7 @@ class RunServer(object):
             sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
             if self.logger.isEnabledFor(logging.DEBUG):
                 debugMsg = "CommSystem.run: server has data to scatter."
-                debugMsg += " Event Id: sec=%d nsec=%d fid=0x%8.8X." % (sec, nsec, fiducials)
+                debugMsg += " Event Id: sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X." % (sec, nsec, fiducials)
                 debugMsg += " Before Send EVT"
                 self.logger.debug(debugMsg)
             self.comm.Send([sendEventReadyBuffer.getNumpyBuffer(),
@@ -488,16 +488,20 @@ class RunMaster(object):
         RET:
          the buffer with the earliest time
         '''
-        idx = 0
-        sec, nsec, fiducials = serverDataList[idx].getEventId()
-        for curIdx in range(1,len(serverDataList)):
-            curSec, curNsec, curFiducials = serverDataList[idx].getEventId()
+        earliestIdx = 0
+        sec, nsec, fiducials = serverDataList[earliestIdx].getEventId()
+        for candIdx in range(1,len(serverDataList)):
+            curSec, curNsec, curFiducials = serverDataList[candIdx].getEventId()
+            earlierByTime = False
             if (curSec < sec) or ((curSec == sec) and (curNsec < nsec)):
+                earlierByTime = True
+            # TODO: should also check if earlier by fiducial
+            if earlierByTime:
                 sec = curSec
                 nsec = curNsec
                 fiducials = curFiducials
-                idx = curIdx
-        return serverDataList[idx]
+                earliestIdx = candIdx
+        return serverDataList[earliestIdx]
         
     def initRecvRequestsFromServers(self):
         # create buffers for receiving, and the requests
@@ -519,11 +523,13 @@ class RunMaster(object):
         self.bcastWorkersBuffer.setEvt()
         self.bcastWorkersBuffer.setRank(selectedServerRank)
         self.bcastWorkersBuffer.setSeconds(sec)
-        self.bcastWorkersBuffer.setCounter(nsec)
-        self.bcastWorkersBuffer.setCounter(fiducials)
+        self.bcastWorkersBuffer.setNanoSeconds(nsec)
+        self.bcastWorkersBuffer.setFiducials(fiducials)
         self.bcastWorkersBuffer.setCounter(counter)
         if self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.debug("CommSystem: before Bcast -> workers EVT sec=%8.8d fid=0x%8.8X counter=%d" % (sec, fiducials, counter))
+            self.logger.debug("CommSystem: before Bcast -> workers EVT sec=0x%8.8d nsec=0x%8.8X fid=0x%5.5X counter=%d" % \
+                              (self.bcastWorkersBuffer.getSeconds(), self.bcastWorkersBuffer.getNanoSeconds(), 
+                               self.bcastWorkersBuffer.getFiducials(), self.bcastWorkersBuffer.getCounter()))
         self.masterWorkersComm.Bcast([self.bcastWorkersBuffer.getNumpyBuffer(),
                                       self.bcastWorkersBuffer.getMPIType()],
                                      root=self.masterRankInMasterWorkersComm)
@@ -569,9 +575,12 @@ class RunMaster(object):
 
     def run(self):
         ########## begin helper functions ########
-        def waitOnServer(self):
+        def waitOnServers(self):
             '''called during communication loop. 
-            Called when no ready servers.
+            Called when not all servers are ready, or at end.
+            The master wants all servers to have data available, or to be done with their
+            data before it picks the next server to scatter.
+
             identifies a done server through waitany
             tests all done servers
             idenfies finisned servers among done servers
@@ -580,20 +589,23 @@ class RunMaster(object):
 
             self.notReadyServers + self.finishedServers + self.readyServers 
 
-            will be the same as it was on entry, and at least one of the notReadyServers will
-            be moved into the finishedServers or readyServers group.
+            will be the same as it was on entry, and self.notReadyServers will be 0. There will be
+            at least one server in the finishedServers or readyServers
             '''
-            assert len(self.notReadyServers)>0, "waitOnServer called, but no not-ready servers"
+            assert len(self.notReadyServers)>0, "waitOnServers called, but no not-ready servers"
 
             if self.logger.isEnabledFor(logging.DEBUG):
                 self.logger.debug("CommSystem: before waitany. notReadyServers=%s" % self.notReadyServers)
             requestList = [serverRequests[rnk] for rnk in self.notReadyServers]
-            idx=MPI.Request.Waitany(requestList)
+            MPI.Request.Waitall(requestList)
             if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug("CommSystem: after waitany. server %d is now ready" % self.notReadyServers[idx])
+                self.logger.debug("CommSystem: after waitall. servers %s now ready" % ','.join(map(str,self.notReadyServers)))
 
             newReadyServers = [server for server in self.notReadyServers \
                                if serverRequests[server].Test()]
+            for svr in newReadyServers:
+                assert svr in self.notReadyServers, "Waitall failed, svr=%d from notReadyServers list is not ready" % svr
+
             newFinishedServers = [server for server in newReadyServers \
                                   if serverReceiveData[server].isEnd()]
             self.finishedServers.extend(newFinishedServers)
@@ -623,11 +635,11 @@ class RunMaster(object):
             if len(self.finishedServers)==len(self.serverRanks): 
                 break
 
-            if len(self.readyServers)==0:
-                waitOnServer(self)
+            if len(self.notReadyServers)!=0:
+                waitOnServers(self)
 
             if len(self.readyServers)==0:
-                # the server we waited on was finished. 
+                # the servers we waited on are finished. 
                 continue
 
             earlyServerData = self.getEarliest([serverReceiveData[server] for server in self.readyServers])
@@ -637,7 +649,7 @@ class RunMaster(object):
                 self.eventIdToCounter = Counter120hz.Counter120hz(sec, nsec, fiducials)
             counter = self.eventIdToCounter.getCounter(sec, fiducials)
             if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug("CommSystem: next server rank=%d sec=%d nsec=%10d fiducials=0x%8.8X counter=%d" % \
+                self.logger.DEBUG("CommSystem: next server rank=%d sec=0x%8.8X nsec=0x%8.8X fiducials=0x%5.5X counter=%5d" % \
                                   (selectedServerRank, sec, nsec, fiducials, counter))
             self.informWorkersOfNewData(selectedServerRank, sec, nsec, fiducials, counter)
 
@@ -692,12 +704,13 @@ class RunMaster(object):
 
 class RunWorker(object):
     def __init__(self, masterWorkersComm, masterRankInMasterWorkersComm, 
-                 wrapEventNumber, xCorrBase, logger):
+                 wrapEventNumber, xCorrBase, logger, isFirstWorker):
         self.masterWorkersComm = masterWorkersComm
         self.masterRankInMasterWorkersComm = masterRankInMasterWorkersComm
         self.wrapEventNumber = wrapEventNumber
         self.xCorrBase = xCorrBase
         self.logger = logger
+        self.isFirstWorker = isFirstWorker
         self.msgBuffer = MVW_MsgBuffer()
         self.evtNumber = 0
         self.wrapped = False
@@ -764,9 +777,13 @@ class RunWorker(object):
                                       (serverWithData, lastTime['counter']))
                 if self.wrapped:
                     self.serverWorkersScatterWrapped(serverWorldRank = serverWithData)
+#                    if self.isFirstWorker: self.logger.info("calling storeNewWorkerDataWrapped: from server=%d counter=%d sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X" % \
+#                                    (serverWithData, lastTime['counter'], lastTime['sec'], lastTime['nsec'], lastTime['fiducials']))
                     self.storeNewWorkerDataWrapped(counter = lastTime['counter'])
                 else:
                     self.serverWorkersScatterNotWrapped(serverWorldRank = serverWithData)
+#                    if self.isFirstWorker: self.logger.info("calling storeNewWorkerDataNotWrapped: from server=%d counter=%d sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X" % \
+#                                    (serverWithData, lastTime['counter'], lastTime['sec'], lastTime['nsec'], lastTime['fiducials']))
                     self.storeNewWorkerDataNotWrapped(counter = lastTime['counter'])
 
             elif self.msgBuffer.isUpdate():
@@ -908,7 +925,7 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
         elif mp.isWorker:
             xCorrBase.workerInit()
             runWorker = RunWorker(mp.masterWorkersComm, mp.masterRankInMasterWorkersComm,
-                                  wrapEventNumber, xCorrBase, logger)
+                                  wrapEventNumber, xCorrBase, logger, mp.isFirstWorker)
             runWorker.run()
             if mp.isFirstWorker:
                 reportTiming = True

@@ -338,6 +338,9 @@ class G2Common(object):
             self.finecolor2ndarrayInd[finecolor] = logicalThisFineColor
             self.finecolor2numElements[finecolor] = np.sum(logicalThisFineColor)
 
+        self.mp.logInfo("UserG2.viewerInit: colorfile contains colors=%s. Number of elements in each color: %s" % \
+                        (self.colors, [self.color2numElements[c] for c in self.colors]))
+
         self.mp.logInfo("UserG2.viewerInit: finecolorfile contains finecolors=%s. Number of elements in each color: %s" % \
                         (self.finecolors, [self.finecolor2numElements[c] for c in self.finecolors]))
 
@@ -530,7 +533,7 @@ class G2IncrementalAccumulator(G2Common):
 class G2IncrementalWindowed(G2IncrementalAccumulator):
     def __init__(self, user_params, system_params, mpiParams, testAlternate):
         super(G2IncrementalWindowed,self).__init__(user_params, system_params, mpiParams, testAlternate)
-        self.mp.logInfo("G2IncrementalWindowed: object initialized")
+        self.mp.logInfo("G2IncrementalWindowed: initialized base (Accumulator) and now Windowed object initialized")
 
     def workerBeforeDataRemove(self, tm, xInd, workerData):
         maxStoredTime = workerData.maxTimeForStoredData()

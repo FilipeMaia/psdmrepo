@@ -217,7 +217,7 @@ class Cspad2x2( unittest.TestCase ) :
         assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorFile
         assert os.path.exists(finecolorFile),  "fine color file %s doesn't exist" % finecolorFile
 
-        numServers = 1
+        numServers = 6
         
         # make a random directory for the testing that we will remove when done
         destDirBase = AppDataPath(os.path.join("ParCorAna","testingDir")).path()
@@ -321,7 +321,7 @@ class Cspad2x2( unittest.TestCase ) :
         check that the input files haven't changed
         '''
         md5sums={'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_color_ndarrCoords.npy':     'dad6ebe25b364eeea4114c036b54ea4c',
-                 'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy': '764cbf1c997f811097c034f0398a38ed',
+                 'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy': 'f6cdb19b26d28d96a17b87ddde3be12c',
                  'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_mask_ndarrCoords.npy':      '9b8ade01f93fc087228c15cad9944856', 
                  'maskColorDir/xcsi0314-r178_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy':  '282715e77fb5e4247a6b0851f3b244ea', 
                  'e524-r0178-s00-c00.xtc':                                                          'b73a43ee4393c8c793d430f951cad021', 
@@ -362,7 +362,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.formatDict['testName'] = testName
         configFileName = self.writeConfigFile('config_G2atEnd.py')
 
-        cmd = 'mpiexec -n 4 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         # check delays
@@ -381,7 +381,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.formatDict['testName'] = testName
         configFileName = self.writeConfigFile('config_G2IncrementalAccumulator.py')
 
-        cmd = 'mpiexec -n 4 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         # check delays
@@ -406,7 +406,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.expectedCounts = [ 18, 17, 16, 15, 13, 10, 5, 0, 0, 0]
         configFileName = self.writeConfigFile('config_G2windoweda.py')
 
-        cmd = 'mpiexec -n 4 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         # check delays
@@ -424,7 +424,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.formatDict['testName'] = 'windowedb'
         configFileName = self.writeConfigFile('config_G2windowedb.py')
 
-        cmd = 'mpiexec -n 4 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         h5A = h5outputFile

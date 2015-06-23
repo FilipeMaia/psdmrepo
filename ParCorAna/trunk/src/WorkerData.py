@@ -1,5 +1,6 @@
 import numpy as np
 import Exceptions
+import logging
 
 class WorkerData(object):
     '''provide access to worker data.
@@ -43,10 +44,11 @@ class WorkerData(object):
 
         self.logger = logger
         self.addRemoveCallbackObject = addRemoveCallbackObject
+        if self.isFirstWorker: self.logger.debug(self.dumpStr())
 
-    def dumpstr(self):
-        res = "tmIdx: start=%d afterEnd=%d\n" % (self._timeStartIdx, self._timeAfterEndIdx)
-        res += "times=\n%r" % self._timesXInds
+    def dumpStr(self):
+        res = "WorkerData tmStart=%d tmAfterEnd=%d nextX=%d wrappedX=%d numOutOfOrder=%d numDupTimes=%d X.shape=%r _timesXInds.shape=%r\n" % \
+              (self._timeStartIdx, self._timeAfterEndIdx, self._nextXIdx, self.wrappedX, self.numOutOfOrder, self.numDupTimes, self.X.shape, self._timesXInds.shape)
         return res
 
     def timesDataIndexes(self):
@@ -191,6 +193,9 @@ class WorkerData(object):
         
         if self.addRemoveCallbackObject is not None:
             self.addRemoveCallbackObject.workerAfterDataInsert(tm, xIndForNewData, self)
+
+        if self.isFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug(("addData tm=%d at xIdx=%d -- " % (tm,xIndForNewData)) + self.dumpStr())
             
 #        print "addData: finished, timeIndForNewData=%d xIndForNewData=%d wrapped=%d tmStard=%d tmAfterEnd=%d" % \
 #            (timeIndForNewData, xIndForNewData, self.wrappedX, self._timeStartIdx, self._timeAfterEndIdx)

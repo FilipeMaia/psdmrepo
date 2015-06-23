@@ -17,6 +17,9 @@ def diffDatasets(hdr, dA, dB, verbose):
   if dA.name == '/system/system_params/h5output':
     return failures
 
+  if dA.name == '/system/system_params/numServers':
+    return failures
+
   if verbose: sys.stdout.write("%s: diffDatasets %s\n" % \
                                (hdr,dA.name))
   if dA.shape != dB.shape:

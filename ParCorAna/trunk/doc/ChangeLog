@@ -11,6 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15:
+- fix issues with multiple servers: JIRA PSAS-161
+  wait for all servers to by ready
+  fix bug with selection earliest time
+- use 6 servers for unit tests, compare to alt test with 1 server
+- change cmp tool to ignore differences in numservers between alttest and maintest
+- fix bug with saving finecolor file using parCorAnaMaskColorTool - it was just the color file before
+	
 Tag: V00-00-14:
 - fix bug with writing mask/color files to h5 file.
 - add documention on finecolor

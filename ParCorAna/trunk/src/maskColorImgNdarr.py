@@ -42,7 +42,7 @@ def makeColorArray(array, numColor):
     N = len(sortedInds)
     if numColor > N:
         numColor = N
-        print "warning: reduced numColor for small amount of data"
+        print "warning: reduced numColor to %d for small amount of data" % numColor
 
     coloredFlat = np.zeros(N, np.int32)
     ind0 = 0
@@ -451,10 +451,10 @@ def makeInitialFiles(dsetstring, psanaTypeStr, srcString, numForAverage=300,
     np.save(fout, ndarr2img(ndarrColor, iX, iY))
     fout.close()
     
-    print "making ndarr finecolor file and saving"
+    print "making ndarr finecolor file with %d colors and saving" % finecolor
     finendarrColor = makeColorArray(ndarrAverage, finecolor)
     fout = file(finecolorNdarrFname, 'w')
-    np.save(fout, ndarrColor)
+    np.save(fout, finendarrColor)
     fout.close()
 
     print "saving to img"
