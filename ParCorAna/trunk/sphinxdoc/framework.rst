@@ -24,7 +24,7 @@ Mask File
   0 means don't process it.
 * The tool parCorAnaMaskColorTool can help users produce this file, and convert from ndarray
   shape to image shape. Often a mask is created in image space, but it is best to create the color
-  file in ndarray space and simply view it in image space.
+  file and finecolor files in ndarray space and simply view them in image space.
 
 .. _usercode:
 
@@ -180,7 +180,7 @@ viewerPublish(counts, lastEventTime, name2delay2ndarray, int8array, h5UserGroup)
   on viewer - this called after the results of all the workers have been gathered together. 
   It gets the counts, the timestamp and 120hz counter for the last event processed, 
   the gathered arrays, the gathered int array, and a h5py group into the h5output file to write to.
-
+  For the UserG2 code, it will make use of the finecolor file in the users_params for its part in the calculation.
 
 G2Common
 ============

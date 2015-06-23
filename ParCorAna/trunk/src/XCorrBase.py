@@ -118,8 +118,8 @@ def writeConfig(h5file, system_params, user_params):
         configKeys = configDict.keys()
         configKeys.sort()
         for key in configKeys:
-            if key in ['maskNdarrayCoords', 'colorNdarrayCoords']:
-                filename = system_params['maskNdarrayCoords']
+            if key in ['maskNdarrayCoords', 'colorNdarrayCoords', 'colorFineNdarrayCoords']:
+                filename = configDict[key]
                 assert os.path.exists(filename), "file %s doesn't exist" % filename
                 numpyArray = np.load(file(filename,'r'))
                 h5Group[key]=numpyArray

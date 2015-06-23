@@ -213,11 +213,19 @@ system_params['testNumEvents'] = 100
 ############ USER MODULE - G2 CONFIG #############
 user_params = {}
 
-# the partition is a numpy array of int's. 0 and negative int's are ignored. int's that are positive
+# the below 'color' file must be a .npy file that partitions the ndarray elements
+# into sets of pixels that are averaged together to make the delay curves.
+# value 0 and negative int's are ignored. int's that are positive
 # partition the elements. That is all elements with '1' form one delay curve, likewise all elements that are '2'
 # form another delay curve.
 user_params['colorNdarrayCoords'] =  "see tutorial for documentation on this parameter"
+
+# The finecolor file below is like the above, a .npy array with the same dimension as the 
+# detector data (and mask file). This partition is used to replace each pixel in the IP and IF
+# matricies with its average on the color it is in - this is done before doing the final G2 
+# calculation to make the delay curve points
 user_params['colorFineNdarrayCoords'] =  "see tutorial for documentation on this parameter"
+
 user_params['saturatedValue'] = (1<<15)
 user_params['LLD'] = 1E-9
 user_params['notzero'] = 1E-5

@@ -11,8 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14:
+- fix bug with writing mask/color files to h5 file.
+- add documention on finecolor
+	
 Tag: V00-00-13:
 - add finecolor
+ 
 	
 Tag: V00-00-12:
 - move import of matplotlib.plt to remove warning message about fork() Jira PSAS-163

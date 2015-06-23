@@ -85,6 +85,7 @@ numbered 1,2 and 5, and also recording xtcav and other IOC's in stream 80 and 81
 when deciding what events to include in the G2 calculation) one would do::
 
   system_params['dataset'] = 'exp=%s:run=%d:live:stream=1,2,5,80,81:dir=/reg/d/ffb/xpp/xpptut13' % (experiment, run) 
+
 Then set numservers (below) to 3 for the three DAQ streams, 1,2 and 5. Note, if you do not need the
 IOC streams for the G2 calculation, do not include them, it will speed up processing.
 
@@ -344,14 +345,21 @@ for grouping different ranks. More on this in the next section::
 
   user_params['colorNdarrayCoords'] = 'colorfile.npy' # not created yet
 
+Note that the color 0 is ignored in the color file - no delay curve is produced for color 0.
+Only colors 1 and above.
+
 Fine Color/Bin/Label File
-----------------------
+-----------------------------
 This is a another parameter that the UserG2 needs. It is a color file that is used to 
 replace classes of pixels with their average value. This is applied to the IP and IF matricies
 before forming the final G2 curves. Note, these modified IP and IF matrices are used for calculating
 the G2 delay curves, the modified IP/IF are not saved to the hdf5 file::
 
   user_params['colorFineNdarrayCoords'] = 'filnColorfile.npy' # not created yet
+
+In this case, color 0 is not ignored, pixels labeled with 0 are replaced with their average just like
+all the others. Whether or not they go into delay curves depends on how they are labeled in the 
+color file above.
 
 Filtering Parameters
 -----------------------
