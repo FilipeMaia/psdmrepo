@@ -222,14 +222,8 @@ class XCorrBase(object):
 
 
     def serverInit(self):
-        self.detectorData1Darray = np.empty(self.mp.totalElements, np.float32)
         self.serverScatterReceiveBuffer = np.zeros(0,dtype=np.float32)
         self.userObj.serverInit()
-
-    def copyOurMaskedDataForScatter(self, dataArray):
-        '''expects ndarray of float32
-        '''
-        self.detectorData1Darray[:] = dataArray[self.mp.maskNdarrayCoords]
 
     def initDelayAndGather(self):
         gatherOneNDArrayCounts = [self.mp.workerWorldRankToCount[rank] for rank in self.mp.workerRanks]

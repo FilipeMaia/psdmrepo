@@ -24,6 +24,13 @@ class EventData(object):
         '''returns tuple (sec, nsec, fiducials) for this event data'''
         return self.sec, self.nsec, self.fiducials
 
+    def __str__(self):
+        return "EventData: sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X dataArray.shape=%r" % \
+            (self.sec, self.nsec, self.fiducials, self.dataArray.shape)
+
+    def __repr__(self):
+        return str(self)
+
 class EventIter(object):
     '''Provides an iterator over psana events. 
     ::

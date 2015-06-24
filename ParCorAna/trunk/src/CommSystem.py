@@ -354,6 +354,48 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
 
     return mc
 
+class ScatterDataQueue(object):
+    def __init__(self, maskToCopyOutData, dtypeForScatter, logger):
+        assert maskToCopyOutData.dtype == np.bool
+        self.maskToCopyOutData = maskToCopyOutData
+        self.numElements = np.sum(maskToCopyOutData)
+        self.dtypeForScatter = dtypeForScatter
+        self.iterDataQueue = []
+        self.scatterDataQueue = []
+        self.logger = logger
+
+    def empty(self):
+        assert len(self.iterDataQueue)==len(self.scatterDataQueue), "ScatterDataQueue: internal lists are not the same length"
+        return len(self.iterDataQueue) == 0
+
+    def nextEventId(self):
+        assert not self.empty(), "ScatterDataQueue: nextEventId called on non-empty data"
+        return self.iterDataQueue[0].eventId()
+
+    def popHead(self):
+        assert not self.empty(), "ScatterDataQueue: popHead called on non-empty data"
+        assert len(self.iterDataQueue)==len(self.scatterDataQueue), "ScatterDataQueue: internal lists are not the same length"
+        datum = self.iterDataQueue.pop(0)
+        scatter1Darray = self.scatterDataQueue.pop(0)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.debug("ScatterDataQueue: popHead %s" % datum)
+        return scatter1Darray
+
+    def addFrom(self, dataGen, num):
+        assert len(self.iterDataQueue)==len(self.scatterDataQueue), "ScatterDataQueue: internal lists are not the same length"
+        while num > 0:
+            try:
+                datum = dataGen.next()
+            except StopIteration:
+                self.logger.debug("ScatterDataQueue: addFrom: dataGen is empty")
+                return
+            scatterData = np.zeros(self.numElements, dtype=self.dtypeForScatter)
+            scatterData[:] = datum.dataArray[self.maskToCopyOutData]
+            self.iterDataQueue.append(datum)
+            self.scatterDataQueue.append(scatterData)
+            if self.logger.isEnabledFor(logging.DEBUG):
+                self.logger.debug("ScatterDataQueue: addFrom %s" % datum)
+            num -= 1
     
 class RunServer(object):
     '''runs server rank
@@ -390,7 +432,7 @@ class RunServer(object):
         self.masterRank = masterRank
         self.logger = logger
 
-    def recordTimeToGetData(self, startTime, endTime):
+    def recordTimeToGetData(self, startTime, endTime, numGets=1):
         global timingdict
         global timingorder
 
@@ -400,45 +442,51 @@ class RunServer(object):
             timingdict[key]=[0.0, 0, 'event', 1e-3, 'ms']
             timingorder.append(key)
         timingdict[key][0] += endTime-startTime
-        timingdict[key][1] += 1
+        timingdict[key][1] += numGets
 
     def run(self):
         sendEventReadyBuffer = SM_MsgBuffer(rank=self.rank)
         sendEventReadyBuffer.setEvt()
         receiveOkForWorkersBuffer = SM_MsgBuffer(rank=self.rank)
         abortFromMaster = False
-
         dataGen = self.dataIter.dataGenerator()
-        t0 = None
-        for datum in dataGen:
-            self.xCorrBase.copyOurMaskedDataForScatter(datum.dataArray)
-            self.recordTimeToGetData(startTime=t0, endTime=time.time())
-            sec, nsec, fiducials = datum.eventId()
+        scatterDataQueue=ScatterDataQueue(self.xCorrBase.mp.maskNdarrayCoords, np.float32, self.logger)
+        initialQueueSize = 1
+        t0 = time.time()
+        scatterDataQueue.addFrom(dataGen, initialQueueSize)
+        self.recordTimeToGetData(t0, time.time(), initialQueueSize)
+        while not scatterDataQueue.empty():
+            sec, nsec, fiducials = scatterDataQueue.nextEventId()
             sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
             if self.logger.isEnabledFor(logging.DEBUG):
-                debugMsg = "CommSystem.run: server has data to scatter."
+                debugMsg = "RunServer: data to scatter,"
                 debugMsg += " Event Id: sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X." % (sec, nsec, fiducials)
                 debugMsg += " Before Send EVT"
                 self.logger.debug(debugMsg)
             self.comm.Send([sendEventReadyBuffer.getNumpyBuffer(),
                             sendEventReadyBuffer.getMPIType()],
                            dest=self.masterRank)
-            self.logger.debug("CommSystem.run: After Send, before Recv")
+            self.logger.debug("RunServer: After Send, before Recv, first adding to Queue")
+            # master is most likely telling one of the other servers to scatter right now.
+            # read new data before waiting to be told to scatter
+            t0 = time.time()
+            scatterDataQueue.addFrom(dataGen, 1) 
+            self.recordTimeToGetData(t0, time.time(), 1)
             self.comm.Recv([receiveOkForWorkersBuffer.getNumpyBuffer(), 
                             receiveOkForWorkersBuffer.getMPIType()],
                            source=self.masterRank)
             if receiveOkForWorkersBuffer.isSendToWorkers():
-                self.logger.debug("CommSystem.run: After Recv. is Send to workers")
-                self.xCorrBase.serverWorkersScatter(detectorData1Darray=self.xCorrBase.detectorData1Darray, 
+                self.logger.debug("RunServer: After Recv. is Send to workers")
+                toScatter1DArray = scatterDataQueue.popHead()
+                self.xCorrBase.serverWorkersScatter(detectorData1Darray=toScatter1DArray, 
                                                     serverWorldRank=None)
 
             elif receiveOkForWorkersBuffer.isAbort():
-                self.logger.debug("CommSystem.run: After Recv. Abort")
+                self.logger.debug("RunServer: After Recv. Abort")
                 abortFromMaster = True
                 break
             else:
                 raise Exception("unknown msgtag from master. buffer=%r" % receiveOkForWorkersBuffer)
-            t0 = time.time()
 
         if abortFromMaster:
             self.dataIter.abortFromMaster()
@@ -598,24 +646,17 @@ class RunMaster(object):
                 self.logger.debug("CommSystem: before waitany. notReadyServers=%s" % self.notReadyServers)
             requestList = [serverRequests[rnk] for rnk in self.notReadyServers]
             MPI.Request.Waitall(requestList)
-            if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug("CommSystem: after waitall. servers %s now ready" % ','.join(map(str,self.notReadyServers)))
 
-            newReadyServers = [server for server in self.notReadyServers \
-                               if serverRequests[server].Test()]
-            for svr in newReadyServers:
-                assert svr in self.notReadyServers, "Waitall failed, svr=%d from notReadyServers list is not ready" % svr
+            newReadyServers = [s for s in self.notReadyServers]
+            self.notReadyServers = []
 
             newFinishedServers = [server for server in newReadyServers \
                                   if serverReceiveData[server].isEnd()]
             self.finishedServers.extend(newFinishedServers)
             for server in newFinishedServers:
-                # take finsished servers out of pool that we wait for a request from
-                self.notReadyServers.remove(server)
                 # take finished servers out of pool to get next event from
                 newReadyServers.remove(server)
-            for server in newReadyServers:
-                self.notReadyServers.remove(server)
+            
             self.readyServers.extend(newReadyServers)
         ############ end helper functions ######
 
@@ -624,6 +665,9 @@ class RunMaster(object):
         numEventsAtLastDataRateMsg = 0
         timeAtLastDataRateMsg = time.time()
         startTime = time.time()
+        waitAllTime = 0.0
+        waitAllNum = 0
+        noData = True
         while True:
             # a server must be in one of: ready, noReady or finished
             serversAccountedFor = len(self.readyServers) + len(self.finishedServers) + \
@@ -632,12 +676,18 @@ class RunMaster(object):
                 "loop invariant broken? #servers=%d != #accountedfor=%d" % \
                 (len(self.serverRanks), len(serversAccountedFor))
 
+            assert len(set(self.readyServers))==len(self.readyServers), "readyServers=%r contains dups" % self.readyServers
+            assert len(set(self.finishedServers))==len(self.finishedServers), "readyServers=%r contains dups" % self.readyServers
+            assert len(set(self.notReadyServers))==len(self.notReadyServers), "notReadyServers=%r contains dups" % self.notReadyServers
+
             if len(self.finishedServers)==len(self.serverRanks): 
                 break
 
             if len(self.notReadyServers)!=0:
+                t0 = time.time()
                 waitOnServers(self)
-
+                waitAllTime += time.time()-t0
+                waitAllNum += 1
             if len(self.readyServers)==0:
                 # the servers we waited on are finished. 
                 continue
@@ -645,11 +695,12 @@ class RunMaster(object):
             earlyServerData = self.getEarliest([serverReceiveData[server] for server in self.readyServers])
             selectedServerRank = earlyServerData.getRank()
             sec, nsec, fiducials = earlyServerData.getEventId()
+            noData = False
             if self.eventIdToCounter is None:
                 self.eventIdToCounter = Counter120hz.Counter120hz(sec, nsec, fiducials)
             counter = self.eventIdToCounter.getCounter(sec, fiducials)
             if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.DEBUG("CommSystem: next server rank=%d sec=0x%8.8X nsec=0x%8.8X fiducials=0x%5.5X counter=%5d" % \
+                self.logger.debug("CommSystem: next server rank=%d sec=0x%8.8X nsec=0x%8.8X fiducials=0x%5.5X counter=%5d" % \
                                   (selectedServerRank, sec, nsec, fiducials, counter))
             self.informWorkersOfNewData(selectedServerRank, sec, nsec, fiducials, counter)
 
@@ -689,6 +740,8 @@ class RunMaster(object):
                 self.logger.info("Current data rate is %.2f Hz. %d events processed" % (dataRateHz, self.numEvents))
                 timeAtLastDataRateMsg = curTime
                 numEventsAtLastDataRateMsg = self.numEvents
+        assert noData == False, "There was no data in master loop"
+        self.logger.info('master waited for ready servers %.2f ms per each time. Did %.2f waits per event' % ((waitAllTime*1000.0)/waitAllNum, waitAllNum/max(1,self.numEvents)))
 
         # one last datarate msg
         dataRateHz = self.numEvents/(time.time()-startTime)
