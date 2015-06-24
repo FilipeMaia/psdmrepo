@@ -6,41 +6,35 @@ def CommonModeRemoval(image, stripSize, method) :
     - array is arrange as [Row][Column]
     - Each row readout simultaneously by Column MOD stripSize ASCIS
 
-    Input image is written over by this function
+    method: string argument to set if median or mean to calculate
+    common-mode noise in for 'stripSize' length of pixels.
+         - MEDIAN : median is used
+         - MEAN : mean is used
+
+    Returns image with common-mode noise removed
     """
 
     # Set up method
     function = None
-    if method == "MEDIAN" : function = np.median
-    if method == "MEAN" : function = np.mean
+    if "MEDIAN" == method.upper() : function = np.median
+    if "MEAN" == method.upper(): function = np.mean
 
     if function is None :
         print method," is not known"
         return
 
-        
-    # Get number of columns and rows 
-    nrows, ncols = image.shape
+
+    # Reshape the image array to be stripSize-wide rows.
+    # re-ordering the array avoids writing python loops and takes
+    # adavantge of numpy's fast methods
+    re_ordered_image = image.reshape(-1,stripSize)
     
-    # Buffer some indicies we'll be using
-    colStart = np.arange(0, ncols, stripSize)
-    colEnd = np.arange(colStart[1], ncols+1, stripSize)
-    
-    # loop over rows
-    for index, row in enumerate(image) :
-        # loop over chunks of columns for current row
-        for start,end in zip(colStart,colEnd) :
-            # Extract 1 ASIC of data
-            strip = row[start:end]
+    # Calculate common mode along each row
+    # reshape is needed so cm_noise is a column vector
+    cm_noise = function(re_ordered_image,axis=1).reshape(-1,1)
 
-            # Find the median & RMS of pixel
-            #            median = np.median(strip)
-            cut = function(strip)
-            #            rms = np.std(strip)
+    # subtract cm_noise off re_ordered_image
+    # and re-order back to original image shape
+    clean_image = (re_ordered_image - cm_noise).reshape(image.shape)
 
-            # All pixel values less than mean+4*sigma are set to zero
-            #            cut = median + (4.0 * rms)
-            #            strip[strip<cut] = 0.0
-
-            #            strip -= median
-            strip -= cut
+    return clean_image
