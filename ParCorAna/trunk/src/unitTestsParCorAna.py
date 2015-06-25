@@ -436,7 +436,24 @@ class Cspad2x2( unittest.TestCase ) :
         o,e,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
         print "stdout=%s\nstderr=%s" % (o,e)
         self.assertEqual(0, retcode, msg="comparing windowed to atEnd with numTimes=%d failed" % self.formatDict['numTimes'])
-        
 
+class UtilFunctions( unittest.TestCase ) :
+
+    def setUp(self) :
+        pass
+
+    def tearDown(self) :
+        pass
+
+    def test_delay(self):
+        delays = corAna.makeDelayList(start=1,
+                                      stop=15000, 
+                                      num=100,
+                                      spacing='log',  # can also be 'lin'
+                                      logbase=10.0)
+        badDelays = [x for x in delays if x <1 or x > 15000]
+        self.assertEqual(len(badDelays),0)
+        self.assertEqual(len(delays),100)
+        
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

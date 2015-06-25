@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18:
+- fix bug with using a different base for forming delays with the delay function
+	
 Tag: V00-00-17:
 - load mask and color files as int8 and int32 respectively in case they are float
 - add error checking on mask/color/finecolor, call checkParams function from defaul_config.py

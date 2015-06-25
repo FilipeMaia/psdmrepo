@@ -35,8 +35,8 @@ def makeDelayList(start, stop, num, spacing, logbase=np.e):
     ####### helper function #######
     def getUniqueRoundedIntegerDelays(start, stop, numToMakeUserNum, spacing, logbase):
         if spacing == 'log':
-            logStart = np.log(start)
-            logStop = np.log(stop)
+            logStart = np.log(start)/np.log(logbase)
+            logStop = np.log(stop)/np.log(logbase)
             delays = np.logspace(start=logStart, stop=logStop, num=numToMakeUserNum, endpoint=True, base=logbase)
         else:
             delays = np.linspace(start, stop, numToMakeUserNum)
