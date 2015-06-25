@@ -722,6 +722,135 @@
 
 }
 
+//------------------ Config100aV2 ------------------
+@type Config100aV2
+  [[type_id(Id_Epix100aConfig, 2)]]
+  [[config_type]]
+  [[pack(4)]]
+{
+  uint32_t _version -> version;
+  uint32_t _runTrigDelay -> runTrigDelay;
+  uint32_t _daqTrigDelay -> daqTrigDelay;
+  uint32_t _dacSetting -> dacSetting;
+  uint32_t _asicPins {
+    uint8_t _asicGR:1 -> asicGR;
+    uint8_t _asicAcq:1 -> asicAcq;
+    uint8_t _asicR0:1 -> asicR0;
+    uint8_t _asicPpmat:1 -> asicPpmat;
+    uint8_t _asicPpbe:1 -> asicPpbe;
+    uint8_t _asicRoClk:1 -> asicRoClk;
+    uint32_t _z:26;
+  }
+  uint32_t _asicControls {
+    uint8_t _asicGRControl:1 -> asicGRControl;
+    uint8_t _asicAcqControl:1 -> asicAcqControl;
+    uint8_t _asicR0Control:1 -> asicR0Control;
+    uint8_t _asicPpmatControl:1 -> asicPpmatControl;
+    uint8_t _asicPpbeControl:1 -> asicPpbeControl;
+    uint8_t _asicR0ClkControl:1 -> asicR0ClkControl;
+    uint8_t _prepulseR0En:1 -> prepulseR0En;
+    uint32_t _adcStreamMode:1 -> adcStreamMode;
+    uint8_t _testPatternEnable:1 -> testPatternEnable;
+    uint8_t _SyncMode:2 -> SyncMode;
+    uint8_t _R0Mode:1 -> R0Mode;
+    uint8_t _z1:20;
+  }
+  uint32_t _acqToAsicR0Delay -> acqToAsicR0Delay;
+  uint32_t _asicR0ToAsicAcq -> asicR0ToAsicAcq;
+  uint32_t _asicAcqWidth -> asicAcqWidth;
+  uint32_t _asicAcqLToPPmatL -> asicAcqLToPPmatL;
+  uint32_t _asicPPmatToReadout -> asicPPmatToReadout;
+  uint32_t _asicRoClkHalfT -> asicRoClkHalfT;
+  uint32_t _adcReadsPerPixel -> adcReadsPerPixel;
+  uint32_t _adcClkHalfT -> adcClkHalfT;
+  uint32_t _asicR0Width -> asicR0Width;
+  uint32_t _adcPipelineDelay -> adcPipelineDelay;
+  uint32_t _Sync {  // new
+    uint16_t _SyncWidth:16 -> SyncWidth;
+    uint16_t _SyncDelay:16 -> SyncDelay;
+  }  // new
+  uint32_t _prepulseR0Width -> prepulseR0Width;
+  uint32_t _prepulseR0Delay -> prepulseR0Delay;
+  uint32_t _digitalCardId0 -> digitalCardId0;
+  uint32_t _digitalCardId1 -> digitalCardId1;
+  uint32_t _analogCardId0 -> analogCardId0;
+  uint32_t _analogCardId1 -> analogCardId1;
+  uint32_t _carrierId0 -> carrierId0;
+  uint32_t _carrierId1 -> carrierId1;
+  uint32_t _numberOfAsicsPerRow -> numberOfAsicsPerRow;
+  uint32_t _numberOfAsicsPerColumn -> numberOfAsicsPerColumn;
+  uint32_t _numberOfRowsPerAsic -> numberOfRowsPerAsic;
+  uint32_t _numberOfReadableRowsPerAsic -> numberOfReadableRowsPerAsic;
+  // for epix100a  352
+  uint32_t _numberOfPixelsPerAsicRow -> numberOfPixelsPerAsicRow;
+  // for epix100a 96*4 = 384
+  uint32_t _calibrationRowCountPerASIC -> calibrationRowCountPerASIC;
+  uint32_t _environmentalRowCountPerASIC -> environmentalRowCountPerASIC;
+  uint32_t _baseClockFrequency -> baseClockFrequency;
+  uint32_t _asicMask -> asicMask;
+  uint32_t _enableAutomaticRunTrigger -> enableAutomaticRunTrigger;
+  uint32_t _numberOf125MhzTicksPerRunTrigger -> numberOf125MhzTicksPerRunTrigger;
+  uint32_t _Scope {
+    uint8_t _scopeEnable:1 -> scopeEnable;
+    uint8_t _scopeTrigEdge:1 -> scopeTrigEdge;
+    uint8_t _scopeTrigChan:4 -> scopeTrigChan;
+    uint8_t _scopeArmMode:2 -> scopeArmMode;
+    uint8_t _z:8;
+    uint16_t _scopeADCThreshold:16 -> scopeADCThreshold;
+  }
+  uint32_t _ScopeTriggerParms_1 {
+    uint16_t _scopeTrigHoldoff:13 -> scopeTrigHoldoff;
+    uint16_t _scopeTrigOffset:13 -> scopeTrigOffset;
+  }
+  uint32_t _ScopeTriggerParms_2 {
+    uint16_t _scopeTraceLength:13 -> scopeTraceLength;
+    uint16_t _scopeADCsameplesToSkip:13 -> scopeADCsameplesToSkip;
+  }
+  uint32_t _ScopeWaveformSelects {
+    uint8_t _scopeChanAwaveformSelect:5 -> scopeChanAwaveformSelect;
+    uint8_t _scopeChanBwaveformSelect:5 -> scopeChanBwaveformSelect;
+    uint32_t _z:22;
+  }
+  Asic100aConfigV1 _asics[@self.numberOfAsicsPerRow()*@self.numberOfAsicsPerColumn()] -> asics;
+  uint16_t _asicPixelConfigArray[ @self.numberOfRows()][ @self.numberOfColumns()] -> asicPixelConfigArray;
+  
+  /* Calibration row config map is one row for every two calib rows */
+  uint8_t  _calibPixelConfigArray[ @self.numberOfCalibrationRows()  / 2 ][ @self.numberOfPixelsPerAsicRow()*@self.numberOfAsicsPerRow()] -> calibPixelConfigArray;
+
+  /* Number of pixel rows in a readout unit */
+  uint32_t numberOfRows()  [[inline]]
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.numberOfRowsPerAsic(); @}
+
+  /* Number of readable pixel rows in a readout unit */
+  uint32_t numberOfReadableRows()  [[inline]]
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.numberOfReadableRowsPerAsic(); @}
+
+  /* Number of pixel columns in a readout unit */
+  uint32_t numberOfColumns()  [[inline]]
+  [[language("C++")]] @{ return  @self.numberOfAsicsPerRow()*@self.numberOfPixelsPerAsicRow(); @}
+
+  /* Number of calibration rows in a readout unit */
+  uint32_t numberOfCalibrationRows()  [[inline]]
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.calibrationRowCountPerASIC(); @}
+
+  /* Number of rows in a readout unit */
+  uint32_t numberOfEnvironmentalRows()  [[inline]]
+  [[language("C++")]] @{ return @self.numberOfAsicsPerColumn()*@self.environmentalRowCountPerASIC(); @}
+
+  /* Number of columns in a readout unit */
+  uint32_t numberOfAsics()  [[inline]]
+  [[language("C++")]] @{ return  @self.numberOfAsicsPerRow()*@self.numberOfAsicsPerColumn(); @}
+
+  /* Constructor which takes values for every attribute */
+  @init()  [[auto]];
+
+  /* Constructor which takes values necessary for size calculations */
+  @init(numberOfAsicsPerRow -> _numberOfAsicsPerRow, numberOfAsicsPerColumn -> _numberOfAsicsPerColumn, 
+      numberOfRowsPerAsic -> _numberOfRowsPerAsic, numberOfPixelsPerAsicRow -> _numberOfPixelsPerAsicRow,
+      calibrationRowCountPerASIC -> _calibrationRowCountPerASIC)  [[inline]];
+
+}
+
 //------------------ AsicSConfigV1 ------------------
 @type AsicSConfigV1
   [[pack(4)]]
@@ -904,6 +1033,8 @@
   uint32_t _digitalCardId1 -> digitalCardId1;
   uint32_t _analogCardId0 -> analogCardId0;
   uint32_t _analogCardId1 -> analogCardId1;
+  uint32_t _carrierId0 -> carrierId0;
+  uint32_t _carrierId1 -> carrierId1;
   uint32_t _numberOfAsicsPerRow -> numberOfAsicsPerRow;
   uint32_t _numberOfAsicsPerColumn -> numberOfAsicsPerColumn;
   uint32_t _numberOfRowsPerAsic -> numberOfRowsPerAsic;
@@ -1013,6 +1144,7 @@
   [[type_id(Id_EpixElement, 2)]]
   [[pack(2)]]
   [[config(Config100aV1)]]
+  [[config(Config100aV2)]]
   [[config(ConfigSV1)]]
 {
   uint32_t _first {
