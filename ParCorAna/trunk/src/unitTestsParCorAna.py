@@ -217,7 +217,7 @@ class Cspad2x2( unittest.TestCase ) :
         assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorFile
         assert os.path.exists(finecolorFile),  "fine color file %s doesn't exist" % finecolorFile
 
-        numServers = 6
+        numServers = 3
         
         # make a random directory for the testing that we will remove when done
         destDirBase = AppDataPath(os.path.join("ParCorAna","testingDir")).path()
@@ -454,6 +454,6 @@ class UtilFunctions( unittest.TestCase ) :
         badDelays = [x for x in delays if x <1 or x > 15000]
         self.assertEqual(len(badDelays),0)
         self.assertEqual(len(delays),100)
-        
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

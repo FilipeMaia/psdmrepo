@@ -450,7 +450,11 @@ class XCorrBase(object):
 
         for workerRank in self.mp.workerRanks[0:-1]:
             workerCount = self.mp.workerWorldRankToCount[workerRank]
-            workerStartPositions.append(workerCount * self.numDelays)
+            lastWorkerStartPosition = workerStartPositions[-1]
+            workerStartPositions.append(lastWorkerStartPosition + workerCount * self.numDelays)
+
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logger.info("viewerFormNDArrays: workerStartPositions=%s" % workerStartPositions)
 
         ndarrayShape = self.mp.maskNdarrayCoords.shape  
 

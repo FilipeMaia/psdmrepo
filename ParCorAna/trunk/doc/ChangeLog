@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19:
+- fix bug in viewerFormNDArrays. After gathering data from all the workers, the
+  starting offset of each worker was not calculated properly - all but the first had 
+  the same offset. The unit tests were passing because I never tested against multiple
+  workers. The unit tests now using both multiple servers and multiple workers.
+
 Tag: V00-00-18:
 - fix bug with using a different base for forming delays with the delay function
 	
