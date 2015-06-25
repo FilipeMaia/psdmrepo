@@ -113,15 +113,17 @@ def writeConfig(h5file, system_params, user_params):
         h5Group = h5file.create_group('system')
     systemParamsGroup = h5Group.create_group('system_params')
     userParamsGroup = h5Group.create_group('user_params')
+    fname2type = {'maskNdarrayCoords':np.int8, 'colorNdarrayCoords':np.int32, 'colorFineNdarrayCoords':np.int32}
     for configDict, h5Group in zip([system_params, user_params],
                                    [systemParamsGroup, userParamsGroup]):
         configKeys = configDict.keys()
         configKeys.sort()
         for key in configKeys:
-            if key in ['maskNdarrayCoords', 'colorNdarrayCoords', 'colorFineNdarrayCoords']:
+            if key in fname2type:
+                astype = fname2type[key]
                 filename = configDict[key]
                 assert os.path.exists(filename), "file %s doesn't exist" % filename
-                numpyArray = np.load(file(filename,'r'))
+                numpyArray = np.load(file(filename,'r')).astype(astype)
                 h5Group[key]=numpyArray
             else:
                 value = configDict[key]

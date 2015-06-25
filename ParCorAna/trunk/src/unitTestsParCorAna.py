@@ -297,6 +297,8 @@ class Cspad2x2( unittest.TestCase ) :
         user_params['colorNdarrayCoords'] = '{colorFile}'
         user_params['colorFineNdarrayCoords'] = '{finecolorFile}'
         user_params['saturatedValue'] = (1<<15)
+        user_params['plot_colors'] = None
+        user_params['print_delay_curves'] = False
         user_params['LLD'] = 1E-9
         user_params['notzero'] = 1E-5
         user_params['psmon_plot'] = False

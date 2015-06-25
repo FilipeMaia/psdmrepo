@@ -7,6 +7,8 @@ import datetime
 import glob
 from mpi4py import MPI
 import sys
+import os
+import numpy as np
 
 def formatFileName(fname):
     '''Looks for %T in a file and %C. Replaces them with 
@@ -153,7 +155,7 @@ def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl='INFO', propa
     loggers[loggerName]=logger
     return logger
 
-def checkParams(system_params, user_params):
+def checkParams(system_params, user_params, checkUserParams=False):
     expectedSystemKeys = set(['dataset',
                               'src',
                               'psanaType', 
@@ -183,3 +185,37 @@ def checkParams(system_params, user_params):
         (undefinedSystemKeys,)
     if len(newSystemKeys)>0 and MPI.COMM_WORLD.Get_rank()==0:
         sys.stderr.write("Warning: unexpected keys in system_params: %r\n" % (newSystemKeys,))
+    if checkUserParams:
+        
+        assert 'colorNdarrayCoords' in user_params
+        assert 'colorFineNdarrayCoords' in user_params
+        assert os.path.exists(system_params['maskNdarrayCoords']), "maskNdarrayCoords file %s doesn't exist" % system_params['maskNdarrayCoords']
+        assert os.path.exists(user_params['colorNdarrayCoords']), "colorNdarrayCoords file %s doesn't exist" % user_params['colorNdarrayCoords']
+        assert os.path.exists(user_params['colorFineNdarrayCoords']), "colorFineNdarrayCoords file %s doesn't exist" % user_params['colorFineNdarrayCoords']
+        mask = np.load(system_params['maskNdarrayCoords']).astype(np.int8)
+        color = np.load(user_params['colorNdarrayCoords']).astype(np.int32)
+        finecolor = np.load(user_params['colorFineNdarrayCoords']).astype(np.int32)
+        
+        assert mask.shape == color.shape, "mask shape=%r != color.shape=%r" % (mask.shape, color.shape)
+        assert color.shape == finecolor.shape, "color.shape=%r != finecolor.shape=%r" % (color.shape, finecolor.shape)
+
+        mask_flat = mask.flatten()
+        maskValues = set(mask_flat)
+        assert maskValues.union(set([0,1])) == set([0,1]), "mask contains values other than 0 and 1." + \
+            (" mask contains %d distinct values" % len(maskValues))
+        assert 1 in maskValues, "The mask does not have the value 1, it is all 0. Elements marked with 1 are processed"
+        maskNdarrayCoords = mask == 1 # is is important to convert mask to array of bool, np.bool
+        masked_color = mask * color
+        pixel_waste =  np.sum(masked_color <= 0)
+        pixels_on = np.sum(masked_color > 0)
+        if pixel_waste > 0 and MPI.COMM_WORLD.Get_rank() == 0:
+            sys.stderr.write(("Warning: there are %d or %.1f%% pixels that are 0 or < 0 in the color file: "+
+                             "%s that are not 0 in the mask file: %s. These pixels will still be "+
+                              "procssed by workers, but not the viewer. Consider turning them off in the " + 
+                              "mask file. There are %d pixels that are on.\n") % \
+                             (pixel_waste, 100.0*pixel_waste/float(mask_flat.shape[0]),
+                              user_params['colorNdarrayCoords'],
+                              system_params['maskNdarrayCoords'],
+                              pixels_on))
+        
+        

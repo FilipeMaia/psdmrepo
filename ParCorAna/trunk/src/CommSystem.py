@@ -183,7 +183,7 @@ class MPI_Communicators:
           * workerWorldRankToCount[rank]:  number of element that worker processes
           * workerWorldRankToOffset[rank]: offset of where those elements start in 
                                            a flattened version of the ndarray
-          * maskNdarrayCoords:            the mask as a logical True/False array
+          * maskNdarrayCoords:             the mask as a logical True/False array
                                            shape has not been changed
 
         '''
@@ -1037,7 +1037,7 @@ class CommSystemFramework(object):
         mp.setLogger(verbosity)
         maskNdarrayCoords_Filename = system_params['maskNdarrayCoords']
         assert os.path.exists(maskNdarrayCoords_Filename), "mask file %s not found" % maskNdarrayCoords_Filename
-        maskNdarrayCoords = np.load(maskNdarrayCoords_Filename)
+        maskNdarrayCoords = np.load(maskNdarrayCoords_Filename).astype(np.int8)
         mp.setMask(maskNdarrayCoords)
         srcString = system_params['src']
         numEvents = system_params['numEvents']

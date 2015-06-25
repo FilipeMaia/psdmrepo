@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17:
+- load mask and color files as int8 and int32 respectively in case they are float
+- add error checking on mask/color/finecolor, call checkParams function from defaul_config.py
+- add user_params 'plot_colors' to control number of colors plotted
+- add 'print_delay_curves' to get start/stop of all delay curvers on the screen
+
+	
 Tag: V00-00-16:
 - previous fix for mult servers slowed things down, server reads were not running in parrallel
 - fixed this, see comments in JIRA PSAS-161 - servers now read next array after reporting ready,

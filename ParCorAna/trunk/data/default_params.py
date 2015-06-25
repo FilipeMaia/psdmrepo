@@ -232,6 +232,8 @@ user_params['notzero'] = 1E-5
 user_params['psmon_plot'] = False
 # to set a different port for psmon plotting, change this
 # user_params['psmon_port'] = 12301
+user_params['plot_colors'] = None
+user_params['print_delay_curves'] = False
 
 
 ##################
@@ -245,4 +247,5 @@ if __name__ == '__main__':
     print "######## user_params dict #########"
     from pprint import pprint
     pprint(user_params)
+    ParCorAna.checkParams(system_params, user_params, checkUserParams=True)
 

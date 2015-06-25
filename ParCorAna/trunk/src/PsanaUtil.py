@@ -170,7 +170,7 @@ def readDetectorDataAndEventTimes(system_params, eventOkFunction=None):
     srcString = system_params['src']
     maskFile = system_params['maskNdarrayCoords']
     assert os.path.exists(maskFile), "maskfile=%s doesn't exist" % maskFile
-    mask = np.load(maskFile)
+    mask = np.load(maskFile).astype(np.int8)
     self.maskShape = mask.shape
     self.maskFlatIndexArray = 1 == mask.flatten()
 

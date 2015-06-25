@@ -294,11 +294,11 @@ class G2Common(object):
         '''
         colorFile = self.user_params['colorNdarrayCoords']        
         assert os.path.exists(colorFile), "user_params['colorNdarrayCoords']=%s not found" % colorFile
-        self.color_ndarrayCoords = np.load(colorFile)
+        self.color_ndarrayCoords = np.load(colorFile).astype(np.int32)
 
         finecolorFile = self.user_params['colorFineNdarrayCoords']        
         assert os.path.exists(finecolorFile), "user_params['colorFineNdarrayCoords']=%s not found" % finecolorFile
-        self.finecolor_ndarrayCoords = np.load(finecolorFile)
+        self.finecolor_ndarrayCoords = np.load(finecolorFile).astype(np.int32)
 
         self.maskNdarrayCoords = maskNdarrayCoords
         assert np.issubdtype(self.color_ndarrayCoords.dtype, np.integer), "color array does not have an integer type."
@@ -353,6 +353,11 @@ class G2Common(object):
             psplotCmd = 'psplot --logx -s %s -p %s MULTI' % (hostname, port)
             self.mp.logInfo("Run cmd: %s" % psplotCmd)
 
+        assert 'plot_colors' in self.user_params, "new parameter 'plot_colors' required in config. Set to 'None' to plot all colors, otherwise list like '[1,2,3]'"
+        assert 'print_delay_curves' in self.user_params, "new parameter 'print_delay_curves' required in config. Set to 'True' or 'False'"
+        self.plotColors = self.user_params['plot_colors']
+        assert self.plotColors is None or isinstance(self.plotColors,list), "plot_colors must be None or a list of colors"
+        self.printDelayCurves = self.user_params['print_delay_curves']
 
     def viewerPublish(self, counts, lastEventTime, name2delay2ndarray, 
                       int8ndarray,  h5GroupUser):
@@ -390,7 +395,11 @@ class G2Common(object):
 
         self.maskOutNewSaturatedElements(saturated_ndarrayCoords)
 
+        eps = 1e-6 # protect from division by zero
+
         for delayIdx, delayCount in enumerate(counts):
+            if delayCount <= 0:
+                continue
             delay = self.delays[delayIdx]
             G2 = name2delay2ndarray['G2'][delay]
             IF = name2delay2ndarray['IF'][delay]
@@ -402,13 +411,15 @@ class G2Common(object):
             assert IP.shape == ndarrayShape, "UserG2.viewerPublish: IP.shape=%s != expected=%s" % \
                 (IP.shape, ndarrayShape)
             
-            
             G2 /= np.float32(delayCount)
             IF /= np.float32(delayCount)
             IP /= np.float32(delayCount)
 
             fineColorAvg_IF = replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
             fineColorAvg_IP = replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
+            
+            fineColorAvg_IF[fineColorAvg_IF<=eps]=eps
+            fineColorAvg_IP[fineColorAvg_IP<=eps]=eps
 
             final = G2 / (fineColorAvg_IP * fineColorAvg_IF)
 
@@ -419,6 +430,16 @@ class G2Common(object):
                     delayCurves[color][delayIdx] = average
 
         counter120hz = lastEventTime['counter']
+
+        if self.printDelayCurves:
+            for color in self.color2ndarrayInd.keys():
+                if color not in delayCurves: 
+                    continue
+                self.mp.logger.info("evt=%5d color=%2d delayCurve=%s ... %s" % \
+                                    (counter120hz, color, ', '.join(map(str,delayCurves[color][0:10])),
+                                     ', '.join(map(str,delayCurves[color][-10:]))))
+                    
+
         groupName = 'G2_results_at_%6.6d' % counter120hz
 
         if h5GroupUser is not None:
@@ -450,6 +471,8 @@ class G2Common(object):
             multi = psmonPlots.MultiPlot(counter120hz, 'MULTI', ncols=3)
             for color in self.colors:
                 if color not in delayCurves: continue
+                if (self.plotColors is not None) and (not color in self.plotColors):
+                    continue
                 thisPlot = psmonPlots.XYPlot(counter120hz, 'color/bin=%d' % color, 
                                   self.delays, delayCurves[color], formats='bs-')
                 multi.add(thisPlot)
