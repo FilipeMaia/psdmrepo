@@ -302,6 +302,13 @@ class Cspad2x2( unittest.TestCase ) :
         user_params['LLD'] = 1E-9
         user_params['notzero'] = 1E-5
         user_params['psmon_plot'] = False
+        user_params['ipimb_threshold_lower'] = .05
+        user_params['ipimb_srcs'] = []
+        user_params['debug_plot']=False
+        user_params['plot_colors']=[1,4,6,8]
+        user_params['iX']=None
+        user_params['iY']=None
+
         '''
 
     def tearDown(self) :

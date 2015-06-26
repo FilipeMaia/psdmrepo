@@ -11,6 +11,15 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20:
+- add debugging statements
+- add many user_parms, in particular parameters to filter based on ipimbs
+- add 'debug_plot' and support to see some of the IP/G2/IF at viewerUpdate
+- add forwarding functions logInfo, logDebug, etc to UserG2
+- only plot the delays for which there is a nonzero count, cleans up plots
+- label x-axis for plots in time, not 120hz counter
+- add example config file for ffb live & plotting
+	
 Tag: V00-00-19:
 - fix bug in viewerFormNDArrays. After gathering data from all the workers, the
   starting offset of each worker was not calculated properly - all but the first had 

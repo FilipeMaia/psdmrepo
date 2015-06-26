@@ -344,7 +344,13 @@ class XCorrBase(object):
             ## calculate:
             t0 = time.time()
             name2array, counts, int8array = self.userObj.workerCalc(self.workerData)
-
+            if self.mp.logger.isEnabledFor(logging.DEBUG):
+                for nm in self.arrayNames:
+                    for delayIdx, delay in enumerate(self.delays):
+                        self.mp.logInfo("lastTime=%s dly=%d nm=%s min=%.1f avg=%.1f max=%.1f" % \
+                                        (lastTime['counter'], delay, nm, np.min(name2array[nm][delayIdx,:]),
+                                         np.average(name2array[nm][delayIdx,:]),
+                                         np.max(name2array[nm][delayIdx,:])), allWorkers = True)
             calcTime = time.time() - t0
             self.checkUserWorkerCalcArgs(name2array, counts, int8array)
             self.mp.logInfo('g2worker.calc at 120hz counter=%s took %.4f sec' % \
@@ -473,6 +479,9 @@ class XCorrBase(object):
                     startIdx = workerStartPositions[workerIdx] + delayIdx * workerCount 
                     endIdx = startIdx + workerCount
                     flatMaskedThisWorker = self.gatheredFlatNDArrays[nm][startIdx:endIdx]
+                    if self.logger.isEnabledFor(logging.DEBUG):
+                        self.logger.debug("viewerFormNDarrays dly=%d nm=%s wkr=%d wkrOff=%d wkrCnt=%d startIdx=%d endIdx=%d (numelem=%d) avg=%.0f max=%.0f" % \
+                                          (delay, nm, workerRank, workerOffset, workerCount, startIdx, endIdx, endIdx-startIdx, np.average(flatMaskedThisWorker), np.max(flatMaskedThisWorker)))
                     flatMaskedFromAllWorkers[workerOffset:(workerOffset+workerCount)] = flatMaskedThisWorker
 
                 name2delay2ndarray[nm][delay][self.mp.maskNdarrayCoords] = flatMaskedFromAllWorkers

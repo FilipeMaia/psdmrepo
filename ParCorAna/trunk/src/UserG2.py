@@ -21,6 +21,22 @@ import psmon.config as psmonConfig
 import psmon.publish as psmonPublish
 import psmon.plots as psmonPlots
 
+def getStats(vec):
+    '''returns dict with 'min','5','10',25','med','75','90','95','max' and 'T' (# elem)
+    to see what data looks like
+    '''
+    assert len(vec.shape)==1, "getStats for 1D vector of data"
+    svec = np.sort(vec)
+    n = len(svec)
+    assert n>0, "getStats called on empty vector"
+    res = {'T':n}
+    res['min']=svec[0]
+    res['max']=svec[-1]
+    res['med']=svec[min(n-1, max(0, int(n/2)))]
+    for percentile in [5,10,25,75,90,95]:
+        res[str(percentile)]=svec[min(n-1, max(0, int((percentile/100.0)*n)))]
+    return res
+
 def replaceSubsetsWithAverage(A, subsetDict):
     '''Takes a matrix, and a dictionary  of logical indicies for
     the matrix. Replaces each logicalIndex of values with its average.
@@ -31,7 +47,8 @@ def replaceSubsetsWithAverage(A, subsetDict):
             (key, subsetInd.shape, orig.shape)
         assert subsetInd.dtype == np.bool, "replaceSubsetsWithAverage: subset for key=%r does not have type np.bool" % \
             (key,)
-        avgA[subsetInd] = np.average(A[subsetInd])
+        avgVal = np.average(A[subsetInd])
+        avgA[subsetInd] = avgVal
     return avgA
 
 ####################################
@@ -42,12 +59,53 @@ class G2Common(object):
         self.user_params = user_params
         self.system_params = system_params
         self.mp = mpiParams
+        self.logger = self.mp.logger
         self.testAlternate = testAlternate
 
         self._arrayNames = ['G2','IF','IP']
 
         self.delays = system_params['delays']
         self.numDelays = len(self.delays)
+
+        self.debugPlot = self.user_params['debug_plot']
+        self.maskNdarrayCoords = self.mp.maskNdarrayCoords
+        assert self.maskNdarrayCoords.dtype == np.bool
+        assert os.path.exists(self.user_params['colorNdarrayCoords']), "color file: %s doesn't exist" % self.user_params['colorNdarrayCoords']
+        colorMask = np.load(self.user_params['colorNdarrayCoords']).astype(np.int32) >= 1
+        self.debugMask = self.maskNdarrayCoords * colorMask
+        self.iX = None
+        self.iY = None
+        self.fullImageShape = None
+        self.debugPlotImageBounds = None
+        if self.debugPlot:
+            numElemOrig = np.cumprod(self.maskNdarrayCoords.shape)[-1]
+            numElemMask = np.sum(self.debugMask)
+            self.logInfo("debugPlot=1, debugMask has %d elements (%.2f%% of total)" % \
+                         (numElemMask, 100.0*numElemMask/float(numElemOrig)))
+            assert 'iX' in user_params, "user_params['debug_plot'] specified, but user_params['iX'] not found. iX file needed (see parCorAnaMaskColorTool)"
+            assert 'iY' in user_params, "user_params['debug_plot'] specified, but user_params['iY'] not found. iY file needed (see parCorAnaMaskColorTool)"
+            iXfname = user_params['iX']
+            iYfname = user_params['iY']
+            assert os.path.exists(iXfname), "file user_params['iX']= %s doesn't exist" % iXfname
+            assert os.path.exists(iYfname), "file user_params['iY']= %s doesn't exist" % iYfname
+            self.iX = np.load(iXfname)
+            self.iY = np.load(iYfname)
+            assert self.iX.shape == self.debugMask.shape, "loaded iX shape=%s != mask shape=%s" % (self.iX.shape, self.debugMask.shape)
+            assert self.iY.shape == self.debugMask.shape, "loaded iY shape=%s != mask shape=%s" % (self.iY.shape, self.debugMask.shape)
+            self.fullImageShape, self.debugPlotImageBounds = ParCorAna.imgBoundBox(self.iX, self.iY, self.debugMask)
+            
+
+    def logInfo(self, msg, allWorkers=False):
+        self.mp.logInfo(msg, allWorkers)
+
+    def logDebug(self, msg, allWorkers=False):
+        self.mp.logDebug(msg, allWorkers)
+
+    def logError(self, msg, allWorkers=False):
+        self.mp.logError(msg, allWorkers)
+
+    def logWarning(self, msg, allWorkers=False):
+        self.mp.logWarning(msg, allWorkers)
 
     ### COMMON CALLBACK ####
     # callbacks used by multiple roles, i.e, workers and viewer
@@ -68,7 +126,11 @@ class G2Common(object):
     def serverInit(self):
         '''Called after framework initializes server.
         '''
-        pass
+        assert 'ipimb_threshold_lower' in self.user_params, "must supply ipimb_threshold_lower in user_params for ipimb"
+        assert 'ipimb_srcs' in self.user_params, "must supply ipimb_srcs in user_params for list of ipimb srcs (each a str)"
+        self.ipimbThresh = self.user_params['ipimb_threshold_lower']
+        ipimbSrcStrings = self.user_params['ipimb_srcs']
+        self.ipimbSrcs = [psana.Source(srcString) for srcString in ipimbSrcStrings]
 
     def serverEventOk(self, evt):
         '''tells framework if this event is suitable for including in calculation.
@@ -89,6 +151,13 @@ class G2Common(object):
         Return:
           (bool): True if this event should be included in analysis
         '''
+        for src in self.ipimbSrcs:
+            fexData = evt.get(psana.Lusi.IpmFexV1, src)
+            if fexData is None:
+                self.logWarning("no fex at %r" % src)
+                return False
+            if fexData.sum() < self.ipimbThresh:
+                return False
         return True
 
     def serverFinalDataArray(self, dataArray, evt):
@@ -99,6 +168,15 @@ class G2Common(object):
         Return the oringial dataArray to say the event should be processed.
         Optionally, one can make a copy of the dataArray, modify it, and return the copy.
         '''
+        if self.logger.isEnabledFor(logging.DEBUG):
+            dataForStats = dataArray[self.debugMask].flatten()
+            stats = getStats(dataForStats)
+            evtId = evt.get(psana.EventId)
+            sec, nsec = evtId.time()
+            fiducials = evtId.fiducials()
+            self.logDebug("dataArray: sec=0x%8.8X fid=0x%5.5X T=%10d min=%5.0f 5=%5.0f 10=%5.0f 25=%5.0f med=%5.0f 75=%5.0f 90=%5.0f 95=%5.0f max=%5.0f" % \
+                         (sec, fiducials, stats['T'], stats['min'], stats['5'], stats['10'], stats['25'],
+                          stats['med'], stats['75'], stats['90'], stats['95'], stats['max']))
         return dataArray
 
     ######## WORKER CALLBACKS #########
@@ -164,10 +242,10 @@ class G2Common(object):
         self.saturatedElements[indexOfSaturatedElements]=1
         indexOfNegativeAndSmallNumbers = data < self.notzero   ## FACTOR OUT
         data[indexOfNegativeAndSmallNumbers] = self.notzero
-        if self.mp.logger.isEnabledFor(logging.DEBUG):
+        if self.logger.isEnabledFor(logging.DEBUG):
             numSaturated = np.sum(indexOfSaturatedElements)
             numNeg = np.sum(indexOfNegativeAndSmallNumbers)
-            self.mp.logDebug("G2Common.workerAdjustData: set %d negative values to %r, identified %d saturated pixels" % \
+            self.logDebug("G2Common.workerAdjustData: set %d negative values to %r, identified %d saturated pixels" % \
                              (numNeg, self.notzero, numSaturated))
         
     def workerCalc(self, workerData):
@@ -300,7 +378,7 @@ class G2Common(object):
         assert os.path.exists(finecolorFile), "user_params['colorFineNdarrayCoords']=%s not found" % finecolorFile
         self.finecolor_ndarrayCoords = np.load(finecolorFile).astype(np.int32)
 
-        self.maskNdarrayCoords = maskNdarrayCoords
+        assert self.maskNdarrayCoords.shape == maskNdarrayCoords.shape, "viewerInit maskNdarrayCoords has different shape=%s then what was set in UserG2.init=%s" % (maskNdarrayCoords.shape, self.maskNdarrayCoords.shape)
         assert np.issubdtype(self.color_ndarrayCoords.dtype, np.integer), "color array does not have an integer type."
         assert np.issubdtype(self.finecolor_ndarrayCoords.dtype, np.integer), "finecolor array does not have an integer type."
         assert self.maskNdarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
@@ -345,14 +423,24 @@ class G2Common(object):
                         (self.finecolors, [self.finecolor2numElements[c] for c in self.finecolors]))
 
         self.plot = self.user_params['psmon_plot']
-        if self.plot:
+        if self.plot or self.debugPlot:
             hostname = os.environ.get('HOSTNAME','*UNKNOWN*')
             port = self.user_params.get('psmon_port',psmonConfig.APP_PORT)
             psmonPublish.init()
             self.mp.logInfo("Initialized psmon. viewer host is: %s" % hostname)
             psplotCmd = 'psplot --logx -s %s -p %s MULTI' % (hostname, port)
-            self.mp.logInfo("Run cmd: %s" % psplotCmd)
-
+            debugPlotCmd = 'psplot -s %s -p %s DEBUG' % (hostname, port)
+            self.logInfo("*********** PSPLOT CMD *************")
+            if self.plot:
+                self.logInfo("Run cmd: %s" % psplotCmd)
+            if self.debugPlot:
+                self.logInfo("For debug plot, run cmd: %s" % debugPlotCmd)
+                tmp = self.debugPlotImageBounds
+                rowA,rowB,colA,colB = tmp['rowA'], tmp['rowB'], tmp['colA'], tmp['colB']
+                self.logInfo(" will plot image[%d:%d,%d:%d] for IF,IP,G2 for a few delays" % \
+                             (rowA, rowB, colA, colB))
+            self.logInfo("*********** END PSPLOT CMD *************")
+            
         assert 'plot_colors' in self.user_params, "new parameter 'plot_colors' required in config. Set to 'None' to plot all colors, otherwise list like '[1,2,3]'"
         assert 'print_delay_curves' in self.user_params, "new parameter 'print_delay_curves' required in config. Set to 'True' or 'False'"
         self.plotColors = self.user_params['plot_colors']
@@ -397,6 +485,32 @@ class G2Common(object):
 
         eps = 1e-6 # protect from division by zero
 
+        counter120hz = lastEventTime['counter']
+
+        if self.debugPlot:
+            rowA = self.debugPlotImageBounds['rowA']
+            rowB = self.debugPlotImageBounds['rowB']
+            colA = self.debugPlotImageBounds['colA']
+            colB = self.debugPlotImageBounds['colB']
+
+            # each row is a delay, columns are IF IP G2
+            debugPlot = psmonPlots.MultiPlot(counter120hz, 'DEBUG', ncols=3)
+            delaysToDo = self.delays[0:3]
+            for nm in ['IF','IP','G2']:
+                for delay in delaysToDo:
+                    ndarr = name2delay2ndarray[nm][delay]
+                    fullImage = np.zeros(self.fullImageShape,np.float32)
+                    fullImage[self.iX.flatten(), self.iY.flatten()] = ndarr.flatten()[:]
+                    image = fullImage[rowA:rowB,colA:colB]
+                    title = "cntr=%d %s dly=%d" % (counter120hz, nm, delay)
+                    imagePlot = psmonPlots.Image(counter120hz, title, image)
+                    debugPlot.add(imagePlot)
+                    stats = getStats(image.flatten())
+                    self.logInfo("%s: cntr=%d min=%5.3f 5=%5.3f 10=%5.3f 25=%5.3f med=%5.3f 75=%5.3f 90=%5.3f 95=%5.3f max=%5.3f" % \
+                                 (title, counter120hz, stats['min'], stats['5'], stats['10'], stats['25'],
+                                  stats['med'], stats['75'], stats['90'], stats['95'], stats['max']))
+            psmonPublish.send('DEBUG', debugPlot)
+
         for delayIdx, delayCount in enumerate(counts):
             if delayCount <= 0:
                 continue
@@ -415,11 +529,13 @@ class G2Common(object):
             IF /= np.float32(delayCount)
             IP /= np.float32(delayCount)
 
+#            fineColorAvg_IF = IF #replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
+#            fineColorAvg_IP = IP # replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
             fineColorAvg_IF = replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
             fineColorAvg_IP = replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
             
-            fineColorAvg_IF[fineColorAvg_IF<=eps]=eps
-            fineColorAvg_IP[fineColorAvg_IP<=eps]=eps
+#            fineColorAvg_IF[fineColorAvg_IF<=eps]=eps
+#            fineColorAvg_IP[fineColorAvg_IP<=eps]=eps
 
             final = G2 / (fineColorAvg_IP * fineColorAvg_IF)
 
@@ -429,15 +545,14 @@ class G2Common(object):
                     average = np.sum(final[colorNdarrayInd]) / np.float32(numElementsThisColor)
                     delayCurves[color][delayIdx] = average
 
-        counter120hz = lastEventTime['counter']
 
         if self.printDelayCurves:
             for color in self.color2ndarrayInd.keys():
                 if color not in delayCurves: 
                     continue
-                self.mp.logger.info("evt=%5d color=%2d delayCurve=%s ... %s" % \
-                                    (counter120hz, color, ', '.join(map(str,delayCurves[color][0:10])),
-                                     ', '.join(map(str,delayCurves[color][-10:]))))
+                self.logInfo("evt=%5d color=%2d delayCurve=%s ... %s" % \
+                             (counter120hz, color, ', '.join(map(str,delayCurves[color][0:10])),
+                              ', '.join(map(str,delayCurves[color][-10:]))))
                     
 
         groupName = 'G2_results_at_%6.6d' % counter120hz
@@ -468,13 +583,15 @@ class G2Common(object):
                 ParCorAna.writeToH5Group(group, name2delay2ndarray)
 
         if self.plot:
+            goodDelays = counts > 0
             multi = psmonPlots.MultiPlot(counter120hz, 'MULTI', ncols=3)
             for color in self.colors:
                 if color not in delayCurves: continue
                 if (self.plotColors is not None) and (not color in self.plotColors):
                     continue
                 thisPlot = psmonPlots.XYPlot(counter120hz, 'color/bin=%d' % color, 
-                                  self.delays, delayCurves[color], formats='bs-')
+                                             [d/120.0 for d in self.delays[goodDelays]], delayCurves[color][goodDelays], 
+                                             xlabel='tau (sec)', ylabel='G2', formats='bs-')
                 multi.add(thisPlot)
             psmonPublish.send('MULTI', multi)
 
@@ -526,6 +643,9 @@ class G2IncrementalAccumulator(G2Common):
 
     def workerAfterDataInsert(self, tm, xInd, workerData):
         maxStoredTime = workerData.maxTimeForStoredData()
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logInfo("tm=%d xInd=%s new worker data avg: %.2f" % \
+                         (tm, xInd, np.average(workerData.X[xInd])), allWorkers=True)
         for delayIdx, delay in enumerate(self.delays):
             if delay > maxStoredTime: break
             tmEarlier = tm - delay
@@ -545,6 +665,9 @@ class G2IncrementalAccumulator(G2Common):
                 self.IP[delayIdx,:] += intensitiesFirstTime
                 self.IF[delayIdx,:] += intensitiesLaterTime
                 self.counts[delayIdx] += 1
+#            self.mp.logInfo("tm=%s delay=%d G2.min=%.1f G2.avg=%.1f G2.max=%.1f" % (tm, delay, np.min(self.G2[delayIdx,:]), np.average(self.G2[delayIdx,:]), np.max(self.G2[delayIdx,:])), allWorkers=True)
+#            self.mp.logInfo("tm=%s delay=%d IF.min=%.1f IF.avg=%.1f IF.max=%.1f" % (tm, delay, np.min(self.IF[delayIdx,:]), np.average(self.IF[delayIdx,:]), np.max(self.IF[delayIdx,:])), allWorkers=True)
+#            self.mp.logInfo("tm=%s delay=%d IP.min=%.1f IP.avg=%.1f IP.max=%.1f" % (tm, delay, np.min(self.IP[delayIdx,:]), np.average(self.IP[delayIdx,:]), np.max(self.IP[delayIdx,:])), allWorkers=True)
 
     def workerCalc(self, workerData):
         return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements

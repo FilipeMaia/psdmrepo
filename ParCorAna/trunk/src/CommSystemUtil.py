@@ -219,3 +219,19 @@ def checkParams(system_params, user_params, checkUserParams=False):
                               pixels_on))
         
         
+
+def imgBoundBox(iX, iY, maskNdArrayCoords):
+    numImageRows = np.max(iX)+1
+    numImageCols = np.max(iY)+1
+    fullImageShape = (numImageRows, numImageCols)
+    maskImage = np.zeros(fullImageShape, dtype=np.int)
+    maskImage[iX.flatten(), iY.flatten()] = maskNdArrayCoords.astype(np.int8).flatten()[:]
+    rowSums = np.sum(maskImage,1)
+    colSums = np.sum(maskImage,0)
+    rowNonZero = np.where(rowSums>0)[0]
+    colNonZero = np.where(colSums>0)[0]
+    bounds = {'rowA':np.min(rowNonZero),
+              'rowB':np.max(rowNonZero),
+              'colA':np.min(colNonZero),
+              'colB':np.max(colNonZero)}
+    return fullImageShape, bounds
