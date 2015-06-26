@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 
-pdsdata_ver = '8.2.9'
+pdsdata_ver = '8.3.1'
 PREFIX = pjoin('$SIT_EXTERNAL_SW', 'pdsdata', pdsdata_ver)
 
 # pdsdata package will link all the stuff, but only includes one
