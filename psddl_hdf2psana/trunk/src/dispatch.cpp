@@ -183,6 +183,10 @@ try {
     // Epix::Config100aV1
     cfgStore.putProxy(psddl_hdf2psana::Epix::make_Config100aV1(schema_version, group, idx), src);
     break;
+  case 1054612895:
+    // Epix::Config100aV2
+    cfgStore.putProxy(psddl_hdf2psana::Epix::make_Config100aV2(schema_version, group, idx), src);
+    break;
   case 1078464760:
     // Bld::BldDataEBeamV5
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV5(schema_version, group, idx), src);
@@ -494,6 +498,8 @@ try {
   case 2914045211:
     // Epix::ElementV2
     if (boost::shared_ptr<Psana::Epix::Config100aV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Epix::make_ElementV2(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::Epix::Config100aV2> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV2(schema_version, group, idx, cfgPtr), src);
     }
     break;

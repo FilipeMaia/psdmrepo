@@ -934,6 +934,198 @@ void make_datasets(const Psana::Epix::Config100aV1& obj, hdf5pp::Group group, co
 void store_at(const Psana::Epix::Config100aV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
+namespace ns_Config100aV2_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::Epix::Config100aV2& psanaobj);
+  ~dataset_config();
+
+  uint32_t version;
+  uint32_t runTrigDelay;
+  uint32_t daqTrigDelay;
+  uint32_t dacSetting;
+  uint8_t asicGR;
+  uint8_t asicAcq;
+  uint8_t asicR0;
+  uint8_t asicPpmat;
+  uint8_t asicPpbe;
+  uint8_t asicRoClk;
+  uint8_t asicGRControl;
+  uint8_t asicAcqControl;
+  uint8_t asicR0Control;
+  uint8_t asicPpmatControl;
+  uint8_t asicPpbeControl;
+  uint8_t asicR0ClkControl;
+  uint8_t prepulseR0En;
+  uint32_t adcStreamMode;
+  uint8_t testPatternEnable;
+  uint8_t SyncMode;
+  uint8_t R0Mode;
+  uint32_t acqToAsicR0Delay;
+  uint32_t asicR0ToAsicAcq;
+  uint32_t asicAcqWidth;
+  uint32_t asicAcqLToPPmatL;
+  uint32_t asicPPmatToReadout;
+  uint32_t asicRoClkHalfT;
+  uint32_t adcReadsPerPixel;
+  uint32_t adcClkHalfT;
+  uint32_t asicR0Width;
+  uint32_t adcPipelineDelay;
+  uint16_t SyncWidth;
+  uint16_t SyncDelay;
+  uint32_t prepulseR0Width;
+  uint32_t prepulseR0Delay;
+  uint32_t digitalCardId0;
+  uint32_t digitalCardId1;
+  uint32_t analogCardId0;
+  uint32_t analogCardId1;
+  uint32_t carrierId0;
+  uint32_t carrierId1;
+  uint32_t numberOfAsicsPerRow;
+  uint32_t numberOfAsicsPerColumn;
+  uint32_t numberOfRowsPerAsic;
+  uint32_t numberOfReadableRowsPerAsic;
+  uint32_t numberOfPixelsPerAsicRow;
+  uint32_t calibrationRowCountPerASIC;
+  uint32_t environmentalRowCountPerASIC;
+  uint32_t baseClockFrequency;
+  uint32_t asicMask;
+  uint32_t enableAutomaticRunTrigger;
+  uint32_t numberOf125MhzTicksPerRunTrigger;
+  uint8_t scopeEnable;
+  uint8_t scopeTrigEdge;
+  uint8_t scopeTrigChan;
+  uint8_t scopeArmMode;
+  uint16_t scopeADCThreshold;
+  uint16_t scopeTrigHoldoff;
+  uint16_t scopeTrigOffset;
+  uint16_t scopeTraceLength;
+  uint16_t scopeADCsameplesToSkip;
+  uint8_t scopeChanAwaveformSelect;
+  uint8_t scopeChanBwaveformSelect;
+  uint32_t numberOfRows;
+  uint32_t numberOfReadableRows;
+  uint32_t numberOfColumns;
+  uint32_t numberOfCalibrationRows;
+  uint32_t numberOfEnvironmentalRows;
+  uint32_t numberOfAsics;
+
+
+};
+}
+
+
+class Config100aV2_v0 : public Psana::Epix::Config100aV2 {
+public:
+  typedef Psana::Epix::Config100aV2 PsanaType;
+  Config100aV2_v0() {}
+  Config100aV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~Config100aV2_v0() {}
+  virtual uint32_t version() const;
+  virtual uint32_t runTrigDelay() const;
+  virtual uint32_t daqTrigDelay() const;
+  virtual uint32_t dacSetting() const;
+  virtual uint8_t asicGR() const;
+  virtual uint8_t asicAcq() const;
+  virtual uint8_t asicR0() const;
+  virtual uint8_t asicPpmat() const;
+  virtual uint8_t asicPpbe() const;
+  virtual uint8_t asicRoClk() const;
+  virtual uint8_t asicGRControl() const;
+  virtual uint8_t asicAcqControl() const;
+  virtual uint8_t asicR0Control() const;
+  virtual uint8_t asicPpmatControl() const;
+  virtual uint8_t asicPpbeControl() const;
+  virtual uint8_t asicR0ClkControl() const;
+  virtual uint8_t prepulseR0En() const;
+  virtual uint32_t adcStreamMode() const;
+  virtual uint8_t testPatternEnable() const;
+  virtual uint8_t SyncMode() const;
+  virtual uint8_t R0Mode() const;
+  virtual uint32_t acqToAsicR0Delay() const;
+  virtual uint32_t asicR0ToAsicAcq() const;
+  virtual uint32_t asicAcqWidth() const;
+  virtual uint32_t asicAcqLToPPmatL() const;
+  virtual uint32_t asicPPmatToReadout() const;
+  virtual uint32_t asicRoClkHalfT() const;
+  virtual uint32_t adcReadsPerPixel() const;
+  virtual uint32_t adcClkHalfT() const;
+  virtual uint32_t asicR0Width() const;
+  virtual uint32_t adcPipelineDelay() const;
+  virtual uint16_t SyncWidth() const;
+  virtual uint16_t SyncDelay() const;
+  virtual uint32_t prepulseR0Width() const;
+  virtual uint32_t prepulseR0Delay() const;
+  virtual uint32_t digitalCardId0() const;
+  virtual uint32_t digitalCardId1() const;
+  virtual uint32_t analogCardId0() const;
+  virtual uint32_t analogCardId1() const;
+  virtual uint32_t carrierId0() const;
+  virtual uint32_t carrierId1() const;
+  virtual uint32_t numberOfAsicsPerRow() const;
+  virtual uint32_t numberOfAsicsPerColumn() const;
+  virtual uint32_t numberOfRowsPerAsic() const;
+  virtual uint32_t numberOfReadableRowsPerAsic() const;
+  virtual uint32_t numberOfPixelsPerAsicRow() const;
+  virtual uint32_t calibrationRowCountPerASIC() const;
+  virtual uint32_t environmentalRowCountPerASIC() const;
+  virtual uint32_t baseClockFrequency() const;
+  virtual uint32_t asicMask() const;
+  virtual uint32_t enableAutomaticRunTrigger() const;
+  virtual uint32_t numberOf125MhzTicksPerRunTrigger() const;
+  virtual uint8_t scopeEnable() const;
+  virtual uint8_t scopeTrigEdge() const;
+  virtual uint8_t scopeTrigChan() const;
+  virtual uint8_t scopeArmMode() const;
+  virtual uint16_t scopeADCThreshold() const;
+  virtual uint16_t scopeTrigHoldoff() const;
+  virtual uint16_t scopeTrigOffset() const;
+  virtual uint16_t scopeTraceLength() const;
+  virtual uint16_t scopeADCsameplesToSkip() const;
+  virtual uint8_t scopeChanAwaveformSelect() const;
+  virtual uint8_t scopeChanBwaveformSelect() const;
+  virtual const Psana::Epix::Asic100aConfigV1& asics(uint32_t i0) const;
+  virtual ndarray<const uint16_t, 2> asicPixelConfigArray() const;
+  virtual ndarray<const uint8_t, 2> calibPixelConfigArray() const;
+  virtual uint32_t numberOfRows() const;
+  virtual uint32_t numberOfReadableRows() const;
+  virtual uint32_t numberOfColumns() const;
+  virtual uint32_t numberOfCalibrationRows() const;
+  virtual uint32_t numberOfEnvironmentalRows() const;
+  virtual uint32_t numberOfAsics() const;
+  /** Method which returns the shape (dimensions) of the data returned by asics() method. */
+  std::vector<int> asics_shape() const;
+
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Epix::ns_Config100aV2_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable ndarray<const Asic100aConfigV1_v0, 1> m_ds_asics;
+  void read_ds_asics() const;
+  mutable ndarray<const uint16_t, 2> m_ds_asicPixelConfigArray;
+  void read_ds_asicPixelConfigArray() const;
+  mutable ndarray<const uint8_t, 2> m_ds_calibPixelConfigArray;
+  void read_ds_calibPixelConfigArray() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::Config100aV2> > make_Config100aV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Epix::Config100aV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Epix::Config100aV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Epix::Config100aV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
 namespace ns_ElementV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
@@ -1061,6 +1253,7 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::Config100aV1>& cfg);
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::Config100aV2>& cfg);
 
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Epix::ElementV2& obj, hdf5pp::Group group, int version = -1);

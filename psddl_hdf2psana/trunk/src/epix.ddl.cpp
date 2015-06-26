@@ -3133,6 +3133,691 @@ void store_at(const Psana::Epix::Config100aV1* obj, hdf5pp::Group group, long in
 }
 
 
+hdf5pp::Type ns_Config100aV2_v0_dataset_config_stored_type()
+{
+  typedef ns_Config100aV2_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("version", offsetof(DsType, version), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("runTrigDelay", offsetof(DsType, runTrigDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("daqTrigDelay", offsetof(DsType, daqTrigDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("dacSetting", offsetof(DsType, dacSetting), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicGR", offsetof(DsType, asicGR), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicAcq", offsetof(DsType, asicAcq), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicR0", offsetof(DsType, asicR0), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicPpmat", offsetof(DsType, asicPpmat), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicPpbe", offsetof(DsType, asicPpbe), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicRoClk", offsetof(DsType, asicRoClk), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicGRControl", offsetof(DsType, asicGRControl), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicAcqControl", offsetof(DsType, asicAcqControl), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicR0Control", offsetof(DsType, asicR0Control), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicPpmatControl", offsetof(DsType, asicPpmatControl), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicPpbeControl", offsetof(DsType, asicPpbeControl), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("asicR0ClkControl", offsetof(DsType, asicR0ClkControl), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("prepulseR0En", offsetof(DsType, prepulseR0En), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("adcStreamMode", offsetof(DsType, adcStreamMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testPatternEnable", offsetof(DsType, testPatternEnable), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("SyncMode", offsetof(DsType, SyncMode), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("R0Mode", offsetof(DsType, R0Mode), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("acqToAsicR0Delay", offsetof(DsType, acqToAsicR0Delay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicR0ToAsicAcq", offsetof(DsType, asicR0ToAsicAcq), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicAcqWidth", offsetof(DsType, asicAcqWidth), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicAcqLToPPmatL", offsetof(DsType, asicAcqLToPPmatL), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicPPmatToReadout", offsetof(DsType, asicPPmatToReadout), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicRoClkHalfT", offsetof(DsType, asicRoClkHalfT), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("adcReadsPerPixel", offsetof(DsType, adcReadsPerPixel), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("adcClkHalfT", offsetof(DsType, adcClkHalfT), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicR0Width", offsetof(DsType, asicR0Width), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("adcPipelineDelay", offsetof(DsType, adcPipelineDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("SyncWidth", offsetof(DsType, SyncWidth), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("SyncDelay", offsetof(DsType, SyncDelay), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("prepulseR0Width", offsetof(DsType, prepulseR0Width), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("prepulseR0Delay", offsetof(DsType, prepulseR0Delay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("digitalCardId0", offsetof(DsType, digitalCardId0), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("digitalCardId1", offsetof(DsType, digitalCardId1), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("analogCardId0", offsetof(DsType, analogCardId0), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("analogCardId1", offsetof(DsType, analogCardId1), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("carrierId0", offsetof(DsType, carrierId0), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("carrierId1", offsetof(DsType, carrierId1), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfAsicsPerRow", offsetof(DsType, numberOfAsicsPerRow), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfAsicsPerColumn", offsetof(DsType, numberOfAsicsPerColumn), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfRowsPerAsic", offsetof(DsType, numberOfRowsPerAsic), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfReadableRowsPerAsic", offsetof(DsType, numberOfReadableRowsPerAsic), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfPixelsPerAsicRow", offsetof(DsType, numberOfPixelsPerAsicRow), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("calibrationRowCountPerASIC", offsetof(DsType, calibrationRowCountPerASIC), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("environmentalRowCountPerASIC", offsetof(DsType, environmentalRowCountPerASIC), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("baseClockFrequency", offsetof(DsType, baseClockFrequency), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("enableAutomaticRunTrigger", offsetof(DsType, enableAutomaticRunTrigger), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOf125MhzTicksPerRunTrigger", offsetof(DsType, numberOf125MhzTicksPerRunTrigger), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("scopeEnable", offsetof(DsType, scopeEnable), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("scopeTrigEdge", offsetof(DsType, scopeTrigEdge), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("scopeTrigChan", offsetof(DsType, scopeTrigChan), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("scopeArmMode", offsetof(DsType, scopeArmMode), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("scopeADCThreshold", offsetof(DsType, scopeADCThreshold), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("scopeTrigHoldoff", offsetof(DsType, scopeTrigHoldoff), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("scopeTrigOffset", offsetof(DsType, scopeTrigOffset), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("scopeTraceLength", offsetof(DsType, scopeTraceLength), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("scopeADCsameplesToSkip", offsetof(DsType, scopeADCsameplesToSkip), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("scopeChanAwaveformSelect", offsetof(DsType, scopeChanAwaveformSelect), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("scopeChanBwaveformSelect", offsetof(DsType, scopeChanBwaveformSelect), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("numberOfRows", offsetof(DsType, numberOfRows), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfReadableRows", offsetof(DsType, numberOfReadableRows), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfColumns", offsetof(DsType, numberOfColumns), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfCalibrationRows", offsetof(DsType, numberOfCalibrationRows), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfEnvironmentalRows", offsetof(DsType, numberOfEnvironmentalRows), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("numberOfAsics", offsetof(DsType, numberOfAsics), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_Config100aV2_v0::dataset_config::stored_type()
+{
+  static hdf5pp::Type type = ns_Config100aV2_v0_dataset_config_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_Config100aV2_v0_dataset_config_native_type()
+{
+  typedef ns_Config100aV2_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("version", offsetof(DsType, version), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("runTrigDelay", offsetof(DsType, runTrigDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("daqTrigDelay", offsetof(DsType, daqTrigDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("dacSetting", offsetof(DsType, dacSetting), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicGR", offsetof(DsType, asicGR), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicAcq", offsetof(DsType, asicAcq), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicR0", offsetof(DsType, asicR0), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicPpmat", offsetof(DsType, asicPpmat), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicPpbe", offsetof(DsType, asicPpbe), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicRoClk", offsetof(DsType, asicRoClk), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicGRControl", offsetof(DsType, asicGRControl), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicAcqControl", offsetof(DsType, asicAcqControl), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicR0Control", offsetof(DsType, asicR0Control), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicPpmatControl", offsetof(DsType, asicPpmatControl), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicPpbeControl", offsetof(DsType, asicPpbeControl), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("asicR0ClkControl", offsetof(DsType, asicR0ClkControl), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("prepulseR0En", offsetof(DsType, prepulseR0En), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("adcStreamMode", offsetof(DsType, adcStreamMode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testPatternEnable", offsetof(DsType, testPatternEnable), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("SyncMode", offsetof(DsType, SyncMode), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("R0Mode", offsetof(DsType, R0Mode), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("acqToAsicR0Delay", offsetof(DsType, acqToAsicR0Delay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicR0ToAsicAcq", offsetof(DsType, asicR0ToAsicAcq), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicAcqWidth", offsetof(DsType, asicAcqWidth), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicAcqLToPPmatL", offsetof(DsType, asicAcqLToPPmatL), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicPPmatToReadout", offsetof(DsType, asicPPmatToReadout), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicRoClkHalfT", offsetof(DsType, asicRoClkHalfT), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("adcReadsPerPixel", offsetof(DsType, adcReadsPerPixel), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("adcClkHalfT", offsetof(DsType, adcClkHalfT), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicR0Width", offsetof(DsType, asicR0Width), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("adcPipelineDelay", offsetof(DsType, adcPipelineDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("SyncWidth", offsetof(DsType, SyncWidth), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("SyncDelay", offsetof(DsType, SyncDelay), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("prepulseR0Width", offsetof(DsType, prepulseR0Width), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("prepulseR0Delay", offsetof(DsType, prepulseR0Delay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("digitalCardId0", offsetof(DsType, digitalCardId0), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("digitalCardId1", offsetof(DsType, digitalCardId1), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("analogCardId0", offsetof(DsType, analogCardId0), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("analogCardId1", offsetof(DsType, analogCardId1), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("carrierId0", offsetof(DsType, carrierId0), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("carrierId1", offsetof(DsType, carrierId1), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfAsicsPerRow", offsetof(DsType, numberOfAsicsPerRow), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfAsicsPerColumn", offsetof(DsType, numberOfAsicsPerColumn), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfRowsPerAsic", offsetof(DsType, numberOfRowsPerAsic), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfReadableRowsPerAsic", offsetof(DsType, numberOfReadableRowsPerAsic), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfPixelsPerAsicRow", offsetof(DsType, numberOfPixelsPerAsicRow), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("calibrationRowCountPerASIC", offsetof(DsType, calibrationRowCountPerASIC), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("environmentalRowCountPerASIC", offsetof(DsType, environmentalRowCountPerASIC), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("baseClockFrequency", offsetof(DsType, baseClockFrequency), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("enableAutomaticRunTrigger", offsetof(DsType, enableAutomaticRunTrigger), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOf125MhzTicksPerRunTrigger", offsetof(DsType, numberOf125MhzTicksPerRunTrigger), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("scopeEnable", offsetof(DsType, scopeEnable), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("scopeTrigEdge", offsetof(DsType, scopeTrigEdge), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("scopeTrigChan", offsetof(DsType, scopeTrigChan), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("scopeArmMode", offsetof(DsType, scopeArmMode), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("scopeADCThreshold", offsetof(DsType, scopeADCThreshold), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("scopeTrigHoldoff", offsetof(DsType, scopeTrigHoldoff), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("scopeTrigOffset", offsetof(DsType, scopeTrigOffset), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("scopeTraceLength", offsetof(DsType, scopeTraceLength), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("scopeADCsameplesToSkip", offsetof(DsType, scopeADCsameplesToSkip), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("scopeChanAwaveformSelect", offsetof(DsType, scopeChanAwaveformSelect), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("scopeChanBwaveformSelect", offsetof(DsType, scopeChanBwaveformSelect), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("numberOfRows", offsetof(DsType, numberOfRows), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfReadableRows", offsetof(DsType, numberOfReadableRows), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfColumns", offsetof(DsType, numberOfColumns), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfCalibrationRows", offsetof(DsType, numberOfCalibrationRows), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfEnvironmentalRows", offsetof(DsType, numberOfEnvironmentalRows), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("numberOfAsics", offsetof(DsType, numberOfAsics), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_Config100aV2_v0::dataset_config::native_type()
+{
+  static hdf5pp::Type type = ns_Config100aV2_v0_dataset_config_native_type();
+  return type;
+}
+
+ns_Config100aV2_v0::dataset_config::dataset_config()
+{
+}
+
+ns_Config100aV2_v0::dataset_config::dataset_config(const Psana::Epix::Config100aV2& psanaobj)
+  : version(psanaobj.version())
+  , runTrigDelay(psanaobj.runTrigDelay())
+  , daqTrigDelay(psanaobj.daqTrigDelay())
+  , dacSetting(psanaobj.dacSetting())
+  , asicGR(psanaobj.asicGR())
+  , asicAcq(psanaobj.asicAcq())
+  , asicR0(psanaobj.asicR0())
+  , asicPpmat(psanaobj.asicPpmat())
+  , asicPpbe(psanaobj.asicPpbe())
+  , asicRoClk(psanaobj.asicRoClk())
+  , asicGRControl(psanaobj.asicGRControl())
+  , asicAcqControl(psanaobj.asicAcqControl())
+  , asicR0Control(psanaobj.asicR0Control())
+  , asicPpmatControl(psanaobj.asicPpmatControl())
+  , asicPpbeControl(psanaobj.asicPpbeControl())
+  , asicR0ClkControl(psanaobj.asicR0ClkControl())
+  , prepulseR0En(psanaobj.prepulseR0En())
+  , adcStreamMode(psanaobj.adcStreamMode())
+  , testPatternEnable(psanaobj.testPatternEnable())
+  , SyncMode(psanaobj.SyncMode())
+  , R0Mode(psanaobj.R0Mode())
+  , acqToAsicR0Delay(psanaobj.acqToAsicR0Delay())
+  , asicR0ToAsicAcq(psanaobj.asicR0ToAsicAcq())
+  , asicAcqWidth(psanaobj.asicAcqWidth())
+  , asicAcqLToPPmatL(psanaobj.asicAcqLToPPmatL())
+  , asicPPmatToReadout(psanaobj.asicPPmatToReadout())
+  , asicRoClkHalfT(psanaobj.asicRoClkHalfT())
+  , adcReadsPerPixel(psanaobj.adcReadsPerPixel())
+  , adcClkHalfT(psanaobj.adcClkHalfT())
+  , asicR0Width(psanaobj.asicR0Width())
+  , adcPipelineDelay(psanaobj.adcPipelineDelay())
+  , SyncWidth(psanaobj.SyncWidth())
+  , SyncDelay(psanaobj.SyncDelay())
+  , prepulseR0Width(psanaobj.prepulseR0Width())
+  , prepulseR0Delay(psanaobj.prepulseR0Delay())
+  , digitalCardId0(psanaobj.digitalCardId0())
+  , digitalCardId1(psanaobj.digitalCardId1())
+  , analogCardId0(psanaobj.analogCardId0())
+  , analogCardId1(psanaobj.analogCardId1())
+  , carrierId0(psanaobj.carrierId0())
+  , carrierId1(psanaobj.carrierId1())
+  , numberOfAsicsPerRow(psanaobj.numberOfAsicsPerRow())
+  , numberOfAsicsPerColumn(psanaobj.numberOfAsicsPerColumn())
+  , numberOfRowsPerAsic(psanaobj.numberOfRowsPerAsic())
+  , numberOfReadableRowsPerAsic(psanaobj.numberOfReadableRowsPerAsic())
+  , numberOfPixelsPerAsicRow(psanaobj.numberOfPixelsPerAsicRow())
+  , calibrationRowCountPerASIC(psanaobj.calibrationRowCountPerASIC())
+  , environmentalRowCountPerASIC(psanaobj.environmentalRowCountPerASIC())
+  , baseClockFrequency(psanaobj.baseClockFrequency())
+  , asicMask(psanaobj.asicMask())
+  , enableAutomaticRunTrigger(psanaobj.enableAutomaticRunTrigger())
+  , numberOf125MhzTicksPerRunTrigger(psanaobj.numberOf125MhzTicksPerRunTrigger())
+  , scopeEnable(psanaobj.scopeEnable())
+  , scopeTrigEdge(psanaobj.scopeTrigEdge())
+  , scopeTrigChan(psanaobj.scopeTrigChan())
+  , scopeArmMode(psanaobj.scopeArmMode())
+  , scopeADCThreshold(psanaobj.scopeADCThreshold())
+  , scopeTrigHoldoff(psanaobj.scopeTrigHoldoff())
+  , scopeTrigOffset(psanaobj.scopeTrigOffset())
+  , scopeTraceLength(psanaobj.scopeTraceLength())
+  , scopeADCsameplesToSkip(psanaobj.scopeADCsameplesToSkip())
+  , scopeChanAwaveformSelect(psanaobj.scopeChanAwaveformSelect())
+  , scopeChanBwaveformSelect(psanaobj.scopeChanBwaveformSelect())
+  , numberOfRows(psanaobj.numberOfRows())
+  , numberOfReadableRows(psanaobj.numberOfReadableRows())
+  , numberOfColumns(psanaobj.numberOfColumns())
+  , numberOfCalibrationRows(psanaobj.numberOfCalibrationRows())
+  , numberOfEnvironmentalRows(psanaobj.numberOfEnvironmentalRows())
+  , numberOfAsics(psanaobj.numberOfAsics())
+{
+}
+
+ns_Config100aV2_v0::dataset_config::~dataset_config()
+{
+}
+uint32_t Config100aV2_v0::version() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->version);
+}
+uint32_t Config100aV2_v0::runTrigDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->runTrigDelay);
+}
+uint32_t Config100aV2_v0::daqTrigDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->daqTrigDelay);
+}
+uint32_t Config100aV2_v0::dacSetting() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->dacSetting);
+}
+uint8_t Config100aV2_v0::asicGR() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicGR);
+}
+uint8_t Config100aV2_v0::asicAcq() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicAcq);
+}
+uint8_t Config100aV2_v0::asicR0() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicR0);
+}
+uint8_t Config100aV2_v0::asicPpmat() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicPpmat);
+}
+uint8_t Config100aV2_v0::asicPpbe() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicPpbe);
+}
+uint8_t Config100aV2_v0::asicRoClk() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicRoClk);
+}
+uint8_t Config100aV2_v0::asicGRControl() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicGRControl);
+}
+uint8_t Config100aV2_v0::asicAcqControl() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicAcqControl);
+}
+uint8_t Config100aV2_v0::asicR0Control() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicR0Control);
+}
+uint8_t Config100aV2_v0::asicPpmatControl() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicPpmatControl);
+}
+uint8_t Config100aV2_v0::asicPpbeControl() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicPpbeControl);
+}
+uint8_t Config100aV2_v0::asicR0ClkControl() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->asicR0ClkControl);
+}
+uint8_t Config100aV2_v0::prepulseR0En() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->prepulseR0En);
+}
+uint32_t Config100aV2_v0::adcStreamMode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->adcStreamMode);
+}
+uint8_t Config100aV2_v0::testPatternEnable() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->testPatternEnable);
+}
+uint8_t Config100aV2_v0::SyncMode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->SyncMode);
+}
+uint8_t Config100aV2_v0::R0Mode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->R0Mode);
+}
+uint32_t Config100aV2_v0::acqToAsicR0Delay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->acqToAsicR0Delay);
+}
+uint32_t Config100aV2_v0::asicR0ToAsicAcq() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicR0ToAsicAcq);
+}
+uint32_t Config100aV2_v0::asicAcqWidth() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicAcqWidth);
+}
+uint32_t Config100aV2_v0::asicAcqLToPPmatL() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicAcqLToPPmatL);
+}
+uint32_t Config100aV2_v0::asicPPmatToReadout() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicPPmatToReadout);
+}
+uint32_t Config100aV2_v0::asicRoClkHalfT() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicRoClkHalfT);
+}
+uint32_t Config100aV2_v0::adcReadsPerPixel() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->adcReadsPerPixel);
+}
+uint32_t Config100aV2_v0::adcClkHalfT() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->adcClkHalfT);
+}
+uint32_t Config100aV2_v0::asicR0Width() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicR0Width);
+}
+uint32_t Config100aV2_v0::adcPipelineDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->adcPipelineDelay);
+}
+uint16_t Config100aV2_v0::SyncWidth() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->SyncWidth);
+}
+uint16_t Config100aV2_v0::SyncDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->SyncDelay);
+}
+uint32_t Config100aV2_v0::prepulseR0Width() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->prepulseR0Width);
+}
+uint32_t Config100aV2_v0::prepulseR0Delay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->prepulseR0Delay);
+}
+uint32_t Config100aV2_v0::digitalCardId0() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->digitalCardId0);
+}
+uint32_t Config100aV2_v0::digitalCardId1() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->digitalCardId1);
+}
+uint32_t Config100aV2_v0::analogCardId0() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->analogCardId0);
+}
+uint32_t Config100aV2_v0::analogCardId1() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->analogCardId1);
+}
+uint32_t Config100aV2_v0::carrierId0() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->carrierId0);
+}
+uint32_t Config100aV2_v0::carrierId1() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->carrierId1);
+}
+uint32_t Config100aV2_v0::numberOfAsicsPerRow() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfAsicsPerRow);
+}
+uint32_t Config100aV2_v0::numberOfAsicsPerColumn() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfAsicsPerColumn);
+}
+uint32_t Config100aV2_v0::numberOfRowsPerAsic() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfRowsPerAsic);
+}
+uint32_t Config100aV2_v0::numberOfReadableRowsPerAsic() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfReadableRowsPerAsic);
+}
+uint32_t Config100aV2_v0::numberOfPixelsPerAsicRow() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfPixelsPerAsicRow);
+}
+uint32_t Config100aV2_v0::calibrationRowCountPerASIC() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->calibrationRowCountPerASIC);
+}
+uint32_t Config100aV2_v0::environmentalRowCountPerASIC() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->environmentalRowCountPerASIC);
+}
+uint32_t Config100aV2_v0::baseClockFrequency() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->baseClockFrequency);
+}
+uint32_t Config100aV2_v0::asicMask() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicMask);
+}
+uint32_t Config100aV2_v0::enableAutomaticRunTrigger() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->enableAutomaticRunTrigger);
+}
+uint32_t Config100aV2_v0::numberOf125MhzTicksPerRunTrigger() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOf125MhzTicksPerRunTrigger);
+}
+uint8_t Config100aV2_v0::scopeEnable() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeEnable);
+}
+uint8_t Config100aV2_v0::scopeTrigEdge() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeTrigEdge);
+}
+uint8_t Config100aV2_v0::scopeTrigChan() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeTrigChan);
+}
+uint8_t Config100aV2_v0::scopeArmMode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeArmMode);
+}
+uint16_t Config100aV2_v0::scopeADCThreshold() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->scopeADCThreshold);
+}
+uint16_t Config100aV2_v0::scopeTrigHoldoff() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->scopeTrigHoldoff);
+}
+uint16_t Config100aV2_v0::scopeTrigOffset() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->scopeTrigOffset);
+}
+uint16_t Config100aV2_v0::scopeTraceLength() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->scopeTraceLength);
+}
+uint16_t Config100aV2_v0::scopeADCsameplesToSkip() const {
+  if (not m_ds_config) read_ds_config();
+  return uint16_t(m_ds_config->scopeADCsameplesToSkip);
+}
+uint8_t Config100aV2_v0::scopeChanAwaveformSelect() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeChanAwaveformSelect);
+}
+uint8_t Config100aV2_v0::scopeChanBwaveformSelect() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->scopeChanBwaveformSelect);
+}
+const Psana::Epix::Asic100aConfigV1& Config100aV2_v0::asics(uint32_t i0) const {
+  if (m_ds_asics.empty()) read_ds_asics();
+  return m_ds_asics[i0];
+}
+ndarray<const uint16_t, 2> Config100aV2_v0::asicPixelConfigArray() const {
+  if (m_ds_asicPixelConfigArray.empty()) read_ds_asicPixelConfigArray();
+  return m_ds_asicPixelConfigArray;
+}
+ndarray<const uint8_t, 2> Config100aV2_v0::calibPixelConfigArray() const {
+  if (m_ds_calibPixelConfigArray.empty()) read_ds_calibPixelConfigArray();
+  return m_ds_calibPixelConfigArray;
+}
+uint32_t Config100aV2_v0::numberOfRows() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfRows);
+}
+uint32_t Config100aV2_v0::numberOfReadableRows() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfReadableRows);
+}
+uint32_t Config100aV2_v0::numberOfColumns() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfColumns);
+}
+uint32_t Config100aV2_v0::numberOfCalibrationRows() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfCalibrationRows);
+}
+uint32_t Config100aV2_v0::numberOfEnvironmentalRows() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfEnvironmentalRows);
+}
+uint32_t Config100aV2_v0::numberOfAsics() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->numberOfAsics);
+}
+std::vector<int>
+Config100aV2_v0::asics_shape() const{ 
+  int shape[] = { this->numberOfAsicsPerRow()*this->numberOfAsicsPerColumn() };
+  return std::vector<int>(shape, shape+1); 
+}
+void Config100aV2_v0::read_ds_config() const {
+  m_ds_config = hdf5pp::Utils::readGroup<Epix::ns_Config100aV2_v0::dataset_config>(m_group, "config", m_idx);
+}
+void Config100aV2_v0::read_ds_asics() const {
+  ndarray<Epix::ns_Asic100aConfigV1_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Epix::ns_Asic100aConfigV1_v0::dataset_data, 1>(m_group, "asics", m_idx);
+  ndarray<Asic100aConfigV1_v0, 1> tmp(arr.shape());
+  ndarray<Asic100aConfigV1_v0, 1>::iterator out = tmp.begin();
+  for (ndarray<Epix::ns_Asic100aConfigV1_v0::dataset_data, 1>::iterator in = arr.begin(); in != arr.end(); ++ in, ++ out) {
+    *out = Asic100aConfigV1_v0(boost::make_shared<Epix::ns_Asic100aConfigV1_v0::dataset_data>(*in));
+  }
+  m_ds_asics = tmp;
+}
+void Config100aV2_v0::read_ds_asicPixelConfigArray() const {
+  m_ds_asicPixelConfigArray = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "asicPixelConfigArray", m_idx);
+}
+void Config100aV2_v0::read_ds_calibPixelConfigArray() const {
+  m_ds_calibPixelConfigArray = hdf5pp::Utils::readNdarray<uint8_t, 2>(m_group, "calibPixelConfigArray", m_idx);
+}
+
+void make_datasets_Config100aV2_v0(const Psana::Epix::Config100aV2& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Epix::ns_Config100aV2_v0::dataset_config::stored_type();
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    const std::vector<int>& shape = obj.asics_shape();
+    hsize_t dims[1];
+    std::copy(shape.begin(), shape.end(), dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Epix::ns_Asic100aConfigV1_v0::dataset_data>::stored_type(), 1, dims);
+    hdf5pp::Utils::createDataset(group, "asics", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.asicPixelConfigArray()) PsanaArray;
+    const PsanaArray& psana_array = obj.asicPixelConfigArray();
+    hsize_t dims[2];
+    std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
+    hdf5pp::Utils::createDataset(group, "asicPixelConfigArray", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.calibPixelConfigArray()) PsanaArray;
+    const PsanaArray& psana_array = obj.calibPixelConfigArray();
+    hsize_t dims[2];
+    std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), 2, dims);
+    hdf5pp::Utils::createDataset(group, "calibPixelConfigArray", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+}
+
+void store_Config100aV2_v0(const Psana::Epix::Config100aV2* obj, hdf5pp::Group group, long index, bool append)
+{
+  if (obj) {
+    Epix::ns_Config100aV2_v0::dataset_config ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
+  }
+  if (obj) {
+    const std::vector<int>& shape = obj->asics_shape();
+    unsigned dims[1] = { shape[0] };
+    ndarray<Epix::ns_Asic100aConfigV1_v0::dataset_data, 1> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      hdf_array[i] = Epix::ns_Asic100aConfigV1_v0::dataset_data(obj->asics(i));
+    }
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "asics", hdf_array, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "asics", hdf_array);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "asics", index < 0 ? index : index + 1);
+  }
+
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "asicPixelConfigArray", obj->asicPixelConfigArray(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "asicPixelConfigArray", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "asicPixelConfigArray", obj->asicPixelConfigArray());
+  }
+
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "calibPixelConfigArray", obj->calibPixelConfigArray(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "calibPixelConfigArray", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "calibPixelConfigArray", obj->calibPixelConfigArray());
+  }
+
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::Config100aV2> > make_Config100aV2(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::Config100aV2> >(boost::make_shared<Config100aV2_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::Config100aV2> >(boost::shared_ptr<Psana::Epix::Config100aV2>());
+  }
+}
+
+void make_datasets(const Psana::Epix::Config100aV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    make_datasets_Config100aV2_v0(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Epix.Config100aV2", version);
+  }
+}
+
+void store_Config100aV2(const Psana::Epix::Config100aV2* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+  case 0:
+    store_Config100aV2_v0(obj, group, index, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Epix.Config100aV2", version);
+  }
+}
+
+void store(const Psana::Epix::Config100aV2& obj, hdf5pp::Group group, int version) 
+{
+  store_Config100aV2(&obj, group, 0, version, false);
+}
+
+void store_at(const Psana::Epix::Config100aV2* obj, hdf5pp::Group group, long index, int version)
+{
+  store_Config100aV2(obj, group, index, version, true);
+}
+
+
 hdf5pp::Type ns_ElementV1_v0_dataset_data_stored_type()
 {
   typedef ns_ElementV1_v0::dataset_data DsType;
@@ -3548,6 +4233,7 @@ void ElementV2_v0<Config>::read_ds_temperatures() const {
   m_ds_temperatures = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "temperatures", m_idx);
 }
 template class ElementV2_v0<Psana::Epix::Config100aV1>;
+template class ElementV2_v0<Psana::Epix::Config100aV2>;
 
 void make_datasets_ElementV2_v0(const Psana::Epix::ElementV2& obj, 
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
@@ -3652,6 +4338,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV2> > make_ElementV2(int vers
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV2> >(boost::make_shared<ElementV2_v0<Psana::Epix::Config100aV1> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV2> >(boost::shared_ptr<Psana::Epix::ElementV2>());
+  }
+}
+boost::shared_ptr<PSEvt::Proxy<Psana::Epix::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Epix::Config100aV2>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV2> >(boost::make_shared<ElementV2_v0<Psana::Epix::Config100aV2> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Epix::ElementV2> >(boost::shared_ptr<Psana::Epix::ElementV2>());
   }
