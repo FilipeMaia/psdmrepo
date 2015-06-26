@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-32
+2015-6-26 David Schneider
+- update to pdsdata 8.3.1 with Epix::Config100aV2, JIRA PSAS-166
+
 Tag: V00-02-31
 2015-6-2 David Schneider
 - add full event key filter, opent eventkey_filter. JIRA PSAS-155

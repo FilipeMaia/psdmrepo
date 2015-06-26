@@ -201,6 +201,7 @@ void HdfWriterMap::initialize() {
   m_mainMap[ & typeid(Psana::Encoder::DataV2) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV2> >(), DaqType);
   m_mainMap[ & typeid(Psana::Epics::ConfigV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epics::ConfigV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Epix::Config100aV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epix::Config100aV1> >(), DaqType);
+  m_mainMap[ & typeid(Psana::Epix::Config100aV2) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epix::Config100aV2> >(), DaqType);
   m_mainMap[ & typeid(Psana::Epix::Config10KV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epix::Config10KV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Epix::ConfigV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epix::ConfigV1> >(), DaqType);
   m_mainMap[ & typeid(Psana::Epix::ElementV1) ] = MapValue(boost::make_shared<HdfWriterPsana<Psana::Epix::ElementV1> >(), DaqType);
