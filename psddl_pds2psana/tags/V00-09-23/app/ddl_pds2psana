@@ -1,0 +1,36 @@
+#!@PYTHON@
+
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
+
+programDescription = '''
+script to run the pds2psana and psd2psana-dispatch DDL back-ends to produce the DDL generated 
+for the psddl_pds2psana package.
+'''
+
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc'],
+                                                          includeHdf=False,
+                                                          includeDecl=False)
+
+    for pkg, subdict in pkgdict.iteritems():
+        cmd = psddlCmdStart + ' -b pds2psana -I data -E psddl_pds2psana/include' + \
+              ' -O psddl_pds2psana/src -i psddl_pds2psana -t psddl_pds2psana' + \
+              ' -B psana-inc:psddl_psana -B pdsdata-inc:pdsdata/psddl -B psana-ns:Psana' + \
+              ' -B pdsdata-ns:Pds ' + subdict['ddlfile']
+        if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+        sys.stdout.flush()
+        res = subprocess.call(cmd, shell=True)
+        assert res == 0, "error code=%s with cmd: %s" % (res,cmd)
+
+    dispatchCmd = psddlCmdStart + '-b pds2psana-dispatch -I data' + \
+                  ' -e psddl_pds2psana/include/dispatch.h -o psddl_pds2psana/src/dispatch.cpp' + \
+                  ' -i psddl_pds2psana -t psddl_pds2psana -B psana-ns:Psana -B pdsdata-ns:Pds ' + \
+                  ' '.join([subdict['ddlfile'] for subdict in pkgdict.values()])
+    if verbose: sys.stdout.write("executing:\n%s\n" % dispatchCmd)
+    sys.stdout.flush()
+    sys.exit(subprocess.call(dispatchCmd, shell=True))
+
