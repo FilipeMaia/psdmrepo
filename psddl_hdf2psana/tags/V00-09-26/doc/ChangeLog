@@ -1,0 +1,470 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_hdf2psana
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-09-26
+2015-6-26 David Schneider
+- update to pdsdata 8.3.1 with Epix::Config100aV2, JIRA PSAS-166
+
+Tag: V00-09-25
+2015-5-28 David Schneider
+- update to pdsdata 8.2.9 with BldDataSpectrometerV1 hproj int32 fix, JIRA PSAS-151
+	
+Tag: V00-09-24
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
+Tag: V00-09-23
+2015-2-23 David Schneider
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+- forgot to update Changelog with Tag V00-09-22
+	
+Tag: V00-09-21
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+	
+Tag: V00-09-20
+2015-2-3 David Schneider
+- rewrite ddl_hdf2psana wrapper script to exclude smalldata and take 
+  -d for devel types.
+- continue to track JIRA PSAS-103.
+
+Tag: V00-09-19
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103. Note issue with smlData. Some generated code was modified in this package.
+	
+Tag: V00-09-18
+2014-12-04 David Schneider
+- Fix bug. JIRA PSAS-78. Translator crashing on BldDataSpectrometerV1 because the peaks are not specified as possible zero dim.
+
+Tag: V00-09-17
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
+Tag: V00-09-16
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
+Tag: V00-09-15
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+	
+Tag: V00-09-14
+2014-10-03 David Schneider
+- regenerate for new pdsdata 8.1.4/psddldata with:
+  Evr::IOConfigV2. Track JIRA issue PSAS-41
+
+Tag: V00-09-13
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+- added schema's for TimeTool and GenerigPgp classes. In timetool-h5.ddl
+  Note use of [[vlen]] for basename string, and [[zero_len]] for TimeTool 
+  data where projection array can be zero len.
+	
+Tag: V00-09-12
+2014-07-03 David Schneider
+- regenerate for new pdsdata/psddldata with BldEBeamV6
+
+Tag: V00-09-11
+2014-06-14 David Schneider
+- regenerate whole thing from psddldata V01-00-10
+- trac ticket #309
+
+Tag: V00-09-10
+2014-06-11 David Schneider
+- switch to direct hdf5 calls to read string attribute
+  concerned prior code had memory bug with read in data
+	
+Tag: V00-09-09 
+2014-06-10 David Schneider
+- convert fixed and vlen ndarrays in hdf5 files into the event store.
+- refactor with Translator package
+  move Translator NDArrayParameters class here
+- add schema constants that are shared between both packages
+- track ticket  #308 (for reading ndarrays into psana).
+
+Tag: V00-09-08
+2014-06-05 David Schneider
+- fix trac #305 https://pswww.slac.stanford.edu/trac/psdm/ticket/305
+  pass pvname when storing epics pv to deal with pv's having the same
+  pvId - right thing to do for psana-translate, should be Ok for
+  older o2o-translated files.
+
+Tag: V00-09-07
+2014-05-08 David Schneider
+- regenerate for psddldata V01-00-09.
+- track ticket 300.
+
+Tag: V00-09-06
+2014-05-03 David Schneider
+- regenerate for psddldata V01-00-08.
+- track ticket 295.
+
+Tag: V00-09-05
+2014-03-10 David Schneider
+- regenerate for psddldata V01-00-06.
+- track ticket 278.
+
+Tag: V00-09-04
+2014-03-10 David Schneider
+- regenerate for psddldata V01-00-05.
+
+Tag: V00-09-03
+2014-03-04 Andy
+- forgot to add instantiation of Oceanoptics::DataV1_v0<ConfigV2>
+
+Tag: V00-09-02
+2014-03-04 Andy
+- regenerate whole thing from psddldata V01-00-04
+- trac ticket #276
+
+Tag: V00-09-01
+2014-02-12 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+
+Tag: V00-09-00
+2014-01-13 Andy Salnikov
+- support for aliases
+
+Tag: V00-08-03
+2014-01-10 Andy Salnikov
+- oceanoptics: add special dataset "corrSpectra" like in old translator
+
+Tag: V00-08-02
+2014-01-07 Andy Salnikov
+- regenerate whole thing from psddldata V01-00-01 with psddl V00-13-02
+- fix for Acqiris::TdcData writing
+
+Tag: V00-08-01
+2013-12-23 Andy Salnikov
+- camera.cpp: failed to compile with gcc47, was OK for older compilers
+
+Tag: V00-08-00
+2013-12-22 Andy Salnikov
+- regenerate whole thing from psddldata V01-00-00 with psddl V00-13-00
+
+Tag: V00-07-10
+2013-12-21 Andy Salnikov
+- camera.cpp: bug fix for image reading, checked size of the wrong type
+
+Tag: V00-07-09
+2013-12-19 Andy Salnikov
+- forgot epix-h5.ddl.xml in previous commit 
+
+Tag: V00-07-08
+2013-12-19 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-56
+- new epix package
+
+Tag: V00-07-07
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-55
+
+Tag: V00-07-06
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-54
+- special schema for andor.ConfigV1 to remove few derived things that are
+  not in the 020 schema
+
+Tag: V00-07-05
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-53
+- new type Evr::SrcConfigV1
+
+Tag: V00-07-04
+2013-12-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-50
+- new epixsampler package
+
+Tag: V00-07-03
+2013-11-18 Andy Salnikov
+- add sections attribute to cspad config types
+- this needs latest tag of psddl (V00-12-07 or better)
+
+Tag: V00-07-02
+2013-11-12 Andy Salnikov
+- small improvement to ddl_* script
+
+Tag: V00-07-01
+2013-11-12 Andy Salnikov
+- upgrade to pdsdata V07-02-07
+- ipimb config types finally got array of capacitor values
+- new rayonix package
+
+Tag: V00-07-00
+2013-11-05 Andy Salnikov
+- preparation for new DDL parser: tags renamed:
+  - no-proxy to embedded (in h5 schema)
+  - need psddl V00-12-00 for this change
+  
+Tag: V00-06-00
+2013-10-31 Andy Salnikov
+- replace chunk size argument for make_datasets with chunk slzie policy 
+  objects
+- chunk policy also determines chunk cache size, method in HdfParameters
+  is not used any more, class is removed 
+- class DefaultChunkPolicy provides default implementation of the 
+  chunk policy which repeats what we have in old translator.
+
+Tag: V00-05-03
+2013-10-24 Andy Salnikov
+- more mistakes in ControlData.ConfigV2 generated by old translator,
+  need a new schema version
+- generated code now adds _schemaVersion attribute to a group
+
+Tag: V00-05-02
+2013-10-11 Andy Salnikov
+- actual schema for ControlData.ConfigV2 and ConfigV3 classes produced 
+  by "old" translator was missing one attribute (npvLabels)
+- create special v0 schema for these two classes which lacks that
+  attribute and v1 schema that has it. 
+- v0 also needs manual implementation of the npvLabels() method in a new
+  file control.cpp
+
+Tag: V00-05-01
+2013-10-08 Andy Salnikov
+- bld.cpp: fix for arg list in store_BldDataAcqADCV1_v0()
+
+Tag: V00-05-00
+2013-10-08 Andy Salnikov
+- regenerated with psddl V00-09-01
+- store_at() method now accepts pointer instead of ref, stores blank if 
+  pointer is zero
+
+Tag: V00-04-00
+2013-10-08 Andy Salnikov
+- regenerated with psddl V00-09-00
+- replaced append() method with store_at()
+- disable proxy generation for few internal classes
+
+Tag: V00-03-03
+2013-10-07 Andy Salnikov
+- fix the name of the dataset for Alias.ConfigV1
+
+Tag: V00-03-02
+2013-10-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-45 with psddl V00-08-18
+
+Tag: V00-03-01
+2013-09-24 Andy Salnikov
+- fix missing constructor definition
+
+Tag: V00-03-00
+2013-09-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
+
+Tag: V00-02-05
+2013-08-14 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-30
+
+Tag: V00-02-04
+2013-08-05 Andy Salnikov
+- fix compilation warnings about signed/unsigned comparison
+
+Tag: V00-02-03
+2013-08-01 Andy Salnikov
+- re-generate everyhting with psddl V00-08-09
+- HDF5 writing support should be complete (hopefully), but there may be
+  a bunch of new bugs here
+
+Tag: V00-02-02
+2013-07-29 Andy Salnikov
+- re-generate everyhting with psddl V00-08-08
+
+Tag: V00-02-01
+2013-07-03 Andy Salnikov
+- bug fix - forgot to implement default ctor in 
+  ns_ClockTime_v0::dataset_data class
+
+Tag: V00-02-00
+2013-07-02 Andy Salnikov
+- re-generate everyhting with psddl V00-07-01
+- started adding code for storing the data in HDF5
+
+Tag: V00-01-32
+2013-05-22 Andy Salnikov
+- fixing doxygen comments
+
+Tag: V00-01-31
+2013-05-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-28
+
+Tag: V00-01-30
+2013-05-15 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-27
+- ne package imp
+
+Tag: V00-01-29
+2013-04-25 Andy Salnikov
+- one additional change needed for new cspad config type
+
+Tag: V00-01-28
+2013-04-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-26
+
+Tag: V00-01-27
+2013-04-23 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-25
+- pnccd.FullFramveV1 need some change, no longer needs Config type
+
+Tag: V00-01-26
+2013-03-29 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-24
+- improve support for enum and vlen types
+
+Tag: V00-01-25
+2013-03-28 Andy Salnikov
+- fixing acqiris schema, adding new schema version for DataDescV1
+
+Tag: V00-01-24
+2013-03-27 Andy Salnikov
+- add support for EPICS aliases
+
+Tag: V00-01-23
+2013-03-27 Andy Salnikov
+- fix for cspad2x2 schema
+
+Tag: V00-01-22
+2013-03-27 Andy Salnikov
+- a bit of refactoring/renaming, no code changes
+
+Tag: V00-01-21
+2013-03-26 Andy Salnikov
+- fix to cspad schema
+
+Tag: V00-01-20
+2013-03-26 Andy Salnikov
+- checking Evr mess: in Nov 2012 translator changed silently dataset name
+  where EvrDataV3 data is stored (this happend during one big refactoring,
+  the change was not intentional)
+- as a result we now have EvrDataV3 which can be stored in "evrData" 
+  or "data" dataset depending when transtion happened
+- replacing generated EvrDataV3 code here with hand-written (adopted from 
+  generated) which checks dataset name before reading the data from it
+
+Tag: V00-01-19
+2013-03-25 Andy Salnikov
+- fix camera frame image reading
+
+Tag: V00-01-18
+2013-03-25 Andy Salnikov
+- fixing image joining in PNCCD::FullFrame
+
+Tag: V00-01-17
+2013-03-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-21
+
+Tag: V00-01-16
+2013-03-25 Andy Salnikov
+- fixing princeton schema
+
+Tag: V00-01-15
+2013-03-25 Andy Salnikov
+- fix Timepix schema for config types
+
+Tag: V00-01-14
+2013-03-24 Andy Salnikov
+- use new psddlc feature to remap enum constant names ito names used 
+  by HDF5 translator
+
+Tag: V00-01-13
+2013-03-23 Andy Salnikov
+- fix ControlData schema
+
+Tag: V00-01-12
+2013-03-23 Andy Salnikov
+- fix FCCD schema
+
+Tag: V00-01-11
+2013-03-22 Andy Salnikov
+- fix Fli schema
+
+Tag: V00-01-10
+2013-03-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-17
+- use new enum-base feature to avoid specification of attribute type
+
+Tag: V00-01-09
+2013-03-22 Andy Salnikov
+- forgot to add data/gsc16ai-h5.ddl.xml to last tag
+
+Tag: V00-01-08
+2013-03-22 Andy Salnikov
+- fix schema for Gsc16ia, apparently HDF5 does not like conversion from 
+  enum types in file to integer types in memory
+
+Tag: V00-01-07
+2013-03-22 Andy Salnikov
+- fix schema for OceanOptics.DataV1
+
+Tag: V00-01-06
+2013-03-22 Andy Salnikov
+- for UsdUsb::DavaV1 schema version 1 use generated code
+
+Tag: V00-01-05
+2013-03-22 Andy Salnikov
+- introduce new schema version for UsdUsb::DavaV1, this version has signed
+  encoder_count field.
+
+Tag: V00-01-04
+2013-03-21 Andy Salnikov
+- fix attribute name in usdusb schema
+
+Tag: V00-01-03
+2013-03-21 Andy Salnikov
+- fix for string EPICS PV type
+- fix for BLD GMD schema
+- splitting of shared BLD data types implemented
+
+Tag: V00-01-02
+2013-03-19 Andy Salnikov
+- non-compound datasets
+
+Tag: V00-01-01
+2013-03-19 Andy Salnikov
+- updates to evr, acquiris and epics
+
+Tag: V00-01-00
+2013-03-19 Andy Salnikov
+- updates to epics stuff, try to avoid reading data if possible
+
+Tag: V00-00-02
+2013-03-15 Andy Salnikov
+- forgot to add epics-h5.ddl
+
+Tag: V00-00-01
+2013-03-15 Andy Salnikov
+- added epics, not very efficient implementation
+- first production tag for nightlies
+
+Tag: andy-20130313-01
+2013-03-13 Andy Salnikov
+- added acqiris and pnccd
+
+Tag: andy-20130312-01
+2013-03-12 Andy Salnikov
+- progress on vlen arrays, adding evr abd bld to the bunch
+
+Tag: andy-20130226-02
+2013-02-26 Andy Salnikov
+- work in progress
+
+Tag: andy-20130226-01
+2013-02-26 Andy Salnikov
+- work in progress
