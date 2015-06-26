@@ -458,6 +458,102 @@ public:
   virtual std::vector<int> asics_shape() const = 0;
 };
 
+/** @class Config100aV2
+
+  
+*/
+
+
+class Config100aV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_Epix100aConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  virtual ~Config100aV2();
+  virtual uint32_t version() const = 0;
+  virtual uint32_t runTrigDelay() const = 0;
+  virtual uint32_t daqTrigDelay() const = 0;
+  virtual uint32_t dacSetting() const = 0;
+  virtual uint8_t asicGR() const = 0;
+  virtual uint8_t asicAcq() const = 0;
+  virtual uint8_t asicR0() const = 0;
+  virtual uint8_t asicPpmat() const = 0;
+  virtual uint8_t asicPpbe() const = 0;
+  virtual uint8_t asicRoClk() const = 0;
+  virtual uint8_t asicGRControl() const = 0;
+  virtual uint8_t asicAcqControl() const = 0;
+  virtual uint8_t asicR0Control() const = 0;
+  virtual uint8_t asicPpmatControl() const = 0;
+  virtual uint8_t asicPpbeControl() const = 0;
+  virtual uint8_t asicR0ClkControl() const = 0;
+  virtual uint8_t prepulseR0En() const = 0;
+  virtual uint32_t adcStreamMode() const = 0;
+  virtual uint8_t testPatternEnable() const = 0;
+  virtual uint8_t SyncMode() const = 0;
+  virtual uint8_t R0Mode() const = 0;
+  virtual uint32_t acqToAsicR0Delay() const = 0;
+  virtual uint32_t asicR0ToAsicAcq() const = 0;
+  virtual uint32_t asicAcqWidth() const = 0;
+  virtual uint32_t asicAcqLToPPmatL() const = 0;
+  virtual uint32_t asicPPmatToReadout() const = 0;
+  virtual uint32_t asicRoClkHalfT() const = 0;
+  virtual uint32_t adcReadsPerPixel() const = 0;
+  virtual uint32_t adcClkHalfT() const = 0;
+  virtual uint32_t asicR0Width() const = 0;
+  virtual uint32_t adcPipelineDelay() const = 0;
+  virtual uint16_t SyncWidth() const = 0;
+  virtual uint16_t SyncDelay() const = 0;
+  virtual uint32_t prepulseR0Width() const = 0;
+  virtual uint32_t prepulseR0Delay() const = 0;
+  virtual uint32_t digitalCardId0() const = 0;
+  virtual uint32_t digitalCardId1() const = 0;
+  virtual uint32_t analogCardId0() const = 0;
+  virtual uint32_t analogCardId1() const = 0;
+  virtual uint32_t carrierId0() const = 0;
+  virtual uint32_t carrierId1() const = 0;
+  virtual uint32_t numberOfAsicsPerRow() const = 0;
+  virtual uint32_t numberOfAsicsPerColumn() const = 0;
+  virtual uint32_t numberOfRowsPerAsic() const = 0;
+  virtual uint32_t numberOfReadableRowsPerAsic() const = 0;
+  /** for epix100a  352 */
+  virtual uint32_t numberOfPixelsPerAsicRow() const = 0;
+  /** for epix100a 96*4 = 384 */
+  virtual uint32_t calibrationRowCountPerASIC() const = 0;
+  virtual uint32_t environmentalRowCountPerASIC() const = 0;
+  virtual uint32_t baseClockFrequency() const = 0;
+  virtual uint32_t asicMask() const = 0;
+  virtual uint32_t enableAutomaticRunTrigger() const = 0;
+  virtual uint32_t numberOf125MhzTicksPerRunTrigger() const = 0;
+  virtual uint8_t scopeEnable() const = 0;
+  virtual uint8_t scopeTrigEdge() const = 0;
+  virtual uint8_t scopeTrigChan() const = 0;
+  virtual uint8_t scopeArmMode() const = 0;
+  virtual uint16_t scopeADCThreshold() const = 0;
+  virtual uint16_t scopeTrigHoldoff() const = 0;
+  virtual uint16_t scopeTrigOffset() const = 0;
+  virtual uint16_t scopeTraceLength() const = 0;
+  virtual uint16_t scopeADCsameplesToSkip() const = 0;
+  virtual uint8_t scopeChanAwaveformSelect() const = 0;
+  virtual uint8_t scopeChanBwaveformSelect() const = 0;
+  virtual const Epix::Asic100aConfigV1& asics(uint32_t i0) const = 0;
+  virtual ndarray<const uint16_t, 2> asicPixelConfigArray() const = 0;
+  /** Calibration row config map is one row for every two calib rows */
+  virtual ndarray<const uint8_t, 2> calibPixelConfigArray() const = 0;
+  /** Number of pixel rows in a readout unit */
+  virtual uint32_t numberOfRows() const = 0;
+  /** Number of readable pixel rows in a readout unit */
+  virtual uint32_t numberOfReadableRows() const = 0;
+  /** Number of pixel columns in a readout unit */
+  virtual uint32_t numberOfColumns() const = 0;
+  /** Number of calibration rows in a readout unit */
+  virtual uint32_t numberOfCalibrationRows() const = 0;
+  /** Number of rows in a readout unit */
+  virtual uint32_t numberOfEnvironmentalRows() const = 0;
+  /** Number of columns in a readout unit */
+  virtual uint32_t numberOfAsics() const = 0;
+  /** Method which returns the shape (dimensions) of the data returned by asics() method. */
+  virtual std::vector<int> asics_shape() const = 0;
+};
+
 /** @class ElementV1
 
   
@@ -489,6 +585,7 @@ public:
 */
 
 class Config100aV1;
+class Config100aV2;
 
 class ElementV2 {
 public:

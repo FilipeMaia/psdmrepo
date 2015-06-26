@@ -25,6 +25,9 @@ Asic100aConfigV1::~Asic100aConfigV1() {}
 Config100aV1::~Config100aV1() {}
 
 
+Config100aV2::~Config100aV2() {}
+
+
 ElementV1::~ElementV1() {}
 
 
