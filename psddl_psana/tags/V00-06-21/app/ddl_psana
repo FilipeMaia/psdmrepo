@@ -1,0 +1,26 @@
+#!@PYTHON@
+
+import os
+import sys
+import subprocess
+import psddl.WrapperScriptCommon as wsc
+
+programDescription = '''
+script to run the psana DDL back end to produce the DDL generated 
+for the psddl_psana package.
+'''
+
+if __name__ == "__main__":
+    psddlCmdStart, verbose, pkgdict = wsc.standardWrapper(description=programDescription,
+                                                          defaultExclude=['xtc'],
+                                                          includeHdf=False,
+                                                          includeDecl=False)
+
+    for pkg, subdict in pkgdict.iteritems():
+        cmd = psddlCmdStart + '-b psana -I data -E psddl_psana/include ' + \
+              '-O psddl_psana/src -i psddl_psana -t Psana ' + subdict['ddlfile']
+        if verbose: sys.stdout.write("executing:\n%s\n" % cmd)
+        sys.stdout.flush()
+        res = subprocess.call(cmd, shell=True)
+        assert res == 0, "error code=%s with cmd: %s" % (res,cmd)
+
