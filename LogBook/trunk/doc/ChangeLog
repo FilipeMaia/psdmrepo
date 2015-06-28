@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-08
+2015-06-27 Igor Gaponenko
+- added 'Begin Time' and 'End Time' options to the 'Run Info' group
+of user-defined Run Tables (JIRA PSWA-49).
+
 Tag: V01-00-07
 2015-06-22 Mikhail Dubrovin
 - LogBookGrabber_qt - use default url parameter, fix usage for -h option (PSAS-70)

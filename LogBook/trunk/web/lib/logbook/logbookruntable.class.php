@@ -124,7 +124,16 @@ class LogBookRunTable {
                             }
                             break ;
                         case 'Run Duration':
-                            $row[$name] = $run->end_time() ? LogBookUtils::format_seconds_1($run->end_time()->sec - $run->begin_time()->sec) : '' ;
+                            $end = $run->end_time() ;
+                            $row[$name] = $end ? LogBookUtils::format_seconds_1($end->sec - $run->begin_time()->sec) : '' ;
+                            break ;
+                        case 'Begin Time':
+                            $begin = $run->begin_time() ;
+                            $row[$name] = '<b>'.$begin->toStringDay().'</b>&nbsp;&nbsp;'.$begin->toStringHMS() ;
+                            break ;
+                        case 'End Time':
+                            $end = $run->end_time() ;
+                            $row[$name] = $end ? '<b>'.$end->toStringDay().'</b>&nbsp;&nbsp;'.$end->toStringHMS() : '' ;
                             break ;
                     }
                     break ;
