@@ -1,0 +1,9 @@
+#expswitch-history {
+  padding: 20px;
+}
+#expswitch-history > #body {
+  margin-top: 10px;
+}
+#expswitch-history .info {
+  color: maroon;
+}

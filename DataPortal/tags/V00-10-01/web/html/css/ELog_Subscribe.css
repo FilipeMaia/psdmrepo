@@ -1,0 +1,16 @@
+#elog-subscribe {
+  padding: 20px;
+}
+.elog-subscribe-user {
+  max-width: 640px;
+}
+.elog-subscribe-user h3 {
+  font-size: 16px;
+}
+
+.elog-subscribe-all {
+  max-width: 640px;
+}
+.elog-subscribe-all h3 {
+  font-size: 16px;
+}

@@ -1,0 +1,40 @@
+#runtables-calib {
+    padding:    0;
+}
+#runtables-calib .update-button img {
+    width:      11px;
+}
+.runtables-calib-ctrl {
+    width:      inherit;
+    padding:    10px 10px 10px 20px;
+}
+.runtables-calib-wa {
+    width:      inherit;
+    padding:    10px 20px 10px 20px;
+}
+.runtables-calib-body {
+    font-size:  11px;
+}
+.runtables-calib-info {
+    color:          maroon;
+}
+div.runtables-calib-comment-cont {
+    max-height: 52px;
+    min-width:  480px;
+    overflow:   auto;
+}
+div.runtables-calib-comment {
+}
+div.runtables-calib-comment pre {
+    margin:     0;
+    padding:    0;
+}
+textarea.runtables-calib-comment {
+    padding:    0;
+}
+
+#runtables-calib a.link {
+    text-decoration:    none !important;
+    font-weight:        bold !important;
+    color:              #0071bc !important;
+}
