@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-11
+2015-06-27 Igor Gaponenko
+- fixed bugs and finished implementing HDF5 Translation service configuration.
+- added 'Begin Time' and 'End Time' options to the 'Run Info' group
+of user-defined Run Tables (JIRA PSWA-49).
+
 Tag: V00-10-00
 2015-04-23 Igor Gaponenko
 - allowed to pass an optional parameter for the instrument name

@@ -41,6 +41,205 @@ class Config extends DbConnection {
     }
 
     /**
+     * Parse an optional value of a policy parameter and return a value
+     * of a type matcing the default value. Return the default value of no
+     * parameter is found.
+     *
+     * @param string $str
+     * @param mixed $default_value
+     * @return mixed
+     */
+    private static function parse_policy_parameter_str ($str, $default_value) {
+        return (!isset($str) || is_null($str)) ?
+            $default_value :
+            (is_int($default_value) ?
+                intval($str) :
+                $str) ;
+    }
+
+    /**
+     * Return a ready to be serialzied (into JSON) array with the general
+     * parameters of the Data REtention Policy.
+     *
+     * @param DataPortal\ServiceJSON $SVC
+     * @return array
+     */
+    public static function general_policy2array ($SVC) {
+        return array (
+            'SHORT-TERM'  => array (
+                'ctime'     => Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('SHORT-TERM',  'CTIME'),    '') ,
+                'retention' => Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('SHORT-TERM',  'RETENTION'), 0)) ,
+            'MEDIUM-TERM' => array (
+                'ctime'     => Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'CTIME'),    '') ,
+                'retention' => Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'RETENTION'), 0) ,
+                'quota'     => Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'QUOTA'),     0)) ,
+        ) ;
+    }
+
+    /**
+     * Parse an optional value of a policy parameter and return a value
+     * of a type matcing the default value. Return the default value of no
+     * parameter is found.
+     *
+     * @param \RegDB\RegDBExperimentParam $param
+     * @param mixed $default_value
+     * @return mixed
+     */
+    private static function parse_policy_parameter ($param, $default_value) {
+        return (!isset($param) || is_null($param) || !$param->value()) ?
+            $default_value :
+            (is_int($default_value) ?
+                intval($param->value()) :
+                $param->value()) ;
+    }
+
+    /**
+     * Return a ready to be serialzied (into JSON) array with the experiment
+     * specific exeptions of the Data Retention Policy.
+     *
+     * @param \RegDB\RegDBExperiment $experiment
+     * @return array
+     */
+    private static function experiment_policy_exception2array ($experiment) {
+        $result = array (
+            'id'         => $experiment->id() ,
+            'name'       => $experiment->name() ,
+            'instr_name' => $experiment->instrument()->name() ,
+            'policy'     => array (
+                'SHORT-TERM'  => array (
+                    'ctime'     => Config::parse_policy_parameter($experiment->find_param_by_name('SHORT-TERM-DISK-QUOTA-CTIME'),    '') ,
+                    'retention' => Config::parse_policy_parameter($experiment->find_param_by_name('SHORT-TERM-DISK-QUOTA-RETENTION'), 0)) ,
+                'MEDIUM-TERM' => array (
+                    'ctime'     => Config::parse_policy_parameter($experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA-CTIME'),    '') ,
+                    'retention' => Config::parse_policy_parameter($experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA-RETENTION'), 0) ,
+                    'quota'     => Config::parse_policy_parameter($experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA'),           0))
+            )
+        ) ;
+        if (($result['policy']['SHORT-TERM' ]['ctime'    ] !== '') ||
+            ($result['policy']['SHORT-TERM' ]['retention'] !==  0) ||
+            ($result['policy']['MEDIUM-TERM']['ctime'    ] !== '') ||
+            ($result['policy']['MEDIUM-TERM']['retention'] !==  0) ||
+            ($result['policy']['MEDIUM-TERM']['quota'    ] !==  0)) return $result ;
+
+        return null ;
+    }
+
+    /**
+     * Return a ready to be serialzied (into JSON) array with the the experiment
+     * specific exeptions of the Data Retention Policy either for teh specified
+     * experiment or for all experiments for which exceptions are found.
+     *
+     * @param DataPortal\ServiceJSON $SVC
+     * @return array
+     */
+    public static function policy_exceptions2array ($SVC, $exper_id=null) {
+        $experiments = array() ;
+        if ($exper_id) {
+            $exper = $SVC->safe_assign ($SVC->regdb()->find_experiment_by_id($exper_id) ,
+                                        "no experiment exists for id: {$exper_id}") ;
+            $policy = Config::experiment_policy_exception2array($exper) ;
+            if ($policy) array_push($experiments, $policy) ;
+        } else {
+            foreach ($SVC->regdb()->experiments() as $exper) {
+                $policy = Config::experiment_policy_exception2array($exper) ;
+                if ($policy) array_push($experiments, $policy) ;
+            }
+        }
+        return $experiments ;
+    }
+
+    /**
+     * Set policy exceptions for an experiment
+     *
+     * The 'policy' parameter is a two-level dictionary which is expected
+     * to have the following format:
+     * 
+     *   { <storage_class_name> : { <param_name> : <value> }}
+     *
+     * This will get translated into the following experiment-level
+     * parametrers:
+     * 
+     *   SHORT-TERM-DISK-QUOTA-CTIME
+     *   SHORT-TERM-DISK-QUOTA-RETENTION
+     *   MEDIUM-TERM-DISK-QUOTA
+     *   MEDIUM-TERM-DISK-QUOTA-CTIME
+     *   MEDIUM-TERM-DISK-QUOTA-RETENTION
+     *
+     * @param DataPortal\ServiceJSON $SVC
+     * @param \RegDB\RegDBExperiment $experiment
+     * @param array $policy
+     */
+    public static function set_experiment_policy_exceptions ($SVC, $experiment, $policy) {
+
+        $known_Storage_classes = array('SHORT-TERM','MEDIUM-TERM') ;
+
+        foreach ($policy as $storage_class_name => $storage_class) {
+
+            $SVC->assert (
+                in_array($storage_class_name, $known_Storage_classes) ,
+                "unsupported storage class: '{$storage_class_name}'") ;
+
+            foreach ($storage_class as $key => $str) {
+                $name  = "{$storage_class_name}-DISK-QUOTA" ;
+                $value = '' ;
+                switch ($key) {
+                    case 'ctime':
+                        $name .= '-CTIME' ;
+                        if ($str !== '')
+                            $value = $SVC->safe_assign (
+                                \LusiTime\LusiTime::parse($str) ,
+                                "failed to interpret parameter value '{$str}' as CTIME") ;
+                        break ;
+                    case 'retention':
+                        $name .= '-RETENTION' ;
+                        $value = $str ;
+                        break ;
+                    case 'quota':
+                        $name .= '' ;
+                        $value = $str ;
+                        break ;
+                    default:
+                        $SVC->abort("unsupported policy parameter '{$key}' of storage class: '{$storage_class_name}'") ;
+                }
+                $param = $SVC->safe_assign (
+                    $experiment->set_param($name, $value) ,
+                    "failed to set value='{$value}' to experiment-specific parameter {$name} of experiment id: {$exper_id}") ;
+            }
+        }
+    }
+    /**
+     * Return a ready to be serialzied (into JSON) array with the amended
+     * policy for an experiment. The resulted policy will be based on the
+     * the general Data Retention Policy and experiments-pecific
+     * exceptions applied on top of it.
+     *
+     * @param DataPortal\ServiceJSON $SVC
+     * @param \RegDB\RegDBExperiment $experiment
+     * @return array
+     */
+    public static function experiment_policy2array ($SVC, $experiment) {
+        return array (
+            'SHORT-TERM'  => array (
+                'ctime'     => Config::parse_policy_parameter (
+                                    $experiment->find_param_by_name('SHORT-TERM-DISK-QUOTA-CTIME') ,
+                                    Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('SHORT-TERM',  'CTIME'),    '')) ,
+                'retention' => Config::parse_policy_parameter (
+                                    $experiment->find_param_by_name('SHORT-TERM-DISK-QUOTA-RETENTION') ,
+                                    Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('SHORT-TERM',  'RETENTION'), 0))) ,
+            'MEDIUM-TERM' => array (
+                'ctime'     => Config::parse_policy_parameter (
+                                    $experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA-CTIME') ,
+                                    Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'CTIME'),    '')) ,
+                'retention' => Config::parse_policy_parameter (
+                                    $experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA-RETENTION') ,
+                                    Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'RETENTION'), 0)) ,
+                'quota'     => Config::parse_policy_parameter (
+                                    $experiment->find_param_by_name('MEDIUM-TERM-DISK-QUOTA') ,
+                                    Config::parse_policy_parameter_str($SVC->configdb()->get_policy_param('MEDIUM-TERM', 'QUOTA'),     0)))
+        ) ;
+    }
+
+    /**
      * Constructor
      *
      * @param string $host
@@ -53,21 +252,22 @@ class Config extends DbConnection {
     }
 
 
-
     public function set_policy_param($storage, $attr, $value = '') {
         $storage_escaped = $this->escape_string(trim($storage));
         $attr_escaped = $this->escape_string(trim($attr));
         $sql = null;
         if (trim($value) == '') {
-            if (!is_null($this->get_policy_param($storage, $attr)))
+            if (!is_null($this->get_policy_param($storage, $attr))) {
                 $sql = "DELETE FROM {$this->database}.storage_policy WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'";
+                $this->query($sql);
+            }
         } else {
             $value_escaped = $this->escape_string(strtolower(trim($value)));
             $sql = is_null($this->get_policy_param($storage, $attr)) ?
                 "INSERT INTO {$this->database}.storage_policy VALUES ('{$storage_escaped}','{$attr_escaped}','{$value_escaped}')" :
                 "UPDATE {$this->database}.storage_policy SET value='{$value_escaped}' WHERE storage='{$storage_escaped}' AND attr='{$attr_escaped}'" ;
+            $this->query($sql);
         }
-        $this->query($sql);
     }
 
     public function get_policy_param($storage, $attr) {

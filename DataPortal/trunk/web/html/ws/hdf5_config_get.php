@@ -10,8 +10,10 @@
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'filemgr/filemgr.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
 
 use \FileMgr\IfaceCtrlDb ;
+use \RegDB\RegDBDataSet ;
 
 DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
@@ -24,15 +26,21 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     $experiment = $SVC->safe_assign ($SVC->regdb()->find_experiment_by_id($exper_id) ,
                                      "no experiment found for id={$exper_id}") ;
 
-    $section    = '' ;
     $instr_name = $experiment->instrument()->name() ;
     $exp_name   = $experiment->name() ;
 
+    $dataset = new RegDBDataSet($SVC->ifacectrldb($service)->get_config_param_val_r (
+        'live-mode' ,
+        'dataset' ,
+        $instr_name ,
+        $exp_name)) ;
+
     $config = array (
-        'auto'        => $experiment                ->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5[$service]) ? 1 : 0 ,
-        'ffb'         => $SVC->ifacectrldb($service)->get_config_param_val_r('live-mode', 'dataset', $instr_name, $exp_name) === IfaceCtrlDb::$DATASET_FFB ? 1 : 0 ,
-        'release_dir' => $SVC->ifacectrldb($service)->get_config_param_val_r('',          'release', $instr_name, $exp_name) ,
-        'config_file' => $SVC->ifacectrldb($service)->get_config_param_val_r('',          'config',  $instr_name, $exp_name)
+        'auto'        => $experiment->find_param_by_name(IfaceCtrlDb::$AUTO_TRANSLATE_HDF5[$service]) ? 1 : 0 ,
+        'ffb'         => $dataset->is_ffb() ? 1 : 0 ,
+        'release_dir' => $SVC->ifacectrldb($service)->get_config_param_val_r('', 'release', $instr_name, $exp_name) ,
+        'config_file' => $SVC->ifacectrldb($service)->get_config_param_val_r('', 'config',  $instr_name, $exp_name) ,
+        'stream'      => is_null($dataset->get_stream()) ? '' : $dataset->get_stream()
     ) ;
     switch ($service) {
         case 'MONITORING' :

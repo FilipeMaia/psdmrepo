@@ -339,7 +339,21 @@ function (
                                'the HDF5 files. Note that one possible donwside of teh mode is that it may \n' +
                                'potentially put too much load onto the FFB file system which may negatively \n' +
                                'affect data migration processes.' ,
-                    edit_mode: true, editor: 'checkbox'}
+                    edit_mode: true, editor: 'checkbox'} , {
+
+                    name:      'stream' ,
+                        text:      'DAQ stream filter' ,
+                        title:     'An optional filter of the DAQ streams which should be \n' +
+                                   'selected for the translation. This parameter may be needed to \n' +
+                                   'bypass streams (like IOC s80, s81, etc.) which are delayed \n' +
+                                   'to moved to the input file system (FFB or ANA). Here are a few \n' +
+                                   'examples of the valid value of the parameter: \n' +
+                                   '  0-79 \n' +
+                                   '  0,3-4,80,81 \n' +
+                                   'Clear the input to turn this filter off.' +
+                                   'Note that using this filter will results in not having the corresponding \n' +
+                                   'data carried by non-mentioned streams in the generated HDF5 files.' ,
+                        edit_mode: true, editor: 'text', edit_size: 32}
                 ] ;
                 switch (this.service) {
                     case 'Monitoring':
@@ -487,6 +501,7 @@ function (
             this._config_editor().set_value('config_file', 'Loading...') ;
             this._config_editor().set_value('auto',        'Loading...') ;
             this._config_editor().set_value('ffb',         'Loading...') ;
+            this._config_editor().set_value('stream',      'Loading...') ;
             switch (this.service) {
                 case 'Standard':
                     break ;
@@ -809,7 +824,10 @@ function (
             this._config_editor().edit_value('config_file') ;
             this._config_editor().edit_value('auto') ;
             this._config_editor().edit_value('ffb') ;
+            this._config_editor().edit_value('stream') ;
             switch (this.service) {
+                case 'Standard':
+                    break ;
                 case 'Monitoring':
                     this._config_editor().edit_value('outdir') ;
                     this._config_editor().edit_value('ccinsubdir') ;
@@ -828,7 +846,8 @@ function (
                 release_dir: this._config_editor().get_value('release_dir') ,
                 config_file: this._config_editor().get_value('config_file') ,
                 auto:        this._config_editor().get_value('auto') ? 1 : 0 ,
-                ffb:         this._config_editor().get_value('ffb')  ? 1 : 0
+                ffb:         this._config_editor().get_value('ffb')  ? 1 : 0 ,
+                stream:      this._config_editor().get_value('stream')
             } ;
             switch (this.service) {
                 case 'Monitoring':
@@ -852,9 +871,9 @@ function (
                     _that._config_editor().view_value('config_file') ;
                     _that._config_editor().view_value('auto') ;
                     _that._config_editor().view_value('ffb') ;
+                    _that._config_editor().view_value('stream') ;
                     switch (_that.service) {
                         case 'Monitoring':
-                            _that._config_editor().view_value('njobs') ;
                             _that._config_editor().view_value('outdir') ;
                             _that._config_editor().view_value('ccinsubdir') ;
                             _that._config_editor().view_value('exclusive') ;
@@ -873,6 +892,7 @@ function (
             this._config_editor().view_value('config_file') ;
             this._config_editor().view_value('auto') ;
             this._config_editor().view_value('ffb') ;
+            this._config_editor().view_value('stream') ;
             switch (this.service) {
                 case 'Monitoring':
                     this._config_editor().view_value('outdir') ;
@@ -890,6 +910,7 @@ function (
             this._config_editor().set_value('config_file', this._config.config_file) ;
             this._config_editor().set_value('auto',        this._config.auto) ;
             this._config_editor().set_value('ffb',         this._config.ffb) ;
+            this._config_editor().set_value('stream',      this._config.stream) ;
             switch (this.service) {
                 case 'Monitoring':
                     this._config_editor().set_value('outdir',      this._config.outdir) ;

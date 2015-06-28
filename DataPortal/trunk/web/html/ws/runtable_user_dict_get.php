@@ -19,7 +19,9 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
         'Editable' => array() ,
         'Run Info' => array(
             array('name' => 'Run Duration', 'descr' => 'Run Duration') ,
-            array('name' => 'Run Title'   , 'descr' => 'Run Title'   )
+            array('name' => 'Run Title'   , 'descr' => 'Run Title'   ) ,
+            array('name' => 'Begin Time'  , 'descr' => 'Begin Time'  ) ,
+            array('name' => 'End Time'    , 'descr' => 'End Time'    )
         ) ,
         'Calibrations'  => array(
             array('name' => 'dark',     'descr' => 'dark') ,

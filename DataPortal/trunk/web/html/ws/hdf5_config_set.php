@@ -13,8 +13,10 @@
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'filemgr/filemgr.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
 
 use \FileMgr\IfaceCtrlDb ;
+use \RegDB\RegDBDataSet ;
 
 /**
  * Update the specified configuration parameter in the Interface
@@ -85,6 +87,7 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
     $release_dir = $SVC->optional_str ('release_dir', null) ;
     $config_file = $SVC->optional_str ('config_file', null) ;
 
+    $stream      = $SVC->optional_str ('stream', null) ;
     $outdir      = $SVC->optional_str ('outdir', null) ;
     $ccinsubdir  = $SVC->optional_str('ccinsubdir', null) ;         // accepting String to allow removel when '' is provided
 
@@ -111,15 +114,57 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
             $config['auto'] = $auto ;
         }
     }
+    
+    ///////////////////////////////////////////////////////////
+    // Special processing for the 'ffb' parameter as it
+    // requires some non-trivial manipulation with the dataset
+    // specification.
+    ///////////////////////////////////////////////////////////
 
-    $config['ffb'] = update_config_param (
-        $exper ,
-        $SVC ,
-        $service ,
+    $dataset = new RegDBDataSet($SVC->ifacectrldb($service)->get_config_param_val_r (
         'live-mode' ,
         'dataset' ,
-        'Format of the dataset in live mode' ,
-        $ffb ? IfaceCtrlDb::$DATASET_FFB : IfaceCtrlDb::$DATASET_PSDM) === IfaceCtrlDb::$DATASET_FFB ? 1 : 0 ;
+         $exper->instrument()->name() ,
+         $exper->name())) ;
+
+    if (!is_null($ffb)) {
+
+        if ($ffb) $dataset->set_ffb() ;
+        else      $dataset->set_ana() ;
+
+        update_config_param (
+            $exper ,
+            $SVC ,
+            $service ,
+            'live-mode' ,
+            'dataset' ,
+            'Format of the dataset in live mode' ,
+            $dataset->dataset()) ;
+    }
+    $config['ffb'] = $dataset->is_ffb() ? 1 : 0 ;
+
+    //////////////////////////////////////////////////////////
+    // special processing for the 'stream' parameter as it
+    // requires some non-trivial manipulation with the dataset
+    // specification.
+    ///////////////////////////////////////////////////////////
+
+    if (!is_null($stream)) {
+
+        if ($stream === '') $dataset->remove_stream() ;
+        else                $dataset->set_stream($stream) ;
+
+        update_config_param (
+            $exper ,
+            $SVC ,
+            $service ,
+            'live-mode' ,
+            'dataset' ,
+            'Format of the dataset in live mode' ,
+            $dataset->dataset()) ;
+    }
+    $config['stream'] = is_null($dataset->get_stream()) ? '' : $dataset->get_stream() ;
+
 
     $config['release_dir'] = update_config_param (
         $exper ,
