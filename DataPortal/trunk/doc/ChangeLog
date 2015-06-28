@@ -11,7 +11,7 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-10-11
+Tag: V00-10-01
 2015-06-27 Igor Gaponenko
 - fixed bugs and finished implementing HDF5 Translation service configuration.
 - added 'Begin Time' and 'End Time' options to the 'Run Info' group
