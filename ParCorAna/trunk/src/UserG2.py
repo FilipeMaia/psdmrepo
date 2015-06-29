@@ -597,7 +597,7 @@ class G2Common(object):
         
         saturatedIdx = newSaturated > 0
         if np.sum(saturatedIdx)==0: 
-            # no saturated pixels
+            # no saturated pixels at all
             return self.color_ndarrayCoords, self.color2total, self.colors
 
         goodPixels = np.logical_not(saturatedIdx)
@@ -606,13 +606,18 @@ class G2Common(object):
         newColors = newColor2total.keys()
         newColors.sort()
 
-        numberDroppedPixels = np.sum(saturatedIdx)
-        
+        numberDroppedPixels = 0
         droppedColors = set(self.colors).difference(set(newColors))
+        for color in droppedColors:
+            numberDroppedPixels += self.color2total[color]
+        for color in self.colors:
+            if color in newColor2total:
+                numberDroppedPixels += (self.color2total[color] - newColor2total[color])
+        
         droppedColorsMsg = ''
-        if len(droppedColors) > 0:
+        if numberDroppedPixels > 0:
             droppedColorsMsg = ". %d colors are being dropped" % len(droppedColors)
-        self.logInfo("%d new saturated pixels being removed from color labeling%s" % (numberDroppedPixels, droppedColorsMsg))
+            self.logInfo("%d new saturated pixels being removed from color labeling%s" % (numberDroppedPixels, droppedColorsMsg))
         return newColorLabeling, newColor2total, newColors
 
 

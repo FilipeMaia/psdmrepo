@@ -11,6 +11,9 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+- improve error message about saturated pixels being removed from colors
+	
 Tag: V00-00-22
 - replace inefficient averaging over color and finecolors with efficient
   numpy.bincount. Should greatly increase spead of viewer with many colors.
