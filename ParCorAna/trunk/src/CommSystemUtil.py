@@ -189,9 +189,9 @@ def checkParams(system_params, user_params, checkUserParams=False):
         
         assert 'colorNdarrayCoords' in user_params
         assert 'colorFineNdarrayCoords' in user_params
-        assert os.path.exists(system_params['maskNdarrayCoords']), "maskNdarrayCoords file %s doesn't exist" % system_params['maskNdarrayCoords']
-        assert os.path.exists(user_params['colorNdarrayCoords']), "colorNdarrayCoords file %s doesn't exist" % user_params['colorNdarrayCoords']
-        assert os.path.exists(user_params['colorFineNdarrayCoords']), "colorFineNdarrayCoords file %s doesn't exist" % user_params['colorFineNdarrayCoords']
+        assert os.path.exists(system_params['maskNdarrayCoords']), "maskNdarrayCoords file:  '%s' doesn't exist" % system_params['maskNdarrayCoords']
+        assert os.path.exists(user_params['colorNdarrayCoords']), "colorNdarrayCoords file:  '%s' doesn't exist" % user_params['colorNdarrayCoords']
+        assert os.path.exists(user_params['colorFineNdarrayCoords']), "colorFineNdarrayCoords file:  '%s' doesn't exist" % user_params['colorFineNdarrayCoords']
         mask = np.load(system_params['maskNdarrayCoords']).astype(np.int8)
         color = np.load(user_params['colorNdarrayCoords']).astype(np.int32)
         finecolor = np.load(user_params['colorFineNdarrayCoords']).astype(np.int32)

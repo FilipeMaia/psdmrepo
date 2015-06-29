@@ -549,7 +549,7 @@ class G2Common(object):
             multi = psmonPlots.MultiPlot(counter120hz, 'MULTI', ncols=3)
             for color in self.colors:
                 if color not in delayCurves: continue
-                if (self.plotColors is not None) and (not color in self.plotColors):
+                if (self.plotColors is not None) and (not (color in self.plotColors)):
                     continue
                 thisPlot = psmonPlots.XYPlot(counter120hz, 'color/bin=%d' % color, 
                                              [d/120.0 for d in self.delays[goodDelays]], delayCurves[color][goodDelays], 

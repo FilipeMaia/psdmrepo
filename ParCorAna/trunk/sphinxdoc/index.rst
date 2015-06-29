@@ -24,6 +24,7 @@ Contents:
    framework
    testing
    architecture
+   tips
 
 ############
  Background

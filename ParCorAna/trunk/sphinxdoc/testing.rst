@@ -54,18 +54,15 @@ This creates the *h5output* argument using the testing mask and running on the t
 
 to run the alternative calculation. Note that the alternative calculation is *not* run in MPI. 
 
-Finally, there is a tool to compare the results. Currently, this tool requires a later version of the psana_test
-package then is in the release. First do::
-
-  addpkg psana_test V00-08-29
-  scons
-
-Then one can compare the two h5 files with the command::
+Finally, there is a tool to compare the results. One can compare the two h5 files with the command::
 
   parCorAnaDriver -c myconfig.py --cmp
 
 which compares the two h5output files defined in the config file. This runs a separate tool - 
 cmpParCorAnaH5OutputPy which is part of the ParCorAna package.
+
+As mentioned in the tutorial, parCorAnaDriver in the compare mode identifies the two h5output files to compare from the config file. If these filenames have the %C and %T options
+in them, the driver will not get the correct filenames for the cmpParCorAnaH5OutputPy tool.
 
 
 .. _alttest:

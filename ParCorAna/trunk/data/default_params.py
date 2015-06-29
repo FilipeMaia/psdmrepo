@@ -149,12 +149,10 @@ system_params['serverHosts'] = None # system selects which hosts to use
 
 system_params['times'] = 50000     # number of distinct times that each worker holds onto
 
-eventsPerMinute = 120*60
-numMinutes = 2
-system_params['update'] = eventsPerMinute*numMinutes  # update/viewer publish every n events. 
+eventsPerSecond = 120
+numSeconds = 20
+system_params['update'] = numSeconds * eventsPerSecond  # update/viewer publish every n events. 
               # Set to 0 to only update at the end.
-              # This is the number of events the system goes through before doing another viewer publish. Note - 
-              # the workers, on 250 cores, will takes 130 seconds when processing 50,000 events.
 
 
 ######### delays ############
@@ -234,7 +232,12 @@ user_params['psmon_plot'] = False
 # user_params['psmon_port'] = 12301
 user_params['plot_colors'] = None
 user_params['print_delay_curves'] = False
+user_params['debug_plot'] = False
+user_params['iX'] = None
+user_params['iY'] = None
 
+user_params['ipimb_threshold_lower'] = .05
+user_params['ipimb_srcs'] = []
 
 ##################
 # for debugging this params file, run it as a python script. It will

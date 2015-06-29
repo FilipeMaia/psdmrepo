@@ -37,16 +37,18 @@ so users can quickly go through it in time order, and quickly look up data with 
 specific time delay or offset from a given piece of data. 
 
 The framework maintains a rolling buffer of the data. The size of this is controlled 
-in the system_params. Default is to store 50,000 times and compute delays up to 25,000. 
+in the system_params. In default_config.py, times is set to store 50,000 times, for
+delays up to 25,000.
 
 DAQ data can come out of order, and can be missing times, or have gaps, ie, one will
-have data at the 120hz counter values of 1,2,4 but might never get 3. Moreover the data may
-have arrived in the order 1,4,2. While the framework maintains a sorted list of the 
-times, it does not move the detector data around. That is if one were to go through the
-data array of WorkerData in order, you would look at data from 120hz counter times 1,4,2. 
-However one does not do this, WorkerData provides an interface that lets you go through 
-the times in order, and  look up specific times. It then gives you the correct index 
-into the data array. 
+have data at the 120hz counter values of 1,2,4 but might never get 3. Filtering in the
+servers based on low ipimb's or other criteria will create gaps in the times as well.
+Moreover the data may have arrived out of order, for instance in the order 1,4,2. While 
+the framework maintains a sorted list of the times, it does not move the detector data 
+around. That is if one were to go through the data array of WorkerData in order, you 
+would look at data from 120hz counter times 1,4,2. However one does not do this, 
+WorkerData provides an interface that lets you go through the times in order, and 
+look up specific times. It then gives you the correct index into the data array. 
 
 We will see how to use this interface in the G2atEnd_, G2IncrementalAccumulator_, G2IncrementalWindowed_ 
 sections below.
@@ -71,7 +73,7 @@ The file::
 
   ParCorAna/src/UserG2.py 
 
-provides an example of carrying out the G2 calculation. It is carried out in three ways and provides
+Is a functional example of carrying out the G2 calculation. It is carried out in three ways and provides
 a testing method. This is implemented in several classes covered in the sections 
 G2atEnd_, G2IncrementalAccumulator_, G2IncrementalWindowed_ below.
 
@@ -101,15 +103,16 @@ For example, if one did::
   def workerCallback(self):
     print self.badEvents
 
-you would get an error. serverCallback is only called on the server ranks. This will not add the attribute 
+you would get an error as badEvents is not an attribute during workerCallback. 
+serverCallback is only called on the server ranks. This will not add the attribute 
 badEvents to instance of the userClass on the workers.
 
-The framework handles the flow of all data between servers, workers and the viewer. It calls certain methods
-by in the userClass after this data has been transferred, or before hand to decide if it should transfer data.
+The framework handles the flow of all data between servers, workers and the viewer. It calls certain methods 
+in the userClass after this data has been transferred, or before hand to decide if it should transfer data.
 
 Presently, all of the below methods must be implemented in the userClass. Many will not be needed and can
 be made optional in the future. For now though, a default implementation is provided in UserG2.py so users can
-decide what they want to modify.UserG2.py has the most up to date documentation. 
+decide what they want to modify. UserG2.py has the most up to date documentation. 
 
 All of these callbacks have names that start with either fw, server, worker, viewer. This indicates
 which part of the framework calls the function. fw indiciates multiple roles use the function - i.e, both
@@ -134,7 +137,7 @@ serverEventOk(self, evt):
    framework has extracted it (saves time not to extract it twice).
    
 serverFinalDataArray(self, dataArray, evt): 
-  if eventOk returns True, then the server roles of the framework extract the detector data.
+  if eventOk returns True, then the framework extracts the detector data.
   It is then passed to this user callback. If this callback returns None, presumably based on analyzing the 
   detector data, then the event is not processed. If dataArray is returned, or some other numpy array,
   then it is processed. Users can return a modified copy of dataArray. For instance, if one is doing 
@@ -144,28 +147,36 @@ serverFinalDataArray(self, dataArray, evt):
 
 workerInit(self, numELementsWorker):
   initializes worker. Each worker is told how many pixel elements of the detector it processes.
-  This number can vary by at most one among the workers. G2Common creates the arrays that will be returend for
-  G2, Ip and IF here - each being a numDelays x numElementsWorker array of float64. It also sets up the counts
+  G2Common creates the arrays that will be returend for
+  G2, Ip and IF here - each being a numDelays x numElementsWorker array of float32. It also sets up the counts
   array and reads some user_params values that will be used during processing.
 
-workerAdjustTerms(self, mode, dataIdx, pivotIndex, lenT, T, X):
-  this function is used by G2onGoing, but not by G2atEnd. This lets workers adjust ongoing 
-  terms in their final calculation based on new data. The parameters describe the new data coming in, and/or
-  data being overwritten if the number of events has exceeded the times stored. This allows a class like
-  G2atEnd to implement a windowed correlation analysis as well as a correlation analysis that covers the entire
-  span of the data.
-
 workerAdjustData(self, data):
-  this is called before the framework stores data that workers will use for their correlation analysis.
-  For example, if one wanted to set all non-positive numbers to a small value, each worker could execute
-  that code on their portion of the data here. 
+  this worker callback allows one to adjust data before it is stored. For example to 
+  replace negative values with 0, or a small positive number.
 
-workerCalc(self, T, numTimesFilled, X): 
-  this is an important function. This is called to create the final arrays that will be
-  gathered from all the workers and sent to the viewer. This function returns a dictionary whose keys are
-  the names returned by arrayNames, and whose values are the calculated arrays. It also returns counts of 
-  how many pairs there are for each delay, as well as the int8array discussed in the overview to hold things
-  like saturated pixels.
+workerBeforeDataRemove(self, tm, xInd, workerData):
+  This is the first of three worker functions that takes the workerData object - the object with
+  all the stored data as well as an interface to the times associated with the data. 
+  It is only called when the framework has gone through so many events that it is about to
+  overwrite the oldest worker data. The function is passed the time of this oldest data, as
+  well as the index of this oldest data in the workerData X array.
+  The G2IncrementalWindowed calculation makes use of this function, but it is not needed
+  for the straight forward G2atEnd calculation.
+
+workerAfterDataInsert(self, tm, xInd, workerData):
+  This is second of three worker functions that takes the workerData object - the object with
+  all the stored data as well as an interface to the times associated with the data. 
+  It is called for each dataArray, after it has been stored in the workerData. The callback
+  receives the time and index of the data. The G2IncrementalAccumulator makes use of this 
+  function, but it is not needed for the straight forward G2atEnd calculation.
+
+workerCalc(self, workerData): 
+  this is an important function. It is the third of the three functions taking the workerData object.
+  It is called to create the final arrays that will be gathered from all the workers and sent to the viewer. 
+  This function returns a dictionary whose keys are the names returned by arrayNames, and whose values are 
+  the calculated arrays. It also returns counts of how many pairs there are for each delay, as well as the
+ int8array discussed in the overview to hold things like saturated pixels.
 
 viewerInit(self, maskNdarrayCoords, h5GroupUser):
   called when the viewer is initialized. The viewer is responsible for binning results from the workers
@@ -180,7 +191,11 @@ viewerPublish(counts, lastEventTime, name2delay2ndarray, int8array, h5UserGroup)
   on viewer - this called after the results of all the workers have been gathered together. 
   It gets the counts, the timestamp and 120hz counter for the last event processed, 
   the gathered arrays, the gathered int array, and a h5py group into the h5output file to write to.
-  For the UserG2 code, it will make use of the finecolor file in the users_params for its part in the calculation.
+  For the UserG2 code, it will make use of the color and finecolor file in the users_params for its 
+  part in the calculation.
+
+calcAndPublishForTestAlt(self,sortedEventIds, sortedData, h5GroupUser):
+  implements the simple alternate calcualtion for testing (see testing section).
 
 G2Common
 ============

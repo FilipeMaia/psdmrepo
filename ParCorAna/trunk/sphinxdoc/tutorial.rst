@@ -23,8 +23,8 @@ these commands::
   # now identify the most recent tag of ParCorAna
   psvn tags ParCorAna
 
-  # suppose the last tag in the Vnn-nn-nn series is V00-00-08, then do
-  addpkg ParCorAna V00-00-08
+  # suppose the last tag in the Vnn-nn-nn series is V00-00-25, then do
+  addpkg ParCorAna V00-00-25
   scons
 
 .. _configfile:
@@ -77,7 +77,7 @@ live mode. For example::
   system_params['dataset'] = 'exp=%s:run=%d:live:dir=/reg/d/ffb/xpp/xpptut13' % (experiment, run) 
 
 This will start processing xtc files as soon as they appear on the ffb - usually a few seconds behind the shot.
-Further by running with 6 servers on psfehq (see below), one should be able to keep up with reading the data.
+Further by running with 6 servers on psfehq (see below), one should able read data as fast as it is it written (120hz).
 
 If the DAQ streams for the run are not numbered 0-n, and you are using several servers to keep up with the 
 data, you will need to explicitly list the streams. For example, if you are collecting from three DAQ streams
@@ -87,7 +87,7 @@ when deciding what events to include in the G2 calculation) one would do::
   system_params['dataset'] = 'exp=%s:run=%d:live:stream=1,2,5,80,81:dir=/reg/d/ffb/xpp/xpptut13' % (experiment, run) 
 
 Then set numservers (below) to 3 for the three DAQ streams, 1,2 and 5. Note, if you do not need the
-IOC streams for the G2 calculation, do not include them, it will speed up processing.
+IOC streams for the G2 calculation, do not include them. Reading the IOC streams may slow down the servers to the point where they cannot read the data at 120hz.
 
 These parameters::
 
@@ -147,47 +147,57 @@ to make sure there are no errors in the file, as well as to pretty print the fin
 user_params dictionaries. The resulting 'psanaOptions' from the above call to makePsanaOptions are::
 
   'psanaOptions': {'CSPadPixCoords.CSPadNDArrProducer.is_fullsize': 'True',
-                   'CSPadPixCoords.CSPadNDArrProducer.key_out': 'ndarray',
-                   'CSPadPixCoords.CSPadNDArrProducer.outkey': 'ndarray',
-                   'CSPadPixCoords.CSPadNDArrProducer.outtype': 'double',
-                   'CSPadPixCoords.CSPadNDArrProducer.source': 'DetInfo(XppGon.0:Cspad.0)',
-                   'ImgAlgos.NDArrCalib.below_thre_value': 0,
-                   'ImgAlgos.NDArrCalib.do_bkgd': False,
-                   'ImgAlgos.NDArrCalib.do_cmod': True,
-                   'ImgAlgos.NDArrCalib.do_gain': False,
-                   'ImgAlgos.NDArrCalib.do_mask': False,
-                   'ImgAlgos.NDArrCalib.do_nrms': False,
-                   'ImgAlgos.NDArrCalib.do_peds': True,
-                   'ImgAlgos.NDArrCalib.do_stat': True,
-                   'ImgAlgos.NDArrCalib.do_thre': False,
-                   'ImgAlgos.NDArrCalib.fname_bkgd': '',
-                   'ImgAlgos.NDArrCalib.fname_mask': '',
-                   'ImgAlgos.NDArrCalib.key_in': 'ndarray',
-                   'ImgAlgos.NDArrCalib.key_out': 'calibrated',
-                   'ImgAlgos.NDArrCalib.masked_value': 0,
-                   'ImgAlgos.NDArrCalib.source': 'DetInfo(XppGon.0:Cspad.0)',
-                   'ImgAlgos.NDArrCalib.threshold': 0,
-                   'ImgAlgos.NDArrCalib.threshold_nrms': 3,
-                   'modules': 'CSPadPixCoords.CSPadNDArrProducer ImgAlgos.NDArrCalib'}
+                  'CSPadPixCoords.CSPadNDArrProducer.key_out': 'ndarray',
+                  'CSPadPixCoords.CSPadNDArrProducer.outkey': 'ndarray',
+                  'CSPadPixCoords.CSPadNDArrProducer.outtype': 'float',
+                  'CSPadPixCoords.CSPadNDArrProducer.source': 'DetInfo(XppGon.0:Cspad.0)',
+                  'ImgAlgos.NDArrCalib.below_thre_value': 0,
+                  'ImgAlgos.NDArrCalib.do_bkgd': False,
+                  'ImgAlgos.NDArrCalib.do_cmod': True,
+                  'ImgAlgos.NDArrCalib.do_gain': False,
+                  'ImgAlgos.NDArrCalib.do_mask': False,
+                  'ImgAlgos.NDArrCalib.do_nrms': False,
+                  'ImgAlgos.NDArrCalib.do_peds': True,
+                  'ImgAlgos.NDArrCalib.do_stat': True,
+                  'ImgAlgos.NDArrCalib.do_thre': False,
+                  'ImgAlgos.NDArrCalib.fname_bkgd': '',
+                  'ImgAlgos.NDArrCalib.fname_mask': '',
+                  'ImgAlgos.NDArrCalib.key_in': 'ndarray',
+                  'ImgAlgos.NDArrCalib.key_out': 'calibrated',
+                  'ImgAlgos.NDArrCalib.masked_value': 0,
+                  'ImgAlgos.NDArrCalib.outtype': 'float',
+                  'ImgAlgos.NDArrCalib.source': 'DetInfo(XppGon.0:Cspad.0)',
+                  'ImgAlgos.NDArrCalib.threshold': 0,
+                  'ImgAlgos.NDArrCalib.threshold_nrms': 3,
+                  'modules': 'CSPadPixCoords.CSPadNDArrProducer ImgAlgos.NDArrCalib'},
 
+
+One could also modify the above to directly set the psana options.
+
+Note that the psana modules are instructed to the detector data array as float rather than double.
+Currently the ParCorAna framework uses float32 for handling the detector data. In the future there
+will be an option to support double, and possibly int16.
 
 Worker Storage
 ================
 
-The psana calibration module NDArrCalib defaults to creating ndarrays of double. 
-These are 8 bytes wide. Each worker stores a portion of this ndarray. To guarantee no 
-loss of precision, workers should store results in the same data format - i.e, float64.
-However for large detectors and long correlation types, this may require too much 
-memory. For full cspad where all pixels are included in the mask, and 50,000 times are stored
-on the workers, this amounts to 50,000*(32*388*185)*8=855GB of memory that must be 
-distributed amoung all the workers. If each host has 24GB, one would 
-have to use 36 hosts. If each host runs 12 MPI ranks, we need 432 ranks for the workers.
-
-A simple way to use less memory, is to have the workers store the detector data as 4
-byte floats. This is what is done in default_params.py::
+As mentioned above, ParCorAna requires that the psana calibration module NDArrCalib produce
+an ndarray of float as opposed to double. The framework will then scatter arrays of floats 
+to the workers. It is reccommended that workers store this data as float32 as well.
+This is what is done in default_params.py::
 
   system_params['workerStoreDtype'] = np.float32
 
+One could set this to np.float64 if one is concerned about precision when accumulating
+statistics for the correlation matricies. This is valid concern as one can do 50,000
+multiply and adds of the calibrated detector pixels. A worse case upper bound for this 
+accumulated result might be 10^14 (assumming 1<<15 is the maximum pixel value), however 
+float32 can represent 10^38. 
+
+Presently, using float64 for worker storage is untested, and 
+the framework will have to downcast the worker's float64's to float32 in order gather
+results for the viewer. That is the viewer will only get float32 results. In the 
+future we will make float64 vs. float32 an option for the framework.
 
 Mask File
 ===========
@@ -195,10 +205,11 @@ Mask File
 You need to provide the framework with a mask file for the detector data. This is a 
 numpy array with the same dimensions as the ndarray that the psana ndarray producer 
 module creates. This is not necessarily a 2D image that is easy to plot. In addition, 
-you should create a testing mask file that masks a very small number of pixels 
-(10 to 100). The small number of pixels in the test mask file allows one to run 
+you should create a testing mask file that includes a very small number of pixels 
+(10 to 100) in the mask. The small number of pixels in the test mask file allows one to run 
 a simple alternative calculation against the data to validate the calculation done
-through the framework.
+through the framework, as well as to debug a large part of the code outside the MPI
+framework.
 ::
 
   system_params['maskNdarrayCoords'] = 'maskfile.npy' # not created yet
@@ -208,19 +219,20 @@ through the framework.
 Number of Servers
 ===================
 
-The servers are responsible for working through the data, breaking up an ndarray of detector 
-data, and scattering it to the workers. When developing, we usuaully specify 
+The servers are responsible for reading the data, forming and calibrating the detector arrays, and 
+scattering these arrays to the workers. When developing, we usuaully specify 
 one server. When analyzing data in live mode, we usually specify 6 servers, or however many
 DAQ streams there are in the run. The framework sets things up so that each server only processes
-one stream. As long as each server can run at 20hz it will keep up with live 120hz data. 
+one stream. As long as each server can run at 20hz the framework can potentially keep up with live 120hz data. 
 If you are analyzing xtcav data, then each server will process 2 or more streams. The framework 
 outputs timing at the end which gives us an idea of how fast or slow the servers are.
-Specifying more than 6 servers will not help, rather it will waste too many ranks on servers.
+In live mode, specifying more than 6 servers will not help, rather it will waste too many ranks on servers.
 
 In index mode, specifying more than six servers can help the servers run faster. However usually
 the bottleneck will be with the workers, and more than six servers is not neccessary. The framework
 outputs timing information at the end of runs that allow one to see what part of the system
-is slow.
+is slow. Presently, little testing has been done in index mode. Most testing has been in live mode, or
+offline mode with six servers. 
 
 By default, the framework will pick distinct hosts to run the servers on. Distributing the I/O
 among several hosts seems to improve performance, but this is debatable.
@@ -245,17 +257,27 @@ These parameters specify how many events we will store, and what the delays are.
 If one stores 50,000 events but there are 100,000 events in the dataset, the 
 framework will start overwriting the oldest data at event 50,001. 
 
-Above we are specifying 100 delays that are logarithmically spaced from 1 to 25,000 bu
+Above we are specifying 100 delays that are logarithmically spaced from 1 to 25,000 by
 using a utility function in ParCorAna. However one can set their own delays::
 
   system_params['delays'] =  [    1,    10, 100, 1000]
 
-Periodically, the workers are told to calculate correlation for their pixels. The framework
-gathers these results from all the workers and sends it to the viewer. When 'update' is 0, 
+Periodically, the workers are told that the correlation statistics for their pixels are 
+going to be gathered together for the viewer. When 'update' is 0, 
 this just happens once at the end. Otherwise 'update' specifies the number of events between
-these gathers. If one is analyzing live data and producing plots, one could specify 360 to get a 
-plot every 3 seconds - however gathering results at the viewer can be expensive, and 3 seconds may
-be too frequent to keep up with the data (depending on the problem size).
+these gathers. If one is analyzing live data and producing plots, one could specify 2400 to get a 
+plot for every 20 seconds of data (the frequency of the plots depends on how fast the system is
+keeping up with data). . Recent tests (see section ??) with full cspad on the psfehq show that 
+gathering results at the viewer typically take 1-2 seconds. In terms of keeping up with live 
+data, this slows the worker down some. The viewer presently spends about 16 seconds processing 
+the gathered data to form plots. If one asks for plots to frequently, the whole system will 
+wait for the viewer to finish its last plots.
+
+The other danger with plotting to frequently, is if one is also writing h5output. Currently, 
+both h5output and plots are done with every update to the viewer (in the future this will be
+changed). With 100 delays, each update will trigger the equivalent of 600 events worth 
+(around 6 seconds) of full cspad to be written to the output file. This could slow things down 
+significantly, and cause a lot of output to be created.
 
 User Module
 ========================
@@ -273,12 +295,15 @@ calculation:
  * **G2IncrementalAccumulator** workers do O(D) work with each event, doing correlation over all times
  * **G2IncrementalWindowed** workers do O(D) work with each event, doing a windowed correlation, over the last T times
 
+Note - G2IncrementalAccumulator is what has been tested the most for live data analysis - this is
+the preferred method to use as it reduces the overall compute time.
+
 More on this in section XXX???
 
 H5Output
 =============
 The system will optionally manage an h5output file. This is not a file for collective MPI
-writes. Within the user code, only the viewer rank should write to the file. The viewer
+writes. Within the user code, only the viewer rank can write to the file. The viewer
 will receive an open group to the file at run time. 
 
 Set h5output to None if you do not want h5 output - important to speed up online monitoring with 
@@ -298,7 +323,6 @@ filename.
   system_params['h5output'] = 'g2calc_%s-r%4.4d.h5' % (experiment, run)
   system_params['testh5output'] = 'g2calc_test_%s-r%4.4d.h5' % (experiment, run)
 
-
 example of using %T and %C, note the %% in the value to get one % in the string after 
 expanding experiment and run::
 
@@ -312,6 +336,11 @@ For re-running the analysis, set the below to True to overwrite existing h5 file
 While the analysis is running, it adds the extension .inprogress to the output file.
 The framework will never overwrite a .inprogress file, even if 'overwrite' is True.
 If analysis crashed due to an error, these leftover files need to be manually removed.
+
+Note: for using making use of the testing in the framework, (discussed later) use of 
+the %C or %T options in the h5output and testH5output filenames will brake the ability 
+of the framework to identify output files to compare. One could still run the compare 
+tool to directly compare these output files.
 
 Debugging/Develepment Switches
 =====================================
@@ -346,20 +375,22 @@ for grouping different ranks. More on this in the next section::
   user_params['colorNdarrayCoords'] = 'colorfile.npy' # not created yet
 
 Note that the color 0 is ignored in the color file - no delay curve is produced for color 0.
-Only colors 1 and above.
+Only colors 1 and above are used. If the framework observes many pixels with color 0 that
+are included in the mask file - it will warn you in case you want to prepare a new mask to
+exclude those pixels from worker calculations.
 
 Fine Color/Bin/Label File
 -----------------------------
 This is a another parameter that the UserG2 needs. It is a color file that is used to 
-replace classes of pixels with their average value. This is applied to the IP and IF matricies
-before forming the final G2 curves. Note, these modified IP and IF matrices are used for calculating
-the G2 delay curves, the modified IP/IF are not saved to the hdf5 file::
+replace sets of pixels with their average value before forming the final delay curve. 
+This is applied to the IP and IF matricies before forming the final G2 curves. Note, 
+these modified IP and IF matrices are used for calculating the G2 delay curves, 
+however the modified IP/IF are not saved to the hdf5 file::
 
-  user_params['colorFineNdarrayCoords'] = 'filnColorfile.npy' # not created yet
+  user_params['colorFineNdarrayCoords'] = 'fineColorfile.npy' # not created yet
 
-In this case, color 0 is not ignored, pixels labeled with 0 are replaced with their average just like
-all the others. Whether or not they go into delay curves depends on how they are labeled in the 
-color file above.
+As with the color file, color 0 is ignored. Moreover, one should ensure that any pixel with a 
+color that is nonzero, has a finecolor that is nonzero as well. 
 
 Filtering Parameters
 -----------------------
@@ -369,16 +400,44 @@ parameters that it makes use of::
   user_params['saturatedValue'] = (1<<15)
   user_params['LLD'] = 1E-9
   user_params['notzero'] = 1E-5
+  user_params['ipimb_threshold_lower'] = .05
+  user_params['ipimb_srcs'] = []
+
+Workers use saturatedValue to identify saturated pixels. Note - in practice, you want to pick a value
+that works with the calibrated data - 1<<15 is the saturation value for the raw detector data, but 
+workers receive calibrated data.
+
+Workers use notzero to replace negative, 0, and small positive numbers in the worker data.
+
+Servers use ipmb_srcs and ipimb_threshold_lower to look for low values in ipimb's. When a low value is
+identified, the server does not send the data to the workers. It is skipped.
+
 
 Plotting
 ----------
-The UserG2 module provides an example of how to use the psmon package to plot.
+The UserG2 module uses the psmon package to plot.
 This is the preffered method to plot for online monitoring where the analysis job
-runs on a batch farm. For now we set this value to False. Using psmon for plotting
+runs on a batch farm. The 'psmon_plot' parameter turns plotting on, and the 'plot_colors'
+param allows one to specify a subset of colors to plot (otherwise all colors are plotted).
+For now we set this value to False. Using psmon for plotting
 will be covered in section XXX???
 ::
 
   user_params['psmon_plot'] = False
+  user_params['plot_colors'] = None
+
+There are also some options for debugging:
+::
+
+  user_params['print_delay_curves'] = False
+  user_params['debug_plot'] = False
+  user_params['iX'] = None
+  user_params['iY'] = None
+
+The first just prints statistics about the delay curves in the text output of the program.
+'debug_plot' will bring up a plot of the gathered G2 and IF matricies for a few delays.
+It will plot it in image space using the ndarray to image conversation matricies iX and
+iY (discussed below).
 
 
 ***************************
@@ -388,7 +447,7 @@ The system requires a mask file that identifies the pixels to process.
 Reducing the number of pixels processed can be the key to fast feedback during an experiment.
 A userClass for correlation analysis will typically use two 'color' files to label
 pixels to average together. The first, a coarser one, is used to average pixels for the
-final delay curves. The second, a finer one, is used to replace classes of pixels with their
+final delay curves. The second, a finer one, is used to replace sets of pixels with their
 average value before forming the delay curves. In addition to the mask file for analyzing data, 
 users should produce a testmask file for testing their compution. 
 This file should only compute on a few (10-100) pixels.
@@ -416,10 +475,9 @@ The finecolor file will have 18 colors (since we used the --finecolor 18 option)
 As an example, these colors bin pixels based on intensity. In practice users will want to bin pixels
 based on other criteria.
 
-The tool parCorAnaMaskColorTool can produce a great deal of output that can be ignored.
-To deal with converting from images to ndarrays, it is neccessary to work with geometry files.
-If a geometry file is not present for your experiment, one should be deployed into the calibration
-area. One can also specify a geometry file with the -g file. 
+Conversion from images to ndarrays is made possible by geometry files. If a geometry file is not present 
+for your experiment, one should be deployed into the calibration area. One can also specify a geometry 
+file with the -g file. 
 
 Often people will edit image files to produce the mask and color file. These need to then be converted
 back to ndarrays. The help for parCorAnaMaskColorTool explains how to do this. One issue with this though,
@@ -440,8 +498,11 @@ Now in myconfig.py, set the mask, testmask, and color file::
   system_params['maskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_mask_ndarrCoords.npy'
   system_params['testMaskNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_testmask_ndarrCoords.npy'
   user_params['colorNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_color_ndarrCoords.npy'
+  user_params['colorFineNdarrayCoords'] = 'xpptut13-r1437_XppGon_0_Cspad_0_finecolor_ndarrCoords.npy'
 
-Note that the last parameter is to the user_params - the framework knows nothing about the coloring.
+Note that the last two parameters is to the user_params - the framework knows nothing about the coloring.
+It is scattering detector data, and collecting delay curves - the UserG2 viewer code makes use of the
+colorings to form these final delay curvers.
 
 ********************
 Check Config File
@@ -452,7 +513,8 @@ all the imports work and the syntax is correct::
 
   python myconfig.py
 
-The config file does a pretty-print of the two dictionaries defined.
+The __main__ body for the config file first does a pretty-print of the two dictionaries defined. It then
+tries to find the mask and color files, and does some validity checks on them.
 
 .. _runlocal:
 
@@ -465,8 +527,7 @@ Now you are ready to run the software. To test using a few cores on your local m
   mpiexec -n 4 parCorAnaDriver -c myconfig.py -n 100
 
 This should run without error. Even though we are only running on 100 events, the viewer will be
-gathering 100 (delays) * 32 * 388 * 185 (cspad dimensions) * 8 (float64) = 1,837,568,000 bytes, 
-or close to 2GB.
+gathering 100 (delays) * 32 * 388 * 185 (cspad dimensions) * 4 (float64) or close to 1GB.
 
 ***********************************
 Results
@@ -484,12 +545,15 @@ In /system, one finds::
 
   /system/system_params    Dataset 
   /system/user_params      Dataset
-  /system/color_ndarrayCoords Dataset
-  /system/mask_ndarrayCoords Dataset 
+
+  /system/system_params/maskNdarrayCoords Dataset 
+  /system/user_params/color_ndarrayCoords Dataset
+  /system/user_params/colorFine_ndarrayCoords Dataset
 
 The first two are the system_params and user_params dictionaries from the config file.
 
-The latter two are the mask and color ndarrays specified in the system_params.
+The latter three are the mask, color and finecolor ndarrays specified in the system_params
+and user_params.
 
 In /user one finds whatever the user viewer code decides to write. The example 
 UserG2 module writes, for example::
@@ -534,17 +598,13 @@ the option::
 
 in the config file.
 
-You may not want to use the --logx option if the delays are linearly spaced. If you use the 
---logx option and get an error, it is a recent option that may not be in the current analysis
-release yet. Do::
+You may not want to use the --logx option if the delays are linearly spaced.
 
-  newrel ana-current myrel
-  cd myrel
-  sit_setup
-  addpkg psmon HEAD
-  scons
+The viewer always runs on rank 0, so one can do ::
 
-and try the command again.
+  bjobs -w
+
+To see what host you are launched on.
 
 .. _runonbatch:
 

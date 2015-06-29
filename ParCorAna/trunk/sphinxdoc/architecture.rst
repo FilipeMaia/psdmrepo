@@ -8,7 +8,7 @@
 Below we take a top down approach to summarizing the components of the framework.
 
 **************************
-mpiFnDriver
+parCorAnaDriver
 **************************
 
 This is where the system starts. Use the -h option to get help on running it. A path it is is already setup in 
@@ -17,9 +17,8 @@ an analysis release with the ParCorAna package. Key steps that it takes:
 * reads the config file. Some config file options can be overriden with command line options, namely:
 
   ** verbosity - more for debugging
-  ** numevents - more for debugging, end early
+  ** numevents - more for debugging, end early (current bug - numevents per server, not for all)
   ** h5output  - override output file
-  ** elementsperworker  - more for debugging
 
 * Instantiates a framework and runs it:
 
@@ -30,7 +29,7 @@ an analysis release with the ParCorAna package. Key steps that it takes:
 CommSystemFramework
 **************************
 
-this is what the mpiFnDriver kicks off. This handles the mpi
+this is what the parCorAnaDriver kicks off. This handles the mpi
 communication between master/servers/workers/viewer. It is meant to be 
 agnostic of the kind of calculation being done. 
 

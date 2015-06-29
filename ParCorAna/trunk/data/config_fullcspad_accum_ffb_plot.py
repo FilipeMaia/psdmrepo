@@ -4,7 +4,7 @@ import ParCorAna
 
 system_params={}
 experiment = 'xcs84213'; run=117  # this has CsPad.DataV2  # 40k - 60k
-system_params['dataset'] = 'exp=%s:run=%d:live:stream=0-5:dir=/reg/d/ffb/xcs/xcs84213/xtc' % (experiment, run) 
+system_params['dataset'] = 'exp=%s:run=%d:live:stream=0-5:dir=/reg/d/ffb/xcs/%s/xtc' % (experiment, run, experiment) 
 
 #system_params['dataset'] = 'exp=%s:run=%d' % (experiment, run) 
 
@@ -32,12 +32,11 @@ system_params['serverHosts'] = None # system selects which hosts to use
 
 system_params['times'] = 35000     # number of distinct times that each worker holds onto
 
-eventsPerMinute = 120*60
-numMinutes = .5
-system_params['update'] = int(eventsPerMinute*numMinutes)  # update/viewer publish every n events. 
-              # Set to 0 to only update at the end.
-              # This is the number of events the system goes through before doing another viewer publish. Note - 
-              # the workers, on 250 cores, will takes 130 seconds when processing 50,000 events.
+eventsPerSecond = 120
+numSeconds = 30
+system_params['update'] = numSeconds*eventsPerSecond # update/viewer publish every n events. 
+# Set to 0 to only update at the end.
+# This is the number of events the system goes through before doing another viewer publish.
 
 
 ######### delays ############
