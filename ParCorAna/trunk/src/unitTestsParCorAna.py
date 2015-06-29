@@ -11,13 +11,9 @@
 import sys
 import os
 import logging
-#import stat
 import tempfile
 import unittest
 from cStringIO import StringIO
-#import subprocess as sb
-#import collections
-#import math
 import numpy as np
 import h5py
 import glob
@@ -28,9 +24,6 @@ import shutil
 import psana
 from AppUtils.AppDataPath import AppDataPath
 import psana_test.psanaTestLib as ptl
-
-#import h5py
-#import psana_test.psanaTestLib as ptl
 
 import ParCorAna as corAna
 
@@ -64,25 +57,11 @@ def unindent(x):
 class FormatFileName( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
         self.longMessage = True
         destDirBase = AppDataPath(os.path.join("ParCorAna","testingDir")).path()
         self.tempDestDir = tempfile.mkdtemp(dir=destDirBase)
 
     def tearDown(self) :
-        """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
-        """
         shutil.rmtree(self.tempDestDir, ignore_errors=True)
         
     def test_formatFileName(self):
@@ -120,23 +99,9 @@ class FormatFileName( unittest.TestCase ) :
 class ParCorAna( unittest.TestCase ) :
 
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
         self.longMessage = True
 
     def tearDown(self) :
-        """
-        Method called immediately after the test method has been called and 
-        the result recorded. This is called even if the test method raised 
-        an exception, so the implementation in subclasses may need to be 
-        particularly careful about checking internal state. Any exception raised 
-        by this method will be considered an error rather than a test failure. 
-        This method will only be called if the setUp() succeeds, regardless 
-        of the outcome of the test method. 
-        """
         pass
         
     def test_parseDataSetString(self):
@@ -192,30 +157,35 @@ class Cspad2x2( unittest.TestCase ) :
     '''Test on small cspad2x2
     '''
     def setUp(self) :
-    	""" 
-    	Method called to prepare the test fixture. This is called immediately 
-    	before calling the test method; any exception raised by this method 
-    	will be considered an error rather than a test failure.  
-    	"""
-        pass
         dataDir = os.path.join(ptl.getMultiFileDataDir(), 'test_013_xcsi0314')
         experiment = 'xcsi0314'
         run = 178  
+        correctVersion = 0
 
         maskColorDir = os.path.join(dataDir, 'maskColorDir')
+        correctOutputDir = os.path.join(dataDir, 'ParCorAnaTestAnswers')
+        assert os.path.exists(maskColorDir)
+        assert os.path.exists(correctOutputDir)
         maskFileBaseName = '%s-r%d_XcsEndstation_0_Cspad2x2_0_mask_ndarrCoords.npy' % (experiment, run)
         testMaskFileBaseName = '%s-r%d_XcsEndstation_0_Cspad2x2_0_testmask_ndarrCoords.npy' % (experiment, run)
         colorFileBaseName =  '%s-r%d_XcsEndstation_0_Cspad2x2_0_color_ndarrCoords.npy' % (experiment, run)
         finecolorFileBaseName =  '%s-r%d_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy' % (experiment, run)
+        atEndCorrectBaseName = 'g2calc_cspad2x2_atEnd_%s-r%4.4d_v%d.h5' % (experiment, run, correctVersion)
+        accumCorrectBaseName = 'g2calc_cspad2x2_incrAccum_%s-r%4.4d_v%d.h5' % (experiment, run, correctVersion)
+        
         maskFile = os.path.join(maskColorDir, maskFileBaseName)
         testMaskFile = os.path.join(maskColorDir, testMaskFileBaseName)
         colorFile = os.path.join(maskColorDir, colorFileBaseName)
         finecolorFile = os.path.join(maskColorDir, finecolorFileBaseName)
+        self.atEndAnswerFile = os.path.join(correctOutputDir, atEndCorrectBaseName)
+        self.accumAnswerFile = os.path.join(correctOutputDir, accumCorrectBaseName)
 
         assert os.path.exists(maskFile), "mask file %s doesn't exist" % maskFile
         assert os.path.exists(testMaskFile),  "test maskfile %s doesn't exist" % testMaskFile
         assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorFile
         assert os.path.exists(finecolorFile),  "fine color file %s doesn't exist" % finecolorFile
+        assert os.path.exists(self.atEndAnswerFile), "atEnd file %s doesn't exist" % self.atEndFile
+        assert os.path.exists(self.accumAnswerFile), "accumAnswerFile file %s doesn't exist" % self.accumAnswerFile
 
         numServers = 3
         
@@ -338,7 +308,9 @@ class Cspad2x2( unittest.TestCase ) :
                  'e524-r0178-s02-c00.xtc':                                                          'd340d899c5ab36f34b75df419af3b711', 
                  'e524-r0178-s03-c00.xtc':                                                          '111d1ab55c6bbb685bea7d5501587e1d', 
                  'e524-r0178-s04-c00.xtc':                                                          '18fcbc6eec20d2a94f31750f49dc1bda', 
-                'e524-r0178-s05-c00.xtc':                                                           '9d87909f0c613ca6433fc94d0985521d' 
+                 'e524-r0178-s05-c00.xtc':                                                          '9d87909f0c613ca6433fc94d0985521d',
+                 'ParCorAnaTestAnswers/g2calc_cspad2x2_atEnd_xcsi0314-r0178_v0.h5':                 'e4eec5c9fb4ee3247a110bebdcf95c55',
+                 'ParCorAnaTestAnswers/g2calc_cspad2x2_incrAccum_xcsi0314-r0178_v0.h5':             '2483bc4ddd2387ee331f936cf876680e',
         }
         for fname, prev_md5 in md5sums.iteritems():
             fullFname = os.path.join(self.dataDir,fname)
@@ -378,6 +350,10 @@ class Cspad2x2( unittest.TestCase ) :
         h5outputFile = self.formatDict['h5outputFile'] % testName
         self.checkDelays(h5outputFile , self.formatDict['delays'], self.expectedCounts)
 
+        # check that the output agrees with the previously saved version:
+        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy %s %s' % (h5outputFile, self.atEndAnswerFile)
+        self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously rased output, cmd %s" % cmdCmpPrevious)
+
         cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
@@ -396,6 +372,10 @@ class Cspad2x2( unittest.TestCase ) :
         # check delays
         h5outputFile = self.formatDict['h5outputFile'] % testName
         self.checkDelays(h5outputFile, self.formatDict['delays'], self.expectedCounts)
+
+        # check that the output agrees with the previously saved version:
+        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy %s %s' % (h5outputFile, self.accumAnswerFile)
+        self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously saved output, cmd %s" % cmdCmpPrevious)
 
         cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)

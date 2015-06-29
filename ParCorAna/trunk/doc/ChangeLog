@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-21:
+- save unit test results into files in /reg/g/psdm/data_test ... so that
+  unit tests can compare to previously computed output. 
+- Extend unit tests to compare to previous output.
+- Modify compare tool to ignore testH5out system_param in comparing output files.
+	
+	
 Tag: V00-00-20:
 - add debugging statements
 - add many user_parms, in particular parameters to filter based on ipimbs
