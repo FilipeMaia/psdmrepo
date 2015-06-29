@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+- remove saturated pixels from finecolor as well as color data.
+- add unit test for saturated pixels based on parsing output.
+	
 Tag: V00-00-23
 - improve error message about saturated pixels being removed from colors
 	

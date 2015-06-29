@@ -204,6 +204,8 @@ class Cspad2x2( unittest.TestCase ) :
         testName = '--TESTS-MUST-FILL-THIS-IN--'
         numTimes = 100  # test data only has 60 events
         delays = [1, 2, 3, 5, 7, 10, 15, 23, 34, 50]
+        saturatedValue = (1<<15) 
+        update = 0
         self.formatDict = locals().copy()
 
         self.numEvents = 60     # There are 60 events in the test data.
@@ -249,7 +251,7 @@ class Cspad2x2( unittest.TestCase ) :
         system_params['numServers'] = {numServers}
         system_params['serverHosts'] = None  # None means system selects which hosts to use (default). 
         system_params['times'] = {numTimes}
-        system_params['update'] = 0
+        system_params['update'] = {update}
         system_params['delays'] = {delays}
         testName = '{testName}'
         system_params['h5output'] = '{h5outputFile}' % testName
@@ -266,7 +268,7 @@ class Cspad2x2( unittest.TestCase ) :
         user_params = {{}}
         user_params['colorNdarrayCoords'] = '{colorFile}'
         user_params['colorFineNdarrayCoords'] = '{finecolorFile}'
-        user_params['saturatedValue'] = (1<<15)
+        user_params['saturatedValue'] = {saturatedValue}
         user_params['plot_colors'] = None
         user_params['print_delay_curves'] = False
         user_params['LLD'] = 1E-9
@@ -359,6 +361,32 @@ class Cspad2x2( unittest.TestCase ) :
 
         cmd = 'parCorAnaDriver --cmp -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="error running %s - files must differ" % cmd)
+        
+    def test_SaturatedPixels(self):
+        self.formatDict['userClass']='UserG2.G2atEnd'
+        self.formatDict['saturatedValue'] = 300
+        self.formatDict['update'] = 30
+        testName = 'atEndSat'
+        self.formatDict['testName'] = testName
+        configFileName = self.writeConfigFile('config_G2atEndSat.py')
+
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
+        output,err,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
+        self.assertEqual(0, retcode, msg="Error running %s" % cmd)
+        output += '\n'
+        output += err
+        expectedLines = ["99 new saturated pixels being removed from color labeling. 1 colors are being dropped",
+                         "1 new saturated pixels being removed from color labeling. 1 colors are being dropped"]
+
+        for ln in output.split('\n'):
+            if len(expectedLines)==0:
+                break
+            if ln.find(expectedLines[0])>=0:
+                expectedLines.pop(0)
+                
+        self.assertEqual(0,len(expectedLines), "From cmd: %s\nDid not find output lines that included these lines in this order:\n%s" % \
+                         (cmd, '\n'.join(expectedLines)))
+
         
     def test_G2IncrementalAccumulator(self):
         self.formatDict['userClass']='UserG2.G2IncrementalAccumulator'

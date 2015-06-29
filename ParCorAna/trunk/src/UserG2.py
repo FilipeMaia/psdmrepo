@@ -461,7 +461,7 @@ class G2Common(object):
         assert saturated_ndarrayCoords.shape == self.color_ndarrayCoords.shape, "UserG2.viewerPublish: gathered satureated pixel shape wrong. shape=%s != %s" % \
             (saturated_ndarrayCoords.shape, self.color_ndarrayCoords.shape)
 
-        self.color_ndarrayCoords, self.color2total, self.colors = self.updateColorBasedOnNewSaturated(saturated_ndarrayCoords)
+        self.changeColorDataIfNewSaturated(saturated_ndarrayCoords)
 
         delayCurves = {}
         for color in self.colors:
@@ -585,41 +585,73 @@ class G2Common(object):
         psmonPublish.send('DEBUG', debugPlot)
 
 
-    def updateColorBasedOnNewSaturated(self, newSaturated):
+    def changeColorDataIfNewSaturated(self, newSaturated):
         '''update color data based on new saturated pixels. Get new saturated
-        pixels out of the color label ndarray, update the total color counts for average,
-        and possibly remove a color if its count went to 0.
+        pixels out of the color and finecolor label ndarray, update the total 
+        color/finecolors counts for average, and possibly remove a color if its 
+        count went to 0.
 
         Args:
           saturated_ndarrayCoords: an int8 with the detector ndarray shape. 
                                    positive values means this is a saturated pixels.
+        Output:
+          possibly modifies all color and finecolor data members
         '''
+
+        ########### helper functions ###########
+        def getNewColorData(goodPixels, oldColorLabeling):
+            assert goodPixels.dtype == np.bool
+            newColorLabeling = goodPixels * oldColorLabeling
+            newColor2total = sumColoredPixels(newColorLabeling)
+            newColors = newColor2total.keys()
+            newColors.sort()
+            return newColorLabeling, newColor2total, newColors
         
+        def calcDropedPixels(oldColor2total, newColor2total):
+            oldColors = oldColor2total.keys()
+            newColors = newColor2total.keys()
+            numberDroppedPixels = 0
+            droppedColors = set(oldColors).difference(set(newColors))
+            for color in droppedColors:
+                numberDroppedPixels += oldColor2total[color]
+            for color in newColors:
+                assert color in oldColor2total, "unexpected: newcolor=%d not in oldColors?" % color
+                numberDropedThisColor = (oldColor2total[color] - newColor2total[color]) 
+                assert numberDropedThisColor >= 0, "internal error: more pixels of color=%d after excluding saturated pixels than there were before?" % color
+                numberDroppedPixels += numberDropedThisColor
+            return numberDroppedPixels, droppedColors
+
+        ######### end helper functions #############
         saturatedIdx = newSaturated > 0
         if np.sum(saturatedIdx)==0: 
             # no saturated pixels at all
-            return self.color_ndarrayCoords, self.color2total, self.colors
+            return
 
         goodPixels = np.logical_not(saturatedIdx)
-        newColorLabeling = goodPixels * self.color_ndarrayCoords
-        newColor2total = sumColoredPixels(newColorLabeling)
-        newColors = newColor2total.keys()
-        newColors.sort()
+        newColorLabeling, newColor2total, newColors = getNewColorData(goodPixels, self.color_ndarrayCoords)
 
-        numberDroppedPixels = 0
-        droppedColors = set(self.colors).difference(set(newColors))
-        for color in droppedColors:
-            numberDroppedPixels += self.color2total[color]
-        for color in self.colors:
-            if color in newColor2total:
-                numberDroppedPixels += (self.color2total[color] - newColor2total[color])
-        
+        numberDroppedPixels, droppedColors = calcDropedPixels(self.color2total, newColor2total)
+
+        if numberDroppedPixels == 0:
+            # no new saturated pixels
+            return
+
+        newFineColorLabeling, newFineColor2total, newFineColors = getNewColorData(goodPixels, self.finecolor_ndarrayCoords)
+
         droppedColorsMsg = ''
-        if numberDroppedPixels > 0:
+        if len(droppedColors) > 0:
             droppedColorsMsg = ". %d colors are being dropped" % len(droppedColors)
-            self.logInfo("%d new saturated pixels being removed from color labeling%s" % (numberDroppedPixels, droppedColorsMsg))
-        return newColorLabeling, newColor2total, newColors
 
+        self.logInfo("%d new saturated pixels being removed from color labeling%s" % (numberDroppedPixels, droppedColorsMsg))
+
+        self.color_ndarrayCoords[:] = newColorLabeling[:]
+        self.finecolor_ndarrayCoords[:] = newFineColorLabeling[:]
+        
+        self.color2total = newColor2total
+        self.finecolor2total = newFineColor2total
+
+        self.colors = newColors
+        self.finecolors = newFineColors
 
 
 #################### Incremental Accumulator Calculation #######################        
