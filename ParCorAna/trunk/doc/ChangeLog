@@ -11,6 +11,15 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+- replace inefficient averaging over color and finecolors with efficient
+  numpy.bincount. Should greatly increase spead of viewer with many colors.
+- do not require h5output or testH5output to be set for test_main or test_alt modes
+  useful for debugging config file with no h5output.
+- warn/error about finecolor file == 0 when color file != 0
+- UserG2 refactors: debugPlot function, loadColorFile function, replaceSubsetsWithAverage
+  make modifications to colors based on saturated pixels more explicit
+	
 Tag: V00-00-21:
 - save unit test results into files in /reg/g/psdm/data_test ... so that
   unit tests can compare to previously computed output. 

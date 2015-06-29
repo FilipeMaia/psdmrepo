@@ -442,5 +442,80 @@ class UtilFunctions( unittest.TestCase ) :
         self.assertEqual(len(badDelays),0)
         self.assertEqual(len(delays),100)
 
+    def test_replaceSubsetsWithAverage(self):        
+        A = np.array(range(15))
+        A.resize((3,5))
+        labels = np.array([1]*5 + [2]*5 + [3]*5, np.int)
+        labels.resize((3,5))
+        avgA = corAna.replaceSubsetsWithAverage(A,labels)
+        self.assertEqual(avgA.shape, A.shape)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[0,idx], 2.0)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[1,idx], 7.0)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[2,idx], 12.0)
+        self.assertEqual(avgA.dtype, np.float32)
+        A = A.astype(np.float64)
+        avgA = corAna.replaceSubsetsWithAverage(A,labels)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[0,idx], 2.0)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[1,idx], 7.0)
+        for idx in range(5):
+            self.assertAlmostEqual(avgA[2,idx], 12.0)
+        self.assertEqual(avgA.dtype, np.float64)
+
+    def test_replaceSubsetsWithAverageOddShapes(self):        
+        A = np.array(range(15))
+        A.resize((3,5))
+        labels = np.array([0]*2 + [2]*5 + [4]*5 + [6]*3, np.int)
+        labels.resize((3,5))
+        avgA = corAna.replaceSubsetsWithAverage(A,labels)
+        self.assertAlmostEqual(avgA[0,0], 0.5)
+        self.assertAlmostEqual(avgA[0,1], 0.5)
+
+        self.assertAlmostEqual(avgA[0,2], 4.0)
+        self.assertAlmostEqual(avgA[0,3], 4.0)
+        self.assertAlmostEqual(avgA[0,4], 4.0)
+        self.assertAlmostEqual(avgA[1,0], 4.0)
+        self.assertAlmostEqual(avgA[1,1], 4.0)
+
+        self.assertAlmostEqual(avgA[1,2], 9.0)
+        self.assertAlmostEqual(avgA[1,3], 9.0)
+        self.assertAlmostEqual(avgA[1,4], 9.0)
+        self.assertAlmostEqual(avgA[2,0], 9.0)
+        self.assertAlmostEqual(avgA[2,1], 9.0)
+
+        self.assertAlmostEqual(avgA[2,2], 13.0)
+        self.assertAlmostEqual(avgA[2,3], 13.0)
+        self.assertAlmostEqual(avgA[2,4], 13.0)
+
+    def test_replaceSubsetsWithAverageOddShapesAndWithCounts(self):        
+        A = np.array(range(15))
+        A.resize((3,5))
+        labels = np.array([0]*2 + [2]*5 + [4]*5 + [6]*3, np.int)
+        labels.resize((3,5))
+        label2count = {0:2,2:5,4:5,6:3}
+        avgA = corAna.replaceSubsetsWithAverage(A,labels, label2count)
+        self.assertAlmostEqual(avgA[0,0], 0.5)
+        self.assertAlmostEqual(avgA[0,1], 0.5)
+
+        self.assertAlmostEqual(avgA[0,2], 4.0)
+        self.assertAlmostEqual(avgA[0,3], 4.0)
+        self.assertAlmostEqual(avgA[0,4], 4.0)
+        self.assertAlmostEqual(avgA[1,0], 4.0)
+        self.assertAlmostEqual(avgA[1,1], 4.0)
+
+        self.assertAlmostEqual(avgA[1,2], 9.0)
+        self.assertAlmostEqual(avgA[1,3], 9.0)
+        self.assertAlmostEqual(avgA[1,4], 9.0)
+        self.assertAlmostEqual(avgA[2,0], 9.0)
+        self.assertAlmostEqual(avgA[2,1], 9.0)
+
+        self.assertAlmostEqual(avgA[2,2], 13.0)
+        self.assertAlmostEqual(avgA[2,3], 13.0)
+        self.assertAlmostEqual(avgA[2,4], 13.0)
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])

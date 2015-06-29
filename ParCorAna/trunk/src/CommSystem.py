@@ -925,9 +925,10 @@ def runTestAlt(mp, xCorrBase):
         sortedEventIds[idx]['sec'] = eventIdInSortOrder[0]
         sortedEventIds[idx]['nsec'] = eventIdInSortOrder[1]
         sortedEventIds[idx]['fiducials'] = eventIdInSortOrder[2]
-    testGroup = xCorrBase.h5file.create_group('test')
-    testGroup['detectorEventIds'] = sortedEventIds
-    testGroup['detectorData'] = sortedData
+    if xCorrBase.h5file is not None:
+        testGroup = xCorrBase.h5file.create_group('test')
+        testGroup['detectorEventIds'] = sortedEventIds
+        testGroup['detectorData'] = sortedData
         
     xCorrBase.userObj.calcAndPublishForTestAlt(sortedEventIds, sortedData, xCorrBase.h5GroupUser)
     xCorrBase.shutdown_viewer()

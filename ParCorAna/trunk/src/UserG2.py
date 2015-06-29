@@ -21,6 +21,33 @@ import psmon.config as psmonConfig
 import psmon.publish as psmonPublish
 import psmon.plots as psmonPlots
 
+########## utility helper functions ###################
+def sumColoredPixels(colorNdarr):
+    binCountVector = np.bincount(colorNdarr.flatten())
+    color2total = {}
+    for color, colorTotal in enumerate(binCountVector):
+        if color == 0:
+            continue
+        if colorTotal == 0:
+            continue
+        color2total[color] = colorTotal
+
+    return color2total
+    
+def loadColorFile(colorFile, maskNdarrayCoords, MaxColor):
+    assert os.path.exists(colorFile), "color file=%s not found" % colorFile
+    color_ndarrayCoords = np.load(colorFile).astype(np.int32)
+    assert np.min(color_ndarrayCoords)>=0, "negative values found in color file"
+    assert np.max(color_ndarrayCoords) <= MaxColor, "color file has values exceeding=%d, is color file corrupt?" % MaxColor
+    assert maskNdarrayCoords.shape == color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
+            (maskNdarrayCoords.shape, color_ndarrayCoords.shape)
+    assert maskNdarrayCoords.dtype == np.bool
+    color_ndarrayCoords *= maskNdarrayCoords
+    color2total = sumColoredPixels(color_ndarrayCoords)
+    colors = color2total.keys()
+    colors.sort()
+    return color_ndarrayCoords, color2total, colors
+
 def getStats(vec):
     '''returns dict with 'min','5','10',25','med','75','90','95','max' and 'T' (# elem)
     to see what data looks like
@@ -36,20 +63,6 @@ def getStats(vec):
     for percentile in [5,10,25,75,90,95]:
         res[str(percentile)]=svec[min(n-1, max(0, int((percentile/100.0)*n)))]
     return res
-
-def replaceSubsetsWithAverage(A, subsetDict):
-    '''Takes a matrix, and a dictionary  of logical indicies for
-    the matrix. Replaces each logicalIndex of values with its average.
-    '''
-    avgA = np.zeros(A.shape, A.dtype)
-    for key,subsetInd in subsetDict.iteritems():
-        assert subsetInd.shape == A.shape, "replaceSubsetsWithAverage: subset for key=%r has shape=%r != orig shape=%r" % \
-            (key, subsetInd.shape, orig.shape)
-        assert subsetInd.dtype == np.bool, "replaceSubsetsWithAverage: subset for key=%r does not have type np.bool" % \
-            (key,)
-        avgVal = np.average(A[subsetInd])
-        avgA[subsetInd] = avgVal
-    return avgA
 
 ####################################
 class G2Common(object):
@@ -240,7 +253,7 @@ class G2Common(object):
         '''
         indexOfSaturatedElements = data >= self.saturatedValue
         self.saturatedElements[indexOfSaturatedElements]=1
-        indexOfNegativeAndSmallNumbers = data < self.notzero   ## FACTOR OUT
+        indexOfNegativeAndSmallNumbers = data < self.notzero 
         data[indexOfNegativeAndSmallNumbers] = self.notzero
         if self.logger.isEnabledFor(logging.DEBUG):
             numSaturated = np.sum(indexOfSaturatedElements)
@@ -286,7 +299,8 @@ class G2Common(object):
         amount of data accumulated.
 
         The simplest way to compare results is to reuse the viewerPublish function, however one
-        may want to write an alternate calculate to test this as well.
+        may want to write an alternate calculation to compare to the viewerPublish the framework
+        uses as well.
 
         Args:
           sortedEventIds: array of int64, sorted 120hz counters for all the data in the test.
@@ -370,57 +384,30 @@ class G2Common(object):
           h5GroupUser: if system was given an h5 file for output, this is a h5py group opened
                        into that file. Otherwise this argument is None
         '''
-        colorFile = self.user_params['colorNdarrayCoords']        
-        assert os.path.exists(colorFile), "user_params['colorNdarrayCoords']=%s not found" % colorFile
-        self.color_ndarrayCoords = np.load(colorFile).astype(np.int32)
-
-        finecolorFile = self.user_params['colorFineNdarrayCoords']        
-        assert os.path.exists(finecolorFile), "user_params['colorFineNdarrayCoords']=%s not found" % finecolorFile
-        self.finecolor_ndarrayCoords = np.load(finecolorFile).astype(np.int32)
-
+        # TODO: don't pass maskNdarrayCoords to viewrInit and remove this check
         assert self.maskNdarrayCoords.shape == maskNdarrayCoords.shape, "viewerInit maskNdarrayCoords has different shape=%s then what was set in UserG2.init=%s" % (maskNdarrayCoords.shape, self.maskNdarrayCoords.shape)
-        assert np.issubdtype(self.color_ndarrayCoords.dtype, np.integer), "color array does not have an integer type."
-        assert np.issubdtype(self.finecolor_ndarrayCoords.dtype, np.integer), "finecolor array does not have an integer type."
-        assert self.maskNdarrayCoords.shape == self.color_ndarrayCoords.shape, "mask.shape=%s != color.shape=%s" % \
-            (self.maskNdarrayCoords.shape, self.color_ndarrayCoords.shape)
-        assert self.maskNdarrayCoords.shape == self.finecolor_ndarrayCoords.shape, "mask.shape=%s != finecolor.shape=%s" % \
-            (self.maskNdarrayCoords.shape, self.finecolor_ndarrayCoords.shape)
 
-        self.colors = [color for color in set(self.color_ndarrayCoords.flatten()) if color > 0]
-        self.colors.sort()
-        self.numColors = len(self.colors)
+        MaxColor = 1<<14  # arbitrary, but to protect against corrupt color file
+        self.color_ndarrayCoords, self.color2total, self.colors = loadColorFile(self.user_params['colorNdarrayCoords'], 
+                                                                                self.maskNdarrayCoords,
+                                                                                MaxColor)
 
-        self.finecolors = [color for color in set(self.finecolor_ndarrayCoords.flatten()) if color > 0]
-        self.finecolors.sort()
-        self.finenumColors = len(self.colors)
+        self.finecolor_ndarrayCoords, self.finecolor2total, self.finecolors = loadColorFile(self.user_params['colorFineNdarrayCoords'], 
+                                                                                            self.maskNdarrayCoords,
+                                                                                            MaxColor)
 
-        # set up a dictionary that maps each color to a logical index array (in ndarray coords) of
-        # what elements are part of that color. Use the mask to take out masked elements.
-        self.color2ndarrayInd = {}
-        self.color2numElements = {}
-        for color in self.colors:
-            logicalThisColor = self.color_ndarrayCoords == color
-            # take out masked elements
-            logicalThisColor[np.logical_not(self.maskNdarrayCoords)] = False
-            self.color2ndarrayInd[color] = logicalThisColor
-            self.color2numElements[color] = np.sum(logicalThisColor)
+        numFineColorThatAreZeroInColoredPixels = np.sum(self.finecolor_ndarrayCoords[self.color_ndarrayCoords > 0] == 0)
+        assert numFineColorThatAreZeroInColoredPixels == 0, \
+            ("There are %d pixels with the finecolor==0 " % numFineColorThatAreZeroInColoredPixels) + \
+            "in mask-included pixels that have a nonzero color. Color 0 is not processed " + \
+            "in color or finecolor file. All valid colored pixels (color > 0) must have a " + \
+            "valid finecolor (color > 0)"
 
-        # set up a dictionary that maps each finecolor to a logical index array (in ndarray coords) of
-        # what elements are part of that color. Use the mask to take out masked elements.
-        self.finecolor2ndarrayInd = {}
-        self.finecolor2numElements = {}
-        for finecolor in self.finecolors:
-            logicalThisFineColor = self.finecolor_ndarrayCoords == finecolor
-            # take out masked elements
-            logicalThisFineColor[np.logical_not(self.maskNdarrayCoords)] = False
-            self.finecolor2ndarrayInd[finecolor] = logicalThisFineColor
-            self.finecolor2numElements[finecolor] = np.sum(logicalThisFineColor)
+        self.mp.logInfo("UserG2.viewerInit: mask included pixels contain colors: %s with counts: %s" % \
+                        (self.colors, [self.color2total[c] for c in self.colors]))
 
-        self.mp.logInfo("UserG2.viewerInit: colorfile contains colors=%s. Number of elements in each color: %s" % \
-                        (self.colors, [self.color2numElements[c] for c in self.colors]))
-
-        self.mp.logInfo("UserG2.viewerInit: finecolorfile contains finecolors=%s. Number of elements in each color: %s" % \
-                        (self.finecolors, [self.finecolor2numElements[c] for c in self.finecolors]))
+        self.mp.logInfo("UserG2.viewerInit: mask included pixels contain finecolors: %s with counts: %s" % \
+                        (self.finecolors, [self.finecolor2total[c] for c in self.finecolors]))
 
         self.plot = self.user_params['psmon_plot']
         if self.plot or self.debugPlot:
@@ -441,8 +428,8 @@ class G2Common(object):
                              (rowA, rowB, colA, colB))
             self.logInfo("*********** END PSPLOT CMD *************")
             
-        assert 'plot_colors' in self.user_params, "new parameter 'plot_colors' required in config. Set to 'None' to plot all colors, otherwise list like '[1,2,3]'"
-        assert 'print_delay_curves' in self.user_params, "new parameter 'print_delay_curves' required in config. Set to 'True' or 'False'"
+        assert 'plot_colors' in self.user_params, "parameter 'plot_colors' required in config. Set to 'None' to plot all colors, otherwise list like '[1,2,3]'"
+        assert 'print_delay_curves' in self.user_params, "parameter 'print_delay_curves' required in config. Set to 'True' or 'False'"
         self.plotColors = self.user_params['plot_colors']
         assert self.plotColors is None or isinstance(self.plotColors,list), "plot_colors must be None or a list of colors"
         self.printDelayCurves = self.user_params['print_delay_curves']
@@ -458,11 +445,11 @@ class G2Common(object):
                  that were a given delay apart.
          lastEventTime (dict): has keys 'sec', 'nsec', 'fiducials', and 'counter' for the last event that was
                  scattered to workers before gathering at the viewer.
-         counter: 120hz counter for last event before publish
+         name2delay2ndarray: this is a 2D dictionary of the gathered, named arrays at each delay. 
+                             For example name2delay2ndarray['IF'][2] will be the IF ndarray at delay
+                             2 for the G2 calculation - this is before normalizing, i.e, it has not
+                             been divided by the count of the number of delays at 2.
 
-         name2delay2ndarray: this is a 2D dictionary of the gathered, named arrays. For example
-                             name2delay2ndarray['G2'][2] will be the ndarray of G2 calcluations for
-                             the G2 term.
          int8ndarray: gathered int8 array from all the workers, the pixels they found to be saturated.
          h5GroupUser: either None, or a valid h5py Group to write results into the h5file
         '''
@@ -470,46 +457,27 @@ class G2Common(object):
         assert len(counts) == len(self.delays), "UserG2.viewerPublish: len(counts)=%d != len(delays)=%d" % \
             (len(counts), len(self.delays))
 
+        saturated_ndarrayCoords = int8ndarray
+        assert saturated_ndarrayCoords.shape == self.color_ndarrayCoords.shape, "UserG2.viewerPublish: gathered satureated pixel shape wrong. shape=%s != %s" % \
+            (saturated_ndarrayCoords.shape, self.color_ndarrayCoords.shape)
+
+        self.color_ndarrayCoords, self.color2total, self.colors = self.updateColorBasedOnNewSaturated(saturated_ndarrayCoords)
+
         delayCurves = {}
         for color in self.colors:
-            if self.color2numElements[color] > 0:
-                delayCurves[color] = np.zeros(len(counts), np.float32)
+            delayCurves[color] = np.zeros(len(counts), np.float32)
         
         ndarrayShape = self.color_ndarrayCoords.shape
-        saturated_ndarrayCoords = int8ndarray
-        assert saturated_ndarrayCoords.shape == ndarrayShape, \
-            ("UserG2.viewerPublish: gathered saturated_ndarrayCoords.shape=%s != expected=%s" % \
-             (saturated_ndarrayCoords.shape, self.color_ndarrayCoords.shape))
 
-        self.maskOutNewSaturatedElements(saturated_ndarrayCoords)
-
-        eps = 1e-6 # protect from division by zero
+#        eps = 1e-6 # protect from division by zero
 
         counter120hz = lastEventTime['counter']
 
         if self.debugPlot:
-            rowA = self.debugPlotImageBounds['rowA']
-            rowB = self.debugPlotImageBounds['rowB']
-            colA = self.debugPlotImageBounds['colA']
-            colB = self.debugPlotImageBounds['colB']
-
-            # each row is a delay, columns are IF IP G2
-            debugPlot = psmonPlots.MultiPlot(counter120hz, 'DEBUG', ncols=3)
-            delaysToDo = self.delays[0:3]
-            for nm in ['IF','IP','G2']:
-                for delay in delaysToDo:
-                    ndarr = name2delay2ndarray[nm][delay]
-                    fullImage = np.zeros(self.fullImageShape,np.float32)
-                    fullImage[self.iX.flatten(), self.iY.flatten()] = ndarr.flatten()[:]
-                    image = fullImage[rowA:rowB,colA:colB]
-                    title = "cntr=%d %s dly=%d" % (counter120hz, nm, delay)
-                    imagePlot = psmonPlots.Image(counter120hz, title, image)
-                    debugPlot.add(imagePlot)
-                    stats = getStats(image.flatten())
-                    self.logInfo("%s: cntr=%d min=%5.3f 5=%5.3f 10=%5.3f 25=%5.3f med=%5.3f 75=%5.3f 90=%5.3f 95=%5.3f max=%5.3f" % \
-                                 (title, counter120hz, stats['min'], stats['5'], stats['10'], stats['25'],
-                                  stats['med'], stats['75'], stats['90'], stats['95'], stats['max']))
-            psmonPublish.send('DEBUG', debugPlot)
+            # you can pick other delays or matricies to plot here, or do this after
+            # dividing by delayCount below
+            self.doDebugPlot(counter120hz, delaysToPlot=self.delays[0:2], 
+                             namesToPlot=['IF','G2'], name2delay2ndarray=name2delay2ndarray)
 
         for delayIdx, delayCount in enumerate(counts):
             if delayCount <= 0:
@@ -518,41 +486,35 @@ class G2Common(object):
             G2 = name2delay2ndarray['G2'][delay]
             IF = name2delay2ndarray['IF'][delay]
             IP = name2delay2ndarray['IP'][delay]
-            assert G2.shape == ndarrayShape, "UserG2.viewerPublish: G2.shape=%s != expected=%s" % \
+            assert G2.shape == ndarrayShape, "UserG2.viewerPublish: G2.shape=%s != %s" % \
                 (G2.shape, ndarrayShape)
-            assert IF.shape == ndarrayShape, "UserG2.viewerPublish: IF.shape=%s != expected=%s" % \
+            assert IF.shape == ndarrayShape, "UserG2.viewerPublish: IF.shape=%s != %s" % \
                 (IF.shape, ndarrayShape)
-            assert IP.shape == ndarrayShape, "UserG2.viewerPublish: IP.shape=%s != expected=%s" % \
+            assert IP.shape == ndarrayShape, "UserG2.viewerPublish: IP.shape=%s != %s" % \
                 (IP.shape, ndarrayShape)
             
             G2 /= np.float32(delayCount)
             IF /= np.float32(delayCount)
             IP /= np.float32(delayCount)
 
-#            fineColorAvg_IF = IF #replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
-#            fineColorAvg_IP = IP # replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
-            fineColorAvg_IF = replaceSubsetsWithAverage(IF, self.finecolor2ndarrayInd)
-            fineColorAvg_IP = replaceSubsetsWithAverage(IP, self.finecolor2ndarrayInd)
+            fineColorAvg_IF = ParCorAna.replaceSubsetsWithAverage(IF, self.finecolor_ndarrayCoords, self.finecolor2total)
+            fineColorAvg_IP = ParCorAna.replaceSubsetsWithAverage(IP, self.finecolor_ndarrayCoords, self.finecolor2total)
             
 #            fineColorAvg_IF[fineColorAvg_IF<=eps]=eps
 #            fineColorAvg_IP[fineColorAvg_IP<=eps]=eps
 
             final = G2 / (fineColorAvg_IP * fineColorAvg_IF)
 
-            for color, colorNdarrayInd in self.color2ndarrayInd.iteritems():
-                numElementsThisColor = self.color2numElements[color]
-                if numElementsThisColor>0:
-                    average = np.sum(final[colorNdarrayInd]) / np.float32(numElementsThisColor)
-                    delayCurves[color][delayIdx] = average
+            finalColorSums = np.bincount(self.color_ndarrayCoords.flatten(), final.flatten())
+            
+            for color, colorTotal  in self.color2total.iteritems():
+                delayCurves[color][delayIdx] = finalColorSums[color]/np.float32(colorTotal)
 
 
         if self.printDelayCurves:
-            for color in self.color2ndarrayInd.keys():
-                if color not in delayCurves: 
-                    continue
-                self.logInfo("evt=%5d color=%2d delayCurve=%s ... %s" % \
-                             (counter120hz, color, ', '.join(map(str,delayCurves[color][0:10])),
-                              ', '.join(map(str,delayCurves[color][-10:]))))
+            for color in self.color2total.keys():
+                self.logInfo("evt=%5d color=%2d delayCurve=%s ..." % \
+                             (counter120hz, color, ', '.join(map(str,delayCurves[color][0:10]))))
                     
 
         groupName = 'G2_results_at_%6.6d' % counter120hz
@@ -598,31 +560,61 @@ class G2Common(object):
 
 
     ######## VIEWER HELPERS (NOT CALLBACKS, JUST USER CODE) ##########
-    def maskOutNewSaturatedElements(self, saturated_ndarrayCoords):
-        '''update masks and counts for each color based on new saturated elements
+    def doDebugPlot(self, counter120hz, delaysToPlot, namesToPlot, name2delay2ndarray):
+        '''makes a multi plot with given delays, and matrix names.
+        '''
+        rowA = self.debugPlotImageBounds['rowA']
+        rowB = self.debugPlotImageBounds['rowB']
+        colA = self.debugPlotImageBounds['colA']
+        colB = self.debugPlotImageBounds['colB']
+
+        debugPlot = psmonPlots.MultiPlot(counter120hz, 'DEBUG', ncols=3)
+        for nm in namesToPlot:
+            for delay in delaysToPlot:
+                ndarr = name2delay2ndarray[nm][delay]
+                fullImage = np.zeros(self.fullImageShape,np.float32)
+                fullImage[self.iX.flatten(), self.iY.flatten()] = ndarr.flatten()[:]
+                image = fullImage[rowA:rowB,colA:colB]
+                title = "cntr=%d %s dly=%d" % (counter120hz, nm, delay)
+                imagePlot = psmonPlots.Image(counter120hz, title, image)
+                debugPlot.add(imagePlot)
+                stats = getStats(image.flatten())
+                self.logInfo("%s: cntr=%d min=%5.3f 5=%5.3f 10=%5.3f 25=%5.3f med=%5.3f 75=%5.3f 90=%5.3f 95=%5.3f max=%5.3f" % \
+                             (title, counter120hz, stats['min'], stats['5'], stats['10'], stats['25'],
+                              stats['med'], stats['75'], stats['90'], stats['95'], stats['max']))
+        psmonPublish.send('DEBUG', debugPlot)
+
+
+    def updateColorBasedOnNewSaturated(self, newSaturated):
+        '''update color data based on new saturated pixels. Get new saturated
+        pixels out of the color label ndarray, update the total color counts for average,
+        and possibly remove a color if its count went to 0.
 
         Args:
           saturated_ndarrayCoords: an int8 with the detector ndarray shape. 
                                    positive values means this is a saturated pixels.
         '''
         
-        saturatedIdx = saturated_ndarrayCoords > 0
-        if np.sum(saturated_ndarrayCoords)==0: 
+        saturatedIdx = newSaturated > 0
+        if np.sum(saturatedIdx)==0: 
             # no saturated pixels
-            return
+            return self.color_ndarrayCoords, self.color2total, self.colors
 
-        numColorsChanged = 0
-        numNewSaturatedElements = 0
-        for color, colorNdarrayInd in self.color2ndarrayInd.iteritems():
-            numElementsThisColor = self.color2numElements[color]
-            colorNdarrayInd[saturatedIdx]=False
-            self.color2numElements[color] = np.sum(colorNdarrayInd)
-            if self.color2numElements[color] < numElementsThisColor:
-                numColorsChanged += 1
-                numNewSaturatedElements += (numElementsThisColor - self.color2numElements[color])
-        if numNewSaturatedElements > 0:
-            self.mp.logInfo("UserG2.maskOutNewSaturatedElements: removed %d elements from among %d colors" % \
-                            (numNewSaturatedElements, numColorsChanged))
+        goodPixels = np.logical_not(saturatedIdx)
+        newColorLabeling = goodPixels * self.color_ndarrayCoords
+        newColor2total = sumColoredPixels(newColorLabeling)
+        newColors = newColor2total.keys()
+        newColors.sort()
+
+        numberDroppedPixels = np.sum(saturatedIdx)
+        
+        droppedColors = set(self.colors).difference(set(newColors))
+        droppedColorsMsg = ''
+        if len(droppedColors) > 0:
+            droppedColorsMsg = ". %d colors are being dropped" % len(droppedColors)
+        self.logInfo("%d new saturated pixels being removed from color labeling%s" % (numberDroppedPixels, droppedColorsMsg))
+        return newColorLabeling, newColor2total, newColors
+
 
 
 #################### Incremental Accumulator Calculation #######################        

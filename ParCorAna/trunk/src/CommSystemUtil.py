@@ -199,6 +199,15 @@ def checkParams(system_params, user_params, checkUserParams=False):
         assert mask.shape == color.shape, "mask shape=%r != color.shape=%r" % (mask.shape, color.shape)
         assert color.shape == finecolor.shape, "color.shape=%r != finecolor.shape=%r" % (color.shape, finecolor.shape)
 
+        MAXCOLOR = 1<<14 # arbitrary, but to try to warn against corrupt files
+
+        assert np.min(color)>=0, "color file contains values < 0"
+        assert np.min(finecolor)>=0, "color file contains values < 0"
+        assert np.max(color)<=MAXCOLOR, "color file contains values > %d" % MAXCOLOR
+        assert np.max(finecolor)<=MAXCOLOR, "color file contains values > %d" % MAXCOLOR
+        
+        numFineColorThatAreZeroWhereColorIsNonZero = np.sum(finecolor[color > 0] == 0)
+        assert numFineColorThatAreZeroWhereColorIsNonZero == 0, "finecolor file has pixels that are zero where color file is nonzero"
         mask_flat = mask.flatten()
         maskValues = set(mask_flat)
         assert maskValues.union(set([0,1])) == set([0,1]), "mask contains values other than 0 and 1." + \
@@ -212,15 +221,28 @@ def checkParams(system_params, user_params, checkUserParams=False):
             sys.stderr.write(("Warning: there are %d or %.1f%% pixels that are 0 or < 0 in the color file: "+
                              "%s that are not 0 in the mask file: %s. These pixels will still be "+
                               "procssed by workers, but not the viewer. Consider turning them off in the " + 
-                              "mask file. There are %d pixels that are on.\n") % \
+                              "mask file. There are %d mask included pixels that are on in the color file.\n") % \
                              (pixel_waste, 100.0*pixel_waste/float(mask_flat.shape[0]),
                               user_params['colorNdarrayCoords'],
                               system_params['maskNdarrayCoords'],
                               pixels_on))
         
-        
 
 def imgBoundBox(iX, iY, maskNdArrayCoords):
+    '''returns bounding box in image space for ndarray mask
+    
+    Takes three matricies, all ndarray's
+    ARGS:
+      iX     gives row/dim0 in image space for each pixel in ndarray
+      iY     gives row/dim1 in image space for each pixel in ndarray
+
+      maskNdArrayCoords   0/1 mask
+
+    returns dictionary with 'rowA', 'rowB', 'colA', 'colB' for bounding
+    box of mask in image space
+    '''
+    assert iX.shape == iY.shape
+    assert iY.shape == maskNdArrayCoords.shape
     numImageRows = np.max(iX)+1
     numImageCols = np.max(iY)+1
     fullImageShape = (numImageRows, numImageCols)
@@ -235,3 +257,32 @@ def imgBoundBox(iX, iY, maskNdArrayCoords):
               'colA':np.min(colNonZero),
               'colB':np.max(colNonZero)}
     return fullImageShape, bounds
+
+
+def replaceSubsetsWithAverage(A, labels, label2total=None):
+    '''Returns matrix based on A, where each element gets average over pixels with the same label
+    ARGS:
+      A           - numpy array of values to average over labeled subsets
+      labels      - numpy array of ints, >= 0, same shape as A, each int labels a subset
+      label2total - optional dictionary of number of pixels in each label in labels
+    RETURN:
+      new matrix of averages values 
+    '''
+    assert A.shape == labels.shape
+    if label2total == None:
+        labelCounts = np.bincount(labels.flatten())
+        label2total = {}
+        for label,count in enumerate(labelCounts):
+            label2total[label]=count
+    groupedAverages = np.bincount(labels.flatten(), A.flatten())
+    for label, count in label2total.iteritems():
+        if label >=0 and label < len(groupedAverages):
+            groupedAverages[label] /= float(count)
+    avgA_dtype = np.float32
+    if A.dtype == np.float64:
+        avgA_dtype = np.float64
+    avgA = np.zeros(A.size, dtype=avgA_dtype)
+    avgA[:] = groupedAverages[labels.flatten()]
+    avgA.resize(A.shape)
+    return avgA
+

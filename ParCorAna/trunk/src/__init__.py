@@ -382,7 +382,8 @@ from CommSystem import identifyCommSubsystems, identifyServerRanks
 from CommSystem import RunServer, RunMaster, RunWorker, RunViewer
 from CommSystem import runCommSystem
 from CommSystem import CommSystemFramework
-from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger, checkParams, formatFileName, imgBoundBox
+from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger
+from CommSystemUtil import checkParams, formatFileName, imgBoundBox, replaceSubsetsWithAverage
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 from PsanaUtil import parseDataSetString, makePsanaOptions, psanaNdArrays
 from PsanaUtil import readDetectorDataAndEventTimes, getSortedCountersBasedOnSecNsecAtHertz
@@ -398,4 +399,4 @@ __all__ = ['SM_MsgBuffer', 'MVW_MsgBuffer',
            'checkCountsOffsets', 'divideAmongWorkers', 'makeLogger',
            'divideAmongWorkers', 'checkCountsOffsets',
            'WorkerData', 'XCorrBase', 'makeDelayList', 'writeToH5Group',
-            'checkParams', 'formatFileName', 'imgBoundBox']
+            'checkParams', 'formatFileName', 'imgBoundBox', 'replaceSubsetsWithAverage']

@@ -4,8 +4,6 @@ from mpi4py import MPI
 import os
 import sys
 import argparse
-import logging
-import numpy as np
 import psana_test.psanaTestLib as ptl
 import ParCorAna as pca
 import time
@@ -103,8 +101,8 @@ if __name__ == '__main__':
     pca.checkParams(system_params, user_params)
     numSystemParamKeys = len(system_params)
     if args.test_main or args.test_alt:
-        assert system_params['h5output'] is not None, "testing mode, but system_params['h5output'] is None"
-        assert system_params['testH5output'] is not None, "testing mode, but system_params['testH5output'] is None"
+        if ((system_params['h5output'] is None) or (system_params['testH5output'] is None)) and (MPI.COMM_WORLD.Get_rank()==0):
+            sys.stderr.write("parCorAnaDriver WARNING: test_main or test_alt specified, but at least one of system_params 'h5output' or 'testH5output' is None\n")
         system_params['numEvents'] = system_params['testNumEvents']
         system_params['maskNdarrayCoords'] = system_params['testMaskNdarrayCoords']
 

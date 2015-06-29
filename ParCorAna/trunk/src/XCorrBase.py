@@ -479,7 +479,7 @@ class XCorrBase(object):
                     startIdx = workerStartPositions[workerIdx] + delayIdx * workerCount 
                     endIdx = startIdx + workerCount
                     flatMaskedThisWorker = self.gatheredFlatNDArrays[nm][startIdx:endIdx]
-                    if self.logger.isEnabledFor(logging.DEBUG):
+                    if self.logger.isEnabledFor(logging.DEBUG) and counts[delayIdx]>0:
                         self.logger.debug("viewerFormNDarrays dly=%d nm=%s wkr=%d wkrOff=%d wkrCnt=%d startIdx=%d endIdx=%d (numelem=%d) avg=%.0f max=%.0f" % \
                                           (delay, nm, workerRank, workerOffset, workerCount, startIdx, endIdx, endIdx-startIdx, np.average(flatMaskedThisWorker), np.max(flatMaskedThisWorker)))
                     flatMaskedFromAllWorkers[workerOffset:(workerOffset+workerCount)] = flatMaskedThisWorker
