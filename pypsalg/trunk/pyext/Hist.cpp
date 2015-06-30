@@ -42,6 +42,15 @@ void Hist1D::fill(ndarray<double, 1> vals, ndarray<double, 1> weights)
   }
 }
 
+void Hist1D::fill(ndarray<double, 2> valsWeights)
+{
+  const ndarray<double,2>::shape_t* shape = valsWeights.shape();
+  assert(shape[1]==2); // x-coordinate plus weight
+  for (unsigned i=0; i<shape[0]; i++) {
+    fill(valsWeights[i][0],valsWeights[i][1]);
+  }
+}
+
 Hist2D::Hist2D(unsigned nbinsx, double xlow, double xhigh,
                unsigned nbinsy, double ylow, double yhigh) :
   _xaxis(nbinsx, xlow, xhigh),
@@ -81,6 +90,28 @@ void Hist2D::fill(ndarray<double, 2> xyWeightVals)
   assert(shape[1]==3); // 2 columns of x-y coordinates plus weights
   for (unsigned i=0; i<shape[0]; i++) {
     fill(xyWeightVals[i][0],xyWeightVals[i][1],xyWeightVals[i][2]);
+  }
+}
+
+void Hist2D::fill(ndarray<double, 1> xvals, ndarray<double, 1> yvals, ndarray<double, 1> weights)
+{
+  const ndarray<double,1>::shape_t* xshape = xvals.shape();
+  const ndarray<double,1>::shape_t* yshape = yvals.shape();
+  const ndarray<double,1>::shape_t* wshape = weights.shape();
+  assert(xshape[0]==yshape[0]);
+  assert(xshape[0]==wshape[0]);
+  for (unsigned i=0; i<xshape[0]; i++) {
+    fill(xvals[i],yvals[i],weights[i]);
+  }
+}
+
+void Hist2D::fill(ndarray<double, 1> xvals, ndarray<double, 1> yvals, double weight)
+{
+  const ndarray<double,1>::shape_t* xshape = xvals.shape();
+  const ndarray<double,1>::shape_t* yshape = yvals.shape();
+  assert(xshape[0]==yshape[0]);
+  for (unsigned i=0; i<xshape[0]; i++) {
+    fill(xvals[i],yvals[i],weight);
   }
 }
 

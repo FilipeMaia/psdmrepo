@@ -522,6 +522,8 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
   void(pypsalg::Hist2D::* hist2DFillVal)(double,double,double) = &pypsalg::Hist2D::fill;
   void(pypsalg::Hist2D::* hist2DFillVec)(ndarray<double,2>,double) = &pypsalg::Hist2D::fill;
   void(pypsalg::Hist2D::* hist2DFillVecWeights)(ndarray<double,2>) = &pypsalg::Hist2D::fill;
+  void(pypsalg::Hist2D::* hist2DFill2VecWeight)(ndarray<double,1>,ndarray<double,1>,double) = &pypsalg::Hist2D::fill;
+  void(pypsalg::Hist2D::* hist2DFill2VecWeights)(ndarray<double,1>,ndarray<double,1>,ndarray<double,1>) = &pypsalg::Hist2D::fill;
 
   static const char Hist2DClassDoc[] =
     "Class to manage 2D histograms";
@@ -544,14 +546,27 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
     "  doubles) with shape (NPoints,2)\n"
     "- single value to increment all bins by (double)";
   static const char Hist2DFillVecWeightsDoc[] =
+    "Arguments:\n"
     "- X/Y/Weight array of coordinates of bins to increment (2D numpy\n"
     "  array of doubles) with shape (NPoints,3)";
+  static const char Hist2DFill2VecWeightDoc[] =
+    "Arguments:\n"
+    "- 1D numpy array of X coordinates\n"
+    "- 1D numpy array of y coordinates\n"
+    "- amount to increment all bins by (double)";
+  static const char Hist2DFill2VecWeightsDoc[] =
+    "Arguments:\n"
+    "- 1D numpy array of X coordinates (double)\n"
+    "- 1D numpy array of y coordinates (double)\n"
+    "- 1D numpy array of weights (double)";
   static const char Hist2DGetDoc[] =
     "No arguments.  Return histogram as numpy array.";
   boost::python::class_<pypsalg::Hist2D>("Hist2D", Hist2DClassDoc, boost::python::init<int,double,double,int,double,double>(Hist2DCtorDoc))
     .def("fill",hist2DFillVal, Hist2DFillValDoc)
     .def("fill",hist2DFillVec, Hist2DFillVecDoc)
     .def("fill",hist2DFillVecWeights, Hist2DFillVecWeightsDoc)
+    .def("fill",hist2DFill2VecWeight, Hist2DFill2VecWeightDoc)
+    .def("fill",hist2DFill2VecWeights, Hist2DFill2VecWeightsDoc)
     .def("get",&pypsalg::Hist2D::get, Hist2DGetDoc)
     ;
 

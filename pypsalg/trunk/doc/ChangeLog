@@ -11,6 +11,10 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-10
+2015-06-30 Christopher O'Grady
+Add some more histogram filling methods
+
 Tag: V00-01-09
 2015-06-29 Christopher O'Grady
 Add some boost-python 1D/2D histograms

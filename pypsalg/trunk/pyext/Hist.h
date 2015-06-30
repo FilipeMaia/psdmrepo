@@ -40,6 +40,7 @@ class Hist1D
   void fill(double val, double weight);
   void fill(ndarray<double, 1> vals, double weight);
   void fill(ndarray<double, 1> vals, ndarray<double, 1> weights);
+  void fill(ndarray<double, 2> valsWeights);
 
  private:
   HistAxis axis;
@@ -55,6 +56,8 @@ class Hist2D
   void fill(double xval, double yval, double weight=1.);
   void fill(ndarray<double, 2> xyvals, double weight);
   void fill(ndarray<double, 2> xyWeightVals);
+  void fill(ndarray<double, 1> xvals, ndarray<double, 1> yvals, ndarray<double, 1> weights);
+  void fill(ndarray<double, 1> xvals, ndarray<double, 1> yvals, double weight);
 
  private:
   HistAxis _xaxis;
