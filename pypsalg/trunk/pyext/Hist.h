@@ -13,7 +13,12 @@ class HistAxis
     _high(high),
     _binsize((high-low)/(nbins + 1.)),
     _nbins(nbins)
-  {}
+  {
+    _axisvals = make_ndarray<double>(nbins);
+    for (unsigned i=0; i<nbins; i++) _axisvals[i]=_low+_binsize*(i+0.5);
+  }
+
+  ndarray<double,1> get() {return _axisvals;}
 
   int bin(double val)
   {
@@ -30,6 +35,7 @@ class HistAxis
   double _high;
   double _binsize;
   unsigned _nbins;
+  ndarray<double, 1> _axisvals;
 };
 
 class Hist1D
@@ -37,6 +43,7 @@ class Hist1D
  public:
   Hist1D(unsigned nbins, double low, double high);
   ndarray<double, 1> get();
+  ndarray<double, 1> xaxis() {return axis.get();}
   void fill(double val, double weight);
   void fill(ndarray<double, 1> vals, double weight);
   void fill(ndarray<double, 1> vals, ndarray<double, 1> weights);
@@ -53,6 +60,8 @@ class Hist2D
   Hist2D(unsigned nbinsx, double xlow, double xhigh,
          unsigned nbinsy, double ylow, double yhigh);
   ndarray<double, 2> get();
+  ndarray<double, 1> xaxis() {return _xaxis.get();}
+  ndarray<double, 1> yaxis() {return _yaxis.get();}
   void fill(double xval, double yval, double weight=1.);
   void fill(ndarray<double, 2> xyvals, double weight);
   void fill(ndarray<double, 2> xyWeightVals);

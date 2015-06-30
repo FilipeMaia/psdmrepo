@@ -512,11 +512,14 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
     "  length as array of values";
   static const char Hist1DGetDoc[] =
     "No arguments.  Return histogram as numpy array.";
+  static const char Hist1DAxisDoc[] =
+    "No arguments.  Return bin-centers as numpy array.";
   boost::python::class_<pypsalg::Hist1D>("Hist1D", Hist1DClassDoc, boost::python::init<int,double,double>(Hist1DCtorDoc))
     .def("fill",hist1DFillVal, Hist1DFillValDoc)
     .def("fill",hist1DFillVec, Hist1DFillVecDoc)
     .def("fill",hist1DFillVecWeights, Hist1DFillVecWeightsDoc)
     .def("get",&pypsalg::Hist1D::get, Hist1DGetDoc)
+    .def("xaxis",&pypsalg::Hist1D::xaxis, Hist1DAxisDoc)
     ;
 
   void(pypsalg::Hist2D::* hist2DFillVal)(double,double,double) = &pypsalg::Hist2D::fill;
@@ -561,6 +564,8 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
     "- 1D numpy array of weights (double)";
   static const char Hist2DGetDoc[] =
     "No arguments.  Return histogram as numpy array.";
+  static const char Hist2DAxisDoc[] =
+    "No arguments.  Return bin-centers as numpy array.";
   boost::python::class_<pypsalg::Hist2D>("Hist2D", Hist2DClassDoc, boost::python::init<int,double,double,int,double,double>(Hist2DCtorDoc))
     .def("fill",hist2DFillVal, Hist2DFillValDoc)
     .def("fill",hist2DFillVec, Hist2DFillVecDoc)
@@ -568,6 +573,8 @@ BOOST_PYTHON_MODULE(pypsalg_cpp)
     .def("fill",hist2DFill2VecWeight, Hist2DFill2VecWeightDoc)
     .def("fill",hist2DFill2VecWeights, Hist2DFill2VecWeightsDoc)
     .def("get",&pypsalg::Hist2D::get, Hist2DGetDoc)
+    .def("xaxis",&pypsalg::Hist2D::xaxis, Hist2DAxisDoc)
+    .def("yaxis",&pypsalg::Hist2D::yaxis, Hist2DAxisDoc)
     ;
 
 }

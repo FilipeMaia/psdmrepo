@@ -13,7 +13,7 @@ reverse time order.
 
 Tag: V00-01-10
 2015-06-30 Christopher O'Grady
-Add some more histogram filling methods
+Add some more histogram filling methods and methods to return axis numbers.
 
 Tag: V00-01-09
 2015-06-29 Christopher O'Grady
