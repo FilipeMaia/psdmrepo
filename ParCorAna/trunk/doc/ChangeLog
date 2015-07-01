@@ -11,6 +11,8 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+- disable parcorana unit test since it broke nightly
 	
 Tag: V00-00-25
 - update default_config.py to include new UserG2 params for ipimbs
