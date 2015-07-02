@@ -339,8 +339,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=30,      type='int' )
 
         # GUIMaskEditor.py
-        #def_fname_geometry    = '/reg/d/psdm/CXI/cxitut13/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
-        #def_fname_roi_img_nda = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19/cspad-ndarr-ave-cxii0114-r0227.dat'
         cdir = '/reg/g/psdm/detector/alignment/cspad/calib-cxi-ds1-2014-03-19/calib/'
         def_fname_geometry    = cdir + 'CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
         def_fname_roi_img_nda = cdir + '../cspad-ndarr-ave-cxii0114-r0227.npy'
@@ -352,12 +350,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.fname_roi_mask_nda_tst = self.declareParameter( name='FNAME_ROI_MASK_NDARRAY_TEST',val_def='./work/roi_mask_nda_tst.npy',   type='str' )
         self.sensor_mask_cbits      = self.declareParameter( name='SENSOR_MASK_CONTROL_BITS',   val_def=255,       type='int' )
 
-
-        def_fname_geo    = cdir + 'CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
+        def_fname_geo         = cdir + 'CsPad::CalibV1/CxiDs1.0:Cspad.0/geometry/0-end.data'
         def_fname_geo_img_nda = cdir + '../cspad-ndarr-ave-cxii0114-r0227.dat'
         self.fname_geo_img_nda      = self.declareParameter( name='FNAME_GEO_IMAGE_NDARRAY',    val_def=def_fname_geo_img_nda,           type='str' )
         self.fname_geo_in           = self.declareParameter( name='FNAME_GEO_IN',               val_def=def_fname_geo,                   type='str' )
-        self.fname_geo_out          = self.declareParameter( name='FNAME_GEO_OUT',              val_def='./work/geometry.data',           type='str' )
+        self.fname_geo_out          = self.declareParameter( name='FNAME_GEO_OUT',              val_def='./work/geometry.data',          type='str' )
         self.geo_log_level          = self.declareParameter( name='GEO_LIST_LOG_LEVELS', val_def=self.list_geo_log_levels[1],            type='str' )
 
         # GUIFileManagerSingleControl.py
@@ -366,6 +363,12 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # CommandLineCalib.py
         self.xtc_dir_non_std    = self.declareParameter( name='XTC_DIR_NON_STD',   val_def='',       type='str' ) # './my/xtc'
         self.job_timeout_sec    = self.declareParameter( name='JOB_TIMEOUT_SEC',   val_def=2000,     type='int' )
+
+        # GUIMaskEditor: parameters for med - mask editor command line
+        self.med_line_width = self.declareParameter( name='MED_LINE_WIDTH',      val_def= 1,                type='int' )
+        self.med_line_color = self.declareParameter( name='MED_LINE_COLOR',      val_def='k',               type='str' )
+        self.med_picker     = self.declareParameter( name='MED_PICKER',          val_def= 5,                type='int' )
+        self.med_img_fname  = self.declareParameter( name='MED_IMAGE_FNAME',     val_def='./work/plot.png', type='str' )
 
 #-----------------------------
     

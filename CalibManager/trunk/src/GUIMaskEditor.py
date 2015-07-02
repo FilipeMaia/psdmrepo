@@ -86,6 +86,10 @@ class GUIMaskEditor ( Frame ) :
         self.fname_roi_mask_nda_tst = cp.fname_roi_mask_nda_tst
         self.sensor_mask_cbits      = cp.sensor_mask_cbits
 
+        self.med_line_width         = cp.med_line_width
+        self.med_line_color         = cp.med_line_color
+        self.med_picker             = cp.med_picker
+        self.med_img_fname          = cp.med_img_fname
 
         self.img_arr = None
 
@@ -104,13 +108,13 @@ class GUIMaskEditor ( Frame ) :
         self.lab_mask_cbits = QtGui.QLabel('Mask control bits:')
 
         self.but_geometry         = QtGui.QPushButton( ' 1. Select geometry file' )
-        self.but_roi_img_nda      = QtGui.QPushButton( ' 2. Select ndarray for image file' )
+        self.but_roi_img_nda      = QtGui.QPushButton( ' 2. Select file with N-d array for image' )
         self.but_roi_img          = QtGui.QPushButton( 'Image' )
-        self.but_reco_image       = QtGui.QPushButton( ' 3. Reconstruct image from ndarray')
+        self.but_reco_image       = QtGui.QPushButton( ' 3. Reconstruct image from N-d array')
         self.but_roi_mask_img     = QtGui.QPushButton( 'Mask image' )
         self.but_mask_editor      = QtGui.QPushButton( ' 4. Open Mask Editor')
-        self.but_roi_mask_nda     = QtGui.QPushButton( 'Mask ndarray' )
-        self.but_roi_convert      = QtGui.QPushButton( ' 5. Convert mask image to ndarray')
+        self.but_roi_mask_nda     = QtGui.QPushButton( 'Mask N-d array' )
+        self.but_roi_convert      = QtGui.QPushButton( ' 5. Convert mask image to N-d array')
 
         self.but_plot             = QtGui.QPushButton( 'Plot')
         self.but_view             = QtGui.QPushButton( 'View')
@@ -186,19 +190,25 @@ class GUIMaskEditor ( Frame ) :
     #-------------------
 
     def showToolTips(self):
-        #pass
-        self.edi_roi_img.setToolTip('Path to the file with image data') 
-        self.but_roi_img.setToolTip('Open file browser dialog window \nand select the file with image data') 
-        self.but_mask_editor.setToolTip('Open/Close Mask Editor window')
 
+        self.but_geometry.setToolTip('Select input file with detector geometry parameters')
+        self.but_roi_img_nda.setToolTip('Select input file with N-d array for image\nor N-d array of ones') 
+        self.but_reco_image.setToolTip('Reconstruct image from geometry and N-d array')
+        self.but_mask_editor.setToolTip('Open/close Mask Editor window')
+        self.but_roi_convert.setToolTip('Convert 2-d mask image to N-d mask')
+        self.but_roi_img.setToolTip('Select input/output file name for 2-d image') 
+        self.but_roi_mask_img.setToolTip('Select input/output file name for 2-d mask')
+        self.but_roi_mask_nda.setToolTip('Select output file name for N-d mask')
 
-#    def setFrame(self):
-#        self.frame = QtGui.QFrame(self)
-#        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
-#        self.frame.setLineWidth(0)
-#        self.frame.setMidLineWidth(1)
-#        self.frame.setGeometry(self.rect())
-#        #self.frame.setVisible(False)
+        self.edi_geometry.setToolTip('Path to the file with detector geometry parameters') 
+        self.edi_roi_img_nda.setToolTip('Path to the file with N-d array for image') 
+        self.edi_roi_img.setToolTip('Path to the file with 2-d image') 
+        self.edi_roi_mask_img.setToolTip('Path to the file with 2-d mask') 
+        self.edi_roi_mask_nda.setToolTip('Path to the file with N-d mask') 
+
+        self.edi_mask_cbits.setToolTip('Mask control bits:\n  0 - none\n +1 - mask edges\n +2 - central columns\n +4 - unbounded pixels \n +4 - unbounded neighbours') 
+        self.but_plot.setToolTip('Open/close plotter window\nto check images in files')
+        self.but_view.setToolTip('Open/close text file content viewer')
 
 
     def setStyle(self):
@@ -304,7 +314,13 @@ class GUIMaskEditor ( Frame ) :
 
     def on_but_roi_img_nda(self):
         logger.info('Select file with ndarray for image', __name__)
-        self.set_file_name(self.edi_roi_img_nda, self.fname_roi_img_nda, mode='open')
+        msg = 'Ok - continue to select file with ndarray\nCancel - use ndarray of ones'
+        status = gu.confirm_or_cancel_dialog_box(parent=self, text=msg, title='Sele')
+        if not status :
+            self.fname_roi_img_nda.setValue('')
+            self.edi_roi_img_nda.setText('')
+        else :
+            self.set_file_name(self.edi_roi_img_nda, self.fname_roi_img_nda, mode='open')
 
 
     def on_but_roi_img(self):
@@ -357,18 +373,18 @@ class GUIMaskEditor ( Frame ) :
          #print 'openFileWithImageArray: self.arr.shape:', self.img_arr.shape
          #print self.img_arr
 
-
+         
     def dictOfMaskEditorPars (self):       
         pars = {'parent' : None, 
                 'arr'    : self.img_arr, 
                 'xyc'    : None, # xyc=(opts.xc,opts.yc)
                 'ifname' : self.fname_roi_img.value(), 
-                'ofname' : 'plot.png', 
+                'ofname' : self.med_img_fname.value(), 
                 'mfname' : self.fname_roi_mask_img.value(),
                 'title'  : 'Mask Editor', 
-                'lw'     : 1, 
-                'col'    : 'k',
-                'picker' : 8,
+                'lw'     : self.med_line_width.value(),
+                'col'    : self.med_line_color.value(),
+                'picker' : self.med_picker.value(),
                 'verb'   : True,
                 'ccd_rot': 0, 
                 'updown' : False}
@@ -378,6 +394,16 @@ class GUIMaskEditor ( Frame ) :
         #    print '%9s : %s' % (k,v)
 
         return pars
+
+
+    def on_mask_editor_window_is_closed(self):
+        #print 'mask_editor_window_is_closed' 
+        self.disconnect(cp.maskeditor, QtCore.SIGNAL('MaskEditorWindowIsClosed()'), self.on_mask_editor_window_is_closed) 
+        self.but_mask_editor.setStyleSheet(cp.styleButtonLeft)
+        self.but_mask_editor.setText(' 4. Open Mask Editor')
+        #self.on_but_mask_editor()
+        del cp.maskeditor
+        cp.maskeditor = None
 
 
     def on_but_mask_editor  (self):       
@@ -392,6 +418,7 @@ class GUIMaskEditor ( Frame ) :
                 logger.warning(msg, __name__)
                 status = gu.confirm_or_cancel_dialog_box(parent=self, text=msg, title='Confirm or cancel')
                 if not status : return
+                self.disconnect(cp.maskeditor, QtCore.SIGNAL('MaskEditorWindowIsClosed()'), self.on_mask_editor_window_is_closed) 
 
             cp.maskeditor.close()
             del cp.maskeditor
@@ -410,6 +437,8 @@ class GUIMaskEditor ( Frame ) :
             cp.maskeditor.move(self.pos().__add__(QtCore.QPoint(820,-7))) # open window with offset w.r.t. parent
             cp.maskeditor.show()
 
+            self.connect(cp.maskeditor, QtCore.SIGNAL('MaskEditorWindowIsClosed()'), self.on_mask_editor_window_is_closed) 
+
         self.setStatus(0)
 
 
@@ -424,6 +453,7 @@ class GUIMaskEditor ( Frame ) :
         geometry = GeometryAccess(gfname, 0)
         iX, iY = geometry.get_pixel_coord_indexes()
 
+        if afname == '' : afname = None
         afext = '' if afname is None else os.path.splitext(afname)[1]
 
         nda = np.ones(iX.shape, dtype=np.uint16) if afname is None else \
@@ -574,7 +604,7 @@ class GUIMaskEditor ( Frame ) :
 
     def on_edi_mask_cbits(self):
         str_value = str( self.edi_mask_cbits.displayText() )
-        self.sensor_mask_cbits.setValue(float(str_value))  
+        self.sensor_mask_cbits.setValue(int(str_value))  
         logger.info('Set sensor mask control bitword: %s' % str_value, __name__ )
 
 

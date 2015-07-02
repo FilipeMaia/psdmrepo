@@ -384,6 +384,11 @@ def remove_file(path) :
 #----------------------------------
 
 def load_textfile(path) :
+    """Returns entire content of the text file or standard str presentation of numpy array for *.npy file
+    """ 
+    ext = os.path.splitext(path)[1]
+    if ext == '.npy' : return str(np.load(path))
+    
     f=open(path,'r')
     text = f.read()
     f.close() 
