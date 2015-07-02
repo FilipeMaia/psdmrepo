@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2015-07-02 Mikhail S. Dubrovin
+- in MaskEditor emit signal 'MaskEditorWindowIsClosed()' (PSAS-6)
+	
 Tag: V00-00-22
 2015-04-09 Mikhail S. Dubrovin
 - in *.py replace !=None -> is not None, ==None -> is None

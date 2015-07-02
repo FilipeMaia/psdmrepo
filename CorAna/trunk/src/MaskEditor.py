@@ -167,6 +167,9 @@ class MaskEditor (QtGui.QWidget) :
 
         #print 'Close application'
 
+        self.emit(QtCore.SIGNAL('MaskEditorWindowIsClosed()'))
+
+
     def help_message(self):
         msg  = 'Mouse control buttons for Mask Editor' + \
                '\n' + '='*37 + \
