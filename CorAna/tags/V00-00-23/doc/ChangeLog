@@ -1,0 +1,388 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CorAna
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-23
+2015-07-02 Mikhail S. Dubrovin
+- in MaskEditor emit signal 'MaskEditorWindowIsClosed()' (PSAS-6)
+	
+Tag: V00-00-22
+2015-04-09 Mikhail S. Dubrovin
+- in *.py replace !=None -> is not None, ==None -> is None
+	
+Tag: V00-00-21
+2015-01-13 Mikhail S. Dubrovin
+- MaskEditorButtons.py - extend option -m to save the mask as a *.npy file
+	
+Tag: V00-00-20
+2014-06-17 Mikhail S. Dubrovin
+- ArrFileExchange constrain print for print_bits=32
+
+Tag: V00-00-19
+2014-06-12 Mikhail S. Dubrovin
+- integrate ArrFileExchange with src/MaskEditor.py	
+- in app/med add option -f for file exchange mode
+- change src/MaskEditorButtons.py for file exchange mode
+	
+Tag: V00-00-18
+2014-06-10 Mikhail S. Dubrovin
+- add ArrFileExchange.py for ndarray-via-file exchange between processes
+- add app/test_img_gen for test purpose
+- apply command: 
+	psvn mktxtprop src/*
+	or
+	svn propset svn:keywords "Revision" src/*
+
+Tag: V00-00-17
+2013-12-16 Mikhail S. Dubrovin
+- update all minor changes
+
+2013-12-03 Mikhail S. Dubrovin
+- in GUIMain.py add automatic creation of the work directory, if it is missing
+	
+2013-12-03 Mikhail S. Dubrovin
+Tag: V00-00-16
+- in GUISystemSettingsRight.py - add queue psanacsq
+- in ConfigFileGenerator.py and data/scripts/psana-cora-split.cfg - add evaluation of average and rms in splitting (for subtracted peds)
+- in FileNameManager.py - add file names for average and rms in splitting
+- in GUIData.py - change default input/output file names for average
+- in Drag.py - matplotlib.nxutils(points_inside_poly) is depricated in 1.3.x and is replaced by matplotlib.path (Path)
+
+2013-09-16 Mikhail S. Dubrovin
+Tag: V00-00-15
+- add 'ccd_rot' and 'updown' parameters in src/MaskEditor.py
+
+2013-05-08 Mikhail S. Dubrovin
+Tag: V00-00-14
+- change initialization of matplotlib.use('Qt4Agg')
+- add protection in case of missing files etc.
+- a lot of print statements (test for difference in results...) 
+  need to be commented.
+	
+2013-04-26 Mikhail S. Dubrovin
+Tag: V00-00-13
+- update all changes
+
+2013-04-04 Mikhail S. Dubrovin
+- add PlotGraphWidget.py PlotGraph.py RecordsFromFiles.py
+
+2013-04-02 Mikhail S. Dubrovin
+- add correct q map for reflection geometry in ViewResults.py
+- add I(q-stat,tau) plot in ViewResults.py
+
+2013-04-01 Mikhail S. Dubrovin
+Tag: V00-00-12
+- in src/ConfigFileGenerator.py remove the file names for hot-pixel fraction 
+	(do not evaluate it from data).
+- in ViewResults.py, GUIViewResults.py, GUIViewControl.py - add get_formatted_table_of_results()
+	and print it from GUI
+
+2013-03-29 Mikhail S. Dubrovin
+- in src/ViewResults.pyvalueToIndexMaskedadd protection in binning 
+	for indarr(V==Vmax) = Nbins1 (not Nbins that is overflow)
+
+2013-03-29 Mikhail S. Dubrovin
+Tag: V00-00-11
+- add GUIListOfTau.py to select/create the file with tau indexes
+- in GUIFileBrowser.py add edit and save options
+- in PlotImgSpeButtons.py and PlotImgSpe.py add option to select and load the file
+
+2013-03-27 Mikhail S. Dubrovin
+Tag: V00-00-10
+- add files' status tables in GUIData and GUIDark
+- add src/GUIFilesStatusTable.py	
+
+2013-03-25 Mikhail S. Dubrovin
+Tag: V00-00-09
+- minor improvements and extra protections in many places
+- do not rotate g2_vs_tau plot
+
+2013-03-22 Mikhail S. Dubrovin
+Tag: V00-00-08
+- use intensity monitors data for image correction
+- switch to the new pythonic interface for ELog submission with responce
+- many improvements in data processing; add mask for hot pixels using rms on dark, 
+  satturated pixels
+	
+2013-03-12 Mikhail S. Dubrovin
+Tag: V00-00-07
+- add reflected beam geometry for q_map evaluation. Currently use the tab status
+  variable to switch between q_maps for direct and reflected beam geometry.
+
+2013-03-11 Mikhail S. Dubrovin
+Tag: V00-00-06
+- add GlobalExternal.py
+- trancate bins reserved for overflow in output g2_vs_tau array.
+
+2013-03-08 Mikhail S. Dubrovin
+Tag: V00-00-05
+- add parameter in ImgAlgos::ImgCalib to turn on/off the const low level threshold
+  accomodate these change in 
+M       src/ConfigFileGenerator.py
+M       data/scripts/psana-cora-split.cfg
+	
+2013-03-07 Mikhail S. Dubrovin
+Tag: V00-00-04
+- add 
+	1) pedestal subtraction,
+	2) hot and saturated pixels mask evaluation
+	3) threshold for const level and N*rms
+	
+2013-02-21 Mikhail S. Dubrovin
+Tag: V00-00-03
+app/med and src/MaskEditor.py are ready
+	as standalone and embadded aplications
+
+2013-02-19 Mikhail S. Dubrovin
+Tag: V00-00-02
+
+2013-02-18 Mikhail S. Dubrovin
+A         app/med                  2013-02-18
+A         src/DragPolygon.py       2013-02-15
+A         src/MaskEditor.py        2013-02-08
+A         src/MaskEditorButtons.py
+A         src/DragRectangle.py
+A         src/DragWedge.py
+A         src/DragCircle.py
+A         src/DragCenter.py
+	
+2013-02-07 Mikhail S. Dubrovin
+A       src/DragObjectSet.py
+A       src/Drag.py
+A       src/DragLine.py
+
+A       src/PlotG2.py
+A       src/PlotG2Widget.py
+A       src/PlotG2Buttons.py
+
+2013-02-05 Mikhail S. Dubrovin
+D       src/GUIBlamish.py -> GUIBlemish, "blam" -> "blem" everywhere
+A  +    src/GUIBlemish.py
+
+2013-01-31 Mikhail S. Dubrovin
+Tag: V00-00-01
+
+2013-01-23 Mikhail S. Dubrovin
+- add modules:
+2013-01-28
+A       src/GUISetupData.py
+A  +    src/GUISetupBeamZero.py
+A  +    src/GUISetupSpecular.py	
+D       src/GUIBeamZeroPars.py     -> src/GUISetupBeamZero.py
+D       src/GUISpecularPars.py     -> src/GUISetupSpecular.py
+D       src/GUITransmissionPars.py -> src/GUISetupBeamZero.py
+	
+A    +    src/GUIViewControl.py             2013-01-24
+D         src/GUILoadResults.py -> GUIViewControl.py
+A         src/ViewResults.py                2013-01-23
+A         src/GUIRunInput.py                2013-01-17
+D         src/GUIRunInfo.py -> GUIRunInput 
+A         src/GUIRunAuto.py                 2013-01-15
+A         src/GUIRunMerge.py                2013-01-15 
+A         src/GUIRunProc.py                 2013-01-10
+A         app/tcmt                          2013-01-06
+A         src/ThreadWorker.py               2013-01-06
+A         src/GUIRunInfo.py                 2012-12-28
+A         src/GUIRunSplit.py                2012-12-28
+A         src/BatchJob.py                   2012-12-19 - as a base class
+A         src/BatchJobCorAna.py             2012-12-19
+A         data/scripts/psana-cora-split.cfg 2012-12-19
+A         src/GUIELogPostingFields.py       2012-12-14
+A         src/GUIELogPostingDialog.py       2012-12-14
+
+2012-12-07 Mikhail S. Dubrovin
+- Reneme:
+app/coranash -> app/tcdpe
+- Add
+M       src/ConfigParameters.py - Add declaration for lists of parameters
+M       src/ConfigParametersCorAna.py
+A       src/GUIIntensityMonitors.py
+	
+2012-12-06 Mikhail S. Dubrovin
+- Reneme:
+D       src/ImgSpeButtons.py -> src/PlotImgSpeButtons.py
+D       src/ImgSpeWidget.py  -> src/PlotImgSpeWidget.py
+D       src/ImgSpeWithGUI.py -> src/PlotImgSpe.py
+
+- add/remove modules:
+A         src/EventTimeRecords.py
+
+D         src/PlotTimeWithGUI.py -> PlotTime.py
+A         src/PlotTime.py
+A         src/PlotTimeWidget.py
+
+A         src/PlotArrayButtons.py
+A         src/PlotArray.py
+A         src/PlotArrayWidget.py	
+
+2012-12-04 Mikhail S. Dubrovin
+- add/remove modules:
+A       data/scripts/psana-data-aver.cfg 2012-12-04
+A       data/scripts/psana-peds-aver.cfg 2012-12-04
+D       data/scripts/psana-peds.cfg      2012-12-04
+A       src/BatchJobData.py              2012-12-03
+A       src/GUIData.py                   2012-12-03
+A       data/scripts/psana-data-scan.cfg 2012-11-29
+A       src/GUISetupEnergyAngle.py       2012-11-27
+
+2012-11-26 Mikhail S. Dubrovin
+- add/remove modules:
+D       src/GUICCDCorrectionSettings.py
+D       src/GUIBatchPars.py
+D       src/GUIBatchInfoLeft.py
+D       src/GUIBatchInfoRight.py
+D       src/GUIBatchInfo.py
+A  +    src/GUISetupInfoRight.py
+A  +    src/GUISetupPars.py
+A  +    src/GUISetupInfoLeft.py
+A  +    src/GUISetupInfo.py
+A       src/GUIMainTB.py
+A       src/GUIMainSplit.py
+
+2012-11-21 Mikhail S. Dubrovin
+- add module(s):
+A       src/GUIMainTB.py
+
+2012-11-19 Mikhail S. Dubrovin
+- change name for modules:
+D         data/scripts/psana-pedestals.cfg
+A         data/scripts/psana-peds.cfg
+D         data/scripts/psana-tahometer.cfg
+A         data/scripts/psana-peds-scan.cfg
+- add modules:
+A         src/BatchLogParser.py
+A         src/GUIFlatField.py
+A         src/GUIBlamish.py
+
+2012-11-15 Mikhail S. Dubrovin
+- add modules:
+A         src/GUIHelp.py
+A         src/GUIWorkResDirs.py
+
+2012-11-14 Mikhail S. Dubrovin
+- add/change modules:
+A         src/GUIFileBrowser.py
+
+2012-11-11 Mikhail S. Dubrovin
+- add/change modules:
+A         src/ImgSpeButtons.py
+A         src/ImgSpeNavToolBar.py
+A         src/ImgSpeWidget.py
+A         src/ImgSpeWithGUI.py
+	
+2012-11-08 Mikhail S. Dubrovin
+- add/change modules:
+A       src/GUIDark.py
+A       data/scripts/psana-tahometer.cfg
+
+2012-11-06 Mikhail S. Dubrovin
+- add/change modules:
+D       src/PsanaConfigFileGenerator.py
+A  +    src/ConfigFileGenerator.py
+	
+
+2012-11-05 Mikhail S. Dubrovin
+- add modules:
+A       src/PsanaConfigFileGenerator.py
+A       src/FileNameManager.py
+A       src/BatchJobPedestals.py
+A       src/AppDataPath.py
+A         CorAna/data
+A         CorAna/data/scripts
+A         CorAna/data/scripts/psana-pedestals.cfg
+	
+2012-11-02 Mikhail S. Dubrovin
+- add/changed modules:
+D       src/GUILoadFiles.py
+A  +    src/GUIFiles.py
+A         src/Overlay.py
+A         src/CorAnaUtils.py
+A         src/GUILoadResults.py	
+
+2012-10-31 Mikhail S. Dubrovin
+- add modules:
+A         src/GUIViewResults.py
+A         src/GUIRun.py
+A         src/GUILogger.py
+
+2012-10-30 Mikhail S. Dubrovin
+- add modules:
+A         src/GUICCDCorrectionSettings.py
+A         src/GUISystemSettingsRight.py
+A         src/GUISystemSettings.py
+A         src/GUICCDSettings.py
+A         src/GUISystemSettingsLeft.py
+
+2012-10-29 Mikhail S. Dubrovin
+- add modules:
+A         src/GUIAnaSettingsOptions.py
+A         src/GUINonKineticMode.py
+A         src/GUIAnaPartitions.py
+	
+2012-10-22 Mikhail S. Dubrovin
+- add modules:
+A       src/GUIAnaSettingsLeft.py
+A       src/GUIBatchPars.py
+A       src/Logger.py
+A       src/GlobalUtils.py
+A       src/GUIAnaSettingsRight.py
+A       src/GUIAnaSettings.py
+
+2012-10-17 Mikhail S. Dubrovin
+- add modules:
+A       src/GUIBatchInfoRight.py
+A       src/GUIKineticMode.py
+A       src/GUIBatchInfo.py
+	
+2012-10-16 Mikhail S. Dubrovin
+- add modules:
+A       src/GUISpecularPars.py
+A       src/GUIBatchInfoLeft.py
+A       src/GUIBeamZeroPars.py
+A       src/GUIImgSizePosition.py
+A       src/GUILoadFiles.py
+	
+2012-10-10 Mikhail S. Dubrovin
+- add dirs/modules:
+A       app
+A       app/coranash
+A       doc
+A       doc/ChangeLog
+A       doc/README
+A       SConscript
+A       src
+A       src/GUIMain.py
+A       src/ConfigParameters.py
+A       src/ConfigParametersCorAna.py
+A       src/GUIConfigParameters.py
+
+2012-10-08 Mikhail S. Dubrovin
+Creation of the CorAna packageon dubrovin@pslogin01 
+cd LCLS/PSANA-V01
+kinit
+sit_setup
+
+# create local package
+newpkg CorAna
+mkdir CorAna/src
+
+# create package in SVN and check it out
+psvn newpkg CorAna
+addpkg CorAna
+	
+	
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
