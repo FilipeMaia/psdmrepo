@@ -11,7 +11,7 @@ class HistAxis
   HistAxis(unsigned nbins, double low, double high) :
     _low(low),
     _high(high),
-    _binsize((high-low)/(nbins + 1.)),
+    _binsize((high-low)/nbins),
     _nbins(nbins)
   {
     _axisvals = make_ndarray<double>(nbins);

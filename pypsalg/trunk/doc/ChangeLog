@@ -11,6 +11,10 @@ Package author: Ankush Mitra
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2015-07-02 Christopher O'Grady
+Correct off-by-one error in calculating binsize
+
 Tag: V00-01-10
 2015-06-30 Christopher O'Grady
 Add some more histogram filling methods and methods to return axis numbers.
