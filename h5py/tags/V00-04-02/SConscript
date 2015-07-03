@@ -1,0 +1,31 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package h5py
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+pkg = "h5py"
+pkg_dir = "2.3.1d"
+pkg_ver = "2.3.1d"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', "h5py", pkg_dir)
+PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
+LINKPY = pkg
+PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+
+standardExternalPackage(pkg, **locals())

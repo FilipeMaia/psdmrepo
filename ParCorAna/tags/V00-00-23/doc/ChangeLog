@@ -1,0 +1,166 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ParCorAna
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-23
+- improve error message about saturated pixels being removed from colors
+	
+Tag: V00-00-22
+- replace inefficient averaging over color and finecolors with efficient
+  numpy.bincount. Should greatly increase spead of viewer with many colors.
+- do not require h5output or testH5output to be set for test_main or test_alt modes
+  useful for debugging config file with no h5output.
+- warn/error about finecolor file == 0 when color file != 0
+- UserG2 refactors: debugPlot function, loadColorFile function, replaceSubsetsWithAverage
+  make modifications to colors based on saturated pixels more explicit
+	
+Tag: V00-00-21:
+- save unit test results into files in /reg/g/psdm/data_test ... so that
+  unit tests can compare to previously computed output. 
+- Extend unit tests to compare to previous output.
+- Modify compare tool to ignore testH5out system_param in comparing output files.
+	
+	
+Tag: V00-00-20:
+- add debugging statements
+- add many user_parms, in particular parameters to filter based on ipimbs
+- add 'debug_plot' and support to see some of the IP/G2/IF at viewerUpdate
+- add forwarding functions logInfo, logDebug, etc to UserG2
+- only plot the delays for which there is a nonzero count, cleans up plots
+- label x-axis for plots in time, not 120hz counter
+- add example config file for ffb live & plotting
+	
+Tag: V00-00-19:
+- fix bug in viewerFormNDArrays. After gathering data from all the workers, the
+  starting offset of each worker was not calculated properly - all but the first had 
+  the same offset. The unit tests were passing because I never tested against multiple
+  workers. The unit tests now using both multiple servers and multiple workers.
+
+Tag: V00-00-18:
+- fix bug with using a different base for forming delays with the delay function
+	
+Tag: V00-00-17:
+- load mask and color files as int8 and int32 respectively in case they are float
+- add error checking on mask/color/finecolor, call checkParams function from defaul_config.py
+- add user_params 'plot_colors' to control number of colors plotted
+- add 'print_delay_curves' to get start/stop of all delay curvers on the screen
+
+	
+Tag: V00-00-16:
+- previous fix for mult servers slowed things down, server reads were not running in parrallel
+- fixed this, see comments in JIRA PSAS-161 - servers now read next array after reporting ready,
+  assumption is master will probably pick a different server to scatter
+- added print of EventData, added class ScatterDataQueue
+  
+	
+Tag: V00-00-15:
+- fix issues with multiple servers: JIRA PSAS-161
+  wait for all servers to by ready
+  fix bug with selection earliest time
+- use 6 servers for unit tests, compare to alt test with 1 server
+- change cmp tool to ignore differences in numservers between alttest and maintest
+- fix bug with saving finecolor file using parCorAnaMaskColorTool - it was just the color file before
+	
+Tag: V00-00-14:
+- fix bug with writing mask/color files to h5 file.
+- add documention on finecolor
+	
+Tag: V00-00-13:
+- add finecolor
+ 
+	
+Tag: V00-00-12:
+- move import of matplotlib.plt to remove warning message about fork() Jira PSAS-163
+	
+Tag: V00-00-11:
+- optimizations to get to real time with full cspad Jira PSAS-162:
+-- change from float64 to float32 to speed up scatter and gather
+-- specify 'float' type for psana NDArray modules
+-- move server copy of masked pixels so it doesn't block workers
+- This introduces change in UserG2 code for users	
+- fix bug with formatFileName and %C
+- start to undo circular inclusions of ParCorAna in src files
+	
+Tag: V00-00-09:
+- fix bug with overriding system_parms via command line arguments
+- improve error/diagnostic messages
+	
+Tag: V00-00-08:
+- add MPI_Barrier with output to driver to check for MPI problems 
+- make %C increase in h5 output file if there is a .inprogress file
+- fix bug with overriding numServers through command line
+- improve documentation
+	
+Tag: V00-00-07
+- fix bugs with handling stream in dataset, need to specify streams for 
+  non-standard streams, can't specify more servers than DAQ streams
+- fix bug in UserG2, did not implement beforeData for incremental
+- adjust documentation a bit
+- take out userg2 page from sphinxdoc
+- add modules to src	
+- add code to parCorAnaMaskColorTool to check for geometry information that is
+  wrong - on the tutorial data it returned iX, iY that were one pixel greater
+  then the image size - image producer must have changed - now the geometry 
+  file is out of sync?
+	
+Tag: V00-00-06
+- remove XCorrWorkerBase and replace with WorkerData
+- add unit tests for 60 events of cspad2x2
+- add UserG2 for 3 methods - incremental accumulate, windowed, g2atend
+- update documenation and default_params.py
+- add support for %T and %C in h5output file, with unit test
+- extend parCorAnaMaskColorTool to create testmask with 10 pixels on.
+	
+Tag: V00-00-05
+- implement WorkerData for incrememtal calculation
+- add some unit tests
+- add psmon plotting
+- before refactor to plug in WorkerData
+	
+Tag: V00-00-04
+2015-4-10 David Schneider
+- update sphinx documentation
+- implement testing part of framework, and cmp script for h5 output
+- change names of parameters in system_params/user_params, consistently camelcase
+- change message structure to include more than just 120hz counter, pass full
+  timing information to workers, viewer, etc
+	
+Tag: V00-00-03
+2015-3-26 David A. Schneider
+- switch to using fiducials for event time JIRA Issue PS-126. Servers include
+  fiducial in their message to master, master computers counter from server info,
+  workers & viewer only get counter.
+- add optimization for debug messages, don't form debug strings unless we are 
+  doing debug logging
+- change name framework uses for xcorrbase to that, from g2, g2 is in user code
+	
+2015-3-24 David A. Schneider
+- add sphinxdoc directory and .rst files for documentation.
+  updated default_config.py to include the worker_store_dtype value
+	
+2015-1-21 David A. Schneider
+- improve helper function returning delay list to always return requested # of delays
+	
+2015-1-20 David A. Schneider
+- change default server assignment to round robin on available hosts
+- take out automatic detection of server hosts for shmem
+- identify instrument in psana datasource for shmem as well as exp=
+	
+2015-1-15 David A. Schneider
+- get mask color tool to work with a detector that produces a 2D ndarray for which there is no geometry file
+
+2015-1-15 David A. Schneider
+- Fix bugs when using more than one server in live/offline mode when streams are not specified.
+
+2015-1-15 David A. Schneider
+- Initial check in. Based on package MpiDetectFn from users svn repo.
+- JIRA Issue PSAS-63

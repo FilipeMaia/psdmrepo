@@ -1,0 +1,589 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddldata
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag V01-00-27
+2015-04-30 Daniel Damiani
+- bld.ddl: add BldDataAnalogInputV1 type
+
+Tag V01-00-26
+
+Tag V01-00-25
+2015-02-20 Chris Ford
+- evr.ddl: remove devel tag from DataV4 data type
+
+2015-02-19 Chris Ford
+- evr.ddl: add DataV4 data type with devel tag
+
+Tag V01-00-24
+2015-02-02 Jana Thayer
+
+Tag V01-00-23
+2015-01-08 Matt Weaver
+- quartz.ddl: add taps,testpattern to ConfigV2 
+- epix.ddl: comment out EpixSConfigV1 (devel) from EpixData [config] list	
+
+Tag V01-00-22
+2014-11-25 David Schneider
+- bld.ddl: restoring pv names to documentation - see JIRA Issue PSAS-73
+
+Tag V01-00-21
+2014-11-25 Matt Weaver
+- quartz.ddl: Added ConfigV2 with hardware ROI
+	
+Tag V01-00-20
+2014-11-18 Matt Weaver
+- timetool.ddl: Added ConfigV2, DataV2 to include 2 spectral line analysis
+	
+2014-11-10 Christopher O'Grady
+- Update doc strings for fee gasdet and GMD.
+
+Tag V01-00-19
+2014-10-23 Matt Weaver
+- Removed devel tag fro Epix100a definitions	
+
+Tag V01-00-18
+2014-10-13 Daniel Flath
+- bld.ddl::BldDataSpectrometerV1
+	
+Tag V01-00-17
+2014-10-13 Matt Weaver
+- Added Epix100a definitions with devel tag
+	
+Tag V01-00-15
+2014-10-01 Matt Weaver
+- Added EvrIOConfigv2 for detector-trigger mapping
+
+Tag V01-00-14
+2014-09-16 Matt Weaver
+- Added TimeTool data type
+
+Tag: V01-00-13
+2014-09-15 Matt Weaver
+- Added TimeTool config type, GenericPgp config type, and L3T::DataV2 type
+	
+Tag: V01-00-12
+2014-07-03 Jana Thayer
+- Support the 3 new fields in Ebeam BLD V6 in bldreader, cfgreader, xtcreader, and xtcMonClientExample.
+	
+Tag:  V01-00-11
+2014-06-30 Christopher O'Grady
+- Added 3 photon-energy related doubles to Ebeam BLD (now V6).
+	
+Tag:  V01-00-10
+2014-06-13 Jana
+- Added 2 PMT values to Gas Detector BLD data type
+	
+Tag: V01-00-09
+2014-05-08 Tomy
+- BldDataGMDV2
+
+Tag: V01-00-08
+2014-05-01 Jack
+- epix10k, comments, adjust padding bit lengths
+	
+Tag: V01-00-07
+2014-04-30 Matt
+- epix10k, on behalf of Jack
+	
+Tag: V01-00-06 
+2014-03-10 Tomy
+- Fix typo in pimax
+
+Tag: V01-00-05
+2014-03-06 Matt
+- Adding EBeamV5
+
+Tag: V01-00-04
+2014-03-03 Tomy
+- Adding ddl files of pimax and arraychar
+- Add ocean optics data v2 and config v2
+
+Tag: V01-00-03
+2014-01-30 Matt
+- Revised proposed partition config object
+
+Tag: V01-00-02
+2014-01-27 Matt
+- partition.ddl: added a DAQ partition configuration object that describes
+	which segments contribute to which readout groups
+
+Tag: V01-00-01
+2014-01-07 Andy
+- acqiris.ddl: fixing base type for some enums, this does not change
+  interfaces but makes it better compatible with old HDF5 schema
+
+Tag: V01-00-00
+2013-12-22 Andy
+- switching from XML to new DDL
+
+Tag: V00-04-57
+2013-12-22 Andy
+- acqiris: update comments for TdcDataV1.data() method
+
+Tag: V00-04-56
+2013-12-18 Matt
+- add Epix.ConfigV1,ElementV1 definitions
+
+Tag: V00-04-55
+2013-12-12 Andy
+- bug fix in Ipimb.ConfigV1.capacitorValues() method, it returned incorrect 
+  values
+- fix Andor.ConfigV1 methods to use methods instead of direct data access, 
+  this is necessary to support new HDF5 schema which does not store corresponding
+  data fields
+
+Tag: V00-04-54
+2013-12-12 Andy
+- in evr.EventCodeV[34] remove _u16MaskEventAttr_value() method, this is not 
+  used anywhere and interferes with default HDF5 schema
+
+Tag: V00-04-53
+2013-12-12 Andy
+- fix definition of EpicsSampler.ConfigV1.sampleInterval_sec method
+
+Tag: V00-04-52
+2013-12-06 Matt
+- add Evr::SrcConfigV1 for event source hardware - SLAC modification of EVR.
+
+Tag: V00-04-51
+2013-12-02 Andy
+- add "config-type" tag to EpixSampler.ConfigV1
+
+Tag: V00-04-49
+2013-12-02 Matt
+- add Rayonix ConfigV2
+	
+Tag: V00-04-48
+2013-12-02 Matt
+- add EpixSampler data types
+	
+Tag: V00-04-47
+2013-11-12 Andy
+- ipimb.Config classes define capacitorValues() method which return
+  array of CapacitorValue enums (note tat in our current implementation
+  arrays of enums are returned as arrays of ints).
+
+Tag: V00-04-46
+2013-11-06 Andy
+- this tag also includes new rayonix package
+- add "no-sizeof" tag to few classes to suppress warnings
+
+Tag: V00-04-45
+2013-10-01 Andy
+- BldDataSpectrometerV0: make it non-value-type and add auto constructor
+
+Tag: V00-04-44
+2013-09-30 Andy
+- Mike added new type BldDataSpectrometerV0
+
+Tag: V00-04-43
+2013-09-26 Andy Salnikov
+- fix bitfield order in opal1k.ConfigV1
+
+Tag: V00-04-42
+2013-09-26 Matt Weaver
+- documented new Bld.BldDataEBeamV4 fields
+- added Control.ConfigV3 with L3T accepted events field
+- output in pdsdata V07-01-00
+	
+Tag: V00-04-41
+2013-09-25 Andy Salnikov
+- fix for incorrect offsets of data arrays in epics
+
+Tag: V00-04-40
+2013-09-24 Andy Salnikov
+- add map() method to evr.OuputMap and OutputMapV2
+
+Tag: V00-04-39
+2013-09-24 Matt Weaver
+- Added L3T.ConfigV1,DataV1 for level 3 trigger/filter data
+- output in pdsdata V07-00-04
+	
+Tag: V00-04-38
+2013-09-24 Andy Salnikov
+- Bld.BldDataAcqADCV1 needs xtc config which is Acquiris.ConfigV1
+
+Tag: V00-04-37
+2013-09-20 Andy Salnikov
+- add forgotten Bld.BldDataAcqADCV1 type
+
+Tag: V00-04-36
+2013-09-18 Andy Salnikov
+- define conversion constructor Timepix::DataV2(Timepix::DataV1), this needs
+  psddl V00-08-14, the constructor itself has to be implemented separately
+- add methods Camer.FrameV1.depth_bytes()
+- add data_size() method to Timepix.DataV* classes
+
+Tag: V00-04-35
+2013-09-18 Matt Weaver
+- moved pdsdata/xtc/SrcAlias class into alias.ddl.xml (Alias::SrcAlias)
+
+Tag: V00-04-34
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
+Tag: V00-04-33
+2013-09-13 Matt Weaver
+- add auto-constructors for more config types 
+- add some special constructors for non-config types
+- new alias::ConfigV1 type
+- add xtc/SrcAlias class definition (included by alias definition)
+- new BldEBeamV4 version
+- results installed in pdsdata/psddl V07-00-00	
+	
+Tag: V00-04-32
+2013-08-26 Andy Salnikov
+- add auto-constructors for for EPICS types
+
+Tag: V00-04-31
+2013-08-26 Andy Salnikov
+- add auto-constructors for some complex data types
+
+Tag: V00-04-30
+2013-08-14 Andy Salnikov
+- add releaseCode() method to evr.EventCodeV5 and evr.EventCodeV6
+
+Tag: V00-04-29
+2013-07-16 Andy Salnikov
+- imp: add one forgotten constant
+
+Tag: V00-04-28
+2013-05-22 Andy Salnikov
+- bug fix in imp.ddl.xml, Sample._channels is 16 bit instead of 32
+
+Tag: V00-04-27
+2013-05-15 Andy Salnikov
+- adding imp package
+
+Tag: V00-04-26
+2013-04-25 Andy Salnikov
+- upgrading to pdsdata V06-07-04
+- new class cspad.ConfigV5
+
+Tag: V00-04-25
+2013-04-23 Andy Salnikov
+- pnccd.FullFrameV1 does not need xtc-config
+
+Tag: V00-04-24
+2013-03-29 Andy Salnikov
+- wider use of enum base type feature
+
+Tag: V00-04-23
+2013-03-28 Andy Salnikov
+- updated comments in acqiris schema
+
+Tag: V00-04-22
+2013-03-26 Andy Salnikov
+- small changes to cspad scheme to make it work with HDF5
+
+Tag: V00-04-21
+2013-03-25 Andy Salnikov
+- small changes to Orca scheme to make it work better with HDF5
+
+Tag: V00-04-20
+2013-03-25 Andy Salnikov
+- make princeton DDL usable with HDF5
+
+Tag: V00-04-19
+2013-03-24 Andy Salnikov
+- encoder schema: use new enum-base feature to define attributes 
+
+Tag: V00-04-18
+2013-03-22 Andy Salnikov
+- fli: update to support HDF5
+
+Tag: V00-04-17
+2013-03-22 Andy Salnikov
+- gsc16ai.ddl.xml: use new enum-base feature to define attributes to have
+  enum types instead of ints
+
+Tag: V00-04-16
+2013-03-22 Andy Salnikov
+- gsc16ai.ddl.xml: fix numChannels() implementation to be usable with HDF5
+
+Tag: V00-04-15
+2013-03-22 Andy Salnikov
+- removed version() method from oceanoptics.DataV1 interface, pdsdata
+  does not define ths method and number returned from it does not make 
+  much sense 
+
+Tag: V00-04-14
+2013-03-14 Andy Salnikov
+- changes in epics DDL:
+  - all dbr_xxx types have default constructor now
+  - PvConfigV1 is made value-type, makes it easier to work with
+
+Tag: V00-04-13
+2013-03-13 Andy Salnikov
+- add config types to pnccd.FullFrame
+
+Tag: V00-04-12
+2013-03-12 Andy Salnikov
+- add default ctors to lusi value types
+
+Tag: V00-04-11
+2013-03-10 Andy Salnikov
+- small fixes to schema for HDF5 generator
+
+Tag: V00-04-10
+2013-03-04 Andy Salnikov
+- fixing type id for quartz.Config class
+
+Tag: V00-04-09
+2013-03-04 Andy Salnikov
+- update DDL for cspad and acqiris to work with HDF5 generator
+
+Tag: V00-04-08
+2013-02-27 Andy Salnikov
+- small changes to control.ddl.xml to make it usable for HDF5 generator
+
+Tag: V00-04-07
+2013-02-26 Andy Salnikov
+- couple of classes in cspad and cspad2x2 packages made value-type
+- Evr.PulseConfig auto constuctor replaced with specific arguments
+  to take parameters retuurned from non-accessor methods
+
+Tag: V00-04-06
+2013-02-26 Andy Salnikov
+- few fixes to make it work better with HDF5 generator
+
+Tag: V00-04-05
+2013-02-12 Andy Salnikov
+- removed shape method for pvName
+
+Tag: V00-04-04
+2013-02-06 Andy Salnikov
+- in pnccd moved FramesV1 below FulFrameV1. Python bindings use this
+  order to find data in event for given type_id, because those classes
+  have the same type_id FramesV1 was found first. Preferred for Python is 
+  to return FullFrame so it has to come first.
+
+Tag: V00-04-03
+2013-02-05 Andy Salnikov
+- update usdusb.DataV1 definition
+
+Tag: V00-04-02
+2013-02-05 Andy Salnikov
+- upgrading to pdsdata V06-01-04
+- new classes princeton.ConfigV5, princeton.FrameV2
+
+Tag: V00-04-01
+2013-02-04 Andy Salnikov
+- upgrading to pdsdata V06-01-02
+- new classes cspad2x2.ConfigV2 and cspad2x2.ConfigV2QuadReg
+- method ipimb.ConfigV{1,2}.diodeGain() renamed to capacitorValue()
+
+Tag: V00-04-00
+2013-01-30 Andy Salnikov
+- switching to const ndarrays everywhere
+
+Tag: V00-03-16
+2013-01-28 Andy Salnikov
+- updates related to ndarray constness change
+
+Tag: V00-03-15
+2013-01-02 Andy Salnikov
+- upgrading to pdsdata V05-03-00
+- new classes orca.ConfigV1 and timepix.ConfigV3
+- bld.BldDataAcqADCV1 not implemented yet
+
+Tag: V00-03-14
+2012-12-12 Andy Salnikov
+- replace tabs with spaces in XML to get consistent indentation
+- implementation of encoder.DataV*.value changed to forward to method 
+  instead of data member
+
+Tag: V00-03-13
+2012-11-15 Andy Salnikov
+- upgrading to pdsdata V05-01-00
+- new class bld/BldDataGMDV1
+
+Tag: V00-03-12
+2012-11-08 Andy Salnikov
+- upgrading to pdsdata V04-05-00
+- new class princeton/ConfigV4
+- BldDataEbeamV* classes have new DamageMask enum
+- BldDataGMDV0 changed without updating version number
+
+Tag: V00-03-11
+2012-10-23 Andy Salnikov
+- upgrading to pdsdata V04-02-07
+- added new package andor with classes ConfigV1, FrameV1
+
+Tag: V00-03-10
+2012-10-10 Andy Salnikov
+- fix version numer for BldDataGMDV0
+
+Tag: V00-03-09
+2012-10-08 Andy Salnikov
+- upgrading to pdsdata V04-02-01
+- added new classes bld.BldDataGMDV0, usdusb.ConfigV1, usdusb.DataV1
+
+Tag: V00-03-08
+2012-09-28 Andy Salnikov
+- upgrading to pdsdata V04-01-00
+- added new classes control.ConfigV2, evr.ConfigV7
+
+Tag: V00-03-07
+2012-07-24 Andy Salnikov
+- acqiris.ddl.xml: bug fix in Timestamp::value() method
+
+Tag: V00-03-06
+2012-07-06 Andy Salnikov
+- new package quartz with single class ConfigV1 similar to opal1k.ConfigV1
+- pnccd.FrameV1 is now contained in pnccd.FramesV1
+- new class (not in XTC/pdsdata) pnccd.FullFrameV1 containing 1024x1024 image
+
+Tag: V00-03-05
+2012-06-26 Andy Salnikov
+- Encoder.DataV[12]: added value() method, like in pdsdata classes
+  but implemented slightly differently
+  
+Tag: V00-03-04
+2012-06-22 Andy Salnikov
+- EvrData.EventCodeV5: one member method was incorrectly named 
+  (isTerminator instead of isCommand)
+  
+Tag: V00-03-03
+2012-06-03 Andy Salnikov
+- upgrade to pdsdata V03-07-07
+- cspad adds new type ConfigV4
+
+Tag: V00-03-02
+2012-05-11 Andy Salnikov
+- upgrade to pdsdata V03-07-00
+- evr adds new type ConfigV6
+
+Tag: V00-03-01
+2012-05-03 Andy Salnikov
+- upgrade to pdsdata V03-06-00
+- new packages fli.ddl.xml, oceanoptics.ddl.xml
+- princeton adds new type ConfigV3
+
+Tag: V00-03-00
+2012-05-02 Andy Salnikov
+- all config types now have "config-type" tag
+- evr.ddl.xml: one field is split into bitfields, neded to generate 
+  constructor for HDF5 data  
+
+Tag: V00-02-04
+2012-05-01 Andy Salnikov
+- new class epics.ConfigV1
+
+Tag: V00-02-03
+2012-03-27 Andy Salnikov
+- upgrade to pdsdata V03-04-01
+- new class bld.BldDataEBeamV3
+
+Tag: V00-02-02
+2012-03-14 Andy Salnikov
+- upgrade to pdsdata V03-03-01A
+  - new class timepix.ConfigV2
+
+Tag: V00-02-01
+2012-02-17 Andy Salnikov
+- upgrade to pdsdata V03-02-12
+  - new class timepix.DataV2
+- added diodeGain(int) method (does not exist in pdsdata)
+  and gain enums to ipimb.ConfigV{1,2} classes
+
+Tag: V00-02-00
+2012-02-06 Andy Salnikov
+- added cspad2x2 package
+- moved cspad.MiniElementV1 to cspad2x2.ElementV1
+- added cspad2x2.ConfigV1
+
+Tag: V00-01-01
+2012-01-12 Andy Salnikov
+- adding timepix package
+- Princeton.FrameV1 data() method now return 2-dim array
+- Camera.FrameV1 now has two methods data8() and data16() that return
+  either 8-bit or 16-bit data
+
+Tag: V00-01-00
+2011-12-09 Andrei Salnikov
+- few small changes related to ndarray migration
+- evr.IOChannel is now value-type class
+
+Tag: V00-00-14
+2011-11-12 Andrei Salnikov
+- new class encoder.ConfigV2
+- new package gsc16ai with two classes ConfigV1 and DataV1
+
+Tag: V00-00-13
+2011-10-04 Andrei Salnikov
+- CsPad.Element image data type changed from uint16_t to int16_t,
+  calibration output which is essentially signed can reuse the same
+  definitions
+- methods common_mode(int) and sectionMask() added to CsPad.Element
+  classes, this is to simplify data handling and unify with 
+  calibrated data interface
+
+Tag: V00-00-12
+2011-09-12 Andrei Salnikov
+- adding CsPad.MiniElementV1 class
+
+Tag: V00-00-11
+2011-08-29 Andrei Salnikov
+- added Bld::BldDataPimV1 class
+
+Tag: V00-00-10
+2011-08-22 Andrei Salnikov
+- added Princeton::ConfigV2 class (part of pdsdata V02-13-03)
+
+Tag: V00-00-09
+2011-06-16 Andrei Salnikov
+- upgrade to pdsdata V02-11-05
+
+Tag: V00-00-08
+2011-04-26 Andrei Salnikov
+- modified acqiris.DataDescV1Elem so that waveform() method returns 
+  real poinyter to the beginning of the waveform data taking into 
+  account indexFirstPoint() offset.
+
+Tag: V00-00-07
+2011-04-07 Andrei Salnikov
+- added comments everywhere to generate docs for psana classes
+- some bitfields were missing in Control.ConfigV1
+
+Tag: V00-00-06
+2011-04-01 Andrei Salnikov
+- small fix in opal1k.ConfigV1 class
+
+Tag: V00-00-05
+2011-03-31 Andrei Salnikov
+- renamed "dimentions" attribute into "shape"
+- added "shape_method" attribute
+
+Tag: V00-00-04
+2011-03-28 Andrei Salnikov
+- few changes to epics classes:
+  - new intermediate type EpicsPvTimeHeader which is base for all *Time*
+    classes and has a single method stamp()
+  - EpicsPvHeader type has new methods isCtrl(), isTime(), status(), and
+    severity()
+  - precision() method was missing in floating point DBR classes
+
+Tag: V00-00-03
+2011-03-20 Andrei Salnikov
+- removed src and include directories
+- lots of changes in data models, added constructors, reworked epics stuff
+
+Tag: V00-00-02
+2011-01-06 Andrei Salnikov
+- removed C++ files that do not belong here
+
+Tag: V00-00-01
+2011-01-06 Andrei Salnikov
+- first import into repository
+- semi-functional descriptions of all types currently defined

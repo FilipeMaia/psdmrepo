@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package EpicsViewer
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+The Web-based EPICS Archive Viewer
+
+Detailed description:
+=====================
+
+A collection of Web applications for viewing data stored in the EPICS Archive.

@@ -5,8 +5,8 @@
 
 
 # release directory
-release=/reg/neh/home1/wilko/releases/ic-testing
-# release=dm-0.9.1
+#release=/reg/neh/home1/wilko/releases/ic-testing
+release=dm-current
 
 # database options
 conn_file=file:/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn

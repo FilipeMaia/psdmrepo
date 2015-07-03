@@ -1,0 +1,14 @@
+psana:
+- NDArrIOV1: get_ndarray - return empty ndarray in stead of zero-pointer,
+  a lot of cosmetic changes.
+- psana_examples: update DumpEpics.cpp to demonstrate accessing Epics PV's
+  with waveforms by data type, and getting the ndarray of the waveform (PSAS-158)
+
+Imaging and calibration algorithms:
+- ImgAlgos: add class CommonModeCorrection, which is used to apply CommonMode
+  algorithms (PSAS-139)
+- Detector: extensive development (PSAS-139)
+
+External packages:
+- hdf5: update to 1.8.15
+- h5py: update to 2.5.0

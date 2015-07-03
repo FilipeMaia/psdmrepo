@@ -1,0 +1,119 @@
+#!/bin/bash --norc
+
+##doc
+#  mv2offline-daemon [-T] [node] 
+#
+# mv2offline-daemon xpp-dss05 xpp-dss06 
+##end
+
+
+function set_instr_id()
+{    
+    # create an id for an instrument set the global INSTR_ID
+    local instr=(amo xpp sxr cxi xcs mec)
+    
+    for (( i=0; i<${#instr[@]} ; i++ )) ; do
+        if [ "$1" = ${instr[$i]} ] ; then 
+            INST_ID=$i
+            return
+        fi
+    done
+    INST_ID=-1
+}
+
+function node_requested()
+{
+    # check if a allowed node ($1) is requested. return 0 if true
+    for req in ${REQ_NODES} ; do
+        req=${req#daq-}
+        [ ${req} = $1 ] && return 0
+    done
+    return 1
+}
+
+function debug()
+{
+    if [ ${DEBUG} -eq 1 ] ; then
+        echo $*
+    fi
+}
+
+TEST=
+DEBUG=0
+while getopts :Td OPT; do
+    case $OPT in
+        T|+T) TEST=echo ;;
+        d|+d) DEBUG=1 ;;
+        *)
+            echo "usage: ${0##*/} [+-T} [--] ARGS..."
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+REQ_NODES=$*
+PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --holdoff 60 --ignore ^D^C"
+
+case $(hostname) in
+    psana101)  dssnodes="psanaxppffb01 psanaxppffb04" ;;
+    psana102)  dssnodes="psanaamoffb01 psanaamoffb02 psanaamoffb03 psanaxppffb02 psanaxppffb05 psanasxrffb01 psanasxrffb02 psanasxrffb03" ;;
+    psana103)  dssnodes="psanaamoffb04 psanaamoffb05 psanaamoffb06 psanaxppffb03 psanaxppffb06 psanasxrffb04 psanasxrffb05 psanasxrffb06" ;;
+
+    psana201)  dssnodes="psanacxiffb01 psanacxiffb04 psanacxiffb07 psanacxiffb08" ;;
+    psana202)  dssnodes="psanacxiffb02 psanacxiffb05 psanacxiffb09 psanacxiffb10 psanamecffb01 psanaxcsffb01 psanaxcsffb02 psanaxcsffb03" ;;
+    psana203)  dssnodes="psanacxiffb03 psanacxiffb06 psanacxiffb11 psanacxiffb12 psanamecffb02 psanaxcsffb04 psanaxcsffb05 psanaxcsffb06" ;;
+esac
+
+# set pcds release to get proper python version
+. /reg/g/psdm/bin/sit_setup.sh dm-current
+
+# release path
+cd $(dirname $0)
+reldir=$(pwd)
+cmd=$reldir/mv2offline-ana.py
+cmd_opts="--mode ffb-offline -v --ireg"
+
+# instrument specific options
+
+for node in ${dssnodes} ; do
+    case ${node} in
+        *-dss*) 
+            instr=${node%-*} 
+            selhost=daq-${node} ;;
+        psana*ffb??) 
+            instr=${node:5:3} 
+            selhost=${node} ;;
+        *) continue ;;
+    esac
+    dss_id=${node:(-2)}
+    dss_id=${dss_id#0}
+    
+
+    # set the INST_ID
+    set_instr_id  ${instr}
+    port=$(( 30000 + ${INST_ID} * 100 + ${dss_id} ))
+    debug "${node} ${instr} ${selhost} ${dss_id} ${port}"
+    
+    # check if only selected nodes should be started 
+    if [ $# -gt 0 ] && ! node_requested ${node} ; then
+        continue
+    fi
+    
+    logfile=/u1/psdm/mvr/log/mv2offline.${node}
+    if [[ -e ${logfile} ]] && [[ "${TEST}" = "" ]]; then
+        mv_name=${logfile}.$(date +%Y%m%dT%H%M%S)
+        echo ${logfile} ${mv_name}
+        mv ${logfile} ${mv_name}
+    fi
+    
+    extra_opts="--logfile ${logfile} --name $(basename ${logfile}) ${port}"
+    
+    # don't run from a release dir as it might disappear becasue a new mover version is installed
+    if ! cd ../workdir ; then
+        echo "Could not cd to workdir $(pwd)/../workdir"
+        exit 1
+    fi
+    ${TEST} ${PROCSERV} ${extra_opts} ${cmd} --host ${selhost} ${cmd_opts} 
+done
+

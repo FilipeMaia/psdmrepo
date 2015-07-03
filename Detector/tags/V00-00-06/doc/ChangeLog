@@ -1,0 +1,68 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package Detector
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-06
+2015-06-12 Mikhail S. Dubrovin
+- fix sphinx documentation, cosmetic changes.
+- set SConscript to generate documentation 
+	
+Tag: V00-00-05
+2015-06-11 Mikhail S. Dubrovin
+- extensive development (PSAS-139) 
+	- add C++/python code for common mode correction
+	- add calib_data(...) method to apply 3 corrections (pedestals, pixel status mask, common mode)
+	- add protection in many places: return None if returning object is non-available
+	- add PyDetectorAccess.py - get all raw data directly from python data objects (it is faster then using boost/python)
+        - add PyDataAccess.py - global methods to access data objects in case of multiple versions.
+	- add examples/ex_cspad.py - for test purpose (may be removed later)
+	- in PyDetector - add beta-version of sphinx documentation
+
+Tag: V00-00-04
+2015-06-02 Mikhail S. Dubrovin
+- update ChangeLog
+	
+Tag: V00-00-03
+2015-06-02 Mikhail S. Dubrovin
+- update examples, PyDetector returns None if ndarray size is zero (PSAS-139) 
+
+Tag: V00-00-02
+2015-05-22 Mikhail S. Dubrovin
+- DetectorAccess - add methods ndim(.), size(.), shape(.), status(.). (PSAS-139)
+- src/PyDetector.py - return None if calibration parameters are not loaded,
+	- add methods ndim(.), size(.), shape(.), status(.), shaped_array(.), return shaped ndarray.
+- pyext/pyDetector.cpp - support wrapper for new methods.
+- GlobalUtils.py - add enumerated parameters to support CALIB_TYPE and STATUS
+- examples/ex_cspad.py -> ex_all_dets.py - switch between derectors by input integer parameter. 
+	
+2015-05-21 Mikhail S. Dubrovin
+- GlobalUtils.py - add enumerated detector types.
+- src/DetectorAccess.cpp - make sure that calib parameters loaded before ndarray size is reqested.
+- re-name ex_cspad.py -> ex_all_dets.py and update.
+	
+2015-05-20 Mikhail S. Dubrovin
+- rename examples
+- change names and propagation of parameters in PyDetector.py
+- add GlobalUtils.py, PyDetectorAccess.py
+
+2015-05-19 Mikhail S. Dubrovin
+- Fixed problems with imports.
+	
+Tag: V00-00-01
+2015-05-18 Mikhail S. Dubrovin
+- Package pytopsana was re-named to Detector (PSAS-139)
+
+#------------------------------
+Chris & Ankush stuff:
+addpkg psana_python HEAD    (boost converters)
+addpkg -u pyAreaDet	
+#------------------------------

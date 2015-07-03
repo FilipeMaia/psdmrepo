@@ -1,0 +1,172 @@
+#!/usr/bin/env python 
+
+
+"""
+Get the list of active experiments and check if the experiment folders exist.
+
+"""
+
+from __future__ import print_function
+
+import os
+import time 
+import argparse
+import logging
+import datetime
+
+import DmMover.experiment as experiment
+import DmMover.exper_folders as exper_folders
+import RegDB.experiment_info as expinfo
+import RegDB.RegDb
+from DbTools.DbConnection import DbConnection
+
+
+REGDB_CONN_STR = 'file:/reg/g/psdm/psdatmgr/regdb/.regdb-reader-conn'
+
+def stations_instr(instr):
+    # there could be more then one station per experiment
+    if instr == 'CXI':
+        return (0,1)
+    else:
+        return (0,)
+
+
+def all_experiments(age_days=0):
+    conn = DbConnection ( conn_string=REGDB_CONN_STR )
+    
+    regdb = RegDB.RegDb.RegDb(conn)
+    
+    res = regdb.get_experiments()
+    cut = time.time() - (age_days * 24 * 3600) 
+    for e in res:
+        reg_time = long(e['registration_time']) / 1E9
+        if reg_time < cut:
+            continue
+
+        yield e['name'], e['instr_name'].lower()
+
+
+def active_experiments():
+    """ find active experiments and return exp,instr """
+
+    for instr in ('AMO', 'CXI', 'MEC', 'SXR', 'XCS', 'XPP'):
+        for station_id in stations_instr(instr):            
+            info = expinfo.active_experiment(instr, station_id)
+            yield info[1], instr.lower()
+            
+def single_experiment(name):
+    """ return exper-name and instr """
+
+    exp_id = expinfo.name2id(name)
+    if exp_id == None:
+        logging.error("Unknown experiment %s", name)
+        return
+        
+    yield name, name[:3].lower()
+
+# -------------------------------------------------------------------------------    
+
+usage="List and create missing experiment folders"
+help_epilog='''
+Check either all experiments, only the activated ones or specific experiments 
+
+Examples:
+    %% %(prog)s --allage 5               (list all experiments that were registered in last 5 days )
+    %% %(prog)s --allage 5 --mkdir       (create missing dirs for all experiments that were registered in last 5 days )
+
+    %% %(prog)s --active --mkdir         (check only active experiments)
+
+    %% %(prog)s --scractchpath /reg/data/ana102 --mkdir cxidaq12   (create all folders for cxidaq12 and put the
+                                                                    scractch, res... to ana102)
+'''
+
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=help_epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--mkdir', action='store_true', 
+                        help="create missing data folder (xtc, hdf5, scratch, ...) otherwise just list them")
+    parser.add_argument('--active', action='store_true', help="checkall only active experiments.")
+    parser.add_argument('--allage', type=int, default=0, const=82, nargs='?', 
+                        help="Select all experiments that were registered in the db less than %(dest)s days ago. (default %(default)sd)")
+    parser.add_argument('--dirs', help='directories to create')
+    parser.add_argument('--scratchpath', default="/reg/data/ana04", help="Set ana path for scratch, res,...")
+    parser.add_argument('--scratchRR', action='store_true', help="Use round-robin to select scratch folders")
+    parser.add_argument('--datapath', help="Set ana path for xtc,hdf5 and usr")
+    parser.add_argument('--nolink', dest="dolink", action='store_false', default=True, 
+                        help="Do not create link and do not use link to check if dir already exists.")
+    parser.add_argument("--verbose", "-v", action='count', default=0)
+    parser.add_argument('sel_exper', nargs='?', help="experiments to check") 
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    log_levels = [logging.INFO, logging.DEBUG]
+    args.verbose = min(args.verbose, len(log_levels)-1)
+    logging.basicConfig(level=log_levels[args.verbose], format='%(asctime)s %(name)s %(message)s',
+                        datefmt="%Y%m%d %H:%M:%S")
+
+    all_dirs = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
+
+    scratch_dirs = ("/reg/data/ana04", "/reg/data/ana14")
+
+    if args.active:
+        gen = active_experiments()
+        dirs_to_check = all_dirs
+    elif args.allage > 0:
+        gen = all_experiments(args.allage)
+        dirs_to_check = ('res', 'ftc', 'scratch', 'calib')
+    elif args.sel_exper:
+        gen = single_experiment(args.sel_exper)
+        dirs_to_check = ('xtc', 'hdf5', 'usr', 'res', 'ftc', 'scratch', 'calib')
+    else:
+        logging.error("No experiment option selected (--allage, --active or <expname>)")
+        return 1
+
+    if args.dirs:
+        dirs_to_check = tuple( (d for d in args.dirs.split(',') if d in all_dirs) )
+
+    nexp, nmissing, nset = 0,0,0
+    for expname, instr in gen:
+        logging.debug("Exp %s %s link %s", expname, instr, args.dolink)
+
+        nexp += 1
+        if len(expname) != 8:
+            logging.warning("Wrong detector name %s %s", expname, instr)
+            continue
+
+        # select experiment
+        if args.sel_exper and expname not in args.sel_exper:
+            continue
+
+        exppath = "/reg/d/psdm/%s/%s/" % (instr, expname)
+        missing_dirs = []
+        for dt in dirs_to_check:
+            if not args.dolink or  not os.path.exists(exppath + dt):
+                missing_dirs.append(dt)
+
+        if missing_dirs:
+            logging.warn("- %s %s missing dirs: %s", instr, exppath, " ".join(missing_dirs))
+            nmissing += 1
+
+        if missing_dirs:
+            nset += 1
+            exper = experiment.Experiment(name=expname)
+            exper.scratchpath = args.scratchpath 
+            if args.datapath:
+                exper.datapath = args.datapath
+            logging.debug(" ana dir: %s %s", exper.datapath, exper.scratchpath)
+            if args.mkdir:
+                exper_folders.check_all_destpath(exper, missing_dirs, args.dolink)
+    
+        
+    date = datetime.datetime.now()
+    logging.info("Experiments found: %d with missing dirs: %d nset: %d date %s", 
+                 nexp, nmissing, nset, date.strftime("%Y%m%d %H:%M:%S")) 
+
+
+if __name__ == "__main__":
+    
+    main()

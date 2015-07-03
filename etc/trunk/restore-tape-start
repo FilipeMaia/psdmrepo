@@ -3,6 +3,7 @@
 #  Start the queue that submits requests to create missing index files.
 #
 
-. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/restore
+#. /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/releases/restore
+. /reg/g/psdm/bin/sit_setup.sh dm-current
 
-exec simple_cron
+exec dmt-cron

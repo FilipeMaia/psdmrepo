@@ -1,0 +1,50 @@
+#!/bin/bash 
+
+
+##doc
+#  remove a file from a dss node
+#  Check file size
+#
+#  usage: rm_from_dss.sh fpath size [src-host]
+##end
+
+fname=${1:?}
+size=${2:?}
+srchost=$3
+
+lhost=$(hostname)
+
+# check if srchost is different from local host
+if [ "$srchost" ] ; then
+    if [ "${lhost%%.*}" = "${srchost%%.*}" ] ; then
+        echo "rm running on localhost"
+        exit 1
+    fi
+fi
+
+# check if size is digit
+case $size in
+    *[!0-9]*|"") echo "size paramter is non digit"
+        exit 5 ;;
+esac
+
+[ ! -e $fname ] && echo "File does not exist $fname" && exit 2
+
+lsize=$(stat --format %s $fname)
+if [ $? -ne 0 ] ; then
+    echo "stat failed $fname"
+    exit 1
+fi
+
+if [ ${lsize:--1} -eq ${size:--2} ] ; then
+    if rm $fname ; then
+        echo "rm $fname on $lhost"
+        exit 0
+    else
+        echo "rm-failed $fname" 
+        exit 4
+    fi
+else
+    echo "file size mismatch $lsize $size $fname"
+    exit 3
+fi

@@ -1,0 +1,95 @@
+#!/bin/bash 
+
+##doc
+# Start ffb datamover on the ffb nodes. 
+#
+# An ffb node will copy the data from it's corresponding dss node and 
+# the dss name is extracted from the ffb name. The dss name is needed 
+# to for the mover to select the proper files from the DB. 
+#
+# Each ffb nodes might run two movers.
+##end
+
+function err_exit() {
+    exit_rc=$1
+    shift 1
+    echo $*
+    exit ${exit_rc}
+}
+
+function debug() {
+    if [ ${DEBUG} -eq 1 ] ; then
+        echo $*
+    fi
+}
+
+
+function set_DSS_HOST_from_ffb() {
+    # from the ffb name extract the corresponding dss name:
+    # psana<INSTR>ffbNN -> daq-<INSTR>-dssNN where <INSTR> 
+    # is the three letter instrument name
+    
+    ffbname=$(hostname)
+    id=${ffbname:(-2)}
+    nchars=$(echo ${id} | sed -e 's/[0-9]*//')
+    if [[ ! -z "${nchars}" ]] ; then
+        echo "host number is not a digit ${nchars} ${ffbname}"
+    else
+        instr=${ffbname:5:3}
+        for knowninstr in amo xcs sxr cxi xpp mec ; do
+            if [ "${instr}" = ${knowninstr} ] ; then
+                DSS_HOST=daq-${instr}-dss${id}
+                return 0
+            fi
+        done
+    fi
+    err_exit 1 "could not find dss host for ${ffbname}"
+}
+
+
+TEST=""
+DEBUG=0
+while getopts :Td OPT; do
+    case $OPT in
+        T|+T) TEST=echo ;;
+        d|+d) DEBUG=1 ;;
+        *) echo "usage: ${0##*/} [+-T} [--] ARGS..."
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+# make sure the right environment is used
+. /reg/g/psdm/bin/sit_setup.sh current
+
+# --------------------------------------
+#  options 
+
+# release dir
+cd $(dirname $0)
+reldir=$(pwd)
+
+cmd=${reldir}/mv2offline-ffb.py
+cmd_opts="-v --rm"
+
+#PROCSERV="/reg/g/pcds/package/procServ-2.4.0/procServ --allow --noautorestart --ignore ^D^C"
+PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --allow --holdoff 60 --ignore ^D^C"
+
+logdir=/u1/psdm/mvr/log
+cd ${logdir}
+
+port=30000
+
+set_DSS_HOST_from_ffb
+echo ${port} ${DSS_HOST}
+
+logfile=$logdir/mv2offline.${DSS_HOST}
+if [[ -e ${logfile} ]] && [[ "${TEST}" = "" ]]; then
+    mv_name=${logfile}.$(date +%Y%m%dT%H%M%S)
+    echo ${logfile} ${mv_name}
+    mv ${logfile} ${mv_name}
+fi
+
+extra_opts="--logfile ${logfile} --name $(basename ${logfile}) ${port}" 
+$TEST $PROCSERV ${extra_opts} ${cmd} --host ${DSS_HOST} ${cmd_opts} 

@@ -1,0 +1,20 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psddl_pyana
+#------------------------------------------------------------------------
+
+Package author: Joseph S. Barrera
+
+Brief description:
+==================
+
+Source and header files generated from psddldata for psana Python support.
+
+Detailed description:
+=====================
+
+More detailed info goes here. Describe main classes/applications built in
+this package. Give few examples of their use.

@@ -1,0 +1,35 @@
+# RULES:
+# Lines starting with # in the beginning of the file are considered as comments or pseudo-comments for metadata
+# Lines without # with space-separated values are used for input of parameters
+# Empty lines are ignored
+# REF: https://confluence.slac.stanford.edu/display/PCDS/pnCCD+processing+pipeline#pnCCDprocessingpipeline-CalibrationofpnCCD
+ 
+# Optional fields:
+# TITLE      This is a file with pedestals
+# DATE_TIME  2014-01-30 10:21:23
+# AUTHOR     someone
+# EXPERIMENT amotut13
+# DETECTOR   Camp.0:pnCCD.1
+# CALIB_TYPE pedestals
+ 
+# Mandatory fields to define the ndarray<TYPE,NDIM> and its shape as unsigned shape[NDIM] = {DIM:1,DIM:2,DIM:3}
+# DTYPE       float
+# NDIM        3
+# DIM:0       3
+# DIM:1       4
+# DIM:2       8
+ 
+21757   21769   33464   10769   68489   68561   77637   54810
+21758   21773   33430   10628   68349   68345   77454   54729
+21678   21820   33054   10637   68310   68254   77976   54617
+21730   21755   33193   10904   68570   68456   77425   54648
+ 		
+33110   10457   68275   68299   56732   79628   21754   21558
+33329   10446   68158   68183   56949   79783   21811   21779
+33141   10369   68476   68506   57121   79700   21858   21839
+33098   10477   68452   68416   56923   79666   21681   21761
+  
+   51      18     -28      18      71     -20     -15     -54
+  178      61     257     247     161     231     111     106 
+    1     -40     104     -24       9     -82      23       6 
+  102      40     272     270     194     246      60     118

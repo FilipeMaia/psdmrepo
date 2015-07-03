@@ -1,0 +1,120 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script tcdpe...
+#
+#------------------------------------------------------------------------
+
+"""This script starts stand alone version of the MaskEditor.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+#import time
+
+import matplotlib
+matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+
+from CorAna.MaskEditor import MaskEditor
+from optparse import OptionParser
+from PyQt4 import QtGui, QtCore
+
+#------------------------------
+
+def input_options_parser() :
+
+    ifname_def	 = './roi-img'
+    mfname_def	 = './roi-mask'
+    ofname_def	 = './fig.png'
+    title_def	 = 'Mask editor'
+    xc_def	 = None       
+    yc_def	 = None       
+    picker_def	 = 8          
+    lw_def	 = 1         
+    col_def	 = 'b'        
+    verb_def  	 = True       
+    fexmod_def	 = False
+
+    parser = OptionParser(description='Optional input parameters.', usage ='usage: %prog [options] args')
+    parser.add_option('-i', '--ifname', dest='ifname', default=ifname_def, action='store', type='string', help='input image file name, default = %s' % ifname_def)
+    parser.add_option('-m', '--mfname', dest='mfname', default=mfname_def, action='store', type='string', help='common path to I/O files with mask, default = %s' % mfname_def)
+    parser.add_option('-o', '--ofname', dest='ofname', default=ofname_def, action='store', type='string', help='output png file name for current canvas, default = %s' % ofname_def)
+    parser.add_option('-t', '--title',  dest='title',  default=title_def,  action='store', type='string', help='initial title of the garphical window, default = %s' % title_def)
+    parser.add_option('-x', '--xc',     dest='xc',     default=xc_def,     action='store', type='float',  help='x coordinate of the center for Wedges, default = %s' % str(xc_def))
+    parser.add_option('-y', '--yc',     dest='yc',     default=yc_def,     action='store', type='float',  help='y coordinate of the center for Wedges, default = %s' % str(yc_def))
+    parser.add_option('-p', '--picker', dest='picker', default=picker_def, action='store', type='int',    help='distance in pix, where object responce on mouse, default = %d' % picker_def)
+    parser.add_option('-w', '--lw',     dest='lw',     default=lw_def,     action='store', type='int',    help='object line width, default = %d' % lw_def)
+    parser.add_option('-c', '--color',  dest='col',    default=col_def,    action='store', type='string', help='color of the form lines "b"-blue, "k"-black, etc., default = %s' % col_def)
+    parser.add_option('-v', '--verbose',dest='verb',   default=verb_def,   action='store_true',           help='allows print on console, default = %s' % str(verb_def))
+    parser.add_option('-q', '--quiet',  dest='verb',                       action='store_false',          help='supress print on console, default = %s' % str(not verb_def))
+    parser.add_option('-f', '--fexmod', dest='fexmod', default=fexmod_def, action='store_true',           help='file exchange mode on/off (True/False), default = %s' % fexmod_def)
+
+    (opts, args) = parser.parse_args()
+    return (opts, args)
+ 
+#---------------------------------
+#
+# run application when launched as a main module
+#
+
+if __name__ == "__main__" :
+
+    (opts, args) = input_options_parser()
+    #print 'opts:\n', opts
+    #print 'args:\n', args
+
+    if opts.xc==None or opts.yc==None : xyc=None
+    else                              : xyc=(opts.xc,opts.yc)
+
+    pars = {'parent' : None, 
+            'arr'    : None, 
+            'xyc'    : xyc,
+            'ifname' : opts.ifname, 
+            'ofname' : opts.ofname, 
+            'mfname' : opts.mfname,
+            'fexmod' : opts.fexmod,
+            'title'  : opts.title, 
+            'lw'     : opts.lw, 
+            'col'    : opts.col,
+            'picker' : opts.picker,
+            'verb'   : opts.verb,
+            'ccd_rot': None, 
+            'updown' : False}
+
+    print 'Start MaskEditor with input parameters:'
+    for k,v in pars.items():
+	print '%9s : %s' % (k,v)
+
+    app = QtGui.QApplication(sys.argv)
+    w = MaskEditor(**pars)
+    w.move(QtCore.QPoint(300,10))
+    w.show()
+    app.exec_()
+    sys.exit('End of application maskeditor')
+
+#---------------------------------

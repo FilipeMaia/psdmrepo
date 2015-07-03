@@ -1,0 +1,66 @@
+#!/usr/bin/env python 
+
+import os
+import sys
+import argparse
+
+from DmMover.transmd5 import comp_bbcp_checksum
+
+
+usage = """
+Compare the checksums on ANA and FFB using the bbcp created checksum files. 
+"""
+epilog=""" 
+Example:
+    %(prog)s --quiet /reg/d/ffb/xpp/xppa1213/xtc/e*xtc 
+
+The checksums of the files on ffb and ana are read from the bbcp-checksum files. 
+An error is reported if the two checksums or the file sizes (files are stat'ed)
+show a mismatch. With the --disk option the files specified on the cmdline are 
+checksummed (md5sum) and the value is comapred agsainst the one from the 
+bbcp-checksum.
+"""
+
+#
+#  lfn = 
+#  cfn = /reg/d/psdm/<instr>/....  
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=epilog)
+    
+    parser.add_argument("--quiet", action="store_true", help="Quiet, only print final stats")
+    parser.add_argument("--disk", action="store_true", 
+                        help="checksum the files from the cmdline and compare")
+    parser.add_argument("fnames", nargs='+', help="xtc file names either on ffb or ana")
+    
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+    
+    prlen = len("/reg/d/psdm")
+    n_good, n_bad = 0,0
+    experiments = set()
+    for pfn in args.fnames:
+        ptoken = [x for x in pfn.split('/') if x]
+        exp = ptoken[4]
+        if not exp in experiments:
+            experiments.add(exp)
+        prefix = os.path.join("/", *ptoken[:3]) if args.disk else None
+        # lfn: /<instr>/<exp>/xtc/... 
+        lfn = os.path.join("/", *ptoken[3:])
+        stat = comp_bbcp_checksum(lfn, args.quiet, pfn_prefix=prefix)
+        if stat:
+            n_good += 1
+        else:
+            n_bad += 1
+            print "ERROR:", pfn
+
+    print "Result Good:", n_good, "Bad:", n_bad, experiments
+
+
+if __name__ == "__main__":
+
+    main()

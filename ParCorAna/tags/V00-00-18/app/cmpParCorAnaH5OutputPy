@@ -1,0 +1,130 @@
+#!@PYTHON@
+
+import sys
+import argparse
+import numpy as np
+import h5py
+import ParCorAna as corAna
+
+def partitionSets(A,B):
+  both = set(A).intersection(set(B))
+  onlyA = set(A).difference(both)
+  onlyB = set(B).difference(both)
+  return onlyA, both, onlyB
+
+def diffDatasets(hdr, dA, dB, verbose):
+  failures = 0
+  if dA.name == '/system/system_params/h5output':
+    return failures
+
+  if dA.name == '/system/system_params/numServers':
+    return failures
+
+  if verbose: sys.stdout.write("%s: diffDatasets %s\n" % \
+                               (hdr,dA.name))
+  if dA.shape != dB.shape:
+    sys.stderr.write('%s: dset=%s shapes differ:\n  dA=%s\n  dB=%s\n' % \
+                     (hdr, dA.name, dA.shape, dB.shape))
+    failures +=1
+    return failures
+
+  if len(dA.shape) == 0:
+    valA = dA.value
+    valB = dB.value
+    if valA != valB:
+      sys.stderr.write('%s: dset=%s values differ:\n  dA=%s\n  dB=%s\n' % \
+                       (hdr, dA.name, valA, valB))
+      failures +=1
+    return failures
+
+  absDiff = np.abs(dA[:].flatten() - dB[:].flatten())
+  norm = dA[:].flatten()
+  norm = np.maximum(dB[:].flatten(), norm)
+  norm = np.maximum(1e-5, norm)
+  peDiff = absDiff / norm
+  oneTenthPercent = .001
+  inds = np.where(peDiff > oneTenthPercent)[0]
+  if len(inds) > 0:
+    firstInd = inds[0]
+    valA = dA[:].flatten()[inds]
+    valB = dB[:].flatten()[inds]
+    sys.stderr.write('%s: dset=%s %d values differ. First flat index=%s. First values:\n  A=%s\n  B=%s\n' % \
+                     (hdr, dA.name, len(inds), firstInd, valA[0], valB[0]))
+    failures +=1
+
+  return failures
+
+def diffGroups(grA, grB, verbose):
+  keysA = grA.keys()
+  keysB = grB.keys()
+  onlyA, both, onlyB = partitionSets(keysA, keysB)
+
+  failures = 0
+  if len(onlyA)>0 and not (grA.name=='/' and grB.name=='/' and len(onlyA)==1 and list(onlyA)[0]=='test'):
+    sys.stderr.write("comparing groups: A=%s vs B=%s there are %d keys in A but NOT B. first few are: %s\n" % \
+                     (grA.name, grB.name, len(onlyA), list(onlyA)[0:5]))
+    failures += 1
+
+  if len(onlyB)>0 and not (grA.name=='/' and grB.name=='/' and len(onlyB)==1 and list(onlyB)[0]=='test'):
+    sys.stderr.write("comparing groups: A=%s vs B=%s there are %d keys in B but NOT A. first few are: %s\n" % \
+                     (grA.name, grB.name, len(onlyB), list(onlyB)[0:5]))
+    failures += 1
+
+  hdr = grA.name
+  if hdr != grB.name:
+    hdr = hdr + ' vs %s' % grB.name
+
+  for nm in list(both):
+    if verbose: sys.stdout.write("Comparing object=%s in %s\n" % (nm,hdr))
+    classA = grA.get(nm, getclass=True)
+    classB = grB.get(nm, getclass=True)
+    if classA != classB:
+      sys.stderr.write("comparing %s, child object=%s has different classes. A=%s B=%s\n" % \
+                       (hdr, nm, classA, classB))
+      failures += 1
+      continue
+    if classA == h5py.Group:
+      failures += diffGroups(grA[nm],grB[nm], verbose)
+    elif classA == h5py.Dataset:
+      failures += diffDatasets(hdr, grA[nm],grB[nm],verbose)
+    else:
+      sys.stderr.write("comparing %s, but child object %s is unknown class=%r\n" % \
+                       (hdr, nm, classA))
+      failures += 1
+
+  return failures
+      
+      
+                                          
+def cmpH5Files(fileA, fileB, verbose):
+  if verbose:
+    print "comparing:\nA: %s\nB: %s" % (fileA, fileB)
+  h5A = h5py.File(fileA,'r')
+  h5B = h5py.File(fileB,'r')
+  rootA = h5A['/']
+  rootB = h5B['/']
+  failures = diffGroups(rootA, rootB, verbose)
+  return failures
+
+programDescription = '''
+compares two .h5 files
+'''
+
+programDescriptionEpilog = '''
+'''
+
+
+if __name__ == '__main__':
+  parser = argparse.ArgumentParser(description=programDescription, 
+                                   epilog=programDescriptionEpilog,
+                                   formatter_class=argparse.RawDescriptionHelpFormatter)
+  parser.add_argument('-v', '--verbose', action='store_true', help="verbose walk through files", default=False)
+  parser.add_argument('fileA', help='file A')
+  parser.add_argument('fileB', help='file B')
+  
+  args = parser.parse_args()
+
+  fileA = args.fileA
+  fileB = args.fileB
+  verbose = args.verbose
+  sys.exit(cmpH5Files(fileA,fileB,verbose))

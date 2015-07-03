@@ -1,0 +1,485 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package LogBook
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V01-00-06
+2015-06-15 Mikhail Dubrovin
+- LogBookGrabber_qt - is added to this package, add files:
+	app/LogBookGrabber_qt
+	src/LogBookWebService.py
+	doc/README-LogBookGrabber_qt
+- in LogBookGrabber_qt - add features requested by Silke (PSAS-70)
+
+Tag: V01-00-05
+2015-04-16 Igor Gaponenko
+- finalized DAQ detectors migration (PSDH-25, PSWA-37)
+- extended the new message posting service to allow posting a vopy of
+a message into a special SDS ("Sample Delivery System" e-log (PSWA-46)
+
+Tag: V01-00-04
+2015-03-10 Igor Gaponenko
+- added support for new class of run attributes 'DAQ Detetector Status',
+migration of the 'DAQ_Detectors' class to 'DAQ Detectors' (PSWA-37)
+
+Tag: V01-00-03
+2014-12-08 Igor Gaponenko
+- server-side implementation for e-Log message forwarding
+as per JIRA PSWA-19
+
+Tag: V01-00-02
+2014-11-03 Igor Gaponenko
+- minor fix in the URL for e-log notifications
+
+Tag: V01-00-01
+2014-10-10 Igor Gaponenko
+- added Web services run_begin and run_end as per JIRA ticket PSWA-5
+- made required modificatons to the PHP classes
+- extended Web service message_new to support posting a copy of a message into
+an instrument e-log if requested by a client.The feature is now enabled in the
+Web UI
+
+Tag: V01-00-00
+2014-04-30 Igor Gaponenko
+- major package cleanup: removed the old LogBook Web application
+- major refactoring and renaming of the Web services to the new PHP framework
+
+Tag: V00-03-18
+2014-03-17 Igor Gaponenko
+- migrated to the new framework and extended the functionality of the Web service: RequestAllRuns.php
+
+Tag: V00-03-17
+2014-03-02 Igor Gaponenko
+- saving results of the on-going modifications
+
+Tag: V00-03-16
+2014-01-31 Igor Gaponenko
+- finishied the first implementation of the new Web Portal
+
+Tag: V00-03-15
+2013-12-19 Igor Gaponenko
+- extended database schema to support run tables
+- extended the PHP API to allow storing/fetching run tables
+
+Tag: V00-03-14
+2013-12-13 Igor Gaponenko
+- more modifications required by the Web Portal refactoring
+
+Tag: V00-03-13
+2013-11-15 Igor Gaponenko
+- extensions required for the new Web Portal
+
+Tag: V00-03-12
+2013-11-01 Igor Gaponenko
+- fixed a few minor bugs
+- added support for run tables
+
+Tag: V00-03-11
+2013-10-11 Igor Gaponenko
+- added support for modifying values of run attributes
+- added support for the navigation betwean different contexts in Web Portal for messages and runs
+
+Tag: V00-03-10
+2013-08-08 Igor Gaponenko
+- added support for the naviagtion by message identifiers
+
+Tag: V00-03-09
+2013-07-21 Andy Salnikov
+- update LogBookTestApp for changes in CmdLine interfaces
+
+Tag: V00-03-08
+2013-05-21 Igor Gaponenko
+- added updated schema file to support the 'EPICS' run type
+- updated C++ API and the test application accordingly
+
+Tag: V00-03-07
+2013-03-21 Igor Gaponenko
+- added updated schema file
+
+Tag: V00-03-06
+2013-03-20 Igor Gaponenko
+- upgraded database schema for runs to allow one more run type 'TEST'
+- made proper changes to the C++ API and to the test application
+
+Tag: V00-03-05
+2013-02-12 Igor Gaponenko
+- improved version of the Python module for posting messages to allow this
+operation on behalf of the current user w/o explicit exchance of credentials.
+
+Tag: V00-03-04
+2013-01-28 Igor Gaponenko
+- fixed 2 bugs left after prior migration of Web services location (from html/ to html/ws/)
+
+Tag: V00-03-03
+2012-12-10 Igor Gaponenko
+- support mobile DAQ
+- migrated ws/NewFFEntry4posterJSON to the new PHP framework
+
+Tag: V00-03-02
+2012-11-08 Igor Gaponenko
+- extended C++ API to support multiple DAQ 'stations' per instrument
+
+Tag: V00-03-01
+2012-10-11 Igor Gaponenko
+- improved implementatin for the num_runs(() method of the Experiment class
+- added a Web service to report the last run of an experiment
+- minor improvements in the ExperimentsByLastRun.php script
+
+Tag: V00-03-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-02-15
+2012-07-14  Andy Salnikov
+- rhel6/gcc44 migration, added missing headers
+
+Tag: V00-02-14
+2012-07-08
+- extended the open file reporting interface (for DAQ) by an optional
+parameter to report a scope of the report. This is meant to support
+a non-production stream of data of the Fast Feed Back monitoring system.
+
+Tag: V00-02-13
+2012-05-21
+- attaching/dettaching messages to/from runs
+
+Tag: V00-02-12
+2012-04-06
+- added Python module message_poster.py for posting messages into e-log
+- added a Web service for searching messages within an instrument: SearchInInstrument.php
+- improved version of LogBookGrabber4current4run4replyTagsJSON_RHEL6.py
+
+Tag: V00-02-11
+2012-02-19
+- added another version of the Grabber supporting user-selected tag:
+LogBookGrabber4current4run4replyTagsJSON_RHEL6.py
+
+Tag: V00-02-10
+2012-02-16
+- a minor bug fix in the new Grabber
+- added a version of the message search service which would also include
+child messages (NOTE: the previous version is preserved under the following
+name: Search_NO_SEARCH_IN_CHILDREN.php).
+
+Tag: V00-02-09
+2012-02-16
+- improved version of the Grabber & Poster now using JSON service when posting new
+messages. The service would return a status code and an id of a new message created.
+Removed older version of tools from the repository.
+
+Tag: V00-02-08
+2012-02-15
+- added updated implementations of the Grabber (LogBookGrabber4current4run4reply_RHEL6.py)
+and Poster (LogBookPost_RHEL6.py) which work accross all version of Python,
+including 2.4, 2.5, 2.6 and 2.7 (not tested).
+Note, that this required a non-standard package availble from:
+http://atlee.ca/software/poster/index.html
+See more information on it from:
+http://stackoverflow.com/questions/680305/using-multipartposthandler-to-post-form-data-with-python
+- fixed bugs, added a new method runs_intersecting_interval in class LogBookExperiment
+
+Tag: V00-02-07
+2012-02-14
+- added an application (app/LogBookPost.py) for posting e-log entries from
+the command line
+- extended run parameters to show a list of detectors activated during a run
+
+Tag: V00-02-06
+2011-11-17
+- migrated to the NetBeans IDE
+
+Tag: V00-02-05
+2011-11-01
+- extended MySQL schema to support run attributes
+- extended C++ API to support run attributes
+
+Tag: V00-02-04
+2011-10-28
+- extended C++ API method LogBook::Connection::reportOpenFile() to report
+the host name and the local directory path name for files created by DAQ.
+- made proper adjustments to teh test application LogBookTestApp
+
+Tag: V00-02-03
+2011-10-28 
+- fixed a bug in PHP class method LogBook::instance()
+
+Tag: V00-02-02
+2011-10-24 Andy Salnikov
+- removed include Lusi/Lusi.h from test app too
+
+Tag: V00-02-01
+2011-10-24 Andy Salnikov
+- removed include Lusi/Lusi.h, no use for it any more
+
+Tag: 00-02-00
+2011-09-20 Igor Gaponenko
+- added support for deleting messages. Note, that MySQL schema had to be extended.
+See details in the new schema file. The previous implementations of e-log won't work
+with the new schema.
+
+
+Tag: 00-01-28
+2011-09-06 Igor Gaponenko
+- added static function LogBook::instance()
+
+Tag: 00-01-27
+2011-08-11 Igor Gaponenko
+- fixed the Grabber to allow run, message id and snappshot description
+fields at all times, not just after a snapshot has been taken.
+
+Tag: 00-01-26
+2011-08-05 Igor Gaponenko
+- added new service for Grabber: RequestExperimentsNew.php
+- fixed an ordering bug in an SQL query for entries
+- fixed a bug in the e-log utilities class
+
+Tag: 00-01-25
+2011-07-12 Igor Gaponenko
+- code refactoring in services to use logbookutil for common operations
+- added Web service for the Grabber to post new messages/replies
+- new version of the Grabber with the following improvements: proper error handling
+for errors reported by services, replyiing to messages, memory clean up after
+displaying an image preview and enabling the message text input before grabbing
+an image
+
+Tag: 00-01-24
+2011-07-07 Igor Gaponenko
+- updated version of e-log "Grabber" to allow posting messages for runs
+- improved version of the message creation services to allow posting for a run number (not just of run id)
+- added a service to extend existing messages by adding more tags and/or attachments
+
+Tag: 00-01-23
+2011-06-30 Igor Gaponenko
+- improvements needed for the new version of Portal
+
+Tag: 00-01-22
+2011-06-14 Igor Gaponenko
+- added a new service for posting messages from JQUery AJAX Form
+plug-in w/o refreshing the page. The new service will return a JSON
+object representing a mewely posted entry.
+
+Tag: 00-01-21
+2011-06-10 Igor Gaponenko
+- committing changes required by the first production version of Portal
+
+Tag: 00-01-20
+2011-05-13 Igor Gaponenko
+- extended parameters returned by the message search script Search
+- added more run finder methods to the Experiment's API
+
+2011-04-08 Igor Gaponenko
+- save results of the on-going development
+
+Tag: 00-01-19
+2011-02-25 Igor Gaponenko
+- added RequestCurrentExperiment.php to support new version of Grabber
+- added services for Portal
+- code refactoring and other improvements
+- bug fixes
+
+Tag: 00-01-18
+- extended C++ API to allow fetching the current experiment info
+for instruments
+
+Tag: 00-01-17
+2010-08-12 Igor Gaponenko
+- increased file limit for uploads from 10 MB to 25 MB
+- relying on Apache Rewrite module for downloading/previewing
+attachments (use more generic logbook/attachments/<id>/<file>
+instead of ShowAttachment.php?id=<id>
+
+
+Tag: 00-01-16
+2010-07-28 Igor Gaponenko
+- refactoring in the search operation (to clean up the code and prepare for further
+improvements)
+- removed previously introduced debug printouts (into a temporary file)
+
+Tag: 00-01-15
+2010-07-16 Igor Gaponenko
+- case insensitive search in the "Find" operation
+- added 2 more Run Parameters for AMO
+- automatically inject begin/end run messages for the live list of messages
+
+Tag: V00-01-14
+2010-06-29 Igor Gaponenko
+- inject run records into list of messages reported by the Web application
+- updated implementation of the Grabber
+- updated Eclipse project files
+
+Tag: V00-01-11
+2010-01-04 Igor Gaponenko
+- fixed bugs in the PHP API implementation
+- extended 'service-type' interface in the web/dynamic/index.php
+- experiment lookup by a pair of names (instrument,experiment)
+
+Tag: V00-01-10
+2009-11-18 Igor Gaponenko
+- optimized query in Search.php and Web GUI to display last 25 messages in the experiment
+Summary page.
+- implemented experiment-specific Run parameters.
+- minor changes and bug fixes in the in the list of common run parameters
+- changes in the New Message & Reply to Message forms generators to make things
+compatible with the RHEL5 standard PHP 5.1.6.
+
+Tag: V00-01-09
+2009-11-13 Igor Gaponenko
+- fixed a a bug in the LogBookExperiment::find_last_shift() method which wasn't usinng
+an experiment identifier to narrow down the begin time.
+- fixed a bug in the file descriptions list of the GUI apps when replying to a message
+(a s a result it was one less attachment posted)
+- move divs for message tags and file descriptions close to the definition of the forms
+in both New MEssage and message Reply dialogs to deal with the out-of-box PHP 5.1.6 issue.
+- cleaned up the code of the GUI app
+
+Tag: V00-01-08
+2009-11-09 Igor Gaponenko
+- implemented e-mail notifications for subscribed users
+- extended the MySQL schema (the WrokBench hasn't been updated yet!)
+
+Tag: V00-01-07
+2009-10-28 Igor Gaponenko
+- the first real implementation of the Run Summary page to display parameter values
+from the database.
+
+Tag: V00-01-06
+2009-10-27 Igor Gaponenko
+- reimplemented the PHP connection class to use persistent MySQL connections
+- added a support for locations & facilities (as alternatives for instruments
+and experiments)
+- implemented the first version of the message viewer for indiovidual messages
+(no support for the Prev/Next messages yet)
+- implemented 'persistent' links for individual messages. That would allow users
+to embed direct links to the LogBook messages from other documents
+
+Tag: V00-01-05
+2009-10-15 Igor Gaponenko
+- added an initial support for 'location' and 'facilities'
+
+Tag: V00-01-04
+2009-10-12 Igor Gaponenko
+- added 'logout' to the Web app interface. It works only for WebAuth.
+
+Tag: V00-01-03
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+
+Tag: V00-01-02
+2009-09-28 Igor Gaponenko
+- the second stable version of the C++ API. Added support for registering
+files for OFFLINE processing. Split database contexts in the API. Fixed bugs.
+
+Tag: V00-01-01
+2009-09-13 Igor Gaponenko
+- added the first version of the C++ API
+- increased a limit of the downloaded attachments from 1 MB to 10 MB.
+- extended the schema by adding the 'type' column to the 'run' table
+in the same way it's done in SciMD database (see the patch file:
+doc/LogBook_schema_v1_patched.sql)
+
+Tag: V00-01-00
+2009-09-02 Igor Gaponenko
+- added the fine-grain authorization protection layer into the web
+application (both UI and PHP backend)
+- fixed bugs.
+
+Tag: V00-00-17
+2009-08-28 Igor Gaponenko
+- implemented the read-only version of the LogBook application
+- reinforced all PHP scripts modifying the database to work within
+and authenticated context only
+- implemented a display for message subthreads
+- implemented 'Reply', 'Edit' and 'Delete' operations for messages
+(including subthreads)
+- bug fixes
+- added 'Goals' for the shifts (requested when begining a new shift
+and displayed at the 'Shift Status')
+- a number of visualization imprivements in the mesage viwere of
+the LogBook UI: 'First' and 'Last' pages, 'tags' and 'replies' signs.
+- added 'Print' button to the LogBook screen 'Grabber'
+
+Tag: V00-00-16
+2009-08-22 Igor Gaponenko
+- reorganized message action controls
+- implemented message Delete and Edit dialogs
+
+Tag: V00-00-15
+2009-08-20 Igor Gaponenko
+- minor fixes and improvements. This is the first production version deploed.
+
+Tag: V00-00-14
+2009-08-18 Igor Gaponenko
+- minor bug fixes in the LogBook app
+- require the Web service URI in the LogBook "grabber" script
+
+Tag: V00-00-13
+2009-08-11 Igor Gaponenko
+- implemented posting replies to messages. Not complete implementation though.
+- refactored the application configuration
+- fixed bugs
+- creaned markup
+
+Tag: V00-00-12
+2009-08-07 Igor Gaponenko
+- implemented the screen "graber" client (an X11 Python/Tk application) 
+
+Tag: V00-00-11
+2009-08-02 Igor Gaponenko
+- refactored message display in Web application to fix bugs and get rid of memory leaks
+- fully implemented "auto-refresh" mode in Web app
+
+Tag: V00-00-10
+2009-07-31 Igor Gaponenko
+- improved style of the Web application
+- improved functionality of 'Search'
+- added tests of the FPDF PHP library (the library itself is also included
+into the tag)
+
+Tag: V00-00-09
+2009-07-26 Igor Gaponenko
+- implemented the paginator in 'Search'
+- got rid of the 'compact' presentation in 'Search'
+- reduced form in 'Search'
+- added CSS not to display underlines in hyper links
+- added a utility function (Utilities.js) to locate HTML elements by class name
+
+Tag: V00-00-08
+2009-07-21 Igor Gaponenko
+- fully implemented the search (except the paginator in the 'detailed' mode)
+- refactored the main page to get rid of duplications in its code
+- fixed bugs
+
+Tag: V00-00-07
+2009-07-18 Igor Gaponenko
+- the first complete implementation of the LogBook Web application. Some
+minor features are still missing though.
+
+Tag: V00-00-05
+- re-organized the source code before starting to work on a "dynamic"
+version of the application.
+
+Tag: V00-00-04
+2009-06-10 Andy Salnikov
+- adding SConscript file
+
+Tag: V00-00-03
+2009-06-10 Igor Gaponenko
+- extend schema and PHP implementation to allow shift crew members
+in addition to the shift leader. Implement HTML tests.
+
+Tag: V00-00-02
+2009-06-09 Igor Gaponenko
+- first implementation
+
+Tag: V00-00-01
+2009-05-19 Igor Gaponenko
+- initial version of the package

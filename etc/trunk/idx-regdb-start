@@ -5,7 +5,7 @@
 
 . /reg/g/psdm/bin/sit_setup.sh dm-current
 
-which idx_failed_regdb
-echo "Start idx_failed_regdb $@" 
+which idx-failed-regdb
+echo "Start idx-failed-regdb $@" 
 
-exec idx_failed_regdb "$@"
+exec idx-failed-regdb "$@"
