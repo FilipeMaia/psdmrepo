@@ -2,7 +2,7 @@
 import time
 from psana import *
 from psmon import publish
-from psmon.util import ImageHelper, MultiImageHelper, XYPlotHelper, HistHelper, HistOverlayHelper
+from psmon.helper import ImageHelper, MultiImageHelper, XYPlotHelper, HistHelper, HistOverlayHelper
 
 
 def main():
