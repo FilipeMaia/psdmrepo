@@ -155,7 +155,12 @@ public:
 
   /**
    *  @brief Fills-in the map of perfect segment coordinates, defined through the chip geometry.
-   *  @param[in] use_wide_pix_center Optional parameter can be used if the wide-pixel row coordinate is prefered to be in the raw center.
+   *  @param[in] rows - number of rows
+   *  @param[in] cols - number of columns
+   *  @param[in] pix_size_rows - pixel size in rows in micrometers [um] 
+   *  @param[in] pix_size_cols - pixel size in columns in micrometers [um] 
+   *  @param[in] pix_size_depth - pixel size in depth in micrometers [um] 
+   *  @param[in] pix_scale_size - pixel size parameter taken as a 2-d image grid parameter
    */
   SegGeometryMatrixV1 ( const size_t& rows = 512
 		      , const size_t& cols = 512

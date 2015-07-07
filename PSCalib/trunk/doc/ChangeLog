@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-45
+2015-07-07 Mikhail S. Dubrovin	
+- SegGeometryMatrixV1.h, GeometryAccess.h, CalibParsStore.h - fix doxygen documentation for parameter description.
+
 Tag: V00-02-44
 2015-05-22 Mikhail S. Dubrovin	
 - CalibPars - add virtual method status. (for PSAS-139)

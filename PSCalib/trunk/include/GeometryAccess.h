@@ -196,6 +196,7 @@ public:
    *  @param[in]  oname - object name
    *  @param[in]  oindex - object index
    *  @param[in]  do_tilt - on/off tilt angle correction
+   *  @param[in]  do_eval - update all evaluated arrays
    */
   void  get_pixel_coords(const double*& X, 
                          const double*& Y, 

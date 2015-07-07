@@ -120,7 +120,7 @@ public:
    *  
    *  @param[in] calibdir       Calibration directory for current experiment.
    *  @param[in] group          Data type and group names.
-   *  @param[in] src            The data source name, ex.: Camp.0:pnCCD.0
+   *  @param[in] str_src        The data source name, ex.: Camp.0:pnCCD.0
    *  @param[in] runnum         Run number to search the valid file name.
    *  @param[in] print_bits     Print control bit-word.
    */ 
