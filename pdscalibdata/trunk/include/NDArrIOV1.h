@@ -185,18 +185,18 @@ public:
 
   /**
    *  @brief Constructor with missing default initialization. Empty ndarray will be returned if constants from file can not be loaded.
-   *  @param[in] fname std::string file name
-   *  @param[in] print_bits unsigned bit-word to control verbosity
+   *  @param[in] fname - std::string file name
+   *  @param[in] print_bits - unsigned bit-word to control verbosity
    */ 
   NDArrIOV1 ( const std::string& fname
 	    , const unsigned print_bits=0377 );
 
   /**
    *  @brief Constructor with default ndarray of specified shape filled by a single value.
-   *  @param[in] fname std::string file name
-   *  @param[in] shape_def default shape of the ndarray (is used for shape crosscheck at readout and in case of missing file or metadata)
-   *  @param[in] val_def value to fill all data elements by default(in case of missing file or metadata)
-   *  @param[in] print_bits unsigned bit-word to control verbosity
+   *  @param[in] fname - std::string file name
+   *  @param[in] shape_def - default shape of the ndarray (is used for shape crosscheck at readout and in case of missing file or metadata)
+   *  @param[in] val_def - value to fill all data elements by default(in case of missing file or metadata)
+   *  @param[in] print_bits - unsigned bit-word to control verbosity
    */ 
   NDArrIOV1 ( const std::string& fname
 	    , const shape_t* shape_def
@@ -205,9 +205,9 @@ public:
 
   /**
    *  @brief Constructor with externally defined default ndarray.
-   *  @param[in] fname std::string file name
-   *  @param[in] default ndarray, which will be returned if file is missing 
-   *  @param[in] print_bits unsigned bit-word to control verbosity
+   *  @param[in] fname - std::string file name
+   *  @param[in] nda_def - default ndarray, which will be returned if file is missing 
+   *  @param[in] print_bits - unsigned bit-word to control verbosity
    */ 
   NDArrIOV1 ( const std::string& fname
 	    , const ndarray<const TDATA, NDIM>& nda_def

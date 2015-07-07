@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-35
+2015-07-07 Mikhail S. Dubrovin	
+- NDArrIOV1.h - fix doxygen documentation.
+	
 Tag: V00-05-34
 2015-06-05 Mikhail S. Dubrovin	
 - NDArrIOV1::get_ndarray - return empty ndarray in stead of zero-pointer, a lot of cosmetic changes.
