@@ -559,6 +559,9 @@ std::string H5Output::readConfigParameters() {
   m_maxSavedPreviousSplitEvents = configReportIfNotDefault("max_saved_split_events", 3000);
   remainingConfigKeys.remove("max_saved_split_events");
 
+  m_excludeConfigureEventData = configReportIfNotDefault("exclude_config_eventdata",false);
+  remainingConfigKeys.remove("exclude_config_eventdata");
+
   // remove all the keys that the h5-mpi-translate driver uses but H5Output does not:
   remainingConfigKeys.remove("fast_index");
   remainingConfigKeys.remove("fi_mb_half_block");
@@ -846,7 +849,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_configureGroupDir.clearMaps();
   m_chunkManager.beginJob(env);
   
-  addConfigTypes(evt, env, m_configureGroupDir, m_currentConfigureGroup);
+  addConfigTypes(evt, env, m_configureGroupDir, m_currentConfigureGroup, m_excludeConfigureEventData);
   m_epicsGroupDir.processBeginJob(m_currentConfigureGroup.id(), 
                                   env.epicsStore(), eventId);
 }
@@ -871,7 +874,7 @@ void H5Output::beginRun(Event& evt, Env& env)
     stop();
   }
 
-  addConfigTypes(evt, env, m_runGroupDir, m_currentRunGroup);
+  addConfigTypes(evt, env, m_runGroupDir, m_currentRunGroup, m_excludeConfigureEventData);
 
 }
 
@@ -886,7 +889,7 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   m_calibCycleGroupDir.clearMaps();
   m_currentEventCounter = 0;
   m_chunkManager.beginCalibCycle(env);
-  addConfigTypes(evt, env, m_calibCycleGroupDir, m_currentCalibCycleGroup);
+  addConfigTypes(evt, env, m_calibCycleGroupDir, m_currentCalibCycleGroup, m_excludeConfigureEventData);
   m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
 }
 
@@ -1334,13 +1337,17 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
 }
 
 void H5Output::addConfigTypes(PSEvt::Event &evt, PSEnv::Env &env, 
-			      TypeSrcKeyH5GroupDirectory &configGroupDirectory,
-                              hdf5pp::Group & parentGroup) {
+                              TypeSrcKeyH5GroupDirectory &configGroupDirectory,
+                              hdf5pp::Group & parentGroup,
+                              bool excludeEventData) {
   boost::shared_ptr<EventId> eventId = evt.get();
   boost::shared_ptr<PSEvt::DamageMap> damageMap = evt.get();
   list<EventKey> envEventKeys = getUpdatedConfigKeys(env);
   problemWithTranslatingBothDAQ_and_Control_AliasLists(envEventKeys);
-  list<EventKey> evtEventKeys = evt.keys();
+  list<EventKey> evtEventKeys;
+  if (not excludeEventData) {
+    evtEventKeys = evt.keys();
+  }
   int newTypes=0;
   int newSrcs=0;
   int newDatasets=0;

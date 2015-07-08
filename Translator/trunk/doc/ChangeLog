@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-33
+2015-7-8 David Schneider
+- add option exclude_config_eventdata to address JIRA PSAS-167	
+
 Tag: V00-02-32
 2015-6-26 David Schneider
 - update to pdsdata 8.3.1 with Epix::Config100aV2, JIRA PSAS-166

@@ -102,9 +102,10 @@ protected:
   void removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void createNextConfigureGroup(boost::shared_ptr<EventId> eventId);
   void addConfigTypes(PSEvt::Event &evt,
-		      PSEnv::Env &env,
-		      TypeSrcKeyH5GroupDirectory &configGroupDirectory,
-                      hdf5pp::Group & parentGroup);
+                      PSEnv::Env &env,
+                      TypeSrcKeyH5GroupDirectory &configGroupDirectory,
+                      hdf5pp::Group & parentGroup,
+                      bool excludeEventData = false);
   void createNextRunGroup(boost::shared_ptr<EventId> eventId);
   void createNextCalibCycleGroup(boost::shared_ptr<EventId> eventId);
   void createNextCalibCycleExtLink(const char *linkName, hdf5pp::Group &runGroup);
@@ -260,6 +261,8 @@ private:
   double m_translatorTime;
   boost::shared_ptr<SplitScanMgr> m_splitScanMgr;
   bool m_printedNotFilteringWarning;
+
+  bool m_excludeConfigureEventData;
 }; // class H5Output
 
 } // namespace
