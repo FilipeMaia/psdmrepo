@@ -1,0 +1,25 @@
+psana:
+- pdsdata: update to 8.3.1 with Epix::Config100aV2 (PSAS-166)
+
+Algorithms:
+- Detector: add implementation and access to Acqiris through
+  PyDetector.raw_data() (PSAS-139)
+- pypsalg: add fast/simple boost-python based 1D/2D histograms
+- CorAna: in MaskEditor emit signal 'MaskEditorWindowIsClosed()' (PSAS-6)
+
+Applications:
+- LogBook: LogBookGrabber_qt - use default url parameter, fix usage for
+  -h option (PSAS-70)
+- Translator: add option exclude_config_eventdata to address translation issues
+  with xcsh8215 (PSAS-167)
+- CalibManager: Improve ROI Mask GUI performance (PSAS-6)
+
+Bugs fixed
+- pdscalibdata: in NDArrIOV1.h - fix doxygen documentation.
+- PSCalib:  SegGeometryMatrixV1.h, GeometryAccess.h, CalibParsStore.h - fix
+  doxygen documentation for parameter description.
+
+Build System
+- SConsTools: address 'text file is busy' issue when running unit tests
+  by sleeping 1sec between install and run. Include failed unittest output
+  rather than referring to log.
