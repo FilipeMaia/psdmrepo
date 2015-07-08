@@ -132,6 +132,12 @@ def getTestDataDir():
         " Is this an external distrubtion? test data not available outside SLAC"
     return testDataDir
 
+def getTestCalibDir():
+    testCalibDir = os.path.join(expandSitRoot(), 'data_test/calib')
+    assert os.path.exists(testCalibDir), "test calib dir does not exist." + \
+        " Is this an external distrubtion? test data not available outside SLAC"
+    return testCalibDir
+
 def getMultiFileDataDir():
     multiDataDir = os.path.join(expandSitRoot(), 'data_test/multifile')
     assert os.path.exists(multiDataDir), "multifile test data dir does not exist." + \
