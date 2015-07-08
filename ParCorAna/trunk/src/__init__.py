@@ -386,7 +386,7 @@ from CommSystemUtil import checkCountsOffsets, divideAmongWorkers, makeLogger
 from CommSystemUtil import checkParams, formatFileName, imgBoundBox, replaceSubsetsWithAverage
 from MessageBuffers import SM_MsgBuffer, MVW_MsgBuffer
 from PsanaUtil import parseDataSetString, makePsanaOptions, psanaNdArrays
-from PsanaUtil import readDetectorDataAndEventTimes, getSortedCountersBasedOnSecNsecAtHertz
+from PsanaUtil import getSortedCountersBasedOnSecNsecAtHertz
 from XCorrBase import makeDelayList, writeToH5Group, XCorrBase, writeConfig
 from WorkerData import WorkerData
 import maskColorImgNdarr

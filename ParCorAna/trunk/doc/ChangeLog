@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-27
+- take out unused function readDetectorDataAndEventTimes
+- fix unit tests to use calibration constants that are readable from psdev
+- add warning in the beginning if it looks like the calibration is failing
+- add default print_bits=0 option to psana config so it is easier to change it
+	
 Tag: V00-00-26
 - disable parcorana unit test since it broke nightly
 	

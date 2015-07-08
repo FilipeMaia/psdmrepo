@@ -367,7 +367,9 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
         psanaOptions['ImgAlgos.NDArrCalib.threshold_nrms'] = 3  #  threshold as a number of sigmas to pixel_rms parameters
         psanaOptions['ImgAlgos.NDArrCalib.threshold'] = 0       #  common low level threshold in ADU below_thre_value
         psanaOptions['ImgAlgos.NDArrCalib.below_thre_value'] = 0 # intensity substituted for pixels below threshold
+
         # other options are bkgd_ind_min, bkgd_ind_max, bkgd_ind_inc and print_bits
+        psanaOptions['ImgAlgos.NDArrCalib.print_bits'] = 0 # increase to get more messages
 
     if imageOutKey is not None:
         psanaOptions['modules'] += ' ImgAlgos.NDArrImageProducer'
@@ -376,6 +378,8 @@ def makePsanaOptions(srcString, psanaType, ndarrayOutKey, ndarrayCalibOutKey, im
         psanaOptions['ImgAlgos.NDArrImageProducer.key_in'] = imageInputKey
         psanaOptions['ImgAlgos.NDArrImageProducer.key_out'] = imageOutKey
         psanaOptions['ImgAlgos.NDArrImageProducer.type_out'] = 'float'
+
+        psanaOptions['ImgAlgos.NDArrImageProducer.print_bits'] = 0 # increase to get more messages
         outArrayType = dim2array[2]
 
     return psanaOptions, outArrayType

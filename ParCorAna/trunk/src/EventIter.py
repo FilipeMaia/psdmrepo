@@ -121,9 +121,13 @@ class EventIter(object):
         self.getType = self.system_params['outputArrayType']
         self.getSrc = psana.Source(self.system_params['src'])
         self.getKey = self.system_params['ndarrayCalibOutKey']
+        self.numCalibChecksLeft = 3
+        self.calibCheckNdarrKey = self.system_params['ndarrayProducerOutKey']
         if self.getKey is None:
             self.logger.warning("system_params['ndarrayCalibOutKey'] is None. using uncalibrated key: 'ndarrayProducerOutKey'")
             self.getKey = self.system_params['ndarrayProducerOutKey']
+            self.numCalibChecksLeft = 0
+            self.calibCheckNdarrKey = None
         assert self.getKey is not None, "Neither 'ndarrayCalibOutKey' nor 'ndarrayProducerOutKey' is set in system_params"
 
     def eventOk(self, evt):
@@ -144,10 +148,37 @@ class EventIter(object):
             ("shape ERROR. evt ndarray shape=%s != %s (the expected ndarray shape usual from the mask file)" % \
              (dataArray.shape, self.ndarrayShape))
 
+        if self.numCalibChecksLeft > 0 and (self.calibCheckNdarrKey is not None):
+            self.numCalibChecksLeft -= 1
+            self.doCalibCheck(dataArray, evt)
+            
         dataArray = self.userObj.serverFinalDataArray(dataArray, evt)
         if dataArray is not None and dataArray.dtype != np.float32:
             dataArray = dataArray.astype(np.float32)
         return dataArray # may be None, or modified copy
+
+    def doCalibCheck(self, dataArray, evt):
+        rawNdarr = evt.get(self.getType, self.getSrc, self.calibCheckNdarrKey)
+        assert rawNdarr is not None, "could not pull raw ndarray to check calibration"
+        rawvar = np.var(rawNdarr)
+        calibvar = np.var(dataArray)
+        verySmall = 1e-6
+        evtId = evt.get(psana.EventId)
+        sec, nsec = evtId.time()
+        fiducials = evtId.fiducials()
+        if rawvar < verySmall:
+            self.logger.warning("event sec=0x%8.8X fid=0x%5.5X variance of uncalibrated ndarray is less than %f" % \
+                                (sec, fiducials, rawvar))
+            return
+        percentDiffInVariance = abs( 100.0 * (1.0 - calibvar/rawvar))
+        if percentDiffInVariance > 95.0:
+            calibAvg = np.average(dataArray)
+            calibMin = np.min(dataArray)
+            calibMax = np.max(dataArray)
+            self.logger.warning(("event sec=0x%8.8X fid=0x%5.5X variance of calibrated ndarray " + \
+                                 "is significantly less than that of raw ndarray. calib stats: " + \
+                                 "min=%f avg=%f max=%f var=%f while raw var=%f") % \
+                                (sec, fiducials, calibMin, calibAvg, calibMax, calibvar, rawvar))
 
     def abortFromMaster(self):
         pass

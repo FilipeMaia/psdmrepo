@@ -8,6 +8,6 @@
 from ParCorAna.unitTestsWorkerData import *
 
 if __name__ == "__main__":
-    # now run the tests in unitTestsParCorAna, this routine does not return.
+    # now run the tests in unitTestsWorkerData, this routine does not return.
     unittest.main(argv=[sys.argv[0], '-v'])
 

@@ -206,6 +206,7 @@ class Cspad2x2( unittest.TestCase ) :
         delays = [1, 2, 3, 5, 7, 10, 15, 23, 34, 50]
         saturatedValue = (1<<15) 
         update = 0
+        calibDir = ptl.getTestCalibDir()
         self.formatDict = locals().copy()
 
         self.numEvents = 60     # There are 60 events in the test data.
@@ -245,6 +246,7 @@ class Cspad2x2( unittest.TestCase ) :
                                    ndarrayOutKey=system_params['ndarrayProducerOutKey'],
                                    ndarrayCalibOutKey=system_params['ndarrayCalibOutKey'])
 
+        system_params['psanaOptions']['psana.calib-dir']='{calibDir}'
         system_params['workerStoreDtype']=np.float32
         system_params['maskNdarrayCoords'] = '{maskFile}'
         system_params['testMaskNdarrayCoords'] = '{testMaskFile}'
@@ -311,8 +313,8 @@ class Cspad2x2( unittest.TestCase ) :
                  'e524-r0178-s03-c00.xtc':                                                          '111d1ab55c6bbb685bea7d5501587e1d', 
                  'e524-r0178-s04-c00.xtc':                                                          '18fcbc6eec20d2a94f31750f49dc1bda', 
                  'e524-r0178-s05-c00.xtc':                                                          '9d87909f0c613ca6433fc94d0985521d',
-                 'ParCorAnaTestAnswers/g2calc_cspad2x2_atEnd_xcsi0314-r0178_v0.h5':                 'e4eec5c9fb4ee3247a110bebdcf95c55',
-                 'ParCorAnaTestAnswers/g2calc_cspad2x2_incrAccum_xcsi0314-r0178_v0.h5':             '2483bc4ddd2387ee331f936cf876680e',
+                 'ParCorAnaTestAnswers/g2calc_cspad2x2_atEnd_xcsi0314-r0178_v0.h5':                 '777d665671ce0b38476c16377f597724',
+                 'ParCorAnaTestAnswers/g2calc_cspad2x2_incrAccum_xcsi0314-r0178_v0.h5':             'f3e67511e46fcff5aab272463faeccfc',
         }
         for fname, prev_md5 in md5sums.iteritems():
             fullFname = os.path.join(self.dataDir,fname)
@@ -354,7 +356,7 @@ class Cspad2x2( unittest.TestCase ) :
 
         # check that the output agrees with the previously saved version:
         cmdCmpPrevious = 'cmpParCorAnaH5OutputPy %s %s' % (h5outputFile, self.atEndAnswerFile)
-        self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously rased output, cmd %s" % cmdCmpPrevious)
+        self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously saved output, cmd %s" % cmdCmpPrevious)
 
         cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
