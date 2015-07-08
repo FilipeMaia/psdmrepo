@@ -1,0 +1,151 @@
+#!@PYTHON@
+
+from mpi4py import MPI
+import os
+import sys
+import argparse
+import psana_test.psanaTestLib as ptl
+import ParCorAna as pca
+import time
+
+programDescription = '''
+parallel detector correletation analysis.
+
+MPI program that divides elements among mpi program to distribute processing of detector data across multiple 
+workers. Divides elements amoung workers. A config file must be provided
+'''
+
+programDescriptionEpilog = '''
+# TODO: add epilog with examples of how to run, use parameters
+'''
+
+def getSystemAndUserParams(filename):
+    assert os.path.exists(filename), "configuration file: %s does not exist" % filename
+    globalName = '__%s__' % os.path.splitext(os.path.basename(__file__))[0]
+    configGlobals={'__name__':globalName}
+    configLocals={}
+    execfile(filename, configGlobals, configLocals)
+    assert 'system_params' in configLocals.keys(), "config file did not define 'system_params'"
+    assert 'user_params' in configLocals.keys(), "config file did not define 'user_params'"
+    system_params = configLocals['system_params']
+    user_params = configLocals['user_params']
+    assert isinstance(system_params, dict), "system_params is not a dict"
+    assert isinstance(user_params, dict), "user_params is not a dict"
+    return system_params, user_params
+
+
+def mainRoutine(system_params, user_params, test_alt):
+    framework = pca.CommSystemFramework(system_params, user_params, test_alt)
+    return framework.run()
+
+def setCommandLineOverrideArguments(args, system_params):
+    '''overwrites parameters in system_params based on args
+
+    Args:
+      args: result of argparse, has command line argument values as members
+      system_params (dict): the system parameters to potential overwrite/modify
+    '''
+    if args.verbosity is not None:
+        system_params['verbosity'] = args.verbosity
+    
+    for arg, dictkey, argtype in zip([args.numevents, args.h5output, args.dataset, args.numServers], \
+                                     ['numEvents',    'h5output',    'dataset',    'numServers'], \
+                                     [int,            str,           str,           int]):
+        if arg is not None:
+            try:
+                system_params[dictkey]=argtype(arg)
+            except:
+                if MPI.COMM_WORLD.rank==0:
+                    sys.stderr.write("ERROR: tried to set system_params key='%s' to value='%s' as type %s but failed\n" % (dictkey, arg, argtype))
+                raise
+            if MPI.COMM_WORLD.rank==0:
+                sys.stdout.write("Override config file parameter %s with value %s\n" % \
+                                 (dictkey, arg))
+                sys.stdout.flush()
+
+    if args.overwrite:
+        system_params['overwrite'] = True
+
+    # if numEvents is given, adjust times
+    if args.numevents is not None and args.numevents > 0:
+        warnmsg = ''
+        if system_params['times'] > args.numevents:
+            warnmsg += 'set times from %d to %d based on numevents\n' % (system_params['times'], args.numevents)
+            system_params['times'] = args.numevents
+        if MPI.COMM_WORLD.Get_rank()==0:
+            sys.stderr.write('WARNING: %s\n' % warnmsg)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=programDescription, 
+                                     epilog=programDescriptionEpilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    ########################
+    # server paramemeters
+    parser.add_argument('-n', '--numevents', type=int, help="number of events to process, default is all", default=None)
+    parser.add_argument('-v', '--verbosity', type=str, help="logger verbosity (debug, info, warn) default is info", default=None)
+    parser.add_argument('-c', '--config', type=str, help="config file - Python code defining dictionary params.", default=None)
+    parser.add_argument('-o', '--h5output', type=str, help="h5 output file for both test and typical- (replaces both config file values)", default=None)
+    parser.add_argument('-m', '--maskFile', type=str, help="mask file - (replace config file value)", default=None)
+    parser.add_argument('-d', '--dataset', type=str, help="set dataset string (replace config file value)", default=None)
+    parser.add_argument('-s', '--numServers', type=int, help="number of servers (replace config file value)", default=None)
+    parser.add_argument('--overwrite', action='store_true', help="overwrite h5output file if given. overrides config file", default=False)
+    parser.add_argument('--test_main', action='store_true', help="runs the main framework code with test parameters.", default=False)
+    parser.add_argument('--test_alt', action='store_true', help="runs the alternate testing function with test parameters.",default=False)
+    parser.add_argument('--cmp', action='store_true', help="compare the h5output and testh5output files.",default=False)
+    #######################
+    
+    args = parser.parse_args()
+    
+    assert args.config is not None, "You must provide a config file"
+    system_params, user_params = getSystemAndUserParams(args.config)
+    pca.checkParams(system_params, user_params)
+    numSystemParamKeys = len(system_params)
+    if args.test_main or args.test_alt:
+        if ((system_params['h5output'] is None) or (system_params['testH5output'] is None)) and (MPI.COMM_WORLD.Get_rank()==0):
+            sys.stderr.write("parCorAnaDriver WARNING: test_main or test_alt specified, but at least one of system_params 'h5output' or 'testH5output' is None\n")
+        system_params['numEvents'] = system_params['testNumEvents']
+        system_params['maskNdarrayCoords'] = system_params['testMaskNdarrayCoords']
+
+    if args.test_alt:
+        system_params['h5output'] =  system_params['testH5output']
+        system_params['numServers'] =  1
+
+    setCommandLineOverrideArguments(args, system_params)
+
+    if args.test_alt:
+        if system_params['numServers'] != 1:
+            sys.stdout.write("parCorAnaDriver: setting numServers = 1 in system_params for test_alt mode\n")
+            system_params['numServers'] =  1
+
+    assert len(system_params)==numSystemParamKeys, "bug in parCorAnaDriver - it has added a key to system_params"
+
+    assert args.test_main + args.test_alt + args.cmp <= 1, \
+        "only one of the options --test_main --test_alt and cmp can be set at one time"
+
+    if args.cmp:
+        assert system_params['h5output'] is not None, "h5output not specified in system_params. Cannot compare"
+        assert system_params['testH5output'] is not None, "testh5output not specified in system_params. Cannot compare"
+        frameWorkFile = pca.formatFileName(system_params['h5output'])
+        testFile = pca.formatFileName(system_params['testH5output'])
+        cmd = "cmpParCorAnaH5OutputPy %s %s" % (frameWorkFile, testFile)
+        assert os.path.exists(frameWorkFile), "h5 output file from framework (not testalt): %s doesn't exist. Can't run cmd: %s" % \
+            (frameWorkFile, cmd)
+        assert os.path.exists(testFile), "Test file %s doesn't exist. Can't run cmd: %s" % \
+            (frameWorkFile, cmd)
+        sys.stdout.write("Running cmp command: %s\n" % cmd)
+        o,e,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
+        sys.stdout.write('cmp stdout=\n%s\n'%o)
+        sys.stderr.write('cmp stderr=\n%s\n'%e)
+        sys.exit(retcode)
+    else:
+        # synchronize everything before launching
+        if MPI.COMM_WORLD.rank == 0:
+            t0 = time.time()
+            sys.stdout.write("parCorAnaDriver rank=0 before first Collective MPI call (MPI_Barrier). If no output follows, there is a problem with the cluster.\n")
+            sys.stdout.flush()
+        MPI.COMM_WORLD.Barrier()
+        if MPI.COMM_WORLD.rank == 0:
+            dt = time.time()-t0
+            sys.stdout.write("parCorAnaDriver rank=0 after first collective MPI call. Elapsed time: %.2f sec\n" % dt)
+            sys.stdout.flush()
+        sys.exit(mainRoutine(system_params=system_params, user_params=user_params, test_alt=args.test_alt))
