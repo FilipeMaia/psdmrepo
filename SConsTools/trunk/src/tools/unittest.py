@@ -8,6 +8,7 @@ AUTHORS:
 """
 
 import os
+import time
 
 import SCons
 from SCons.Builder import Builder
@@ -35,11 +36,19 @@ class _unitTest :
     
             cmd = bin+ ' > ' + out + ' 2>&1' 
             trace ( "Executing unitTest `%s'" % ( bin ), "unitTest", 3 )
+            time.sleep(1)
             ret = os.system ( cmd )
     
             if ret != 0 :
-                l = '*** Unit test failed, check log file '+out+' ***'
-                s = '*'*len(l)
+                try:
+                    logfilecontents = file(out).read()
+                except Exception, e:
+                    logfilecontents = "-- could not read logfile. Exception received:\n"
+                    logfilecontents += str(e)
+                    logfilecontents += "\n----------"
+                l = '*** Unit test failed, contens of log file: '+out+' ***\n'
+                s = '*' * len(l)
+                l += logfilecontents 
                 print s
                 print l
                 print s
