@@ -42,7 +42,6 @@ pkg_ver = "2.1.0"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
 PYDIR  = pjoin('lib', '$PYTHON', 'site-packages')
-LINKPY = "requests"
 PKGINFO = (pkg, pkg_ver, '$PYTHON')
 
 standardExternalPackage ( pkg, **locals() )
