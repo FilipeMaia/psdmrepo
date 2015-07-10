@@ -25,6 +25,7 @@ Contents:
    testing
    architecture
    tips
+   programming
 
 ############
  Background

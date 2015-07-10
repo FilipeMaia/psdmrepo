@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+- make sure rank0 avaiable for viewer
+- cleanup code, comments
+- start mpi4py programming tips file.
+- simplify timing wrapper, add timing to server functions
+- change warning about related to failing calibration, reduce false positives	
+	
 Tag: V00-00-27
 - take out unused function readDetectorDataAndEventTimes
 - fix unit tests to use calibration constants that are readable from psdev

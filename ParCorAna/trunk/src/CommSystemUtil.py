@@ -156,6 +156,15 @@ def makeLogger(isTestMode, isMaster, isViewer, isServer, rank, lvl='INFO', propa
     return logger
 
 def checkParams(system_params, user_params, checkUserParams=False):
+    '''Checks for correct keys in system_params. Optionally checks userParams.
+
+    When checking userParams, checks against UserG2 module in this package. 
+    Loads mask file from system_params and checks its shape against that of
+    the color and finecolor files in the user_params. Checks for consistency in
+    the color/finecolor file. Warns of 'pixel waste', pixels that are 0 in the color
+    files but 1 in the mask file (These pixels could be masked out without changing the
+    resulting delay curves).
+    '''
     expectedSystemKeys = set(['dataset',
                               'src',
                               'psanaType', 

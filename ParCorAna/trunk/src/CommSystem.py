@@ -63,11 +63,11 @@ def roundRobin(n, dictData):
         raise Exception("roundRobin did not get n=%d values from dictData=%r" % (n, dictData))
     return results
                            
-def identifyServerRanks(comm, numServers, serverHosts=None):
-    '''returns ranks to be the servers, puts servers on distinct hosts if possible.
+def identifyServerRanks(comm, numServers, serverHosts=None, excludeRank0=True):
+    '''returns ranks to be the servers. Defaults to put servers on distinct hosts if possible.
 
     Server ranks will be picked in a round robin fashion among the distinct hosts
-    in the MPI world.
+    in the MPI world. Default is to not include Rank0 in server assignment.
 
     Args:
       comm (MPI.Comm): communicator from whith mpi world hostnames are identified.
@@ -76,6 +76,7 @@ def identifyServerRanks(comm, numServers, serverHosts=None):
       numServers (int): number of servers to find
       serverHosts (list, optional): None or empty means use default host assignment. Otherwise 
                                     list must be a set of unique hostnames. 
+      excludeRank0 (bool, optional): don't include rank0 in servers, default is True
     Returns:
       (tuple): tuple containing:
 
@@ -83,8 +84,9 @@ def identifyServerRanks(comm, numServers, serverHosts=None):
         * hostmsg (str)- a logging string about  the hosts chosen
     '''
 
-    assert comm.Get_size() >= numServers, "More servers requested than are in the MPI World. numServers=%d > MPI World Size=%d" % \
-        (numServers, comm.Get_size())
+    assert comm.Get_size() >= numServers+int(excludeRank0), \
+        "To many servers requested for MPI World. numServers=%d. MPI World Size=%d. excludeRank0=%d" % \
+        (numServers, comm.Get_size(), excludeRank0)
 
     if serverHosts is None:
         serverHosts = []
@@ -96,16 +98,25 @@ def identifyServerRanks(comm, numServers, serverHosts=None):
     assert len(allHostNames) == comm.Get_size(), 'allgather failed - did not get one host per rank'
     serverHost2ranks = collections.defaultdict(list)
     for ii, hostName in enumerate(allHostNames):
+        if excludeRank0 and ii==0:
+            continue
         serverHost2ranks[hostName].append(ii)
 
-    for host in serverHosts:
-        assert host in serverHost2ranks.keys(), "specified host: %s not in MPI world hosts: %r" % (host, serverHost2ranks.keys())
+    hostsNotFound = [host for host in serverHosts if host not in serverHost2ranks.keys()]
+    for host in hostsNotFound:
+        if MPI.Get_rank()==0:
+            if host == allHostNames[0] and excludeRank0:
+                sys.write("WARNING specified server host: %s only had rank 0 on it. rank 0 is reserved. Host will not be used for a server.")
+            else:
+                sys.write("WARNING specified host: %s was not found in MPI World." % host)
 
     if len(serverHosts) == 0:
         ranksForRoundRobin = serverHost2ranks
     else:
         ranksForRoundRobin = dict()
         for host in serverHosts:
+            if host in hostsNotFound:
+                continue
             ranksForRoundRobin[host]=serverHost2ranks[host]
 
     serverRanks = roundRobin(numServers, ranksForRoundRobin)
@@ -242,6 +253,7 @@ def getTestingMPIObject():
     mp.isServer = True
     mp.isWorker = True
     mp.isFirstWorker = True
+    mp.isFirstServer = True
     mp.isViewer = True
     mp.isMaster = False
     mp.testMode = True
@@ -259,14 +271,14 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
     '''Return a fully initialized instance of a MPI_Communicators object
     The object will contain the following attributes::
 
-      serverRanks      - ranks that are servers in COMM_WORLD
-      comm             - duplicate of the COMM_WORLD
-      rank             - rank in COMM_WORLD
-      worldNumProcs    - size of COMM_WORLD
-      masterRank       - master rank in COMM_WORLD
-      viewerRank       - viewer rank in COMM_WORLD
-      workerRanks      - list of worker ranks in COMM_WORLD
-      firstWorkerRank  - first worker rank in COMM_WORLD
+      serverRanks      - ranks that are servers in worldComm
+      comm             - duplicate of the worldComm
+      rank             - rank in worldComm
+      worldNumProcs    - size of worldComm
+      masterRank       - master rank in worldComm
+      viewerRank       - viewer rank in worldComm
+      workerRanks      - list of worker ranks in worldComm
+      firstWorkerRank  - first worker rank in worldComm
       numWorkers       - number of workers
 
       # these parameters identify which group this rank is
@@ -285,10 +297,9 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
 
       # the following is a dict with one key for each server rank
       serverWorkers[serverRank]['comm'] - intra communicator, this server and all workers
-      serverWorkers[serverRank]['serverRankInComm'] - 
+      serverWorkers[serverRank]['serverRankInComm'] - this server rank in the comm
       serverWorkers[serverRank]['workerRanksInCommDict'] -  a key for this dict is a
          worker rank in the world space. The value is the rank in the 'comm' value
-      
     '''
     assert len(serverRanks) > 0, "need at least one server"
     assert min(serverRanks) >= 0, "cannot have negative server ranks"
@@ -314,11 +325,13 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
     availRanks.remove(mc.masterRank)
     mc.workerRanks = availRanks
     mc.firstWorkerRank = min(mc.workerRanks)
+    mc.firstServerRank = min(mc.serverRanks)
 
     mc.isMaster = mc.rank == mc.masterRank
     mc.isViewer = mc.rank == mc.viewerRank
     mc.isServer = mc.rank in mc.serverRanks
     mc.isFirstWorker = mc.rank == mc.firstWorkerRank
+    mc.isFirstServer = mc.rank == mc.firstServerRank
     mc.isWorker = mc.rank not in ([mc.masterRank, mc.viewerRank] + mc.serverRanks)
     mc.numWorkers = len(mc.workerRanks)
     
@@ -355,6 +368,11 @@ def identifyCommSubsystems(serverRanks, worldComm=None):
     return mc
 
 class ScatterDataQueue(object):
+    '''queue of event data to scatter. Helper for servers.
+
+    After a server gets data and tells the master its timestamp, it will work on adding
+    a new array to the queue.
+    '''
     def __init__(self, maskToCopyOutData, dtypeForScatter, logger):
         assert maskToCopyOutData.dtype == np.bool
         self.maskToCopyOutData = maskToCopyOutData
@@ -431,56 +449,59 @@ class RunServer(object):
         self.rank = rank
         self.masterRank = masterRank
         self.logger = logger
+        self.dataGen = None
+        self.scatterDataQueue = None
 
-    def recordTimeToGetData(self, startTime, endTime, numGets=1):
-        global timingdict
-        global timingorder
+    @Timing.timecall(timingDict=timingdict)
+    def addDataToScatterQueue(self):
+        self.scatterDataQueue.addFrom(self.dataGen, 1)
+        
+    @Timing.timecall(timingDict=timingdict)
+    def sendEventReadyToMaster(self, sendEventReadyBuffer):
+        sec, nsec, fiducials = self.scatterDataQueue.nextEventId()
+        sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            debugMsg = "RunServer: data to scatter,"
+            debugMsg += " Event Id: sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X." % (sec, nsec, fiducials)
+            debugMsg += " Before Send EVT"
+            self.logger.debug(debugMsg)
+        self.comm.Send([sendEventReadyBuffer.getNumpyBuffer(),
+                        sendEventReadyBuffer.getMPIType()],
+                       dest=self.masterRank)
+        self.logger.debug("RunServer: After Send, before Recv, first adding to Queue")
+        
+    @Timing.timecall(timingDict=timingdict)
+    def receiveMessageFromMaster(self, receiveOkForWorkersBuffer):
+            self.comm.Recv([receiveOkForWorkersBuffer.getNumpyBuffer(), 
+                            receiveOkForWorkersBuffer.getMPIType()],
+                           source=self.masterRank)
 
-        if startTime is None: return
-        key = 'ServerTimeToGetData'
-        if key not in timingdict:
-            timingdict[key]=[0.0, 0, 'event', 1e-3, 'ms']
-            timingorder.append(key)
-        timingdict[key][0] += endTime-startTime
-        timingdict[key][1] += numGets
+    @Timing.timecall(timingDict=timingdict)
+    def scatterToWorkers(self):
+        self.logger.debug("RunServer: about to scatter to workers")
+        toScatter1DArray = self.scatterDataQueue.popHead()
+        self.xCorrBase.serverWorkersScatter(detectorData1Darray=toScatter1DArray, 
+                                            serverWorldRank=None)
 
     def run(self):
         sendEventReadyBuffer = SM_MsgBuffer(rank=self.rank)
         sendEventReadyBuffer.setEvt()
         receiveOkForWorkersBuffer = SM_MsgBuffer(rank=self.rank)
         abortFromMaster = False
-        dataGen = self.dataIter.dataGenerator()
-        scatterDataQueue=ScatterDataQueue(self.xCorrBase.mp.maskNdarrayCoords, np.float32, self.logger)
+        self.dataGen = self.dataIter.dataGenerator()
+        self.scatterDataQueue=ScatterDataQueue(self.xCorrBase.mp.maskNdarrayCoords, np.float32, self.logger)
         initialQueueSize = 1
-        t0 = time.time()
-        scatterDataQueue.addFrom(dataGen, initialQueueSize)
-        self.recordTimeToGetData(t0, time.time(), initialQueueSize)
-        while not scatterDataQueue.empty():
-            sec, nsec, fiducials = scatterDataQueue.nextEventId()
-            sendEventReadyBuffer.setEventId(sec, nsec, fiducials)
-            if self.logger.isEnabledFor(logging.DEBUG):
-                debugMsg = "RunServer: data to scatter,"
-                debugMsg += " Event Id: sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X." % (sec, nsec, fiducials)
-                debugMsg += " Before Send EVT"
-                self.logger.debug(debugMsg)
-            self.comm.Send([sendEventReadyBuffer.getNumpyBuffer(),
-                            sendEventReadyBuffer.getMPIType()],
-                           dest=self.masterRank)
-            self.logger.debug("RunServer: After Send, before Recv, first adding to Queue")
+        while initialQueueSize > 0:
+            initialQueueSize -= 1
+            self.addDataToScatterQueue()
+        while not self.scatterDataQueue.empty():
+            self.sendEventReadyToMaster(sendEventReadyBuffer)
             # master is most likely telling one of the other servers to scatter right now.
             # read new data before waiting to be told to scatter
-            t0 = time.time()
-            scatterDataQueue.addFrom(dataGen, 1) 
-            self.recordTimeToGetData(t0, time.time(), 1)
-            self.comm.Recv([receiveOkForWorkersBuffer.getNumpyBuffer(), 
-                            receiveOkForWorkersBuffer.getMPIType()],
-                           source=self.masterRank)
+            self.addDataToScatterQueue()
+            self.receiveMessageFromMaster(receiveOkForWorkersBuffer)
             if receiveOkForWorkersBuffer.isSendToWorkers():
-                self.logger.debug("RunServer: After Recv. is Send to workers")
-                toScatter1DArray = scatterDataQueue.popHead()
-                self.xCorrBase.serverWorkersScatter(detectorData1Darray=toScatter1DArray, 
-                                                    serverWorldRank=None)
-
+                self.scatterToWorkers()
             elif receiveOkForWorkersBuffer.isAbort():
                 self.logger.debug("RunServer: After Recv. Abort")
                 abortFromMaster = True
@@ -566,7 +587,7 @@ class RunMaster(object):
         self.logger.debug("CommSystem: after first Irecv from servers")
         return serverReceiveData, serverRequests
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
+    @Timing.timecall(timingDict=timingdict)
     def informWorkersOfNewData(self, selectedServerRank, sec, nsec, fiducials, counter):
         self.bcastWorkersBuffer.setEvt()
         self.bcastWorkersBuffer.setRank(selectedServerRank)
@@ -585,7 +606,7 @@ class RunMaster(object):
         if self.logger.isEnabledFor(logging.DEBUG):
             self.logger.debug("CommSystem: after Bcast/Barrier -> workers EVT counter=%d" % counter)
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
+    @Timing.timecall(timingDict=timingdict)
     def informViewerOfUpdate(self, sec, nsec, fiducials, counter):
         self.viewerBuffer.setUpdate()
         self.viewerBuffer.setSeconds(sec)
@@ -602,7 +623,7 @@ class RunMaster(object):
                              self.viewerBuffer.getMPIType()],
                             dest=self.viewerRank)
 
-    @Timing.timecall(CSPADEVT)
+    @Timing.timecall(timingDict=timingdict)
     def informWorkersToUpdateViewer(self):
         self.logger.debug("CommSystem: before Bcast -> workers UPDATE")
         self.bcastWorkersBuffer.setUpdate()
@@ -757,56 +778,33 @@ class RunMaster(object):
 
 class RunWorker(object):
     def __init__(self, masterWorkersComm, masterRankInMasterWorkersComm, 
-                 wrapEventNumber, xCorrBase, logger, isFirstWorker):
+                 xCorrBase, logger, isFirstWorker):
         self.masterWorkersComm = masterWorkersComm
         self.masterRankInMasterWorkersComm = masterRankInMasterWorkersComm
-        self.wrapEventNumber = wrapEventNumber
         self.xCorrBase = xCorrBase
         self.logger = logger
         self.isFirstWorker = isFirstWorker
         self.msgBuffer = MVW_MsgBuffer()
         self.evtNumber = 0
-        self.wrapped = False
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def workerWaitForMasterBcastWrapped(self):
-        self.workerWaitForMasterBcast()
-
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def workerWaitForMasterBcastNotWrapped(self):
-        self.workerWaitForMasterBcast()
-
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
+    @Timing.timecall(timingDict=timingdict)
     def workerWaitForMasterBcast(self):
         self.masterWorkersComm.Bcast([self.msgBuffer.getNumpyBuffer(),
                                       self.msgBuffer.getMPIType()],
                                      root=self.masterRankInMasterWorkersComm)
         self.masterWorkersComm.Barrier()
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def serverWorkersScatterWrapped(self, serverWorldRank):
+    @Timing.timecall(timingDict=timingdict)
+    def serverWorkersScatter(self, serverWorldRank):
         self.xCorrBase.serverWorkersScatter(detectorData1Darray=None,
                                      serverWorldRank = serverWorldRank)
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def serverWorkersScatterNotWrapped(self, serverWorldRank):
-        self.xCorrBase.serverWorkersScatter(detectorData1Darray=None,
-                                     serverWorldRank = serverWorldRank)
-
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def storeNewWorkerDataWrapped(self, counter):
+    @Timing.timecall(timingDict=timingdict)
+    def storeNewWorkerData(self, counter):
         self.xCorrBase.storeNewWorkerData(counter = counter)
 
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def storeNewWorkerDataNotWrapped(self, counter):
-        self.xCorrBase.storeNewWorkerData(counter = counter)
-
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def viewerWorkersUpdateWrapped(self, lastTime):
-        self.xCorrBase.viewerWorkersUpdate(lastTime = lastTime)
-
-    @Timing.timecall(CSPADEVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
-    def viewerWorkersUpdateNotWrapped(self, lastTime):
+    @Timing.timecall(timingDict=timingdict)
+    def viewerWorkersUpdate(self, lastTime):
         self.xCorrBase.viewerWorkersUpdate(lastTime = lastTime)
 
     def run(self):
@@ -814,13 +812,8 @@ class RunWorker(object):
         numEvents = 0
         while True:
             numEvents += 1
-            if numEvents % 1201 == 1200:
-                pass
             self.logger.debug("CommSystem.run: before Bcast from master")
-            if self.wrapped:
-                self.workerWaitForMasterBcastWrapped()
-            else:
-                self.workerWaitForMasterBcastNotWrapped()
+            self.workerWaitForMasterBcast()
 
             if self.msgBuffer.isEvt():
                 serverWithData = self.msgBuffer.getRank()
@@ -828,23 +821,12 @@ class RunWorker(object):
                 if self.logger.isEnabledFor(logging.DEBUG):
                     self.logger.debug("CommSystem.run: after Bcast from master. EVT server=%2d counter=%d" % \
                                       (serverWithData, lastTime['counter']))
-                if self.wrapped:
-                    self.serverWorkersScatterWrapped(serverWorldRank = serverWithData)
-#                    if self.isFirstWorker: self.logger.info("calling storeNewWorkerDataWrapped: from server=%d counter=%d sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X" % \
-#                                    (serverWithData, lastTime['counter'], lastTime['sec'], lastTime['nsec'], lastTime['fiducials']))
-                    self.storeNewWorkerDataWrapped(counter = lastTime['counter'])
-                else:
-                    self.serverWorkersScatterNotWrapped(serverWorldRank = serverWithData)
-#                    if self.isFirstWorker: self.logger.info("calling storeNewWorkerDataNotWrapped: from server=%d counter=%d sec=0x%8.8X nsec=0x%8.8X fid=0x%5.5X" % \
-#                                    (serverWithData, lastTime['counter'], lastTime['sec'], lastTime['nsec'], lastTime['fiducials']))
-                    self.storeNewWorkerDataNotWrapped(counter = lastTime['counter'])
+                self.serverWorkersScatter(serverWorldRank = serverWithData)
+                self.storeNewWorkerData(counter = lastTime['counter'])
 
             elif self.msgBuffer.isUpdate():
                 self.logger.debug("CommSystem.run: after Bcast from master - UPDATE")
-                if self.wrapped:
-                    self.viewerWorkersUpdateWrapped(lastTime = lastTime)
-                else:
-                    self.viewerWorkersUpdateNotWrapped(lastTime = lastTime)
+                self.viewerWorkersUpdate(lastTime = lastTime)
                 self.logger.debug("CommSystem.run: returned from viewer workers update")
             elif self.msgBuffer.isEnd():
                 self.logger.debug("CommSystem.run: after Bcast from master - END. quiting")
@@ -852,8 +834,6 @@ class RunWorker(object):
             else:
                 raise Exception("unknown msgtag")
             self.evtNumber += 1
-            if self.evtNumber >= self.wrapEventNumber:
-                self.wrapped = True
 
 class RunViewer(object):
     def __init__(self, worldComm, masterRank, xCorrBase, logger):
@@ -863,13 +843,13 @@ class RunViewer(object):
         self.xCorrBase = xCorrBase
         self.msgbuffer = MVW_MsgBuffer()
 
-    @Timing.timecall(VIEWEREVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
+    @Timing.timecall(timingDict=timingdict)
     def waitForMasterMessage(self):
         self.worldComm.Recv([self.msgbuffer.getNumpyBuffer(),
                    self.msgbuffer.getMPIType()],
                   source=self.masterRank)
 
-    @Timing.timecall(VIEWEREVT, timingDict=timingdict, timingDictInsertOrder=timingorder)
+    @Timing.timecall(timingDict=timingdict)
     def viewerWorkersUpdate(self, lastTime):
         self.xCorrBase.viewerWorkersUpdate(lastTime)
 
@@ -934,13 +914,12 @@ def runTestAlt(mp, xCorrBase):
     xCorrBase.shutdown_viewer()
     return 0
 
-def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_alt):
+def runCommSystem(mp, updateInterval, xCorrBase, hostmsg, test_alt):
     '''main driver for the system. 
 
     ARGS:
       mp - instance of MPI_Communicators
       updateInterval (int): 
-      wrapEventNumber (int):
       xCorrBase:
       hostmsg: 
       test_alt (bool): True if this is testing mode
@@ -958,8 +937,9 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
             runServer = RunServer(eventIter, xCorrBase,
                                   mp.comm, mp.rank, mp.masterRank, xCorrBase.logger)
             runServer.run()
-            reportTiming = True
-            timingNode = 'SERVER'
+            if mp.isFirstServer:
+                reportTiming = True
+                timingNode = 'FIRST SERVER'
 
         elif mp.isMaster:
             runMaster = RunMaster(mp.comm, mp.masterRank, mp.viewerRank, mp.serverRanks, 
@@ -979,7 +959,7 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
         elif mp.isWorker:
             xCorrBase.workerInit()
             runWorker = RunWorker(mp.masterWorkersComm, mp.masterRankInMasterWorkersComm,
-                                  wrapEventNumber, xCorrBase, logger, mp.isFirstWorker)
+                                  xCorrBase, logger, mp.isFirstWorker)
             runWorker.run()
             if mp.isFirstWorker:
                 reportTiming = True
@@ -999,7 +979,7 @@ def runCommSystem(mp, updateInterval, wrapEventNumber, xCorrBase, hostmsg, test_
         hdr = '--BEGIN %s TIMING--' % timingNode
         footer = '--END %s TIMING--' % timingNode
         Timing.reportOnTimingDict(logger,hdr, footer,
-                                  timingDict=timingdict, keyOrder=timingorder)
+                                  timingDict=timingdict)
     return 0
 
 def isNoneOrListOfStrings(arg):
@@ -1029,7 +1009,8 @@ class CommSystemFramework(object):
         else:
             serverRanks, hostmsg = identifyServerRanks(MPI.COMM_WORLD,
                                                        numServers,
-                                                       serverHosts)
+                                                       serverHosts,
+                                                       excludeRank0=True)
             # set mpi paramemeters for framework
             mp = identifyCommSubsystems(serverRanks=serverRanks, worldComm=MPI.COMM_WORLD)
 
@@ -1061,5 +1042,5 @@ class CommSystemFramework(object):
         self.updateInterval = system_params['update']
         
     def run(self):
-        return runCommSystem(self.mp, self.updateInterval, self.maxTimes, self.xcorrBase, self.hostmsg, self.test_alt)
+        return runCommSystem(self.mp, self.updateInterval, self.xcorrBase, self.hostmsg, self.test_alt)
 

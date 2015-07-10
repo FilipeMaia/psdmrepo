@@ -150,35 +150,35 @@ class EventIter(object):
 
         if self.numCalibChecksLeft > 0 and (self.calibCheckNdarrKey is not None):
             self.numCalibChecksLeft -= 1
-            self.doCalibCheck(dataArray, evt)
+            self.doCalibCheck(dataArray, evt, self.numCalibChecksLeft)
             
         dataArray = self.userObj.serverFinalDataArray(dataArray, evt)
         if dataArray is not None and dataArray.dtype != np.float32:
             dataArray = dataArray.astype(np.float32)
         return dataArray # may be None, or modified copy
 
-    def doCalibCheck(self, dataArray, evt):
+    def doCalibCheck(self, dataArray, evt, numCalibChecksLeft):
         rawNdarr = evt.get(self.getType, self.getSrc, self.calibCheckNdarrKey)
         assert rawNdarr is not None, "could not pull raw ndarray to check calibration"
-        rawvar = np.var(rawNdarr)
-        calibvar = np.var(dataArray)
-        verySmall = 1e-6
+        rawstd = np.std(rawNdarr)
+        calibstd = np.std(dataArray)
+        verySmall = 1e-3
         evtId = evt.get(psana.EventId)
         sec, nsec = evtId.time()
         fiducials = evtId.fiducials()
-        if rawvar < verySmall:
-            self.logger.warning("event sec=0x%8.8X fid=0x%5.5X variance of uncalibrated ndarray is less than %f" % \
-                                (sec, fiducials, rawvar))
+        if rawstd < verySmall:
+            self.logger.warning("event sec=0x%8.8X fid=0x%5.5X stdev of uncalibrated ndarray is less than %f (only %d more checks will be made)" % \
+                                (sec, fiducials, rawstd, numCalibChecksLeft))
             return
-        percentDiffInVariance = abs( 100.0 * (1.0 - calibvar/rawvar))
-        if percentDiffInVariance > 95.0:
+        percentDiffInStdev = abs( 100.0 * (1.0 - calibstd/rawstd))
+        if percentDiffInStdev > 99.0 or calibstd < 10.0:
             calibAvg = np.average(dataArray)
-            calibMin = np.min(dataArray)
             calibMax = np.max(dataArray)
-            self.logger.warning(("event sec=0x%8.8X fid=0x%5.5X variance of calibrated ndarray " + \
-                                 "is significantly less than that of raw ndarray. calib stats: " + \
-                                 "min=%f avg=%f max=%f var=%f while raw var=%f") % \
-                                (sec, fiducials, calibMin, calibAvg, calibMax, calibvar, rawvar))
+            self.logger.warning(("event sec=0x%8.8X fid=0x%5.5X stdev of calibrated ndarray is very small or " + \
+                                 "more than %.0f%% less than raw ndarray. calib stats: " + \
+                                 "avg=%.1f max=%.1f stdev=%.2f while raw stdev=%.2f. Only %d more such checks will be made") % \
+                                (sec, fiducials, percentDiffInStdev, calibAvg, calibMax, calibstd, rawstd,
+                                 numCalibChecksLeft))
 
     def abortFromMaster(self):
         pass

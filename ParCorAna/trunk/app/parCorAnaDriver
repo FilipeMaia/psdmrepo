@@ -16,10 +16,11 @@ workers. Divides elements amoung workers. A config file must be provided
 '''
 
 programDescriptionEpilog = '''
-# TODO: add epilog with examples of how to run, use parameters
 '''
 
 def getSystemAndUserParams(filename):
+    '''Loads the 'system_params' and 'user_params' dicts from a python file.
+    '''
     assert os.path.exists(filename), "configuration file: %s does not exist" % filename
     globalName = '__%s__' % os.path.splitext(os.path.basename(__file__))[0]
     configGlobals={'__name__':globalName}
