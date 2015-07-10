@@ -215,7 +215,7 @@ class XCorrBase(object):
                        MPI.FLOAT],
                       recvBuffer,
                       root = serverRankInComm)
-        comm.Barrier()
+#        comm.Barrier()
         if self.isServerOrFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
             if self.mp.isServer:
                 self.logger.debug('XCorrBase.serverWorkersScatter: after Scatterv and Barrier')
