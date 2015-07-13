@@ -20,3 +20,6 @@ Tag: V00-00-02
 - saving results of the on-going development before integrating
 the DisplaySelector widget
 
+Tag: V00-00-03
+2015-07-13 Igor Gaponenko
+- cleaned up the project from older development versions of files
