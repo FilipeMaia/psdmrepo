@@ -219,7 +219,7 @@ span.error {
 }
 </style>
 
-<script data-main="../EpicsViewer/js/test_webservices_N.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
+<script data-main="../EpicsViewer/js_demo1/demo1_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
 
 <script>
 <?php

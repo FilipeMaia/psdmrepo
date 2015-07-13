@@ -11,7 +11,7 @@ require.config ({
         'jquery.mousewheel' : '/jquery/js/jquery.mousewheel' ,
         'underscore'        : '/underscore/underscore-min' ,
         'webfwk'            : 'webfwk/js' ,
-        'EpicsViewer'       : 'EpicsViewer/js'
+        'EpicsViewer'       : 'EpicsViewer/js_demo1'
     } ,
     shim : {
         'jquery' : {

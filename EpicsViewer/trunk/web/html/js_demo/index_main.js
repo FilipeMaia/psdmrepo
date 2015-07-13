@@ -11,7 +11,7 @@ require.config ({
         'jquery.mousewheel' : '/jquery/js/jquery.mousewheel' ,
         'underscore'        : '/underscore/underscore-min' ,
         'webfwk'            : 'webfwk/js' ,
-        'EpicsViewer'       : 'EpicsViewer/js'
+        'EpicsViewer'       : 'EpicsViewer/js_demo'
     } ,
     shim : {
         'jquery' : {
@@ -52,15 +52,14 @@ function (
     var Integer = {
         MAX_VALUE: Math.pow(2, 31) - 1
     } ;
-    function pad (number) {
-        if (number < 10) {
-            return '0' + number ;
-        }
-        return number ;
-    }
     if (!Date.prototype.toISOString) {
         (function () {
-
+            function pad (number) {
+                if (number < 10) {
+                    return '0' + number ;
+                }
+                return number ;
+            }
             Date.prototype.toISOString = function () {
                 return this.getUTCFullYear() +
                     '-' + pad(this.getUTCMonth() + 1) +
@@ -72,12 +71,6 @@ function (
                     'Z' ;
             } ;
         } ()) ;
-    }
-    function time2htmlUTC (t) {
-        return  t.getUTCFullYear()+'-'+pad(t.getUTCMonth()+1)+'-'+pad(t.getUTCDate()) +
-                '&nbsp;&nbsp;<span style="font-weight:bold;">' +
-                pad(t.getUTCHours())+':'+pad(t.getUTCMinutes())+':'+pad(t.getUTCSeconds()) +
-                '</span>' ;
     }
     
     /**
@@ -456,18 +449,9 @@ function (
                             console.log("unlocked Y range of plot '"+name) ;
                         }
                     }
-                } ,
-                ruler_change: function (values) {
-                    for (var pvname in values) {
-                        var v = values[pvname] ;
-                        var msec = Math.floor(1000. * v[0]) ,
-                            t = new Date(msec) ;
-                        _that._selectedPVs[pvname].children('td.time') .html(time2htmlUTC(t)) ;
-                        _that._selectedPVs[pvname].children('td.value').text(v[1]) ;
-                    }
                 }
             }) ;
-            this._timeSeriesPlot.display($('#timeseries')) ;
+            this._timeSeriesPlot.display($('#getdata_timeseries')) ;
             
             this._finder = {
                 input:   $('#finder > #input > input') ,
@@ -682,8 +666,6 @@ function (
       '<option val="log10"  >log10</option> ' +
     '</select> ' +
   '</td> ' +
-  '<td class="time" ></td> ' +
-  '<td class="value" ></td> ' +
 '</tr> ' ;
             this._selected.children('tbody').append(html) ;
             this._selectedPVs[pvname] = this._selected.children('tbody').find('tr[id="'+pvname+'"]') ;
@@ -728,9 +710,8 @@ function (
                 var tr = $(this).closest('tr') ;
                 var pvname = tr.prop('id') ;
                 _that._scales[pvname] = $(this).val() ;
-                delete _that._y_range_lock[pvname] ;
                 _that._loadAllTimeLines() ;
-            }).prop('disabled', true) ;
+            }) ;
         } ;
         this._removeEntryFromSelected = function (pvname) {
             console.log('_removeEntryFromSelected: '+pvname) ;
@@ -758,9 +739,6 @@ function (
         this.load_timeline = function (pvname, xbins) {
 
             console.log('loading timeline', this.pvtypeinfo, pvname) ;
-
-            // Disable controls while loading
-            this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', true) ;
 
             // data subchannel for the PV
             var pvname_archiveFields = pvname + (this._archiveFields[pvname] === '' ? '' :  '.' + this._archiveFields[pvname]) ;
@@ -921,19 +899,7 @@ function (
                         }
                     }
                 }
-            // Update controls accordingly
-    
-            if (y_min < 0) {
-                // falback to the linear mode for negative values
-                this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', true).val('linear') ;
-                this._scales[pvname] = 'linear' ;
-                delete this._y_range_lock[pvname] ;
-            } else {
-                // otherwise respect any choice of a user
-                this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', false) ;
-            }
-
-            console.log('display_timeline - points.length', points.length) ;
+                console.log('display_timeline - points.length', points.length) ;
 
                 many_series.push({
                     name: pvname ,
@@ -947,11 +913,14 @@ function (
                     scale: this._scales[pvname]
                 }) ;
             }
+
+            // Update controls accordingly
     
             this._end_ymd.datepicker('setDate', date2YmdLocal(this._options.to)) ;
             this._end_hh.val(padTimeWithZeroes(this._options.to.getHours())) ;
             this._end_mm.val(padTimeWithZeroes(this._options.to.getMinutes())) ;
             this._end_ss.val(padTimeWithZeroes(this._options.to.getSeconds())) ;
+
 
             // Plot the points using an appropriate method
 

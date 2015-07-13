@@ -52,15 +52,14 @@ function (
     var Integer = {
         MAX_VALUE: Math.pow(2, 31) - 1
     } ;
-    function pad (number) {
-        if (number < 10) {
-            return '0' + number ;
-        }
-        return number ;
-    }
     if (!Date.prototype.toISOString) {
         (function () {
-
+            function pad (number) {
+                if (number < 10) {
+                    return '0' + number ;
+                }
+                return number ;
+            }
             Date.prototype.toISOString = function () {
                 return this.getUTCFullYear() +
                     '-' + pad(this.getUTCMonth() + 1) +
@@ -72,12 +71,6 @@ function (
                     'Z' ;
             } ;
         } ()) ;
-    }
-    function time2htmlUTC (t) {
-        return  t.getUTCFullYear()+'-'+pad(t.getUTCMonth()+1)+'-'+pad(t.getUTCDate()) +
-                '&nbsp;&nbsp;<span style="font-weight:bold;">' +
-                pad(t.getUTCHours())+':'+pad(t.getUTCMinutes())+':'+pad(t.getUTCSeconds()) +
-                '</span>' ;
     }
     
     /**
@@ -152,86 +145,6 @@ function (
         console.log('Interval.zoomOut: unknown window: '+name) ;
         return undefined ;
     } ;
-
-
-    var _PROCESSING_OPTIONS = [
-
-        {   operator: "raw" ,
-            desc: "Returns unprocessed data"} ,
-
-        {   operator: "firstSample" ,
-            desc:     "Returns the first sample in a bin. This is the default sparsification operator."} ,
-
-        {   operator: "lastSample" ,
-            desc:     "Returns the last sample in a bin."} ,
-
-        {   operator: "firstFill" ,
-            desc:     "Similar to the firstSample operator with the exception that we alter the timestamp " + 
-                      "to the middle of the bin and copy over the previous bin's value if a bin does not have any samples."} ,
-
-        {   operator: "lastFill" ,
-            desc:     "Similar to the firstFill operator with the exception that we use the last sample in the bin."} ,
-
-        {   operator: "mean" ,
-            desc:     "Returns the average value of a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getMean()"} ,
-
-        {   operator: "min" ,
-            desc:     "Returns the minimum value in a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getMin()"} ,
-
-        {   operator: "max" ,
-            desc:     "Returns the maximum value in a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getMax()"} ,
-
-        {   operator: "count" ,
-            desc:     "Returns the number of samples in a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getN()"} ,
-
-        {   operator: "ncount" ,
-            desc:     "Returns the total number of samples in a selected time span."} ,
-
-        {   operator: "nth" ,
-            desc:     "Returns every n-th value."} ,
-
-        {   operator: "median" ,
-            desc:     "Returns the median value of a bin. This is computed using DescriptiveStatistics " +
-                      "and is DescriptiveStatistics.getPercentile(50)"} ,
-
-        {   operator: "std" ,
-            desc:     "Returns the standard deviation of a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getStandardDeviation()"} ,
-
-        {   operator: "jitter" ,
-            desc:     "Returns the jitter (the standard deviation divided by the mean) of a bin. This is computed " +
-                      "using SummaryStatistics and is SummaryStatistics.getStandardDeviation()/SummaryStatistics.getMean()"} ,
-
-        {   operator: "ignoreflyer" ,
-            desc:     "Ignores data that is more than the specified amount of std deviation from the mean in the bin. " +
-                      "This is computed using SummaryStatistics. It takes two arguments, the binning interval and " +
-                      "the number of standard deviations (by default, 3.0). It filters the data and returns onlythose values " +
-                      "which satisfy Math.abs(val - SummaryStatistics.getMean()) <= numDeviations*SummaryStatistics.getStandardDeviation()"} ,
-
-        {   operator: "flyers" ,
-            desc:     "Opposite of ignoreflyers - only returns data that is more than the specified " +
-                      "amount of std deviation from the mean in the bin."} ,
-
-        {   operator: "variance" ,
-            desc:     "Returns the variance of a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getVariance()"} ,
-
-        {   operator: "popvariance" ,
-            desc:     "Returns the population variance of a bin. This is computed using SummaryStatistics " +
-                      "and is SummaryStatistics.getPopulationVariance()"} ,
-
-        {   operator: "kurtosis" ,
-            desc:     "Returns the kurtosis of a bin - Kurtosis is a measure of the peakedness. " +
-                      "This is computed using DescriptiveStatistics and is DescriptiveStatistics.getKurtosis()"} ,
-
-        {   operator: "skewness" ,
-            desc:     "Returns the skewness of a bin - Skewness is a measure of the asymmetry. " +
-                      "This is computed using DescriptiveStatistics and is DescriptiveStatistics.getSkewness()"}
-    ] ;
 
     function Test () {
 
@@ -456,18 +369,9 @@ function (
                             console.log("unlocked Y range of plot '"+name) ;
                         }
                     }
-                } ,
-                ruler_change: function (values) {
-                    for (var pvname in values) {
-                        var v = values[pvname] ;
-                        var msec = Math.floor(1000. * v[0]) ,
-                            t = new Date(msec) ;
-                        _that._selectedPVs[pvname].children('td.time') .html(time2htmlUTC(t)) ;
-                        _that._selectedPVs[pvname].children('td.value').text(v[1]) ;
-                    }
                 }
             }) ;
-            this._timeSeriesPlot.display($('#timeseries')) ;
+            this._timeSeriesPlot.display($('#getdata_timeseries')) ;
             
             this._finder = {
                 input:   $('#finder > #input > input') ,
@@ -633,8 +537,8 @@ function (
                         return ;
                     }
                     _that.pvtypeinfo[pvname] = data ;
-                    _that._addEntryToSelected(pvname) ;
                     _that.load_timeline(pvname) ;
+                    _that._addEntryToSelected(pvname) ;
                 }
             ) ;
         } ;
@@ -643,107 +547,50 @@ function (
         this._getNextColor = function () {
             return _DEFAULT_PLOT_COLOR[this._colorCounter++ % _DEFAULT_PLOT_COLOR.length] ;
         } ;
-        this._plot = {} ;
         this._colors = {} ;
-        this._archiveFields = {} ;
-        this._processing = {} ;
-        this._scales = {} ;
         this._selectedPVs = {} ;
         this._addEntryToSelected = function (pvname) {
-            this._plot[pvname] = true ;
             this._colors[pvname] = this._getNextColor() ;
-            this._archiveFields[pvname] = '' ;
-            this._processing[pvname] = '' ;
-            this._scales[pvname] = 'linear' ;
-            var html =
+            this._selected.children('tbody').append (
 '<tr id="'+pvname+'" > ' +
   '<td><button name="delete" class="control-button-important" >x</button></td> ' +
   '<td><input  name="plot"   type="checkbox" checked="checked" /></td> ' +
   '<td><div    name="color"  style="width: 12px; height:12px; background-color: '+this._colors[pvname]+';" >&nbsp;</div></td> ' +
-  '<td class="pvname" >'+pvname+'</td> ' +
-  '<td> ' +
-    '<select  name="archiveFields" > ' +
-      '<option val=""       ></option> ' + _.reduce(this.pvtypeinfo[pvname].archiveFields, function (html, f) { return html +=
-      '<option val="'+f+'" >'+f+'</option> ' ; }, '') +
-    '</select> ' +
-  '</td> ' +
+  '<td>'+pvname+'</td> ' +
   '<td>'+this.pvtypeinfo[pvname].extraFields.RTYP+'</td> ' +
-  '<td>'+this.pvtypeinfo[pvname].units+'</td> ' +
   '<td> ' +
-    '<select   name="processing" > ' +
-      '<option val=""       ></option> ' + _.reduce(_PROCESSING_OPTIONS, function (html, p) { return html +=
-      '<option val="'+p.operator+'" >'+p.operator+'</option> ' ; }, '') +
-    '</select> ' +
+    '<select   name="method" > ' +
+      '<option val=""        >raw</option> ' +
+      '<option val="average" >average</option> ' +
+      '<option val="count"   >count</option> ' +
     '</select> ' +
   '</td> ' +
+  '<td name="bins" ></td> ' +
   '<td> ' +
-    '<select name="scale" > ' +
+    '<select   name="x-scale" > ' +
       '<option val="linear" >linear</option> ' +
       '<option val="log10"  >log10</option> ' +
+      '<option val="log2"   >log2</option> ' +
     '</select> ' +
   '</td> ' +
-  '<td class="time" ></td> ' +
-  '<td class="value" ></td> ' +
-'</tr> ' ;
-            this._selected.children('tbody').append(html) ;
+'</tr> '
+            ) ;
             this._selectedPVs[pvname] = this._selected.children('tbody').find('tr[id="'+pvname+'"]') ;
-            this._selectedPVs[pvname].children('td.pvname')
-                .mouseover(function () {
-                    var tr = $(this).closest('tr') ;
-                    var pvname = tr.prop('id') ;
-                    console.log('mouseover: table row of PV:', pvname) ;
-                    _that._timeSeriesPlot.highlight(pvname, true) ;
-                })
-                .mouseout(function () {
-                    var tr = $(this).closest('tr') ;
-                    var pvname = tr.prop('id') ;
-                    console.log('mouseout: table row of PV:', pvname) ;
-                    _that._timeSeriesPlot.highlight(pvname, false) ;
-                })
-            ;
             this._selectedPVs[pvname].find('button[name="delete"]').button().click(function () {
                 var tr = $(this).closest('tr') ;
                 var pvname = tr.prop('id') ;
                 _that._removeEntryFromSelected(pvname) ;
             }) ;
-            this._selectedPVs[pvname].find('input[name="plot"]').change(function () {
-                var tr = $(this).closest('tr') ;
-                var pvname = tr.prop('id') ;
-                _that._plot[pvname] = $(this).prop('checked') ? true : false ;
-                _that.display_timeline() ;
-            }) ;
-            this._selectedPVs[pvname].find('select[name="archiveFields"]').change(function () {
-                var tr = $(this).closest('tr') ;
-                var pvname = tr.prop('id') ;
-                _that._archiveFields[pvname] = $(this).val() ;
-                _that._loadAllTimeLines() ;
-            }) ;
-            this._selectedPVs[pvname].find('select[name="processing"]').change(function () {
-                var tr = $(this).closest('tr') ;
-                var pvname = tr.prop('id') ;
-                _that._processing[pvname] = $(this).val() ;
-                _that._loadAllTimeLines() ;
-            }) ;
-            this._selectedPVs[pvname].find('select[name="scale"]').change(function () {
-                var tr = $(this).closest('tr') ;
-                var pvname = tr.prop('id') ;
-                _that._scales[pvname] = $(this).val() ;
-                delete _that._y_range_lock[pvname] ;
-                _that._loadAllTimeLines() ;
-            }).prop('disabled', true) ;
         } ;
         this._removeEntryFromSelected = function (pvname) {
             console.log('_removeEntryFromSelected: '+pvname) ;
-            delete this._plot[pvname] ;
-            delete this._colors[pvname] ;
-            delete this._scales[pvname] ;
-            delete this._archiveFields[pvname] ;
-            delete this._processing[pvname] ;
             this._selectedPVs[pvname].remove() ;
             delete this._selectedPVs[pvname] ;
             delete this.pvtypeinfo[pvname] ;
+            console.log('_removeEntryFromSelected:', this.pvtypeinfo) ;
             delete this.pvdata[pvname] ;
             this._options.pvs = _.filter(this._options.pvs, function (pv) { return pv !== pvname ; }) ;
+            console.log('_removeEntryFromSelected:', this._options.pvs) ;
             this._loadAllTimeLines() ;
         } ;
         this._loadAllTimeLines = function (xbins) {
@@ -757,83 +604,44 @@ function (
         this.pvdata = {} ;
         this.load_timeline = function (pvname, xbins) {
 
-            console.log('loading timeline', this.pvtypeinfo, pvname) ;
+            this.loadlog('loading timeline: '+pvname) ;
 
-            // Disable controls while loading
-            this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', true) ;
+            // Apply a bin aggregation function if the current time range includes
+            // too many measurements. The bining algorithm is based on the sampling
+            // period of a PV.
+            //
+            // TODO: the present algorithm is way to primitive to assume that
+            //       PVs get updated at the specified sampling rate rate.
+            //       The actual sampling rate definition varies depending on
+            //       the sampling method:
+            //         'MONITOR' - monitoring status changes (frequency is limited by the sampling period)
+            //         'SCAN'    - fixed frequency (exactly sampling period)
+            //       Besides, PVs may not be archived for some reason.
+            //       One way to deal with that would be to make a separate request
+            //       to the backend using some smaller range (for speed) to "calibrate"
+            //       the actual update frequency of a PV.
 
-            // data subchannel for the PV
-            var pvname_archiveFields = pvname + (this._archiveFields[pvname] === '' ? '' :  '.' + this._archiveFields[pvname]) ;
+            var delta_sec = Math.abs(this._options.to - this._options.from) / 1000 ;
+            var samplingPeriod_sec = +this.pvtypeinfo[pvname].samplingPeriod ;
+            var samplesInDelta = samplingPeriod_sec ? Math.round(delta_sec / samplingPeriod_sec) : 1 ;
 
-            // Make sure the previous value is always set to something.
+            var pv_fetch_method = pvname ;  // raw data, no server-side processing
+
+            // Make sure the previous value is always set to someting.
             // Keep refreshing it after each call with a valid parameter
             // of 'xbin'.
             if (!this._last_xbins) { this._last_xbins = 1024 ;}
             var xbins_best_guess = xbins ? xbins : this._last_xbins ;
-            this._last_xbins = xbins_best_guess ;
-
-
-            // Compute the bin aggregation factor based on the sampling
-            // period of a PV.
-            //
-            // TODO: this algorithm is based on assumtion which may not always
-            // hold to the reality that PVs get always updated at the specified
-            // sampling rate.
-            // The actual sampling rate definition may vary depending on
-            // the sampling method:
-            //
-            //   'MONITOR' - monitoring status changes (frequency is limited by
-            //               the sampling period)
-            //   'SCAN'    - fixed frequency (exactly sampling period)
-            //
-            // Besides, PVs may not be archived for certain perionds of time.
-            // One way to deal with that would be to make a separate request
-            // to the backend using some smaller range (for speed) to "calibrate"
-            // the actual update frequency of a PV.
-
-            var guessedBinFactor = (function () {
-                var delta_sec = Math.abs(_that._options.to - _that._options.from) / 1000 ;
-                var samplingPeriod_sec = +_that.pvtypeinfo[pvname].samplingPeriod ;
-                var samplesInDelta = samplingPeriod_sec ? Math.round(delta_sec / samplingPeriod_sec) : 1 ;
-
-                return samplesInDelta > 2 * _that._last_xbins ?
-                    Math.round(delta_sec / _that._last_xbins) :
-                    1 ;
-            })() ;
-
-            // Deduce the processing method based on user input (if any),
-            // or use the default method.
-
-            var pv_fetch_method ;
-
-            var operator = this._processing[pvname] ;
-            switch (operator) {
-
-                case '':
-
-                    // Apply teh avarage bin aggregation function if the current time
-                    // range includes too many measurements.
-                    pv_fetch_method = guessedBinFactor > 1 ?
-                        'mean_' + guessedBinFactor + '(' + pvname_archiveFields + ')' :
-                        pvname_archiveFields ;
-
-                    break ;
-
-                case 'raw':
-
-                    pv_fetch_method = pvname_archiveFields ;
-                    break ;
-
-                default:
-
-                    // Apply a bin aggregation function requested by a user.
-                    pv_fetch_method = operator + '_' + guessedBinFactor + '(' + pvname_archiveFields + ')' ;
-
-                    break ;
+            if (xbins_best_guess) {
+                if (samplesInDelta > 2 * xbins_best_guess) {
+                    var binFactor = Math.round(delta_sec / xbins_best_guess) ;
+                    pv_fetch_method = 'mean_'+binFactor+'('+pvname+')' ;
+                }
             }
+            this._last_xbins = xbins_best_guess ;   // refresh
 
             var params = {
-                pv: pv_fetch_method ,
+                pv:   pv_fetch_method ,
                 from: this._options.from.toISOString() ,
                 to:   this._options.to.toISOString() ,
             } ;
@@ -865,10 +673,6 @@ function (
 
             var num_pvs = 0 ;
             for (var pvname in this.pvtypeinfo) {
-
-                // skip plots which shouldn't be displayed
-                if (!this._plot[pvname]) continue ;
-
                 ++num_pvs;
                 console.log('display_timeline - pvtypeinfo['+pvname+']', this.pvtypeinfo[pvname]) ;
                 console.log('display_timeline - pvdata['+pvname+'].length', this.pvdata[pvname].length) ;
@@ -877,7 +681,6 @@ function (
             console.log('display_timeline - num pvs', num_pvs) ;
             if (!num_pvs) {
                 console.log('display_timeline - noting to display', num_pvs) ;
-                this._timeSeriesPlot.reset() ;
                 return ;
             }
 
@@ -893,9 +696,6 @@ function (
 
             var many_series = [] ;
             for (var pvname in this.pvtypeinfo) {
-
-                // skip plots which shouldn't be displayed
-                if (!this._plot[pvname]) continue ;
 
                 console.log('display_timeline - pvname', pvname) ;
 
@@ -921,19 +721,7 @@ function (
                         }
                     }
                 }
-            // Update controls accordingly
-    
-            if (y_min < 0) {
-                // falback to the linear mode for negative values
-                this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', true).val('linear') ;
-                this._scales[pvname] = 'linear' ;
-                delete this._y_range_lock[pvname] ;
-            } else {
-                // otherwise respect any choice of a user
-                this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', false) ;
-            }
-
-            console.log('display_timeline - points.length', points.length) ;
+                console.log('display_timeline - points.length', points.length) ;
 
                 many_series.push({
                     name: pvname ,
@@ -943,15 +731,17 @@ function (
                     } ,
                     yLockedRange: this._y_range_lock[pvname] ? this._y_range_lock[pvname] : undefined ,
                     points: points ,
-                    color: this._colors[pvname] ,
-                    scale: this._scales[pvname]
+                    color: this._colors[pvname]
                 }) ;
             }
+
+            // Update controls accordingly
     
             this._end_ymd.datepicker('setDate', date2YmdLocal(this._options.to)) ;
             this._end_hh.val(padTimeWithZeroes(this._options.to.getHours())) ;
             this._end_mm.val(padTimeWithZeroes(this._options.to.getMinutes())) ;
             this._end_ss.val(padTimeWithZeroes(this._options.to.getSeconds())) ;
+
 
             // Plot the points using an appropriate method
 

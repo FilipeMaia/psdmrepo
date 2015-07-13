@@ -94,81 +94,39 @@ function (
         } ;
 
         this._y_move_down = function (i, shift) {
-            var series = this._series[i] ,
-                yMin = series.yRange.min ,
-                yMax = series.yRange.max ;
-            switch (series.scale) {
-                case 'linear':
-                    var deltaY = shift ? shift.dy * (yMax - yMin) / shift.ybins : (yMax - yMin) / 10. ;
-                    series.yRange.min -= deltaY ;
-                    series.yRange.max -= deltaY ;
-                    break ;
-                case 'log10':
-                    if (!shift || (shift.dy && Math.abs(shift.ybins / shift.dy) > 100 * series.yLabels.get().length)) {
-                        series.yRange.min /= 10 ;
-                        series.yRange.max /= 10 ;
-                    }
-                    break ;
-            }
+            var yMin = this._series[i].yRange.min ,
+                yMax = this._series[i].yRange.max ;
+            var deltaY = shift ? shift.dy * (yMax - yMin) / shift.ybins : (yMax - yMin) / 10. ;
+            this._series[i].yRange.min -= deltaY ;
+            this._series[i].yRange.max -= deltaY ;
             this._display() ;
             this._report_y_range_change(i) ;
         } ;
         this._y_move_up = function (i, shift) {
-            var series = this._series[i] ,
-                yMin = series.yRange.min ,
-                yMax = series.yRange.max ;
-            switch (series.scale) {
-                case 'linear':
-                    var deltaY = shift ? shift.dy * (yMax - yMin) / shift.ybins : (yMax - yMin) / 10. ;
-                    series.yRange.min += deltaY ;
-                    series.yRange.max += deltaY ;
-                    break ;
-                case 'log10':
-                    if (!shift || (shift.dy && Math.abs(shift.ybins / shift.dy) > 100 * series.yLabels.get().length)) {
-                        series.yRange.min *= 10 ;
-                        series.yRange.max *= 10 ;
-                        break ;
-                    }
-            }
+            var yMin = this._series[i].yRange.min ,
+                yMax = this._series[i].yRange.max ;
+            var deltaY = shift ? shift.dy * (yMax - yMin) / shift.ybins : (yMax - yMin) / 10. ;
+            this._series[i].yRange.min += deltaY ;
+            this._series[i].yRange.max += deltaY ;
             this._display() ;
             this._report_y_range_change(i) ;
         } ;
         this._y_zoom_in = function (i) {
-            var series = this._series[i] ,
-                yMin = series.yRange.min ,
-                yMax = series.yRange.max ;
-            switch (series.scale) {
-                case 'linear':
-                    var deltaY = (yMax - yMin) / 10. ;
-                    series.yRange.min += deltaY ;
-                    series.yRange.max -= deltaY ;
-                    break ;
-                case 'log10':
-                    // No zooming in below one order of magnitude
-                    if (series.yRange.min && (series.yRange.max / series.yRange.min >= 10)) {
-                        series.yRange.min *= 10 ;
-                        series.yRange.max /= 10 ;
-                    }
-                    break ;
-            }
+            var yMin = this._series[i].yRange.min ,
+                yMax = this._series[i].yRange.max ;
+            var deltaY = (yMax - yMin) / 10. ;
+            this._series[i].yRange.min += deltaY ;
+            this._series[i].yRange.max -= deltaY ;
             this._display() ;
             this._report_y_range_change(i) ;
         } ;
         this._y_zoom_out = function (i) {
-            var series = this._series[i] ,
-                yMin = series.yRange.min ,
-                yMax = series.yRange.max ;
-            switch (series.scale) {
-                case 'linear':
-                    var deltaY = (yMax - yMin) / 10. ;
-                    series.yRange.min -= deltaY ;
-                    series.yRange.max += deltaY ;
-                    break ;
-                case 'log10':
-                    series.yRange.min /= 10 ;
-                    series.yRange.max *= 10 ;
-                    break ;
-            }            this._display() ;
+            var yMin = this._series[i].yRange.min ,
+                yMax = this._series[i].yRange.max ;
+            var deltaY = (yMax - yMin) / 10. ;
+            this._series[i].yRange.min -= deltaY ;
+            this._series[i].yRange.max += deltaY ;
+            this._display() ;
             this._report_y_range_change(i) ;
         } ;
         this._y_reset_or_lock = function (i) {
@@ -190,7 +148,7 @@ function (
                 ybins: 1e9
             }) ;
         } ;
-        this._reportRulerChange = function (x, y) {
+        this._reportRulerChange = function (x) {
             if (this._config.ruler_change) {
                 var values = {} ;
                 for (var sid = 0; sid < this._series.length; ++sid) {
@@ -203,7 +161,6 @@ function (
                                     xCurr = series.positions[i]  [0] ;
                                 if (xPrev <= x && x <= xCurr) {
                                     values[series.name] = series.points[i-1] ;
-                                    this._highlightRulerSelection(sid, series.positions[i-1][0], series.positions[i][0], series.positions[i-1][1]) ;
                                     break ;
                                 }
                             }
@@ -294,6 +251,7 @@ function (
                 // Skip this if in the mouse drag mode
 
                 if (_that._mouseDownPosition) {
+                    _that._mouseMoved = true ;
 
                     // Find a region where the mouse is in
                     var x = e.offsetX ,
@@ -301,27 +259,25 @@ function (
                         deltaX = x - _that._mouseDownPosition.x ,
                         deltaY = y - _that._mouseDownPosition.y ;
 
-                    _that._mouseMoved = deltaY ;
-
                     if (_that._activeRegion) {
                         switch (_that._activeRegion.direction) {
                             case 'Y':
                                 if (deltaY) {
-                                    var sid = _that._activeRegion.position ;
-                                    switch (_that._series[sid].scale) {
-                                        case 'linear':
-                                            var shift = {
+                                    if (deltaY > 0) {
+                                        if (_that._y_move_up)
+                                            _that._y_move_up (_that._activeRegion.position, {
                                                 ybins: _that._geom.PLOT_HEIGHT ,
-                                                dy: Math.abs(deltaY)
-                                            } ;
-                                            if (deltaY > 0) _that._y_move_up  (sid, shift) ;
-                                            else            _that._y_move_down(sid, shift) ;
-                                            break ;
-                                        case 'log10':
-                                            // no shift until the mouse is releases. Otherwise
-                                            // there will be too many moves on the scale.
-                                            break ;
+                                                dy:    deltaY
+                                            }) ;
+                                    } else {
+                                        if (_that._y_move_down)
+                                            _that._y_move_down (_that._activeRegion.position, {
+                                                ybins: _that._geom.PLOT_HEIGHT ,
+                                                dy:    Math.abs(deltaY)
+                                            }) ;
                                     }
+                                } else {
+                                    ;   // This should never happen in this context
                                 }
                                 _that._mouseDownPosition.x = x ;
                                 _that._mouseDownPosition.y = y ;
@@ -351,7 +307,7 @@ function (
                         reg.yMin < y && y < reg.yMax) {
                         _that._trackRegion({direction: 'X', position: +i}) ;
                         _that._drawRulers(x, y) ;
-                        _that._reportRulerChange(x, y) ;
+                        _that._reportRulerChange(x) ;
                         return ;
                     }
                 }
@@ -378,52 +334,48 @@ function (
                     switch (_that._activeRegion.direction) {
                         case 'X':
                             if (deltaX) {
-                                var shift = {
-                                    xbins: _that._geom.PLOT_WIDTH ,
-                                    dx: Math.abs(deltaX)
-                                } ;
                                 if (deltaX > 0) {
                                     if (_that._config.x_move_left)
-                                        _that._config.x_move_left (shift) ;
+                                        _that._config.x_move_left ({
+                                            xbins: _that._geom.PLOT_WIDTH ,
+                                            dx:    deltaX
+                                        }) ;
                                 } else {
                                     if (_that._config.x_move_right)
-                                        _that._config.x_move_right (shift) ;
+                                        _that._config.x_move_right ({
+                                            xbins: _that._geom.PLOT_WIDTH ,
+                                            dx:    Math.abs(deltaX)
+                                        }) ;
                                 }
                             }
                             break ;
 
                         case 'Y':
-                            var sid = _that._activeRegion.position ;
-
-                            if (deltaY || _that._mouseMoved) {
-                                var shift = undefined ;
-                                switch (_that._series[sid].scale) {
-                                    case 'linear':
-                                        shift = {
+                            if (deltaY) {
+                                if (deltaY > 0) {
+                                    if (_that._y_move_up)
+                                        _that._y_move_up (_that._activeRegion.position, {
                                             ybins: _that._geom.PLOT_HEIGHT ,
-                                            dy: Math.abs(deltaY)
-                                        } ;
-                                        break ;
-                                    case 'log10':
-                                        // using the default shift in the direction of
-                                        // the last mouse move.
-                                        // ATTENTION: This logic may produce some confusingresults
-                                        // in case if a users moves teh mouse in opposite directons
-                                        // before releasing it.
-                                        deltaY = _that._mouseMoved ;
-                                        break ;
+                                            dy:    deltaY
+                                        }) ;
+                                } else {
+                                    if (_that._y_move_down)
+                                        _that._y_move_down (_that._activeRegion.position, {
+                                            ybins: _that._geom.PLOT_HEIGHT ,
+                                            dy:    Math.abs(deltaY)
+                                        }) ;
                                 }
-                                if (deltaY > 0) _that._y_move_up  (sid, shift) ;
-                                else            _that._y_move_down(sid, shift) ;
+                            } else {
+                                if (_that._y_reset_or_lock && !_that._mouseMoved)
+                                    _that._y_reset_or_lock(_that._activeRegion.position) ;
                             }
-                            if (!_that._mouseMoved) _that._y_reset_or_lock(sid) ;
                             break ;
                     }
                 }
 
                 // Always reset this
                 _that._mouseDownPosition = null ;
-                _that._mouseMoved = 0 ;
+                _that._mouseMoved = false ;
             }) ;
             this._canvasGrid.mousewheel(function (e) {
 
@@ -826,24 +778,9 @@ function (
             this._geom.PLOT_Y_BEGIN = [] ;
             for (var i = 0;  i < this._series.length; ++i) {
                 var series = this._series[i] ;
-                var stepSize ,
-                    yBegin ;
-                switch (series.scale) {
-                    case 'linear':
-                         // two extra steps - on on top, and the other one at the bottom
-                         // for the overflow content
-                        stepSize = this._geom.PLOT_HEIGHT / (series.yLabels.get().length + 1) ;
-                        yBegin   = this._geom.PLOT_Y_MAX - stepSize ;
-                        break ;
-                    case 'log10':
-                        // no extra steps on ether sides - the plotted data must
-                        // fit in between.
-                        stepSize = this._geom.PLOT_HEIGHT / (series.yLabels.get().length - 1) ;
-                        yBegin   = this._geom.PLOT_Y_MAX ;
-                        break ;
-                }
+                var stepSize = this._geom.PLOT_HEIGHT / (series.yLabels.get().length + 1) ;
                 this._geom.PLOT_Y_STEP_SIZE.push(stepSize) ;
-                this._geom.PLOT_Y_BEGIN.push(yBegin) ;
+                this._geom.PLOT_Y_BEGIN.push(this._geom.PLOT_Y_MAX - stepSize) ;
             }
             console.log('this._geom', this._geom) ;
         } ;
@@ -1023,11 +960,10 @@ function (
             this._cxtPlot.fillStyle = series.color ;   // using the same color as the one of the plotted values
             this._cxtPlot.textAlign = 'right';
 
-            var yFormattedLabels = series.yLabels.pretty_formatted() ;
-
-            for (var step = 0, yTick = this._geom.PLOT_Y_BEGIN[i];
-                     step < series.yLabels.get().length ;
-                   ++step,     yTick -= this._geom.PLOT_Y_STEP_SIZE[i])
+            var yFormattedLabels = series.yLabels.pretty_formatted() ,
+                yTick = this._geom.PLOT_Y_BEGIN[i] ;                // no tick at position 0
+            for (var step = 0; step < series.yLabels.get().length ; // no tick at the end
+                   ++step, yTick -= this._geom.PLOT_Y_STEP_SIZE[i])
             {
                 // Tick
 
@@ -1288,11 +1224,6 @@ function (
                 this._cxtGrid.stroke ();
                 this._cxtGrid.globalAlpha = 1. ;
             }
-        } ;
-        this._highlightRulerSelection = function (sid, xPrev, xCurr, y ) {
-            this._cxtGrid.fillStyle = this._series[sid].color ;
-            //this._cxtGrid.globalAlpha = 0.5 ;
-            this._cxtGrid.fillRect(xPrev, y - 2, xCurr - xPrev, 4) ; 
         } ;
     }
     Class.define_class (TimeSeriesPlotN, Widget.Widget, {}, {}) ;

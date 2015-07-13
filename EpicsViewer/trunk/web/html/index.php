@@ -167,6 +167,8 @@ button > span {
 
 #getdata_control > #selected {
     margin-bottom:  20px;
+    height:         120px;
+    overflow-y:     auto;
 }
 #getdata_control > #selected > table {
     border-spacing: 0;
@@ -196,30 +198,17 @@ button > span {
 #getdata_control > #selected > table > tbody > tr > td:last-child {
     border-right:   0;
 }
-#getdata_control > #selected > table > tbody > tr > td.value {
-    text-align: right;
-}
-#timeseries {
-    position:   relative ;
+
+#getdata_timeseries {
     width:      100%;
     height:     100px;
-}
-#timeseries > canvas#plot {
-    position:   absolute; left: 0; top: 0;
-    z-index:    0;
-    width:      100%;
-}
-#timeseries > canvas#grid {
-    position:   absolute; left: 0; top: 0;
-    z-index:    1;
-    width:      100%;
 }
 span.error {
     color:  maroon;
 }
 </style>
 
-<script data-main="../EpicsViewer/js/test_webservices_N.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
+<script data-main="../EpicsViewer/js_demo/index_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
 
 <script>
 <?php
@@ -281,8 +270,6 @@ Press ESC to clear the input and close the search window." >
                 <td>Units</td>
                 <td>Processing</td>
                 <td>Scale</td>
-                <td>Time (UTC)</td>
-                <td>Value</td>
               </tr>
             </thead>
             <tbody>
@@ -301,7 +288,7 @@ Press ESC to clear the input and close the search window." >
         <div id="end_now"   class="control end" ><button>NOW</button></div>
         <div style="clear:both;" ></div>
       </div>
-      <div id="timeseries" ></div>
+      <canvas id="getdata_timeseries" ></canvas>
     </div>
     <!-- Do not display this image. It's needed as a repository of icons for
          plots. NOte this is just a temporary solution. Eventually the icon
