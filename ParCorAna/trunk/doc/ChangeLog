@@ -11,6 +11,16 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-30
+- add system_params['serversRoundRobin']. Make True default. significant speed up
+- master sends latest time to viewer
+- rework compare tool, allow exclusion of a list of names, improve verbose mode
+- fix bug with WorkerData illuminated by windowed test and round robin servers
+- deploy anwser file for windows no round robin, make unit test compare result to round robin
+- get unit tests to clean up after themselves
+	
+	
+	
 Tag: V00-00-29
 - remove MPI Barriers - improves performance
 - record timing for more functions

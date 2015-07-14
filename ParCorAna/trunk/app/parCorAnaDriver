@@ -67,6 +67,9 @@ def setCommandLineOverrideArguments(args, system_params):
     if args.overwrite:
         system_params['overwrite'] = True
 
+    if args.earlyServer:
+        system_params['serversRoundRobin'] = False
+
     # if numEvents is given, adjust times
     if args.numevents is not None and args.numevents > 0:
         warnmsg = ''
@@ -89,6 +92,7 @@ if __name__ == '__main__':
     parser.add_argument('-m', '--maskFile', type=str, help="mask file - (replace config file value)", default=None)
     parser.add_argument('-d', '--dataset', type=str, help="set dataset string (replace config file value)", default=None)
     parser.add_argument('-s', '--numServers', type=int, help="number of servers (replace config file value)", default=None)
+    parser.add_argument('--earlyServer', action='store_true', help="do not round robin multiple servers, pick earliest", default=False)
     parser.add_argument('--overwrite', action='store_true', help="overwrite h5output file if given. overrides config file", default=False)
     parser.add_argument('--test_main', action='store_true', help="runs the main framework code with test parameters.", default=False)
     parser.add_argument('--test_alt', action='store_true', help="runs the alternate testing function with test parameters.",default=False)
@@ -104,6 +108,8 @@ if __name__ == '__main__':
     if args.test_main or args.test_alt:
         if ((system_params['h5output'] is None) or (system_params['testH5output'] is None)) and (MPI.COMM_WORLD.Get_rank()==0):
             sys.stderr.write("parCorAnaDriver WARNING: test_main or test_alt specified, but at least one of system_params 'h5output' or 'testH5output' is None\n")
+        if system_params['serversRoundRobin'] and system_params['numServers']>0 and (MPI.COMM_WORLD.Get_rank()==0):
+            sys.stderr.write("parCorAnaDriver WARNING: test_main or test_alt specified, but config file specifies multiple servers and round robin. Alt test may not get events in the same order.\n")
         system_params['numEvents'] = system_params['testNumEvents']
         system_params['maskNdarrayCoords'] = system_params['testMaskNdarrayCoords']
 

@@ -130,6 +130,10 @@ system_params['testMaskNdarrayCoords'] = None
 #
 system_params['numServers'] = 1
 system_params['serverHosts'] = None # system selects which hosts to use
+# if serversRoundRobin is True, it will speed up the system at the cost of
+# possibly having events come in a little bit out of order - however the framework
+# is designed for out of order data
+system_params['serversRoundRobin'] = True 
 
 # explicitly listing hosts for servers is only useful when running against hared memory. The 
 # number of server hosts must aggree with the numServers parameter.

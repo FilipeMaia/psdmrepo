@@ -1,6 +1,7 @@
 import numpy as np
 import Exceptions
 import logging
+import math
 
 class WorkerData(object):
     '''provide access to worker data.
@@ -31,14 +32,9 @@ class WorkerData(object):
         self._timesXInds = np.empty((numTimesToInitiallyStore,2), np.int64)
         self._timesXInds[:,WorkerData.X_COLUMN] = WorkerData.INVALID_INDEX
 
-        # for going from data to the time, used internally when re-using a data entry in X
-#        self._xInd2timeInd = np.empty(numWorkerEventsToStore, np.int64)
-#        self._xInd2timeInd[:] = WorkerData.INVALID_INDEX
-
         self._timeStartIdx = 0       # will increase as we overwrite data
         self._timeAfterEndIdx = 0    # always one more than where the last stored time is
         self._nextXIdx = 0
-        self.wrappedX = False
         self.numOutOfOrder = 0
         self.numDupTimes = 0
 
@@ -46,9 +42,17 @@ class WorkerData(object):
         self.addRemoveCallbackObject = addRemoveCallbackObject
         if self.isFirstWorker: self.logger.debug(self.dumpStr())
 
-    def dumpStr(self):
-        res = "WorkerData tmStart=%d tmAfterEnd=%d nextX=%d wrappedX=%d numOutOfOrder=%d numDupTimes=%d X.shape=%r _timesXInds.shape=%r\n" % \
-              (self._timeStartIdx, self._timeAfterEndIdx, self._nextXIdx, self.wrappedX, self.numOutOfOrder, self.numDupTimes, self.X.shape, self._timesXInds.shape)
+    def dumpStr(self, long=False):
+        res = "WorkerData tmStart=%d tmAfterEnd=%d nextX=%d filledX=%d numOutOfOrder=%d numDupTimes=%d X.shape=%r _timesXInds.shape=%r" % \
+              (self._timeStartIdx, self._timeAfterEndIdx, self._nextXIdx, self.filledX(), self.numOutOfOrder, self.numDupTimes, self.X.shape, self._timesXInds.shape)
+        if long:
+            maxwidth = 2
+            def fmt(x):
+                return str(x).rjust(maxwidth+1)
+            tms = map(fmt,self._timesXInds[self._timeStartIdx:self._timeAfterEndIdx:,0])
+            xInds = map(fmt, self._timesXInds[self._timeStartIdx:self._timeAfterEndIdx,1])
+            res += "\n_timesXInds[%d:%d,TIME_COL]=%s" % (self._timeStartIdx, self._timeAfterEndIdx,' '.join(tms))
+            res += "\n_timesXInds[%d:%d,XIND_COL]=%s" % (self._timeStartIdx, self._timeAfterEndIdx,' '.join(xInds))
         return res
 
     def timesDataIndexes(self):
@@ -90,59 +94,32 @@ class WorkerData(object):
             newShape[0] = max(newShape[0], self._timeAfterEndIdx + 3)
             self._timesXInds.resize(newShape, refcheck=False)
 
-    def empty(self):
-        return self._timeAfterEndIdx == self._timeStartIdx
-
-    def latestTime(self):
-        assert not self.empty(), "WorkerData.latestTime called before any data stored"
-        latestTimeIdx = self._timeAfterEndIdx-1
-        latestTime = self._timesXInds[latestTimeIdx, WorkerData.TIME_COLUMN]
-        return latestTime
-
     def _nextTimePosition(self, tm):
-        if self.empty() or tm > self.latestTime():
+        if self.empty() or tm > self.maxTimeForStoredData():
             return self._timeAfterEndIdx
+
+        if tm < self.minTimeForStoredData():
+            return self._timeStartIdx
 
         currentFilledTimesView = self._timesXInds[self._timeStartIdx:self._timeAfterEndIdx, 
                                                   WorkerData.TIME_COLUMN]
-        tmIndex = np.searchsorted(currentFilledTimesView, tm)
-        indexInsideView = (tmIndex >= self._timeStartIdx) and (tmIndex < self._timeAfterEndIdx)
-        if indexInsideView:
-            if currentFilledTimesView[tmIndex] == tm:
-                raise Exceptions.WorkerDataDuplicateTime(tm)
-        return tmIndex
-
-    def _nextXPosition(self, tm):
-        '''get next xindex for new data. Assumes slot will be used, may set wrappedX. 
-        '''
-        if not self.wrappedX:
-            if self._nextXIdx >= self.X.shape[0]:
-                self.wrappedX = True
-        
-        if self.wrappedX:
-            earliestTime, earliestXidx = self._timesXInds[self._timeStartIdx, :]
-            if tm <= earliestTime:
-                raise Exceptions.WorkerDataNextTimeIsEarliest(tm)
-            return earliestXidx
-        else:
-            xIndForNewData = self._nextXIdx
-            self._nextXIdx += 1
-            return xIndForNewData
-
+        tmIndexInView = np.searchsorted(currentFilledTimesView, tm)
+        if tmIndexInView < len(currentFilledTimesView) and currentFilledTimesView[tmIndexInView] == tm:
+            raise Exceptions.WorkerDataDuplicateTime(tm)
+        return tmIndexInView + self._timeStartIdx
 
     ## ---------- end helper functions for addData
 
     def addData(self, tm, newXrow):
-        def filled(self):
-            if self.wrappedX or self._nextXIdx == self.X.shape[0]:
-                return True
-            return False
+        '''adds new data to WorkerData. Calls callbacks as need be.
 
-        if filled(self) and tm <= self.minTimeForStoredData():
+        Returns True/False if data added.
+        '''
+        if self.filledX() and tm <= self.minTimeForStoredData():
             if self.isFirstWorker:
                 self.logger.warning("filled X and received time=%d <= first time=%d, skipping" % \
                                     (tm, self.minTimeForStoredData()))
-            return
+            return False
 
         self._growTimesIfNeeded()
 
@@ -152,42 +129,44 @@ class WorkerData(object):
             if self.isFirstWorker:
                 self.logger.warning("addData: duplicated time=%d, skipping" % tm)
                 self.numDupTimes += 1
-                return
-        if timeIndForNewData < self._timeAfterEndIdx:
-            self.numOutOfOrder += 1
-            if timeIndForNewData == self._timeStartIdx and self.wrappedX and self.isFirstWorker:
-                self.logger.warning("addData: X has already been filled but new data with tm=%d is earlier then all stored data. Dropping data." % timeIndForNewData)
-                return
-            # we are committed to storing this data.
-            # slide down to make room for it.
-            self._timesXInds[timeIndForNewData+1:self._timeAfterEndIdx+1,:] = self._timesXInds[timeIndForNewData:self._timeAfterEndIdx,:] 
+                return False
 
-        try:
-            xIndForNewData = self._nextXPosition(tm)
-        except Exceptions.WorkerDataNextTimeIsEarliest:
-            self.logger.error("WorkerData.AddData: unexpected, already checking for earliest time in filled case, tm=%d, skipping" % tm)
-            return
-            
-        if self.wrappedX:
-            assert xIndForNewData == self._timesXInds[self._timeStartIdx, WorkerData.X_COLUMN], "unxpected, wrappedX but new x ind is not for first time"
+        assert timeIndForNewData >= self._timeStartIdx and timeIndForNewData <= self._timeAfterEndIdx, \
+            "addData: _nextTimePosition returned invalid time index=%d, not in [%d,%d]" % \
+            (timeIndForNewData, self._timeStartIdx, self._timeAfterEndIdx)
+
+        if self.filledX() and timeIndForNewData == self._timeStartIdx and self.isFirstWorker:
+            self.logger.warning("addData: X filled but new time=%d is <= min of stored times. Dropping data." % tm)
+            return False
+
+        # we are committed to storing this data
+        xIndForNewData = None
+        if self.filledX():
+            tmForRemoval = self._timesXInds[self._timeStartIdx, WorkerData.TIME_COLUMN]
+            xIndForRemoval = self._timesXInds[self._timeStartIdx, WorkerData.X_COLUMN]
+            assert xIndForRemoval >= 0 and xIndForRemoval < self.X.shape[0], "addData: xInd=%d for removal is bad" % xIndForRemoval
             if self.addRemoveCallbackObject is not None:
-                self.addRemoveCallbackObject.workerBeforeDataRemove(self._timesXInds[self._timeStartIdx, WorkerData.TIME_COLUMN],
-                                                                    self._timesXInds[self._timeStartIdx, WorkerData.X_COLUMN],
-                                                                    self)
-            # remove old time, clients should no longer be able to see it after this
+                self.addRemoveCallbackObject.workerBeforeDataRemove(tmForRemoval, xIndForRemoval, self)
             self._timesXInds[self._timeStartIdx, WorkerData.X_COLUMN] = WorkerData.INVALID_INDEX
             self._timeStartIdx += 1
+            xIndForNewData = xIndForRemoval
+        else:
+            xIndForNewData = self._nextXIdx
+            self._nextXIdx += 1
+        assert xIndForNewData >= 0 and xIndForNewData < self.X.shape[0], "addData: xIndForNewData=%d is bad" % xIndForNewData
 
-        # store new time, but not the data yet.
-        self._timesXInds[timeIndForNewData,WorkerData.TIME_COLUMN]=tm
-        self._timesXInds[timeIndForNewData,WorkerData.X_COLUMN]=WorkerData.INVALID_INDEX
-        self._timeAfterEndIdx += 1
-
-
-        # let client adjust, then store data
+        # let client adjust new data before we store it.
         if self.addRemoveCallbackObject is not None:
             self.addRemoveCallbackObject.workerAdjustData(newXrow)
 
+        if timeIndForNewData < self._timeAfterEndIdx:
+            self.numOutOfOrder += 1
+            # slide down in time array to make room for new time
+            self._timesXInds[timeIndForNewData+1:self._timeAfterEndIdx+1,:] = self._timesXInds[timeIndForNewData:self._timeAfterEndIdx,:] 
+        self._timeAfterEndIdx += 1
+            
+        # store new time and data
+        self._timesXInds[timeIndForNewData,WorkerData.TIME_COLUMN]=tm
         self.X[xIndForNewData,:] = newXrow[:]
         self._timesXInds[timeIndForNewData, WorkerData.X_COLUMN] = xIndForNewData
         
@@ -195,18 +174,20 @@ class WorkerData(object):
             self.addRemoveCallbackObject.workerAfterDataInsert(tm, xIndForNewData, self)
 
         if self.isFirstWorker and self.logger.isEnabledFor(logging.DEBUG):
-            self.logger.debug(("addData tm=%d at xIdx=%d -- " % (tm,xIndForNewData)) + self.dumpStr())
+            self.logger.debug(("addData tm=%d at xIdx=%d -- " % (tm,xIndForNewData)) + self.dumpStr(long=True))
             
-#        print "addData: finished, timeIndForNewData=%d xIndForNewData=%d wrapped=%d tmStard=%d tmAfterEnd=%d" % \
-#            (timeIndForNewData, xIndForNewData, self.wrappedX, self._timeStartIdx, self._timeAfterEndIdx)
-#        print "addData: stored times: %s" % ','.join(map(str,self._timesXInds[self._timeStartIdx:self._timeAfterEndIdx,0]))
-#        print "addData: stored xidxs: %s" % ','.join(map(str,self._timesXInds[self._timeStartIdx:self._timeAfterEndIdx,1]))
+        return True
 
 
-    ####### EVAL? ######
+    ######## utility functions ##########
+
+    def empty(self):
+        return self._timeAfterEndIdx == self._timeStartIdx
+
+    def filledX(self):
+        return self._nextXIdx == self.X.shape[0]
+
     def minTimeForStoredData(self):
-        '''
-        '''
         assert not self.empty(), "can't ask for min time on empty data. use empty() to check before calling this function"
         return self._timesXInds[self._timeStartIdx, WorkerData.TIME_COLUMN]
     

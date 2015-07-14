@@ -61,8 +61,8 @@ class WorkerDataNoCallback( unittest.TestCase ):
         pass
         
     def test_addDataInOrder(self):
-        '''This tests the implementation of WorkerData. I.e, that the _timesXInds grows and that as
-        the XInd wraps, we drop the earliest time.
+        '''This tests the implementation of WorkerData. I.e, that the _timesXInds grows and that once
+        we fill X, we drop the earliest time.
         '''
 
         times = range(4*self.numTimes)  # wrap around several times
@@ -125,43 +125,39 @@ class WorkerDataNoCallback( unittest.TestCase ):
             ar[0]=x+10
             return ar
 
+        assert self.workerData.X.shape[0] == len(tms)
         for idx,tm in enumerate(tms):
-            self.workerData.addData(tm,mkArrPlus10(tm))
+            self.assertTrue(self.workerData.addData(tm,mkArrPlus10(tm)), msg="Couldn't add data")
             xIdx = self.workerData.tm2idx(tm)
             self.assertIsNotNone(xIdx)
             self.assertEqual(xIdx,idx)
             val = self.workerData.X[xIdx,0]
             self.assertAlmostEqual(10+tm,val)
+            if idx <4:
+                self.assertFalse(self.workerData.filledX())
 
-        # at these point we have just filled up X, but we haven't wrapped yet
-        assert self.workerData.X.shape[0] == len(tms)
-        self.assertFalse(self.workerData.wrappedX)
+        self.assertTrue(self.workerData.filledX())
 
         # we shouldn't be able to add in the earliest tm
         firstTm = min(tms)
         beforeXs = [self.workerData.X[idx,0] for tm,idx in self.workerData.timesDataIndexes()]
-        self.workerData.addData(firstTm, mkArrPlus10(max(beforeXs)+20))
+        self.assertFalse(self.workerData.addData(firstTm, mkArrPlus10(max(beforeXs)+20)), msg="added first tm=%d" % firstTm)
         afterXs = [self.workerData.X[idx,0] for tm,idx in self.workerData.timesDataIndexes()]
 
         self.assertItemsEqual(beforeXs, afterXs)
-        # we still should not have wrapped
-        self.assertFalse(self.workerData.wrappedX)
         
         # we should also not be able to add in a time that is less then the earliest time
-        self.workerData.addData(firstTm-1, mkArrPlus10(max(beforeXs)+20))
+        self.assertFalse(self.workerData.addData(firstTm-1, mkArrPlus10(max(beforeXs)+20)), msg="added earlier time when filled")
         afterXs = [self.workerData.X[idx,0] for tm,idx in self.workerData.timesDataIndexes()]
 
         self.assertItemsEqual(beforeXs, afterXs)
-        # we still should not have wrapped
-        self.assertFalse(self.workerData.wrappedX)
 
         # and we should not be able to add in something we have seen
-        self.workerData.addData(tms[0], mkArrPlus10(max(beforeXs)+20))
+        self.assertFalse(self.workerData.addData(tms[0], mkArrPlus10(max(beforeXs)+20)), msg="added duplicated data")
         afterXs = [self.workerData.X[idx,0] for tm,idx in self.workerData.timesDataIndexes()]
 
         self.assertItemsEqual(beforeXs, afterXs)
-        # we still should not have wrapped
-        self.assertFalse(self.workerData.wrappedX)
+        self.assertTrue(self.workerData.filledX())
 
         # now we will add something in the middle that makes us wrap
         # but first save where we know the xData should go
@@ -175,8 +171,7 @@ class WorkerDataNoCallback( unittest.TestCase ):
         self.assertTrue(10+10 in beforeXs)
         self.assertFalse(10+10 in afterXs)
         self.assertIsNone(self.workerData.tm2idx(10))
-        # now we should have wrapped
-        self.assertTrue(self.workerData.wrappedX)
+        self.assertTrue(self.workerData.filledX())
 
 class WorkerDataCallback( unittest.TestCase ) :
 

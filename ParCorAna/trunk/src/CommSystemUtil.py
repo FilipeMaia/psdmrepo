@@ -177,6 +177,7 @@ def checkParams(system_params, user_params, checkUserParams=False):
                               'testMaskNdarrayCoords',
                               'numServers', 
                               'serverHosts',
+                              'serversRoundRobin',
                               'times', 
                               'update',
                               'delays',

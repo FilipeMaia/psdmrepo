@@ -31,8 +31,6 @@ import ParCorAna as corAna
 def runCmd(cmd, verbose=True):
     o,e,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
     if verbose: print "---  ran cmd: %s" % cmd
-    if verbose: print "output=%s\n\nerror=%s" % (o,e)
-    if verbose: print "return code=%r" % retcode
     return retcode
 
 def removeAllInProgressFromParentDir(fname):
@@ -154,7 +152,27 @@ class ParCorAna( unittest.TestCase ) :
 
 
 class Cspad2x2( unittest.TestCase ) :
-    '''Test on small cspad2x2
+    '''Test on small cspad2x2.
+    This test data has 60 events. 
+    The order we go through the data depends on whether or not we are 
+    round robining through the servers, or picking the earliest server. 
+    One fiducial is missing from the events. This is fiducial 0x08214. 
+    Assigning a 0 up 120hz counter to the events, this will be counter 56. 
+    You will see events 0,1,2, ...,55,57,58,60.
+    When you go through the events using three servers for the three streams in round robin
+    you get the events in this order:
+    0 5 3 1 7 4 2 8 9 6 11 12 10 17 15 13 18 19 14 21 24 16 22 25 20 26 29 23 30 31 27 34 32 28 36 37 33 39 42 35 41 43 38 44 48 40 47 49 45 50 54 46 52 55 51 57 58 53 60 59
+    
+    For incremental window below, with a window of 20, at the end of the run we will 
+    be looking at these counters to form delays:
+    41 43 38 44 48 40 47 49 45 50 54 46 52 55 51 57 58 53 60 59
+
+    below we sort them, and give the differences between them:
+    38 40 41 43 44 45 46 47 48 49 50 51 52 53 54 55 57 58 59 60
+      2  1  2  1  1  1  1  1  1  1  1  1  1  1  1  2  1  1  1 
+
+    for these delays: [1,2,3,5,7,10,15,23,34,50] we will expect counts of
+    1:16, 2:
     '''
     def setUp(self) :
         dataDir = os.path.join(ptl.getMultiFileDataDir(), 'test_013_xcsi0314')
@@ -172,6 +190,7 @@ class Cspad2x2( unittest.TestCase ) :
         finecolorFileBaseName =  '%s-r%d_XcsEndstation_0_Cspad2x2_0_finecolor_ndarrCoords.npy' % (experiment, run)
         atEndCorrectBaseName = 'g2calc_cspad2x2_atEnd_%s-r%4.4d_v%d.h5' % (experiment, run, correctVersion)
         accumCorrectBaseName = 'g2calc_cspad2x2_incrAccum_%s-r%4.4d_v%d.h5' % (experiment, run, correctVersion)
+        windowNoRoundRobinCorrectBaseName = 'g2calc_cspad2x2_windowNoRoundRobin_%s-r%4.4d_v%d.h5' % (experiment, run, correctVersion)
         
         maskFile = os.path.join(maskColorDir, maskFileBaseName)
         testMaskFile = os.path.join(maskColorDir, testMaskFileBaseName)
@@ -179,21 +198,22 @@ class Cspad2x2( unittest.TestCase ) :
         finecolorFile = os.path.join(maskColorDir, finecolorFileBaseName)
         self.atEndAnswerFile = os.path.join(correctOutputDir, atEndCorrectBaseName)
         self.accumAnswerFile = os.path.join(correctOutputDir, accumCorrectBaseName)
-
+        self.windowNoRoundRobinAnswerFile = os.path.join(correctOutputDir, windowNoRoundRobinCorrectBaseName)
         assert os.path.exists(maskFile), "mask file %s doesn't exist" % maskFile
         assert os.path.exists(testMaskFile),  "test maskfile %s doesn't exist" % testMaskFile
         assert os.path.exists(colorFile),  "color file %s doesn't exist" % colorFile
         assert os.path.exists(finecolorFile),  "fine color file %s doesn't exist" % finecolorFile
         assert os.path.exists(self.atEndAnswerFile), "atEnd file %s doesn't exist" % self.atEndFile
         assert os.path.exists(self.accumAnswerFile), "accumAnswerFile file %s doesn't exist" % self.accumAnswerFile
+        assert os.path.exists(self.windowNoRoundRobinAnswerFile), "window no round robin file %s doesn't exist" % self.windowNoRoundRobinAnswerFile
 
         numServers = 3
+        serversRoundRobin = False
         
         # make a random directory for the testing that we will remove when done
         destDirBase = AppDataPath(os.path.join("ParCorAna","testingDir")).path()
         assert len(destDirBase)>0, "did not find testingDir base dir in the ParCorAna data dir"
-#        tempDestDir = tempfile.mkdtemp(dir=destDirBase)
-        tempDestDir = os.path.join(destDirBase, "mytest")   # DVD REMOVE
+        tempDestDir = tempfile.mkdtemp(dir=destDirBase)
         if not os.path.exists(tempDestDir): os.mkdir(tempDestDir)
         h5outputBaseName = 'g2calc_cspad2x2_%%s_%s-r%4.4d.h5' % (experiment, run)  # has %%s for for testName
         testH5outputBaseName = 'test_' + h5outputBaseName
@@ -209,21 +229,13 @@ class Cspad2x2( unittest.TestCase ) :
         calibDir = ptl.getTestCalibDir()
         self.formatDict = locals().copy()
 
-        self.numEvents = 60     # There are 60 events in the test data.
-        # these 60 events go from fiducials 33132 -> 33312, they go by 3 *except* that they skip 
-        # fiducial 33300. So as 120hz counter times, these go from 1 to 61 and they skip 57. 
-        # the number of delay counts we'll get will be 60-delay for delays > 4
-        # and 59-delay for delays <=4.
+        self.numEvents = 60     # see docstring in CsPad2x2 class about
+        # number of events and counter from 0,1,2 ...,55, 57,58, ..., 60
+        # That means we expect the following delay counts:
         def expectedDelay(delay):
             if delay > 4: return 60 - delay
             return 59-delay
         self.expectedCounts = [expectedDelay(delay) for delay in delays]
-        # Here are commands to see this:
-#        eventCountCmd = 'psana -m PrintEventId %s/e*-r%4.4d*.xtc | grep fiducials | grep -v "fiducials=131071" | wc' % (self.dataDir, self.run)
-#        evtCountOut, evtCountErr = ptl.cmdTimeOut(eventCountCmd)
-#        numEventsFromCmd = int(evtCountOut.split()[0])
-#        self.assertEqual(numEvents, numEventsFromCmd, "ran cmd=%s expected to get %d events, but got %d" % (eventCountCmd, numEvents, numEventsFromCmd))
-
 
         self.tempDestDir = tempDestDir
         self.dataDir = dataDir
@@ -251,6 +263,7 @@ class Cspad2x2( unittest.TestCase ) :
         system_params['maskNdarrayCoords'] = '{maskFile}'
         system_params['testMaskNdarrayCoords'] = '{testMaskFile}'
         system_params['numServers'] = {numServers}
+        system_params['serversRoundRobin'] = {serversRoundRobin}
         system_params['serverHosts'] = None  # None means system selects which hosts to use (default). 
         system_params['times'] = {numTimes}
         system_params['update'] = {update}
@@ -295,8 +308,7 @@ class Cspad2x2( unittest.TestCase ) :
         This method will only be called if the setUp() succeeds, regardless 
         of the outcome of the test method. 
         """
-        pass
-#        shutil.rmtree(self.tempDestDir, ignore_errors=True)  DVD REMOVE
+        shutil.rmtree(self.tempDestDir, ignore_errors=True) 
 
 
     def test_FilesSame(self):
@@ -315,6 +327,13 @@ class Cspad2x2( unittest.TestCase ) :
                  'e524-r0178-s05-c00.xtc':                                                          '9d87909f0c613ca6433fc94d0985521d',
                  'ParCorAnaTestAnswers/g2calc_cspad2x2_atEnd_xcsi0314-r0178_v0.h5':                 '777d665671ce0b38476c16377f597724',
                  'ParCorAnaTestAnswers/g2calc_cspad2x2_incrAccum_xcsi0314-r0178_v0.h5':             'f3e67511e46fcff5aab272463faeccfc',
+
+                 # these two files have serversRoundRobin = True, but the unit tests are now testing with
+                 # round robin = False, except for the one windowed test
+#                 'ParCorAnaTestAnswers/g2calc_cspad2x2_atEnd_xcsi0314-r0178_v1.h5':                 'c32335ba2c43a4b91e3f0f3477ff02db',
+#                 'ParCorAnaTestAnswers/g2calc_cspad2x2_incrAccum_xcsi0314-r0178_v1.h5':             '48d129663088942661ca3f6ca6dcc8a5',
+
+                 'ParCorAnaTestAnswers/g2calc_cspad2x2_windowNoRoundRobin_xcsi0314-r0178_v0.h5':    '112d83b2d0e7ee545e26b07a27005fa9',
         }
         for fname, prev_md5 in md5sums.iteritems():
             fullFname = os.path.join(self.dataDir,fname)
@@ -355,7 +374,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.checkDelays(h5outputFile , self.formatDict['delays'], self.expectedCounts)
 
         # check that the output agrees with the previously saved version:
-        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy %s %s' % (h5outputFile, self.atEndAnswerFile)
+        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy -i serversRoundRobin %s %s' % (h5outputFile, self.atEndAnswerFile)
         self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously saved output, cmd %s" % cmdCmpPrevious)
 
         cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
@@ -404,7 +423,7 @@ class Cspad2x2( unittest.TestCase ) :
         self.checkDelays(h5outputFile, self.formatDict['delays'], self.expectedCounts)
 
         # check that the output agrees with the previously saved version:
-        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy %s %s' % (h5outputFile, self.accumAnswerFile)
+        cmdCmpPrevious = 'cmpParCorAnaH5OutputPy -i serversRoundRobin %s %s' % (h5outputFile, self.accumAnswerFile)
         self.assertEqual(0, runCmd(cmdCmpPrevious, verbose=True), msg="Error checking against previously saved output, cmd %s" % cmdCmpPrevious)
 
         cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
@@ -413,46 +432,68 @@ class Cspad2x2( unittest.TestCase ) :
         cmd = 'parCorAnaDriver --cmp -c ' + configFileName
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="error running %s - files must differ" % cmd)
         
-    def test_G2Window(self):
+    def test_G2WindowRoundRobin(self):
         self.formatDict['userClass']='UserG2.G2IncrementalWindowed'
-        testName = 'windowa'
+        testName = 'windowRoundRobin'
+        self.formatDict['testName'] = testName
+        self.formatDict['numTimes'] = 20 
+        self.formatDict['serversRoundRobin'] = True
+        self.assertListEqual(self.formatDict['delays'],[1, 2, 3, 5, 7,10,15,23,34,50])
+        self.expectedCounts =               [ 18, 17, 16, 15, 13, 10, 5, 0, 0, 0]
+        configFileNameA = self.writeConfigFile('config_G2windowRoundRobin.py')
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileNameA
+        self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
+        # check delays
+        h5outputFile = self.formatDict['h5outputFile'] % testName
+        self.checkDelays(h5outputFile, self.formatDict['delays'], self.expectedCounts)
+        # compare the round robin result to non-round robin results
+        nonRoundRobin = self.windowNoRoundRobinAnswerFile
+        cmd = 'cmpParCorAnaH5OutputPy -i serversRoundRobin %s %s' % (h5outputFile, nonRoundRobin)
+        o,e,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
+        self.assertEqual(0, retcode, msg="comparing windowRoundRobin with no round robin with numTimes=%d failed.\ncmp cmd=%s" % \
+                         (self.formatDict['numTimes'], cmd))
+        
+    def test_G2WindowNoRoundRobin(self):
+        self.formatDict['userClass']='UserG2.G2IncrementalWindowed'
+        testName = 'windowNoRoundRobina'
         self.formatDict['testName'] = testName
         self.formatDict['numTimes'] = 20   # 60 events, so we will get a smaller window
         delays = self.formatDict['delays']
         self.assertListEqual(delays,[1,2,3,5,7,10,15,23,34,50])        
-        # ---  the twenty fiducials we will have will effectively look like
-        # 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 -- 18 19 20 21
-        self.expectedCounts = [ 18, 17, 16, 15, 13, 10, 5, 0, 0, 0]
-        configFileName = self.writeConfigFile('config_G2windoweda.py')
+        # the last 20 long window (see comments in CsPad2x2 class) will be
+        # 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 -- 57 58 59 60
+        # with the missing 56, the expected counts will be
+        self.expectedCounts =  [ 18, 17, 16, 15, 13, 10, 5, 0, 0, 0]
+        configFileNameA = self.writeConfigFile('config_G2windowNoRoundRobin.py')
 
-        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileNameA
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         # check delays
         h5outputFile = self.formatDict['h5outputFile'] % testName
         self.checkDelays(h5outputFile, self.formatDict['delays'], self.expectedCounts)
 
-        cmd = 'parCorAnaDriver --test_alt -c ' + configFileName
+        cmd = 'parCorAnaDriver --test_alt -c ' + configFileNameA
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
-        cmd = 'parCorAnaDriver --cmp -c ' + configFileName
+        cmd = 'parCorAnaDriver --cmp -c ' + configFileNameA
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="error running %s - files must differ" % cmd)
         
         # we expect windowed incremental to produce the same result as G2 at end with a small numTimes
         self.formatDict['userClass']='UserG2.G2atEnd'
-        self.formatDict['testName'] = 'windowedb'
-        configFileName = self.writeConfigFile('config_G2windowedb.py')
+        self.formatDict['testName'] = 'windowedNoRoundRobinAtEndForCmp'
+        configFileNameB = self.writeConfigFile('config_G2windowNoRoundRobinCmdAtEnd.py')
 
-        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileName
+        cmd = 'mpiexec -n 9 parCorAnaDriver --test_main -c ' + configFileNameB
         self.assertEqual(0, runCmd(cmd, verbose=True), msg="Error running %s" % cmd)
 
         h5A = h5outputFile
-        h5B = self.formatDict['h5outputFile'] % testName
-        cmd = 'cmpParCorAnaH5OutputPy %s %s' % (h5A, h5B)
+        h5B = self.formatDict['h5outputFile'] % self.formatDict['testName']
+        cmd = 'cmpParCorAnaH5OutputPy -i serversRoundRobin,userClass %s %s' % (h5A, h5B)
         print "running cmd=%s" % cmd
         o,e,retcode = ptl.cmdTimeOutWithReturnCode(cmd)
-        print "stdout=%s\nstderr=%s" % (o,e)
-        self.assertEqual(0, retcode, msg="comparing windowed to atEnd with numTimes=%d failed" % self.formatDict['numTimes'])
+        self.assertEqual(0, retcode, msg="comparing windowNoRoundRobin to atEnd with numTimes=%d failed.\ncmp cmd=%s\nconfigA=%s\nconfigB=%s" % \
+                         (self.formatDict['numTimes'], cmd, configFileNameA, configFileNameB))
 
 class UtilFunctions( unittest.TestCase ) :
 

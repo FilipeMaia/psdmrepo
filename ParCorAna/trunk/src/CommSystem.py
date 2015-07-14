@@ -524,13 +524,14 @@ class RunServer(object):
 class RunMaster(object):
     '''runs master message passing.
     '''
-    def __init__(self, worldComm, masterRank, viewerRank, serverRanks, 
+    def __init__(self, worldComm, masterRank, viewerRank, serverRanks, serversRoundRobin,
                  masterWorkersComm, masterRankInMasterWorkersComm,
                  updateIntervalEvents, hostmsg, logger):
 
         self.worldComm = worldComm
         self.masterRank = masterRank
         self.serverRanks = serverRanks
+        self.serversRoundRobin = serversRoundRobin
         self.masterWorkersComm = masterWorkersComm
         self.masterRankInMasterWorkersComm = masterRankInMasterWorkersComm
         self.updateIntervalEvents = updateIntervalEvents
@@ -552,13 +553,32 @@ class RunMaster(object):
         
         self.eventIdToCounter = None
 
-    def getEarliest(self, serverDataList):
-        '''Takes a list of server data buffers. identifies oldest server::
+    def getNextServerData(self, serverDataList, lastServerRank):
+        '''Takes a list of server data buffers. identifies next server. 
+
+        Ordinarily, does a round robin on the servers, based on the lastServerRank.
+        However if serversRoundRobin is False, or lastServerRank is None, picks the
+        server with the earliest timestamp.
+
         ARGS:
           serverDataList:  each element is a SeversMasterMessaging buffer
+          lastServerRank: rank of last server used.
         RET:
          the buffer with the earliest time
         '''
+        if self.serversRoundRobin and lastServerRank is not None:
+            ranksAndPos = [(serverData.getRank(),ii) for ii,serverData in enumerate(serverDataList)]
+            ranksAndPos.sort()
+            ranks = [pair[0] for pair in ranksAndPos]
+            positions = [pair[1] for pair in ranksAndPos]
+            try:
+                ranks.index(lastServerRank)
+            except ValueError:
+                return serverDataList[positions[0]]
+            nextServerPositionInRoundRobin = ((1 + ranks.index(lastServerRank)) % len(serverDataList))
+            nextServerData = serverDataList[positions[nextServerPositionInRoundRobin]]
+            return nextServerData
+                
         earliestIdx = 0
         sec, nsec, fiducials = serverDataList[earliestIdx].getEventId()
         for candIdx in range(1,len(serverDataList)):
@@ -609,12 +629,12 @@ class RunMaster(object):
             self.logger.debug("CommSystem: after Bcast/Barrier -> workers EVT counter=%d" % counter)
 
     @Timing.timecall(timingDict=timingdict)
-    def informViewerOfUpdate(self, sec, nsec, fiducials, counter):
+    def informViewerOfUpdate(self, latestEventId):
         self.viewerBuffer.setUpdate()
-        self.viewerBuffer.setSeconds(sec)
-        self.viewerBuffer.setNanoSeconds(nsec)
-        self.viewerBuffer.setFiducials(fiducials)
-        self.viewerBuffer.setCounter(counter)
+        self.viewerBuffer.setSeconds(latestEventId['sec'])
+        self.viewerBuffer.setNanoSeconds(latestEventId['nsec'])
+        self.viewerBuffer.setFiducials(latestEventId['fiducials'])
+        self.viewerBuffer.setCounter(latestEventId['counter'])
         self.worldComm.Send([self.viewerBuffer.getNumpyBuffer(),
                              self.viewerBuffer.getMPIType()],
                             dest=self.viewerRank)
@@ -690,9 +710,16 @@ class RunMaster(object):
                                      self.sendOkForWorkersBuffer.getMPIType()], 
                                     dest=selectedServerRank)
     def run(self):
-        ####### helper function ##########
+        ####### helper functions ##########
         def initializeCounterFunctionWithFirstTime(sec, nsec, fiducials):
             self.eventIdToCounter = Counter120hz.Counter120hz(sec, nsec, fiducials)
+
+        def updateLatestEventId(latestEventId, counter, sec, nsec, fiducials):
+            if (latestEventId['counter'] is None) or (counter > latestEventId['counter']):
+                latestEventId['counter']=counter
+                latestEventId['sec']=sec
+                latestEventId['nsec']=nsec
+                latestEventId['fiducials']=fiducials
         ##################################
 
         serverReceiveData, serverRequests = self.initRecvRequestsFromServers()
@@ -700,6 +727,8 @@ class RunMaster(object):
         timeAtLastDataRateMsg = time.time()
         startTime = time.time()
         noData = True
+        selectedServerRank = None
+        latestEventId = {'sec':None, 'nsec':None, 'fiducials':None, 'counter':None}
 
         while True:
             # a server must be in one of: ready, noReady or finished
@@ -721,14 +750,15 @@ class RunMaster(object):
             if len(self.readyServers)==0:
                 # the servers we waited on are finished. 
                 continue
-
-            earlyServerData = self.getEarliest([serverReceiveData[server] for server in self.readyServers])
-            selectedServerRank = earlyServerData.getRank()
-            sec, nsec, fiducials = earlyServerData.getEventId()
+            serverDataList = [serverReceiveData[server] for server in self.readyServers]
+            nextServerData = self.getNextServerData(serverDataList, selectedServerRank)
+            selectedServerRank = nextServerData.getRank()
+            sec, nsec, fiducials = nextServerData.getEventId()
             noData = False
             if self.eventIdToCounter is None:
                 initializeCounterFunctionWithFirstTime(sec, nsec, fiducials)
             counter = self.eventIdToCounter.getCounter(sec, fiducials)
+            updateLatestEventId(latestEventId, counter, sec, nsec, fiducials)
             if self.logger.isEnabledFor(logging.DEBUG):
                 self.logger.debug("CommSystem: next server rank=%d sec=0x%8.8X nsec=0x%8.8X fiducials=0x%5.5X counter=%5d" % \
                                   (selectedServerRank, sec, nsec, fiducials, counter))
@@ -751,7 +781,7 @@ class RunMaster(object):
             if (self.updateIntervalEvents > 0) and (self.numEvents - self.lastUpdate > self.updateIntervalEvents):
                 self.lastUpdate = self.numEvents
                 self.logger.debug("CommSystem: Informing viewers and workers to update" )
-                self.informViewerOfUpdate(sec, nsec, fiducials, counter)
+                self.informViewerOfUpdate(latestEventId)
                 self.informWorkersToUpdateViewer()
 
             # check to display message
@@ -771,7 +801,7 @@ class RunMaster(object):
 
         # send one last update at the end
         self.logger.debug("CommSystem: servers finished. sending one last update")
-        self.informViewerOfUpdate(sec, nsec, fiducials, counter)
+        self.informViewerOfUpdate(latestEventId)
         self.informWorkersToUpdateViewer()
 
         self.sendEndToWorkers()
@@ -915,7 +945,7 @@ def runTestAlt(mp, xCorrBase):
     xCorrBase.shutdown_viewer()
     return 0
 
-def runCommSystem(mp, updateInterval, xCorrBase, hostmsg, test_alt):
+def runCommSystem(mp, updateInterval, xCorrBase, hostmsg, serversRoundRobin, test_alt):
     '''main driver for the system. 
 
     ARGS:
@@ -943,7 +973,7 @@ def runCommSystem(mp, updateInterval, xCorrBase, hostmsg, test_alt):
                 timingNode = 'FIRST SERVER'
 
         elif mp.isMaster:
-            runMaster = RunMaster(mp.comm, mp.masterRank, mp.viewerRank, mp.serverRanks, 
+            runMaster = RunMaster(mp.comm, mp.masterRank, mp.viewerRank, mp.serverRanks, serversRoundRobin,
                                   mp.masterWorkersComm, mp.masterRankInMasterWorkersComm,
                                   updateInterval, hostmsg, logger)
             runMaster.run()
@@ -999,6 +1029,7 @@ class CommSystemFramework(object):
         numServers = int(system_params['numServers'])
         dataset = system_params['dataset']
         serverHosts = system_params['serverHosts']
+        self.serversRoundRobin = system_params['serversRoundRobin']
         assert isNoneOrListOfStrings(serverHosts), "system_params['serverHosts'] is neither None or a list of str"
 
         self.test_alt = test_alt
@@ -1043,5 +1074,5 @@ class CommSystemFramework(object):
         self.updateInterval = system_params['update']
         
     def run(self):
-        return runCommSystem(self.mp, self.updateInterval, self.xcorrBase, self.hostmsg, self.test_alt)
+        return runCommSystem(self.mp, self.updateInterval, self.xcorrBase, self.hostmsg, self.serversRoundRobin, self.test_alt)
 

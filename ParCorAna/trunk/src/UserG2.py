@@ -672,31 +672,35 @@ class G2IncrementalAccumulator(G2Common):
 
     def workerAfterDataInsert(self, tm, xInd, workerData):
         maxStoredTime = workerData.maxTimeForStoredData()
-        if self.logger.isEnabledFor(logging.DEBUG):
-            self.logInfo("tm=%d xInd=%s new worker data avg: %.2f" % \
-                         (tm, xInd, np.average(workerData.X[xInd])), allWorkers=True)
         for delayIdx, delay in enumerate(self.delays):
             if delay > maxStoredTime: break
             tmEarlier = tm - delay
             xIndEarlier = workerData.tm2idx(tmEarlier)
             earlierLaterPairs=[]
             if xIndEarlier is not None:
-                earlierLaterPairs.append((xIndEarlier, xInd))
+                earlierLaterPairs.append((xIndEarlier, xInd, tmEarlier, tm))
             tmLater = tm + delay
             xIndLater = workerData.tm2idx(tmLater)
             if xIndLater is not None:
-                earlierLaterPairs.append((xInd, xIndLater))
+                earlierLaterPairs.append((xInd, xIndLater, tm, tmLater))
             for earlierLaterPair in earlierLaterPairs:
-                idxEarlier, idxLater = earlierLaterPair
+                idxEarlier, idxLater, tmEarlier, tmLater = earlierLaterPair
                 intensitiesFirstTime = workerData.X[idxEarlier,:]
                 intensitiesLaterTime = workerData.X[idxLater,:]
                 self.G2[delayIdx,:] += intensitiesFirstTime * intensitiesLaterTime
                 self.IP[delayIdx,:] += intensitiesFirstTime
                 self.IF[delayIdx,:] += intensitiesLaterTime
                 self.counts[delayIdx] += 1
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logDebug(" workerAfterDataInsert updated dly=%d with pair=(%d,%d) new cnt=%d" % (delay, tmEarlier, tmLater, self.counts[delayIdx]))
+
 #            self.mp.logInfo("tm=%s delay=%d G2.min=%.1f G2.avg=%.1f G2.max=%.1f" % (tm, delay, np.min(self.G2[delayIdx,:]), np.average(self.G2[delayIdx,:]), np.max(self.G2[delayIdx,:])), allWorkers=True)
 #            self.mp.logInfo("tm=%s delay=%d IF.min=%.1f IF.avg=%.1f IF.max=%.1f" % (tm, delay, np.min(self.IF[delayIdx,:]), np.average(self.IF[delayIdx,:]), np.max(self.IF[delayIdx,:])), allWorkers=True)
 #            self.mp.logInfo("tm=%s delay=%d IP.min=%.1f IP.avg=%.1f IP.max=%.1f" % (tm, delay, np.min(self.IP[delayIdx,:]), np.average(self.IP[delayIdx,:]), np.max(self.IP[delayIdx,:])), allWorkers=True)
+        if self.logger.isEnabledFor(logging.DEBUG):
+            cntsStr = ' '.join(map(str,self.counts))
+            self.logDebug("workerAfterDataInsert tm=%d xInd=%s new worker data avg: %.2f cnts=%s" % \
+                          (tm, xInd, np.average(workerData.X[xInd]), cntsStr), allWorkers=True)
 
     def workerCalc(self, workerData):
         return {'G2':self.G2, 'IP':self.IP, 'IF':self.IF}, self.counts, self.saturatedElements
@@ -712,22 +716,32 @@ class G2IncrementalWindowed(G2IncrementalAccumulator):
 
     def workerBeforeDataRemove(self, tm, xInd, workerData):
         maxStoredTime = workerData.maxTimeForStoredData()
+        if self.logger.isEnabledFor(logging.DEBUG):
+            self.logDebug("workerBeforeDataRemove tm=%d xInd=%s old worker data avg: %.2f maxStoredTime=%d" % \
+                          (tm, xInd, np.average(workerData.X[xInd]), maxStoredTime), allWorkers=True)
         for delayIdx, delay in enumerate(self.delays):
             if delay > maxStoredTime: break
             earlierLaterPairs = []
             tmEarlier = tm - delay
             xIndEarlier = workerData.tm2idx(tmEarlier)
             if xIndEarlier is not None:
-                earlierLaterPairs.append((xIndEarlier, xInd))
+                earlierLaterPairs.append((xIndEarlier, xInd, tmEarlier, tm))
             tmLater = tm + delay
             xIndLater = workerData.tm2idx(tmLater)
             if xIndLater is not None:
-                earlierLaterPairs.append((xInd, xIndLater))
+                earlierLaterPairs.append((xInd, xIndLater, tm, tmLater))
             for earlierLaterPair in earlierLaterPairs:
-                idxEarlier, idxLater = earlierLaterPair
+                idxEarlier, idxLater, tmEarlier, tmLater = earlierLaterPair
                 intensitiesEarlier = workerData.X[idxEarlier,:]
                 intensitiesLater = workerData.X[idxLater,:]
-                assert self.counts[delayIdx] > 0, "G2IncrementalWindowed.workerBeforeDataRemove - about to remove affect at delay=%d but counts=0" % delay
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logDebug(" workerAfterDataRemove before update to dly=%d with pair=(%d,%d) current cnt=%d" % (delay, tmEarlier, tmLater, self.counts[delayIdx]))
+                
+                assert self.counts[delayIdx] > 0, ("G2IncrementalWindowed.workerBeforeDataRemove - " + \
+                                                   "about to remove affect at delay=%d for tm " + \
+                                                   "being removed but count=0. removed tm=%d xInd=%d and " + \
+                                                   "matching pair is tmEarlier=%d xIndEarlier=%d tmLater=%d xIndLater=%d")  % \
+                    (delay, tm, xInd, tmEarlier, idxEarlier, tmLater, idxLater)
                 self.counts[delayIdx] -= 1
                 self.G2[delayIdx,:] -= intensitiesEarlier * intensitiesLater
                 self.IP[delayIdx,:] -= intensitiesEarlier

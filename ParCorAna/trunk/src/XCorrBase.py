@@ -347,7 +347,7 @@ class XCorrBase(object):
             if self.mp.logger.isEnabledFor(logging.DEBUG):
                 for nm in self.arrayNames:
                     for delayIdx, delay in enumerate(self.delays):
-                        self.mp.logInfo("lastTime=%s dly=%d nm=%s min=%.1f avg=%.1f max=%.1f" % \
+                        self.mp.logDebug("lastTime=%s dly=%d nm=%s min=%.1f avg=%.1f max=%.1f" % \
                                         (lastTime['counter'], delay, nm, np.min(name2array[nm][delayIdx,:]),
                                          np.average(name2array[nm][delayIdx,:]),
                                          np.max(name2array[nm][delayIdx,:])), allWorkers = True)
