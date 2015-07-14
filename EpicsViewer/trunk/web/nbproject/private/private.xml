@@ -14,8 +14,9 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/css/DisplaySelector.css</file>
         </group>
         <group name="PCDS Web Apps">
-            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/test_webservices_N.js</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/test_displayselector_main.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/proto_main.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/proto.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/Interval.js</file>
         </group>
     </open-files>
 </project-private>
