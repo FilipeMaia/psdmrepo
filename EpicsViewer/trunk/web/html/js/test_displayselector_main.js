@@ -57,30 +57,30 @@ function (cssloader, Class, Widget, DisplaySelector) {
 
     $(function () {
         var ds = new DisplaySelector($('#display'), [
-            {   id:    "timeseries" ,
-                name:  "T<sub>series</sub>" ,
-                descr: "Time series plots for PVs and functions" ,
-                appl:  new DummyPlot(this, 'TimeSeries')} ,
+            {   id:     "timeseries" ,
+                name:   "T<sub>series</sub>" ,
+                descr:  "Time series plots for PVs and functions" ,
+                widget: new DummyPlot(this, 'TimeSeries')} ,
             
-            {   id:    "waveform" ,
-                name:  "W<sub>form</sub>" ,
-                desc:  "Waveform plots for PVs and functions" ,
-                appl:  new DummyPlot(this, 'Waveform')} ,
+            {   id:     "waveform" ,
+                name:   "W<sub>form</sub>" ,
+                desc:   "Waveform plots for PVs and functions" ,
+                widget: new DummyPlot(this, 'Waveform')} ,
 
-            {   id:    "correlation" ,
-                name:  "C<sub>plot</sub>" ,
-                descr: "Correlation plots for select PVs and functions" ,
-                appl:  new DummyPlot(this, 'Correlation plot')} ,
+            {   id:     "correlation" ,
+                name:   "C<sub>plot</sub>" ,
+                descr:  "Correlation plots for select PVs and functions" ,
+                widget: new DummyPlot(this, 'Correlation plot')} ,
             
-            {   id:    "histogram" ,
-                name:  "H-gram" ,
-                descr: "Histograms for all relevant PVs and functions" ,
-                appl:  new DummyPlot(this, 'Histograms')} ,
+            {   id:     "histogram" ,
+                name:   "H-gram" ,
+                descr:  "Histograms for all relevant PVs and functions" ,
+                widget: new DummyPlot(this, 'Histograms')} ,
 
-            {   id:    "info" ,
-                name:  "Info" ,
-                descr: "Detailed information on PVs, functions and plots" ,
-                appl:  new DummyPlot(this, 'Info')}
+            {   id:     "info" ,
+                name:   "Info" ,
+                descr:  "Detailed information on PVs, functions and plots" ,
+                widget: new DummyPlot(this, 'Info')}
         ]) ;
         ds.activate('waveform') ;
     }) ;

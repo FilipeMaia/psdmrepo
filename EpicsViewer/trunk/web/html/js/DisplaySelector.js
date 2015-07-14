@@ -15,19 +15,21 @@ function (
      * This widget provides a layout and a selector for user-defined displays:
      * 
      *   var ds = new DisplaySelector ($('#display'), [
-     *       {  id:    'timeseries', title: 'T<sub>series</sub>' ,
-     *          descr: 'This is the TimeSeries plotter. \nUse it at your discretion.' ,
-     *          appl:  new TimeSeriesDisplay(this)} ,
+     *       {  id:     'timeseries' ,
+     *          title:  'T<sub>series</sub>' ,
+     *          descr:  'This is the TimeSeries plotter. \nUse it at your discretion.' ,
+     *          widget: new TimeSeriesDisplay(this)} ,
      *
-     *       {  id:    'waveform', title: 'T<sub>series</sub>' ,
-     *          descr: '...' ,
-     *          appl:  new WafeFormDisplay(this)}
+     *       {  id:     'waveform' ,
+     *          title:  'T<sub>series</sub>' ,
+     *          descr:  '...' ,
+     *          widget: new WafeFormDisplay(this)}
      *   ]) ;
      *
      *   ds.activate('waveform').load(...) ;
      *   ds.get('waveform').load(...) ;
      * 
-     * IMPORTANT: the application objects passed with the configuration
+     * IMPORTANT: the widget objects passed with the configuration
      * must be subclasses of the Widget class. That's important because
      * the selector class will also asked them to be rendered after
      * the selector renders itself.
@@ -67,15 +69,15 @@ function (
 
             Widget.ASSERT(_.isObject(disp)) ;
 
-            var id   = Widget.PROP_STRING(disp, 'id') ;
-            var appl = Widget.PROP_OBJECT(disp, 'appl') ;
-            Widget.ASSERT(appl instanceof Widget.Widget) ;
+            var id     = Widget.PROP_STRING(disp, 'id') ;
+            var widget = Widget.PROP_OBJECT(disp, 'widget') ;
+            Widget.ASSERT(widget instanceof Widget.Widget) ;
 
             _that._ids.push(id) ;
             _that._id2display[id] = {
-                name:  Widget.PROP_STRING(disp, 'name',  id) ,  // use the identifier if no name is provided
-                descr: Widget.PROP_STRING(disp, 'desct', '') ,  // empty descripton by default
-                appl:  appl
+                name:   Widget.PROP_STRING(disp, 'name',  id) , // use the identifier if no name is provided
+                descr:  Widget.PROP_STRING(disp, 'desct', '') , // empty descripton by default
+                widget: widget
             } ;
         }) ;
 
@@ -104,7 +106,7 @@ function (
 
             // propagate rendering to the displays
             _.each(this._ids, function (id) {
-                _that._id2display[id].appl.display (
+                _that._id2display[id].widget.display (
                     $(_that.container.children('#area').children('.disp-sel-area#'+id))
                 ) ;
             }) ;
@@ -120,31 +122,31 @@ function (
         } ;
 
         /**
-         * Return an application object for teh specified identifier
+         * Return an widget object for the specified identifier
          *
          * @param {string} id
          * @returns {Widget}
          */
         this.get = function (id) {
-            return this._getDisplay(id).appl ;
+            return this._getDisplay(id).widget ;
         } ;
 
         /**
-         * Activate an application area for the specified identifier and
-         * return the application object.
+         * Activate an widget area for the specified identifier and
+         * return the widget object.
          *
          * @param {string} id
          * @returns {Widget}
          */
         this.activate = function (id) {
-            var appl = this.get(id) ;
+            var widget = this.get(id) ;
             // selectors
             this.container.children('#selector').children('.disp-sel-item')    .removeClass('disp-sel-item-active') ;
             this.container.children('#selector').children('.disp-sel-item#'+id).addClass   ('disp-sel-item-active') ;
             // areas
             this.container.children('#area').children('.disp-sel-area')    .removeClass('disp-sel-area-active') ;
             this.container.children('#area').children('.disp-sel-area#'+id).addClass   ('disp-sel-area-active') ;
-            return appl ;
+            return widget ;
         } ;
 
         this._getDisplay = function (id) {
