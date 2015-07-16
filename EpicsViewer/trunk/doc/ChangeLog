@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2015-07-16 Igor Gaponenko
+- finished the protorype version to be given to Murali
+
 Tag: V00-00-05
 2015-07-13 Igor Gaponenko
 - minor changes in the Displayselector widgt and its test

@@ -10,9 +10,10 @@
 }
 .finder > #input {
     float:  left;
-    width:  40px;
+    width:  100px;
 }
-.finder > #input[data]:hover:after {
+.finder > #input[data]:hover:after,
+.finder > button[data]:hover:after {
   content:  attr(data);
   padding:  8px;
   color:    #000000;
@@ -39,7 +40,7 @@
     max-height: 480px;
     overflow:   auto;
     z-index:    10;
-    background-color:   #ffffff;
+    background-color:   #f3f3f3;
 /*
     opacity:    0.9;
     border:     1px solid #b0b0b0;
@@ -62,4 +63,14 @@
 }
 .finder > #results div.pvname_endoflist {
     clear:  both;
+}
+.finder > #new_cplot {
+    position:   relative;
+    left:       170px;
+/*    float:      left;*/
+}
+.finder > #new_funct {
+    position:   relative;
+    left:       160px;
+/*    float:      left;*/
 }

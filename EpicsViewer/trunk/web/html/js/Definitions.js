@@ -33,6 +33,9 @@ function () {
             desc:     "Returns the average value of a bin. This is computed using SummaryStatistics " +
                       "and is SummaryStatistics.getMean()"} ,
 
+        {   operator: "errorbar" ,
+            desc:     "Returns the average value of a bin along with its standard deviation"} ,
+
         {   operator: "min" ,
             desc:     "Returns the minimum value in a bin. This is computed using SummaryStatistics " +
                       "and is SummaryStatistics.getMin()"} ,

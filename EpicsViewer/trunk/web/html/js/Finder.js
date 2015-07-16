@@ -45,10 +45,15 @@ function (
 '  <input type="text" /> ' +
 '</div> ' +
 '<div id="results" ></div> ' +
+'<button id="new_funct" data="Define a new function for generating a synthetic time series \n' +
+'The series will get a unique name and it can be plotted along side PVs." >ADD FUNCTION</button> ' +
+'<button id="new_cplot" data="Define a correlation plot" >C-PLOT CONFIG</button> ' +
 '<div style="clear:both;" ></div> '
         ) ;
         this._input   = cont.find('#input > input') ;
         this._results = cont.children('#results') ;
+        this._new_funct = cont.find('#new_funct').button() ;
+        this._new_cplot = cont.find('#new_cplot').button() ;
 
         this._input.keyup(function (e) {
             switch (e.keyCode) {
@@ -67,6 +72,13 @@ function (
                     break ;
             }
         }) ;
+        this._new_funct.click(function () {
+            alert('This feature has not been implemented') ;
+        }) ;
+        this._new_cplot.click(function () {
+            alert('This feature has not been implemented') ;
+        }) ;
+
         
         // Make sure the window wher ewe report our findings stays within
         // the limits of the visible viewport.
@@ -86,7 +98,8 @@ function (
         this._load_pvs = function (pattern) {
             this._results.removeClass('visible') ;
             var params = {
-                pv: pattern
+                pv: pattern ,
+                limit: 4000
             } ;
             WebService.GET (
                 "/epics/mgmt/bpl/getAllPVs" ,

@@ -8,15 +8,22 @@
             <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/test_webservices_N.php</file>
         </group>
         <group name="PCDS Web App">
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/test_displayselector_main.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/Interval.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/test_displayselector.php</file>
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/DisplaySelector.js</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/test_displayselector.html</file>
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/css/DisplaySelector.css</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/test_displayselector_main.js</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/proto_main.js</file>
         </group>
         <group name="PCDS Web Apps">
             <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/proto_main.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/css/DataTableDisplay.css</file>
             <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/proto.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/TimeSeriesPlotN.js</file>
             <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/Interval.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/DisplaySelector.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/DataTableDisplay.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/test_displayselector_main.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/EpicsViewer/web/html/js/Finder.js</file>
         </group>
     </open-files>
 </project-private>

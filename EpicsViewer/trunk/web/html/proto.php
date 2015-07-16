@@ -18,12 +18,40 @@ body {
 div#body {
     padding:20px;
 }
-#title {
+#title,
+#subtitle {
     font-family:    'Source Sans Pro',Arial,sans-serif;
     font-size:      28px;
     font-weight:    bold;
     text-align:     left;
 }
+#subtitle {
+    color: #0071bc;
+}
+#subtitle:hover {
+    cursor: pointer;
+    color:  red;
+}
+#subtitle[data]:hover:after,
+#home > a[data]:hover:after {
+  content:  attr(data);
+  padding:  8px;
+  margin-left:8px;
+  color:    #000000;
+  position: absolute;
+/*  left:     -1px;
+  top:      0px;*/
+  white-space:  pre;
+  max-width:    520px;
+  z-index:      2;
+  border-radius:    3px ;
+  background-color: lemonchiffon;
+  font-family:  'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight:  normal;
+  font-size:    12px;
+  text-align:   left;
+}
+
 
 button {
     background:     rgba(240, 248, 255, 0.39) !important;
@@ -38,14 +66,16 @@ button > span {
 }
 
 #finder {
-    margin-top: 20px;
+    margin-top:     20px;
+    margin-left:    10px;
 }
 #getdata_control {
-    margin-top: 20px;
+    margin-top:     15px;
+    margin-left:    10px;
 }
 #getdata_control > .title {
     float:          left;
-    margin-left:    5px;
+    margin-left:    8px;
     margin-right:   10px;
     padding:        0px;
     padding-top:    4px;
@@ -96,7 +126,7 @@ button > span {
 
 
 #getdata_control > #selected {
-    margin-bottom:  20px;
+    margin-bottom:  25px;
 }
 #getdata_control > #selected > table {
     border-spacing: 0;
@@ -129,17 +159,26 @@ button > span {
 #getdata_control > #selected > table > tbody > tr > td.value {
     text-align: right;
 }
-#timeseries {
+#display {
+    margin-top:     5px;
+    margin-left:    10px;
+    width:          100%;
+    border-top:     solid 3px #a0a0a0;
+}
+#display > #area {
+    max-width:  100%;
+}
+#display > #area > #timeseries {
     position:   relative ;
     width:      100%;
-    height:     100px;
+/*    height:     100px;*/
 }
-#timeseries > canvas#plot {
+#display > #area > #timeseries > canvas#plot {
     position:   absolute; left: 0; top: 0;
     z-index:    0;
     width:      100%;
 }
-#timeseries > canvas#grid {
+#display > #area > #timeseries > canvas#grid {
     position:   absolute; left: 0; top: 0;
     z-index:    1;
     width:      100%;
@@ -180,18 +219,25 @@ HERE;
 <body>
     <div id="body" >
 
-      <div id="title" >EPICS Archive Viewer (prototype version)</div>
+      <div id="home" style="float:left;" >
+        <a href="../../" data="Go back to the applicaton selector" >
+          <img src="../webfwk/img/home_icon.png" style="height:36px;" >
+        </a>
+      </div>
+      <div id="title" style="float:left; margin-left:20px;" >EPICS Archive Viewer:</div>
+      <div id="subtitle" style="float:left; margin-left:20px;" data="Save a complete state of your screen as a named
+configuration on the Web server. Others will be able to see it." >&lt;save&gt;</div>
+      <div style="clear:both;" ></div>
+
       <div id="finder" ></div>
       <div id="getdata_control" >
         <div id="selected" >
           <table>
             <thead>
               <tr>
-                <td>Delete</td>
+                <td>Del</td>
                 <td>Plot</td>
-                <td>Color</td>
                 <td>Name</td>
-                <td>Archive Fields</d>
                 <td>RTYP</td>
                 <td>Units</td>
                 <td>Processing</td>
@@ -204,9 +250,9 @@ HERE;
             </tbody>
           </table>
         </div>
-        <div                class="title"   >Last:</div>
+        <div                class="title"   >WINDOW SIZE:</div>
         <div id="interval"  class="control" ></div>
-        <div                class="title"   >Before:</div>
+        <div                class="title"   >END:</div>
         <div id="end_ymd"   class="control end" ><input type="text" size="8" /></div>
         <div id="end_hh"    class="control end" ><input type="text" size="1" value="10" /></div>
         <div                class="title   end" >:</div>
@@ -216,7 +262,8 @@ HERE;
         <div id="end_now"   class="control end" ><button>NOW</button></div>
         <div style="clear:both;" ></div>
       </div>
-      <div id="timeseries" ></div>
+      <div id="display" ></div>
+<!--      <div id="timeseries" ></div>-->
     </div>
     <!-- Do not display this image. It's needed as a repository of icons for
          plots. Note this is just a temporary solution. Eventually the icon

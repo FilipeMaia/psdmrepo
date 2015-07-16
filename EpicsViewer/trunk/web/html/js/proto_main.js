@@ -35,11 +35,15 @@ require.config ({
 
 require ([
     'webfwk/CSSLoader' ,
+    'webfwk/Class' ,
+    'webfwk/Widget' ,
     'EpicsViewer/TimeSeriesPlotN' ,
     'EpicsViewer/Definitions' ,
     'EpicsViewer/Interval' ,
     'EpicsViewer/WebService' ,
     'EpicsViewer/Finder' ,
+    'EpicsViewer/DisplaySelector' ,
+    'EpicsViewer/DataTableDisplay' ,
 
     // Make sure the core libraries are preloaded so that the applications
     // won't borther with loading them individually
@@ -48,13 +52,47 @@ require ([
 
 function (
     cssloader ,
+    Class ,
+    Widget ,
     TimeSeriesPlotN ,
     Definitions ,
     Interval ,
     WebService ,
-    Finder) {
+    Finder ,
+    DisplaySelector, 
+    DataTableDisplay) {
 
     cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
+
+    function DummyPlot (parent, message) {
+
+        Widget.Widget.call(this) ;
+
+        this._parent = parent ;
+        this._message = message ;
+
+        this._isRendered = false ;
+        this._isActive = false ;
+
+        this.on_activate = function () {
+            this._isActive = true ;
+            this._display() ;
+        } ;
+        this.on_deactivate = function () {
+            this._isActive = false ;
+        } ;
+        this.render = function () {
+            if (this._isRendered) return ;
+            this._isRendered = true ;
+            this._display() ;
+        } ;
+        this._display = function () {
+            if (!this._isRendered) return ;
+            if (!this._isActive) return ;
+            this.container.html(this._message) ;
+        } ;
+    }
+    Class.define_class(DummyPlot, Widget.Widget, {}, {}) ;
 
     function EpicsViewer (pvs) {
 
@@ -69,7 +107,7 @@ function (
         this._interval = null ;         // the current timeine interval management
 
         // displays (plots)
-        this._timeSeriesPlot = null ;
+        this._displaySelector = null ;
 
         // total number of PVs to be loaded
         this._num2load = 0 ;
@@ -107,34 +145,59 @@ function (
                     _that._loadAllTimeLines(xbins) ;
                 }
             }) ;
-            this._timeSeriesPlot = new TimeSeriesPlotN ({
-                x_zoom_in:      function (e) { _that._interval.zoomIn   (e.xbins) ; } ,
-                x_zoom_out:     function (e) { _that._interval.zoomOut  (e.xbins) ; } ,
-                x_move_left:    function (e) { _that._interval.moveLeft (e.xbins, e.dx) ; } ,
-                x_move_right:   function (e) { _that._interval.moveRight(e.xbins, e.dx) ; } ,
-                y_range_change: function (name, yRange) {
-                    if (yRange) {
-                        _that._y_range_lock[name] = {
-                            min: yRange.min ,
-                            max: yRange.max
-                        } ;
-                    } else {
-                        if (_that._y_range_lock[name]) {
-                            delete _that._y_range_lock[name] ;
+            this._displaySelector = new DisplaySelector($('#display') , [
+                {   id:     "timeseries" ,
+                    name:   "T<sub>series</sub>" ,
+                    descr:  "Time series plots for PVs and functions" ,
+                    widget: new TimeSeriesPlotN ({
+                        x_zoom_in:      function (e) { _that._interval.zoomIn   (e.xbins) ; } ,
+                        x_zoom_out:     function (e) { _that._interval.zoomOut  (e.xbins) ; } ,
+                        x_move_left:    function (e) { _that._interval.moveLeft (e.xbins, e.dx) ; } ,
+                        x_move_right:   function (e) { _that._interval.moveRight(e.xbins, e.dx) ; } ,
+                        y_range_change: function (name, yRange) {
+                            if (yRange) {
+                                _that._y_range_lock[name] = {
+                                    min: yRange.min ,
+                                    max: yRange.max
+                                } ;
+                            } else {
+                                if (_that._y_range_lock[name]) {
+                                    delete _that._y_range_lock[name] ;
+                                }
+                            }
+                        } ,
+                        ruler_change: function (values) {
+                            for (var pvname in values) {
+                                var v = values[pvname] ;
+                                var msec = Math.floor(1000. * v[0]) ,
+                                    t = new Date(msec) ;
+                                _that._selectedPVs[pvname].children('td.time') .html(Interval.time2htmlUTC(t)) ;
+                                _that._selectedPVs[pvname].children('td.value').text(v[1]) ;
+                            }
                         }
-                    }
-                } ,
-                ruler_change: function (values) {
-                    for (var pvname in values) {
-                        var v = values[pvname] ;
-                        var msec = Math.floor(1000. * v[0]) ,
-                            t = new Date(msec) ;
-                        _that._selectedPVs[pvname].children('td.time') .html(Interval.time2htmlUTC(t)) ;
-                        _that._selectedPVs[pvname].children('td.value').text(v[1]) ;
-                    }
-                }
-            }) ;
-            this._timeSeriesPlot.display($('#timeseries')) ;
+                    })} ,
+
+                {   id:     "waveform" ,
+                    name:   "W<sub>form</sub>" ,
+                    descr:  "Waveform plots for PVs and functions" ,
+                    widget: new DummyPlot(this, 'Waveform')} ,
+
+                {   id:     "correlation" ,
+                    name:   "C<sub>plot</sub>" ,
+                    descr:  "Correlation plots for select PVs and functions" ,
+                    widget: new DummyPlot(this, 'Correlation plot')} ,
+
+                {   id:     "histogram" ,
+                    name:   "H-gram" ,
+                    descr:  "Histograms for all relevant PVs and functions" ,
+                    widget: new DummyPlot(this, 'Histograms')} ,
+
+                {   id:     "data" ,
+                    name:   "Data" ,
+                    descr:  "Detailed information on PVs, functions and plots, \n" +
+                            "including tabular representation of data points" ,
+                    widget: new DataTableDisplay()}
+            ]) ;
 
             // Load the specified PV if the one was passed as the parameter
             // to the application.
@@ -175,27 +238,22 @@ function (
         } ;
         this._plot = {} ;
         this._colors = {} ;
-        this._archiveFields = {} ;
         this._processing = {} ;
         this._scales = {} ;
         this._selectedPVs = {} ;
         this._addEntryToSelected = function (pvname) {
             this._plot[pvname] = true ;
             this._colors[pvname] = this._getNextColor() ;
-            this._archiveFields[pvname] = '' ;
             this._processing[pvname] = '' ;
             this._scales[pvname] = 'linear' ;
             var html =
 '<tr id="'+pvname+'" > ' +
   '<td><button name="delete" class="control-button-important" >x</button></td> ' +
   '<td><input  name="plot"   type="checkbox" checked="checked" /></td> ' +
-  '<td><div    name="color"  style="width: 12px; height:12px; background-color: '+this._colors[pvname]+';" >&nbsp;</div></td> ' +
-  '<td class="pvname" >'+pvname+'</td> ' +
-  '<td> ' +
-    '<select  name="archiveFields" > ' +
-      '<option val=""       ></option> ' + _.reduce(this.pvtypeinfo[pvname].archiveFields, function (html, f) { return html +=
-      '<option val="'+f+'" >'+f+'</option> ' ; }, '') +
-    '</select> ' +
+  '<td class="pvname" >' +
+    '<div style="float:left; width: 12px; height:12px; background-color: '+this._colors[pvname]+';" >&nbsp;</div> ' +
+    '<div style="float:left; margin-left:4px;" >' + pvname + '</div> ' +
+    '<div style="clear:both;" ></div> ' +
   '</td> ' +
   '<td>'+this.pvtypeinfo[pvname].extraFields.RTYP+'</td> ' +
   '<td>'+this.pvtypeinfo[pvname].units+'</td> ' +
@@ -221,12 +279,12 @@ function (
                 .mouseover(function () {
                     var tr = $(this).closest('tr') ;
                     var pvname = tr.prop('id') ;
-                    _that._timeSeriesPlot.highlight(pvname, true) ;
+                    _that._displaySelector.get('timeseries').highlight(pvname, true) ;
                 })
                 .mouseout(function () {
                     var tr = $(this).closest('tr') ;
                     var pvname = tr.prop('id') ;
-                    _that._timeSeriesPlot.highlight(pvname, false) ;
+                    _that._displaySelector.get('timeseries').highlight(pvname, false) ;
                 })
             ;
             this._selectedPVs[pvname].find('button[name="delete"]').button().click(function () {
@@ -239,12 +297,6 @@ function (
                 var pvname = tr.prop('id') ;
                 _that._plot[pvname] = $(this).prop('checked') ? true : false ;
                 _that.display_timeline() ;
-            }) ;
-            this._selectedPVs[pvname].find('select[name="archiveFields"]').change(function () {
-                var tr = $(this).closest('tr') ;
-                var pvname = tr.prop('id') ;
-                _that._archiveFields[pvname] = $(this).val() ;
-                _that._loadAllTimeLines() ;
             }) ;
             this._selectedPVs[pvname].find('select[name="processing"]').change(function () {
                 var tr = $(this).closest('tr') ;
@@ -264,7 +316,6 @@ function (
             delete this._plot[pvname] ;
             delete this._colors[pvname] ;
             delete this._scales[pvname] ;
-            delete this._archiveFields[pvname] ;
             delete this._processing[pvname] ;
             this._selectedPVs[pvname].remove() ;
             delete this._selectedPVs[pvname] ;
@@ -288,7 +339,7 @@ function (
             this._selectedPVs[pvname].find('select[name="scale"]').prop('disabled', true) ;
 
             // data subchannel for the PV
-            var pvname_archiveFields = pvname + (this._archiveFields[pvname] === '' ? '' :  '.' + this._archiveFields[pvname]) ;
+            var pvname_archiveFields = pvname  ;
 
             // Make sure the previous value is always set to something.
             // Keep refreshing it after each call with a valid parameter
@@ -355,6 +406,7 @@ function (
                 {   pv:   pv_fetch_method ,
                     from: this._interval.from.toISOString() ,
                     to:   this._interval.to.toISOString() ,
+                    fetchLatestMetadata: true
                 }  ,
                 function (data) {
                     _that.pvdata[pvname] = data ;
@@ -384,7 +436,7 @@ function (
                 ++num_pvs;
             }
             if (!num_pvs) {
-                this._timeSeriesPlot.reset() ;
+                this._displaySelector.get('timeseries').reset() ;
                 return ;
             }
 
@@ -447,7 +499,8 @@ function (
             }
     
             // Plot the points using an appropriate method
-            this._timeSeriesPlot.load(x_range, many_series) ;
+            this._displaySelector.get('timeseries').load(x_range, many_series) ;
+            this._displaySelector.get('data').load(x_range, many_series) ;
         } ;
     }
 

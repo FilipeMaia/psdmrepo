@@ -225,6 +225,15 @@ function (
         this._CANVAS_WIDTH  = 0 ;
         this._CANVAS_HEIGHT = 0 ;
 
+        this.on_activate = function () {
+            this._display() ;
+        } ;
+
+        this.resize = function () {
+            this._canvasPlot.css('height', (window.innerHeight-this._canvasPlot.offset().top - 30)+'px') ;
+            this._canvasGrid.css('height', (window.innerHeight-this._canvasGrid.offset().top - 30)+'px') ;
+        } ;
+
         /**
          * Implement the widget rendering protocol
          *
@@ -250,11 +259,12 @@ function (
             //       bottom of the application's window. This may change if
             //       the application gets a different layout
 
-            this._canvasPlot.css('height', (window.innerHeight-this._canvasPlot.offset().top - 30)+'px') ;
-            this._canvasGrid.css('height', (window.innerHeight-this._canvasGrid.offset().top - 30)+'px') ;
+//            this._canvasPlot.css('height', (window.innerHeight-this._canvasPlot.offset().top - 30)+'px') ;
+//            this._canvasGrid.css('height', (window.innerHeight-this._canvasGrid.offset().top - 30)+'px') ;
+            this.resize() ;
             $(window).resize(function () {
-                _that._canvasPlot.css('height', (window.innerHeight-_that._canvasPlot.offset().top - 30)+'px') ;
-                _that._canvasGrid.css('height', (window.innerHeight-_that._canvasGrid.offset().top - 30)+'px') ;
+//                _that._canvasPlot.css('height', (window.innerHeight-_that._canvasPlot.offset().top - 30)+'px') ;
+//                _that._canvasGrid.css('height', (window.innerHeight-_that._canvasGrid.offset().top - 30)+'px') ;
                 _that._display() ;  // redisplay is needed to prevent plots
                                     // from being scaled.
             }) ;
@@ -682,6 +692,8 @@ function (
             // No data or empty data - no display
             if (!this._series.length) return ;
 
+            this.resize() ;
+
             this._initDrawingContext() ;
             this._prepareAxes() ;
             this._plotData() ;
@@ -1001,9 +1013,11 @@ function (
 
             if (active) {
                 this._cxtPlot.fillStyle = _ACTIVE_AXES_COLOR ;
-                this._cxtPlot.fillRect(xMin+1,  yMin+1, width-1, height-1) ;
+                this._cxtPlot.fillRect(xMin+1,  1, width-1, yMax-1) ;
+//                this._cxtPlot.fillRect(xMin+1,  yMin+1, width-1, height-1) ;
             } else {
-                this._cxtPlot.clearRect(xMin+1, yMin,   width-1, height) ;
+                this._cxtPlot.clearRect(xMin+1, 0,   width-1, yMax) ;
+//                this._cxtPlot.clearRect(xMin+1, yMin,   width-1, height) ;
             }
             
             // Draw the axes itself
@@ -1011,7 +1025,9 @@ function (
             this._cxtPlot.beginPath() ;
             this._cxtPlot.lineWidth   = i == this._series.length - 1 ?                 1.25 :           1 ;
             this._cxtPlot.strokeStyle = i == this._series.length - 1 ? _PRIMARY_AXIS_COLOR : _AXIS_COLOR ;
-            this._cxtPlot.moveTo(xMax, yMin) ;
+//            this._cxtPlot.moveTo(xMax, yMin) ;
+//            this._cxtPlot.lineTo(xMax, yMax) ;
+            this._cxtPlot.moveTo(xMax, 0) ;
             this._cxtPlot.lineTo(xMax, yMax) ;
             this._cxtPlot.stroke();
 
