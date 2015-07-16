@@ -132,11 +132,11 @@ def getImageFromIndexArrays(iX,iY,W=None) :
 
 #--------------------------------
 
-def plotHistogram(arr, amp_range=None, figsize=(6,6), bins=None, title='') :
+def plotHistogram(arr, amp_range=None, figsize=(6,6), bins=None, title='', window=(0.15, 0.10, 0.78, 0.82)) :
     """Makes historgam from input array of values (arr), which are sorted in number of bins (bins) in the range (amp_range=(amin,amax))
     """
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w', frameon=True)
-    axhi = fig.add_axes((0.15, 0.10, 0.78, 0.82))
+    axhi = fig.add_axes(window)
     hbins = bins if bins is not None else 100
     hi = axhi.hist(arr.flatten(), bins=hbins, range=amp_range) #, log=logYIsOn)
     #fig.canvas.set_window_title(title)
@@ -171,9 +171,9 @@ def plotSpectrum(arr, amp_range=None, figsize=(6,6)) : # range=(0,500)
 
 #--------------------------------
 
-def plotImage(arr, img_range=None, amp_range=None, figsize=(12,5), title='Image', origin='upper') : 
+def plotImage(arr, img_range=None, amp_range=None, figsize=(12,5), title='Image', origin='upper', window=(0.05,  0.05, 0.95, 0.92)) : 
     fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    axim = fig.add_axes([0.05,  0.05, 0.95, 0.92])
+    axim = fig.add_axes(window)
     imsh = plt.imshow(arr, interpolation='nearest', aspect='auto', origin=origin, extent=img_range) #,extent=self.XYRange, origin='lower'
     colb = fig.colorbar(imsh, pad=0.005, fraction=0.1, shrink=1, aspect=20)
     if amp_range is not None : imsh.set_clim(amp_range[0],amp_range[1])
@@ -182,9 +182,9 @@ def plotImage(arr, img_range=None, amp_range=None, figsize=(12,5), title='Image'
 
 #--------------------------------
 
-def plotImageLarge(arr, img_range=None, amp_range=None, figsize=(12,10), title='Image', origin='upper') : 
+def plotImageLarge(arr, img_range=None, amp_range=None, figsize=(12,10), title='Image', origin='upper', window=(0.05,  0.03, 0.94, 0.94)) : 
     fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    axim = fig.add_axes((0.05,  0.03, 0.94, 0.94))
+    axim = fig.add_axes(window)
     imsh = axim.imshow(arr, interpolation='nearest', aspect='auto', origin=origin, extent=img_range)
     colb = fig.colorbar(imsh, pad=0.005, fraction=0.09, shrink=1, aspect=40) # orientation=1
     if amp_range is not None : imsh.set_clim(amp_range[0],amp_range[1])
@@ -212,9 +212,9 @@ def plotImageAndSpectrum(arr, amp_range=None) : #range=(0,500)
 
 #------------------------------
 
-def plotGraph(x,y, figsize=(10,5)) : 
+def plotGraph(x,y, figsize=(10,5), window=(0.15, 0.10, 0.78, 0.86)) : 
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    ax = fig.add_axes([0.15, 0.10, 0.78, 0.86])
+    ax = fig.add_axes(window)
     ax.plot(x,y,'b-')
     return fig, ax
 
