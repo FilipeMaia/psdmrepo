@@ -356,7 +356,7 @@ Analyze::Analyze (const std::string& name)
   m_use_calib_db_ref = config("use_calib_db_ref",false);
   m_validConfigKeys.insert("use_calib_db_ref");
 
-  std::string ref_load  = configStr("ref_load");
+  std::string ref_load  = configStr("ref_load", "");
   if (!ref_load.empty()) {
     if (m_use_calib_db_ref) {
       MsgLog(name, fatal, name << ": ref_load and use_calib_db_ref confict, both are set.");
