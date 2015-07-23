@@ -1,0 +1,6 @@
+psana:
+- Detector: Re-implement mask method to generate combined mask array, rename
+  methods by user's request (PSAS-139); PyDetector.py - add protection and warnings
+  for missing data/pedestal/mask in calib(.) (PSAS-139)
+- pyimgalgos: in GlobalGraphics.py - add window parameter in a few methods.
+- TimeTool: allow default option for ref_load parameter (PSAS-168)
