@@ -1,0 +1,54 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package lusi-xtc
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from os.path import join as pjoin
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving some or all parameters.
+#
+
+
+pkg_ver = '8.3.2'
+# version change is needed due to indirect dependency on a newer
+# version of the Boost library on those platforms.
+if env['SIT_ARCH_OS'] in ('rhel6','rhel7') : pkg_ver = pkg_ver + "a"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', 'pdsdata', pkg_ver)
+
+# pdsdata package will link all the stuff, but only includes one
+# library into the build
+BINDIR = 'bin'
+LIBDIR = 'lib'
+INCDIR = 'pdsdata'
+PKGLIBS = 'xtcdata'
+standardExternalPackage('pdsdata', **locals())
+
+del LIBDIR
+del INCDIR
+del BINDIR
+
+# map package names to libraries
+packages = {
+    'app'           : 'appdata',
+    'compress'      : 'compressdata',
+    'index'         : 'indexdata',
+    'psddl'         : 'psddl_pdsdata',
+}
+
+for pkg, lib in packages.items():
+    PKGLIBS = lib
+    PKGINFO = None
+    DEPS = 'pdsdata'
+    standardExternalPackage('pdsdata_'+pkg, **locals())
