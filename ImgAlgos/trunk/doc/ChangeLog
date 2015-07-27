@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-07-27 Mikhail S. Dubrovin
+- Add classes for Python-to-C++ algorithms, modify SConscript (PSAS-147)
+  - new and modified modules: AlgImgProc, AlgArrProc, Window, examples/*, src/__init__.py, PyAlgos.py, pyext/pyImgAlgos.cpp
+- Move struct TwoIndexes from a few classes to to GlobalMethods.h
+  - affected modules: ImgPeakFinderAB.h, ImgMaskEvaluation.h, CSPadArrPeakFinder.h, EpixNDArrProducer.cpp
+
 Tag: V00-03-88
 2015-06-08 Mikhail S. Dubrovin
 - add class CommonModeCorrection, which is used to apply CommonMode algorithms (PSAS-139)

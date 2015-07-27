@@ -135,6 +135,15 @@ using namespace std;
 
  // const static int UnknownCM = -10000; 
 
+//--------------------
+
+struct TwoIndexes {
+  int i;
+  int j;
+};
+
+//--------------------
+
 class NDArrPars {
 public:
   NDArrPars();

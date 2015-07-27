@@ -26,6 +26,7 @@
 //-------------------------------
 #include "ImgAlgos/ImgParametersV1.h"
 #include "ImgAlgos/TimeInterval.h"
+#include "ImgAlgos/GlobalMethods.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -52,10 +53,11 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-struct TwoIndexes {
-  int i;
-  int j;
-};
+// Moved to GlobalMethods.h
+//struct TwoIndexes {
+//  int i;
+//  int j;
+//};
 
 struct MedianResult {
   double avg;

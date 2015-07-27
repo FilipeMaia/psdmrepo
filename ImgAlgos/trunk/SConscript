@@ -29,5 +29,6 @@ Import('*')
 #standardSConscript(NEED_QT=1, UTESTS=[])
 #standardSConscript()
 
-standardSConscript( LIBS="psalg gomp rt pthread png tiff", UTESTS=[], CCFLAGS="-fopenmp")
+#standardSConscript(PYEXTMOD="ImgAlgos", LIBS="psalg gomp rt pthread png tiff", UTESTS=[], CCFLAGS="-fopenmp", DOCGEN="doxy-all pyana-ref")
+standardSConscript(PYEXTMOD="imgalgos_ext", LIBS="psalg gomp rt pthread png tiff", UTESTS=[], CCFLAGS="-fopenmp", DOCGEN="doxy-all pyana-ref")
 

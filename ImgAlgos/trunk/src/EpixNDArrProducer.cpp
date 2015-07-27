@@ -86,6 +86,7 @@ EpixNDArrProducer::beginCalibCycle(Event& evt, Env& env)
   if ( getConfigData<Psana::Epix::ConfigV1>    (env, "ConfigV1"   )  ) return;
   if ( getConfigData<Psana::Epix::Config10KV1> (env, "Config10KV1")  ) return;
   if ( getConfigData<Psana::Epix::Config100aV1>(env, "Config100aV1") ) return;
+  //if ( getConfigData<Psana::Epix::Config100aV2>(env, "Config100aV2") ) return;
 }
 
 //--------------------
