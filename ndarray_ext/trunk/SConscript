@@ -39,6 +39,9 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 
 pkg = "ndarray"
 pkg_ver = "1.1.5"
+# version change is needed due to indirect dependency on a newer
+# version of the Boost library on those platforms.
+if env['SIT_ARCH_OS'] in ('rhel6','rhel7') : pkg_ver = pkg_ver + "a"
 
 PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 INCDIR = "ndarray"
