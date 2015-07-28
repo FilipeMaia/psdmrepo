@@ -1,0 +1,14 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# Description:
+#   Test script for Translator/H5Output event processing
+#   
+#------------------------------------------------------------------------
+
+
+#from Translator.unitTests import *
+
+if __name__ == "__main__":
+  # temporarily disable unit test for rhel7 build
+  pass
+#    unittest.main(argv=[sys.argv[0], '-v'])
