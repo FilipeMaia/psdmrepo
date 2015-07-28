@@ -14,6 +14,7 @@
 #include <ctype.h>
 #include <pthread.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <iostream>
 #include "cheetah/detectorObject.h"
 #include "cheetah/frameBuffer.h"
