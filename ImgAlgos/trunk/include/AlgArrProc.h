@@ -155,6 +155,13 @@ public:
 
   void setWindows(ndarray<const wind_t,2> nda_winds);
 
+  /// Set peak selection parameters MUST BE CALLED BEFORE PEAKFINDER!!!
+  void setPeakSelectionPars(const float& npix_min=2, 
+                            const float& npix_max=200, 
+                            const float& amax_thr=0, 
+                            const float& atot_thr=0,
+                            const float& son_min=3);
+
   //void setSoNPars(const float& r0=5, const float& dr=0.05) { std::cout << "AlgArrProc::setSoNPars IS NOT IMPLEMENTED!!!"; }
 
   /// Destructor
@@ -178,6 +185,12 @@ private:
 
   mask_t*    m_mask_def;
   const mask_t* m_mask;
+
+  float    m_peak_npix_min; // peak selection parameter
+  float    m_peak_npix_max; // peak selection parameter
+  float    m_peak_amax_thr; // peak selection parameter
+  float    m_peak_atot_thr; // peak selection parameter
+  float    m_peak_son_min;  // peak selection parameter
 
   std::vector<Window>        v_winds;
   std::vector<AlgImgProc*>   v_algip;    // vector of pointers to the AlgImgProc objects for windows
@@ -238,6 +251,7 @@ public:
         for(size_t seg=0; seg<m_nsegs; ++seg) {            
             AlgImgProc* p_alg = new AlgImgProc(seg, 0, m_nrows, 0, m_ncols, pbits);
             v_algip.push_back(p_alg);
+            p_alg->setPeakSelectionPars(m_peak_npix_min, m_peak_npix_max, m_peak_amax_thr, m_peak_atot_thr, m_peak_son_min);
         }       
     }
     else {
@@ -246,6 +260,7 @@ public:
         for(std::vector<Window>::iterator it = v_winds.begin(); it != v_winds.end(); ++ it) {
             AlgImgProc* p_alg = new AlgImgProc(it->segind, it->rowmin, it->rowmax, it->colmin, it->colmax , pbits);
             v_algip.push_back(p_alg); 
+            p_alg->setPeakSelectionPars(m_peak_npix_min, m_peak_npix_max, m_peak_amax_thr, m_peak_atot_thr, m_peak_son_min);
         }
     }
 

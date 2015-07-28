@@ -269,7 +269,15 @@ public:
    * @param[in] r0 - radial parameter of the ring for S/N evaluation algorithm
    * @param[in] dr - ring width for S/N evaluation algorithm 
    */
-  void setSoNPars(const float& r0=5, const float& dr=0.05);
+  void setSoNPars(const float& r0=5, 
+                  const float& dr=0.05);
+
+  /// Set peak selection parameters
+  void setPeakSelectionPars(const float& npix_min=2, 
+                            const float& npix_max=200, 
+                            const float& amax_thr=0, 
+                            const float& atot_thr=0,
+                            const float& son_min=3);
 
   /// Returns segment index in the ndarray
   const size_t& segind(){ return m_seg; }
@@ -302,6 +310,12 @@ private:
 
   SoNResult m_sonres_def;
 
+  float    m_peak_npix_min; // peak selection parameter
+  float    m_peak_npix_max; // peak selection parameter
+  float    m_peak_amax_thr; // peak selection parameter
+  float    m_peak_atot_thr; // peak selection parameter
+  float    m_peak_son_min;  // peak selection parameter
+
   //Peak     m_peak;
 
   ndarray<pixel_status_t, 2> m_pixel_status;
@@ -324,6 +338,12 @@ private:
 
   /// Makes m_conmap - map of connected pixels with enumerated regions from m_pixel_status and counts m_numreg
   void _makeMapOfConnectedPixels();
+
+  /// Decide whether PeakWork should be processed and included in the output v_peaks
+  bool _peakWorkIsSelected(const PeakWork& pw);
+
+  /// Decide if peak should be included or not in the output v_peaks
+  bool _peakIsSelected(const Peak& peak);
 
   /// Makes list of peaks from v_peaks_work
   void _makeListOfPeaks();
@@ -372,16 +392,17 @@ void
 _procConnectedPixels(const ndarray<const T,2>& data)
 {
   if(m_pbits & 256) MsgLog(_name(), info, "in _procConnectedPixels, seg=" << m_seg);
+  //if(m_pbits & 256) m_win.print();
 
   v_peaks_work.clear();
 
   if(m_numreg==0) return;
 
-  v_peaks_work.reserve(m_numreg+1);
+  v_peaks_work.reserve(m_numreg+1); // use numeration from 1
   PeakWork pw0; // def init with 0
+  pw0.peak_cmin = m_win.colmax;
+  pw0.peak_rmin = m_win.rowmax;
   std::fill_n(&v_peaks_work[0], int(m_numreg+1), pw0);
-
-  m_win.print();
 
   for(unsigned r = m_win.rowmin; r<m_win.rowmax; r++) {
     for(unsigned c = m_win.colmin; c<m_win.colmax; c++) {
@@ -402,8 +423,8 @@ _procConnectedPixels(const ndarray<const T,2>& data)
       pw.peak_ac2  += amp*c*c;    
 
       if(amp > pw.peak_amax) {
-        pw.peak_row = r;
-	pw.peak_col = c;
+        pw.peak_row  = r;
+	pw.peak_col  = c;
         pw.peak_amax = amp;   
       }
 
@@ -413,7 +434,6 @@ _procConnectedPixels(const ndarray<const T,2>& data)
       if(r > pw.peak_rmax) pw.peak_rmax = r;
     }
   }
-  std::cout << " m_numreg=" << m_numreg << '\n';
 }
 
 //--------------------
@@ -661,7 +681,9 @@ peakFinder( const ndarray<const T,2>&      data
   _makeMapOfConnectedPixels();
   _procConnectedPixels<T>(data);
   _makeListOfPeaks();
-  _addSoNToPeaks<T>(data, mask, r0, dr);  
+  _addSoNToPeaks<T>(data, mask, r0, dr);
+
+  if(m_pbits & 256 && v_peaks.size()) std::cout << "  peakFinder v_peaks[0]: " << v_peaks[0] << '\n';
 
   return v_peaks; 
 }

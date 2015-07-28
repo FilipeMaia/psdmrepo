@@ -41,6 +41,11 @@ AlgImgProc::AlgImgProc ( const size_t&   seg
   , m_r0(5)
   , m_dr(0.05)
   , m_sonres_def()
+  , m_peak_npix_min(2)
+  , m_peak_npix_max(200)
+  , m_peak_amax_thr(0)
+  , m_peak_atot_thr(150)
+  , m_peak_son_min(3)
 {
   if(m_pbits & 256) MsgLog(_name(), info, "in c-tor AlgImgProc, seg=" << m_seg);
   m_win.set(seg, rowmin, rowmax, colmin, colmax);
@@ -87,7 +92,7 @@ AlgImgProc::_makeMapOfConnectedPixels()
     for(unsigned c = m_win.colmin; c<m_win.colmax; c++) {
 
       if(!(m_pixel_status[r][c] & 1)) continue;
-      m_numreg++;
+      ++ m_numreg;
       _findConnectedPixels(r, c);
     }
   }
@@ -115,6 +120,27 @@ AlgImgProc::_findConnectedPixels(const unsigned& r, const unsigned& c)
 
 //--------------------
 
+bool
+AlgImgProc::_peakWorkIsSelected(const PeakWork& pw)
+{
+  if (pw.peak_npix < m_peak_npix_min) return false;
+  if (pw.peak_npix > m_peak_npix_max) return false;
+  if (pw.peak_amax < m_peak_amax_thr) return false;
+  if (pw.peak_atot < m_peak_atot_thr) return false;
+  return true;
+}
+
+//--------------------
+
+bool
+AlgImgProc::_peakIsSelected(const Peak& peak)
+{
+  if (peak.son < m_peak_son_min) return false;
+  return true;
+}
+
+//--------------------
+
 void
 AlgImgProc::_makeListOfPeaks()
 {
@@ -129,7 +155,10 @@ AlgImgProc::_makeListOfPeaks()
 
   for(unsigned i=0; i<m_numreg; i++) {
 
-    PeakWork& pw = v_peaks_work[i+1];
+    PeakWork& pw = v_peaks_work[i+1]; // region numbers begin from 1
+
+    if(! _peakWorkIsSelected(pw)) continue;
+
     Peak   peak; // = v_peaks[i];
 
     peak.seg       = m_seg;
@@ -150,10 +179,9 @@ AlgImgProc::_makeListOfPeaks()
     peak.noise = 0;
     peak.son   = 0;
 
+    //if(! _peakIsSelected(peak)) continue;
     v_peaks.push_back(peak);
   }
-
-  std::cout << "peak0: " << v_peaks[0] << '\n';
 }
 
 //--------------------
@@ -191,6 +219,20 @@ AlgImgProc::setSoNPars(const float& r0, const float& dr)
 
   if(r0==m_r0 && dr==m_dr) return;
   _evaluateRingIndexes(r0, dr);
+}
+
+//--------------------
+
+void
+AlgImgProc::setPeakSelectionPars(const float& npix_min, const float& npix_max,
+                                 const float& amax_thr, const float& atot_thr, const float& son_min)
+{
+  if(m_pbits & 256) MsgLog(_name(), info, "in setPeakSelectionPars, seg=" << m_seg);
+  m_peak_npix_min = npix_min;
+  m_peak_npix_max = npix_max;
+  m_peak_amax_thr = amax_thr;
+  m_peak_atot_thr = atot_thr;
+  m_peak_son_min  = son_min;
 }
 
 //--------------------

@@ -128,7 +128,19 @@ class PyAlgos :
         """
         self.windows = np.array(windows, dtype=np.uint32)
         self.aap.set_windows(self.windows)
-        
+
+##-----------------------------
+
+    def set_peak_selection_pars(self, npix_min=2, npix_max=200, amax_thr=0, atot_thr=0, son_min=3) :
+        """
+        @param npix_min - minimal number of pixels in peak
+        @param npix_max - maximal number of pixels in peak
+        @param amax_thr - threshold on pixel amplitude
+        @param amax_thr - threshold on total amplitude
+        @param son_min - minimal S/N in peak
+        """
+        self.aap.set_peak_selection_pars(npix_min, npix_max, amax_thr, atot_thr, son_min)
+
 ##-----------------------------
 
     def set_mask(self, mask) :

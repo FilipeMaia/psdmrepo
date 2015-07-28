@@ -41,6 +41,7 @@ AlgArrProc::AlgArrProc()
   , m_mask(0)
 {
   v_winds.clear();
+  setPeakSelectionPars(); // default init
 
   if(m_pbits & 1) printInputPars();
 }
@@ -54,6 +55,7 @@ AlgArrProc::AlgArrProc(const unsigned& pbits)
   , m_mask(0)
 {
   v_winds.clear();
+  setPeakSelectionPars(); // default init
 }
 
 //--------------------
@@ -68,6 +70,7 @@ AlgArrProc::AlgArrProc(ndarray<const wind_t,2> nda_winds, const unsigned& pbits)
   if(m_pbits & 256) MsgLog(_name(), info, "in c-tor AlgArrProc(2)");
 
   setWindows(nda_winds);
+  setPeakSelectionPars(); // default init
 
   //v_winds.clear();
 
@@ -136,6 +139,24 @@ AlgArrProc::setWindows(ndarray<const wind_t,2> nda_winds)
 
 //--------------------
 
+void
+AlgArrProc::setPeakSelectionPars(const float& npix_min, 
+                                 const float& npix_max, 
+                                 const float& amax_thr, 
+                                 const float& atot_thr,
+                                 const float& son_min)
+{
+  if(m_pbits & 256) MsgLog(_name(), info, "in setPeakSelectionPars");
+
+  m_peak_npix_min = npix_min;
+  m_peak_npix_max = npix_max;
+  m_peak_amax_thr = amax_thr;
+  m_peak_atot_thr = atot_thr;
+  m_peak_son_min  = son_min;
+}
+
+//--------------------
+
 void 
 AlgArrProc::printInputPars()
 {
@@ -159,8 +180,8 @@ AlgArrProc::printInputPars()
   const ndarray<const float, 2>
   AlgArrProc::_ndarrayOfPeakPars(const unsigned& npeaks)
   {
-    if(m_pbits & 256) MsgLog(_name(), info, "in _ndarrayOfPeakPars");
-    if(m_pbits & 1) MsgLog(_name(), info, "List of found peaks:"); 
+    if(m_pbits & 256) MsgLog(_name(), info, "in _ndarrayOfPeakPars, npeaks = " << npeaks);
+    if(m_pbits & 1) MsgLog(_name(), info, "List of found peaks, npeaks = " << npeaks); 
 
     //unsigned shape[2] = {npeaks, 16};
     unsigned sizepk = sizeof(Peak) / sizeof(float);

@@ -44,8 +44,8 @@ def plot_peaks_on_img(peaks, axim, iX, iY, color='w', pbits=0) :
 ##-----------------------------
 
 ###================
-EVTMAX      = 100
-SKIP_EVENTS = 2
+EVTMAX      = 1
+SKIP_EVENTS = 0
 EVTSKIPPLOT = 1 #10
 DO_PLOT     = False
 DO_PLOT     = True
@@ -111,7 +111,8 @@ winds_equ = (( 0, 0, 185, 0, 388), \
 winds = winds_arc
 #print_arr_attr(winds, 'Windows')
 
-alg = PyAlgos(windows=winds, mask=mask, pbits=256)
+alg = PyAlgos(windows=winds, mask=mask, pbits=1)
+alg.set_peak_selection_pars(npix_min=2, npix_max=200, amax_thr=0, atot_thr=500, son_min=3)
 alg.print_attributes()
 
 ##-----------------------------
@@ -139,11 +140,12 @@ i = 0
 
 for i, evt in enumerate(ds.events()) :
 
+    if i<SKIP_EVENTS : continue
+    if i>=EVTMAX     : break
+
     nda = det.calib(evt)
 
     if nda is not None :
-
-        if i<SKIP_EVENTS : continue
 
         print 85*'_'
         print 'Event %d' % (i)
@@ -151,19 +153,22 @@ for i, evt in enumerate(ds.events()) :
         #print_arr_attr(nda, 'calibrated data')
         t0_sec = time()
         #peaks = alg.peak_finder_v1(nda, thr_low=10, thr_high=150, radius=5, dr=0.05) # dr is used for S/N evaluation
-        peaks = alg.peak_finder_v2(nda, thr=100, r0=5, dr=0.05)
-        print ' ----> consumed time = %f sec' % (time()-t0_sec)
+        peaks = alg.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+        print ' ----> peak_finder consumed time = %f sec' % (time()-t0_sec)
         #print_arr_attr(peaks, 'peaks')
 
         if DO_PLOT and i%EVTSKIPPLOT==0 :
             img = det.image(evt, mask*nda)[xoffset:xoffset+xsize,yoffset:yoffset+ysize]
             ave, rms = img.mean(), img.std()
-            gg.plot_img(img, mode='do not hold', amin=ave-1*rms, amax=ave+8*rms)
+            amin, amax = ave-1*rms, ave+8*rms
+            gg.plot_img(img, mode='do not hold', amin=amin, amax=amax)
             plot_peaks_on_img(peaks, axim, iXshaped, iYshaped, color='w') #, pbits=3)
+
+            #gg.plotHistogram(img, amp_range=(1,100), bins=99, title='Event %d' % i)
+
             fig.canvas.set_window_title('Event: %d' % i)    
             fig.canvas.draw() # re-draw figure content
 
-    if i>EVTMAX : break
 
 print ' ----> Event loop time = %f sec' % (time()-t0_sec_evloop)
 

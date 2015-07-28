@@ -12,6 +12,8 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2015-07-27 Mikhail S. Dubrovin
+Tag: V00-03-89
+- 1-st working versions of peakfinder and dropletfinder (PSAS-147)
 - Add classes for Python-to-C++ algorithms, modify SConscript (PSAS-147)
   - new and modified modules: AlgImgProc, AlgArrProc, Window, examples/*, src/__init__.py, PyAlgos.py, pyext/pyImgAlgos.cpp
 - Move struct TwoIndexes from a few classes to to GlobalMethods.h
