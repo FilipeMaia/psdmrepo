@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "PSCalib/GeometryAccess.h"
+#include "PSCalib/GeometryObject.h"
 
 //-----------------
 // C/C++ Headers --
@@ -182,7 +183,7 @@ GeometryAccess::shpGO GeometryAccess::parse_line(const std::string& line)
 
   if(ss >> pname >> pindex >> oname >> oindex >> x0 >> y0 >> z0 
         >> rot_z >> rot_y >> rot_x >> tilt_z >> tilt_y >> tilt_x) {
-      GeometryAccess::shpGO shp( new GeometryObject::GeometryObject (pname,
+      GeometryAccess::shpGO shp( new GeometryObject (pname,
                               		     pindex,
                               		     oname,
                               		     oindex,
@@ -231,7 +232,7 @@ GeometryAccess::shpGO GeometryAccess::find_parent(const GeometryAccess::shpGO& g
     if(m_pbits & 256) std::cout << "  create one with name:" << geobj->get_parent_name() 
                                 << " idx:" << geobj->get_parent_index() << '\n';
 
-    GeometryAccess::shpGO shp_top_parent( new GeometryObject::GeometryObject (std::string(),
+    GeometryAccess::shpGO shp_top_parent( new GeometryObject (std::string(),
                             		                      0,
                             		                      geobj->get_parent_name(),
                             		                      geobj->get_parent_index()));

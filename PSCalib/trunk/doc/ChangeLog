@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-46
+2015-07-27 Igor Gaponenko
+- fixed two buges uncovered during RHEL7 migration (JIRA PSRT-63)
+
 Tag: V00-02-45
 2015-07-07 Mikhail S. Dubrovin	
 - SegGeometryMatrixV1.h, GeometryAccess.h, CalibParsStore.h - fix doxygen documentation for parameter description.
