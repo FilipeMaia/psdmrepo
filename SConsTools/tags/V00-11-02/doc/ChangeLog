@@ -1,0 +1,540 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SConsTools
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-11-02
+2015-07-28 Igor Gaponenko
+- added linker option '-Wl,--copy-dt-needed-entries' for RHEL7 & GCC48
+to compensate for a change in the default behavior of the CC compiler
+when looking for undefined symbols in a chain of the shared libraries.
+(JIRA PSRT-64)
+
+Tag: V00-11-01
+2015-07-07 David Schneider
+- scons test unittests, sleep a second to try to fix text file is busy 
+  message. Include output of failed unit tests to make it easier to track
+  down build problems.
+
+TagL V00-11-00 
+2015-05-27 Igor Gaponenko
+updated to Python version 7.2.10 JIRA PSRT-52	
+	
+Tag: V00-10-01
+2014-07-17 Igor Gaponenko
+- adding support for RHEL7 and GCC 4.8
+
+Tag: V00-09-15
+2014-04-01 Igor Gaponenko
+- upgraded Qt4 from 4.6.2 to 4.8.5
+
+Tag: V00-09-14
+2013-12-16 Andy Salnikov
+- doc target: remove target directroy, always re-run generators event if 
+  directories are already there
+
+Tag: V00-09-13
+2013-09-19 Andy Salnikov
+- adding one more doc generator for all python modules/packages (pydoc-all)
+- by default all packages that produce python modules add themselves to
+  this generator, can be changed with DOCGEN in SConscript as usual
+
+Tag: V00-09-12
+2013-09-17 Andy Salnikov
+- change how doc target works, packages now decide for themselves to which
+  document generator they want to be added (through DOCGEN parameter)
+- default env now has 'DOC_TARGETS' key which points to a dictionary
+  mapping generator name to list of files or directories (strings, not
+  targets).
+- standardSConscript and standardExternalPackage are both modified to update
+  env['DOC_TARGETS'] based on the value of DOCGEN passed to them
+- default (when DOCGEN is not specified) is for standardSConscript() to add
+  its package to env['DOC_TARGETS']['doxy-all'] and for 
+  standardExternalPackage() to do nothing
+
+Tag: V00-09-11
+2013-08-13 Andy Salnikov
+- one more place needed default env instead of package env
+
+Tag: V00-09-10
+2013-08-08 Andy Salnikov
+- my last commit broke unrelated stuff (Python include path), fixing that now
+
+Tag: V00-09-09
+2013-08-08 Andy Salnikov
+- dependencies.py: fix LIBPATH for exexcutbales
+
+Tag: V00-09-08
+2013-08-07 Andy Salnikov
+- remove mentioning of internal targets from scons -h output
+
+Tag: V00-09-07
+2013-08-06 Andy Salnikov
+- do not print full command line when running pylint unless TRACE is set
+
+Tag: V00-09-06
+2013-08-06 Andy Salnikov
+- add pylint tool
+- add new target called 'pylint' which runs pylint on all python modules
+- extend output of 'scons -h' with the list of common targets
+
+Tag: V00-09-05
+2013-07-29 Andy Salnikov
+- add LINKFLAGS to command line variables
+
+Tag: V00-09-04
+2013-07-29 Andy Salnikov
+- allow modification of CCFLAGS, CPPFLAGS, etc. from scons command line 
+
+Tag: V00-09-03
+2013-07-29 Andy Salnikov
+- more (small) speedup: search for moc files onle when NEED_QT is set
+
+Tag: V00-09-02
+2013-07-28 Andy Salnikov
+- trying to optimize speed by reducing the number of dependencies
+- introduced special scanner class which ignores dependencies for files
+  that are not likely to change (those in arch/$SIT_ARCH/geninc)
+
+Tag: V00-09-01
+2013-06-14 Andy Salnikov
+- make $PYDIR directory in advance to avoid race condition when symlinking
+
+Tag: V00-09-00
+2013-04-05 Andy Salnikov
+- dependencies.py: pdsdata now comes in a number of smaller packages
+
+Tag: V00-08-10
+2013-03-07 Andy Salnikov
+- add gcc45 to tools/psdm_cplusplus
+
+Tag: V00-08-09
+2013-03-07 Andy Salnikov
+- add SuSE ABI directory
+
+Tag: V00-08-08
+2013-03-05 Andy Salnikov
+- do not inlude _psana module into documentation, it has nothing in it
+
+Tag: V00-08-07
+2013-02-22 Andy Salnikov
+- last change to tools/psdm_python.py broke psdm-python-config script,
+  fix this, now psdm-python-config needs SIT_ROOT to be set correctly
+
+Tag: V00-08-06
+2013-02-20 Andy Salnikov
+- fixing python path in tools/psdm_python.py
+
+Tag: V00-08-05
+2013-02-11 Andy Salnikov
+- adding support for collecting links to PHP stuff in ARCHDIR/php directory
+- this is activated by presence (and value) of PHPDIR argument to 
+  standardSConscript():
+  If PHPDIR is a dictionary then it will create symlinks
+     $ARCHDIR/php/<key> -> Package/<value> 
+  for each key:value pair in the dictionary. If PHPDIR is a string it will
+  create symlink
+     $ARCHDIR/php/Package -> Package/PHPDIR
+
+Tag: V00-08-04
+2013-01-28 Andy Salnikov
+- extend "doc" target with docs for psana python modules
+
+Tag: V00-08-03
+2013-01-02 Andy Salnikov
+- define LIB_ABI for ubu12
+
+Tag: V00-08-02
+2012-12-31 Andy Salnikov
+- tools/psdm_python.py - python is the same for all architectures
+
+Tag: V00-08-01
+2012-12-25 Andy Salnikov
+- symlinks to python files in release are made relative now
+
+Tag: V00-08-00
+2012-11-12 Andy Salnikov
+- make python-dependent tools (pyext, pycompile) to use python that is 
+  configured in psdm_python tool, not the python which runs scons
+- psdm_python tool updated so that it can be run outside scons to provide
+  configuration for python
+- new script app/psdm-python-config which runs psdm_python tool without
+  scons and prints python config, this is used by the latest sit_setup
+
+Tag: V00-07-00
+2012-10-26 Andy Salnikov
+- switch to python2.7 on RHEL5
+
+Tag: V00-06-11
+2012-08-31 Andy Salnikov
+- set correct PYTHONPATH when running cython
+- scons_env: fix for single-core machines
+
+Tag: V00-06-10
+2012-08-02 Andy Salnikov
+- tools/psdm_python: add PYTHON_LIBDIRNAME to the environment which resolves 
+  to "lib" or "lib64" depending on which system/Python is used
+- standardExternalPackage: check that LIBDIR/PYDIR/INCDIR/BINDIR actually
+  exist (if given), otherwise build will fail, or if OPTIONAL=True is
+  specified the warning will be printed
+
+Tag: V00-06-09
+2012-07-27 Andy Salnikov
+- tools/psdm_python.py: added env['PYTHON_BINDIR'], small refactoring
+
+Tag: V00-06-08
+2012-07-25 Andy Salnikov
+- -Wunknown-pragmas should have been -Wno-unknown-pragmas
+
+Tag: V00-06-07
+2012-07-23 Andy Salnikov
+- disable -Wunknown-pragmas for gcc41
+- put .sconsign.dblite into build/$SIT_ARCH, enables concurrent builds
+
+Tag: V00-06-06
+2012-07-23 Andy Salnikov
+- add support for rhel6, python2.7
+
+Tag: V00-06-05
+2012-07-16 Andy Salnikov
+- generate doxygen docs for all package in the release
+
+Tag: V00-06-04
+2012-07-05 Andy Salnikov
+- dependencies.py: added a hack to remove mysql dependency from 
+  RdbMySQL package
+
+Tag: V00-06-03
+2012-06-11 Andy Salnikov
+- added targets:
+		  package-dependencies
+		  package-dependencies-base
+		  package-dependencies-local
+		  package-dependencies-reverse  
+  which print package dependencies
+
+Tag: V00-06-02
+2012-06-04 Andy Salnikov
+- undo part of V00-05-00 commit, python modules are copied to
+  arch/ instead of build/
+
+Tag: V00-06-01
+2012-05-22 Andy Salnikov
+- standardExternalPackage: not all variables were expanded correctly
+
+Tag: V00-06-00
+2012-05-22 Andy Salnikov
+- removed rpm_spec tool
+- added pkg_list tool which prints the list of external packages
+- PKG_LIST_FILE variable (def: /dev/stdout) defines name of the output 
+  file for  pkg_list tool
+- target SConsTools.pkg_list uses new pkg_list tool
+- standardExternalPackage: in PKGINFO string $SIT_ARCH.found is replaced
+  with actual "found" value for the package
+- standardExternalPackage: PREFIX and other arguments can use $VAR variables
+  from environment, they will be substituted correctly
+
+Tag: V00-05-04
+2012-05-21 Andy Salnikov
+- update cython tool, there is only an optimized build for pyextra/cython
+
+Tag: V00-05-03
+2012-05-21 Andy Salnikov
+- returning to pre-smart external package linking
+
+Tag: V00-05-02
+2012-05-21 Andy Salnikov
+- still messing with symlink mess
+
+Tag: V00-05-01
+2012-05-21 Andy Salnikov
+- trying to unmess symlink mess
+
+Tag: V00-05-00
+2012-05-21 Andy Salnikov
+- during the build python modules are now copied to build/... directory
+  instead of arch/...
+- removed SConscript files, not really needed
+- update rpm_spec tool to build more packages
+- cython location is specified explicitly, do not rely on $PATH
+- standardExternalPackage updated to use rules instead of explicit mkdir()/symlink()
+
+Tag: V00-04-03
+2012-05-20 Andy Salnikov
+- fixing scons_env, things were done a bit out of order
+
+Tag: V00-04-02
+2012-05-20 Andy Salnikov
+- one more fix for rpm_spec tool
+
+Tag: V00-04-01
+2012-05-20 Andy Salnikov
+- re-tagging V00-03-03 as V00-04-01
+
+Tag: V00-03-03
+2012-05-20 Andy Salnikov
+- small fixes to rmp_spec tool
+
+Tag: V00-04-00
+2012-05-20 Andy Salnikov
+- moved defs from compilers.py to psdm_cplusplucs and psdm_python tools
+- scons will by default run in parallel and use half of all CPUs/cores
+- added INCLUDES to ALL_TARGET which is filled by external packages
+  and 'includes' alias for all those targets
+
+Tag: V00-03-01
+2012-05-19 Andy Salnikov
+- added couple more dependencies to RPM SPEC file generated by rpm_spec tool
+
+Tag: V00-03-00
+2012-05-16 Andy Salnikov
+- adding new tools and targets to make SPEC file and copy (install) the release
+- adding some common variables to the environment such as SIT_EXTERNAL_SW and
+  LIB_ABI to simplify SConscript files for external packages
+- env['PYTHON'] is now python name (like python2.4 or python 2.7), 
+  env['PYTHON_BIN'] is now what env['PYTHON'] was (full path to python
+  executable)
+- standardExternalPackage() now fills EXT_PACKAGE_INFO dict in the environment
+  with the package information, this is used by rpm_spec tool to build the list
+  of dependencies
+
+Tag: V00-02-05
+2012-04-25 Andy Salnikov
+- adding boost_python to dependency analyzer
+- boost_python needs Python include directory flag in CPPPATH
+- added PYTHON_INCDIR and PYTHON_LIBDIR to build env for above
+
+Tag: V00-02-04
+2012-04-20 Andy Salnikov
+- bug fix in Qt stuff
+
+Tag: V00-02-03
+2012-04-20 Andy Salnikov
+- adding Qt4 support to scons
+- packages that need Qt need to add NEED_QT=1 when calling standardSConscript()
+- only moc support has been added so far, no uic yet
+- still a bit experimental, may change in the future
+
+Tag: V00-02-02
+2012-04-16 Andy Salnikov
+- add -I. to CPPPATH, this should translate to the -I{PackageName}, this
+  should help for including header files from non-standard places such
+  as pyext.
+- Python extension module is excluded from package libraries
+
+Tag: V00-02-01
+2012-04-12 Andy Salnikov
+- unittest targes are made AlwaysBuild() as their dependencies 
+  are sometimes impossible to figure out (scripts)
+
+Tag: V00-02-00
+2012-04-11 Andy Salnikov
+- refactoring things a little bit
+- buildes that were installed in builders.py are now made SCons tools
+  and appear as individual tools in src/tools directory
+- Python extensions are now built with new builder (in tools/pyext)
+- work started on integrating Cython support
+
+Tag: V00-01-11
+2012-02-09 Andy Salnikov
+- add quiet option to pydoc-driver
+
+Tag: V00-01-10
+2012-02-09 Andy Salnikov
+- doc target now also runs sphinx on pyana modules and friends
+
+Tag: V00-01-09
+2011-10-24 Andy Salnikov
+- standardExternalPackage() has new kw argument COPYLIBS  which specifies 
+  the list of libraries to copy (instead of symlink)
+
+Tag: V00-01-08
+2011-09-12 Andy Salnikov
+- unit test builder generates a build error if unit test fails
+
+Tag: V00-01-07
+2011-09-08 Andy Salnikov
+- only add -Wno-invalid-offsetof to CXXFLAGS, not CCFLAGS
+
+Tag: V00-01-06
+2011-09-06 Andy Salnikov
+- add support for CCFLAGS kw to standardSConscript
+
+Tag: V00-01-05
+2011-09-01 Andy Salnikov
+- in standardSConscript $LIBS also needs to be added to shared library
+- fixing LIBPATH override
+
+Tag: V00-01-04
+2011-08-17 Andy Salnikov
+- fix doc target if there is nothing to build
+
+Tag: V00-01-03
+2011-08-08 Andy Salnikov
+- added 'doxy-driver -m psana-modules' to doc target
+
+Tag: V00-01-02
+2011-08-05 Andy Salnikov
+- added 'doc' target which generates doc/ directory with some contents
+- do not created include/, data/, web/ directories if they are empty
+
+Tag: V00-01-01
+2011-05-22 Andy Salnikov
+- there was a tag V00-01-00 already which prevented latest tags to
+  appear in the nightly builds
+
+Tag: V00-00-31
+2011-05-21 Andy Salnikov
+- suppress invalid offsetof warnings
+
+Tag: V00-00-30
+2011-05-05 Andy Salnikov
+- added check for conflicts between .sit_release and $SIT_RELEASE
+
+Tag: V00-00-29
+2010-03-30 Andy Salnikov
+- standardExternalPackage: update to allow BINDIR, LIBDIR, etc to
+  be empty (but not None)
+
+Tag: V00-00-28
+2010-03-27 Andy Salnikov
+- in standardExternalPackage: allow symlinking of the directories
+  when doing Python modules
+- also allow explicit specification of which files to link via LINKPY
+  argument to standardExternalPackage
+
+Tag: V00-00-24
+2010-03-26 Andy Salnikov
+- add support for building Python extension modules, everything that 
+  appears in pyext/ directory will be built as Python extension
+
+Tag: V00-00-23
+2010-03-24 Andy Salnikov
+- adding library list when building shared libraries
+
+Tag: V00-00-22
+2009-06-18 Andy Salnikov
+- create web/ directory at the release top level with the links 
+  to the packages web/ directories
+
+Tag: V00-00-21
+2009-05-19 Andy Salnikov
+- added support for test scripts to the standardSConscript.py
+
+Tag: V00-00-20
+2009-05-08 Andy Salnikov
+- standardSConscript.py: fix standardScripts() function which sometimes
+  misses scripts in app/ directory
+
+Tag: V00-00-19
+2009-04-10 Andy Salnikov
+- can use 'dbg' instead of 'deb'
+- for external packages added a logic to locate package directory
+  using different $LUSI_ARCH combinations or LUSI_ARCH_BASE
+
+Tag: V00-00-18
+2009-02-05 Andy Salnikov
+- compilers.py: add support for gcc41
+- we'll use /usr/bin/python2.4 instead of /usr/bin/env python, latter
+  find python2.5 from TWW which we can't use
+
+Tag: V00-00-17
+2009-01-31 Andy Salnikov
+- compilers.py: adding support for RHEL5
+- standardExternalPackage.py: new keyword for standardExternalPackage -
+  INCLUDES, to link only the specified includes, and not the whole 
+  directory. Useful when the external package is installed in /usr. 
+
+Tag: V00-00-16
+2008-12-17 Andy Salnikov
+- compilers.py: added -Wall for c++ compilation
+- fixed properties on few files 
+
+Tag: V00-00-15
+2008-12-15 Andy Salnikov
+- dependencies.py: add workaround for unnecessary rebuilding of the 
+  binaries on the second run
+
+Tag: V00-00-14
+2008-12-09 Andy Salnikov
+- do dependency calculations only after reading all SConscript files
+
+Tag: V00-00-13
+2008-12-08 Andy Salnikov
+- switch to Python2.6
+
+Tag: V00-00-12
+2008-12-02 Andy Salnikov
+- dependencies.py - modified dependency search when the include file is 
+  more than one level deep in geninc/ directory.
+
+Tag: V00-00-11
+2008-11-03 Andy Salnikov
+- fix in standardSConscript.py: UTESTS list did not work
+
+Tag: V00-00-10
+2008-10-31 Andy Salnikov
+- dependencies.py: fix in in findAllDependencies, was skipping non-existing files
+- SConstruct.main: added dependecy of all tests on 'all' target
+
+Tag: V00-00-09
+2008-10-31 Andy Salnikov
+- symlinks in geninc/ directory are made without using scons rules, but
+  directly by standardExternalPackage script itself. Resolves problem 
+  with some weird dependencies.
+
+Tag: V00-00-08
+2008-10-29 Andy Salnikov
+- adding unit test target to the builds
+- standardSConscript: few additional keywords: TESTS, UTESTS, SCRIPTS; 
+  split standardSConscript() into bunch of functions
+- builders.py: make all builders clesses instead of functions, adding
+  strfunction() method to the classes, nicer printing of progress
+- scons_env.py: adding ALL_TARGETS variable to environment, which is a
+  dictionary of the targets for BINS, LIBS, and TEST aliases
+- standardExternalPackage: fills in ALL_TARGETS
+- standardSConscript: fills in ALL_TARGETS
+- SConstruct.main: defines target aliases 'lib', 'bin', 'test'
+- lot's of other improvements
+
+Tag: V00-00-07
+2008-10-29 Andy Salnikov
+- standardSConscript: adding support for building tests in test/, 
+  plus minor refactoring
+
+Tag: V00-00-06
+2008-10-28 Andy Salnikov
+- standardSConscript: added more C/C++ extensions for building libraries and
+  binaries: cc,cpp,cxx,C,c
+- standardExternalPackage: added globbing for LINKLIBS and LINKBINS
+- dependencies: 
+  - tries to guess boost package names
+  - improved topological sort, detect cycles
+
+Tag: V00-00-05
+2008-10-17 Andy Salnikov
+- standardExternalPackage: adding PYDIRSEP option
+
+Tag: V00-00-04
+2008-10-15 Andy Salnikov
+- adding release dependencies module 
+
+Tag: V00-00-01
+2008-10-08 Andy Salnikov
+- added ScriptInstall builder to handle substitution of @XYZ@ placeholders
+  in the scripts
+
+Tag: V00-00-00
+2008-10-08 Andy Salnikov
+- initial import of SConsTools into CVS
+- few python module are in the package at this time, used by SConstruct.main
+- SConstruct.main should be moved into the top release directory as a part
+  of the release preparation (or it can also be linked to SConstruct.main)
