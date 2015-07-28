@@ -374,5 +374,5 @@ RootHManager::checkName(const std::string& name)
 } // namespace RootHist
 
 extern "C" PSHist::HManager * CREATE_PSHIST_HMANAGER_FROM_CONST_CHAR_PTR(const char *rfname) {
-  return new RootHist::RootHManager::RootHManager (std::string(rfname));
+  return new RootHist::RootHManager (std::string(rfname));
 }

@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-02-04
+2015-07-27 Igor Gaponenko
+- fixed a bug uncovered during RHEL7 migration (JIRA PSRT=63)
+
 Tag: V00-02-03
 2015-04-08 David Schneider
 - add factory function to create an instance of a PSHist::HManager based on 
