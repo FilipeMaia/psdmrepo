@@ -14,13 +14,13 @@ Import('*')
 
 from SConsTools.standardExternalPackage import standardExternalPackage
 
+# Do not use this package for RHEL7 because we haven't been able
+# to compile/buuld the corresponding RPM for this platform.
+if env['SIT_ARCH_OS'] not in ('rhel7') :
+    pkg = "ds9"
+    pkg_ver = "6.1.2"
 
-# here is an example setting up a fictional package
+    PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+    BINDIR = "bin"
 
-pkg = "ds9"
-pkg_ver = "6.1.2"
-
-PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
-BINDIR = "bin"
-
-standardExternalPackage(pkg, **locals())
+    standardExternalPackage(pkg, **locals())
