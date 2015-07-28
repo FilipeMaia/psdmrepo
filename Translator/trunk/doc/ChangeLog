@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-34
+2015-07-27 Igor Gaponenko
+- fixed a bug in using the static_cast (JIRA PSRT-63)
+
 Tag: V00-02-33
 2015-7-8 David Schneider
 - add option exclude_config_eventdata to address JIRA PSAS-167	

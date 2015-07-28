@@ -184,7 +184,7 @@ namespace {
       if (*(iter->typeinfo()) == typeid(Psana::Alias::ConfigV1)) {
         Pds::Src src = iter->src();
         if (src.level() == Pds::Level::Control) {
-          Pds::ProcInfo *procInfo = static_cast<const Pds::ProcInfo *>(&src);
+          Pds::ProcInfo *procInfo = static_cast<Pds::ProcInfo *>(&src);
           if (procInfo->ipAddr() == 0) {
             foundDaqAliasKey = true;
             break;
