@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-02
+2015-07-28 Igor Gaponenko
+- added linker option '-Wl,--copy-dt-needed-entries' for RHEL7 & GCC48
+to compensate for a change in the default behavior of the CC compiler
+when looking for undefined symbols in a chain of the shared libraries.
+(JIRA PSRT-64)
+
 Tag: V00-11-01
 2015-07-07 David Schneider
 - scons test unittests, sleep a second to try to fix text file is busy 

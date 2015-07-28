@@ -44,7 +44,7 @@ def generate(env):
         env['CXX'] = 'g++'
         env.Append(CCFLAGS = ' ' + _gcc_opt.get(opt,'') + ' -Wall')
         env.Append(CXXFLAGS = ' -Wno-invalid-offsetof')
-        env.Append(LINKFLAGS = ' ' + _ld_opt.get(opt,''))
+        env.Append(LINKFLAGS = ' ' + _ld_opt.get(opt,'') + ' -Wl,--copy-dt-needed-entries')
 
     
     trace ( "Initialized psdm_cplusplus tool", "psdm_cplusplus", 2 )
