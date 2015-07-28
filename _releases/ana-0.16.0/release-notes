@@ -1,0 +1,24 @@
+This is the first RHEL7-ready release. It's mostly based on
+ana-0.15.9 except fixes needed to compile and build this release
+for RHEL7. These exception are mentioned below.
+
+The modified external packages:
+- ndarray_ext (boost 1.55.0)
+- psdata (boost 1.55.0, headers migration in RHEL7)
+- psalg (boost 1.55.0)
+
+One external package had to be removed:
+- ds9
+
+And here is a list of the "own" packages which had to be modified/adopted
+for RHEL7:
+- RootHist
+- ImgAlgos: note, that due to some technical limitation of the build system
+  which can't build off branches this tag is pulled from the future (yet to
+  be build) release ana-0.15.10.
+- PSCalib
+- cheetah
+- Translator
+
+Further detaisl of the migration cane be found at JIRA issue:
+https://jira.slac.stanford.edu/browse/PSRT-1
