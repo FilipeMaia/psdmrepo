@@ -1,0 +1,59 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package RootHist
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+
+Tag: V00-02-04
+2015-07-27 Igor Gaponenko
+- fixed a bug uncovered during RHEL7 migration (JIRA PSRT=63)
+
+Tag: V00-02-03
+2015-04-08 David Schneider
+- add factory function to create an instance of a PSHist::HManager based on 
+  implementation using root. For dynamically loading root dependency. JIRA PSAS-131
+
+Tag: V00-02-02
+2014-01-13 Andy Salnikov
+- fix bug in last commit
+
+Tag: V00-02-01
+2014-01-10 Andy Salnikov
+- unregister ROOT handler for PIPE signal
+
+Tag: V00-02-00
+2012-07-24 Andy Salnikov
+- moved trunk to branch version1
+- moved branch version0 to trunk
+
+Tag: V00-01-03 (made from branch version0)
+2011-08-08 Andy Salnikov
+- do not run unit tests
+
+Tag: V00-01-02 (made from branch version0)
+2011-07-13 Andy Salnikov
+- fix compilation warning in test/ex_root.cpp
+
+Tag: V00-01-01 (made from branch version0)
+2011-06-29 Andy Salnikov
+- removed all Tuple stuff
+
+Tag: V00-01-00
+2011-06-29 Andy Salnikov
+- PSHist interface changed, updating this implementation
+- RootHmanager needs to keep track of the objects it creates and
+  delete all those objects in destructor
+- Same applies to Tuple and Columns
+- Added few exception classes
+- Test applications moved to test/ directory
+
+Tag: V00-00-01
+2011-04-20 Mikhail S. Dubrovin
