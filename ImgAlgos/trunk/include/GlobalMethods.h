@@ -42,6 +42,12 @@
 //#define png_infopp_NULL (png_infopp)NULL
 //#define int_p_NULL (int*)NULL
 
+// see: https://github.com/ignf/gilviewer/issues/8
+// and: http://libpng.sourceforge.net/ANNOUNCE-1.4.1.txt
+#ifndef int_p_NULL
+#define png_infopp_NULL (png_infopp)NULL
+#define int_p_NULL (int*)NULL
+#endif
 //#include <boost/mpl/vector.hpp>
 #include <boost/gil/gil_all.hpp>
 

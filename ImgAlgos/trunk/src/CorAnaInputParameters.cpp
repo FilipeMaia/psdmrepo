@@ -15,6 +15,7 @@
 //-----------------------
 #include "ImgAlgos/CorAnaInputParameters.h"
 #include <stdlib.h>
+#include <unistd.h>  // getopt, optarg, optopt, optind
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
