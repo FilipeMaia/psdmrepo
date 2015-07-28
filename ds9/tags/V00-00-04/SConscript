@@ -1,0 +1,26 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  SConscript file for package ds9
+#------------------------------------------------------------------------
+
+import os.path
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+
+# Do not use this package for RHEL7 because we haven't been able
+# to compile/buuld the corresponding RPM for this platform.
+if env['SIT_ARCH_OS'] not in ('rhel7') :
+    pkg = "ds9"
+    pkg_ver = "6.1.2"
+
+    PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
+    BINDIR = "bin"
+
+    standardExternalPackage(pkg, **locals())
