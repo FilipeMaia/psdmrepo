@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-11-03
+2015-07-28 Igor Gaponenko
+- added C++ compiler option '-Wno-unused-local-typedefs' to suppress
+warnings caused by unused definitions within the BOOST library
+(JIRA PSRT-63)
+
 Tag: V00-11-02
 2015-07-28 Igor Gaponenko
 - added linker option '-Wl,--copy-dt-needed-entries' for RHEL7 & GCC48

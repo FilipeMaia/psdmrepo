@@ -43,7 +43,7 @@ def generate(env):
         env['CC'] = 'gcc'
         env['CXX'] = 'g++'
         env.Append(CCFLAGS = ' ' + _gcc_opt.get(opt,'') + ' -Wall')
-        env.Append(CXXFLAGS = ' -Wno-invalid-offsetof')
+        env.Append(CXXFLAGS = ' -Wno-invalid-offsetof -Wno-unused-local-typedefs')
         env.Append(LINKFLAGS = ' ' + _ld_opt.get(opt,'') + ' -Wl,--copy-dt-needed-entries')
 
     
