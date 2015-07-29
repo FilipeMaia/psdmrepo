@@ -21,18 +21,6 @@ function (RadioBox) {
             _pad(t.getUTCSeconds()) +
             '</span>' ;
     }
-    function _time2htmlLocal (t) {
-        return  t.getFullYear() +
-            '-' + _pad(t.getMonth() + 1) + 
-            '-' + _pad(t.getDate()) +
-            '&nbsp;&nbsp;<span style="font-weight:bold;">' +
-            _pad(t.getHours()) +
-            ':' +
-            _pad(t.getMinutes()) +
-            ':' +
-            _pad(t.getSeconds()) +
-            '</span>' ;
-    }
     function _date2YmdLocal (d) {
         return d.getFullYear() +
                 '-' +
@@ -130,11 +118,6 @@ function (RadioBox) {
         return undefined ;
     } ;
 
-
-
-    var _AUTO_TRACK_INTERVAL_SEC = 0.9 ,
-        _AUTO_TRACK_MAX_ZOOM = 600 ;
-
     function _IntervalUI (options) {
 
         var _that = this ;
@@ -171,8 +154,8 @@ function (RadioBox) {
             .datepicker('option', 'dateFormat', 'yy-mm-dd')
             .datepicker('setDate', _date2YmdLocal(now))
             .change(function () {
-                _that._end_time_changed() ;
-        }) ;
+                _that._end_time_changed() ; }) ;
+
         this._end_hh = $('#end_hh > input')
             .val(_pad(now.getHours()))
             .change(function () {
@@ -182,8 +165,8 @@ function (RadioBox) {
                     $(this).val(_pad(_that.to.getHours())) ;
                     return ;
                 }
-                _that._end_time_changed() ;
-        }) ;
+                _that._end_time_changed() ; }) ;
+
         this._end_mm = $('#end_mm > input')
             .val(_pad(now.getMinutes()))
             .change(function () {
@@ -193,8 +176,8 @@ function (RadioBox) {
                     $(this).val(_pad(_that.to.getMinutes())) ;
                     return ;
                 }
-                _that._end_time_changed() ;
-        }) ;
+                _that._end_time_changed() ; }) ;
+
         this._end_ss = $('#end_ss > input')
             .val(_pad(now.getSeconds()))
             .change(function () {
@@ -204,75 +187,12 @@ function (RadioBox) {
                     $(this).val(_pad(_that.to.getSeconds())) ;
                     return ;
                 }
-                _that._end_time_changed() ;
-        }) ;
-        this._end_now = $('#end_now > button').button().click(function () {
-            _that._end_time_changed(new Date()) ;
-        }) ;
-        this._end_left = $('#end_left > button').button().click(function () {
-            _that.moveLeft() ;
-        }) ;
-        this._end_right = $('#end_right > button').button().click(function () {
-            _that.moveRight() ;
-        }) ;
-        
-        // ---------------------------------------------------------------------
-        // Auto-tracking mode if enabled would automatically update plots in
-        // the very end of the timeline after resetting the end time to
-        // the present time.
-        //
-        // Note that a choice of the allowed interval sizes will also be limited
-        // to a few shortest ones. This is done to prevent overloading the Web
-        // services.
+                _that._end_time_changed() ; }) ;
 
-
-        this.inAutoTrackMode = function () { return this._autoTrackMode ; }
-
-        this._autoTrackMode = false ;
-        this._end_track_start = $('#end_track').find('button[name="start"]').button().click(function () {
-            _that._autoTrack(true) ;
-        }) ;
-        this._end_track_stop = $('#end_track').find('button[name="stop"]').button().click(function () {
-            _that._autoTrack(false) ;
-        }) ;
-        this._autoTrack = function (yes) {
-            this._autoTrackMode = yes ;
-            if (this._autoTrackMode) {
-                this._end_track_start.closest('.auto-track-visible').removeClass('auto-track-visible').addClass('auto-track-hidden') ;
-                this._end_track_stop .closest('.auto-track-hidden') .removeClass('auto-track-hidden') .addClass('auto-track-visible') ;
-                
-                // Reset end time to the present time
-                this._end_time_changed(new Date()) ;
-
-                // Reset zoom to the shortest one                
-                this._timeZoom(_Interval.minZoomIn) ;
-
-                // Disable all but a few shortest zoom modes
-                var force = true ;
-                this.disable(true, force) ;
-                for (var i = 0, num = _Interval.WINDOW_DEFS.length; i < num; ++i) {
-                    var w = _Interval.WINDOW_DEFS[i] ;
-                    if (+w.name <= _AUTO_TRACK_MAX_ZOOM) this._interval.disable(w.name, false) ;
-                }
-
-                // Start a chain of timers
-                this._startTrackTimer() ;
-
-            } else {
-                this._end_track_start.closest('.auto-track-hidden') .removeClass('auto-track-hidden').addClass('auto-track-visible') ;
-                this._end_track_stop .closest('.auto-track-visible').removeClass('auto-track-visible').addClass('auto-track-hidden') ;
-                this.disable(false) ;
-            }
-        } ;
-        this._startTrackTimer = function () {
-            setTimeout(function () {
-                if (_that._autoTrackMode) {
-                    _that._end_time_changed(new Date()) ;
-                    _that._startTrackTimer() ;
-                }
-            } , _AUTO_TRACK_INTERVAL_SEC * 1000) ;
-        } ;
-
+        this._end_now = $('#end_now > button')
+            .button()
+            .click(function () {
+                _that._end_time_changed(new Date()) ;  }) ;
 
         this.zoomIn = function (xbins) {
             if (!this._options.changes_allowed()) return ;
@@ -282,7 +202,7 @@ function (RadioBox) {
                 zoom     = _Interval.zoomIn(prevZoom) ;
 
             if (prevZoom !== zoom) {
-                this.from = new Date(+this.to - zoom * 1000) ;
+                 this.from = new Date(+this.to - zoom * 1000) ;
 
                 this._interval.activate(zoom) ;
                 this._on_change(xbins) ;
@@ -362,29 +282,18 @@ function (RadioBox) {
             this.to   = new Date(+this.to   + deltaMS) ;
             this._on_change() ;
         } ;
-        this.disable = function (yes, force) {
-            
-            // Prevent unlocking controls in the automatic tracking mode unless forced
-            // to do so. The controls are managed in a special way in this mode.
-            if (this._autoTrackMode && !force) return ;
-
+        this.disable = function (yes) {
             this._interval.disableAll(yes) ;
-
             this._end_ymd.datepicker(yes ? 'disable' : 'enable') ;
-
-            this._end_hh.prop('disabled', yes) ;
-            this._end_mm.prop('disabled', yes) ;
-            this._end_ss.prop('disabled', yes) ;
-
-            this._end_now  .button(yes ? 'disable' : 'enable') ;
-            this._end_left .button(yes ? 'disable' : 'enable') ;
-            this._end_right.button(yes ? 'disable' : 'enable') ;
+            this._end_hh .prop('disabled', yes) ;
+            this._end_mm .prop('disabled', yes) ;
+            this._end_ss .prop('disabled', yes) ;
+            this._end_now.button(yes ? 'disable' : 'enable') ;
         } ;
     }
 
     return {
-        Interval:       _IntervalUI ,
-        time2htmlUTC:   _time2htmlUTC ,
-        time2htmlLocal: _time2htmlLocal
+        Interval: _IntervalUI ,
+        time2htmlUTC: _time2htmlUTC
     }
 }) ;

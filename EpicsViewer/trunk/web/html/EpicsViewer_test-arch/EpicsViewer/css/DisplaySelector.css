@@ -1,0 +1,83 @@
+.disp-sel {
+    width:  100%;
+    font-family: 'Source Sans Pro',Arial,sans-serif;
+}
+.disp-sel > div#selector {
+    position: relative;
+    float:  left;
+}
+.disp-sel > div#selector > div.disp-sel-item, 
+.disp-sel > div#selector > div.disp-sel-item-last {
+    padding:        6px;
+    padding-left:   10px;
+    width:          56px;
+    border-bottom:  solid 1px #d0d0d0;
+    border-right:   solid 1px #a0a0a0;
+    text-align:     left;
+    background: linear-gradient(to right, #ffffff, #d0e5f5);
+    font-size:  14px;
+}
+.disp-sel > div#selector > div.disp-sel-item-last {
+    background: linear-gradient(to right, #e0e0e0, #ffffff);
+    border:         solid 1px #a0a0a0;
+    border-right-color:   #ffffff;
+    border-top:     0;
+    border-bottom:  0;
+}
+.disp-sel > div#selector > div.disp-sel-item:first-child {
+    border-top-color: initial;
+}
+.disp-sel > div#selector > div.disp-sel-item:last-child {
+/*    border-bottom-color:  #f8f8f8;*/
+}
+.disp-sel > div#selector > div.disp-sel-item.disp-sel-item-active {
+    background: linear-gradient(to right, #e0e0e0, #ffffff);
+    font-weight:    bold;
+    border: solid 1px #a0a0a0;
+    border-right-color: #ffffff;
+}
+.disp-sel > div#selector > div.disp-sel-item:first-child.disp-sel-item-active {
+    border-top-color: #ffffff;
+}
+.disp-sel > div#selector > div.disp-sel-item:last-child.disp-sel-item-active {
+    border-bottom-color: #ffffff;
+}
+.disp-sel > div#selector > div.disp-sel-item:hover {
+    background:   #d0e5f5 !important;
+    cursor: pointer;
+    color:  red;
+}
+.disp-sel > div#selector > div.disp-sel-item.disp-sel-item-active:hover {
+    cursor: initial;
+}
+.disp-sel > div#selector > div.disp-sel-item[data]:hover:after {
+  content:  attr(data);
+  padding:  8px;
+  margin-left:8px;
+  color:    #000000;
+  position: absolute;
+  left:     68px;
+  top:      0px;
+  white-space:  pre;
+  max-width:    520px;
+  z-index:      2;
+  border-radius:    3px ;
+  background-color: lemonchiffon;
+  font-family:  'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight:  normal;
+  font-size:    12px;
+  text-align:   left;
+}
+.disp-sel > div#area {
+    position: absolute;
+    left: 96px;
+}
+.disp-sel > div#area > div.disp-sel-area {
+    display: none;
+}
+.disp-sel > div#area > div.disp-sel-area.disp-sel-area-active {
+    display: block;
+}
+.disp-sel > div#end  {
+    clear:  both;
+}

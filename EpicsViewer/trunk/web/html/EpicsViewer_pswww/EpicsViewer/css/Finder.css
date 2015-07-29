@@ -1,0 +1,76 @@
+.finder {
+    position:   relative;
+}
+.finder > #logo {
+    float:          left;
+    margin-right:   5px;
+}
+.finder > #logo > img {
+    width:  20px;
+}
+.finder > #input {
+    float:  left;
+    width:  100px;
+}
+.finder > #input[data]:hover:after,
+.finder > button[data]:hover:after {
+  content:  attr(data);
+  padding:  8px;
+  color:    #000000;
+  position: absolute;
+  left:     -20;
+  top:      -60;
+  white-space:  pre;
+  max-width:    520px;
+  z-index:      2;
+  border-radius:    3px ;
+  background-color: lemonchiffon;
+  font-family:  'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight:  normal;
+  font-size:    12px;
+  text-align:   left;
+}
+.finder > #results {
+    float:      left;
+    position:   absolute;
+    top:        0px;
+    left:       210px;
+    display:    none;
+    padding:    10px;
+    max-height: 480px;
+    overflow:   auto;
+    z-index:    10;
+    background-color:   #f3f3f3;
+/*
+    opacity:    0.9;
+    border:     1px solid #b0b0b0;
+*/
+    border-top: thin solid #c0c0c0;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+}
+.finder > #results.visible {
+    display:    block ;
+}
+.finder > #results div.pvname {
+    float:      left;
+    min-width:  260px;
+    font-size:  12px;
+}
+.finder > #results div.pvname:hover {
+    cursor:             pointer;
+    background-color:   aliceblue;
+    font-weight:        bold;
+}
+.finder > #results div.pvname_endoflist {
+    clear:  both;
+}
+.finder > #new_cplot {
+    position:   relative;
+    left:       170px;
+/*    float:      left;*/
+}
+.finder > #new_funct {
+    position:   relative;
+    left:       160px;
+/*    float:      left;*/
+}

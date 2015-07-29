@@ -42,16 +42,11 @@ function (
 
     var _EVENT_HANDLER = [
         'x_move_left', 'x_move_right', 'x_zoom_in', 'x_zoom_out' ,
-        'y_range_change', 'y_toggle_scale' ,
-        'ruler_change' ,
-        'download_requested', 'download_allowed'
+        'y_range_change' ,
+        'ruler_change'
     ] ;
     
-    var _LOCK_IMAGE = document.getElementById('lock') ,
-        _DOWNLOAD_IMAGE_BLACK = document.getElementById('download-black') ,
-        _DOWNLOAD_IMAGE_RED   = document.getElementById('download-red') ,
-        _DOWNLOAD_IMAGE_WIDTH  = 32 ,
-        _DOWNLOAD_IMAGE_HEIGHT = 34 ;
+    var _LOCK_IMAGE = document.getElementById('lock') ;
 
     /**
      * The 2-column tabular display representing properties and their values
@@ -390,13 +385,6 @@ function (
                     deltaX = x - _that._mouseDownPosition.x ,
                     deltaY = y - _that._mouseDownPosition.y ;
 
-                if (!_that._mouseMoved) {
-                    if (_that._overDownloadButton(x, y)) {
-                        if (_that._config.download_requested) {
-                            _that._config.download_requested(_that._canvasPlot.get(0).toDataURL('image/png')) ;
-                        }
-                    }
-                }
                 if (_that._activeRegion) {
                     switch (_that._activeRegion.direction) {
                         case 'X':
@@ -439,13 +427,7 @@ function (
                                 if (deltaY > 0) _that._y_move_up  (sid, shift) ;
                                 else            _that._y_move_down(sid, shift) ;
                             }
-                            if (!_that._mouseMoved) {
-                                if (_that._overScaleToggleButton(x, y) &&_that._config.y_toggle_scale) {
-                                    _that._config.y_toggle_scale(_that._series[sid].name) ;
-                                } else {
-                                    _that._y_reset_or_lock(sid) ;
-                                }
-                            }
+                            if (!_that._mouseMoved) _that._y_reset_or_lock(sid) ;
                             break ;
                     }
                 }
@@ -670,10 +652,6 @@ function (
                 }
             }
         } ;
-        this._overDownloadButton = function (x, y) {
-            return this._geom.downloadButtonPos.x <= x && x <= this._geom.downloadButtonPos.x + _DOWNLOAD_IMAGE_WIDTH &&
-                   this._geom.downloadButtonPos.y <= y && y <= this._geom.downloadButtonPos.y + _DOWNLOAD_IMAGE_HEIGHT ;
-        } ;
         this.load = function (xRange, many_series) {
             this._xRange = xRange ;
             this._series = [] ;
@@ -883,10 +861,6 @@ function (
                 this._geom.PLOT_Y_STEP_SIZE.push(stepSize) ;
                 this._geom.PLOT_Y_BEGIN.push(yBegin) ;
             }
-            this._geom.downloadButtonPos = {
-                x: this._geom.PLOT_X_MAX - _DOWNLOAD_IMAGE_WIDTH ,
-                y: this._geom.PLOT_Y_MIN
-            } ;
             console.log('this._geom', this._geom) ;
         } ;
 
@@ -1032,7 +1006,8 @@ function (
                 xMax = this._geom.PLOT_LABEL_X[i] ,
                 yMin = this._geom.PLOT_Y_MIN - 2 * _LABEL_FONT_SIZE ,
                 yMax = this._geom.PLOT_Y_MAX + 5 * _LABEL_FONT_SIZE + _TICK_SIZE ,
-                width = xMax - xMin ;
+                width  = xMax - xMin ,
+                height = yMax - yMin ;
 
             // Start position of labels is one simbol left.
 
@@ -1043,8 +1018,10 @@ function (
             if (active) {
                 this._cxtPlot.fillStyle = _ACTIVE_AXES_COLOR ;
                 this._cxtPlot.fillRect(xMin+1,  1, width-1, yMax-1) ;
+//                this._cxtPlot.fillRect(xMin+1,  yMin+1, width-1, height-1) ;
             } else {
                 this._cxtPlot.clearRect(xMin+1, 0,   width-1, yMax) ;
+//                this._cxtPlot.clearRect(xMin+1, yMin,   width-1, height) ;
             }
             
             // Draw the axes itself
@@ -1052,6 +1029,8 @@ function (
             this._cxtPlot.beginPath() ;
             this._cxtPlot.lineWidth   = i == this._series.length - 1 ?                 1.25 :           1 ;
             this._cxtPlot.strokeStyle = i == this._series.length - 1 ? _PRIMARY_AXIS_COLOR : _AXIS_COLOR ;
+//            this._cxtPlot.moveTo(xMax, yMin) ;
+//            this._cxtPlot.lineTo(xMax, yMax) ;
             this._cxtPlot.moveTo(xMax, 0) ;
             this._cxtPlot.lineTo(xMax, yMax) ;
             this._cxtPlot.stroke();
@@ -1099,14 +1078,12 @@ function (
             this._cxtPlot.stroke();
 
             // Put the lock flag on top of the axes to make the user
-            // aware that the dynamic range of the range is not computed automatically.
+            // aware that teh dynamic range of the range is not computed automatically.
 
             if ((series.yRange.min !== series.yOriginalRange.min) ||
                 (series.yRange.max !== series.yOriginalRange.max)) {
-                this._cxtPlot.drawImage(_LOCK_IMAGE, xMax - 20, yMax - 45, 20, 20);
+                this._cxtPlot.drawImage(_LOCK_IMAGE, xMin + (xMax - xMin) / 2 - 10, yMin, 20, 20);
             }
-
-            this._plotScaleToggleButton(i) ;
 
             // Remember the position of this axes region
             this._region.Y[i] = {
@@ -1223,88 +1200,6 @@ function (
                 }
             }
         } ;
-        this._overScaleToggleButton = function (x, y) {
-            if (this._activeRegion && (this._activeRegion.direction === 'Y')) {
-                var sid = this._activeRegion.position ,
-                    xMin = !sid ? this._geom.X_MIN : this._geom.PLOT_LABEL_X[sid-1] ,
-                    xMax = this._geom.PLOT_LABEL_X[sid] ,
-                    yMin = this._geom.PLOT_Y_MAX + 3 * _LABEL_FONT_SIZE ,
-                    yMax = this._geom.PLOT_Y_MAX + 5 * _LABEL_FONT_SIZE + _TICK_SIZE ;
-                return xMin <= x && x <= xMax &&
-                       yMin <= y && y <= yMax ;
-            }
-            return false ;
-        } ;
-        this._plotScaleToggleButton = function (sid, inFocus) {
-
-            var cxt =
-                this._activeRegion &&
-                this._activeRegion.direction === 'Y' && this._activeRegion.position === sid ?  this._cxtGrid : this._cxtPlot ;
-
-            var series = this._series[sid] ,
-                xMin = !sid ? this._geom.X_MIN : this._geom.PLOT_LABEL_X[sid-1] ,
-                xMax = this._geom.PLOT_LABEL_X[sid] ,
-                yMin = this._geom.PLOT_Y_MAX + 3 * _LABEL_FONT_SIZE ,
-                yMax = this._geom.PLOT_Y_MAX + 5 * _LABEL_FONT_SIZE + _TICK_SIZE ;
-
-            cxt.beginPath() ;
-            cxt.lineWidth = 1 ;
-            cxt.strokeStyle = inFocus ? 'red' : _AXIS_COLOR ;
-
-            switch (series.scale) {
-
-                case 'linear':
-                    var xScaleStep  = _TICK_SIZE * .75 ;
-                    for (var y = yMin ; y < yMax; y += xScaleStep)  {
-                        cxt.moveTo (xMin + _TICK_SIZE, y) ;
-                        cxt.lineTo (xMax - _TICK_SIZE, y) ;
-                    }
-                    break ;
-
-                case 'log10':
-                    var xWidth = yMax - yMin ,
-                        xNumSteps = 10 ;
-                    for (var step = 0; step < xNumSteps; step += 1)  {
-                        var y = yMax - xWidth * Math.log10(10 - step) ;
-                        cxt.moveTo (xMin + _TICK_SIZE, y) ;
-                        cxt.lineTo (xMax - _TICK_SIZE, y) ;
-                    }
-                    break ;
-            }
-            cxt.stroke();
-        } ;
-
-        /**
-         * Display the download button if the download capability is requested
-         * by the user when constructing this widget and if it's presently not
-         * prohibited by the user. The state of the button is specified via
-         * the optional parameter to the function.
-         *
-         * @param {boolean} inFocus
-         * @returns {undefined}
-         */
-        this._plotDownloadButton = function (inFocus) {
-
-            if (this._config.download_requested &&
-                this._config.download_allowed()) {
-
-                if (inFocus) {
-                    this._cxtGrid.drawImage (
-                        _DOWNLOAD_IMAGE_RED ,
-                        this._geom.downloadButtonPos.x ,
-                        this._geom.downloadButtonPos.y ,
-                        _DOWNLOAD_IMAGE_WIDTH ,
-                        _DOWNLOAD_IMAGE_HEIGHT);
-                } else {
-                    this._cxtGrid.drawImage (
-                        _DOWNLOAD_IMAGE_BLACK ,
-                        this._geom.downloadButtonPos.x ,
-                        this._geom.downloadButtonPos.y ,
-                        _DOWNLOAD_IMAGE_WIDTH ,
-                        _DOWNLOAD_IMAGE_HEIGHT);
-                }
-            }
-        } ;
         this._plotDataLinear = function (deltaX, series, sid) {
 
             console.log("_plotDataLinear: "+series.name+' series.yLabels.min: '+series.yLabels.min) ;
@@ -1388,15 +1283,6 @@ function (
         } ;
         this._drawRulers = function (xAt, yAt) {
             this._clearGrid() ;
- 
-            // No grid if over the download button which needs to change
-            // its state.
-            if (this._overDownloadButton(xAt, yAt)) {
-                this._plotDownloadButton(true) ;
-                return ;
-            } else {
-                this._plotDownloadButton() ;
-            }
             if (this._activeRegion) {
                 this._cxtGrid.beginPath() ;
                 this._cxtGrid.lineWidth = 1;
@@ -1411,21 +1297,11 @@ function (
                             this._cxtGrid.lineTo(xAt, y + _TICK_SIZE) ;
                         }
                     case 'Y':
-                        // no ruler below the plot area
-                        if (yAt <= this._geom.PLOT_Y_MAX) {
-                            for (var x = 2 * _TICK_SIZE, xStep = 4 * _TICK_SIZE;
-                                     x < this._CANVAS_WIDTH - 2 * _TICK_SIZE;
-                                     x += xStep) {
-                                this._cxtGrid.moveTo(x - _TICK_SIZE, yAt) ;
-                                this._cxtGrid.lineTo(x + _TICK_SIZE, yAt) ;
-                            }
-                        }
-                        if (this._activeRegion.direction === 'Y') {
-                            if (this._overScaleToggleButton(xAt, yAt)) {
-                                this._plotScaleToggleButton(this._activeRegion.position, true) ;
-                            } else {
-                                this._plotScaleToggleButton(this._activeRegion.position) ;
-                            }
+                        for (var x = 2 * _TICK_SIZE, xStep = 4 * _TICK_SIZE;
+                                 x < this._CANVAS_WIDTH - 2 * _TICK_SIZE;
+                                 x += xStep) {
+                            this._cxtGrid.moveTo(x - _TICK_SIZE, yAt) ;
+                            this._cxtGrid.lineTo(x + _TICK_SIZE, yAt) ;
                         }
                         break ;
                 }
@@ -1435,6 +1311,7 @@ function (
         } ;
         this._highlightRulerSelection = function (sid, xPrev, xCurr, y ) {
             this._cxtGrid.fillStyle = this._series[sid].color ;
+            //this._cxtGrid.globalAlpha = 0.5 ;
             this._cxtGrid.fillRect(xPrev, y - 2, xCurr - xPrev, 4) ; 
         } ;
     }

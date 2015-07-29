@@ -5,11 +5,11 @@ require.config ({
     urlArgs     : "bust="+new Date().getTime() ,
 
     paths: {
-        'jquery'            : '/jquery/js/jquery-1.8.2' ,
-        'jquery-ui'         : '/jquery/js/jquery-ui-1.9.1.custom.min' ,
-        'jquery.resize'     : '/jquery/js/jquery.resize' ,
-        'jquery.mousewheel' : '/jquery/js/jquery.mousewheel' ,
-        'underscore'        : '/underscore/underscore-min' ,
+        'jquery'            : 'jquery/js/jquery-1.8.2' ,
+        'jquery-ui'         : 'jquery/js/jquery-ui-1.9.1.custom.min' ,
+        'jquery.resize'     : 'jquery/js/jquery.resize' ,
+        'jquery.mousewheel' : 'jquery/js/jquery.mousewheel' ,
+        'underscore'        : 'underscore/underscore-min' ,
         'webfwk'            : 'webfwk/js' ,
         'EpicsViewer'       : 'EpicsViewer/js'
     } ,
@@ -36,12 +36,12 @@ require.config ({
 require ([
     'webfwk/CSSLoader' ,
     'webfwk/Class' ,
+    'webfwk/Widget' ,
     'EpicsViewer/TimeSeriesPlotN' ,
     'EpicsViewer/Definitions' ,
     'EpicsViewer/Interval' ,
     'EpicsViewer/WebService' ,
     'EpicsViewer/Finder' ,
-    'EpicsViewer/Display' ,
     'EpicsViewer/DisplaySelector' ,
     'EpicsViewer/DataTableDisplay' ,
 
@@ -53,29 +53,34 @@ require ([
 function (
     cssloader ,
     Class ,
+    Widget ,
     TimeSeriesPlotN ,
     Definitions ,
     Interval ,
     WebService ,
     Finder ,
-    Display ,
     DisplaySelector, 
     DataTableDisplay) {
 
-    cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
+    cssloader.load('../jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
 
     function DummyPlot (parent, message) {
 
-        Display.call(this) ;
+        Widget.Widget.call(this) ;
 
         this._parent = parent ;
         this._message = message ;
 
-        this.on_activate   = function () { this._display() ; } ;
-        this.on_deactivate = function () { } ;
-        this.on_resize     = function () { } ;
-
         this._isRendered = false ;
+        this._isActive = false ;
+
+        this.on_activate = function () {
+            this._isActive = true ;
+            this._display() ;
+        } ;
+        this.on_deactivate = function () {
+            this._isActive = false ;
+        } ;
         this.render = function () {
             if (this._isRendered) return ;
             this._isRendered = true ;
@@ -83,11 +88,11 @@ function (
         } ;
         this._display = function () {
             if (!this._isRendered) return ;
-            if (!this.active) return ;
+            if (!this._isActive) return ;
             this.container.html(this._message) ;
         } ;
     }
-    Class.define_class(DummyPlot, Display, {}, {}) ;
+    Class.define_class(DummyPlot, Widget.Widget, {}, {}) ;
 
     function EpicsViewer (pvs) {
 
@@ -121,10 +126,6 @@ function (
             if (this._is_rendered) return ;
             this._is_rendered = true ;
 
-            $('#subtitle').click(function () {
-                alert('Configuration option is yeat to be implemented') ;
-            }) ;
-
             this._pvfinder = new Finder ($('#finder'), {
                 on_select: function (pvname) {
                     if (_.indexOf(_that._options.pvs, pvname) === -1) {
@@ -135,15 +136,6 @@ function (
                 }
             }) ;
             this._selected = $('#getdata_control > #selected > table') ;
-            this._selected.children('thead').children('tr:first-child').click(function () {
-                var tbody = _that._selected.children('tbody') ;
-                if (tbody.hasClass   ('selected-tbody-visible')) {
-                    tbody.removeClass('selected-tbody-visible').addClass('selected-tbody-hidden') ;
-                } else {
-                    tbody.removeClass('selected-tbody-hidden') .addClass('selected-tbody-visible') ;
-                }
-            }) ;
-
             this._interval = new Interval.Interval ({
                 changes_allowed: function () {
                     // no timeline changes while loading a set of PVs
@@ -174,37 +166,14 @@ function (
                                 }
                             }
                         } ,
-                        y_toggle_scale: function (name) {
-                            switch (_that._scales[name]) {
-                                case 'linear': _that._scales[name] = 'log10' ;  break ;
-                                case 'log10' : _that._scales[name] = 'linear' ; break ;
-                            }
-                            _that._selectedPVs[name].find('select[name="scale"]').val(_that._scales[name]) ;
-                            _that._loadAllTimeLines() ;
-                        } ,
                         ruler_change: function (values) {
                             for (var pvname in values) {
                                 var v = values[pvname] ;
-                                if (_.isUndefined(v)) continue ;
                                 var msec = Math.floor(1000. * v[0]) ,
                                     t = new Date(msec) ;
-                                _that._selectedPVs[pvname].children('td.time') .html(Interval.time2htmlLocal(t)) ;
+                                _that._selectedPVs[pvname].children('td.time') .html(Interval.time2htmlUTC(t)) ;
                                 _that._selectedPVs[pvname].children('td.value').text(v[1]) ;
                             }
-                        } ,
-                        download_requested: function (dataURL) {
-                            // Change MIME type to trick the browser to download
-                            // the file instead of displaying it.
-//                            dataURL = dataURL.replace(/^data:image\/[^;]*/, 'data:application/octet-stream');
-
-                            // In addition to <a>'s "download" attribute, you can
-                            // define HTTP-style headers.
-//                            dataURL = dataURL.replace(/^data:application\/octet-stream/, 'data:application/octet-stream;headers=Content-Disposition%3A%20attachment%3B%20filename=Canvas.png');
-
-                            window.open(dataURL, '_blank') ;
-                        } ,
-                        download_allowed: function () {
-                            return !_that._interval.inAutoTrackMode()
                         }
                     })} ,
 
@@ -339,7 +308,7 @@ function (
                 var tr = $(this).closest('tr') ;
                 var pvname = tr.prop('id') ;
                 _that._scales[pvname] = $(this).val() ;
-                //delete _that._y_range_lock[pvname] ;
+                delete _that._y_range_lock[pvname] ;
                 _that._loadAllTimeLines() ;
             }).prop('disabled', true) ;
         } ;

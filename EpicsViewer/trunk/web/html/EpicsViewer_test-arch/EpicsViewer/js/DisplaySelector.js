@@ -1,15 +1,9 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class' ,
-    'webfwk/Widget' ,
-    'EpicsViewer/Display' ,
+    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/Widget' ,
     'underscore'] ,
 
 function (
-    CSSLoader ,
-    Class ,
-    Widget ,
-    Display) {
+    CSSLoader, Class, Widget) {
 
     CSSLoader.load('../EpicsViewer/css/DisplaySelector.css') ;
 
@@ -36,7 +30,7 @@ function (
      *   ds.get('waveform').load(...) ;
      * 
      * IMPORTANT: the widget objects passed with the configuration
-     * must be subclasses of the Display class. That's important because
+     * must be subclasses of the Widget class. That's important because
      * the selector class will also asked them to be rendered after
      * the selector renders itself.
      *
@@ -77,7 +71,7 @@ function (
 
             var id     = Widget.PROP_STRING(disp, 'id') ;
             var widget = Widget.PROP_OBJECT(disp, 'widget') ;
-            Widget.ASSERT(widget instanceof Display) ;
+            Widget.ASSERT(widget instanceof Widget.Widget) ;
 
             _that._ids.push(id) ;
             _that._id2display[id] = {
@@ -86,14 +80,6 @@ function (
                 widget: widget
             } ;
         }) ;
-
-        this._resize = function () {
-            var selector = this.container.children('#selector') ,
-                area     = this.container.children('#area') ,
-                last     = this.container.children('#selector').children('.disp-sel-item-last');
-            area.css('width',  (this.container.innerWidth() - selector.innerWidth()) + 'px') ;
-            last.css('height', (window.innerHeight - last.offset().top - 52) + 'px') ;
-        } ;
 
         /**
          * @brief Implement the widget rendering protocol as required by
@@ -120,11 +106,18 @@ function (
 '<div id="end" ></div> '*/) ;
 
 
-            this._resize() ;
+            var selector = this.container.children('#selector') ,
+                area     = this.container.children('#area') ,
+                last     = this.container.children('#selector').children('.disp-sel-item-last');
+            area.css('width',  (this.container.innerWidth() - selector.innerWidth()) + 'px') ;
+            console.log('window.innerHeight:'+window.innerHeight) ;
+            last.css('height', (window.innerHeight - last.offset().top - 52) + 'px') ;
             $(window).resize(function () {
-                _that._resize() ;
-                // TODO: propagata the 'on_resize' command to all displays (if any) so that
-                // they won't need to register their own event handlers.
+                area.css('width', (_that.container.innerWidth() - selector.innerWidth()) + 'px') ;
+                console.log('window.innerHeight:'+window.innerHeight) ;
+                last.css('height', (window.innerHeight - last.offset().top - 52) + 'px') ;
+//                _that._display() ;  // redisplay is needed to prevent plots
+//                                    // from being scaled.
             }) ;
 
 
@@ -136,11 +129,9 @@ function (
                 ) ;
             }) ;
 
-            // Activate the first item in the list (if any)
-            if (this._ids.length) {
-                this.activate(this._ids[0]) ;
-            }
-                
+            // Activate the first item in the list
+            this.activate(this._ids[0]) ;
+
             // Process user selection
             this.container.children('#selector').children('.disp-sel-item').click(function () {
                 _that.activate($(this).attr('id')) ;
@@ -166,31 +157,15 @@ function (
          * @returns {Widget}
          */
         this.activate = function (id) {
-            // get the widger to be activated. Note that this will also validate
-            // the identifier passed as teh parameter.
             var widget = this.get(id) ;
-
-            // find presently active display
-            var activeItem = this.container.children('#selector').children('.disp-sel-item.disp-sel-item-active') ;
-            if (activeItem.length) {
-
-                var activeItemId = activeItem.attr('id') ;
-
-                // in case if this widget is already active
-                if (activeItemId === id) return ;
-
-                activeItem.removeClass('disp-sel-item-active') ;
-                this.container.children('#area').children('.disp-sel-area#'+activeItemId).removeClass('disp-sel-area-active') ;
-
-                // make sure the widget to go knows that it's no longer active
-                this.get(activeItemId).deactivate() ;
-            }
-            this.container.children('#selector').children('.disp-sel-item#'+id).addClass('disp-sel-item-active') ;
-            this.container.children('#area')    .children('.disp-sel-area#'+id).addClass('disp-sel-area-active') ;
-
+            // selectors
+            this.container.children('#selector').children('.disp-sel-item')    .removeClass('disp-sel-item-active') ;
+            this.container.children('#selector').children('.disp-sel-item#'+id).addClass   ('disp-sel-item-active') ;
+            // areas
+            this.container.children('#area').children('.disp-sel-area')    .removeClass('disp-sel-area-active') ;
+            this.container.children('#area').children('.disp-sel-area#'+id).addClass   ('disp-sel-area-active') ;
             // tell the widget that it's now active
-            widget.activate() ;
-
+            widget.on_activate() ;
             return widget ;
         } ;
 

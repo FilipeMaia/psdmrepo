@@ -1,26 +1,53 @@
 .datatable-disp {
-    padding:    20px 20px 10px 30px;
+    position:   relative;
+    padding:    20px 10px 10px 30px;
     overflow:   auto;
+}
+.datatable-disp div#download {
+    position:   absolute;
+    top:        10px;
+    right:      10px;
+}
+.datatable-disp div#download > a[data]:hover:after {
+  content:  attr(data);
+  padding:  8px;
+  margin-left:8px;
+  color:    #000000;
+  position: absolute;
+  right:    0px;
+  top:      32px;
+  white-space:  pre;
+  max-width:    520px;
+  z-index:      2;
+  border-radius:    3px ;
+  background-color: lemonchiffon;
+  font-family:  'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight:  normal;
+  font-size:    12px;
+  text-align:   left;
 }
 .datatable-disp > table {
     overflow:   auto;
     border-spacing: 0;
     font-size:  12px;
 }
+.datatable-disp > table th,
 .datatable-disp > table td {
     border-right:   solid 1px #d0d0d0 ;
     padding-top:    4px;
     padding-bottom: 2px;
     padding-left:   8px;
     padding-right:  8px;
+    white-space:    nowrap;
 }
-.datatable-disp > table > thead td {
+.datatable-disp > table > thead th {
     border-bottom:  solid 1px #a0a0a0 ;
     font-weight:    bold;
 }
-.datatable-disp > table > thead td:first-child {
+.datatable-disp > table > thead th:first-child {
     text-align:     center;
 }
+.datatable-disp > table th:last-child,
 .datatable-disp > table td:last-child {
     border-right:   0 ;
 }

@@ -2,7 +2,7 @@
 <html>
 <head>
 
-<title>EPICS Archive Viewer (prototype version)</title>
+<title>EPICS Archive Viewer: v1</title>
 
 <meta charset="UTF-8">
 <!--
@@ -33,8 +33,7 @@ div#body {
     color:  red;
 }
 #subtitle[data]:hover:after,
-#home > a[data]:hover:after,
-#getdata_control button[data]:hover:after {
+#home > a[data]:hover:after {
   content:  attr(data);
   padding:  8px;
   margin-left:8px;
@@ -58,8 +57,8 @@ button {
     background:     rgba(240, 248, 255, 0.39) !important;
     border-radius:  2px !important;
 }
-button.control-button-important > span {
-    color:  red !important;
+.control-button-important {
+    color:  red;
 }
 button > span {
     color:      black;
@@ -124,16 +123,8 @@ button > span {
 #getdata_control > .control#end_now {
     margin-left:    10px;
 }
-#getdata_control > .control.track {
-    float:  right;
-    margin-right:   0px;
-}
-#getdata_control > .control.track div.auto-track-visible {
-    display:    block;
-}
-#getdata_control > .control.track div.auto-track-hidden {
-    display:    none;
-}
+
+
 #getdata_control > #selected {
     margin-bottom:  25px;
 }
@@ -142,13 +133,6 @@ button > span {
     font-size:      12px;
     font-family:    Lucida Grande, Lucida Sans, Arial, sans-serif;
 }
-#getdata_control > #selected > table > thead > tr {
-    background-color: #f0f0f0;
-}
-#getdata_control > #selected > table > thead > tr:hover {
-    background: #d0e5f5;
-    cursor:     pointer;
-}
 
 #getdata_control > #selected > table > thead > tr > td {
     padding: 5px 5px 5px 5px;
@@ -156,16 +140,10 @@ button > span {
     border-bottom:  1px solid #b0b0b0;
     font-weight:    bold;
     white-space:    nowrap;
+    background-color: #f0f0f0;
 }
-
 #getdata_control > #selected > table > thead > tr > td:last-child {
     border-right:   0;
-}
-.selected-tbody-visible {
-    display:    table-row-group;
-}
-.selected-tbody-hidden {
-    display:    none;
 }
 #getdata_control > #selected > table > tbody > tr > td.pvname:hover {
     background-color:   aliceblue;
@@ -210,7 +188,7 @@ span.error {
 }
 </style>
 
-<script data-main="../EpicsViewer/js/proto_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
+<script data-main="../EpicsViewer/js/main.js?bust=<?=date_create()->getTimestamp()?>" src="../require/require.js"></script>
 
 <script>
 <?php
@@ -281,29 +259,16 @@ configuration on the Web server. Others will be able to see it." >&lt;save&gt;</
         <div id="end_mm"    class="control end" ><input type="text" size="1" value="34" /></div>
         <div                class="title   end" >:</div>
         <div id="end_ss"    class="control end" ><input type="text" size="1" value="48" /></div>
-        <div id="end_now"   class="control end" ><button data="Set the end time to the present time" >NOW</button></div>
-        <div id="end_left"  class="control end" ><button data="Set the end time one window size earlier" >&lt;</button></div>
-        <div id="end_right" class="control end" ><button data="Set the end time one window size older" >&gt;</button></div>
-        <div id="end_track" class="control track" >
-          <div class="auto-track-visible" >
-            <button class="control-button-important" name="start" data="Begin automatically tracking new values in the end of the timeline" >AUTO</button>
-          </div>
-          <div class="auto-track-hidden" >
-            <div style="float:left;" ><img src="../EpicsViewer/img/preloader.gif" style="height:24px; margin-right:5px;" ></div>
-            <div style="float:left;" ><button name="stop" data="Stop the tracker and switch back to the manual mode" >STOP</button></div>
-            <div style="clear:both;" ></div>
-          </div>
-        </div>
+        <div id="end_now"   class="control end" ><button>NOW</button></div>
         <div style="clear:both;" ></div>
       </div>
       <div id="display" ></div>
+<!--      <div id="timeseries" ></div>-->
     </div>
     <!-- Do not display this image. It's needed as a repository of icons for
          plots. Note this is just a temporary solution. Eventually the icon
          loading will be the widget's responsibility.
       -->
-    <img id="lock"           width="20" height="20" src="../webfwk/img/lock.png"               style="display:none" >
-    <img id="download-black" width="32" height="32" src="../webfwk/img/download-32-000000.png" style="display:none" >
-    <img id="download-red"   width="32" height="32" src="../webfwk/img/download-32-ff0000.png" style="display:none" >
+    <img id="lock" width="20" height="20" src="../webfwk/img/lock.png" alt="The Scream" style="display:none" >
 </body>
 </html>

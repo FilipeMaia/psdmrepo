@@ -149,14 +149,14 @@ function () {
                     var v = list[i].value ;
                     var msec = Math.round(1000 * v) ;
                     var date = new Date(msec) ;
-                    var SS               = ':' + pad(date.getSeconds()) ,
-                        MM               = ':' + pad(date.getMinutes()) ,
+                    var SS               = ':' + pad(date.getUTCSeconds()) ,
+                        MM               = ':' + pad(date.getUTCMinutes()) ,
                         MM_SS            = MM + SS ,
-                        HH_MM            = pad(date.getHours()) + MM ,
+                        HH_MM            = pad(date.getUTCHours()) + MM ,
                         HH_MM_SS         = HH_MM + SS ,
-                        YYYY             = pad(date.getFullYear()) ,
-                        YYYY_MM          = YYYY       + '-' + pad(date.getMonth() + 1) ,
-                        YYYY_MM_DD       = YYYY_MM    + '-' + pad(date.getDate()) ,
+                        YYYY             = pad(date.getUTCFullYear()) ,
+                        YYYY_MM          = YYYY       + '-' + pad(date.getUTCMonth() + 1) ,
+                        YYYY_MM_DD       = YYYY_MM    + '-' + pad(date.getUTCDate()) ,
                         YYYY_MM_DD_HH_MM = YYYY_MM_DD + ' ' + HH_MM ;
                     
                     this._formatted_timestamps[':SS']             .push({value: v, text: SS}) ;
