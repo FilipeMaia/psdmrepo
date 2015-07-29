@@ -15,6 +15,7 @@
 //-----------------------
 #include "PSXtcQC/InputParameters.h"
 #include <stdlib.h>
+#include <unistd.h>  // getopt, getopt_long, getopt_long_only, optarg, optind, opterr, optopt
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
