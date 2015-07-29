@@ -399,7 +399,7 @@ namespace {
       std::map< ValueArrayTypeKey, hid_t>::iterator pos = m_valueArrayTypes.find(valueArrayKey);
       if (pos != m_valueArrayTypes.end()) return pos->second;
       const unsigned rank = 1;
-      hsize_t dims[rank] = {numElem};
+      hsize_t dims[rank] = {(unsigned)numElem};
       hid_t valueArrayType = H5Tarray_create2(baseType, rank, dims);
       if (valueArrayType < 0) {
         MsgLog(logger(), error, "H5Tarray_create2 call failed: baseType="
@@ -430,7 +430,7 @@ namespace {
       hid_t strsType = -1;
       const unsigned rank = 1;
       hid_t stampType = getH5TypeId_epicsTimeStamp();
-      hsize_t dims[rank] = {numStrsCtrlEnum};
+      hsize_t dims[rank] = {(unsigned)numStrsCtrlEnum};
 
       switch (dbrType) {
       case Psana::Epics::DBR_CTRL_STRING:

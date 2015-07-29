@@ -182,7 +182,7 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
               hdf5pp::Group & srcGroup, const PSEvt::EventKey & eventKey, 
               PSEvt::Event & evt, PSEnv::Env & env) 
   {
-    MsgLog("HdfWriterNDArray",debug,"HdfWriterNDArray::append");
+    MsgLog("HdfWriterNDArray",debug,"HdfWriterNDArray::append for " << eventKey);
     boost::shared_ptr< ndarray<ElemType, NDim> > ndarrayPtr;
     ndarrayPtr= getNDArrayPtr<ElemType, NDim>(eventKey, dataTypeLoc, evt, env);
     if (not ndarrayPtr) throw EventKeyNotFound(ERR_LOC, eventKey, dataTypeLoc);
@@ -218,10 +218,12 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
         throw ErrSvc::Issue(ERR_LOC, str.str());
       }
     }
-    void * data;
+    void * data=0;
+    hvl_t vdata;
+    vdata.len=0;
+    vdata.p=0;
     if (vlen) {
       unsigned slowLength = ndarrayPtr->shape()[0];
-      hvl_t vdata;
       vdata.len = slowLength;
       vdata.p = (void *)ndarrayPtr->data();
       data = &vdata;
@@ -244,12 +246,9 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
     enum ndns::Order order = get_C_orFortran_StrideOnly<ElemType,NDim>(*ndarrayPtr, errorMsgForUnsupportedStride);
     if (order != ndns::C) throw NotImplementedException(ERR_LOC, "Fortran stride not implemented");
 
-    NDArrayFormat ndArrayFormat;
     hsize_t dims[NDim];
-    ndArrayFormat.order = order;
     bool hasZeroDim = false;
     for (unsigned i = 0; i < NDim; ++i) {
-      ndArrayFormat.dim[i]=ndarrayPtr->shape()[i];
       dims[i]=ndarrayPtr->shape()[i];
       if (dims[i]==0) hasZeroDim = true;
     }
