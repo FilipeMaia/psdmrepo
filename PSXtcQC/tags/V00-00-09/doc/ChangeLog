@@ -1,0 +1,83 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PSXtcQC
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+=======
+Tag: V00-00-09
+2015-07-29 Igor Gaponenko
+- RHEL7 and GCC48 migration (JIRA PSRT-1)
+
+=======
+Tag: V00-00-08
+2013-03-02 Andy Salnikov
+- there was a small interface change in XtcInput, fixing dependencies here
+
+=======
+Tag: V00-00-07
+2013-01-17 Andy Salnikov
+- XtcInput interfaces changed a bit, updating dependencies here
+
+=======
+Tag: V00-00-06
+2012-09-22 Andy Salnikov
+- suppress compilation warnings on RHEL6/gcc4
+
+=======
+Tag: V00-00-05
+2012-08-08 Mikhail S. Dubrovin
+- Move PSXtcQC/test/dgreader.cpp PSXtcQC/app/xtcqc.cpp
+D       test/dgreader.cpp
+A       app
+A       app/xtcqc.cpp
+M       doc/ChangeLog
+	
+=======
+
+Tag: V00-00-04
+2012-08-06 Andy
+- add missing include to build on RHEL6/gcc44
+
+=======
+Tag: V00-00-03
+2012-08-06 Mikhail S. Dubrovin
+- modify the input parameters sparsification in accordance with 
+  Igor's request for command line interface like
+  xtcqc [-h] [-l <logfile>] [-b <basedir>] <fname1> [<fname2> [<fname3> ...]]
+- redirect output to std::ostream, 
+  which can be selected between std::out or std::ofstream, depending on logfile.	
+M       test/dgreader.cpp
+M       include/QCStatistics.h
+M       src/QCStatistics.cpp
+A       include/InputParameters.h
+A       src/InputParameters.cpp
+	
+=======
+Tag: V00-00-02
+2012-08-03 Andy
+- update code to build on RHEL6/gcc44
+
+=======
+Tag: V00-00-01
+2012-08-01 Mikhail S. Dubrovin
+  First version
+  Contains:
+A       test/dgreader.cpp
+
+A       include/XtcQCIterator.h
+A       include/QCStatistics.h
+A       include/MyXtcQCIterator.h
+A       include/FileFinder.h
+
+A       src/QCStatistics.cpp
+A       src/FileFinder.cpp
+A       src/XtcQCIterator.cpp
+	
