@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>EPICS Archive Viewer</title>
+
+<meta charset="UTF-8" >
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0" >
+
+<link rel="stylesheet" href="css/main.css" />
+
+<!--
+  ATTENTION: there is well known problem with the RequireJS which may not retrieve
+  the latest version of the main file from a Web server. A stale version from
+  the browser's cache may be used instead. A recommended solution to the problem
+  is to increment the value of the 'bust=' parameter each time new version of
+  the application is deployed.
+  -->
+
+<script data-main="js/main.js?bust=2" src="js/require/require.js" ></script>
+
+<!--
+  Application customization section. The default values
+  of certain global options can be changed at deployment time
+  using a template preprocessor engine. Others would be deduced
+  from the optional parameters of the script.
+  -->
+
+<script>
+    
+    // Global parameters are optional
+    
+    var _DEFAULT_RETRIEVAL_URL_BASE = '/epics/retrieval' ,
+        _DEFAULT_AUTHENTICATION_METHOD = 'webkdc' ;
+
+    window.global_options = {
+
+        // The optional name of a desired configuration to initialize the application
+        // with. Note that if a valid configuration found among parameters of the query
+        // then other initialization options (including names of PVs and an initial
+        // interval) will be ignored.
+        config: null ,
+
+        // And alternative way to initialize the application
+        pvs:      [] ,      // names of initial PVs to display
+        from:     null ,    // the begin time (ISO) of an initial time interval
+        to:       null ,    // the end time (ISP) of an initial time interval
+        interval: null ,    // interval mode makes sense only if either or both
+                            // ends of the interval are provided. Allowed options
+                            // here would be:
+                            //   'openfrom' - no 'from' time is provided
+                            //   'closed'   - both 'from' and 'to' are provided
+                            //   'opento'   - no 'to' time is provided
+
+        // The default base path for Web Services which are used to retreive
+        // the information from the Archiver. This parameters may be overrided by
+        // the template engine.
+        retrieval_url_base: _DEFAULT_RETRIEVAL_URL_BASE ,
+
+        // The default authentication method. This parameters may be overrided by
+        // the template engine.
+        auth_method: _DEFAULT_AUTHENTICATION_METHOD
+    } ;
+    
+    // Parse parameters of the URL and override the default values
+    // in the global object.
+
+    /**
+     * Find if the specified parameter is found in the query and if so
+     * then return its decoded value. Return 'null' otherwise.
+     *
+     * @param {String} name
+     * @returns {String}
+     */
+    function getParameterByName (name) {
+        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]") ;
+        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)") ,
+            results = regex.exec(window.location.search) ;
+        return results === null ? null : decodeURIComponent(results[1].replace(/\+/g, " ")) ;
+    }
+    var config = getParameterByName('config') ;
+    if (config) {
+        window.global_options.config = config ;
+    } else {
+
+        // Alternative (simple) configuration options
+
+        var _MAX_PVS = 5 ;
+        for (var i = 1; i <= _MAX_PVS; ++i) {
+            var pv = getParameterByName('pv'+i) ;
+            if (pv) window.global_options.pvs.push(pv) ;
+        }
+        var from = getParameterByName('from') ;
+        if (from) { window.global_options.from = from ; }
+
+        var to = getParameterByName('to') ;
+        if (to) { window.global_options.to = to ;}
+
+        if      ( from &&  to) { window.global_options.interval = 'closed' ; }
+        else if ( from && !to) { window.global_options.interval = 'from' ; }
+        else if (!from &&  to) { window.global_options.interval = 'to' ; }
+    }
+</script>
+
+
+<!--
+  Optional customization of the global options by an external template
+  processor (if any).
+  -->
+
+<!-- @begin(client_retrieval_url_base) -->
+<script>
+    window.global_options.retrieval_url_base = _DEFAULT_RETRIEVAL_URL_BASE ;
+</script>
+<!-- @end(client_retrieval_url_base) -->
+
+<!-- @begin(client_auth_method) -->
+<script>
+    window.global_options.auth_method = _DEFAULT_AUTHENTICATION_METHOD ;
+</script>
+<!-- @end(client_auth_method) -->
+
+
+
+
+
+</head>
+<body>
+    <div id="body" >
+
+      <div id="home" style="float:left;" >
+        <a href="../../" data="Go back to the applicaton selector" >
+          <img src="img/home_icon.png" style="height:36px;" >
+        </a>
+      </div>
+      <div id="title" style="float:left; margin-left:20px;" >EPICS Archive Viewer:</div>
+      <div id="subtitle" style="float:left; margin-left:20px;" data="Save a complete state of your screen as a named
+configuration on the Web server. Others will be able to see it." >&lt;save&gt;</div>
+      <div style="clear:both;" ></div>
+
+      <div id="finder" ></div>
+      <div id="getdata_control" >
+        <div id="selected" >
+          <table>
+            <thead>
+              <tr>
+                <td>Del</td>
+                <td>Plot</td>
+                <td>Name</td>
+                <td>RTYP</td>
+                <td>Units</td>
+                <td>Processing</td>
+                <td>Scale</td>
+                <td>Time (UTC)</td>
+                <td>Value</td>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
+        <div                class="title"   >WINDOW SIZE:</div>
+        <div id="interval"  class="control" ></div>
+        <div                class="title"   >END:</div>
+        <div id="end_ymd"   class="control end" ><input type="text" size="8" /></div>
+        <div id="end_hh"    class="control end" ><input type="text" size="1" value="10" /></div>
+        <div                class="title   end" >:</div>
+        <div id="end_mm"    class="control end" ><input type="text" size="1" value="34" /></div>
+        <div                class="title   end" >:</div>
+        <div id="end_ss"    class="control end" ><input type="text" size="1" value="48" /></div>
+        <div id="end_now"   class="control end" ><button data="Set the end time to the present time" >NOW</button></div>
+        <div id="end_left"  class="control end" ><button data="Set the end time one window size earlier" >&lt;</button></div>
+        <div id="end_right" class="control end" ><button data="Set the end time one window size older" >&gt;</button></div>
+        <div id="end_track" class="control track" >
+          <div class="auto-track-visible" >
+            <button class="control-button-important" name="start" data="Begin automatically tracking new values in the end of the timeline" >AUTO</button>
+          </div>
+          <div class="auto-track-hidden" >
+            <div style="float:left;" ><img src="img/preloader.gif" style="height:24px; margin-right:5px;" ></div>
+            <div style="float:left;" ><button name="stop" data="Stop the tracker and switch back to the manual mode" >STOP</button></div>
+            <div style="clear:both;" ></div>
+          </div>
+        </div>
+        <div style="clear:both;" ></div>
+      </div>
+      <div id="display" ></div>
+    </div>
+    <!-- Do not display these images. They're used as a repository of icons for
+         plots. Note this is just a temporary solution. Eventually the icon
+         loading will be the widget's responsibility.
+      -->
+    <img id="lock"           width="20" height="20" src="img/lock.png"               style="display:none" >
+    <img id="download-black" width="32" height="32" src="img/download-32-000000.png" style="display:none" >
+    <img id="download-red"   width="32" height="32" src="img/download-32-ff0000.png" style="display:none" >
+</body>
+</html>

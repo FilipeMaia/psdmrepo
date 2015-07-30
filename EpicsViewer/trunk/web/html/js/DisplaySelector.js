@@ -1,8 +1,8 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class' ,
-    'webfwk/Widget' ,
-    'EpicsViewer/Display' ,
+    'CSSLoader' ,
+    'Class' ,
+    'Widget' ,
+    'Display' ,
     'underscore'] ,
 
 function (
@@ -11,7 +11,7 @@ function (
     Widget ,
     Display) {
 
-    CSSLoader.load('../EpicsViewer/css/DisplaySelector.css') ;
+    CSSLoader.load('css/DisplaySelector.css') ;
 
     /**
      * @brief display area manager/selector
@@ -116,8 +116,7 @@ function (
 '</div> ' +
 '<div id="area" > ' + _.reduce(this._ids, function (html, id) { var d = _that._id2display[id] ; return html +=
   '<div class="disp-sel-area" id="'+id+'" ></div> ' ; }, '') +
-'</div> ' /*+
-'<div id="end" ></div> '*/) ;
+'</div> ') ;
 
 
             this._resize() ;

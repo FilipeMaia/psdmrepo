@@ -1,6 +1,6 @@
 define ([
-    'webfwk/Class' ,
-    'webfwk/Widget'] ,
+    'Class' ,
+    'Widget'] ,
 
 function (
     Class ,

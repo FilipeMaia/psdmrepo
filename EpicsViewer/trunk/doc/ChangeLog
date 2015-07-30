@@ -11,6 +11,18 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2015-07-29 Igor Gaponenko
+- refactored the project to make it easier for deployment as a single
+ZIP file w/o moving any files around or changing their content. Moved
+in and properly modified external classes (and relevant CSS) which lived
+before in a separate PCDS-specific package 'webfwk'
+- got rif of PHP procesing of the main index file
+- added support for Murali's custom template processor in the index file
+- added processing index file query options in JavaScript. This includes
+support for up to 5 PVs and optional time range (not used yet) and
+a persistent configuration name (not used yet).
+
 Tag: V00-00-07
 2015-07-29 Igor Gaponenko
 - the 'LIVE' mode

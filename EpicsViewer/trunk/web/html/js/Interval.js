@@ -2,7 +2,7 @@
  * Timeline interval definitions
  */
 define ([
-    'webfwk/RadioBox'] ,
+    'RadioBox'] ,
 
 function (RadioBox) {
 

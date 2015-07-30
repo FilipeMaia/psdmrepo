@@ -1,8 +1,8 @@
 define ([
-    'webfwk/Class' ,
-    'EpicsViewer/Display' ,
-    'EpicsViewer/LabelGenerator' ,
-    'EpicsViewer/Log10LabelGenerator'] ,
+    'Class' ,
+    'Display' ,
+    'LabelGenerator' ,
+    'Log10LabelGenerator'] ,
 
 function (
     Class ,

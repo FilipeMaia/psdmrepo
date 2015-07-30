@@ -2,15 +2,15 @@
  * PV Finder UI
  */
 define ([
-    'webfwk/CSSLoader' ,
-    'EpicsViewer/WebService'
+    'CSSLoader' ,
+    'WebService'
 ] ,
 
 function (
     CSSLoader ,
     WebService) {
 
-    CSSLoader.load('../EpicsViewer/css/Finder.css') ;
+    CSSLoader.load('css/Finder.css') ;
 
     var _KEY_ENTER = 13 ,
         _KEY_ESC = 27 ;
@@ -37,7 +37,7 @@ function (
 
         cont.addClass('finder') ;
         cont.html (
-'<div id="logo" ><img src="../webfwk/img/View.png" /></div> ' +
+'<div id="logo" ><img src="img/View.png" /></div> ' +
 '<div id="input" ' +
   'data="' +
     'Enter GLOB pattern and press ENTER to find PVs. \n' +
@@ -102,7 +102,7 @@ function (
                 limit: 4000
             } ;
             WebService.GET (
-                "/epics/mgmt/bpl/getAllPVs" ,
+                window.global_options.retrieval_url_base + "/bpl/getMatchingPVs" ,
                 params ,
                 function (data) {
                     _that._pvs = data ;

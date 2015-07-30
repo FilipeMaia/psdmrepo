@@ -1,8 +1,8 @@
 define ([
-    'webfwk/CSSLoader' ,
-    'webfwk/Class' ,
-    'EpicsViewer/Display' ,
-    'EpicsViewer/Interval'] ,
+    'CSSLoader' ,
+    'Class' ,
+    'Display' ,
+    'Interval'] ,
 
 function (
     CSSLoader ,
@@ -10,7 +10,7 @@ function (
     Display ,
     Interval) {
 
-    CSSLoader.load('../EpicsViewer/css/DataTableDisplay.css') ;
+    CSSLoader.load('css/DataTableDisplay.css') ;
 
     function _DataTableDisplay () {
 
@@ -60,7 +60,7 @@ function (
      'target="_blank" ' +
      'data="Download PV data in the CSV format" ' +
      'download="data.csv" ' +
-     '><img src="../webfwk/img/download-32-000000.png" ></a> ' +
+     '><img src="img/download-32-000000.png" ></a> ' +
 '</div> ' +
 '<table> ' +
   '<thead> ' + 
@@ -134,9 +134,9 @@ function (
                 }
                 this.href = 'data:text/comma-separated-values;charset=utf-8,' + encodeURIComponent(csv) ;
             }).mouseover(function () {
-                $(this).children('img').prop('src', '../webfwk/img/download-32-ff0000.png') ;
+                $(this).children('img').prop('src', 'img/download-32-ff0000.png') ;
             }).mouseout(function () {
-                $(this).children('img').prop('src', '../webfwk/img/download-32-000000.png') ;
+                $(this).children('img').prop('src', 'img/download-32-000000.png') ;
             }) ;
         } ;
 

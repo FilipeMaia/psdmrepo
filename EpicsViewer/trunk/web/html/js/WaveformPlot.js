@@ -1,12 +1,16 @@
 define ([
-    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/Widget' ,
-    'EpicsViewer/LabelGenerator'] ,
+    'CSSLoader' ,
+    'Class' ,
+    'Widget' ,
+    'LabelGenerator'] ,
 
 function (
-    cssloader, Class, Widget ,
+    cssloader ,
+    Class ,
+    Widget ,
     LabelGenerator) {
 
-//    cssloader.load('../EpicsViewer/css/WaveformPlot.css') ;
+    cssloader.load('css/WaveformPlot.css') ;
 
     var _LABEL_SIZE = 12 ;
     var _LABEL_FONT = _LABEL_SIZE+'pt Calibri' ;

@@ -1,15 +1,13 @@
 require.config ({
-    baseUrl: '..' ,
+    baseUrl: 'js' ,
 
     waitSeconds : 15,
     urlArgs     : "bust="+new Date().getTime() ,
 
     paths: {
-        'jquery'      : '/jquery/js/jquery-1.8.2' ,
-        'jquery-ui'   : '/jquery/js/jquery-ui-1.9.1.custom.min' ,
-        'underscore'  : '/underscore/underscore-min' ,
-        'webfwk'      : 'webfwk/js' ,
-        'EpicsViewer' : 'EpicsViewer/js'
+        'jquery'      : 'jquery/js/jquery-1.8.2' ,
+        'jquery-ui'   : 'jquery/js/jquery-ui-1.9.1.custom.min' ,
+        'underscore'  : 'underscore/underscore-min'
     } ,
     shim : {
         'jquery' : {
@@ -32,28 +30,44 @@ require.config ({
 }) ;
 
 require ([
-    'webfwk/CSSLoader', 'webfwk/Class', 'webfwk/Widget' , 'EpicsViewer/DisplaySelector' ,
+    'CSSLoader' ,
+    'Class' ,
+    'Display' ,
+    'DisplaySelector' ,
 
     // Make sure the core libraries are preloaded so that the applications
     // won't borther with loading them individually
 
     'jquery', 'jquery-ui', 'underscore'] ,
 
-function (cssloader, Class, Widget, DisplaySelector) {
+function (cssloader, Class, Display, DisplaySelector) {
 
-    cssloader.load('/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
+    cssloader.load('js/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css') ;
 
     function DummyPlot (parent, message) {
-        Widget.Widget.call(this) ;
+
+        Display.call(this) ;
+
         this._parent = parent ;
         this._message = message ;
+
+        this.on_activate   = function () { this._display() ; } ;
+        this.on_deactivate = function () { } ;
+        this.on_resize     = function () { } ;
+
+        this._isRendered = false ;
         this.render = function () {
             if (this._isRendered) return ;
             this._isRendered = true ;
+            this._display() ;
+        } ;
+        this._display = function () {
+            if (!this._isRendered) return ;
+            if (!this.active) return ;
             this.container.html(this._message) ;
         } ;
     }
-    Class.define_class(DummyPlot, Widget.Widget, {}, {}) ;
+    Class.define_class(DummyPlot, Display, {}, {}) ;
 
     $(function () {
         var ds = new DisplaySelector($('#display'), [

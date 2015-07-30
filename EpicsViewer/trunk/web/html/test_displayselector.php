@@ -19,7 +19,7 @@ h2 {
 }
 </style>
 
-<script data-main="../EpicsViewer/js/test_displayselector_main.js?bust=<?=date_create()->getTimestamp()?>" src="/require/require.js"></script>
+<script data-main="js/test_displayselector_main.js?bust=<?=date_create()->getTimestamp()?>" src="js/require/require.js"></script>
 
 </head>
 <body>
