@@ -9,28 +9,88 @@
 
 """Class provides access to C++ algorithms from python.
 
-
 Usage::
 
-    # !!! None is returned everywhere when requested information is missing.
+    # !!! None is returned whenever requested information is missing.
 
+    IMPORT
+    =========================
     import psana
     from ImgAlgos.PyAlgos import PyAlgos    
 
-    ...
 
-    det = PyAlgos(src, env, pbits=0)
+    DEFINE INPUT PARAMETERS
+    =========================
+    # List of windows
+    winds = None # entire size of all segments will be used for peak finding
+    winds = (( 0, 0, 185, 0, 388), \
+             ( 1, 20,160, 30,300), \
+             ( 7, 0, 185, 0, 388))
 
-    # set parameters, if changed
-    det.set_env(env)
+    # Mask
+    mask = None                   # (default) all pixels in windows will be used for peak finding
+    mask = det.mask()             # see class Detector.PyDetector
+    mask = np.loadtxt(fname_mask) # 
+    mask.shape = <should be the same as shape of data n-d array>
 
-    det.print_member_data()    
+    # Data n-d array
+    nda = det.calib() # see class Detector.PyDetector
 
-    # get pixel array shape, size, and nomber of dimensions
-    shape = det.shape(evt)
 
-    # access intensity calibration parameters
-    peds   = det.pedestals(evt)
+    INITIALIZATION
+    =========================
+    # create object:
+    alg = PyAlgos(windows=winds, mask=mask, pbits=0)
+    # where pbits - is a print info control bit-word:
+    # pbits = 0   - print nothing
+    #       + 1   - main results, list of peaks
+    #       + 2   - input parameters, index matrix of pixels for S/N algorithm
+    #       + 128 - tracking and all details in class PyAlgos.py
+    #       + 256 - tracking and all details in class AlgArrProc
+    #       + 512 - tracking and all details in class AlgImgProc
+
+    # set peak-selector parameters:
+    alg.set_peak_selection_pars(npix_min=5, npix_max=5000, amax_thr=0, atot_thr=0, son_min=10)
+
+    
+    HIT FINDERS
+    =========================
+    Hit finders return simple values for decision on event selection.
+
+    # get number of pixels above threshold
+    npix = alg.number_of_pix_above_thr(data, thr=10)
+
+    # get total intensity of pixels above threshold
+    intensity = alg.intensity_of_pix_above_thr(data, thr=12)
+
+
+    PEAK FINDERS
+    =========================
+    Peak finders return list (numpy.array) of records with found peak parameters.
+
+    # v1 - aka Droplet Finder - two-threshold peak-finding algorithm in restricted region
+    #                           around pixel with maximal intensity.
+    peaks = alg.peak_finder_v1(nda, thr_low=10, thr_high=150, radius=5, dr=0.05)
+
+    # v2 - define peaks for regoins of connected pixels above threshold
+    peaks = alg.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+
+
+    OPTIONAL METHODS
+    =========================
+    # print info
+    alg.print_attributes()   # attributes of the PyAlgos object 
+    alg.print_input_pars()   # member data of C++ objects
+
+    # set parameters for S/N evaluation algorithm
+    alg.set_son_pars(r0=5, dr=0.05)
+
+    # set mask
+    alg.set_mask(mask)
+
+    # set windows in segments to search for peaks
+    alg.set_windows(winds) :
+
 
 This software was developed for the LCLS project.
 If you use all or part of it, please give an appropriate acknowledgment.
@@ -51,11 +111,6 @@ import sys
 import numpy as np
 
 import ImgAlgos
-
-#from ImgAlgos import *
-#import Detector.GlobalUtils as gu
-#from ImgAlgos.AlgArrProc import AlgArrProc
-
 
 ##-----------------------------
 
@@ -105,7 +160,7 @@ class PyAlgos :
         @param mask  - n-d array with mask or None
         @param pbits - print control bit-word
         """
-        #print 'In python c-tor PyAlgos'
+        if pbits & 128 : print 'in c-tor %s' % self.__class__.__name__
 
         self.pbits = pbits
 
@@ -116,18 +171,29 @@ class PyAlgos :
 
         self.aap = ImgAlgos.AlgArrProc(self.windows, self.pbits)
 
-        self.aap.print_input_pars()
+        if self.pbits == 2 : self.print_attributes()
         
-        #if pbits : self.print_attributes()
-
 ##-----------------------------
 
     def set_windows(self, windows) :
         """
         @param windows - tuple of windows
         """
+        if self.pbits & 128 : print 'in PyAlgos.set_windows()'
+
         self.windows = np.array(windows, dtype=np.uint32)
         self.aap.set_windows(self.windows)
+
+##-----------------------------
+
+    def set_son_pars(self, r0=10, dr=0.05) :
+        """ Set parameters for SoN (S/N) evaluation
+        @param r0 - ring internal radius
+        @param dr - ring width
+        """
+        if self.pbits & 128 : print 'in PyAlgos.set_son_pars()'
+
+        self.aap.set_son_pars(r0, dr)
 
 ##-----------------------------
 
@@ -139,6 +205,8 @@ class PyAlgos :
         @param amax_thr - threshold on total amplitude
         @param son_min - minimal S/N in peak
         """
+        if self.pbits & 128 : print 'in PyAlgos.set_peak_selection_pars()'
+
         self.aap.set_peak_selection_pars(npix_min, npix_max, amax_thr, atot_thr, son_min)
 
 ##-----------------------------
@@ -147,8 +215,17 @@ class PyAlgos :
         """
         @param mask - array with mask 1/0 - good/bad pixel
         """
+        if self.pbits & 128 : print 'in PyAlgos.set_mask()'
+
         if mask is None : self.mask = None
         else : self.mask = np.array(mask, dtype=np.uint16)
+
+##-----------------------------
+
+    def print_input_pars(self) :
+        if self.pbits & 128 : print 'in PyAlgos.print_input_pars()'
+
+        self.aap.print_input_pars()
 
 ##-----------------------------
 
@@ -165,7 +242,8 @@ class PyAlgos :
     def check_mask(self, ndim, dtype=np.uint16) :
         """Returns empty mask for None or re-shaped mask for ndim>3, or self.mask
         """
-        if self.pbits & 16 : print_arr_attr(self.mask, cmt='self.mask')
+        if self.pbits & 128 : print_arr_attr(self.mask, cmt='PyAlgos.check_mask() self.mask')
+
         if self.mask is None :
             if ndim>2 : self.mask = np.empty((0,0,0), dtype=dtype)
             else      : self.mask = np.empty((0,0),   dtype=dtype)
@@ -177,7 +255,7 @@ class PyAlgos :
 
     def number_of_pix_above_thr(self, arr, thr=0) :
 
-        if self.pbits & 16 : print_arr_attr(arr, cmt='number_of_pix_above_thr input arr:')
+        if self.pbits & 128 : print_arr_attr(arr, cmt='PyAlgos.number_of_pix_above_thr input arr:')
 
         ndim, dtype = len(arr.shape), arr.dtype
         self.check_mask(ndim)
@@ -199,8 +277,8 @@ class PyAlgos :
         if dtype == np.int16  : return self.aap.number_of_pix_above_thr_s3(nda, msk, thr)
         if dtype == np.uint16 : return self.aap.number_of_pix_above_thr_u3(nda, msk, thr)
 
-        #if self.pbits :
-        print 'WARNING: number_of_pix_above_thr(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
+        if self.pbits :
+            print 'WARNING: PyAlgos.number_of_pix_above_thr(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
 
         return None
 
@@ -208,7 +286,7 @@ class PyAlgos :
 
     def intensity_of_pix_above_thr(self, arr, thr):
 
-        if self.pbits & 16 : print_arr_attr(arr, cmt='intensity_of_pix_above_thr input arr:')
+        if self.pbits & 128 : print_arr_attr(arr, cmt='PyAlgos.intensity_of_pix_above_thr() input arr:')
 
         ndim, dtype = len(arr.shape), arr.dtype
         self.check_mask(ndim)
@@ -230,8 +308,8 @@ class PyAlgos :
         if dtype == np.int16  : return self.aap.intensity_of_pix_above_thr_s3(nda, msk, thr)
         if dtype == np.uint16 : return self.aap.intensity_of_pix_above_thr_u3(nda, msk, thr)
 
-        #if self.pbits :
-        print 'WARNING: intensity_of_pix_above_thr(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
+        if self.pbits :
+            print 'WARNING: PyAlgos.intensity_of_pix_above_thr(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
 
         return None
 
@@ -239,7 +317,7 @@ class PyAlgos :
 
     def peak_finder_v1(self, arr, thr_low, thr_high, radius=5, dr=0.05) :
 
-        if self.pbits & 16 : print_arr_attr(arr, cmt='peak_finder_v1 input arr:')
+        if self.pbits & 128 : print_arr_attr(arr, cmt='PyAlgos.peak_finder_v1() input arr:')
 
         ndim, dtype = len(arr.shape), arr.dtype
         self.check_mask(ndim)
@@ -261,8 +339,8 @@ class PyAlgos :
         if dtype == np.int16  : return self.aap.peak_finder_v1_s3(nda, msk, thr_low, thr_high, radius, dr)
         if dtype == np.uint16 : return self.aap.peak_finder_v1_u3(nda, msk, thr_low, thr_high, radius, dr)
 
-        #if self.pbits :
-        print 'WARNING: peak_finder_v1(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
+        if self.pbits :
+            print 'WARNING: PyAlgos.peak_finder_v1(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
 
         return None
 
@@ -275,9 +353,7 @@ class PyAlgos :
 
     def peak_finder_v2(self, arr, thr=0, r0=5, dr=0.05) :
 
-        #self.set_son_parameters(r0, dr)
-
-        if self.pbits & 16 : print_arr_attr(arr, cmt='peak_finder_v2 input arr:')
+        if self.pbits & 128 : print_arr_attr(arr, cmt='PyAlgos.peak_finder_v2() input arr:')
 
         ndim, dtype = len(arr.shape), arr.dtype
         self.check_mask(ndim)
@@ -299,41 +375,13 @@ class PyAlgos :
         if dtype == np.int16  : return self.aap.peak_finder_v2_s3(nda, msk, thr, r0, dr)
         if dtype == np.uint16 : return self.aap.peak_finder_v2_u3(nda, msk, thr, r0, dr)
 
-        #if self.pbits :
-        print 'WARNING: peak_finder_v2(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
+        if self.pbits :
+            print 'WARNING: PyAlgos.peak_finder_v2(.) method is not implemented for ndim = %d, dtype = %s' % (ndim, str(dtype))
 
         return None
 
 ##-----------------------------
-
-#    def raw_data(self, evt) :
-
-#        # get data using python methods
-#        rdata = self.pyda.raw_data(evt, self.env)
-#        if rdata is not None : return rdata
-
-#        if self.pbits :
-#            print '!!! PyAlgos: Data for source %s is not found in python interface, trying C++' % self.source,
-
-#        # get data using C++ methods
-#        if   self.dettype == gu.CSPAD    : rdata = self.da.data_int16_3 (evt, self.env)
-#        elif self.dettype == gu.CSPAD2X2 : rdata = self.da.data_int16_3 (evt, self.env)
-#        elif self.dettype == gu.PNCCD    : rdata = self.da.data_uint16_3(evt, self.env)
-#        else :                             rdata = self.da.data_uint16_2(evt, self.env)
-#        return self._nda_or_none_(rdata)
-
-##-----------------------------
-
-#    def common_mode_apply(self, evt, nda) :
-#        """Apply common mode correction to nda (assuming that nda is data ndarray with subtracted pedestals)
-#           nda.dtype = np.float32 (or 64) is considered only, because common mode does not make sense for int data.
-#        """
-#        shape0 = nda.shape
-#        nda.shape = (nda.size,)
-#        if nda.dtype == np.float64 : self.da.common_mode_double(evt, self.env, nda)
-#        if nda.dtype == np.float32 : self.da.common_mode_float (evt, self.env, nda)
-#        nda.shape = shape0
-        
+##---------- TEST -------------
 ##-----------------------------
 
 from time import time

@@ -6,7 +6,6 @@
 // 	$Id$
 //
 // Description: see documentation below
-//
 //------------------------------------------------------------------------
 
 //-----------------
@@ -18,7 +17,6 @@
 #include <iostream> // for cout, ostream
 #include <cstddef>  // for size_t
 #include <cstring>  // for memcpy
-//#include <math.h>   // for exp
 #include <cmath>    // for sqrt
 
 //-------------------------------
@@ -44,71 +42,10 @@ using namespace std;
 
 namespace ImgAlgos {
 
-/// @addtogroup ImgAlgos
 
 /**
- *  @ingroup ImgAlgos
- *
- *  @brief AlgImgProc - is a smearing algorithm for ndarray<T,2> using 2-d Gaussian weights.
- *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @version $Id$
- *
- *  @author Mikhail S. Dubrovin
- *
- *  @see AlgImgProc
- *
- *
- *  @anchor interface
- *  @par<interface> Interface Description
- *
- *
- * 
- *  @li  Include
- *  @code
- *  #include "ImgAlgos/AlgImgProc.h"
- *  #include "ndarray/ndarray.h"     // need it for I/O arrays
- *  @endcode
- *
- *
- *
- *  @li Initialization
- *  \n
- *  @code
- *  size_t      seg    = 2;
- *  size_t      rowmin = 10;
- *  size_t      rowmax = 170;
- *  size_t      colmin = 100;
- *  size_t      colmax = 200;
- *  unsigned    pbits  = 0177777;
- * 
- *  ImgAlgos::AlgImgProc* aip = new ImgAlgos::AlgImgProc(seg, rowmin, rowmax, colmin, colmax, pbits);
- *  @endcode
- *
- *  @li Set parameters for S/N
- *  @code
- *  float       r0 = 5;
- *  float       dr = 0.05;
- *  aip->setSoNPars(r0,dr);
- *  @endcode
- *
- *  @li Get S/N
- *  @code
- *  ndarray<const T,2> data = ....;    // input raw ndarray
- *  ndarray<mask_t,2>  mask = ....;    // input mask ndarray, may be omitted
- *  ndarray<mask_t,2>  son;            // output S/N ndarray
- *
- *  aip->SoN<T>(data, mask, son);
- *  @endcode
- *
- *  @li Print methods
- *  @code
- *  aip->printInputPars();
- *  aip->printIndexes();
- *  @endcode
- */
+ * @brief Peak-work parameters
+ */ 
 
 struct PeakWork{
   unsigned  peak_npix;
@@ -156,6 +93,10 @@ struct PeakWork{
     , peak_cmax(cmax)
     {}
 };
+
+/**
+ * @brief Peak parameters
+ */ 
 
 struct Peak{
   float seg;
@@ -209,6 +150,10 @@ struct TwoIndexes {
 };
 */
 
+/**
+ * @brief Structure to hold SoN (S/N) algorithm results
+ */ 
+
 struct SoNResult {
   double avg; // average intensity in the ring
   double rms; // rms in the ring
@@ -226,6 +171,97 @@ struct SoNResult {
     return *this;
   }
 };
+
+/// @addtogroup ImgAlgos
+
+/**
+ *  @ingroup ImgAlgos
+ *
+ *  @brief AlgImgProc - class for 2-d image processing algorithms.
+ *
+ *  This class is not suppose to be used separately. 
+ *  Class AlgImgProc is a part of the Python-C++ algorithm inteface project.
+ *
+ *
+ *  This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @version $Id$
+ *
+ *  @author Mikhail S. Dubrovin
+ *
+ *  @see AlgArrProc, pyImgAlgos.cpp, PyAlgos.py
+ *
+ *
+ *  @anchor interface
+ *  @par<interface> Interface Description
+ *
+ * 
+ *  @li  Include
+ *  @code
+ *  #include "ImgAlgos/AlgImgProc.h"
+ *  #include "ndarray/ndarray.h"     // need it for I/O arrays
+ *  @endcode
+ *
+ *
+ *  @li Initialization
+ *  \n
+ *  @code
+ *  size_t      seg    = 2;
+ *  size_t      rowmin = 10;
+ *  size_t      rowmax = 170;
+ *  size_t      colmin = 100;
+ *  size_t      colmax = 200;
+ *  unsigned    pbits  = 0;  // 0-print nothing, 2-input parameters and S/N matrix of indexes, 512-tracking.
+ * 
+ *  ImgAlgos::AlgImgProc* aip = new ImgAlgos::AlgImgProc(seg, rowmin, rowmax, colmin, colmax, pbits);
+ *  @endcode
+ *
+ *
+ *  @li Define input parameters
+ *  @code
+ *  ndarray<const T,2> data = ....;    // calibrated data ndarray
+ *  ndarray<mask_t,2>  mask = ....;    // mask ndarray, may be omitted
+ *  ndarray<mask_t,2>  son;            // output S/N ndarray
+ *  ndarray<const wind_t,2> winds = ((0,  0, 185,   0, 388), \
+ *                                   (1, 10, 103,  10, 204), \
+ *                                   (1, 10, 103, 250, 380));
+ *  float       r0 = 5;
+ *  float       dr = 0.05;
+ *  ...
+ *  @endcode
+ *
+ *
+ *  @li Set methods
+ *  @code
+ *  aip->setSoNPars(r0,dr);
+ *  aip->setWindows(winds);
+ *  aip->setPeakSelectionPars(npix_min, npix_max, amax_thr, atot_thr, son_min);
+ *  @endcode
+ *
+ *
+ *  @li Get methods
+ *  @code
+ *   size_t ind = aip->segind()
+ *   size_t counter = aip -> numberOfPixAboveThr<T>(seg_data, seg_mask, thr);
+ *   double intensity = aip -> intensityOfPixAboveThr<T>(seg_data, seg_mask, thr);
+ *   std::vector<Peak>& peaks = aip -> dropletFinder<T>(seg_data, seg_mask, thr_low, thr_high, rad, dr);
+ *   std::vector<Peak>& peaks = aip -> peakFinder<T>(seg_data, seg_mask, thr, r0, dr);
+ *   std::vector<Peak>& peaks = aip -> getVectorOfSelectedPeaks();
+ *   std::vector<Peak>& peaks = aip -> getVectorOfPeaks();
+ *  @endcode
+ *
+ *
+ *  @li Print methods
+ *  @code
+ *  aip->printInputPars();
+ *  aip->printMatrixOfRingIndexes();
+ *  aip->printVectorOfRingIndexes();
+ *
+ *  Peak& peak = ...
+ *  cout << peak ...
+ *  @endcode
+ */
 
 class AlgImgProc {
 public:
@@ -269,8 +305,7 @@ public:
    * @param[in] r0 - radial parameter of the ring for S/N evaluation algorithm
    * @param[in] dr - ring width for S/N evaluation algorithm 
    */
-  void setSoNPars(const float& r0=5, 
-                  const float& dr=0.05);
+  void setSoNPars(const float& r0=5, const float& dr=0.05);
 
   /// Set peak selection parameters
   void setPeakSelectionPars(const float& npix_min=2, 
@@ -282,8 +317,11 @@ public:
   /// Returns segment index in the ndarray
   const size_t& segind(){ return m_seg; }
 
-  /// Returns vector of peaks for this segment/window
+  /// Returns vector of all found peaks for this segment/window
   std::vector<Peak>& getVectorOfPeaks(){ return v_peaks; }
+
+  /// Returns vector of selected peaks for this segment/window
+  std::vector<Peak>& getVectorOfSelectedPeaks(){ return v_peaks_sel; }
 
   /// Prints indexes
   void printMatrixOfRingIndexes();
@@ -322,6 +360,7 @@ private:
   ndarray<conmap_t, 2>       m_conmap;
   std::vector<PeakWork>      v_peaks_work;
   std::vector<Peak>          v_peaks;
+  std::vector<Peak>          v_peaks_sel;
   std::vector<TwoIndexes>    v_indexes;
 
   //ndarray<Peak, 1>           m_peaks;
@@ -339,14 +378,20 @@ private:
   /// Makes m_conmap - map of connected pixels with enumerated regions from m_pixel_status and counts m_numreg
   void _makeMapOfConnectedPixels();
 
-  /// Decide whether PeakWork should be processed and included in the output v_peaks
-  bool _peakWorkIsSelected(const PeakWork& pw);
+  /// Decide whether PeakWork should be processed and included in the v_peaks
+  bool _peakWorkIsPreSelected(const PeakWork& pw);
+
+  /// Decide if peak should be processed or not and included in the v_peaks 
+  bool _peakIsPreSelected(const Peak& peak);
 
   /// Decide if peak should be included or not in the output v_peaks
   bool _peakIsSelected(const Peak& peak);
 
-  /// Makes list of peaks from v_peaks_work
-  void _makeListOfPeaks();
+  /// Makes vector of peaks v_peaks from v_peaks_work
+  void _makeVectorOfPeaks();
+
+  /// Makes vector of selected peaks v_peaks_sel from v_peaks
+  void _makeVectorOfSelectedPeaks();
 
   /// Evaluate ring indexes for median algorithm
   void _evaluateRingIndexes(const float& r0, const float& dr);
@@ -368,8 +413,8 @@ _makeMapOfPixelStatus( const ndarray<const T,2>&      data
                      , const T& thr
                      )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _makeMapOfPixelStatus, seg=" << m_seg << " thr=" << thr);
-  if(m_pbits & 256) m_win.print();
+  if(m_pbits & 512) MsgLog(_name(), info, "in _makeMapOfPixelStatus, seg=" << m_seg << " thr=" << thr);
+  if(m_pbits & 512) m_win.print();
 
   m_pixel_status = make_ndarray<pixel_status_t>(data.shape()[0], data.shape()[1]);
   for(unsigned r = m_win.rowmin; r<m_win.rowmax; r++) {
@@ -391,8 +436,8 @@ template <typename T>
 void
 _procConnectedPixels(const ndarray<const T,2>& data)
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _procConnectedPixels, seg=" << m_seg);
-  //if(m_pbits & 256) m_win.print();
+  if(m_pbits & 512) MsgLog(_name(), info, "in _procConnectedPixels, seg=" << m_seg);
+  //if(m_pbits & 512) m_win.print();
 
   v_peaks_work.clear();
 
@@ -453,7 +498,7 @@ void _addSoNToPeaks( const ndarray<const T,2>& data
 	           , const float dr = 0.05
                    )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _addSoNToPeaks, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in _addSoNToPeaks, seg=" << m_seg);
 
   setSoNPars(r0, dr);
 
@@ -494,7 +539,7 @@ _procDroplet( const ndarray<const T,2>&      data
             , const unsigned& c0
             )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _procDroplet, seg=" << m_seg << " r0=" << r0 << " c0=" << c0);
+  if(m_pbits & 512) MsgLog(_name(), info, "in _procDroplet, seg=" << m_seg << " r0=" << r0 << " c0=" << c0);
 
   double a0 = data[r0][c0];
   unsigned npix = 0;
@@ -546,9 +591,40 @@ _procDroplet( const ndarray<const T,2>&      data
   peak.noise     = 0; //sonres.rms;
   peak.son       = 0; //sonres.son;
 
-  v_peaks.push_back(peak);
+  if(_peakIsPreSelected(peak)) v_peaks.push_back(peak);
+}
+//--------------------
+  /**
+   * @brief dropletFinder - two-threshold peak finding algorithm in the region defined by the radial parameter
+   * 
+   * @param[in]  data - ndarray with calibrated intensities
+   * @param[in]  mask - ndarray with mask of bad/good (0/1) pixels
+   * @param[in]  thr_low   - threshold on pixel intensity to be considered in this algorithm 
+   * @param[in]  thr_high  - threshold on pixel intensity to be a candidate to "droplet"
+   * @param[in]  rad       - radius in pixels of squared region to find droplet relative to central pixel
+   */
+template <typename T>
+void 
+_makeVectorOfDroplets( const ndarray<const T,2>&      data
+                     , const ndarray<const mask_t,2>& mask
+                     , const T& thr_low
+                     , const T& thr_high
+                     , const unsigned& rad=5
+                     )
+{
+  if(m_pbits & 512) MsgLog(_name(), info, "in dropletFinder, seg=" << m_seg);
+
+  v_peaks.clear(); // this vector will be filled out for each window
+
+  for(unsigned r = m_win.rowmin; r<m_win.rowmax; r++)
+    for(unsigned c = m_win.colmin; c<m_win.colmax; c++)
+      if(mask[r][c] && (data[r][c]>thr_high)) 
+        _procDroplet<T>(data,mask,thr_low,rad,r,c);	
 }
 
+//--------------------
+//--------------------
+//--------------------
 //--------------------
 
 public:
@@ -569,7 +645,7 @@ numberOfPixAboveThr( const ndarray<const T,2>&      data
                    , const T& thr
                    )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in numberOfPixAboveThr, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in numberOfPixAboveThr, seg=" << m_seg);
 
   m_win.validate(data.shape());
 
@@ -598,7 +674,7 @@ intensityOfPixAboveThr( const ndarray<const T,2>&      data
                       , const T& thr
                       )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in intensityOfPixAboveThr, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in intensityOfPixAboveThr, seg=" << m_seg);
 
   m_win.validate(data.shape());
 
@@ -619,6 +695,8 @@ intensityOfPixAboveThr( const ndarray<const T,2>&      data
    * @param[in]  mask - ndarray with mask of bad/good (0/1) pixels
    * @param[in]  thr_low   - threshold on pixel intensity to be considered in this algorithm 
    * @param[in]  thr_high  - threshold on pixel intensity to be a candidate to "droplet"
+   * @param[in]  rad       - radius in pixels of squared region to find droplet relative to central pixel
+   * @param[in]  dr        - width of the ring of radius rad for SoN algorithm
    */
 
 template <typename T>
@@ -631,21 +709,14 @@ dropletFinder( const ndarray<const T,2>&      data
              , const float&    dr=0.05
              )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in dropletFinder, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in dropletFinder, seg=" << m_seg);
 
   m_win.validate(data.shape());
 
-  v_peaks.clear(); // this vector will be filled out for each segment
-
-  for(unsigned r = m_win.rowmin; r<m_win.rowmax; r++) {
-    for(unsigned c = m_win.colmin; c<m_win.colmax; c++) {
-      if(mask[r][c] && (data[r][c]>thr_high)) 
-        _procDroplet<T>(data,mask,thr_low,rad,r,c);	
-    }
-  }
+  _makeVectorOfDroplets(data, mask, thr_low, thr_high, rad);
   _addSoNToPeaks<T>(data, mask, float(rad), dr);
-
-  return v_peaks; 
+  _makeVectorOfSelectedPeaks();
+  return v_peaks_sel; 
 }
 
 //--------------------
@@ -662,6 +733,8 @@ dropletFinder( const ndarray<const T,2>&      data
    * @param[in]  data - ndarray with calibrated intensities
    * @param[in]  mask - ndarray with mask of bad/good (0/1) pixels
    * @param[in]  thr  - threshold on data values
+   * @param[in]  r0   - radius for SoN algorithm
+   * @param[in]  dr   - width of the ring of radius rad for SoN algorithm
    */
 
 template <typename T>
@@ -673,19 +746,18 @@ peakFinder( const ndarray<const T,2>&      data
 	  , const float dr = 0.05
           )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in peakFinder, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in peakFinder, seg=" << m_seg);
 
   m_win.validate(data.shape());
 
   _makeMapOfPixelStatus<T>(data, mask, thr);
   _makeMapOfConnectedPixels();
   _procConnectedPixels<T>(data);
-  _makeListOfPeaks();
+  _makeVectorOfPeaks();
   _addSoNToPeaks<T>(data, mask, r0, dr);
+  _makeVectorOfSelectedPeaks();
 
-  if(m_pbits & 256 && v_peaks.size()) std::cout << "  peakFinder v_peaks[0]: " << v_peaks[0] << '\n';
-
-  return v_peaks; 
+  return v_peaks_sel; 
 }
 
 //--------------------
@@ -711,7 +783,7 @@ evaluateSoNForPixel( const unsigned& row
                    , const ndarray<const mask_t,2>& mask
                    )
 {
-  //if(m_pbits & 256) MsgLog(_name(), info, "in evaluateSoNForPixel, seg=" << m_seg << " row=" << row << ", col=" << col);
+  //if(m_pbits & 512) MsgLog(_name(), info, "in evaluateSoNForPixel, seg=" << m_seg << " row=" << row << ", col=" << col);
 
   // S/N algorithm initialization
   if(! m_init_son_is_done) {
@@ -773,7 +845,7 @@ void getSoNResult( const ndarray<const T,2>& data
                  , const bool& do_fill_def = false
                  )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in getSoNResult, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in getSoNResult, seg=" << m_seg);
 
   if(do_fill_def) std::fill_n(&result, int(data.size()), m_sonres_def);
 
@@ -790,7 +862,7 @@ void getSoNResult( const ndarray<const T,2>& data
    * 
    * @param[in]  data   - ndarray with calibrated intensities
    * @param[in]  mask   - ndarray with mask of bad/good (0/1) pixels
-   * @param[out] result - ndarray with results of median algorithm (average bkgd, rms, signal, S/N)
+   * @param[out] son - ndarray with results of median algorithm (average bkgd, rms, signal, S/N)
    * @param[in]  do_fill_def - pre-fill ndarray with default values
    */
 
@@ -801,7 +873,7 @@ void getSoN( const ndarray<const T,2>& data
            , const bool& do_fill_def = false
            )
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in getSoN, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in getSoN, seg=" << m_seg);
 
   if(do_fill_def) std::fill_n(&son, int(data.size()), son_t(0));
 

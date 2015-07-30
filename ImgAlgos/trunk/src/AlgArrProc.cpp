@@ -18,33 +18,31 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-//#include <cmath>     // floor, ceil
-//#include <iomanip>   // for std::setw
 #include <sstream>   // for stringstream
 
 namespace ImgAlgos {
 
   typedef AlgArrProc::wind_t wind_t;
-  //typedef AlgArrProc::Peak   Peak;
 
 //--------------------
 // Constructors --
 //--------------------
 
-//AlgArrProc::AlgArrProc(ndarray<const wind_t,2>* p_nda_winds, const unsigned& pbits)
-//AlgArrProc::AlgArrProc(ndarray<const wind_t,2>& nda_winds, const unsigned& pbits)
-
+/*
 AlgArrProc::AlgArrProc()
   : m_pbits(0)
   , m_is_inited(false)
   , m_mask_def(0)
   , m_mask(0)
 {
-  v_winds.clear();
-  setPeakSelectionPars(); // default init
+  if(m_pbits & 256) MsgLog(_name(), info, "in c-tor:0 AlgArrProc()");
 
-  if(m_pbits & 1) printInputPars();
+  default init
+  v_winds.clear();
+  setSoNPars();
+  setPeakSelectionPars();
 }
+*/
 
 //--------------------
 
@@ -54,8 +52,12 @@ AlgArrProc::AlgArrProc(const unsigned& pbits)
   , m_mask_def(0)
   , m_mask(0)
 {
+  if(m_pbits & 256) MsgLog(_name(), info, "in c-tor:1 AlgArrProc(.)");
+
+  // default init
   v_winds.clear();
-  setPeakSelectionPars(); // default init
+  setSoNPars();
+  setPeakSelectionPars();
 }
 
 //--------------------
@@ -66,51 +68,15 @@ AlgArrProc::AlgArrProc(ndarray<const wind_t,2> nda_winds, const unsigned& pbits)
   , m_mask_def(0)
   , m_mask(0)
 {
-  //std::cout << "!!! Here in c-tor AlgArrProc(2)\n";
-  if(m_pbits & 256) MsgLog(_name(), info, "in c-tor AlgArrProc(2)");
+  if(m_pbits & 256) MsgLog(_name(), info, "in c-tor:2 AlgArrProc(..)");
 
   setWindows(nda_winds);
-  setPeakSelectionPars(); // default init
+  // default init
+  setSoNPars();
+  setPeakSelectionPars();
 
-  //v_winds.clear();
-
-  //for( unsigned i=0; i < nda_winds.shape()[0]; ++i) {
-  //  const wind_t* p = &nda_winds[i][0];
-  //  Window win(p[0], p[1], p[2], p[3], p[4]);
-  //  v_winds.push_back(win);
-  //}
-
-  if(m_pbits & 1) printInputPars();
+  if(m_pbits & 2) printInputPars();
 }
-
-//--------------------
-
-/*
-AlgArrProc::AlgArrProc(const AlgArrProc& obj) 
-  : m_pbits(obj.m_pbits)
-  , m_is_inited(obj.m_is_inited)
-{
-  v_winds.clear();
-}
-*/
-
-//--------------------
-
-/*
-AlgArrProc::AlgArrProc(std::vector<Window>& vec_winds, const unsigned& pbits)
-  : m_pbits(pbits)
-  , m_is_inited(false)
-{
-  v_winds.clear();
-
-  for(std::vector<Window>::iterator iti = vec_winds.begin(); iti != vec_winds.end(); ++iti) {
-    //SegWindow segwin = { iti->segind, iti->window};
-    v_winds.push_back(*iti);
-  }
-
-  if(m_pbits & 1) printInputPars();
-}
-*/
 
 //--------------------
 
@@ -158,6 +124,17 @@ AlgArrProc::setPeakSelectionPars(const float& npix_min,
 //--------------------
 
 void 
+AlgArrProc::setSoNPars(const float& r0, const float& dr)
+{ 
+  if(m_pbits & 256) MsgLog(_name(), info, "in setSoNPars, r0=" << r0 << " dr=" << dr);
+
+  m_r0=r0; 
+  m_dr=dr; 
+}
+
+//--------------------
+
+void 
 AlgArrProc::printInputPars()
 {
   std::stringstream ss; 
@@ -170,11 +147,25 @@ AlgArrProc::printInputPars()
     ss << "\n  Number of windows = " << v_winds.size();
     for(std::vector<Window>::iterator it = v_winds.begin(); it != v_winds.end(); ++ it) ss << '\n' << *it;
   }
+  ss << "\n  S/N evaluation parameters:"
+     << "\n    r0: " << m_r0
+     << "\n    dr: " << m_dr;
+
+  ss << "\n  Peak selection parameters:"
+     << "\n    npix_min: " << m_peak_npix_min
+     << "\n    npix_max: " << m_peak_npix_max
+     << "\n    amax_thr: " << m_peak_amax_thr
+     << "\n    atot_thr: " << m_peak_atot_thr
+     << "\n    son_min : " << m_peak_son_min;
 
   MsgLog(_name(), info, ss.str()); 
+
+  if(v_algip.size()>0) {
+    for(std::vector<AlgImgProc*>::iterator it = v_algip.begin(); it != v_algip.end(); ++it) (*it) -> printInputPars();
+  }
+  else MsgLog(_name(), info, "v_algip is empty...");
 }
 
-//--------------------
 //--------------------
 
   const ndarray<const float, 2>
@@ -183,19 +174,16 @@ AlgArrProc::printInputPars()
     if(m_pbits & 256) MsgLog(_name(), info, "in _ndarrayOfPeakPars, npeaks = " << npeaks);
     if(m_pbits & 1) MsgLog(_name(), info, "List of found peaks, npeaks = " << npeaks); 
 
-    //unsigned shape[2] = {npeaks, 16};
     unsigned sizepk = sizeof(Peak) / sizeof(float);
-    //cout << "sizeof(Peak)  = " << sizeof(Peak) << '\n';  // = 64
-    //cout << "sizeof(float) = " << sizeof(float) << '\n'; // = 4
-    //cout << "num values in Peak = " << sizepk << '\n';   // = 14 (as expected)
 
     ndarray<float, 2> nda = make_ndarray<float>(npeaks,sizepk);
 
     unsigned pkcounter = 0;
     for (std::vector<AlgImgProc*>::iterator it = v_algip.begin(); it != v_algip.end(); ++it) {
-      std::vector<Peak>& v_peaks = (*it) -> getVectorOfPeaks();
+      //std::vector<Peak>& peaks = (*it) -> getVectorOfPeaks();
+      std::vector<Peak>& peaks = (*it) -> getVectorOfSelectedPeaks();
 
-      for (std::vector<Peak>::iterator ip = v_peaks.begin(); ip != v_peaks.end(); ++ip) {
+      for (std::vector<Peak>::iterator ip = peaks.begin(); ip != peaks.end(); ++ip) {
 	const Peak& peak = (*ip);
 	float* p_nda = &nda[pkcounter++][0];
         p_nda[ 0] = peak.seg;
@@ -224,39 +212,7 @@ AlgArrProc::printInputPars()
 
 //--------------------
 //--------------------
-
-  const ndarray<const Peak, 1>
-  AlgArrProc::_ndarrayOfPeaks(const unsigned& npeaks)
-  {
-    if(m_pbits & 256) MsgLog(_name(), info, "in _ndarrayOfPeaks");
-    ndarray<Peak, 1> nda = make_ndarray<Peak>(npeaks);
-
-    unsigned pkcounter = 0;
-    for (std::vector<AlgImgProc*>::iterator it = v_algip.begin(); it != v_algip.end(); ++it) {
-      std::vector<Peak>& v_peaks = (*it) -> getVectorOfPeaks();
-
-      for (std::vector<Peak>::iterator ip = v_peaks.begin(); ip != v_peaks.end(); ++ip) 
-        nda[pkcounter ++] = (*ip);
-    }
-    return nda;
-  }
-
-//--------------------
-//--------------------
-
-//template unsigned AlgArrProc::numberOfPixAboveThr<float,2>(const ndarray<const float,2>&, const ndarray<const mask_t,2>&, const float&);
-
-//--------------------
-//--------------------
-//--------------------
-
-/*
-void
-AlgArrProc::_initSegmentPars(const unsigned* shape)
-{
-}
-*/
-//--------------------
 } // namespace ImgAlgos
+//--------------------
 //--------------------
 

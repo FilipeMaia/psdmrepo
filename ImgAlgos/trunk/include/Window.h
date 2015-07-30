@@ -131,14 +131,14 @@ class Window {
   void print()
   {
     std::stringstream ss; 
-    ss << "\nsegind  : " << segind
-       << "\nrowmin  : " << rowmin
-       << "\nrowmax  : " << rowmax
-       << "\ncolmin  : " << colmin
-       << "\ncolmax  : " << colmax;  
-    if(m_shape) ss << "\nshape[0]  : " << m_shape[0]
-                   << "\nshape[1]  : " << m_shape[1];
-    ss << '\n';
+    ss << "seg:"   << segind
+       << " rmin:" << rowmin
+       << " rmax:" << rowmax
+       << " cmin:" << colmin
+       << " cmax:" << colmax;  
+    if(m_shape) ss << " shape=(" << m_shape[0]
+                   << "," << m_shape[1]<< ")";
+    //ss << '\n';
 
     MsgLog(_name(), info, ss.str()); 
   }

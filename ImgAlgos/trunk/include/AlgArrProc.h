@@ -54,7 +54,10 @@ namespace ImgAlgos {
 /**
  *  @ingroup ImgAlgos
  *
- *  @brief AlgArrProc - is a smearing algorithm for ndarray<T,2> using 2-d Gaussian weights.
+ *  @brief AlgArrProc - class for 2-d image processing algorithms.
+ *
+ *  This class is used in pyImgAlgos.cpp
+ *  Class AlgArrProc is a part of the Python-C++ algorithm inteface project.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -63,55 +66,66 @@ namespace ImgAlgos {
  *
  *  @author Mikhail S. Dubrovin
  *
- *  @see AlgArrProc
+ *  @see pyImgAlgos.cpp, PyAlgos.py
  *
  *
  *  @anchor interface
  *  @par<interface> Interface Description
  *
- *
  * 
- *  @li  Include
+ *  @li Includes and typedefs
  *  @code
  *  #include "ImgAlgos/AlgArrProc.h"
  *  #include "ndarray/ndarray.h"     // need it for I/O arrays
+ *  
+ *  typedef PSCalib::CalibPars::pixel_mask_t mask_t;
+ *  typedef ImgAlgos::AlgArrProc::uint32_t wind_t;
  *  @endcode
- *
  *
  *
  *  @li Initialization
  *  \n
  *  @code
- *  size_t      seg    = 2;
- *  size_t      rowmin = 10;
- *  size_t      rowmax = 170;
- *  size_t      colmin = 100;
- *  size_t      colmax = 200;
- *  unsigned    pbits  = 0177777;
+ *  ndarray<const wind_t,2> winds = ...
+ *  unsigned    pbits  = 0; // 0-print nothing, 1-list of peaks, 2-input parameters, 258-tracking.
  * 
- *  ImgAlgos::AlgArrProc* algson = new ImgAlgos::AlgArrProc(seg, rowmin, rowmax, colmin, colmax, pbits);
+ *  ImgAlgos::AlgArrProc* alg = new ImgAlgos::AlgArrProc(winds, pbits);
  *  @endcode
  *
- *  @li Set parameters for S/N
+ *
+ *  @li Define input parameters
  *  @code
+ *  ndarray<const T,2> data = ....;    // calibrated data ndarray
+ *  ndarray<mask_t,2>  mask = ....;    // mask ndarray, may be omitted
+ *  ndarray<mask_t,2>  son;            // output S/N ndarray
+ *  ndarray<const wind_t,2> winds = ((0,  0, 185,   0, 388), \
+ *                                   (1, 10, 103,  10, 204), \
+ *                                   (1, 10, 103, 250, 380));
  *  float       r0 = 5;
  *  float       dr = 0.05;
- *  aip->setSoNPars(r0,dr);
  *  @endcode
  *
- *  @li Get S/N
+ *
+ *  @li Set methods
  *  @code
- *  ndarray<const T,2> data = ....;    // input raw ndarray
- *  ndarray<mask_t,2>  mask = ....;    // input mask ndarray, may be omitted
- *  ndarray<mask_t,2>  son;            // output S/N ndarray
- *
- *  algson->SoN<T>(data, mask, son);
+ *  alg->setWindows(winds);
+ *  alg->setPeakSelectionPars(npix_min, npix_max, amax_thr, atot_thr, son_min);
+ *  alg->setSoNPars(r0,dr);
  *  @endcode
+ *
+ *
+ *  @li Get methods
+ *  @code
+ *  unsigned npix = alg->numberOfPixAboveThr<T>(data, mask, thr);
+ *  double intensity = alg->intensityOfPixAboveThr<T>(data, mask, thr);
+ *  ndarray<const float, 2> peaks = dropletFinder<T>(data, mask, thr_low, hr_high, radius, dr=0.05);
+ *  ndarray<const float, 2> peaks = peakFinder<T>(data, mask, thr, r0, dr=0.05);
+ *  @endcode
+ *
  *
  *  @li Print methods
  *  @code
- *  algson->printInputPars();
- *  algson->printIndexes();
+ *  alg->printInputPars();
  *  @endcode
  */
 
@@ -127,7 +141,6 @@ public:
 
   typedef PSCalib::CalibPars::pixel_mask_t mask_t;
   typedef uint32_t wind_t;
-  //typedef ImgAlgos::Peak Peak;
 
   /*
   typedef unsigned shape_t;
@@ -136,23 +149,23 @@ public:
   typedef float son_t;
   */
 
+
   /**
-   * @brief Class constructor is used for initialization of all paramaters. 
+   * @brief Default constructor
    * 
-   * @param[in] nda_winds - ndarray with windows
    * @param[in] pbits     - print control bit-word; =0-print nothing, +1-input parameters, +2-algorithm area, etc.
    */
+  AlgArrProc(const unsigned& pbits=0);
 
-  AlgArrProc();
-  AlgArrProc(const unsigned& pbits);
+  /**
+   * @brief Main constructor
+   * 
+   * @param[in] winds - ndarray with windows
+   * @param[in] pbits     - print control bit-word; =0-print nothing, +1-input parameters, +2-algorithm area, etc.
+   */
   AlgArrProc(ndarray<const wind_t,2> winds, const unsigned& pbits=0);
-  //AlgArrProc(ndarray<const wind_t,2>& nda_winds, const unsigned& pbits=0);
-  //AlgArrProc(ndarray<const wind_t,2>* nda_winds=0, const unsigned& pbits=0);
-  //AlgArrProc(ndarray<const wind_t,2>& nda_winds, const unsigned& pbits=0) { AlgArrProc(&nda_winds, pbits); };
 
-
-  //AlgArrProc(std::vector<Window>& vec_winds, const unsigned& pbits=0);
-
+  /// Set windows
   void setWindows(ndarray<const wind_t,2> nda_winds);
 
   /// Set peak selection parameters MUST BE CALLED BEFORE PEAKFINDER!!!
@@ -162,7 +175,13 @@ public:
                             const float& atot_thr=0,
                             const float& son_min=3);
 
-  //void setSoNPars(const float& r0=5, const float& dr=0.05) { std::cout << "AlgArrProc::setSoNPars IS NOT IMPLEMENTED!!!"; }
+  /**
+   * @brief Set parameters for SoN (S/N) evaluation
+   * 
+   * @param[in] r0 - ring internal radius for S/N evaluation
+   * @param[in] dr - ring width for S/N evaluation
+   */
+  void setSoNPars(const float& r0=5, const float& dr=0.05);
 
   /// Destructor
   virtual ~AlgArrProc (); 
@@ -186,6 +205,9 @@ private:
   mask_t*    m_mask_def;
   const mask_t* m_mask;
 
+  float    m_r0;       // radial parameter of the ring for S/N evaluation algorithm
+  float    m_dr;       // ring width for S/N evaluation algorithm 
+
   float    m_peak_npix_min; // peak selection parameter
   float    m_peak_npix_max; // peak selection parameter
   float    m_peak_amax_thr; // peak selection parameter
@@ -198,9 +220,6 @@ private:
   /// Returns string name of the class for messanger
   inline const char* _name() {return "ImgAlgos::AlgArrProc";}
 
-  /// Returns ndarray of peaks evaluated by any of peakfinders 
-  const ndarray<const Peak, 1>  _ndarrayOfPeaks(const unsigned& npeaks);
-
   /// Returns ndarray of peak-float pars evaluated by any of peakfinders 
   const ndarray<const float, 2> _ndarrayOfPeakPars(const unsigned& npeaks);
 
@@ -212,7 +231,6 @@ private:
 
 public:
 
-//--------------------
 //--------------------
 
   template <typename T, unsigned NDim>
@@ -241,16 +259,15 @@ public:
 
     m_is_inited = true;
 
-    unsigned pbits = m_pbits; // 0177777;
-
     if(v_winds.empty()) {
         // ALL segments will be processed
         if(m_pbits & 256) MsgLog(_name(), info, "List of windows is empty, all sensors will be processed.")
         v_algip.reserve(m_nsegs);
       
         for(size_t seg=0; seg<m_nsegs; ++seg) {            
-            AlgImgProc* p_alg = new AlgImgProc(seg, 0, m_nrows, 0, m_ncols, pbits);
+            AlgImgProc* p_alg = new AlgImgProc(seg, 0, m_nrows, 0, m_ncols, m_pbits);
             v_algip.push_back(p_alg);
+            p_alg->setSoNPars(m_r0, m_dr);
             p_alg->setPeakSelectionPars(m_peak_npix_min, m_peak_npix_max, m_peak_amax_thr, m_peak_atot_thr, m_peak_son_min);
         }       
     }
@@ -258,8 +275,9 @@ public:
         // Windows ONLY will be processed
         if(m_pbits & 256) MsgLog(_name(), info, "Windows from the list will be processed.")
         for(std::vector<Window>::iterator it = v_winds.begin(); it != v_winds.end(); ++ it) {
-            AlgImgProc* p_alg = new AlgImgProc(it->segind, it->rowmin, it->rowmax, it->colmin, it->colmax , pbits);
+            AlgImgProc* p_alg = new AlgImgProc(it->segind, it->rowmin, it->rowmax, it->colmin, it->colmax , m_pbits);
             v_algip.push_back(p_alg); 
+            p_alg->setSoNPars(m_r0, m_dr);
             p_alg->setPeakSelectionPars(m_peak_npix_min, m_peak_npix_max, m_peak_amax_thr, m_peak_atot_thr, m_peak_son_min);
         }
     }
@@ -358,8 +376,8 @@ public:
 	const ndarray<const T,2>      seg_data(&data.data()[ind], m_sshape);
 	const ndarray<const mask_t,2> seg_mask(&m_mask[ind], m_sshape);
 
-        std::vector<Peak>& v_peaks = (*it) -> dropletFinder<T>(seg_data, seg_mask, thr_low, thr_high, rad, dr);
-	npeaks += v_peaks.size();
+        std::vector<Peak>& peaks = (*it) -> dropletFinder<T>(seg_data, seg_mask, thr_low, thr_high, rad, dr);
+	npeaks += peaks.size();
     }
 
     return _ndarrayOfPeakPars(npeaks);
@@ -389,8 +407,8 @@ public:
 	const ndarray<const T,2>      seg_data(&data.data()[ind], m_sshape);
 	const ndarray<const mask_t,2> seg_mask(&m_mask[ind], m_sshape);
 
-        std::vector<Peak>& v_peaks = (*it) -> peakFinder<T>(seg_data, seg_mask, thr, r0, dr);
-	npeaks += v_peaks.size();
+        std::vector<Peak>& peaks = (*it) -> peakFinder<T>(seg_data, seg_mask, thr, r0, dr);
+	npeaks += peaks.size();
     }
 
     if(m_pbits & 256) MsgLog(_name(), info, "total number of peaks=" << npeaks);    

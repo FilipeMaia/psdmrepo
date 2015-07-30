@@ -14,6 +14,7 @@ typedef ImgAlgos::AlgArrProc::wind_t wind_t;   // uint32_t
 //-------------------
 
 void     (AlgArrProc::*p_swin1) (ndarray<const wind_t,2>) = &AlgArrProc::setWindows;
+void     (AlgArrProc::*p_sson1) (const float&, const float&) = &AlgArrProc::setSoNPars;
 void     (AlgArrProc::*p_spsp1) (const float&, const float&, const float&, const float&, const float&) = &AlgArrProc::setPeakSelectionPars;
 
 unsigned (AlgArrProc::*p_npix_f2) (ndarray<const float,   2>, ndarray<const mask_t,2>, const float&)    = &AlgArrProc::numberOfPixAboveThr<float,   2>;
@@ -89,6 +90,7 @@ BOOST_PYTHON_MODULE(imgalgos_ext)
  
     .def("set_windows", p_swin1)     
     .def("set_peak_selection_pars", p_spsp1)     
+    .def("set_son_pars", p_sson1)     
     .def("print_input_pars", &AlgArrProc::printInputPars)
 
     //.def("set_son_parameters", p_set01)     

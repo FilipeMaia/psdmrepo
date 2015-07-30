@@ -10,12 +10,8 @@ from ImgAlgos.PyAlgos import PyAlgos, print_arr, print_arr_attr
 
 ##-----------------------------
 # Initialization of graphics
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches # for patches.Circle
-
 from pyimgalgos.GlobalGraphics import store as sp
 import pyimgalgos.GlobalGraphics as gg
-#from pyimgalgos.GlobalGraphics import fig_axes, plot_img
 ##-----------------------------
 
 ntest = int(sys.argv[1]) if len(sys.argv)>1 else 1
@@ -23,28 +19,8 @@ print 'Test # %d' % ntest
 
 ##-----------------------------
 
-def plot_peaks_on_img(peaks, axim, iX, iY, color='w', pbits=0) :  
-    """ Extra drawing on the top of image axes (axim)
-        Plots peaks from array as circles in coordinates of image
-    """
-    if peaks is None : return
-
-    anorm = np.average(peaks,axis=0)[4] if len(peaks)>1 else peaks[0][4] if peaks.size>0 else 100    
-    for rec in peaks :
-        s, r, c, amax, atot, npix = rec[0:6]
-        if pbits & 1 : print 's, r, c, amax, atot, npix=', s, r, c, amax, atot, npix
-        x=iX[int(s),int(r),int(c)]
-        y=iY[int(s),int(r),int(c)]
-        if pbits & 2 : print ' x,y=',x,y        
-        xyc = (y,x)
-        r0  = 2+6*atot/anorm
-        circ = patches.Circle(xyc, radius=r0, linewidth=2, color=color, fill=False)
-        axim.add_artist(circ)
-
-##-----------------------------
-
 ###================
-EVTMAX      = 1
+EVTMAX      = 2
 SKIP_EVENTS = 0
 EVTSKIPPLOT = 1 #10
 DO_PLOT     = False
@@ -112,8 +88,10 @@ winds = winds_arc
 #print_arr_attr(winds, 'Windows')
 
 alg = PyAlgos(windows=winds, mask=mask, pbits=1)
-alg.set_peak_selection_pars(npix_min=2, npix_max=200, amax_thr=0, atot_thr=500, son_min=3)
-alg.print_attributes()
+alg.set_peak_selection_pars(npix_min=5, npix_max=5000, amax_thr=0, atot_thr=0, son_min=10)
+###alg.set_son_pars(r0=5, dr=0.05)
+#alg.print_attributes()
+#alg.print_input_pars()
 
 ##-----------------------------
 
@@ -128,9 +106,6 @@ if DO_PLOT :
     iXshaped = det.indexes_x(evt) - xoffset
     iYshaped = det.indexes_y(evt) - yoffset
     iXshaped.shape = iYshaped.shape = (32, 185, 388)
-
-#plt.ion() # do not hold control on show
-#plt.show()
 
 ##-----------------------------
 t0_sec_evloop = time()
@@ -152,8 +127,8 @@ for i, evt in enumerate(ds.events()) :
 
         #print_arr_attr(nda, 'calibrated data')
         t0_sec = time()
-        #peaks = alg.peak_finder_v1(nda, thr_low=10, thr_high=150, radius=5, dr=0.05) # dr is used for S/N evaluation
-        peaks = alg.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+        #peaks = alg.peak_finder_v1(nda, thr_low=10, thr_high=150, radius=10, dr=0.05)
+        peaks = alg.peak_finder_v2(nda, thr=10, r0=7, dr=0.1)
         print ' ----> peak_finder consumed time = %f sec' % (time()-t0_sec)
         #print_arr_attr(peaks, 'peaks')
 
@@ -162,7 +137,7 @@ for i, evt in enumerate(ds.events()) :
             ave, rms = img.mean(), img.std()
             amin, amax = ave-1*rms, ave+8*rms
             gg.plot_img(img, mode='do not hold', amin=amin, amax=amax)
-            plot_peaks_on_img(peaks, axim, iXshaped, iYshaped, color='w') #, pbits=3)
+            gg.plot_peaks_on_img(peaks, axim, iXshaped, iYshaped, color='w') #, pbits=3)
 
             #gg.plotHistogram(img, amp_range=(1,100), bins=99, title='Event %d' % i)
 
@@ -174,18 +149,7 @@ print ' ----> Event loop time = %f sec' % (time()-t0_sec_evloop)
 
 ##-----------------------------
 
-#if img is None :
-#    print 'Image is not available'
-#    sys.exit('FURTHER TEST IS TERMINATED')
-
-#gg.plotImageLarge(img, amp_range=(ave-1*rms, ave+5*rms))
-#gg.show()
-
-##-----------------------------
-
-
-plt.ioff() # hold control on show() after the last image
-plt.show()
+gg.show() # hold image untill it is closed
  
 ##-----------------------------
 

@@ -47,14 +47,10 @@ AlgImgProc::AlgImgProc ( const size_t&   seg
   , m_peak_atot_thr(150)
   , m_peak_son_min(3)
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in c-tor AlgImgProc, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in c-tor AlgImgProc, seg=" << m_seg);
   m_win.set(seg, rowmin, rowmax, colmin, colmax);
 
-  if(m_pbits & 1) printInputPars();
-  if(m_pbits & 2) {
-    printMatrixOfRingIndexes();
-    printVectorOfRingIndexes();
-  }
+  if(m_pbits & 2) printInputPars();
 }
 
 //--------------------
@@ -74,6 +70,9 @@ AlgImgProc::printInputPars()
   //ss << "\nrmin    : " << m_r0
   //   << "\ndr      : " << m_dr
   MsgLog(_name(), info, ss.str()); 
+
+  if(m_pbits & 512) printMatrixOfRingIndexes();
+  if(m_pbits & 512) printVectorOfRingIndexes();
 }
 
 //--------------------
@@ -81,8 +80,6 @@ AlgImgProc::printInputPars()
 void 
 AlgImgProc::_makeMapOfConnectedPixels()
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _makeMapOfConnectedPixels, seg=" << m_seg);
-
   m_conmap = make_ndarray<conmap_t>(m_pixel_status.shape()[0], m_pixel_status.shape()[1]);
 
   std::fill_n(m_conmap.data(), int(m_pixel_status.size()), conmap_t(0));
@@ -97,7 +94,7 @@ AlgImgProc::_makeMapOfConnectedPixels()
     }
   }
 
-  if(m_pbits & 256) std::cout << " number of connected pixel regions=" << m_numreg << '\n';
+  if(m_pbits & 512) MsgLog(_name(), info, "in _makeMapOfConnectedPixels, seg=" << m_seg << ", m_numreg=" <<  m_numreg);
 }
 
 //--------------------
@@ -105,7 +102,7 @@ AlgImgProc::_makeMapOfConnectedPixels()
 void 
 AlgImgProc::_findConnectedPixels(const unsigned& r, const unsigned& c)
 {
-  //if(m_pbits & 256) MsgLog(_name(), info, "in _findConnectedPixels, seg=" << m_seg);
+  //if(m_pbits & 512) MsgLog(_name(), info, "in _findConnectedPixels, seg=" << m_seg);
 
   if(! (m_pixel_status[r][c] & 1)) return;
 
@@ -121,7 +118,7 @@ AlgImgProc::_findConnectedPixels(const unsigned& r, const unsigned& c)
 //--------------------
 
 bool
-AlgImgProc::_peakWorkIsSelected(const PeakWork& pw)
+AlgImgProc::_peakWorkIsPreSelected(const PeakWork& pw)
 {
   if (pw.peak_npix < m_peak_npix_min) return false;
   if (pw.peak_npix > m_peak_npix_max) return false;
@@ -133,18 +130,30 @@ AlgImgProc::_peakWorkIsSelected(const PeakWork& pw)
 //--------------------
 
 bool
+AlgImgProc::_peakIsPreSelected(const Peak& peak)
+{
+  if (peak.npix    < m_peak_npix_min) return false;
+  if (peak.npix    > m_peak_npix_max) return false;
+  if (peak.amp_max < m_peak_amax_thr) return false;
+  if (peak.amp_tot < m_peak_atot_thr) return false;
+  return true;
+}
+
+//--------------------
+
+bool
 AlgImgProc::_peakIsSelected(const Peak& peak)
 {
-  if (peak.son < m_peak_son_min) return false;
+  if (peak.son     < m_peak_son_min ) return false;
   return true;
 }
 
 //--------------------
 
 void
-AlgImgProc::_makeListOfPeaks()
+AlgImgProc::_makeVectorOfPeaks()
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _makeListOfPeaks, seg=" << m_seg << " m_numreg=" << m_numreg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in _makeVectorOfPeaks, seg=" << m_seg << " m_numreg=" << m_numreg);
   //m_peaks = make_ndarray<Peak>(m_numreg);
 
   v_peaks.clear();
@@ -157,7 +166,7 @@ AlgImgProc::_makeListOfPeaks()
 
     PeakWork& pw = v_peaks_work[i+1]; // region numbers begin from 1
 
-    if(! _peakWorkIsSelected(pw)) continue;
+    if(! _peakWorkIsPreSelected(pw)) continue;
 
     Peak   peak; // = v_peaks[i];
 
@@ -179,8 +188,22 @@ AlgImgProc::_makeListOfPeaks()
     peak.noise = 0;
     peak.son   = 0;
 
-    //if(! _peakIsSelected(peak)) continue;
     v_peaks.push_back(peak);
+  }
+}
+//--------------------
+
+void
+AlgImgProc::_makeVectorOfSelectedPeaks()
+{
+  if(m_pbits & 512) MsgLog(_name(), info, "in _makeVectorOfSelectedPeaks, seg=" << m_seg);
+
+  v_peaks_sel.clear();
+
+  //std::vector<Peak>::iterator it;
+  for(std::vector<Peak>::iterator it=v_peaks.begin(); it!=v_peaks.end(); ++it) { 
+    Peak& peak = (*it);
+    if(_peakIsSelected(peak)) v_peaks_sel.push_back(peak);
   }
 }
 
@@ -189,7 +212,7 @@ AlgImgProc::_makeListOfPeaks()
 void 
 AlgImgProc::_evaluateRingIndexes(const float& r0, const float& dr)
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in _evaluateRingIndexes, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in _evaluateRingIndexes, seg=" << m_seg << " r0=" << r0 << " dr=" << dr);
 
   m_r0 = r0;
   m_dr = dr;
@@ -208,6 +231,8 @@ AlgImgProc::_evaluateRingIndexes(const float& r0, const float& dr)
       v_indexes.push_back(inds);
     }
   }
+
+  if(m_pbits & 2) printMatrixOfRingIndexes();
 }
 
 //--------------------
@@ -215,7 +240,7 @@ AlgImgProc::_evaluateRingIndexes(const float& r0, const float& dr)
 void 
 AlgImgProc::setSoNPars(const float& r0, const float& dr)
 { 
-  if(m_pbits & 256) MsgLog(_name(), info, "in setSoNPars, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in setSoNPars, seg=" << m_seg << " r0=" << r0 << " dr=" << dr);
 
   if(r0==m_r0 && dr==m_dr) return;
   _evaluateRingIndexes(r0, dr);
@@ -227,7 +252,7 @@ void
 AlgImgProc::setPeakSelectionPars(const float& npix_min, const float& npix_max,
                                  const float& amax_thr, const float& atot_thr, const float& son_min)
 {
-  if(m_pbits & 256) MsgLog(_name(), info, "in setPeakSelectionPars, seg=" << m_seg);
+  if(m_pbits & 512) MsgLog(_name(), info, "in setPeakSelectionPars, seg=" << m_seg);
   m_peak_npix_min = npix_min;
   m_peak_npix_max = npix_max;
   m_peak_amax_thr = amax_thr;
@@ -240,13 +265,11 @@ AlgImgProc::setPeakSelectionPars(const float& npix_min, const float& npix_max,
 void 
 AlgImgProc::printMatrixOfRingIndexes()
 {
-  _evaluateRingIndexes(m_r0, m_dr);
-
   int indmax = (int)std::ceil(m_r0 + m_dr);
   int indmin = -indmax;
 
   std::stringstream ss; 
-  ss << "printMatrixOfRingIndexes():\n";
+  ss << "printMatrixOfRingIndexes(), seg=" << m_seg << "  r0=" << m_r0 << "  dr=" << m_dr << '\n';
 
   for (int i = indmin; i <= indmax; ++ i) {
     for (int j = indmin; j <= indmax; ++ j) {
@@ -267,7 +290,7 @@ AlgImgProc::printMatrixOfRingIndexes()
 void 
 AlgImgProc::printVectorOfRingIndexes()
 {
-  _evaluateRingIndexes(m_r0, m_dr);
+  if(v_indexes.empty()) _evaluateRingIndexes(m_r0, m_dr);
 
   std::stringstream ss; 
   ss << "printVectorOfRingIndexes():\n Vector size: " << v_indexes.size() << '\n';
