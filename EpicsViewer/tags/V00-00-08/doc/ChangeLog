@@ -1,0 +1,57 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package EpicsViewer
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-08
+2015-07-29 Igor Gaponenko
+- refactored the project to make it easier for deployment as a single
+ZIP file w/o moving any files around or changing their content. Moved
+in and properly modified external classes (and relevant CSS) which lived
+before in a separate PCDS-specific package 'webfwk'
+- got rid of the tests (labels generator and DisplaySelector)
+- got rif of PHP procesing of the main index file
+- added support for Murali's custom template processor in the index file
+- added processing index file query options in JavaScript. This includes
+support for up to 5 PVs and optional time range (not used yet) and
+a persistent configuration name (not used yet).
+
+Tag: V00-00-07
+2015-07-29 Igor Gaponenko
+- the 'LIVE' mode
+- an option for downloading a table as an CSV document
+- an option for downloading (taking a snapshot) of the timeseries plot area
+- linear/log10 switch option directly on the timeseries plot
+
+Tag: V00-00-06
+2015-07-16 Igor Gaponenko
+- finished the protorype version to be given to Murali
+
+Tag: V00-00-05
+2015-07-13 Igor Gaponenko
+- minor changes in the Displayselector widgt and its test
+
+Tag: V00-00-04
+2015-07-13 Igor Gaponenko
+- major refactoring to prepare for multi-display (plot) support
+
+Tag: V00-00-03
+2015-07-13 Igor Gaponenko
+- cleaned up the project from older development versions of files
+
+Tag: V00-00-02
+2015-07-13 Igor Gaponenko
+- saving results of the on-going development before integrating
+the DisplaySelector widget
+
+Tag: V00-00-01
+2015-06-26 Igor Gaponenko
+- saving results of the on-going development
