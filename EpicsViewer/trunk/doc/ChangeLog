@@ -17,6 +17,7 @@ Tag: V00-00-08
 ZIP file w/o moving any files around or changing their content. Moved
 in and properly modified external classes (and relevant CSS) which lived
 before in a separate PCDS-specific package 'webfwk'
+- got rid of the tests (labels generator and DisplaySelector)
 - got rif of PHP procesing of the main index file
 - added support for Murali's custom template processor in the index file
 - added processing index file query options in JavaScript. This includes
