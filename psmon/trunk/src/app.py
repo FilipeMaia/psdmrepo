@@ -341,6 +341,9 @@ class ZMQListener(object):
             LOG.info('Sucessfully registered message handler: %s'%name)
         return handler
 
+    def get_handler(self, name):
+        return self.__message_handler.get(name)
+
     def comm_listener(self):
         while not self.__comm_socket.closed:
             header = self.__comm_socket.recv_string()

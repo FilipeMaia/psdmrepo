@@ -111,7 +111,7 @@ class _Publish(object):
         # turn off further autoconnect attempts
         self.disabled = True
 
-    def register_handler(name, **kwargs):
+    def register_handler(self, name, **kwargs):
         """
         Registers a message handler for recieving messages from suscribed clients.
 
@@ -123,23 +123,23 @@ class _Publish(object):
         """
         return self._reset_listener.register_handler(name, **kwargs)
 
-    def get_handler(name):
+    def get_handler(self, name):
         """
         Returns a referenced to the named message handler.
 
         Arguments:
          - name: the header string/identifier of the requested handler
         """
-        return self._reset_listener.message_handler.get(name)
+        return self._reset_listener.get_handler(name)
 
-    def get_reset_flag():
+    def get_reset_flag(self):
         """
         Gets the state of the client reset flag. This will be set if any client 
         has sent a reset message, and will remain set until cleared.
         """
         return self._reset_listener.get_flag()
 
-    def clear_reset_flag():
+    def clear_reset_flag(self):
         """
         Clears any set reset flags.
         """
