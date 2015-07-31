@@ -2,6 +2,7 @@
 import sys
 import zmq
 import logging
+import IPython
 import argparse
 
 from psmon import app, config, log_level_parse
@@ -10,11 +11,15 @@ from psmon import app, config, log_level_parse
 LOG = logging.getLogger(config.LOG_BASE_NAME)
 
 
-def _print_wrapper(func):
-    def wrapped_func(*args, **kwargs):
-        print func(*args, **kwargs)
-    return wrapped_func
+def _get_banner(host, port):
+    banner_base = '\n{sep}\n*  {wel:<{width}s}  *\n*  {info:<{width}s}  *\n*  {help:<{width}s}  *\n{sep}\n'
+    welcome_line = 'Welcome to the psmon server request client'
+    info_line = 'Connected to host \'{host:s}\' on port \'{port:d}\''.format(host=host, port=port)
+    help_line = 'Available commands: \'request\', \'reset\''
+    width = max(len(welcome_line), len(info_line), len(help_line))
+    separator = '*' * ( width + 6 )
 
+    return banner_base.format(wel=welcome_line, info=info_line, help=help_line, sep=separator, width=width) 
 
 def _parse_cmdline():
     parser = argparse.ArgumentParser(
@@ -48,27 +53,33 @@ def _parse_cmdline():
     return parser.parse_args()
 
 
-def _main(context):
-    args = _parse_cmdline()
+def main():
+    _args = _parse_cmdline()
 
     # set levels for loggers that we care about
-    LOG.setLevel(log_level_parse(args.log))
+    LOG.setLevel(log_level_parse(_args.log))
 
     # start zmq requester
-    LOG.info('Starting request client for host \'%s\' on port \'%d\'', args.server, args.port)
+    LOG.debug('Starting request client for host \'%s\' on port \'%d\'', _args.server, _args.port)
+
     try:
-        comm_socket = context.socket(zmq.REQ)
-        comm_socket.connect('tcp://%s:%d' % (args.server, args.port))
-        zmqreq = app.ZMQRequester(comm_socket)
-        LOG.info('Request client started successfully')
-        return zmqreq
+        _zmqcontext = zmq.Context()
+        _comm_socket = _zmqcontext.socket(zmq.REQ)
+        _comm_socket.connect('tcp://%s:%d' % (_args.server, _args.port))
+        _requester = app.ZMQRequester(_comm_socket)
+        host = _args.server
+        port = _args.port
+        request = _requester.send_request
+        reset = _requester.send_reset_signal
+        LOG.debug('Request client started successfully')
+
+        # Embed an ipython interactive session
+        IPython.embed(banner1=_get_banner(_args.server, _args.port))
     except zmq.ZMQError as err:
         LOG.error('Failed to connect to server: %s', err)
+    except KeyboardInterrupt:
+        print '\nExitting client!'
 
 
 if __name__ == '__main__':
-    _zmqcontext = zmq.Context()
-    _requester = _main(_zmqcontext)
-    request = _print_wrapper(_requester.send_request)
-    reset = _print_wrapper(_requester.send_reset_signal)
-    LOG.info('Available commands: \'request\', \'reset\'')
+    sys.exit(main())
