@@ -38,19 +38,20 @@ def read_bbcp_checksum(lfn, anapath=True,chkext='md5'):
     return  chk_value, chk_type, size
 
 
-def comp_bbcp_checksum(lfn, verbose=False, pfn_prefix=None):
-    """ Comapre checksums for the ffb and ana file copy using 
-    the md5 files that were created by the transfers.  
-    
-    In addition compare the file sizes and optionally (pfn_prefix is set)
-    calculate the checksum for one file copies and compare to the transfer
-    checksum. 
+def comp_bbcp_checksum(lfn, verbose=False, pfn_prefix=None, nosize=False):
+    """ Comapre bbcp transfer checksum values for a file on FFB and ANA.
+  
+    Check that a file on FFB is identical to its copy in ANA. The checks are:
+    1) compare checksums values from the data mover transfers (bbcp checksum)
+    2) Calculate the checksum for one of the copies and compare to the bbcp
+       checksum. Only applied if pfn_prefix is set.
+    3) Compare the file size. Can be disabled with arg nosize=True
 
-    lfn = /<instr>/<exper>/<xtc>/<fn>
+    The lfn is: /<instr>/<exper>/<xtc>/<fn>  e.g.: /amo/amoh25341/xtc/e123-r0002-s01-c00.xtc
     """
 
     ana_chksum, ana_cktype, ana_size = read_bbcp_checksum(lfn)
-    ffb_chksum, ffb_fcktype, ffb_size = read_bbcp_checksum(lfn, False)
+    ffb_chksum, ffb_fcktype, ffb_size = read_bbcp_checksum(lfn, anapath=False)
         
     disk_comp = True
     if pfn_prefix:
@@ -62,11 +63,15 @@ def comp_bbcp_checksum(lfn, verbose=False, pfn_prefix=None):
             print "Mismatch disk", lfn
             disk_comp = False
 
-    st_size = (ana_size == ffb_size) and ana_size >= 0
-    st = ana_chksum == ffb_chksum
+    if nosize:
+        st_size = True
+    else:
+        st_size = (ana_size == ffb_size) and ana_size >= 0
+
+    st_cksum = ana_chksum == ffb_chksum
     if verbose:
         print "status: cksum={} size={} disk={} calcMd5={} Values: {} {}, {} {} {}".format(
-            ana_chksum == ffb_chksum, st_size, disk_comp, pfn_prefix != None,
+            st_cksum, st_size, disk_comp, pfn_prefix != None,
             ana_chksum, ffb_chksum, ana_size, ffb_size, lfn)
         
-    return (ana_chksum == ffb_chksum) and disk_comp and st_size
+    return st_cksum and disk_comp and st_size
