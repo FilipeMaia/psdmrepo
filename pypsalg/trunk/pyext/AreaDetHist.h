@@ -14,13 +14,15 @@ class AreaDetHist {
                bool findIsolated, double minAduGap);
   virtual ~AreaDetHist ();
   
-  ndarray<uint32_t,2> get();
+  ndarray<uint32_t,4> get();
+
   void update(ndarray<double,3> calib_data);
+  void update2x2(ndarray<double,3> calib_data);
 
  private:
   void _fillHistogram(ndarray<double,3> calib_data);
-  void _insertHistElement(double x, int pixelInd);
-  ndarray<uint32_t,2> _histogram;
+  void _insertHistElement(double x, int i, int j, int k);
+  ndarray<uint32_t,4> _histogram;
 
   int _valid_min;
   int _valid_max;
