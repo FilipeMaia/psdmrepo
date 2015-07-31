@@ -11,6 +11,11 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-03
+- option to not check size when verifying file on FFB and ANA
+- for ioc nodes translate their names to psana-. This name will be only used 
+  if the ioc mover is transferring a file directly from a ioc.
+	
 Tag: V00-02-02
 2015-06-22
 - Nicer formatting when printing bbcp checksum comparison.  

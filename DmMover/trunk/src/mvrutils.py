@@ -18,8 +18,11 @@ def network_name(hostname):
     if hostname.startswith('daq-'):
         return "10.1.1.1"
 
-    if hostname == "ioc-fee-rec02":
-        return "psana-fee-rec02"
+    if hostname.startswith('ioc-'):
+        return "psana-" + hostname[4:]
+        
+    #if hostname == "ioc-fee-rec02":
+    #    return "psana-fee-rec02"
     
     return hostname
 
