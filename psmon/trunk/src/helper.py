@@ -81,6 +81,9 @@ class StripHelper(Helper):
             self.data.ydata = self.ydata[:self.index]
         self.index += 1
 
+    def clear(self):
+        self.index = 0
+
 
 class XYPlotHelper(Helper):
     DEFAULT_ARR_SIZE = 100
