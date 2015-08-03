@@ -1,0 +1,30 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSXtcQC
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Brief description:
+==================
+
+This package is intended for XTC file structure quality check.
+
+
+Reminder for myself:
+====================
+
+To compile files located in the test directory use command from the release directory:
+> sit_setup
+> scons PSXtcQC/test
+To run them:
+> build/x86_64-rhel5-gcc41-opt/PSXtcQC/dgreader
+
+Detailed description:
+=====================
+
+More detailed info goes here. Describe main classes/applications built in
+this package. Give few examples of their use.

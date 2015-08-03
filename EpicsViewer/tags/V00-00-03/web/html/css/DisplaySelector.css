@@ -1,0 +1,51 @@
+.disp-sel {
+    width:  100%;
+    background-color:   #f8f8f8;
+    font-family: 'Source Sans Pro',Arial,sans-serif;
+}
+.disp-sel > div#selector {
+    float:  left;
+}
+.disp-sel  div#selector > div.disp-sel-item {
+    padding:        6px;
+    margin-bottom:  1px;
+    width:          56px;
+    border-bottom:  solid 1px #d0d0d0;
+    border-right:   solid 1px #d0d0d0;
+    text-align:     left;
+    background-color:   aliceblue;
+    font-size:  14px;
+}
+.disp-sel > div#selector > div.disp-sel-item:last-child {
+    border-bottom-color:  #f8f8f8;
+}
+.disp-sel > div#selector > div.disp-sel-item.disp-sel-item-active {
+    border-right-color: #f8f8f8;
+    background-color:   initial;
+    font-weight:    bold;
+}
+.disp-sel > div#selector > div.disp-sel-item.disp-sel-item-active:last-child {
+    border-bottom-color:   #f8f8f8;
+}
+.disp-sel > div#selector > div.disp-sel-item:hover {
+    background-color:   #d0e5f5;
+    cursor: pointer;
+}
+.disp-sel > div#selector > div.disp-sel-item.disp-sel-item-active:hover {
+    background-color:   #f8f8f8;
+    cursor: initial;
+}
+.disp-sel > div#area {
+    float:  left;
+    width:  400px;
+    height: 600px;
+}
+.disp-sel > div#area > div.disp-sel-area {
+    display: none;
+}
+.disp-sel > div#area > div.disp-sel-area.disp-sel-area-active {
+    display: block;
+}
+.disp-sel > div#end  {
+    clear:  both;
+}

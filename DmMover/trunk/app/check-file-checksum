@@ -8,17 +8,19 @@ from DmMover.transmd5 import comp_bbcp_checksum
 
 
 usage = """
-Compare the checksums on ANA and FFB using the bbcp created checksum files. 
+Compare the checksums created by the data-mover for the files on FFB and ANA. 
 """
 epilog=""" 
-Example:
-    %(prog)s --quiet /reg/d/ffb/xpp/xppa1213/xtc/e*xtc 
 
-The checksums of the files on ffb and ana are read from the bbcp-checksum files. 
-An error is reported if the two checksums or the file sizes (files are stat'ed)
-show a mismatch. With the --disk option the files specified on the cmdline are 
-checksummed (md5sum) and the value is comapred agsainst the one from the 
-bbcp-checksum.
+Example:
+    %(prog)s --verbose /reg/d/ffb/xpp/xppa1213/xtc/e*xtc 
+
+
+Compare the two checksums of a file that were created by the dss->ffb mover and the 
+ffb->ana mover. The size a file on the FFB and its copied on ANA are also compared. 
+With the --disk option calculate the checksum reading the file on ANA and compare to
+the bbcp checksum.
+An error is reported if there is and checksum or file-size mismatch.
 """
 
 #
@@ -32,8 +34,9 @@ def main():
     
     parser.add_argument("-v","--verbose", action="store_true", default=False, help="Verbose printouts")
     parser.add_argument("--disk", action="store_true", 
-                        help="checksum the files from the cmdline and compare")
-    parser.add_argument("fnames", nargs='+', help="xtc file names either on ffb or ana")
+                        help="calculate checksum and compare to the one created by a data-mover")
+    parser.add_argument("--nosize", action="store_true", default=False, help="do not compare file sizes (Useful if file doesn't exist on ANA")
+    parser.add_argument("fnames", nargs='+', help="xtc file names either on FFB or ANA")
     
     try:
         args = parser.parse_args()
@@ -51,7 +54,7 @@ def main():
         prefix = os.path.join("/", *ptoken[:3]) if args.disk else None
         # lfn: /<instr>/<exp>/xtc/... 
         lfn = os.path.join("/", *ptoken[3:])
-        stat = comp_bbcp_checksum(lfn, args.verbose, pfn_prefix=prefix)
+        stat = comp_bbcp_checksum(lfn, args.verbose, pfn_prefix=prefix, nosize=args.nosize)
         if stat:
             n_good += 1
         else:

@@ -5,14 +5,23 @@
 # xtc file | date added | status | lsfjob | 
 ##
 
+from __future__ import print_function
+
 import os
 import sys
 import time
+import ConfigParser
 import sqlite3 as sq
 
-from AppUtils.AppBase import AppBase
 
+from AppUtils.AppBase import AppBase
 from DmMover.xtcidxjob import JobQueue, LsfIdxJobs
+
+Defaults = {
+    "release"  : "dm-current",
+    "dbpath"   : "/u1/psdm/srv_idx/db",
+    "waitfile" : "/u1/psdm/srv_idx/WAIT"
+}
 
 
 class CreateIdxFilesApp(AppBase):
@@ -20,19 +29,24 @@ class CreateIdxFilesApp(AppBase):
     def __init__(self):
         AppBase.__init__(self, installLogger = True, usage = "usage: %prog [options]" )
 
-        self._parser.add_option("--maxrun", type='int', default=10,
+        self._parser.add_option("-c","--cfg", help="Config file")
+        self._parser.add_option("--maxrun", type="int", default=10,
                                 help="max number of active jobs")
-        self._parser.add_option("--wait", type='int', default=30,
+        self._parser.add_option("--wait", type="int", default=30,
                                 help="wait time between checking for new jobs")
+
+    
+    def _run(self):        
         
-        
-    def _run(self):
-        
-        jqueue = JobQueue("/u1/psdm/srv_idx/db")
-        jexe = LsfIdxJobs(release="/reg/neh/home1/wilko/release_dev/git/data_mover", \
-                          cmd="idx-create")
-        
-        wait_file = "/u1/psdm/srv_idx/WAIT"
+        config = self.idx_config()
+        print("CONFIG  " + "  ".join(( "{}:{}".format(x,y) for x,y in config.iteritems() )))
+
+
+
+        wait_file = config.waitfile
+        jqueue = JobQueue(config.dbpath)
+
+        jexe = LsfIdxJobs(release=config.release, cmd="idx-create", logdir=config.logdir)
         while True:
             
             if os.path.exists(wait_file):
@@ -40,13 +54,15 @@ class CreateIdxFilesApp(AppBase):
                 time.sleep(self._options.wait)
                 continue
 
-
             # check active jobs 
             n_allowed = self._options.maxrun
             for job in jqueue.active():
-                stat = jexe.job_done(job)
+                stat,rc = jexe.job_done(job)
                 if stat:
-                    jqueue.job_done(job)
+                    if rc == 0:
+                        jqueue.job_done(job)
+                    else:
+                        jqueue.job_failed(job, rc)
                 else:
                     n_allowed -= 1 
                 self.debug("Job status %s  %s %s allowed: %d", stat, job.fn, job.path, n_allowed)
@@ -57,19 +73,44 @@ class CreateIdxFilesApp(AppBase):
                 if n_allowed <= 0:
                     break
                 self.debug("to submit %s allowed: %d", job.fn, n_allowed)
+                
                 try:
-                    jexe.run(job)
+                    batch_job = jexe.run(job)
                 except Exception:
                     self.error("Job submission failed %s", job.fn)
                 else:
-                    jqueue.job_submitted(job)
+                    print(type(batch_job.jobid()),batch_job.jobid())
+                    jqueue.job_submitted(job, batch_job.jobid())
                     n_allowed -= 1
                     time.sleep(1)
-
+            
             time.sleep(self._options.wait)
 
     
-    
+    def idx_config(self, section='idxService'):
+
+        if not self._options.cfg: 
+            return {}
+        
+        config = ConfigParser.SafeConfigParser()
+        config.read(self._options.cfg)
+
+        Defaults.update(dict(config.items(section)))
+
+        class IdxConfig(dict):
+            def __init__(self, args):
+                dict.__init__(self, args)
+                
+            def __getattr__(self, attr):
+                if attr in self:
+                    return self[attr]
+                else:
+                    raise AttributeError(attr)
+
+        return IdxConfig(Defaults)
+
+
+
 if __name__ == "__main__":
     
     app = CreateIdxFilesApp()

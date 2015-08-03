@@ -1,0 +1,47 @@
+#------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: SConscript 7490 2014-01-02 23:04:37Z salnikov@SLAC.STANFORD.EDU $
+#
+# Description:
+#  SConscript file for package pycparser
+#------------------------------------------------------------------------
+
+# Do not delete following line, it must be present in 
+# SConscript file for any SIT project
+Import('*')
+
+from SConsTools.standardExternalPackage import standardExternalPackage
+from os.path import join as pjoin
+
+#
+# For the standard external packages which contain includes, libraries, 
+# and applications it is usually sufficient to call standardExternalPackage()
+# giving few keyword arguments. Here is a complete list of arguments:
+#
+#    PREFIX   - top directory of the external package
+#    INCDIR   - include directory, absolute or relative to PREFIX
+#    INCLUDES - include files to copy (space-separated list of patterns)
+#    PYDIR    - Python src directory, absolute or relative to PREFIX
+#    LINKPY   - Python files to link (patterns), or all files if not present
+#    PYDIRSEP - if present and evaluates to True installs python code to a 
+#               separate directory arch/$SIT_ARCH/python/<package>
+#    LIBDIR   - libraries directory, absolute or relative to PREFIX
+#    COPYLIBS - library names to copy
+#    LINKLIBS - library names to link, or all libs if LINKLIBS and COPYLIBS are empty
+#    BINDIR   - binaries directory, absolute or relative to PREFIX
+#    LINKBINS - binary names to link, or all binaries if not present
+#    PKGLIBS  - names of libraries that have to be linked for this package
+#    DEPS     - names of other packages that we depend upon
+#    PKGINFO  - package information, such as RPM package name
+
+
+# here is an example setting up a fictional package
+
+pkg = "pycparser"
+pkg_ver = "2.14"
+
+PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
+PYDIR  = pjoin('lib', '$PYTHON', 'site-packages')
+PKGINFO = (pkg, pkg_ver, '$PYTHON')
+
+standardExternalPackage ( pkg, **locals() )

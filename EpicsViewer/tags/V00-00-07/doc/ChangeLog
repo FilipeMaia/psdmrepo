@@ -1,0 +1,44 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package EpicsViewer
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-07
+2015-07-29 Igor Gaponenko
+- the 'LIVE' mode
+- an option for downloading a table as an CSV document
+- an option for downloading (taking a snapshot) of the timeseries plot area
+- linear/log10 switch option directly on the timeseries plot
+
+Tag: V00-00-06
+2015-07-16 Igor Gaponenko
+- finished the protorype version to be given to Murali
+
+Tag: V00-00-05
+2015-07-13 Igor Gaponenko
+- minor changes in the Displayselector widgt and its test
+
+Tag: V00-00-04
+2015-07-13 Igor Gaponenko
+- major refactoring to prepare for multi-display (plot) support
+
+Tag: V00-00-03
+2015-07-13 Igor Gaponenko
+- cleaned up the project from older development versions of files
+
+Tag: V00-00-02
+2015-07-13 Igor Gaponenko
+- saving results of the on-going development before integrating
+the DisplaySelector widget
+
+Tag: V00-00-01
+2015-06-26 Igor Gaponenko
+- saving results of the on-going development

@@ -16,9 +16,9 @@
 #         -l: do not add request if idx exists
 #
 
-readonly DB=/u1/psdm/srv_idx/db
+readonly DB=${DM_IDX_DB:-/u1/psdm/srv_idx/db}
 readonly DB_TIMEOUT=3000
-readonly WAITFN=/u1/psdm/srv_idx/WAIT
+readonly WAITFN={DM_IDX_WAIT:-/u1/psdm/srv_idx/WAIT}
 
 list_status() {
     local stat=$1
@@ -97,6 +97,7 @@ case $1 in
     new) list_status NEW ;;
     sub*) list_status SUBMIT ;;
     done*) list_status DONE ;;
+    fail*) list_status FAIL ;;
     wait) 
         wait_status ${2} 
         shift 1 ;;
