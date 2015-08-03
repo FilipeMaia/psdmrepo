@@ -21,6 +21,8 @@ create table idx(
     fpath TEXT NOT NULL,
     date_added INTEGER,
     date_status INTEGER,
+    batchjobid INTEGER,
+    exitCode INTEGER,
     status REFERENCES StatusEnum(statusName) DEFAULT 'NEW'
 );
 

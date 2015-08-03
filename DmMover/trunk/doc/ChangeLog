@@ -15,6 +15,10 @@ Tag: V00-02-03
 - option to not check size when verifying file on FFB and ANA
 - for ioc nodes translate their names to psana-. This name will be only used 
   if the ioc mover is transferring a file directly from a ioc.
+- for idx file creation, record the lsf job id in the database and use it to query 
+  the status of a job (PSDH-21).
+- configure the service that handles the index queue using a config file or env variables
+  for the client tools.
 	
 Tag: V00-02-02
 2015-06-22
