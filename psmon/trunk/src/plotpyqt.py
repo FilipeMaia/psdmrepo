@@ -289,7 +289,7 @@ class XYPlotClient(PlotClient):
                 self.plot_view.plot(
                     x=xdata,
                     y=ydata,
-                    name=legend,
+                    name=config.PYQT_LEGEND_FORMAT%legend,
                     **parse_fmt_xyplot(format_val, cval)
                 )
             )
@@ -324,7 +324,7 @@ class HistClient(PlotClient):
                 self.plot_view.plot(
                     x=bins,
                     y=values,
-                    name=legend,
+                    name=config.PYQT_LEGEND_FORMAT%legend,
                     stepMode=True,
                     fillLevel=fillLevel,
                     **parse_fmt_hist(format_val, fill_val, cval)
