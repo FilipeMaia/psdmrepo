@@ -1,6 +1,7 @@
 import time
 import numpy as np
 
+from psmon.util import make_bins
 from psmon.plots import Image, MultiPlot, Hist, XYPlot
 
 
