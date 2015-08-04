@@ -188,7 +188,7 @@ def parse_fmt_hist(fmt_str, fill=True, color_index=0):
             line = pg.mkPen(color, style=line_style)
 
     # brush entry should always be present in the output
-    fmt_dict['brush'] = color
+    fmt_dict['fillBrush'] = color
 
     # only pass add these entries if they are non-null
     if line is not None:

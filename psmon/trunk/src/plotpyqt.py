@@ -320,17 +320,16 @@ class HistClient(PlotClient):
             cval = len(self.hists)
             fillLevel = 0 if fill_val else None
             self.formats.append((format_val, fill_val, cval))
-            # can directly use 'self.plot_view.plot' instead once we upgrade to pyqtgraph
-            hist = pg.PlotCurveItem(
-                x=bins,
-                y=values,
-                name=legend,
-                stepMode=True,
-                fillLevel=fillLevel,
-                **parse_fmt_hist(format_val, fill_val, cval)
+            self.hists.append(
+                self.plot_view.plot(
+                    x=bins,
+                    y=values,
+                    name=legend,
+                    stepMode=True,
+                    fillLevel=fillLevel,
+                    **parse_fmt_hist(format_val, fill_val, cval)
+                )
             )
-            self.plot_view.addItem(hist)
-            self.hists.append(hist)
 
     def update_sub(self, data):
         """
