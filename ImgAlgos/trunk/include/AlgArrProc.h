@@ -79,7 +79,8 @@ namespace ImgAlgos {
  *  #include "ndarray/ndarray.h"     // need it for I/O arrays
  *  
  *  typedef PSCalib::CalibPars::pixel_mask_t mask_t;
- *  typedef ImgAlgos::AlgArrProc::uint32_t wind_t;
+ *  typedef ImgAlgos::AlgArrProc::wind_t wind_t;
+ *  typedef ImgAlgos::AlgImgProc::conmap_t conmap_t;
  *  @endcode
  *
  *
@@ -118,8 +119,11 @@ namespace ImgAlgos {
  *  @code
  *  unsigned npix = alg->numberOfPixAboveThr<T>(data, mask, thr);
  *  double intensity = alg->intensityOfPixAboveThr<T>(data, mask, thr);
- *  ndarray<const float, 2> peaks = dropletFinder<T>(data, mask, thr_low, hr_high, radius, dr=0.05);
- *  ndarray<const float, 2> peaks = peakFinder<T>(data, mask, thr, r0, dr=0.05);
+ *  ndarray<const float, 2> peaks = alg->dropletFinder<T>(data, mask, thr_low, hr_high, radius, dr=0.05);
+ *  ndarray<const float, 2> peaks = alg->peakFinder<T>(data, mask, thr, r0, dr=0.05);
+ *  
+ *  // Call after peakFinder(...) ONLY!
+ *  ndarray<conmap_t, 3> maps =  alg->mapsOfConnectedPixels();
  *  @endcode
  *
  *
@@ -141,6 +145,7 @@ public:
 
   typedef PSCalib::CalibPars::pixel_mask_t mask_t;
   typedef uint32_t wind_t;
+  typedef AlgImgProc::conmap_t conmap_t;
 
   /*
   typedef unsigned shape_t;
@@ -182,6 +187,9 @@ public:
    * @param[in] dr - ring width for S/N evaluation
    */
   void setSoNPars(const float& r0=5, const float& dr=0.05);
+
+  /// Returns 3-d array of maps of connected pixels for all segments, works after peakFinder(...) ONLY!
+  ndarray<const conmap_t, 3> mapsOfConnectedPixels();
 
   /// Destructor
   virtual ~AlgArrProc (); 

@@ -381,6 +381,15 @@ class PyAlgos :
         return None
 
 ##-----------------------------
+
+    def maps_of_connected_pixels(self) :
+
+        if self.pbits & 128 : print 'in PyAlgos.maps_of_connected_pixels()'
+        arr = self.aap.maps_of_connected_pixels()
+        if self.pbits & 128 : print_arr_attr(arr, cmt='maps_of_connected_pixels arr:')
+        return arr
+
+##-----------------------------
 ##---------- TEST -------------
 ##-----------------------------
 

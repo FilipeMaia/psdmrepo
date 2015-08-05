@@ -197,10 +197,12 @@ struct SoNResult {
  *  @par<interface> Interface Description
  *
  * 
- *  @li  Include
+ *  @li  Includes and typedefs
  *  @code
  *  #include "ImgAlgos/AlgImgProc.h"
  *  #include "ndarray/ndarray.h"     // need it for I/O arrays
+ *  
+ *  typedef ImgAlgos::AlgImgProc::conmap_t conmap_t;
  *  @endcode
  *
  *
@@ -249,6 +251,9 @@ struct SoNResult {
  *   std::vector<Peak>& peaks = aip -> peakFinder<T>(seg_data, seg_mask, thr, r0, dr);
  *   std::vector<Peak>& peaks = aip -> getVectorOfSelectedPeaks();
  *   std::vector<Peak>& peaks = aip -> getVectorOfPeaks();
+ *
+ *   // call after peakFinder ONLY!
+ *   ndarray<conmap_t, 2>& conmap = aip -> mapOfConnectedPixels();
  *  @endcode
  *
  *
@@ -314,6 +319,9 @@ public:
                             const float& atot_thr=0,
                             const float& son_min=3);
 
+  /// Returns reference to Window object
+  const Window& window(){ return m_win; }
+
   /// Returns segment index in the ndarray
   const size_t& segind(){ return m_seg; }
 
@@ -322,6 +330,9 @@ public:
 
   /// Returns vector of selected peaks for this segment/window
   std::vector<Peak>& getVectorOfSelectedPeaks(){ return v_peaks_sel; }
+
+  /// Returns map of connected pixels after peakFinder(.)
+  ndarray<conmap_t, 2>& mapOfConnectedPixels() { return m_conmap; }
 
   /// Prints indexes
   void printMatrixOfRingIndexes();

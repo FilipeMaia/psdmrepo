@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-92
+2015-08-05 Mikhail S. Dubrovin
+- Multiple modifications in AlgArrProc, AlgImgProc, PyAlgos, ex_peakfinder_cspad.py to get production version (PSAS-147)
+
 Tag: V00-03-91
 2015-07-91 Mikhail S. Dubrovin
 - For Python-to-C++ project modules cleen-up code, sort-out print-out info, update documentation (PSAS-147)

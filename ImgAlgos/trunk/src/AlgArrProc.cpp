@@ -19,10 +19,12 @@
 // C/C++ Headers --
 //-----------------
 #include <sstream>   // for stringstream
+#include <cstring>  // for memcpy
 
 namespace ImgAlgos {
 
   typedef AlgArrProc::wind_t wind_t;
+  typedef AlgImgProc::conmap_t conmap_t;
 
 //--------------------
 // Constructors --
@@ -168,9 +170,9 @@ AlgArrProc::printInputPars()
 
 //--------------------
 
-  const ndarray<const float, 2>
-  AlgArrProc::_ndarrayOfPeakPars(const unsigned& npeaks)
-  {
+const ndarray<const float, 2>
+AlgArrProc::_ndarrayOfPeakPars(const unsigned& npeaks)
+{
     if(m_pbits & 256) MsgLog(_name(), info, "in _ndarrayOfPeakPars, npeaks = " << npeaks);
     if(m_pbits & 1) MsgLog(_name(), info, "List of found peaks, npeaks = " << npeaks); 
 
@@ -208,8 +210,31 @@ AlgArrProc::printInputPars()
       }
     }
     return nda;
-  }
+}
 
+//--------------------
+
+ndarray<const conmap_t, 3>
+AlgArrProc::mapsOfConnectedPixels()
+{
+  if(m_pbits & 256) MsgLog(_name(), info, "in mapsOfConnectedPixels");
+
+  unsigned shape[3] = {m_nsegs, m_nrows, m_ncols};
+  ndarray<conmap_t, 3> maps(shape);
+
+  for(std::vector<AlgImgProc*>::iterator it = v_algip.begin(); it != v_algip.end(); ++it) {
+
+    ndarray<conmap_t, 2>& conmap = (*it) -> mapOfConnectedPixels();
+    const Window& win = (*it) -> window();
+
+    for(unsigned r = win.rowmin; r<win.rowmax; r++) 
+      for(unsigned c = win.colmin; c<win.colmax; c++)
+        maps[win.segind][r][c] = conmap[r][c];
+  }
+  return maps;
+}
+
+//--------------------
 //--------------------
 //--------------------
 } // namespace ImgAlgos
