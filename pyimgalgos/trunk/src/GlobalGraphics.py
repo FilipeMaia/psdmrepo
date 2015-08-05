@@ -28,15 +28,8 @@ import matplotlib.lines   as lines
 import matplotlib.patches as patches
 
 from CalibManager.PlotImgSpeWidget import add_stat_text
-#---------------------
-#class CSPadImageProducer (object) :
-#    """This is an empty class"""
-#---------------------
-#    def __init__ (self) :
-#        print 'CSPadImageProducer __init__'
-#--------------------------------
-#------------------------------
 
+#------------------------------
 class Storage :
     def __init__(self) :
         pass
@@ -85,7 +78,34 @@ def plot_img(img, mode=None, amin=None, amax=None) :
     #fig.canvas.draw()
     plt.show()
 
-#------------------------------
+##-----------------------------
+
+def plot_peaks_on_img(peaks, axim, iX, iY, color='w', pbits=0) :  
+    """ Draws peaks on the top of image axes (axim)
+        Plots peaks from array as circles in coordinates of image.
+
+        @param peaks - 2-d list/tuple of peaks; first 6 values in each peak record should be (s, r, c, amax, atot, npix)  
+        @param axim - image axes
+        @param iX - array of x-coordinate indexes for all pixels addressed as [s, r, c] - segment, row, column
+        @param iX - array of y-coordinate indexes for all pixels addressed as [s, r, c] - segment, row, column
+        @param color - peak-ring color
+        @param pbits - verbosity; print 0 - nothing, +1 - peak parameters, +2 - x, y peak coordinate indexes
+    """
+    if peaks is None : return
+
+    anorm = np.average(peaks,axis=0)[4] if len(peaks)>1 else peaks[0][4] if peaks.size>0 else 100    
+    for rec in peaks :
+        s, r, c, amax, atot, npix = rec[0:6]
+        if pbits & 1 : print 's, r, c, amax, atot, npix=', s, r, c, amax, atot, npix
+        x=iX[int(s),int(r),int(c)]
+        y=iY[int(s),int(r),int(c)]
+        if pbits & 2 : print ' x,y=',x,y        
+        xyc = (y,x)
+        r0  = 2+6*atot/anorm
+        circ = patches.Circle(xyc, radius=r0, linewidth=2, color=color, fill=False)
+        axim.add_artist(circ)
+
+##-----------------------------
 
 def size_of_shape(shape=(2,3,8)) :
     size=1
@@ -274,9 +294,10 @@ def move_fig(fig, x0=200, y0=100) :
 
 #--------------------------------
 
-def show() :
+def show(mode=None) :
+    if mode is None : plt.ioff() # hold contraol at show() (connect to keyboard for controllable re-drawing)
+    else            : plt.ion()  # do not hold control
     plt.show()
-    #file.close()
 
 #----------------------------------------------
 

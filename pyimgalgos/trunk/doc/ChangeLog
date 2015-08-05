@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-27
+2015-08-05 Mikhail S. Dubrovin
+- add PeakStore.py
+- in GlobalGraphics.py add plot_peaks_on_img(), extend show(mode)
+- add DOCGEN in SConscript
+	
 Tag: V00-00-26
 2015-07-16 Mikhail S. Dubrovin
 - GlobalGraphics.py - add window parameter in a few methods
