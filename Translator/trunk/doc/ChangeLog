@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-37
+2015-08-07 David Schneider
+- run unit tests in subdirectory based on SIT_ARCH so that buildbot can run
+  tests in parallel on different platforms.
+
 Tag: V00-02-36
 2015-07-28 David Schneider
 - fix bug with in the Translation of vlen ndarrays (JIRA PSAS-170)
