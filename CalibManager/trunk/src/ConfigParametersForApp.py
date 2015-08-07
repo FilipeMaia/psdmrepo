@@ -262,6 +262,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # GUIFileManager.py
         self.current_fmanager_tab = self.declareParameter( name='CURRENT_FILE_MANAGER_TAB', val_def='Single File', type='str' )
+        self.path_fm_selected     = self.declareParameter( name='PATH_FILE_MANAGER_SELECTED', val_def='', type='str' )
 
         # GUIMainSplit.py
         ####self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
@@ -454,6 +455,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'filter'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'geometry'
            #,'beam_vector'
            #,'beam_intersect'
@@ -469,6 +472,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'filter'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
             ]
 
         self.const_types_princeton = [
@@ -476,6 +481,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
             ]
 
@@ -484,6 +491,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
            ,'geometry'
             ]
@@ -501,6 +510,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
             ]
 
@@ -509,6 +520,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
            ,'geometry'
             ]
@@ -518,6 +531,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
             ]
 
@@ -526,6 +541,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'pixel_mask'
+           ,'pixel_bkgd'
            ,'common_mode'
             ]
 

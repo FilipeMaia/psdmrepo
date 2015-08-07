@@ -149,7 +149,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.          setStyleSheet(cp.styleBkgd)
+        self.           setStyleSheet(cp.styleBkgd)
         self.but_move  .setStyleSheet(cp.styleButton)
         self.but_copy  .setStyleSheet(cp.styleButton)
         self.but_delete.setStyleSheet(cp.styleButton)

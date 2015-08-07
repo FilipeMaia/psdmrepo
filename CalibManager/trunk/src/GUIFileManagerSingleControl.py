@@ -83,7 +83,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
         #cp.setIcons()
 
-        self.path_fm_selected = ''
+        self.path_fm_selected = cp.path_fm_selected
         self.setParams()
 
         self.guirange  = GUIRange(None, self.str_run_from, self.str_run_to)
@@ -94,7 +94,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.but_type       = QtGui.QPushButton(self.calib_type + self.char_expand )
 
         self.lab_file = QtGui.QLabel('File:')
-        self.edi_file = QtGui.QLineEdit ( self.path_fm_selected ) # fnm.path_to_calib_dir() )
+        self.edi_file = QtGui.QLineEdit ( self.path_fm_selected.value() ) # fnm.path_to_calib_dir() )
         self.edi_file.setReadOnly(True)
  
         self.but_move   = QtGui.QPushButton('Move')
@@ -207,6 +207,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.lab_src   .setStyleSheet(cp.styleLabel)
         self.lab_type  .setStyleSheet(cp.styleLabel)
  
+        self.but_move.setVisible(False)
         #self.butViewwser.setVisible(False)
         #self.butSave.setText('')
         #self.butExit.setText('')
@@ -264,8 +265,8 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
  
 
     def setParams(self) :
-        if self.path_fm_selected != '' :
-            self.path_fm_selected = os.path.dirname(self.path_fm_selected)
+        #if self.path_fm_selected.value() != self.path_fm_selected.value_def() :
+        #    self.path_fm_selected.setValue(os.path.dirname(self.path_fm_selected.value()))
         self.str_run_from     = '0'
         self.str_run_to       = 'end'
         self.source_name      = 'Select'
@@ -274,7 +275,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
     def resetFields(self) :
         self.setParams()
-        self.edi_file  .setText(self.path_fm_selected)
+        self.edi_file  .setText(self.path_fm_selected.value())
         self.but_src   .setText(self.source_name + self.char_expand )
         self.but_type  .setText(self.calib_type + self.char_expand )
         self.setStyleButtons()
@@ -282,8 +283,8 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
 
     def resetFieldsOnDelete(self) :
-        self.path_fm_selected = os.path.dirname(self.path_fm_selected) # ''
-        self.edi_file  .setText(self.path_fm_selected)
+        self.path_fm_selected.setValue(os.path.dirname(self.path_fm_selected)) # ''
+        self.edi_file.setText(self.path_fm_selected.value())
         self.setStyleButtons()
 
 
@@ -364,6 +365,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
                          ,'Use CALIB directory'
                          ,'Use CURRENT FILE directory'
                          ,'Use OTHER EXPERIMENT directory'
+                         ,'Use ALIGNMENT ARCHIVE'
                          ,'Use ./'
                          ,'Reset'
                          ,'Cancel'
@@ -376,9 +378,10 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         elif selected == list_of_opts[1] : return fnm.path_to_calib_dir()
         elif selected == list_of_opts[2] : return dir_current
         elif selected == list_of_opts[3] : return os.path.join(fnm.path_to_calib_dir(),'../../')
-        elif selected == list_of_opts[4] : return './'
-        elif selected == list_of_opts[5] : return ''
-        elif selected == list_of_opts[6] : return None
+        elif selected == list_of_opts[4] : return '/reg/g/psdm/detector/alignment/'
+        elif selected == list_of_opts[5] : return './'
+        elif selected == list_of_opts[6] : return ''
+        elif selected == list_of_opts[7] : return None
         else                             : return None
  
 
@@ -415,7 +418,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
                 return
 
         self.edi_file.setText(path)
-        self.path_fm_selected = path # .setValue(path)
+        self.path_fm_selected.setValue(path) # .setValue(path)
         logger.debug('Selected file:\n' + path, __name__)
 
         self.setStyleButtons()

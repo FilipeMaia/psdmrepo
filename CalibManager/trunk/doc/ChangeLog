@@ -12,6 +12,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2015-08-07 Mikhail S. Dubrovin
+Tag: V00-00-97
+- ConfigParametersForApp.py - add type pixel_bkgd and pixel_mask in the list of types for all detectors
+- GUIFileManagerSingleControl.py - make persistent path to source file.
+	
 2015-07-02 Mikhail S. Dubrovin
 Tag: V00-00-96
 - Improve ROI Mask GUI performance (PSAS-6)
