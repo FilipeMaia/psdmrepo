@@ -1,0 +1,125 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package SysMon
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-02
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
+Tag: V00-02-01
+2015-04-23 Igor Gaponenko
+- the new implementation of the Data Migration monitoring (JIRA PSDH-34)
+
+Tag: V00-02-00
+2015-04-16 Igor Gaponenko
+- the first implementation of the new File Migration Monitor (PSDH-34)
+
+Tag: V00-01-14
+2015-03-10 Igor Gaponenko
+- minor update to the home page of pswww.slac.stanford.edu
+
+Tag: V00-01-13
+2015-02-26 Igor Gaponenko
+- fixed a bug in the disk space monitoring application PSWA-20
+
+Tag: V00-01-12
+2014-12-19 Igor Gaponenko
+- JIRA tickets: PSDH-12, PSDH-14, PSDH-17
+- full implementation of the disk space monitoring
+- fixed bugs in the data mover monitoring Web UI
+
+Tag: V00-01-11
+2014-12-08 Igor Gaponenko
+- saving results of the ongoing development of the Web application
+
+Tag: V00-01-10
+2014-11-24 Igor Gaponenko
+- added schema for disk space utilization monitoring as per JIRA
+rickets: PSDH-12 and PSDH-17
+- saving results of the ongoing development of the Web application
+
+Tag: V00-01-09
+2014-10-31 Igor Gaponenko
+- added schema for data movers performance monitoring as per JIRA
+tickets: PSDH-12 and PSDH-14
+
+Tag: V00-01-08
+2014-10-10 Igor Gaponenko
+- new development: a prototype for the distributed plotting service
+based on the MySQL database to store plots, Python API to update plots,
+and a Web UI to display plots in real-time
+
+Tag: V00-01-07
+2014-04-30 Igor Gaponenko
+- minor cleanup and refactoring of the package
+
+Tag: V00-01-06
+2013-10-11 Igor Gaponenko
+- got rid of foreign keys in the file system analytics tables in an attempt to
+improve the overall performance of teh application
+- added support for file system classes: ftc and scratch
+
+Tag: V00-01-05
+2013-04-08 Igor Gaponenko
+- extended database schema to support a bookkeeping for actions over
+file systems.
+
+Tag: V00-01-04
+2012-12-10 Igor Gaponenko
+- Table.js migration
+
+Tag: V00-01-03
+2012-11-08 Igor Gaponenko
+- added the file system scanner script
+
+Tag: V00-01-02
+2012-11-08 Igor Gaponenko
+- completed the first version of the File System Analytics project
+
+Tag: V00-01-01
+2012-10-18 Igor Gaponenko
+- added database schema for File System Analytics project
+
+Tag: V00-01-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-00-06
+2012-04-23 Igor Gaponenko
+- extended Beam Time Monitor schema to support e-mail subscriptions
+
+Tag: V00-00-05
+2012-04-06 Igor Gaponenko
+- fixed a bug in the Beam-Time Monitor driver script
+
+Tag: V00-00-04
+2012-03-30 Igor Gaponenko
+- modified database schema for the Beam-Time Monitor
+
+Tag: V00-00-03
+2012-03-22 Igor Gaponenko
+- added documentation
+- modified the driver script to be ready for the final deployement
+
+Tag: V00-00-02
+2012-03-21 Igor Gaponenko
+- the first implementation of the beam-time monitor is complete now.
+It brings the database schema, two python applications to separate
+EPICS and MySQL contexts (due to an alledged thread management bug in
+the Python EPICS code 'pyca'), and a shell script driver ro be run
+in a cron job (etc.) for constant monitoring of desired PV values.
+
+Tag: V00-00-01
+2012-03-09 Igor Gaponenko
+- saving results of the on-going development
+
