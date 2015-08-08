@@ -1,0 +1,144 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package LusiTime
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-07
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
+Tag: V00-01-06
+2015-04-16 Igor Gaponenko
+- fixed a bug in method LusiTime::to_float()
+
+Tag: V00-01-05
+2014-10-10 Igor Gaponenko
+- extended LusiTime parser to support symbol 'T' as date/time separator as
+per the true ISO format specification.
+- extended class LusiTime with a method returning true ISO representation of
+an object
+
+Tag: V00-01-04
+2013-12-13 Igor Gaponenko
+- one more method added into PHP class LusiTime
+
+Tag: V00-01-03
+2013-10-11 Igor Gaponenko
+- one more method added into PHP class LusiTime
+
+Tag: V00-01-02
+2013-07-25 Igor Gaponenko
+- more methods added to PHP classes: LusiTime and LusiInterval
+
+Tag: V00-01-01
+2013-01-03 Andy Salnikov
+- need to add explicit -lrt
+
+Tag: V00-01-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-00-25
+2012-08-14 Igor Gaponenko
+- improved and simplified implementation of the LusiTime class
+
+Tag: V00-00-24
+2012-05-21 Igor Gaponenko
+- extended interface to the LusiTime class (needed by Data Taking Time Monitor)
+- addded an interval class
+
+Tag: V00-00-22
+2012-02-14 Igor Gaponenko
+- extended LusitIme with one convenience method
+
+Tag: V00-00-21
+2011-10-24 Andy Salnikov
+- removed include Lusi.h
+
+Tag: V00-00-20
+2011-02-26 Igor Gaponenko
+- added method LusiTime::month()
+
+Tag: V00-00-19
+2011-02-25 Igor Gaponenko
+- extended API to support data portal
+- bug fixes
+
+Tag: V00-00-18
+2010-07-28 Igor Gaponenko
+- upgraded PHP code for PHP 5.3
+
+Tag: V00-00-16
+2010-05-28 Igor Gaponenko
+- bug fix in PHP LusiTime::parse()
+
+Tag: V00-00-14
+2009-12-10 Andy Salnikov
+- TimeFormat::format() now returns string <InvalidTime> instead of
+  throwing exception if time is not valid
+
+Tag: V00-00-13
+2009-09-30 Igor Gaponenko
+- IDE migration from NetBeans to Eclipse
+
+Tag: V00-00-12
+2009-08-02 Igor Gaponenko
+- fixed a bug in PHP class LusiTime
+
+Tag: V00-00-11
+2009-07-18 Igor Gaponenko
+- extended PHP class LusiTime
+
+Tag: V00-00-10
+2009-07-17 Igor Gaponenko
+- added PHP class LusiInterval
+- removed autoloader for PHP classes
+- migrated PHP class LusiTime to use local timezone
+
+Tag: V00-00-08
+2009-06-08 Igor Gaponenko
+- added autoloader for PHP classes
+- aded include file for PHP library
+
+Tag: V00-00-07
+2009-06-08 Igor Gaponenko
+- added subdirectory 'web' with PHP code implementing similar functionality
+for Web applications. A goal is to keep related things together.
+
+Tag: V00-00-06
+2009-05-19 Andy Salnikov
+- added Python implementation of the same Time class
+- added unit tests for Python class
+
+Tag: V00-00-05
+2009-05-18 Igor Gaponenko
+- refined implementation of the packaging (into 64-bit integer)
+   algorithm.
+
+Tag: V00-00-04
+2009-05-18 Igor Gaponenko
+- added packang/unpacking into/from 64-bit unsigned integer.
+
+Tag: V00-00-03
+2009-05-18 Andy Salnikov
+- Time formatting reworked, support for fractional seconds and 
+  timezones
+- details are in README
+
+Tag: V00-00-02
+2009-05-05 Igor Gaponenko
+- added two methods for bidirectional translation of timestamps
+to and from regulat C++ strings.
+
+Tag: V00-00-01
+2009-05-05 Andy Salnikov
+- initial incomplete implementation of Time class and test cases
