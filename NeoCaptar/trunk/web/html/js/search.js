@@ -36,23 +36,23 @@ function p_appl_search() {
      * -------------------------------------------------------------------------
      */
     this.name      = 'search';
-	this.full_name = 'Search';
-	this.context   = '';
+    this.full_name = 'Search';
+    this.context   = '';
     this.default_context = 'cables';
 
     this.select = function(context, when_done) {
-		this.context   = context;
-		this.when_done = when_done;
-		this.init();
-	};
-	this.select_default = function() {
-		if( this.context == '' ) this.context = this.default_context;
-		this.init();
-	};
-	this.if_ready2giveup = function(handler2call) {
+        this.context   = context;
+        this.when_done = when_done;
         this.init();
-		handler2call();
-	};
+    };
+    this.select_default = function() {
+        if( this.context == '' ) this.context = this.default_context;
+        this.init();
+    };
+    this.if_ready2giveup = function(handler2call) {
+        this.init();
+        handler2call();
+    };
     this.simple_search = function(pattern) {
         this.init();
         that.search_cables_reset();
@@ -148,16 +148,16 @@ function p_appl_search() {
      * ----------------------------------------
      */
     this.initialized = false;
-	this.init = function() {
-		if( this.initialized ) return;
-		this.initialized = true;
-		$('#search-cables-search').button().click(function() { that.search_cables(); });
-		$('#search-cables-reset' ).button().click(function() { that.search_cables_reset(); });
+    this.init = function() {
+        if( this.initialized ) return;
+        this.initialized = true;
+        $('#search-cables-search').button().click(function() { that.search_cables(); });
+        $('#search-cables-reset' ).button().click(function() { that.search_cables_reset(); });
         $('#search-cables-form').find('input')
         .keyup(function(e) {
-			if( $(this).val() == '' ) { return; }
-			if( e.keyCode == 13     ) { that.search_cables(); }
-		});
+            if( $(this).val() == '' ) { return; }
+            if( e.keyCode == 13     ) { that.search_cables(); }
+        });
         that.cols2display = {
             project:  true,
             job:      true,
@@ -187,7 +187,7 @@ function p_appl_search() {
         $('#search-cables').find('.export:button').
             button().
             click(function() {
-                global_export_cables(that.params,this.name);
+                global_export_cables(that.params, this.name);
             }
         );
         this.enable_export_tools_if(false);
@@ -200,8 +200,8 @@ function p_appl_search() {
     this.proj_id2title = null;
     this.cols2display = null;
     this.cable2html = function(cidx) {
-		var c = this.cable[cidx];
-		var html =
+        var c = this.cable[cidx];
+        var html =
 '<tr id="search-cables-'+cidx+'-1" class="table_row ">'+
 '  <td nowrap="nowrap" class="table_cell table_cell_left table_cell_bottom "><div class="status"><b>'+c.status+'</b></div></td>';
         html += this.cols2display.project ?
@@ -274,8 +274,8 @@ function p_appl_search() {
 '  <td nowrap="nowrap" class="table_cell table_cell_strong_bottom table_cell_right ">&nbsp;</td>' : '';
         html +=
 '</tr>';
-		return html;
-	};
+        return html;
+    };
     this.display_cables = function() {
         if(this.cable == null) return;
         var html =
@@ -327,12 +327,12 @@ function p_appl_search() {
         html += this.cols2display.modified ?
 '    <td nowrap="nowrap" class="table_hdr">modified</td>'+
 '    <td nowrap="nowrap" class="table_hdr">by user</td>' : '';
-		for( var cidx in this.cable ) html += this.cable2html(cidx);
+        for( var cidx in this.cable ) html += this.cable2html(cidx);
         html +=
 '  </tr>'+
 '</tbody></table>';
         $('#search-cables-result').html(html);
-	};
+    };
     this.sort_cables = function() {
         var sort_by = $('#search-cables-display').find('select[name="sort"]').val();
         var sorter  = null;
@@ -350,25 +350,25 @@ function p_appl_search() {
         this.cable.sort(sorter);
     };
     this.select_cables_by_status = function() {
-		var status = $('#search-cables-result').find('select[name="status"]').val();
-		if( '- status -' == status ) {
-			for( var cidx in this.cable ) {
-				$('#search-cables-'+cidx+'-1').css('display','');
-				$('#search-cables-'+cidx+'-2').css('display','');
-			}
-		} else {
-			for( var cidx in this.cable ) {
-				var style = this.cable[cidx].status == status ? '' : 'none';
-				$('#search-cables-'+cidx+'-1').css('display',style);
-				$('#search-cables-'+cidx+'-2').css('display',style);
-			}
-		}
+        var status = $('#search-cables-result').find('select[name="status"]').val();
+        if( '- status -' == status ) {
+            for( var cidx in this.cable ) {
+                $('#search-cables-'+cidx+'-1').css('display','');
+                $('#search-cables-'+cidx+'-2').css('display','');
+            }
+        } else {
+            for( var cidx in this.cable ) {
+                var style = this.cable[cidx].status == status ? '' : 'none';
+                $('#search-cables-'+cidx+'-1').css('display',style);
+                $('#search-cables-'+cidx+'-2').css('display',style);
+            }
+        }
     };
     this.params = null;
     this.search_cable_by_cablenumber_impl = function(cablenumber) {
         this.search_cables_impl({cablenumber:cablenumber});
     };
-	this.search_cables = function() {
+    this.search_cables = function() {
         var form = $('#search-cables-form');
         this.search_cables_impl({
             partial_cable          : form.find('input[name="cable"]').val(),
@@ -400,7 +400,7 @@ function p_appl_search() {
             partial_destination_loc: ''
         });
     };
-	this.search_cables_impl = function(params) {
+    this.search_cables_impl = function(params) {
 
         this.params = params;
         this.enable_export_tools_if(false);
@@ -409,38 +409,38 @@ function p_appl_search() {
         // returned by the Web service. Also restrict the number of cables rendered/returned
         // by the script.
         //
-		$('#search-cables-search').button('disable');
-		$('#search-cables-reset').button('disable');
-		$('#search-cables-info').html('Searching...');
-		var jqXHR = $.get(
-			'../neocaptar/ws/cable_search.php', this.params,
-			function(data) {
-				if( data.status != 'success') {
-					report_error('failed to load cables because of: '+data.message);
-					return;
-				}
-				that.cable = data.cable;
+        $('#search-cables-search').button('disable');
+        $('#search-cables-reset').button('disable');
+        $('#search-cables-info').html('Searching...');
+        var jqXHR = $.get(
+            '../neocaptar/ws/cable_search.php', this.params,
+            function(data) {
+                if( data.status != 'success') {
+                    report_error('failed to load cables because of: '+data.message);
+                    return;
+                }
+                that.cable = data.cable;
                 that.proj_id2title = data.proj_id2title;
                 that.sort_cables();
-				that.display_cables();
+                that.display_cables();
                 $('#search-cables-info').html(data.cable.length+' cables');
                 that.enable_export_tools_if(true);
             },
-			'JSON'
-		).error(
-			function () {
+            'JSON'
+        ).error(
+            function () {
                 $('#search-cables-info').html('operation failed');
-				report_error('failed because of: '+jqXHR.statusText);
-			}
-		).complete(
-			function () {
-				$('#search-cables-search').button('enable');
-				$('#search-cables-reset').button('enable');
-			}
-		);
-	};
+                report_error('failed because of: '+jqXHR.statusText);
+            }
+        ).complete(
+            function () {
+                $('#search-cables-search').button('enable');
+                $('#search-cables-reset').button('enable');
+            }
+        );
+    };
     this.export_cables = function(outformat) {
-        global_export_cables(this.params,outformat);
+        global_export_cables(this.params, outformat);
     };
     return this;
 }

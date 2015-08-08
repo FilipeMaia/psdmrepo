@@ -2039,7 +2039,7 @@ required_field_html+' required feild';
     };
     this.export_project = function(project_id,outformat) {
         var params = {project_id:project_id};
-        global_export_cables(params,outformat);
+        global_export_cables(params, outformat);
     };
     this.search_project_by_id = function(id) {
         $('#projects-search-info').html('Searching...');

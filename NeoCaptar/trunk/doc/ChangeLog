@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag:  V00-03-03
+2015-08-07 Igor Gaponenko
+- minor layout improvements for the main table of projects
+- replaced tabs by spaces
+- improved interface for generating Excel spreadsheets
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
 Tag: V00-03-02
 2015-02-02 Igor Gaponenko
 - updated database schema by reinforcing the cable number allocator

@@ -146,10 +146,19 @@ function export_cables2excel($cables,$path,$user) {
 
     $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
     $objWriter->save($path);
+
+    header("Content-type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") ;
+    header('Content-Disposition: attachment; filename='.$path) ;
+
+    ob_clean() ;
+    flush() ;
+    readfile($path) ;
+
+    exit() ;
 }
 
 $export_tools = array(
-    'excel' => array('convertor' => export_cables2excel,'extension' => '.xlsx' )
+    'excel' => array('convertor' => 'export_cables2excel','extension' => '.xlsx' )
 );
 
 try {
@@ -272,9 +281,9 @@ try {
 
         $file = "neocaptar_".(LusiTime::now()->sec).$export_tools[$format]['extension'];
         $url  = "../neocaptar_documents/".$file;
-        $path = "/tmp/neocaptar/".$file;
+        $path = "/tmp/".$file;
 
-        $export_tools[$format]['convertor']($cables,$path,$user);
+        $export_tools[$format]['convertor']($cables, $path, $user);
 
         $neocaptar->commit();
         $authdb->commit();

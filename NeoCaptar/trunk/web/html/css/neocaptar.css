@@ -57,9 +57,9 @@ div.proj-hdr:hover {
 }
 
 .proj-created {
-  float: left;
+  float:       left;
   margin-left: 5px;
-  width: 100px;
+  width:       90px;
 }
 .proj-owner {
   float: left;
@@ -93,11 +93,11 @@ div.proj-hdr:hover {
 
 .proj-modified {
   float: left;
-  width: 160px;
+  width: 80px;
 }
 .proj-due {
   float: left;
-  width: 100px;
+  width: 80px;
 }
 .proj-con {
   padding:20px;

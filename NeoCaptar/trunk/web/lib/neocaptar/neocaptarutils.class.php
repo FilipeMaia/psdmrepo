@@ -212,7 +212,8 @@ class NeoCaptarUtils {
             'due_sec'          => $p->due_time()->sec,
             'due'              => $p->due_time()->toStringDay(),
             'modified_sec'     => $p->modified_time()->sec,
-            'modified'         => $p->modified_time()->toStringShort(),
+            'modified'         => $p->modified_time()->toStringDay(),
+//            'modified'         => $p->modified_time()->toStringShort(),
             'status'           => $p->status()
         );
     }

@@ -851,31 +851,10 @@ function global_search_cables_by_dict_device_location_id (id)   { global_switch_
 function global_search_cables_by_dict_device_region_id   (id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_region_id   (id); }
 function global_search_cables_by_dict_device_component_id(id)   { global_switch_context('search',  'cables').search_cables_by_dict_device_component_id(id); }
 
-function global_export_cables(search_params,outformat) {
+function global_export_cables(search_params, outformat) {
     search_params.format = outformat;
-    var html = '<img src="../webfwk/img/loading.gif" />';
-    var dialog = report_action('Generating Document: '+outformat,html);
-    var jqXHR = $.get(
-        '../neocaptar/ws/cable_search.php', search_params,
-        function(data) {
-            if( data.status != 'success' ) {
-                report_error( data.message );
-                dialog.dialog('close');
-                return;
-            }
-            var html = 'Document is ready to be downloaded from this location: <a class="link" href="'+data.url+'" target="_blank" >'+data.name+'</a>';
-            dialog.html(html);
-        },
-        'JSON'
-    ).error(
-        function () {
-            report_error('failed because of: '+jqXHR.statusText);
-            dialog.dialog('close');
-        }
-    ).complete(
-        function () {
-        }
-    );
+    var url = '../neocaptar/ws/cable_search.php?'+$.param(search_params, true) ;
+    window.open(url) ;
 }
 function global_truncate_cable    (str) { return str.substring(0, 8); }
 function global_truncate_connector(str) { return str.substring(0, 8); }
@@ -1105,7 +1084,7 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
 
         <!-- Table header -->
         <div id="projects-search-header">
-          <div style="float:left; margin-left:20px; width:100px;"><span class="proj-table-hdr">Created</span></div>
+          <div style="float:left; margin-left:20px; width: 90px;"><span class="proj-table-hdr">Created</span></div>
           <div style="float:left;                   width: 70px;"><span class="proj-table-hdr">Owner</span></div>
           <div style="float:left;                   width:300px;"><span class="proj-table-hdr">Title</span></div>
           <div style="float:left;                   width: 70px;"><span class="proj-table-hdr">Job #</span></div>
@@ -1119,8 +1098,8 @@ function global_cable_sorter_by_modified   (a,b) { return a.modified.time_64 - b
           <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Com</span></div>
           <div style="float:left;                   width: 40px;"><span class="proj-table-hdr">Dmg</span></div>
           <div style="float:left;margin-right: 19px; border-right:1px solid #000000; width: 60px;"><span class="proj-table-hdr">Rtr</span></div>
-          <div style="float:left;                   width:100px;"><span class="proj-table-hdr">Deadline</span></div>
-          <div style="float:left;                   width:160px;"><span class="proj-table-hdr">Modified</span></div>
+          <div style="float:left;                   width: 80px;"><span class="proj-table-hdr">Deadline</span></div>
+          <div style="float:left;                   width: 80px;"><span class="proj-table-hdr">Modified</span></div>
           <div style="clear:both;"></div>
         </div>
 
