@@ -89,6 +89,9 @@ input {
 
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 require_once( 'authdb/authdb.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
 require_once( 'lusitime/lusitime.inc.php' );

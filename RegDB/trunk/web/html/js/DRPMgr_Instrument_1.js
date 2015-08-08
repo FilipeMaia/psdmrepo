@@ -24,10 +24,6 @@ function (
         filesystem:
             DRPMgr_Defs.DOCUMENT_METHOD (
                 'Narrow a search down to the specified file system.') ,
-        year:
-            DRPMgr_Defs.DOCUMENT_METHOD (
-                'Narrow a search down to the specified year when the last \n' +
-                'of an experiment began.') ,
         purge:
             DRPMgr_Defs.DOCUMENT_METHOD (
                 'Begin purging files in this context. The operation can be \n' +
@@ -36,11 +32,6 @@ function (
             DRPMgr_Defs.DOCUMENT_METHOD (
                 'Review which data can be purged in this context. Note, this \n' +
                 'operation will not trigger any purge.') ,
-        reset:
-            DRPMgr_Defs.DOCUMENT_METHOD (
-                'Reset this form back to the default state which \n' +
-                'would include all known experiments. \n' +
-                'ATTENTION: this can be a lengthy operation!') ,
         stop:
             DRPMgr_Defs.DOCUMENT_METHOD (
                 'Stop the on-going purge. The operation can be resumed later.') ,
@@ -110,60 +101,24 @@ function (
         var data = [
             {   category: 'total' ,
                 title:    'TOTAL' ,
-                'SHORT-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 0 ,
-                    purge_allowed:  0} ,
-                'MEDIUM-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 0 ,
-                    purge_allowed:  0} ,
-                'HPSS': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 0 ,
-                    purge_allowed:  0}
+                'SHORT-TERM':  {num_files: 0, size_gb:   0, review_allowed: 0, purge_allowed: 0} ,
+                'MEDIUM-TERM': {num_files: 0, size_gb:   0, review_allowed: 0, purge_allowed: 0} ,
+                'HPSS':        {num_files: 0, size_gb:   0, review_allowed: 0, purge_allowed: 0}
             } , {
                 category: 'expired' ,
                 title:    'Expired (by Policy)' ,
-                'SHORT-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 1 ,
-                    purge_allowed:  1} ,
-                'MEDIUM-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 1 ,
-                    purge_allowed:  1} ,
-                'HPSS': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 0 ,
-                    purge_allowed:  0}
+                'SHORT-TERM':  {num_files: 0, size_gb:   0, review_allowed: 1, purge_allowed: 1} ,
+                'MEDIUM-TERM': {num_files: 0, size_gb:   0, review_allowed: 1, purge_allowed: 1} ,
+                'HPSS':        {num_files: 0, size_gb:   0, review_allowed: 0, purge_allowed: 0}
             }
         ] ;
         for (var m = 24; m > 0; m--) {
             data.push ({
                 category: m ,
                 title:    m+' m' ,
-                'SHORT-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 1 ,
-                    purge_allowed:  1} ,
-                'MEDIUM-TERM': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 1 ,
-                    purge_allowed:  1} ,
-                'HPSS': {
-                    'xtc':  {num_files: 0, size_gb: 0} ,
-                    'hdf5': {num_files: 0, size_gb: 0} ,
-                    review_allowed: 0 ,
-                    purge_allowed:  0}
+                'SHORT-TERM':  {num_files: 0, size_gb:   0, review_allowed: 1, purge_allowed: 1} ,
+                'MEDIUM-TERM': {num_files: 0, size_gb:   0, review_allowed: 1, purge_allowed: 1} ,
+                'HPSS':        {num_files: 0, size_gb:   0, review_allowed: 0, purge_allowed: 0}
             }) ;
         }
         return data ;
@@ -301,26 +256,16 @@ function (
             var rows = [] ;
             for (var i in data) {
                 var t = data[i] ;
-
-                var short_num_files  = t['SHORT-TERM']['xtc'].num_files + t['SHORT-TERM']['hdf5'].num_files ,
-                    short_size_gb    = t['SHORT-TERM']['xtc'].size_gb   + t['SHORT-TERM']['hdf5'].size_gb ;
-
-                var medium_num_files = t['MEDIUM-TERM']['xtc'].num_files + t['MEDIUM-TERM']['hdf5'].num_files ,
-                    medium_size_gb   = t['MEDIUM-TERM']['xtc'].size_gb   + t['MEDIUM-TERM']['hdf5'].size_gb ;
-
-                var hpss_num_files   = t['HPSS']['xtc'].num_files + t['HPSS']['hdf5'].num_files ,
-                    hpss_size_gb     = t['HPSS']['xtc'].size_gb   + t['HPSS']['hdf5'].size_gb ;
-
                 rows.push([
                     t.title ,
-                    short_num_files  ? short_num_files  : '' ,
-                    short_size_gb    ? short_size_gb    : '' ,
+                    t['SHORT-TERM'].num_files  ? t['SHORT-TERM'].num_files : '' ,
+                    t['SHORT-TERM'].size_gb    ? t['SHORT-TERM'].size_gb   : '' ,
                     t ,
-                    medium_num_files ? medium_num_files : '' ,
-                    medium_size_gb   ? medium_size_gb   : '' ,
+                    t['MEDIUM-TERM'].num_files ? t['MEDIUM-TERM'].num_files : '' ,
+                    t['MEDIUM-TERM'].size_gb   ? t['MEDIUM-TERM'].size_gb   : '' ,
                     t ,
-                    hpss_num_files   ? hpss_num_files   : '' ,
-                    hpss_size_gb     ? hpss_size_gb     : ''
+                    t['HPSS'].num_files ? t['HPSS'].num_files : '' ,
+                    t['HPSS'].size_gb   ? t['HPSS'].size_gb   : ''
                 ]) ;
             }
             this._table().load(rows) ;
@@ -510,9 +455,9 @@ function (
 
         // The filesystem and experiment infor is loaded first
 
-        this._experiments  = null ;
-        this._filesystems  = null ;
-        this._years        = null ;
+        this._experiments  = {} ;
+        this._years        = [] ;
+        this._filesystems  = [] ;
 
         // The detailed info on experiments is loaded one-by-one
         // via a queue defined below. This phase will be temporarily
@@ -583,15 +528,7 @@ function (
       '</div> ' +
     '</div> ' +
 
-    '<div class="control-group" '+_DOCUMENT.year+' > ' +
-      '<div class="control-group-title" >Year</div> ' +
-      '<div class="control-group-selector" > ' +
-        '<select name="year" ></select> ' +
-      '</div> ' +
-    '</div> ' +
-
     '<div class="control-group control-group-buttons" > ' +
-      '<button name="reset"  class="control-button" '                         +_DOCUMENT.reset +' >RESET</button> ' +
       '<button name="stop"   class="control-button control-button-important" '+_DOCUMENT.stop  +' >STOP</button> ' +
       '<button name="update" class="control-button" '                         +_DOCUMENT.update+' ><img src="../webfwk/img/Update.png" /></button> ' +
     '</div> ' +
@@ -639,59 +576,18 @@ function (
                             _.reduce (
                                 _.isUndefined(filesystems) ? [] : filesystems ,
                                 function (options, path) {
-                                    options.push({value: path, text: path}) ;
+                                    options.push({value:path, text: path}) ;
                                     return options ;
                                 } ,
                                 [{value: '', default: true}]) ,
                         on_change:
-                            function () {
-                                _that._load() ;
-                            } ,
-                        config_handler: this._config_handler('filesystem')
+                            function () { _that._load() ; }
                     }
                 ) ;
             }
             return this._filesystem_selector_obj ;
         } ;
-        this._year_selector = function (years) {
-            
-            // Allow object initializion with complete or empty list
-            // of choices. Force re-initialization if a complete list
-            // is provided.
-            if (!this._year_selector_obj || !_.isUndefined(years)) {
 
-                // Clean up the previous object if exists.
-                if (this._year_selector_obj)
-                    delete this._year_selector_obj ;
-                
-                this._year_selector_obj = new SelectOption (
-                    this._ctrl().find('div.control-group-selector').children('select[name="year"]') ,
-                    {   disabled: true ,
-                        options:
-                            _.reduce (
-                                _.isUndefined(years) ? [] : years ,
-                                function (options, year) {
-                                    options.push({value: year.toString(), text: year.toString()}) ;
-                                    return options ;
-                                } ,
-                                [{value: '', default: true}]) ,
-                        on_change:
-                            function () {
-                                _that._load() ;
-                            } ,
-                        config_handler: this._config_handler('year')
-                    }
-                ) ;
-            }
-            return this._year_selector_obj ;
-        } ;
-
-        this._button_reset = function () {
-            if (!this._button_reset_elem) {
-                this._button_reset_elem = this._ctrl().find('.control-button[name="reset"]').button() ;
-            }
-            return this._button_reset_elem ;
-        } ;
         this._button_stop = function () {
             if (!this._button_stop_elem) {
                 this._button_stop_elem = this._ctrl().find('.control-button[name="stop"]').button() ;
@@ -765,11 +661,6 @@ function (
             // Render UI elements and put them into the disabled
             // state before the initial loading has finished.
             this._filesystem_selector().enable(false) ;
-            this._year_selector()      .enable(false) ;
-
-            this._button_reset()
-                .button('disable')
-                .click(function () { _that._reset() ; }) ;
 
             this._button_load()
                 .button('disable')
@@ -790,32 +681,18 @@ function (
             Fwk.web_service_GET (
                 '../regdb/ws/drp_instruments_get.php' ,
                 {   instr_name: this._instr_name ,
-                    fs:         this._filesystem_selector().value() ,
-                    year:       this._year_selector()      .value()
+                    fs: this._filesystem_selector().value()
                 } ,
                 function (data) {
-
                     _that._experiments = data.experiments ;
-                    
-                    // Iniialize selector of filesystems and years only onece when
-                    // loading this information for the first time.
-                    if (!_that._filesystems) {
-                        _that._filesystems = data.filesystems ;
-                        _that._years       = data.years ;
-                        _that._filesystem_selector(_that._filesystems) ;
-                        _that._year_selector      (_that._years) ;
-                    }
+                    _that._years       = data.years ;
+                    _that._filesystems = data.filesystems ;
+                    _that._filesystem_selector(_that._filesystems) ;
                     _that._reset_all_years() ;
 
                     // Update the control elements
                     // Initialize tabs and and display tables with experiment info
                     _that._pre_display() ;
-
-                    _that._filesystem_selector().enable(true) ;
-                    _that._year_selector()      .enable(true) ;
-
-                    _that._button_reset().button('enable') ;
-                    _that._button_load ().button('enable') ;
 
                     // Feed all experiments into the load queue and initiate
                     // the main loading process.
@@ -830,25 +707,17 @@ function (
         } ;
         this._pre_display = function () {
 
-            // Initialize tabs only for experiments which have been
-            // reported by the service
-            
-            var years = _.filter (
-                this._years ,
-                function (y) {
-                    return _.has(_that._experiments, y) ;
-                }
-            ) ;
+            // Initialize tabs
             var html =
 '<ul>' +
-  '<li><a href="#all-years" >All years</a></li> ' + _.reduce(years, function (html, y) { return html +=
+  '<li><a href="#all-years" >All years</a></li> ' + _.reduce(this._years, function (html, y) { return html +=
   '<li><a href="#'+y+'" >'+y+'</a></li> ' ; }, '') +
 '</ul> ' +
 '<div id="all-years" > ' +
   '<div class="tab-cont" > ' +
     '<div id="table"></div>' +
   '</div>' +
-'</div>' +                                          _.reduce(years, function (html, y) { return html +=
+'</div>' +                                          _.reduce(this._years, function (html, y) { return html +=
 '<div id="'+y+'" > ' +
   '<div class="tab-cont" > ' +
     '<div class="stack" ></div> ' +
@@ -870,37 +739,16 @@ function (
             var rows = [] ;
             for (var i in this._all_years) {
                 var t = this._all_years[i] ;
-//                rows.push([
-//                    t.title ,
-//                    t['SHORT-TERM'].num_files  ? t['SHORT-TERM'].num_files : '' ,
-//                    t['SHORT-TERM'].size_gb    ? t['SHORT-TERM'].size_gb   : '' ,
-//                    t ,
-//                    t['MEDIUM-TERM'].num_files ? t['MEDIUM-TERM'].num_files : '' ,
-//                    t['MEDIUM-TERM'].size_gb   ? t['MEDIUM-TERM'].size_gb   : '' ,
-//                    t ,
-//                    t['HPSS'].num_files ? t['HPSS'].num_files : '' ,
-//                    t['HPSS'].size_gb   ? t['HPSS'].size_gb   : ''
-//                ]) ;
-
-                var short_num_files  = t['SHORT-TERM']['xtc'].num_files + t['SHORT-TERM']['hdf5'].num_files ,
-                    short_size_gb    = t['SHORT-TERM']['xtc'].size_gb   + t['SHORT-TERM']['hdf5'].size_gb ;
-
-                var medium_num_files = t['MEDIUM-TERM']['xtc'].num_files + t['MEDIUM-TERM']['hdf5'].num_files ,
-                    medium_size_gb   = t['MEDIUM-TERM']['xtc'].size_gb   + t['MEDIUM-TERM']['hdf5'].size_gb ;
-
-                var hpss_num_files   = t['HPSS']['xtc'].num_files + t['HPSS']['hdf5'].num_files ,
-                    hpss_size_gb     = t['HPSS']['xtc'].size_gb   + t['HPSS']['hdf5'].size_gb ;
-
                 rows.push([
                     t.title ,
-                    short_num_files  ? short_num_files  : '' ,
-                    short_size_gb    ? short_size_gb    : '' ,
+                    t['SHORT-TERM'].num_files  ? t['SHORT-TERM'].num_files : '' ,
+                    t['SHORT-TERM'].size_gb    ? t['SHORT-TERM'].size_gb   : '' ,
                     t ,
-                    medium_num_files ? medium_num_files : '' ,
-                    medium_size_gb   ? medium_size_gb   : '' ,
+                    t['MEDIUM-TERM'].num_files ? t['MEDIUM-TERM'].num_files : '' ,
+                    t['MEDIUM-TERM'].size_gb   ? t['MEDIUM-TERM'].size_gb   : '' ,
                     t ,
-                    hpss_num_files   ? hpss_num_files   : '' ,
-                    hpss_size_gb     ? hpss_size_gb     : ''
+                    t['HPSS'].num_files ? t['HPSS'].num_files : '' ,
+                    t['HPSS'].size_gb   ? t['HPSS'].size_gb   : ''
                 ]) ;
             }
            this._all_years_table().load(rows) ;
@@ -909,20 +757,13 @@ function (
            this._all_years_table().get_container().find('.control-button').button('disable') ;
         } ;
 
-        this._reset = function () {
-            this._filesystem_selector().set_value('') ;
-            this._year_selector()      .set_value('') ;
-            this._load() ;
-        } ;
         this._load = function () {
             // Render UI elements and put them into the disabled
             // state before the initial loading has finished.
             this._filesystem_selector().enable(false) ;
-            this._year_selector()      .enable(false) ;
 
-            this._button_reset().button('disable') ;
-            this._button_stop ().button('disable') ;
-            this._button_load ().button('disable') ;
+            this._button_stop().button('disable') ;
+            this._button_load().button('disable') ;
 
             // Pre-load file systems and experiment names
             this._pre_load() ;
@@ -1074,26 +915,17 @@ function (
                 access:          access2html(data) ,
                 fs:              experiment.fs
             } ;
-            if (experiment.id == 445) {
-                console.log(experiment, data) ;
-            }
             for (var i in data) {
                 var t = data[i] ;
                 switch (t.category) {
                     case 'total':
-                        var hpss_size_gb   = t['HPSS']       ['xtc'].size_gb + t['HPSS']       ['hdf5'].size_gb ;
-                        var short_size_gb  = t['SHORT-TERM'] ['xtc'].size_gb + t['SHORT-TERM'] ['hdf5'].size_gb ;
-                        var medium_size_gb = t['MEDIUM-TERM']['xtc'].size_gb + t['MEDIUM-TERM']['hdf5'].size_gb ;
-
-                        if (hpss_size_gb)   title_data.total = hpss_size_gb ;
-                        if (short_size_gb)  title_data.sterm = short_size_gb ;
-                        if (medium_size_gb) title_data.mterm = medium_size_gb ;
+                        if (t['HPSS'].size_gb)        title_data.total = t['HPSS'].size_gb ;
+                        if (t['SHORT-TERM'] .size_gb) title_data.sterm = t['SHORT-TERM'].size_gb ;
+                        if (t['MEDIUM-TERM'].size_gb) title_data.mterm = t['MEDIUM-TERM'].size_gb ;
                         break ;
                     case 'expired':
-                        var short_size_gb  = t['SHORT-TERM'] ['xtc'].size_gb + t['SHORT-TERM'] ['hdf5'].size_gb ;
-                        var medium_size_gb = t['MEDIUM-TERM']['xtc'].size_gb + t['MEDIUM-TERM']['hdf5'].size_gb ;
-                        if (short_size_gb)  title_data.sterm_expired = short_size_gb ;
-                        if (medium_size_gb) title_data.mterm_expired = medium_size_gb ;
+                        if (t['SHORT-TERM'] .size_gb) title_data.sterm_expired = t['SHORT-TERM'] .size_gb ;
+                        if (t['MEDIUM-TERM'].size_gb) title_data.mterm_expired = t['MEDIUM-TERM'].size_gb ;
                         break ;
                 }
             }
@@ -1110,9 +942,7 @@ function (
             if (!this._load_next()) {
                 console.log('DRPMgr_Instrument.finished_loading() all experiments are now loaded') ;
                 this._filesystem_selector().enable(true) ;
-                this._year_selector()      .enable(true) ;
-                this._button_reset().button('enable') ;
-                this._button_load ().button('enable') ;
+                this._button_load().button('enable') ;
             }
         } ;
 

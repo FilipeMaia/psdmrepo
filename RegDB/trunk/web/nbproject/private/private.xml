@@ -2,19 +2,20 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group/>
         <group name="PCDS Web App"/>
-        <group>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/js/DRPMgr_Totals.js</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/js/DRPMgr_Instrument.js</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/js/drpmgr_main.js</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/js/DRPMgr_Policy.js</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/drpmgr.php</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/css/DRPMgr_Policy.css</file>
-            <file>file:/Users/gapon/SLAC_AFS/lcls/releases/pswww-apps-dev/RegDB/web/html/js/DRPMgr_Exceptions.js</file>
-        </group>
         <group name="PCDS Web Apps">
-            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/css/DRPMgr_Policy.css</file>
-            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/js/DRPMgr_Exceptions.js</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/AutoTranslate2HDF5.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/StoragePolicyMgr.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/NERSCMigrationMonitorStats.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/FileMigrationMonitor.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/ExperimentDataPath.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/FileMigrationLatency.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/SimpleTapeMonitor.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/ExperimentTapeRequests.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/drpmgr.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/NERSCMigrationMonitor.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/RegDB/web/html/index.php</file>
         </group>
     </open-files>
 </project-private>

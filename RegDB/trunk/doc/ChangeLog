@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-12
+2015-08-07 Igor Gaponenko
+- saving results of the on-going development of the new Access
+Time-based Data Retention Policy
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
 Tag: V00-02-11
 2015-05-26 Wilko Kroeger
 - added functions to RegDb to query the datapath for an experiment

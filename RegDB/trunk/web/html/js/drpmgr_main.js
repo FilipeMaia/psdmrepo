@@ -87,11 +87,11 @@ function (
             var instr_name = app_config.instruments[i] ;
             menus.push ({
                 name: instr_name, menu: [{
-                    name: 'Manage', application: new DRPMgr_Instrument(instr_name, app_config)}]
+                    name: 'Manage', application: new DRPMgr_Instrument(app_config, instr_name)}]
             }) ;
         }
         menus.push ({
-            name: 'Totals', menu: [{
+            name: 'All Instruments', menu: [{
                 name: 'Storage Usage', application: new DRPMgr_Totals(app_config)}]
         }) ;
 
