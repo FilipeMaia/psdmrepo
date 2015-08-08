@@ -1,6 +1,9 @@
 <?php
 
-$title    = 'PCDS' ;
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
+$title    = 'LCLS Controls & Data Systems' ;
 $subtitle = 'Web Tools & Documentation Catalog' ;
 
 $groups = array (
@@ -401,7 +404,7 @@ $groups = array (
 
 <head>
 
-<title><?="{$title} : {$subtitle}"?></title>
+<title><?="{$title}: {$subtitle}"?></title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -414,8 +417,8 @@ $groups = array (
         margin:         0;
         padding:        0;
     }
-    #body {
-        padding:        20px;
+    #top {
+        padding:        0px;
         /*
         font-family:    "Linux Libertine",Georgia,Times,serif;
         */
@@ -428,9 +431,9 @@ $groups = array (
         */
     }
     #header {
-        margin-bottom:      20px;
-        padding:            10px;
-        background-color:   #E0E0E0; /*#A6C9E2;*/
+        padding:            14px;
+        background-color:   #8c1515;
+        color:              #f0f0f0;
         box-shadow:         0 8px 10px rgba(0,0,0,0.36);
     }
     #title {
@@ -446,6 +449,12 @@ $groups = array (
         background-image:   0 !important;
         border-radius:      2px !important;
         border-color:       darkgrey !important;
+    }
+    #center {
+        padding:        20px;
+        padding-top:    10px;
+        overflow-y:     auto;
+        font-family:    'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
     }
     .group {
         float:          left;
@@ -468,7 +477,7 @@ $groups = array (
     }
     .group > .entry > a.link {
         text-decoration:    none;
-        color:              #0071bc;
+        color:              #2e2d29; /*#0071bc;*/
     }
     .group > .entry > a.link:hover {
         color:              #000000;
@@ -492,15 +501,37 @@ $groups = array (
         clear:          both;
     }
     @media screen and (max-width: 800px){
+        #header {
+            box-shadow: none;
+            border:     0;
+        }
         #title {
             font-size:  24px;
+            max-width:  80%;
+        }
+        #center {
+            padding:    0px;
+            border:     0;
         }
         .group {
             float:      none;
-            margin:     10px 0px 10px 0;
+            width:      100%;
+            box-shadow: none;
+            border:     0;
+            margin:     0;
+            padding:    0;
+            padding-bottom: 15px;
         }
         .group > .name {
             font-size:  18px;
+            background-color:   #f0f0f0;
+            background: linear-gradient(#e0e0e0, #ffffff);
+            padding:    10px;
+            margin:     0;
+            border:     0;
+        }
+        .group > .entry {
+            padding: 5px 5px 0px 15px;
         }
         .group > .entry > a.link {
             font-size:  14px;
@@ -641,7 +672,7 @@ $(document).ready(
 </head>
 
 <body>
-    <div id="body" >
+    <div id="top" >
         <div id="header">
             <div id="title" style="float:left;" ><?=$title?> : <?=$subtitle?></div>
             <div id="login" style="float:right;" >
@@ -660,6 +691,8 @@ $(document).ready(
             </div>
             <div style="clear:both;"></div>
         </div>
+    </div>
+    <div id="center" >
 <?php   foreach ($groups as $g) { ?>
         <div class="group" >
             <div class="name" ><?=$g['name']?></div>

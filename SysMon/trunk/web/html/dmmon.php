@@ -1,5 +1,8 @@
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 require_once 'authdb/authdb.inc.php' ;
 require_once 'regdb/regdb.inc.php' ;
 
@@ -8,6 +11,12 @@ use RegDB\RegDB ;
 
 $title    = 'System Monitoring' ;
 $subtitle = 'Data Movers' ;
+
+AuthDB::instance()->begin() ;
+$is_data_administrator = AuthDB::instance()->hasPrivilege(
+    AuthDB::instance()->authName() ,
+    null ,
+    'StoragePolicyMgr', 'edit') ;
 
 RegDB::instance()->begin() ;
 $instruments = array() ;
@@ -53,7 +62,9 @@ var app_config = {
 
     instruments: <?php echo json_encode($instruments) ?> ,
 
-    no_page_access_html:
+    access_control: {
+        can_edit: <?php echo $is_data_administrator ? 1 : 0 ?> ,
+        no_page_access_html:
 '<br><br>' +
 '<center>' +
 '  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">' +
@@ -62,7 +73,8 @@ var app_config = {
 '</center>' +
 '<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">' +
 '  We\'re sorry! Our records indicate that your SLAC UNIX account has no proper permissions to access this page.' +
-'</div>' ,
+'</div>'
+    } ,
 
     select_app:          '<?=$select_app?>' ,
     select_app_context1: '<?=$select_app_context1?>' ,

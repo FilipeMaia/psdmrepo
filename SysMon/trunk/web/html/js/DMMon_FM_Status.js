@@ -386,11 +386,11 @@ function (
                     this._wa().find('#files') ,
                     hdr ,
                     rows ,
-                    {
-                        default_sort_column:  4 ,           /* created */
+                    {   default_sort_column:  4 ,           /* created */
                         default_sort_forward: false ,       /* sort in ascending order */
                         text_when_empty:      null
-                    }) ;
+                    }
+                ) ;
                 this._table_obj.display() ;
             }
             return this._table_obj ;

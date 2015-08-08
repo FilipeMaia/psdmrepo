@@ -4,22 +4,10 @@ namespace SysMon ;
 
 require_once 'sysmon.inc.php' ;
 
-if (PHP_VERSION_ID < 50400) {
-    /*
-     * This interface was formally introduced in PHP 5.4 for
-     * better control over what gets serialized into the JSON format.
-     */
-    if (!interface_exists ('\SysMon\JsonSerializable', false)) {
-        interface JsonSerializable {
-            public function jsonSerialize () ;
-        }
-    }
-}
-
 /**
  * An abstraction for the file migration delay events.
  */
-class SysMonFMDelayEvent implements JsonSerializable {
+class SysMonFMDelayEvent {
 
     // Object parameters
 

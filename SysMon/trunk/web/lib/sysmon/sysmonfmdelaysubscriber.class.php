@@ -10,22 +10,10 @@ require_once 'regdb/regdb.inc.php' ;
 use \LusiTime\LusiTime ;
 use \RegDB\RegDB ;
 
-if (PHP_VERSION_ID < 50400) {
-    /*
-     * This interface was formally introduced in PHP 5.4 for
-     * better control over what gets serialized into the JSON format.
-     */
-    if (!interface_exists ('\SysMon\JsonSerializable', false)) {
-        interface JsonSerializable {
-            public function jsonSerialize () ;
-        }
-    }
-}
-
 /**
  * An abstraction for the file migration delay subscribers.
  */
-class SysMonFMDelaySubscriber implements JsonSerializable  {
+class SysMonFMDelaySubscriber {
 
     // Object parameters
 
@@ -114,19 +102,9 @@ class SysMonFMDelaySubscriber implements JsonSerializable  {
         $obj->last_sec  = $this->last_sec ;
         $obj->delay_sec = $this->delay_sec ;
 
-        if (PHP_VERSION_ID < 50400) {
-            /*
-             * JSON-ready object serialization control is provided
-             * through a special interface JsonSerializable as
-             * of PHP 5.4. The method jsonSerialize will return \stdClass
-             * object with members ready for the JSON serialization.
-             * Until that we have to call this method explicitly.
-             */
-            $obj->events = array() ;
-            foreach ($this->events() as $e)
-                array_push($obj->events, $e->jsonSerialize()) ;
-        } else {
-            $obj->events = $this->events() ;
+        $obj->events = array() ;
+        foreach ($this->events() as $e) {
+            array_push($obj->events, $e->jsonSerialize()) ;
         }
         return $obj ;
     }
