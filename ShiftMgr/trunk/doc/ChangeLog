@@ -11,6 +11,9 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
 
 Tag: V00-02-03
 2015-04-16 Igor Gaponenko

@@ -25,7 +25,7 @@ function export_shifts2excel ($shifts, $user) {
     require_once 'PHPExcel.php' ;
 
     $file = "LCLS_Shift_Report_".(LusiTime::now()->sec).".xlsx";
-    $path = "/tmp/shiftmgr/".$file;
+    $path = "/tmp/".$file;
 
     $title = 'Title' ;
 
@@ -153,12 +153,12 @@ function export_shifts2excel ($shifts, $user) {
  *   <range> [<begin>] [<end>] [<stopper>] [<door>] [<lcls>] [<daq>] [<instruments>] [<types>]
  */
 \DataPortal\Service::run_handler('GET', function($SVC) {
-
-    $user = $SVC->regdb()->find_user_account($SVC->authdb()->authName()) ;
-    
-    $shifts = Utils::query_shifts($SVC) ;
-
-    export_shifts2excel($shifts, $user) ;
+    export_shifts2excel (
+        Utils::query_shifts($SVC) ,
+        $SVC->regdb()->find_user_account (
+            $SVC->authdb()->authName()
+        )
+    ) ;
 }) ;
 
 ?>
