@@ -1,0 +1,24 @@
+span.toggler {
+    background-color:   #ffffff;
+    border:             1px solid #c0c0c0;
+    border-radius:      4px;
+    -moz-border-radius: 4px;
+    cursor:             pointer;
+}
+
+button.control-button,
+label.control-label {
+    font-size:  10px    !important;
+    color:      black   !important;
+}
+button.control-button-important {
+    color:      red     !important;
+}
+button.control-button-small {
+    font-size:  9px     !important;    
+}
+
+button {
+    background:         rgba(240, 248, 255, 0.39)   !important;
+    border-radius:      2px                         !important;
+}

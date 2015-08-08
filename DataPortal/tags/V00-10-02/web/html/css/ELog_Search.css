@@ -1,0 +1,59 @@
+#elog-search {
+  padding: 0;
+}
+
+#elog-search > #ctrl > #tabs {
+  padding-top: 0px;
+  background: 0;
+  font-size: 11px;
+}
+#elog-search > #ctrl > #tabs > ul {
+  background: #f5f8f9 url(images/ui-bg_inset-hard_100_f5f8f9_1x100.png) 50% 50% repeat-x;
+}
+#elog-search > #ctrl > #tabs > ul > li {
+  border-radius: 0 !important;
+}
+
+#elog-search > #ctrl .search-dialog {
+  min-height: 96px;
+  /*
+  border-bottom: 1px solid #c0c0c0;
+  */
+  border-left: 1px solid #c0c0c0;
+  padding: 20px 10px 10px 20px;
+  background-color: #ffffff;
+  font-size: 12px;
+}
+#elog-search #ctrl .search-dialog span.label {
+  display: block;
+  margin-bottom: 5px;
+  margin-right: 10px;
+  font-weight: bold;
+}
+#elog-search #ctrl .search-dialog input[type="text"],
+#elog-search #ctrl .search-dialog select {
+  display: block;
+  margin-bottom: 5px;
+  margin-right: 10px;
+}
+
+#elog-search #ctrl .search-dialog input[name="text2search"] {
+  width: 100%;
+}
+
+#elog-search #ctrl .search-dialog .group {
+  float: left;
+  margin-right: 20px;
+}
+#elog-search #ctrl .search-dialog .buttons {
+  margin-left: 20px;
+  padding-top: 19px;
+}
+
+#elog-search > #body {
+  padding: 10px 20px 10px 20px;
+}
+
+#elog-search .info {
+  color: maroon;
+}

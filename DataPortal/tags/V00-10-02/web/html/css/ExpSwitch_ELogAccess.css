@@ -1,0 +1,41 @@
+#expswitch-elog {
+  padding: 20px;
+}
+
+#expswitch-elog > #body {
+  margin-top: 10px;
+}
+#expswitch-elog body #operator {
+  margin-top: 5px;
+  padding-left: 10px;
+  max-width: 640px;
+}
+#expswitch-elog #operator > h2 {
+  margin-top: 5px;
+}
+#expswitch-elog #operator > div {
+  margin-top: 10px;
+  padding-left: 20px;
+}
+#expswitch-elog #operator p {
+  max-width: 640px;
+  margin-bottom: 15px;
+}
+#expswitch-elog #operator p span,
+#expswitch-elog #operator p a
+{
+  font-weight:bold;
+  white-space:nowrap;
+}
+#expswitch-elog #operator > div > button[name='remove'] {
+  margin-left: 10px;
+  color: red;
+}
+#expswitch-elog #operator > div > #checktable {
+  margin-top: 15px;
+}
+
+#expswitch-elog .info {
+  color: maroon;
+}
+
