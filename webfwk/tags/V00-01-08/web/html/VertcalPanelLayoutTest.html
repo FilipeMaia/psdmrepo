@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>TODO supply a title</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<script src="/jquery/js/jquery-1.8.2.js"></script>
+
+<style>
+body {
+    margin: 0;
+    padding:20px;
+}
+div#plots {
+    width:  100%;
+    background-color:   #f8f8f8;
+}
+div#selector {
+    float:  left;
+}
+div#selector > div.item {
+    padding:    6px;
+    width:      56px;
+    border-bottom:  solid 1px #d0d0d0;
+    border-right:   solid 1px #d0d0d0;
+    text-align:     left;
+    background-color:   aliceblue;
+}
+div#selector > div.item:last-child {
+    border-bottom-color:  #f8f8f8;
+}
+div#selector > div.item.active {
+    border-right-color: #f8f8f8;
+    background-color:   initial;
+    font-weight:    bold;
+}
+div#selector > div.item.active:last-child {
+    border-bottom-color:   #f8f8f8;
+}
+div#selector > div.item:hover {
+    background-color:   #d0e5f5;
+    cursor: pointer;
+}
+div#selector > div.item.active:hover {
+    background-color:   #f8f8f8;
+    cursor: initial;
+}
+div#area {
+    float:  left;
+    width:  400px;
+    height: 600px;
+}
+div#end  {
+    clear:  both;
+}
+
+</style>
+
+<script>
+$(function () {
+    $('.item').click(function() {
+        var item = $(this) ;
+        if (item.hasClass('active')) return ;
+        $('.item.active').removeClass('active') ;
+        item.addClass('active') ;
+    }) ;
+}) ;
+</script>
+
+</head>
+<body>
+  <div id="plots">
+    <div id="selector">
+      <div class="item active" title="Time series plot">T<sub>series</sub></div>
+      <div class="item"        title="Waveforms">W<sub>form</sub></div>
+      <div class="item"        title="Correlation plots">C<sub>plot</sub></div>
+      <div class="item"        title="Histograms">H-gram</div>
+      <div class="item"        title="Detailed information on PVs">Info</div>
+    </div>
+    <div id="area">&nbsp;</div>
+    <div id="end"></div>
+  </div>
+</body>
+</html>

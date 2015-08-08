@@ -1,0 +1,131 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package webfwk
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-08
+2015-08-07 Igor Gaponenko
+- minor improvements in widgets
+
+Tag: V00-01-07
+2015-04-23 Igor Gaponenko
+- extended widget CheckTable to allow registering a callback function
+on changes made to the object state
+- moved _ASSERT and _PROP methods which are used to parse widget configuration
+options from CheckTable into it sbase class Widget. This will allow using
+these methods from any derived widgets.
+- added three new widgets: Checkbox, SelectOption and TextInput. The widgets
+allow to be configured with an optional persistent state backend (to save
+teh state on each change and to restore it upon an initialization).
+- fixed a minor bug in the Framework
+
+Tag: V00-01-06
+2015-04-16 Igor Gaponenko
+- fixed a memory leak bug in SmartTable widget
+- added a test for memory leaks
+- improved styling for tooltips
+
+Tag: V00-01-05
+2015-03-10 Igor Gaponenko
+- added group headers and fancy annotation to the PropList widget
+- added another demo for SmartTable widget
+
+Tag: V00-01-04
+2015-02-26 Igor Gaponenko
+- minor changes in CSS (size and colors)
+
+Tag: V00-01-03
+2014-12-08 Igor Gaponenko
+- minor changes in CSS (fonts)
+
+Tag: V00-01-02
+2014-10-24 Igor Gaponenko
+- new dynamuically loadable module SimpleTable to replace Table as per JIRA
+ticket PSWA-16. Also added a test for the new class.
+- extended FwkApplication to be aware about its "path": application/tab name,
+context1, and context2 (when last two are awailable)
+- minor modification to the CSS loading mechanism to prevent pages from
+styaing in browser caches forever as per JIRA ticket PSWA-14
+
+Tag: V00-01-01
+2014-10-10 Igor Gaponenko
+- code cleanup
+- smart table widget
+- continued RequireJS migration
+- minor extention to the Fwk API
+
+Tag: V00-01-00
+2014-05-21 Igor Gaponenko
+- imajor refactoring to migrate to the component model based on RequireJS (AMD)
+
+Tag: V00-00-11
+2014-05-17 Igor Gaponenko
+- loader for CSS files
+
+Tag: V00-00-10
+2014-05-16 Igor Gaponenko
+- extended API and other improvements in classes RadioBox and CheckTable
+
+Tag: V00-00-09
+2014-04-30 Igor Gaponenko
+- moved in javascript libraries from other refactored packages
+
+Tag: V00-00-08
+2014-04-22 Igor Gaponenko
+- added new classes: PropList, CheckTable
+- moved in the test for Table
+- fixed a bug in StackOfRows
+
+Tag: V00-00-07
+2014-03-17 Igor Gaponenko
+- reinforced CSS to address an issue with Google Chrome
+- fixed bugs in the StackOfRows
+- added a new widget: RadioBox
+
+Tag: V00-00-06
+2014-03-02 Igor Gaponenko
+- improved implementation of Fwk and widgets
+
+Tag: V00-00-05
+2013-12-13 Igor Gaponenko
+- implemented SmartTAble JS class
+- improved version of teh StackOfRows and Fwk
+
+Tag: V00-00-04
+2013-11-15 Igor Gaponenko
+- fixed bugs in StackOfRows
+- extended implementation of StackOfRows (many improvements)
+
+Tag: V00-00-03
+2013-11-01 Igor Gaponenko
+- fixed bugs in Fwk
+- extended Table.display() to allow hiding/showing columns
+- style improvements for Stack and Table
+- hosted jquery.resize.js plugin
+- experiments with decorated_table (plans for adding "smart" header to Table)
+
+Tag: V00-00-02
+2013-10-11 Igor Gaponenko
+- added support for configurable toolbar
+- minor improvements in the Table widget
+
+Tag: V00-00-01
+2013-08-21 Igor Gaponenko
+- added a hierarchy of JavaScript base classes and widgets
+- moved in Fwk.js and its CSS
+- moved in Table.js and its CSS
+- extended API and improved implementation of the StackOfRos.js
+- fixed bugs in Fwk.js
+- refactored Fwk.js and changed the API for describing applications
+- moved in the test of Fwk
+- moved in Web serviced for server-side configuration of the Fwk-based applications
+and testing Fwk
+- moved in an icon for the Fwk PRINTER button
