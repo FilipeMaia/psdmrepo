@@ -2,6 +2,9 @@
 <project-private xmlns="http://www.netbeans.org/ns/project-private/1">
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
-        <group name="PCDS Web Apps"/>
+        <group name="PCDS Web Apps">
+            <file>file:/N:/lcls/releases/pswww-apps-dev/NeoCaptar/web/html/ws/cable_search.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/NeoCaptar/web/html/index.php</file>
+        </group>
     </open-files>
 </project-private>
