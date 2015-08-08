@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-02
+2015-08-07 Igor Gaponenko
+- improved error reporting in the ServiceJSON
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
 Tag: V00-10-01
 2015-06-27 Igor Gaponenko
 - fixed bugs and finished implementing HDF5 Translation service configuration.

@@ -9,6 +9,15 @@ use \LusiTime\LusiTime;
 
 class ServiceJSON {
 
+    private static function _exception2HTML ($e) {
+        $html =
+'<div style="color:red;">'.$e->getMessage().'</div>' ;
+        foreach ($e->getTrace() as $t) {
+            $html .=
+'<div>'.$t['file'].':'.$t['line'].'</div>' ;
+        }
+        return $html ;
+    }
     public static function run_handler ($method, $body, $options=array()) {
         try {
             $svc = new ServiceJSON ($method, $options) ;
@@ -16,7 +25,8 @@ class ServiceJSON {
                                             // or chose to return result using 'return'.
         } catch( \Exception $e ) {
             ServiceJSON::report_error (
-                $e.'<pre>'.print_r($e->getTrace(), true).'</pre>' ,
+//                $e.'<pre>'.print_r($e->getTrace(), true).'</pre>' ,
+                ServiceJSON::_exception2HTML($e) ,
                 array () ,
                 $options
             ) ;

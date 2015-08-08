@@ -1,5 +1,8 @@
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 // Let a user to select an experiment first if no valid experiment
 // identifier is supplied to the script.
 

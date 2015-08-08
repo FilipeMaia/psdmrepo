@@ -1,5 +1,7 @@
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
 
 // Extend the default 30 seconds limit becase the script has to harvest a lot
 // of data from various sources.

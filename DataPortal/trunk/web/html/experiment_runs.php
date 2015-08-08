@@ -1,5 +1,8 @@
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 /*
  * This script is used as a web service to get the information about
  * an experiment from LogBook.

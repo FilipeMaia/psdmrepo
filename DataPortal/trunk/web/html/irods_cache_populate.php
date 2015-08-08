@@ -12,6 +12,9 @@
 
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );
