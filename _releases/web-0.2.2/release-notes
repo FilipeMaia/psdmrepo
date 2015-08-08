@@ -1,3 +1,0 @@
-- upgraded boost to version 1.55.0 to allow building for RHEL7
-- upgraded SConsTools for RHEL7 support
-- also build for RHEL7
