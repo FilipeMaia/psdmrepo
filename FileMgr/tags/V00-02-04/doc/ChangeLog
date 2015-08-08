@@ -1,0 +1,117 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package FileMgr
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-04
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+- bug fix in the IRODS WS
+- minor code cleanup
+
+Tag: V00-02-03
+2015-06-19 Wilko Kroeger
+- Use the fully qualified name for psww in the default url
+	
+Tag: V00-02-02
+2015-03-10 Igor Gaponenko
+- add support for numeric types in the Interface Controller
+Database API
+- fixed two bugs in the implementation of the Interface Controller
+Web Service client
+
+Tag: V00-02-01
+2014-10-10 Igor Gaponenko
+- added two Web services for the NERSC data management folks: placed, runstat
+- minor code clean up in one PHP file
+
+Tag: V00-02-00
+2014-04-30 Igor Gaponenko
+- moved javascript libraries to package webfwk/
+- moinor package cleanup
+
+Tag: V00-01-05
+2013-11-01 Igor Gaponenko
+- fixed a bug in filemgrifacectrlws
+
+Tag: V00-01-04
+2013-10-17 Igor Gaponenko
+- extended the FileMgrException class to carry errno() as the third property where this applies
+- modified the DbConnection class to return errno() of MySQL errors
+
+Tag: V00-01-03
+2013-06-18 Igor Gaponenko
+- extended the file status report to return the file size (if known) from iRODS File Catalog
+- modified the Python module and its ezample accordingly
+- fixed a bug in the older Explorer application
+
+Tag: V00-01-02
+2012-11-08 Igor Gaponenko
+- migrated file service to the new framework
+- extended contract API of the database connection class
+
+Tag: V00-01-01
+2012-10-11 Igor Gaponenko
+- get rid of TABs in one file
+
+Tag: V00-01-00
+2012-10-08 Igor Gaponenko
+- major code re-organization to separate Web services, JavaScript code and CSS
+into dedicated subdirectories
+
+Tag: V00-00-12
+2012-08-14 Igor Gaponenko
+- added a utility class to make REST requeste from PHP
+- extended an class to iRODS File Manager
+
+Tag: V00-00-11
+2012-05-21 Igor Gaponenko
+- fixed a bug in the Web service
+
+Tag: V00-00-10
+2012-04-23 Igor Gaponenko
+- added Web service GetExtendedFileStatusJSON.php to be used by ONLINE
+cleanup script to determine which files are safe to be removed from DSS
+nodes
+- added Python module file_status for inquering file status from the Data Manager
+using the above mentiond Web service. Also added a simple test script.
+
+Tag: V00-00-09
+2011-11-17 Igor Gaponenko
+- migrated to NetBeans IDE
+
+Tag: V00-00-08
+2011-06-10 Igor Gaponenko
+- fixed bugs preventing File Explorer from seeing files info of "future" experiments
+
+Tag: V00-00-07
+2011-05-13 Igor Gaponenko
+- bug fix in the Interface Controller Web service
+
+Tag: V00-00-06
+2011-02-25 Igor Gaponenko
+- bug fixes
+
+Tag: V00-00-05
+2010-10-20 Igor Gaponenko
+- added Interface Controller service
+- added HDF5 translation monitor
+- added FileMgrConfig.inc.php
+
+Tag: V00-00-03
+2010-07-20 Igor Gaponenko
+- correct error processing in iRODS web service interaction class
+
+Tag: V00-00-01
+2010-01-04 Igor Gaponenko
+- the first (yet to be finished) implementation of the experimental data
+and iRODS catalogs exporers
+
