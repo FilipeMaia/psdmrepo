@@ -64,7 +64,7 @@ def main():
     publish.local = args.local
     publish.client_opts.daemon = True
 
-    shelp = StripHelper(publish.send, topic, points, title="Strip Chart Test")
+    shelp = StripHelper(topic, points, title="Strip Chart Test")
 
     counter = 0
     while counter < max_updates or max_updates < 1:

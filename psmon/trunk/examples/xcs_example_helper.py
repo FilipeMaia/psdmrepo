@@ -19,8 +19,8 @@ def main():
         expname='exp=%s:run=%s'%(exp, run)
 
     input_srcs = [
-        (Source('DetInfo(XcsBeamline.1:Tm6740.5)'), Camera.FrameV1, Camera.FrameV1.data16, ImageHelper(publish.send, 'yag5', pubrate=myrate)),
-        (Source('DetInfo(XcsEndstation.1:Opal1000.1)'), Camera.FrameV1, Camera.FrameV1.data16, ImageHelper(publish.send, 'xcs-spectrometer', pubrate=myrate)),
+        (Source('DetInfo(XcsBeamline.1:Tm6740.5)'), Camera.FrameV1, Camera.FrameV1.data16, ImageHelper('yag5', pubrate=myrate)),
+        (Source('DetInfo(XcsEndstation.1:Opal1000.1)'), Camera.FrameV1, Camera.FrameV1.data16, ImageHelper('xcs-spectrometer', pubrate=myrate)),
     ]
     ipimb_srcs = [
         (
@@ -28,7 +28,6 @@ def main():
             Lusi.IpmFexV1,
             Lusi.IpmFexV1.channel,
             XYPlotHelper(
-                publish.send,
                 'xcs-ipm-02-0v2',
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
@@ -36,7 +35,6 @@ def main():
                 pubrate=myrate
             ),
             HistHelper(
-                publish.send,
                 'xcs-ipm-02-hist0',
                 100,
                 0.0,
@@ -51,7 +49,6 @@ def main():
             Lusi.IpmFexV1,
             Lusi.IpmFexV1.channel,
             XYPlotHelper(
-                publish.send,
                 'xcs-ipm-04-0v2',
                 xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
                 ylabel={'axis_title': 'chan 2', 'axis_units': 'V'},
@@ -59,7 +56,6 @@ def main():
                 pubrate=myrate
             ),
             HistHelper(
-                publish.send,
                 'xcs-ipm-04-hist0',
                 100,
                 0.0,
@@ -70,9 +66,8 @@ def main():
             ),
         ),
     ]
-    multi_image_helper = MultiImageHelper(publish.send, 'xcs-multi-image', 2, pubrate=myrate)
+    multi_image_helper = MultiImageHelper('xcs-multi-image', 2, pubrate=myrate)
     over_histo_helper = HistOverlayHelper(
-        publish.send,
         'xcs-overlay-histo',
         xlabel={'axis_title': 'chan 0', 'axis_units': 'V'},
         ylabel={'axis_title': 'shots'},

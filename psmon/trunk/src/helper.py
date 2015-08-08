@@ -1,17 +1,18 @@
 import time
 import numpy as np
 
+from psmon import publish
 from psmon.util import make_bins
 from psmon.plots import Image, MultiPlot, Hist, XYPlot
 
 
 class Helper(object):
-    def __init__(self, publisher, topic, title=None, pubrate=None):
-        self.publisher = publisher
+    def __init__(self, topic, title=None, pubrate=None, publisher=None):
         self.topic = topic
         self.data = None
         self.title = title or self.topic
         self.pubrate = pubrate
+        self.publisher = publisher or publish.send
         self.__last_pub = time.time()
 
     def publish(self):
@@ -22,8 +23,8 @@ class Helper(object):
 
 
 class MultiHelper(Helper):
-    def __init__(self, publisher, topic, num_data, title=None, pubrate=None):
-        super(MultiHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, num_data, title=None, pubrate=None, publisher=None):
+        super(MultiHelper, self).__init__(topic, title, pubrate, publisher)
         self.data = MultiPlot(None, self.title, [None] * num_data)
 
     def set_data(self, index, type, *args, **kwargs):
@@ -31,8 +32,8 @@ class MultiHelper(Helper):
 
 
 class ImageHelper(Helper):
-    def __init__(self, publisher, topic, title=None, pubrate=None):
-        super(ImageHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, title=None, pubrate=None, publisher=None):
+        super(ImageHelper, self).__init__(topic, title, pubrate, publisher)
         self.data = Image(None, self.title, None)
 
     def set_image(self, image, image_title=None):
@@ -42,16 +43,16 @@ class ImageHelper(Helper):
 
 
 class MultiImageHelper(MultiHelper):
-    def __init__(self, publisher, topic, num_image, title=None, pubrate=None):
-        super(MultiImageHelper, self).__init__(publisher, topic, num_image, title=None, pubrate=None)
+    def __init__(self, topic, num_image, title=None, pubrate=None, publisher=None):
+        super(MultiImageHelper, self).__init__(topic, num_image, title, pubrate, publisher)
 
     def set_image(self, index, image, image_title=None):
         self.set_data(index, Image, image_title, None, image)
 
 
 class StripHelper(Helper):
-    def __init__(self, publisher, topic, npoints, title=None, xlabel=None, ylabel=None, format='-', pubrate=None):
-        super(StripHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, npoints, title=None, xlabel=None, ylabel=None, format='-', pubrate=None, publisher=None):
+        super(StripHelper, self).__init__(topic, title, pubrate, publisher)
         self.index = 0
         self.npoints = npoints
         self.xdata = np.arange(npoints)
@@ -89,8 +90,8 @@ class StripHelper(Helper):
 class XYPlotHelper(Helper):
     DEFAULT_ARR_SIZE = 100
 
-    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, format='-', pubrate=None):
-        super(XYPlotHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, title=None, xlabel=None, ylabel=None, format='-', pubrate=None, publisher=None):
+        super(XYPlotHelper, self).__init__(topic, title, pubrate, publisher)
         self.index = 0
         self.xdata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
         self.ydata = np.zeros(XYPlotHelper.DEFAULT_ARR_SIZE)
@@ -122,8 +123,8 @@ class XYPlotHelper(Helper):
 
 
 class HistHelper(Helper):
-    def __init__(self, publisher, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='-', pubrate=None):
-        super(HistHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, nbins, bmin, bmax, title=None, xlabel=None, ylabel=None, format='-', pubrate=None, publisher=None):
+        super(HistHelper, self).__init__(topic, title, pubrate, publisher)
         self.nbins = int(nbins)
         self.bmin = float(bmin)
         self.bmax = float(bmax)
@@ -148,8 +149,8 @@ class HistHelper(Helper):
 
 
 class HistOverlayHelper(Helper):
-    def __init__(self, publisher, topic, title=None, xlabel=None, ylabel=None, pubrate=None):
-        super(HistOverlayHelper, self).__init__(publisher, topic, title, pubrate)
+    def __init__(self, topic, title=None, xlabel=None, ylabel=None, pubrate=None, publisher=None):
+        super(HistOverlayHelper, self).__init__(topic, title, pubrate, publisher)
         self.nhist = 0
         self.nbins = []
         self.ranges = []
