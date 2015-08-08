@@ -22,7 +22,7 @@ function export_equipment2excel ($equipment, $user) {
     require_once 'PHPExcel.php' ;
 
     $file = "PCDS_Equipment_Report_".(LusiTime::now()->sec).".xlsx";
-    $path = "/tmp/irep/".$file;
+    $path = "/tmp/".$file;
 
     $title = 'Title' ;
 
@@ -137,7 +137,11 @@ function export_equipment2excel ($equipment, $user) {
 \DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     $format = $SVC->required_str('format') ;
     if ($format === 'excel') {
-        export_equipment2excel(\Irep\IrepUtils::find_equipment($SVC)) ;
+        export_equipment2excel (
+            \Irep\IrepUtils::find_equipment($SVC) ,
+            $SVC->regdb()->find_user_account (
+                $SVC->authdb()->authName()
+            )) ;
     }
     $SVC->abort("unsupported export format: '{$format}'") ;
 }) ;
