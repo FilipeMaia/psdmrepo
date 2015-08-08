@@ -50,8 +50,6 @@ class IfaceCtrlDb extends DbConnection {
         'STANDARD'   => 'AUTO_TRANSLATE_HDF5' ,
         'MONITORING' => 'FFB_AUTO_TRANSLATE_HDF5'
     ) ;
-    public static $DATASET_FFB             = 'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/ffb/%(instrument_lower)s/%(experiment)s/xtc' ;
-    public static $DATASET_PSDM            = 'exp=%(instrument)s/%(experiment)s:run=%(run_number)d:live:dir=/reg/d/psdm/%(instrument_lower)s/%(experiment)s/xtc' ;
 
     /**
      * Singleton to simplify certain operations.

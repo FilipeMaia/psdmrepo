@@ -21,6 +21,8 @@ ini_set("memory_limit","256M");
 
 use \stdClass;
 
+define ('ATIME_SHIFT',   100*1000*1000) ;
+
 /*
  * The helper utility class to deal with iRODS Database
  */
@@ -149,6 +151,7 @@ class FileMgrIrodsDb extends DbConnection {
             $f->checksum = $row['data_checksum'];
             $f->collName = $collection_name;
             $f->ctime    = $row['create_ts'];
+            $f->atime    = $row['data_expiry_ts'] ? $row['data_expiry_ts'] - ATIME_SHIFT : $f->ctime ;
             $f->datamode = $row['data_mode'];
             $f->id       = $row['data_id'];
             $f->mtime    = $row['modify_ts'];

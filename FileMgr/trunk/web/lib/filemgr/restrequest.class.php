@@ -130,10 +130,7 @@ class RestRequest {
         if ($this->username !== null && $this->password !== null) {
             curl_setopt($curlHandle, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
             curl_setopt($curlHandle, CURLOPT_USERPWD, $this->username . ':' . $this->password);
-            // The next option is needed to bypass strict checking of the SSL certificate
-            // against the server DNS name. This is useful when doing load balancing
-            // or using Virtual IP mapping on the server side.
-            curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 1);
+            curl_setopt($curlHandle, CURLOPT_SSL_VERIFYHOST, 2);
         }
     }
     public function getAcceptType   ()            { return $this->acceptType;                 }

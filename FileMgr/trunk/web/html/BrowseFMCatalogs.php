@@ -23,6 +23,9 @@ and open the template in the editor.
 
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 $path = '';
 if( isset( $_GET['path'] )) $path = $_GET['path'];
 
