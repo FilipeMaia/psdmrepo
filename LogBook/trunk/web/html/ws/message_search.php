@@ -107,7 +107,7 @@ function sort_and_truncate_from_head ($SVC, &$entries_by_timestamps, $limit) {
 
     $limit_num = null ;
     $unit      = null ;
-    if (2 == sscanf($limit, "%d%s", $limit_num, &$unit)) {
+    if (2 == sscanf($limit, "%d%s", $limit_num, $unit)) {
 
         $nsec_ago = 1000000000 * $limit_num ;
         switch ($unit) {

@@ -1,5 +1,8 @@
 <?php
 
+# Needed to supress complains in the server's log files
+date_default_timezone_set('America/Los_Angeles') ;
+
 /*
  * Request redirector from the legacy Logbook to the Web Portal.
  */

@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-09
+2015-07-08 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
 Tag: V01-00-08
 2015-06-27 Igor Gaponenko
 - added 'Begin Time' and 'End Time' options to the 'Run Info' group
