@@ -1,0 +1,47 @@
+#drpmgr-exceptions {
+    padding:        10px;
+    padding-left:   20px;
+}
+#drpmgr-exceptions .info {
+    color:      maroon;
+}
+#drpmgr-exceptions .info#info {
+    font-size:  18px;
+}
+#drpmgr-exceptions > #notes {
+    max-width:      650px;
+}
+#drpmgr-exceptions > #notes > p {
+    margin: 0px;
+    margin-bottom:  10px;
+}
+#drpmgr-exceptions > #notes > p:last-child {
+    margin-bottom:  0px;
+}
+#drpmgr-exceptions > #buttons {
+    margin-left:    20px;
+}
+#drpmgr-exceptions #buttons button[name="update"] img {
+    width:      11px;
+}
+#drpmgr-exceptions > #experiments {
+    margin-top: 20px;
+}
+
+#drpmgr-exceptions .control-button[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-family: 'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  text-align: left;
+}

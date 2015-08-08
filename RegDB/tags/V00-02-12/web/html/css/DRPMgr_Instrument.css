@@ -1,0 +1,111 @@
+.drpmgr-instrument {
+    padding-left:   20px;
+}
+.drpmgr-instrument .info {
+    color:          maroon;
+}
+.drpmgr-instrument .info#updated {
+    margin-top:     10px;
+    margin-right:   10px;
+}
+.drpmgr-instrument > #ctrl {
+}
+.drpmgr-instrument > #ctrl > .control-group {
+    float:          left;
+    margin-right:   20px;
+}
+.drpmgr-instrument > #ctrl > .control-group
+                           > .control-group-title {
+    font-size:      12px;
+    font-weight:    bold;
+}
+.drpmgr-instrument > #ctrl > .control-group
+                           > .control-group-selector {
+    margin-top: 5px;
+}
+.drpmgr-instrument > #ctrl > .control-group
+                           > .control-group-selector
+                           > input[type="text"] {
+    width:  100%;
+}
+.drpmgr-instrument > #ctrl > .control-group-end {
+    clear:  both;
+}
+.drpmgr-instrument > #ctrl > .control-group-buttons {
+    margin-left:    30px;
+    margin-right:   0;
+    padding-top:    5px;
+}
+.drpmgr-instrument > #ctrl > .control-group button {
+    margin-top: 10px;
+}
+.drpmgr-instrument > #ctrl > .control-group button[name="update"] img {
+    width:      11px;
+}
+
+/*
+ * These rules apply to all tabs and panels found witin
+ * the application.
+ */
+.drpmgr-instrument > #tabs,
+.drpmgr-instrument > #tabs #tabs {
+    margin-top:     25px;
+    font-size:      11px;
+}
+.drpmgr-instrument > #tabs       > ul > li,
+.drpmgr-instrument > #tabs #tabs > ul > li {
+    -webkit-border-radius:  0;
+    -moz-border-radius:     0;
+    -khtml-border-radius:   0;
+    border-radius:          0;
+}
+.drpmgr-instrument > #tabs .tab-cont {
+    border:         solid 1px #b0b0b0;
+    padding:        25px;
+}
+.drpmgr-instrument > #tabs .tab-cont .experiment {
+    padding:        10px;
+    padding-top:    5px;
+}
+
+
+
+
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info {
+    font-size:      13px;
+}
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info > .param,
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info > .value {
+    float:          left;
+    padding-right:  10px;
+}
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info > .param {
+    font-weight:    bold;
+}
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info > .end {
+    clear:          both;
+}
+.drpmgr-instrument > #tabs .tab-cont .experiment > #tabs {
+    margin-top:     20px;
+}
+.drpmgr-instrument > #ctrl > .control-group button[data]:hover:after,
+.drpmgr-instrument > #ctrl > .control-group[data]:hover:after,
+.drpmgr-instrument > #tabs .tab-cont .experiment button[data]:hover:after,
+.drpmgr-instrument > #tabs .tab-cont .experiment > .experiment_info > .value[data]:hover:after {
+    content:    attr(data);
+    padding:    8px;
+    color:      #000000;
+    position:   absolute;
+    left:       -20;
+    top:        -60;
+    white-space: pre;
+    max-width:  520px;
+    z-index:    2;
+    border-radius:      3px ;
+    background-color:    lemonchiffon;
+    font-family:    'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+    font-weight:    normal;
+    font-size:      12px;
+    text-align:     left;
+}
+
