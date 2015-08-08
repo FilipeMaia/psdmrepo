@@ -1,0 +1,86 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package ShiftMgr
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-04
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
+Tag: V00-02-03
+2015-04-16 Igor Gaponenko
+- minor improvements in the UI to make the shifts table a bit less wide
+
+Tag: V00-02-02
+2014-10-24 Igor Gaponenko
+- modified a configuration of the module loader (RequireJS) as per JIRA ticket
+PSWA-14 to prevent pages from staying in browser caches forever.
+
+Tag: V00-02-01
+2014-10-10 Igor Gaponenko
+- minor code cleanup
+
+Tag: V00-02-00
+2014-05-21 Igor Gaponenko
+- nearly completed migration to the component model using RequireJS
+
+Tag: V00-01-09
+2014-04-30 Igor Gaponenko
+- minor package cleanup
+
+Tag: V00-01-08
+2014-04-22 Igor Gaponenko
+- fixed layout in CSS to deal with a bug in Chrome
+
+Tag: V00-01-07
+2014-03-17 Igor Gaponenko
+- extended the application to report experiments being active during a shift
+
+Tag: V00-01-06
+2013-12-13 Igor Gaponenko
+- reinforced application logic to deal with the DayLight savings switches
+
+Tag: V00-01-05
+2013-10-17 Igor Gaponenko
+- reinforced the automated procedure for creating shifts to avoid duplicates
+- increased the auto-refresh interval for shifts to 30 seconds
+- moniro code refactoring in JavaScript classes
+
+Tag: V00-01-04
+2013-10-11 Igor Gaponenko
+- the first stable version of the application
+
+Tag: V00-01-03
+2013-08-21 Igor Gaponenko
+- migrated to the latest version of webwfk
+- fixed a bug in History.ps
+
+Tag: V00-01-02
+2013-08-12 Igor Gaponenko
+- migrated to use JavaScript widgets from the new package webfwk.
+
+Tag: V00-01-01
+2013-08-08 Igor Gaponenko
+- added History at all levels
+
+Tag: V00-01-00
+2013-07-25 Igor Gaponenko
+- the application has been rewritten from scratch. The old code has been discarded.
+- teh first version deployed fro production.
+
+Tag: V00-00-02
+2013-06-03 Igor Gaponenko
+- the package has been reset to its initial state (empty) and then repopulated
+from Joe's work directory: /u/re/jbarrera/shiftmgr/
+
+Tag: V00-00-01
+2013-04-09 Igor Gaponenko
+- just created this template project with sample database schema, PHP API
