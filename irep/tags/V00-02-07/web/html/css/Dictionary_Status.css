@@ -1,0 +1,18 @@
+#dictionary-status {
+    padding:        20px;
+}
+#dictionary-status > #updated-info {
+    margin-top:     20px;
+}
+#dictionary-status > #tables {
+    margin-top:     10px;
+}
+#dictionary-status > #tables > .table-cont {
+    margin-right:   20px;
+}
+#dictionary-status > #tables > .table-cont > .table {
+    margin-top:     10px;
+}
+#dictionary-status .info {
+    color:          maroon;
+}
