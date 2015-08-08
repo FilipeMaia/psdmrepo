@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2015-08-07 Igor Gaponenko
+- automatic authorization for the LDAP management of the instrument groups
+
 Tag: V00-02-01
 2014-12-08 Igor Gaponenko
 - minor changes in CSS (fonts)
