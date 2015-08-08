@@ -217,6 +217,7 @@ function (
             if(attr.checked)  html += ' checked="checked"';
             if(attr.onclick)  html += ' onclick="'+attr.onclick+'"';
             if(attr.title)    html += ' title="'+attr.title+'"';
+            if(attr.extra)    html += ' '+attr.extra;
         }
         return html;
     }
@@ -324,7 +325,10 @@ function (
         this.selected_object = function() {
             return this.selected_row ? this.selected_row[this.selected_col] : null;
         };
+        this._sort_enabled = true ;
+        this.enable_sort = function (yes_or_no) { this._sort_enabled = yes_or_no ? true : false ; } ;
         this.sort_rows = function() {
+            if (!this._sort_enabled) return ;
             var column = this.sorted.column;
             if( !this.header.sorted[column] ) return;
             var bound_sort_func = new sort_func(this.header.types[column], column);
@@ -529,6 +533,8 @@ function (
                 var row = that.rows[i];
                 that.row_select_action(row);
             });
+
+            if( this.common_after_sort ) this.common_after_sort() ;
         };
 
         this.erase = function(text_when_empty) {
@@ -713,6 +719,7 @@ function (
             column:  this.options.default_sort_column  !== undefined ? this.options.default_sort_column  : 0,   // the number of a column by which rows are sorted
             forward: this.options.default_sort_forward !== undefined ? this.options.default_sort_forward : true // sort direction
         };
+        this.common_after_sort = this.options.common_after_sort !== undefined ? this.options.common_after_sort : null;
         this.selected_col = this.options.selected_col !== undefined ? this.options.selected_col : 0;
         this.selected_row = rows ? rows[0] : null;
 

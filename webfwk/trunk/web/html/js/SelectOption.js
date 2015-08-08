@@ -56,8 +56,8 @@ function (
         var config2parse = config || {} ;
         Widget.ASSERT(_.isObject(config2parse)) ;
 
-        this._config.disabled       = Widget.PROP_FUNCTION(config2parse, 'disabled ',      false) ;
-        this._config.on_change      = Widget.PROP_FUNCTION(config2parse, 'on_change',      null) ;
+        this._config.disabled       = Widget.PROP_BOOL    (config2parse, 'disabled', false) ;
+        this._config.on_change      = Widget.PROP_FUNCTION(config2parse, 'on_change', null) ;
         this._config.config_handler = Widget.PROP_OBJECT  (config2parse, 'config_handler', null) ;
         this._config.options        = [] ;
         this._config.default_value  = null ;

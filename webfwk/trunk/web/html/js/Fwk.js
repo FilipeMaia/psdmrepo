@@ -666,6 +666,40 @@ function (
                 title: title
             }) ;
         } ;
+        this.ask_for_line = function (title, msg, on_ok, on_cancel) {
+            var container = $('#fwk-popupdialogs-varable-size') ;
+            container.html (
+'<p><span class="ui-icon ui-icon-alert" style="float:left ;"></span>'+msg+'</p>'+
+'<div><input class="user-input" type="text" size="32" />'
+            ) ;
+            var dialog = container.dialog ({
+                resizable: true ,
+                modal: true ,
+                width:  300 ,
+                height: 180 ,
+                buttons: {
+                    "Submit": function () {
+                        var user_input = container.find('input').val() ;
+                        $(this).dialog('close') ;
+                        if (on_ok) on_ok(user_input) ;
+                    },
+                    Cancel: function () {
+                        $(this).dialog('close') ;
+                        if (on_cancel) on_cancel() ;
+                    }
+                } ,
+                title: title
+            }) ;
+            dialog.dialog('open') ;
+            container.find('input.user-input').keyup(function(e) {
+                if (e.keyCode === 13) {
+                    var user_input = $(this).val() ;
+                    dialog.dialog('destroy') ;  // must use 'destroy' instead of 'close' to prevent
+                                                // potential side effects
+                    if (on_ok) on_ok(user_input) ;
+                }
+            }) ;
+        } ;
         this.edit_dialog = function (title, msg, on_save, on_cancel) {
             var container = $('#fwk-editdialogs') ;
             container.html(msg) ;

@@ -4,6 +4,22 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group name="PCDS Web App"/>
         <group/>
-        <group name="PCDS Web Apps"/>
+        <group name="PCDS Web Apps">
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_smarttable.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_radiobox.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/VertcalPanelLayoutTest.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/fwk.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_simpletable.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_stackofrows1.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_table.php</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/decorated_table.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_smarttable1.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_stackofrows2.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/table.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_proplist.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_checktable.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/test_memoryleaks.html</file>
+            <file>file:/N:/lcls/releases/pswww-apps-dev/webfwk/web/html/plugin.html</file>
+        </group>
     </open-files>
 </project-private>

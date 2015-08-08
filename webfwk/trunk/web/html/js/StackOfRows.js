@@ -475,6 +475,7 @@ add_row : function (row_data) {
             this.options
         )
     ) ;
+    return id ;
 } ,
 
 set_rows : function (row_data) {

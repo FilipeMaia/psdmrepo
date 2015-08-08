@@ -28,15 +28,11 @@ function RadioBox (buttons, onchange, options) {
 
     Widget.Widget.call(this) ;
 
-    function _ASSERT (expression) {
-        if (!expression) throw new Widget.WidgetError('RadioBox::'+arguments.callee.caller.name) ;
-    }
-
     // Verify parameters of the object
 
-    _ASSERT(_.isArray(buttons) && buttons.length) ;
+    Widget.ASSERT(_.isArray(buttons) && buttons.length) ;
     this._buttons = _.map(buttons, function (button) {
-        _ASSERT (
+        Widget.ASSERT (
             _.isObject(button) &&
             _.has(button, 'name') && _.isString(button.name) && button.name !== '' &&
             _.has(button, 'text') && _.isString(button.text) && button.text !== '') ;
@@ -44,7 +40,7 @@ function RadioBox (buttons, onchange, options) {
         function get_prop (button, prop) {
             if (_.has(button, prop)) {
                 var val = button[prop] ;
-                _ASSERT(_.isString(val)) ;
+                Widget.ASSERT(_.isString(val)) ;
                 return val ;
             }
             return '' ;
@@ -59,7 +55,7 @@ function RadioBox (buttons, onchange, options) {
         return result ;
     }) ;
 
-    _ASSERT(_.isFunction(onchange)) ;
+    Widget.ASSERT(_.isFunction(onchange)) ;
     this._onchange = onchange ;
 
     this._options = {
@@ -67,12 +63,12 @@ function RadioBox (buttons, onchange, options) {
         pointer:  false                     // the optional pointer to the active button
     } ;
     if (options) {
-        _ASSERT(_.isObject(options)) ;
+        Widget.ASSERT(_.isObject(options)) ;
         if (_.has(options, 'activate')) {
             var button2activate = _.find(this._buttons, function (button) {
                 return button.name === options.activate ;
             }) ;
-            _ASSERT(button2activate) ;
+            Widget.ASSERT(button2activate) ;
             this._options.activate = button2activate.name ;
         }
         this._options.pointer = _.has(options, 'pointer') && options.pointer ;
@@ -93,6 +89,7 @@ function RadioBox (buttons, onchange, options) {
         if (this._is_rendered) return ;
         this._is_rendered = true ;
 
+        // Render the widget
         var html =
 '<div class="radio-box" >' ;
         for (var i in this._buttons) {
@@ -102,7 +99,7 @@ function RadioBox (buttons, onchange, options) {
     '<button name="'+button.name+'"' +
            ' class="radio-box-button '+button.class+'"' +
            ' style="'+button.style+'"' +
-           ' title="'+button.title+'" >'+button.text+'</button>' +
+           ' data="'+button.title+'" >'+button.text+'</button>' +
     '<div class="radio-box-hint" >&nbsp;</div>' +
   '</div>' ;
         }
@@ -111,14 +108,11 @@ function RadioBox (buttons, onchange, options) {
 '</div>' ;
         this.container.html(html) ;
 
+        // Initialize the dynamic state of the widget as per its
+        // parameters.
         this._button_elements = this.container.find('.radio-box-button').
             button().
             button('enable') ;
-
-        this._button_elements.
-            next().
-            removeClass('radio-box-hint-active') ;
-
         this.container.find('.radio-box-button[name="'+this._options.activate+'"]').
             button().
             button('disable').
@@ -126,27 +120,22 @@ function RadioBox (buttons, onchange, options) {
             next().
             addClass('radio-box-hint-active') ;
 
-        this._button_elements.click(function () {
-
-            _that._button_elements.
-                button('enable').
-                removeClass('radio-box-active').
-                next().
-                removeClass('radio-box-hint-active') ; 
-
-            $(this).
-                button('disable').
-                addClass('radio-box-active').
-                next().
-                addClass('radio-box-hint-active') ;
-        
+        // Initialize event handlers on user actions
+        this._button_elements.click(function () {       
+            _that.activate(this.name) ;
             _that._onchange(this.name) ;
         }) ;
+
     } ;
     
+    /**
+     * Return the name of the presently active button.
+     * 
+     * @returns {string}
+     */
     this.active = function () {
-        _ASSERT(this._is_rendered) ;
-        return this.container.find('.radio-box-button.radio-box-active"]').attr('name') ;
+        Widget.ASSERT(this._is_rendered) ;
+        return this.container.find('.radio-box-button.radio-box-active').attr('name') ;
     } ;
     
     /**
@@ -155,27 +144,73 @@ function RadioBox (buttons, onchange, options) {
      * NOTES:
      * - throw an exception if not a valid button
      *
-     * @param string name
+     * @param {string} name
      * @returns {undefined}
      */
     this.activate = function (name) {
-        _ASSERT(this._is_rendered) ;
-        _ASSERT(_.isString(name)) ;
-        var button2activate = _.find(this._buttons, function (button) {
-            return button.name === name ;
-        }) ;
-        _ASSERT(button2activate) ;
-        this._button_elements.
+        this._ASSERT_IS_VALID(name) ;
+        this.container.find('.radio-box-button[name="'+this.active()+'"]').
             button('enable').
             removeClass('radio-box-active').
             next().
             removeClass('radio-box-hint-active') ;
-
         this.container.find('.radio-box-button[name="'+name+'"]').
             button('disable').
             addClass('radio-box-active').
             next().
             addClass('radio-box-hint-active') ;
+    } ;
+    
+    /**
+     * Disable all but the presently active buttons. For the later do noting.
+     *
+     * @param {boolean} yes
+     * @returns {undefined}
+     */
+    this.disableAll = function (yes) {
+        Widget.ASSERT(this._is_rendered) ;
+        if (yes) {
+            this._button_elements.button('disable') ;
+        } else {
+            this._button_elements.button('enable') ;
+            this.activate(this.active()) ;  // the active button should stay disabled
+        }
+    } ;
+    
+    /**
+     * Disable the specified button unless it's presently active. In the later
+     * case do nothing.
+     * 
+     * @param {type} name
+     * @param {boolean} yes
+     * @returns {undefined}
+     */
+    this.disable = function (name, yes) {
+        this._ASSERT_IS_VALID(name) ;
+        var button = this.container.find('.radio-box-button[name="'+name+'"]') ;
+        if (yes) {
+            button.button('disable') ;
+        } else {
+            // the active button should stay disabled, so we can't do it here
+            if (name !== this.active()) {
+                button.button('enable') ;
+            }
+        }
+    } ;
+    
+    /**
+     * Assert that the specified button name is a valid one.
+     *
+     * @param {string} name
+     * @returns {undefined}
+     */
+    this._ASSERT_IS_VALID = function (name) {
+        Widget.ASSERT(this._is_rendered) ;
+        Widget.ASSERT(_.isString(name)) ;
+        var button = _.find(this._buttons, function (button) {
+            return button.name === name ;
+        }) ;
+        Widget.ASSERT(button) ;
     } ;
 }
 Class.define_class(RadioBox, Widget.Widget, {}, {}) ;
