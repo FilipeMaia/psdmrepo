@@ -1,0 +1,26 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package websrt
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-03
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
+Tag: V00-00-02
+2014-11-10 Igor Gaponenko
+- migrated to a different SVN source code viewer
+- split Data Management releases into two classes (normal and legacy) as a
+followup of the recent change in the naming convention for the releases.
+
+Tag: V00-00-01
+2014-03-17 Igor Gaponenko
+- the first implementation of the release status reporting tool
