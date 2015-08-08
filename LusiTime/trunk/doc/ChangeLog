@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2015-08-07 Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
 Tag: V00-01-06
 2015-04-16 Igor Gaponenko
 - fixed a bug in method LusiTime::to_float()
