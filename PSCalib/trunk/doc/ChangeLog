@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-47
+2015-07-10 Mikhail S. Dubrovin	
+- fixed compiler complains in method rotation_cs() for RHEL7 migration (PSAS-171)
+	
 Tag: V00-02-46
 2015-07-27 Igor Gaponenko
 - fixed two buges uncovered during RHEL7 migration (JIRA PSRT-63)

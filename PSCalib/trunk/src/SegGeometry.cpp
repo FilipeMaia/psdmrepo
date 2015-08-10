@@ -49,7 +49,7 @@ void rotation_ang(const double* x, const double* y, unsigned size, double angle_
 
 void rotation_cs(const double* x, const double* y, unsigned size, double C, double S, double* xrot, double* yrot)
 {
-  for (unsigned i=0; i<size; i++, xrot++, yrot++, *x++, *y++) {
+  for (unsigned i=0; i<size; i++, xrot++, yrot++, x++, y++) {
     *xrot = *x *C - *y *S;
     *yrot = *y *C + *x *S; 
   }
