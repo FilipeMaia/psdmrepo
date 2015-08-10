@@ -270,7 +270,7 @@ private:
 
   std::string m_fname;
   TDATA       m_val_def;
-  const ndarray<const TDATA, NDIM>& m_nda_def;
+  const ndarray<const TDATA, NDIM> m_nda_def;
   ndarray<TDATA, NDIM> m_nda_empty;
   unsigned    m_print_bits;
   unsigned    m_count_str_data;

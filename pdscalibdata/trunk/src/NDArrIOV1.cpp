@@ -83,6 +83,7 @@ NDArrIOV1<TDATA, NDIM>::NDArrIOV1 ( const std::string& fname
   init();
   m_size = nda_def.size();
   std::memcpy (&m_shape[0], nda_def.shape(), c_ndim*sizeof(shape_t));  
+  //std::cout << "XXX m_nda_def in c-tor 2: " << m_nda_def << '\n';
 }
 
 //-----------------------------
@@ -270,7 +271,7 @@ void NDArrIOV1<TDATA, NDIM>::create_ndarray(const bool& fill_def)
       else return; // There is no default initialization for ctor=0 w/o shape
     }    
     if( m_print_bits & 16 ) MsgLog(__name__(), info, "Created ndarray of the shape=(" << str_shape() << ")");
-    //if( m_print_bits & 32 ) MsgLog(__name__(), info, "Created ndarray: " << *p_nda);
+    if( m_print_bits & 32 ) MsgLog(__name__(), info, "Created ndarray: " << *p_nda);
 }
 
 //-----------------------------
