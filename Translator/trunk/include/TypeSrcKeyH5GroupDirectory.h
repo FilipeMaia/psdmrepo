@@ -245,6 +245,15 @@ class TypeSrcKeyH5GroupDirectory {
   SrcKeyMap::iterator endSrcKey(const PSEvt::EventKey &eventKey);
   SrcKeyGroup & addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
                                boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter);
+  /* partitions all the eventKeys that are in the TypeSrcKey directory into three sets, 
+     based on a input set of srcs. The sets are:
+       outputSrcMap -            keys that have not been written during the present event, and
+                                 have a src in the srcs argument
+       outputOtherNotWritten -   keys that have not been written during the present event, and 
+                                 do not have a src in the srcs argument
+       outputWrittenKeys -       Any key that has already been written during the present event
+                                 regardless of whether or not in the srcs argument
+   */
   void getNotWrittenSrcPartition(const std::set<Pds::Src> & srcs, 
                                  std::map<Pds::Src, std::vector<PSEvt::EventKey> > & outputSrcMap, 
                                  std::vector<PSEvt::EventKey> & outputOtherNotWritten,

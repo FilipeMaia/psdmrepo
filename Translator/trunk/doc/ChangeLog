@@ -11,6 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-38
+2015-08-10 David Schneider
+- fix bug with trying to add blanks to ndarrays - (JIRA PSAS-172)
+  add testing module TestPutNDArray
+  add unit test for issue
+  and test data to $SIT_ROOT/data_test/multifile - test_017_xppi0815
+
 Tag: V00-02-37
 2015-08-07 David Schneider
 - run unit tests in subdirectory based on SIT_ARCH so that buildbot can run

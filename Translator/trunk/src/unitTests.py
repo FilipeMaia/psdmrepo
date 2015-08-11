@@ -36,6 +36,7 @@ assert SIT_ARCH != '$SIT_ARCH', '$SIT_ARCH is not defined. run sit_setup'
 DATADIR = os.path.join(SIT_ROOT,"data_test/Translator")
 SPLITSCANDATADIR    = os.path.join(SIT_ROOT,"data_test/multifile/test_002_xppd9714")
 SPLITSCANDATADIRBUG = os.path.join(SIT_ROOT,"data_test/multifile/test_006_xppd7114")
+NDARRAYADDBLANKDATADIRBUG = os.path.join(SIT_ROOT,"data_test/multifile/test_017_xppi0815")
 XPPTUTDATADIR=os.path.join(SIT_ROOT,"data_test/multifile/test_003_xpptut13")
 CALIBDATADIR=os.path.join(SIT_ROOT,"data_test/calib")
 TESTOUTDIR = AppDataPath(os.path.join("Translator", "test_output")).path()
@@ -1758,6 +1759,48 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(srcs, expected)
         os.unlink(outputFile)
 
+    def test_addBlankNDarray(self):
+       '''JIRA PSAS-172, if you filter out the cspad and write an array associated with its
+       source, you can get a crash when the cspad source shows up as a dropped contribution. 
+       When the Translator finds damage associated with the cspad source that does not specify 
+       the cspad type (dropped contributions, i.e, split events), it will look at what it is 
+       writing to that source. It will find the one ndarray. Then it will try to add a blank.
+
+       Test data for this comes from exp=xppi0815:run=102. In calib cycle 0 events (0-up) 205 and 206 do not
+       have cspad. The damage reads like:
+
+       [info:psana_examples.DumpDamage]  event() run=0 calib=0 eventNumber=205 totalEvents= 205
+        --- --- --- dmg 0x00008000 EventKey(type=Psana::CsPad::DataV1, src=DetInfo(XppGon.0:Cspad.0))
+                    dropped=0 uninitialized=0 OutOfOrder=0 OutOfSynch=0 UserDefined=0 
+                    IncompleteContribution=1 ContainsIncomplete=0 userBits=0x0
+
+       [info:psana_examples.DumpDamage]  event() run=0 calib=0 eventNumber=206 totalEvents= 206
+        -------- src damage with dropped contribs --------- 
+        0x00000002  DetInfo(XppGon.0:Cspad.0)
+
+       That is initially, we know there is damage for the cspad, but in the next event, it is damage 
+       associated with the cspad source - the Translator will find that it is writing ndarrays to this 
+       source and try to add a blank. We test that no exception is thrown, that we do not add blanks for 
+       ndarrays.
+
+       We prepare test data from xppi08 stream 5 [0,0x005AF120)  this gets first event, good cspad
+         [0x0B40B460, 0x0B5D9518)  datagrams 39 and 40 -- both have damage
+       '''
+       input_file = 'exp=xppi0815:run=102:dir=%s' % NDARRAYADDBLANKDATADIRBUG
+       output_h5 = 'test_addBlank_ndarray.h5'
+       cmd = 'psana -m Translator.TestPutNDArray,Translator.H5Output'
+       cmd += ' -o Translator.H5Output.output_file=%s' % output_h5
+       cmd += ' -o Translator.H5Output.overwrite=1'
+       cmd += ''' -o 'Translator.H5Output.src_filter=exclude opal_0 opal_1 opal_2 cspad cs140_0 cs140_1' '''
+       cmd += ' -o Translator.H5Output.unknown_src_ok=1 -o Translator.H5Output.deflate=-1'
+       cmd += ' -o Translator.TestPutNDArray.cspadsrc=cspad '
+       cmd += input_file
+       out, err = ptl.cmdTimeOut(cmd)
+       assert os.path.exists(output_h5), "output_h5=%s doesn't exist in test" % output_h5
+       os.unlink(output_h5)
+       for ln in err.split('\n'):
+         self.assertTrue(ptl.filterPsanaStderr(ln), msg="stderr output ln=%s obtained from cmd=%s" % (ln, cmd))
+       
     def test_epics(self):
         '''Test epics translation. test_020 has 4 kinds of epics, string, short, enum, long and double.
         '''

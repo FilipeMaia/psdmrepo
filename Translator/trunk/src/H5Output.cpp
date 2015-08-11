@@ -1143,7 +1143,6 @@ void H5Output::setEventKeysToTranslate(PSEvt::Event &evt, PSEnv::Env &env,
   }
 }
 
-
 void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env) 
 {
   boost::shared_ptr<EventId> eventId = evt.get();
@@ -1269,15 +1268,15 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
     // As a given source can have several types of data, there may be two or more 
     // droppedContributions from a given source.  That is there may be Src repeats in the 
     // droppedContribs list below.  If there is at least one dropped contribution from a
-    // source, we will append blanks to all the types that are event based from that source 
-    // that were not already written. We qualify on event based in case config data from the
-    // calib cycle exists for the source as well.
+    // source, we will append blanks to all the DAQ types that are event based from that source 
+    // that were not already written -- however note we specify DAQ types -- we will not append
+    // blanks to user types, i.e, ndarrays or strings. We qualify on event based rather than
+    // config based in case config data from the calib cycle exists for the source as well.
     // The damage we use for these blanks will be from one of these droppedContrib entries with
     // that Src. We have no way to identify which damage will go with which type in this case.
     // This situtation will be rare, and when it happens, most likely all droppedContrib entries
     // from the same Src will have the same damage - the DroppedContribution bit.
 
-    BlankNonBlanks blankNonBlanks;
     set<Pds::Src> droppedSrcs;
     map<Pds::Src,Pds::Damage> src2damage;
     for (size_t idx = 0; idx < droppedContribs.size(); ++idx) {
@@ -1286,26 +1285,35 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
       droppedSrcs.insert(src);
       src2damage[src]=damage;
     }
+
     map<Pds::Src, vector<PSEvt::EventKey> > droppedSrcsNotWritten;
-    vector<PSEvt::EventKey> otherNotWritten;
+    vector<PSEvt::EventKey> otherNotWritten_notUsed;
     vector<PSEvt::EventKey> writtenKeys;
     m_calibCycleGroupDir.getNotWrittenSrcPartition(droppedSrcs,
                                                    droppedSrcsNotWritten,
-                                                   otherNotWritten,
+                                                   otherNotWritten_notUsed,
                                                    writtenKeys);
-    set<Pds::Src>::iterator droppedSrc;
-    for (droppedSrc = droppedSrcs.begin(); droppedSrc != droppedSrcs.end(); ++droppedSrc) {
+
+    BlankNonBlanks blankNonBlanks;
+    for (set<Pds::Src>::iterator droppedSrc = droppedSrcs.begin(); 
+         droppedSrc != droppedSrcs.end(); ++droppedSrc) {
       const Pds::Src & src = *droppedSrc;
       map<Pds::Src, vector<PSEvt::EventKey> >::iterator notWrittenIter;
       notWrittenIter= droppedSrcsNotWritten.find(src);
       if (notWrittenIter == droppedSrcsNotWritten.end()) {
-        MsgLog(logger,warning, 
+        MsgLog(logger,trace, 
                "dropped src: " << src << " has not been seen before.  Not writing a blank.");
         continue;
       }
       vector<PSEvt::EventKey> & notWritten = notWrittenIter->second;
       for (size_t notWrittenIdx = 0; notWrittenIdx < notWritten.size(); ++notWrittenIdx) {
         PSEvt::EventKey & eventKey = notWritten[notWrittenIdx];
+        bool not_DAQ_data = (eventKey.key().size()>0) or (isNDArray(eventKey.typeinfo()));
+        if (not_DAQ_data) {
+          MsgLog(logger, trace, "AddBlank loop - skipping key: " << eventKey << 
+                 " even though src has dropped contributions - appears to be non-DAQ data");
+          continue;
+        }
         SrcKeyMap::iterator srcKeyPos = m_calibCycleGroupDir.findSrcKey(eventKey);
         SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
         Pds::Damage damage = src2damage[src];
@@ -1313,7 +1321,7 @@ void H5Output::eventImpl(PSEvt::Event &evt, PSEnv::Env &env)
           try {
             long pos = srcKeyGroup.appendBlankTimeAndDamage(eventKey, eventId, damage);
             blankNonBlanks.blanks[eventKey] = pos;
-          } catch (const std::runtime_error &exp) {
+          } catch (const std::exception &exp) {
             MsgLog(logger, error, exp.what());
             MsgLog(logger, error, "Failed to append blank. notWritten loop. notWrittenIdx=" << notWrittenIdx);
             throw exp;
