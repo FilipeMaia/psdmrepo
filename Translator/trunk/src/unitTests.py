@@ -24,30 +24,19 @@ import glob
 import psana
 import h5py
 import psana_test.psanaTestLib as ptl
-from AppUtils.AppDataPath import AppDataPath
 
 # -----------------------------
 # Test data
 # -----------------------------
 SIT_ROOT = os.path.expandvars('$SIT_ROOT')
 assert SIT_ROOT != '$SIT_ROOT', '$SIT_ROOT is not defined. run sit_setup'
-SIT_ARCH = os.path.expandvars('$SIT_ARCH')
-assert SIT_ARCH != '$SIT_ARCH', '$SIT_ARCH is not defined. run sit_setup'
 DATADIR = os.path.join(SIT_ROOT,"data_test/Translator")
 SPLITSCANDATADIR    = os.path.join(SIT_ROOT,"data_test/multifile/test_002_xppd9714")
 SPLITSCANDATADIRBUG = os.path.join(SIT_ROOT,"data_test/multifile/test_006_xppd7114")
 NDARRAYADDBLANKDATADIRBUG = os.path.join(SIT_ROOT,"data_test/multifile/test_017_xppi0815")
 XPPTUTDATADIR=os.path.join(SIT_ROOT,"data_test/multifile/test_003_xpptut13")
 CALIBDATADIR=os.path.join(SIT_ROOT,"data_test/calib")
-TESTOUTDIR = AppDataPath(os.path.join("Translator", "test_output")).path()
-assert os.path.exists(TESTOUTDIR), "test output dir: %s doesn't exit" % TESTOUTDIR
-OUTDIR = os.path.join(TESTOUTDIR, SIT_ARCH)
-try:
-  os.mkdir(OUTDIR)
-except OSError:
-  pass
-assert os.path.exists(OUTDIR), "outdir: %s doesn't exist. Attempt to create this directory failed." % OUTDIR
-
+OUTDIR = ptl.getDataArchDir(pkg='Translator', datasubdir='test_output')
 TESTDATA_T1= os.path.join(DATADIR, "test_042_Translator_t1.xtc")
 TESTDATA_T1_INITIAL_DAMAGE = os.path.join(DATADIR,"test_046_Translator_t1_initial_damage.xtc")
 TESTDATA_T1_END_DAMAGE = os.path.join(DATADIR,"test_045_Translator_t1_end_damage.xtc")

@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-39
+2015-08-10 David Schneider
+- change unitTests to use psanaTestLib function to get output directory with SIT_ARCH
+	
 Tag: V00-02-38
 2015-08-10 David Schneider
 - fix bug with trying to add blanks to ndarrays - (JIRA PSAS-172)
