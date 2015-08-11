@@ -11,6 +11,14 @@ Package author: Dan Damiani
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-12
+2015-08-10 Dan Damiani
+- Fix a missing-import bug with the HistHelper and HistOverlayHelper classes
+- Fix a bug with the matplotlib client and newer versions of matplotlib
+- Hist objects in pyqtgraph now use the standard PlotDataItem interface
+- Add offsets to text in legends
+- Add scripts for testing psmon plotting features
+
 Tag: V00-01-11
 2015-07-31 Dan Damiani
 - Added a strip chart helper class
