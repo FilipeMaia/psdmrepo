@@ -1,9 +1,10 @@
-# This is a script for managing psana test data. From the release directory do
+# This is a script for managing and running tests with the psana test data. From the release directory do
 #
 #        python psana_test/src/psanaTestLib.py
 #
 # to get the usage commands that are available.
 
+# Python packages
 import sys
 import glob
 import subprocess as sb
@@ -18,6 +19,9 @@ import time
 import ctypes
 import xml.etree.ElementTree as ET
 
+# ana release packages
+from AppUtils.AppDataPath import AppDataPath
+
 usage = '''enter one of the commands:
 
 prev   updates psana_test/data/previousDump.txt.
@@ -30,7 +34,7 @@ prev   updates psana_test/data/previousDump.txt.
        This file is used by the test command to detect changes.
 
        optional args:  
-         delete=False    don't delete dump file (they will be in psana_test/data/prev_xtc_dump)
+         delete=False    don't delete dump file (they will be in psana_test/data/test_output/$SIT_ARCH/prev_xtc_dump)
          all=True        redo dump of all tests - not just new test files. 
                          Does not append, creates psana_test/data/previousDump.txt from scratch.
 
@@ -122,6 +126,36 @@ def expandSitRoot():
     sit_root = os.path.expandvars(sit_root_envvar)
     assert sit_root != sit_root_envvar, "%s not expanded. run sit_setup" % sit_root_envvar
     return sit_root
+
+def expandSitArch():
+    sit_arch_envvar = '$SIT_ARCH'
+    sit_arch = os.path.expandvars(sit_arch_envvar)
+    assert sit_arch != sit_arch_envvar, "%s not expanded. run sit_setup" % sit_arch_envvar
+    return sit_arch
+
+def getDataArchDir(pkg, datasubdir, archsubdir=''):
+    assert len(pkg)>0
+    assert len(datasubdir)>0
+
+    def makeIfDoesntExist(dirpath):
+        if not os.path.exists(dirpath):
+            try:
+                os.mkdir(dirpath)
+            except OSError:
+                pass
+            assert os.path.exists(dirpath), "failed to make directory: %s" % dirpath
+
+    dataPkgDir  = AppDataPath(pkg).path()
+    assert os.path.exists(dataPkgDir), "package directory: %s doesn't exist" % dataPkgDir
+    subDir = os.path.join(dataPkgDir, datasubdir)
+    makeIfDoesntExist(subDir)
+    sit_arch = expandSitArch()
+    finalDir = os.path.join(subDir, sit_arch)
+    makeIfDoesntExist(finalDir)
+    if len(archsubdir) > 0:
+        finalDir = os.path.join(finalDir, archsubdir)
+        makeIfDoesntExist(finalDir)
+    return finalDir
 
 def instrDataDir():
     return '/reg/d/psdm'
@@ -531,13 +565,13 @@ def previousDumpFile(deleteDump=True, doall=False):
     print "   (dump a few events for some xtc, without epics aliases in dump, and no epics pvId's in dump)"
     testFiles = getTestFiles()
     multiTests = getMultiDatasets()
+    dumpOutputDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='prev_xtc_dump')
     for src,srcDict in zip(['xtc','multi'],[testFiles, multiTests]):
         for testNumber, info in srcDict.iteritems():
             if (src == 'xtc') and (testNumber in prevXtc): continue
             if (src == 'multi') and (testNumber in prevMulti): continue
             t0 = time.time()
             xtc_md5s = {}
-            dumpOutputDir = os.path.join('psana_test', 'data', 'prev_xtc_dump')
             if src == 'xtc':
                 inputDatasource = info['path']
                 xtc_md5s[info['basename'] ] = get_md5sum(inputDatasource)
@@ -804,8 +838,9 @@ def testShmCommand(args):
     xtcservercmd += ' -r %d' % ratePerSecond
     numberOfClients = 1
     xtcservercmd += ' -c %d' % numberOfClients
-    xtcserverCmdStdout = 'testShm.xtcserver.stdout'
-    xtcserverCmdStderr = 'testShm.xtcserver.stderr'
+    OUTDIR = getDataArchDir(pkg='psana_test', datasubdir='test_output')
+    xtcserverCmdStdout = os.path.join(OUTDIR,'testShm.xtcserver.stdout')
+    xtcserverCmdStderr = os.path.join(OUTDIR,'testShm.xtcserver.stderr')
     dataSource = 'shmem=%s.0' % shmemName
     dumpcmd = 'psana -m psana_test.dump %s' % dataSource
     print "about to launch commands:"
@@ -975,6 +1010,9 @@ def testCommand(args):
     assert delete.lower() in ['','false','true']
     assert verbose.lower() in ['','false','true']        
 
+    dumpOutputDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_xtc_dump')
+    h5dir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_h5')
+    h5dumpDir = getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='current_h5_dump')
     delete = not (delete.lower() == 'false')
     verbose = (verbose.lower() == 'true')
     xtcTestFiles = getTestFiles(noTranslator=True)
@@ -1072,8 +1110,7 @@ def testCommand(args):
             h5OutputBase = os.path.splitext(h5OutputBase)[0] + '.h5'
             h5OutputDumpBase = h5OutputBase + '.dump'
             testLabel = "%s%s_test_%3.3d" % (regressStr, src, num)
-            dumpOutputPath = os.path.join('psana_test', 'data', 'current_xtc_dump', 
-                                          dumpOutputBase)
+            dumpOutputPath = os.path.join(dumpOutputDir, dumpOutputBase)
             cmd, err = psanaDump(inputDataSource, dumpOutputPath, 
                                  numEvents, dumpEpicsAliases=dumpEpicsAliases, 
                                  regressDump=regressDump, verbose=verbose)
@@ -1093,11 +1130,9 @@ def testCommand(args):
                 msg %= (regressStr, src, num)
                 print msg
 
-            h5dir = os.path.join('psana_test', 'data', 'current_h5')
-            assert os.path.exists(h5dir), "h5dir: %s doesn't exist" % h5dir
             h5file = os.path.join(h5dir, h5OutputBase)
             translate(inputDataSource, h5file, numEvents, testLabel, verbose)
-            h5DumpPath = os.path.join('psana_test', 'data', 'current_h5_dump', h5OutputDumpBase)
+            h5DumpPath = os.path.join(h5dumpDir, h5OutputDumpBase)
             cmd, err = psanaDump(h5file, h5DumpPath, numEvents, 
                                  dumpEpicsAliases=dumpEpicsAliases, regressDump=regressDump, verbose=verbose)
             if len(err) > 0:

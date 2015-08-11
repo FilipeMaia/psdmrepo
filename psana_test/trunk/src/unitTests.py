@@ -25,7 +25,7 @@ from AppUtils.AppDataPath import AppDataPath
 import multiprocessing
 
 DATADIR = ptl.getTestDataDir()
-OUTDIR = "data/psana_test"
+OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 #------------------
 # Utility functions 
@@ -147,7 +147,9 @@ class Psana( unittest.TestCase ) :
 
     def test_Index(self):
         # test the pickling of EventTime objects
-        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=999')
+        dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_005_xcstut13')
+        assert os.path.exists(dataSourceDir), "datasource dir: %s doesn't exist" % dataSourceDir
+        ds = psana.DataSource('dir=%s:exp=xcstut13:run=999' % dataSourceDir)
         savetimes = []
         nevent=0
         for evt in ds.events():
@@ -167,7 +169,7 @@ class Psana( unittest.TestCase ) :
         times = pickle.load(f)
         f.close()
         os.remove(myfile)
-        ds = psana.DataSource('dir=/reg/g/psdm/data_test/multifile/test_005_xcstut13:exp=xcstut13:run=999:idx')
+        ds = psana.DataSource('dir=%s:exp=xcstut13:run=999:idx' % dataSourceDir)
         run = ds.runs().next()
         expectFid = [5366,11177,14060]
         expectSec = [1339858956,1339858972,1339858980]
@@ -477,7 +479,7 @@ class Psana( unittest.TestCase ) :
         dataSourceDir = os.path.join(ptl.getMultiFileDataDir(), 'test_004_xppa1714')
 
        # test that mp mode gives us what we saw before on DAQ only streams
-        dumpOutput = 'unittest_test_mp_mpmode.dump'
+        dumpOutput = os.path.join(OUTDIR,'unittest_test_mp_mpmode.dump')
         cmd = '''psana -c '' -p 1'''
         cmd += ' -o psana_test.dump.output_file=%s' % dumpOutput
         cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
@@ -493,7 +495,7 @@ class Psana( unittest.TestCase ) :
         os.unlink(dumpOutput)
         
         # test that mp mode is the same as not mp mode (DAQ only streams)
-        dumpOutput = 'unittest_test_mp_normal.dump'
+        dumpOutput = os.path.join(OUTDIR,'unittest_test_mp_normal.dump')
         cmd = '''psana -c '' -o psana_test.dump.output_file=%s''' % dumpOutput
         cmd += (''' -m psana_test.dump exp=xppa1714:run=157:stream=0-20:dir=%s''' % dataSourceDir)
         o,e = ptl.cmdTimeOut(cmd,100)
@@ -674,8 +676,7 @@ class Psana( unittest.TestCase ) :
         srcDir = os.path.join(ptl.getMultiFileDataDir(), 'test_009_%s' % expname)
         assert os.path.exists(srcDir), "srcDir=%s doesn't exist" % srcDir
 
-        destDirBase = AppDataPath(os.path.join("psana_test",'liveModeSim')).path()
-        assert len(destDirBase)>0, "did not find liveModeSim base dir in the psana_test data dir"
+        destDirBase = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output', archsubdir='liveModeSim')
 
         # make a random directory for the testing that we will remove when done
         destDir = tempfile.mkdtemp(dir=destDirBase)

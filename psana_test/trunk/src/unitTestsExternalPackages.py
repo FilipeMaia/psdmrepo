@@ -15,7 +15,7 @@ import unittest
 import psana_test.psanaTestLib as ptl
 
 DATADIR = "/reg/g/psdm/data_test/Translator"
-OUTDIR = "data/psana_test"
+OUTDIR = ptl.getDataArchDir(pkg='psana_test', datasubdir='test_output')
 
 #------------------
 # Utility functions 
