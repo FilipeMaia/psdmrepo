@@ -6,7 +6,7 @@ import collections
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib import rcParams
-from matplotlib.axes import _process_plot_format
+from matplotlib.axes._base import _process_plot_format
 
 from psmon import config
 from psmon.util import is_py_iter, arg_inflate_flat, arg_inflate_tuple, inflate_input
