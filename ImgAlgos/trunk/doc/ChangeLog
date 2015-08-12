@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-93
+2015-08-11 Mikhail S. Dubrovin
+- in PyAlgos.py add reshape_nda_to_2d, subtract_bkgd, update doc. (PSAS-147)
+- extend example ex_peakfinder_cspad.py up to real case analysis.
+	
 Tag: V00-03-92
 2015-08-05 Mikhail S. Dubrovin
 - Multiple modifications in AlgArrProc, AlgImgProc, PyAlgos, ex_peakfinder_cspad.py to get production version (PSAS-147)

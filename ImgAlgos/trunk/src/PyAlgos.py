@@ -91,6 +91,15 @@ Usage::
     # set windows in segments to search for peaks
     alg.set_windows(winds) :
 
+    # Call after alg.peak_finder_v2 ONLY! Returns n-d array with 2-d maps of connected pixels 
+    maps = maps_of_connected_pixels()
+
+    GLOBAL METHODS
+    =========================
+    #   Subtracts numpy array of bkgd from data using normalization in windows.
+    #   Each window is specified by 5 parameters: (segment, rowmin, rowmax, colmin, colmax)
+    #   For 2-d arrays segment is not used, but still 5 parameters needs to be specified.
+    cdata = subtract_bkgd(data, bkgd, mask=None, winds=None, pbits=0)
 
 This software was developed for the LCLS project.
 If you use all or part of it, please give an appropriate acknowledgment.
@@ -111,15 +120,25 @@ import sys
 import numpy as np
 
 import ImgAlgos
+import pyimgalgos.GlobalUtils as piagu
+
+##-----------------------------
+
+def reshape_nda_to_2d(arr) :
+    """Reshape np.array to 2-d
+    """
+    sh = arr.shape
+    if len(sh)<3 : return arr
+    arr.shape = (arr.size/sh[-1], sh[-1])
+    return arr
 
 ##-----------------------------
 
 def reshape_nda_to_3d(arr) :
-    """Reshape np.array to 3d
+    """Reshape np.array to 3-d
     """
     sh = arr.shape
     if len(sh)<4 : return arr
-
     arr.shape = (arr.size/sh[-1]/sh[-2], sh[-2], sh[-1])
     return arr
 
@@ -388,6 +407,15 @@ class PyAlgos :
         arr = self.aap.maps_of_connected_pixels()
         if self.pbits & 128 : print_arr_attr(arr, cmt='maps_of_connected_pixels arr:')
         return arr
+
+##-----------------------------
+
+def subtract_bkgd(data, bkgd, mask=None, winds=None, pbits=0) :
+    """Subtracts numpy array of bkgd from data using normalization in windows.
+       Each window is specified by 5 parameters: (segment, rowmin, rowmax, colmin, colmax)
+       For 2-d arrays segment is not used, but still 5 parameters needs to be specified.
+    """
+    return piagu.subtract_bkgd(data, bkgd, mask, winds, pbits)
 
 ##-----------------------------
 ##---------- TEST -------------

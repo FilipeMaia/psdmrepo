@@ -9,6 +9,7 @@ from Detector.PyDetector import PyDetector
 from ImgAlgos.PyAlgos import PyAlgos, print_arr, print_arr_attr
 
 from pyimgalgos.PeakStore import PeakStore
+from pyimgalgos.GlobalUtils import subtract_bkgd
 
 ##-----------------------------
 # Initialization of graphics
@@ -21,9 +22,9 @@ print 'Test # %d' % ntest
 
 ##-----------------------------
 SKIP        = 0
-EVTMAX      = 10 + SKIP
+EVTMAX      = 20 + SKIP
 EVTPLOT     = 1 
-DO_PLOT     = True 
+DO_PLOT     = True
 ##-----------------------------
 
 def do_print(i) :
@@ -40,6 +41,7 @@ print '%s\nExample for\n  dataset: %s\n  source : %s' % (85*'_',dsname, src)
 
 # Non-standard calib directory
 #psana.setOption('psana.calib-dir', './empty/calib')
+psana.setOption('psana.calib-dir', '/reg/d/psdm/CXI/cxif5315/calib')
 
 ds  = psana.DataSource(dsname)
 evt = ds.events().next()
@@ -57,6 +59,13 @@ runnum = evt.run()
 det = PyDetector(src, env, pbits=0)
 print 85*'_', '\nInstrument: %s  run number: %d' % (det.instrument(), runnum)
 
+nda_peds  = det.pedestals(evt)
+nda_bkgd  = det.bkgd(evt)
+nda_smask = det.mask(evt, calib=False, status=True, edges=True, central=True, unbond=True, unbondnbrs=True)
+
+#print_arr_attr(nda_peds, 'nda_peds')
+#print_arr_attr(nda_bkgd, 'nda_bkgd')
+#print_arr_attr(nda_smask, 'nda_smask')
 ##-----------------------------
 
 shape_cspad = (32,185,388)
@@ -67,18 +76,25 @@ mask_img = np.loadtxt('../rel-mengning/work/roi_mask_nda_equ_arc.txt')
 mask_arc.shape = mask_equ.shape = mask_img.shape = shape_cspad
 print_arr_attr(mask_arc, 'mask_arc')
 
-winds_arc = [ (s, 0, 185, 0, 388) for s in (0,1,7,8,9,15,16,17,23,24,25,31)]
-winds_equ = [ (s, 0, 185, 0, 388) for s in (0,1,3,8,9,11,16,17,19,24,25,27)]
+
+seg1 = np.ones((185,388))
+regs_check = np.zeros(shape_cspad)
+for s in (4,12,20,28) : regs_check[s,10:100,270:370] = 20*seg1[10:100,270:370]
+
+winds_bkgd = [ (s, 10, 100, 270, 370) for s in (4,12,20,28)] # use part of segments 4 and 20 to subtr bkgd
+
+winds_arc  = [ (s, 0, 185, 0, 388) for s in (0,1,7,8,9,15,16,17,23,24,25,31)]
+winds_equ  = [ (s, 0, 185, 0, 388) for s in (0,1,3,8,9,11,16,17,19,24,25,27)]
 #winds_all = [ (s, 0, 185, 0, 388) for s in (0,1,3,7,8,9,11,15,16,17,19,23,24,25,27,31)]
 
 print_arr(winds_arc, 'winds_arc')
 print_arr_attr(winds_arc, 'winds_arc')
 
 alg_arc = PyAlgos(windows=winds_arc, mask=mask_arc, pbits=0)
-alg_arc.set_peak_selection_pars(npix_min=5, npix_max=6000, amax_thr=0, atot_thr=2000, son_min=8)
+alg_arc.set_peak_selection_pars(npix_min=5, npix_max=500, amax_thr=0, atot_thr=1000, son_min=6)
 
 alg_equ = PyAlgos(windows=winds_equ, mask=mask_equ, pbits=0)
-alg_equ.set_peak_selection_pars(npix_min=5, npix_max=6000, amax_thr=0, atot_thr=2000, son_min=8)
+alg_equ.set_peak_selection_pars(npix_min=5, npix_max=500, amax_thr=0, atot_thr=1000, son_min=6)
 
 #alg_equ.print_attributes()
 #alg_equ.print_input_pars()
@@ -140,7 +156,17 @@ for i, evt in enumerate(ds.events()) :
     if i>=EVTMAX : break
 
     # get calibrated data ndarray and proccess it if it is available
-    nda = det.calib(evt)
+    t1_sec = time()
+    #nda = det.calib(evt)
+
+    # Apply custom calibration: raw, -peds, -bkgd, *smask, -cmod
+    nda =  np.array(det.raw(evt), dtype=np.float32, copy=True)
+    nda -= nda_peds
+    nda =  subtract_bkgd(nda, nda_bkgd, mask=nda_smask, winds=winds_bkgd, pbits=0)
+    nda *= nda_smask
+    det.common_mode_apply(evt, nda)
+
+    #print '  ----> calibration dt = %f sec' % (time()-t1_sec)
 
     if nda is not None :
 
@@ -148,13 +174,14 @@ for i, evt in enumerate(ds.events()) :
         t0_sec = time()
 
         # run peakfinders and get list of peak records for each region
-        peaks_arc = alg_arc.peak_finder_v1(nda, thr_low=10, thr_high=100, radius=5, dr=0.05)
-        #peaks_arc = alg_arc.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+        #peaks_arc = alg_arc.peak_finder_v1(nda, thr_low=20, thr_high=150, radius=5, dr=0.05)
+        peaks_arc = alg_arc.peak_finder_v2(nda, thr=20, r0=5, dr=0.05)
 
-        peaks_equ = alg_equ.peak_finder_v1(nda, thr_low=10, thr_high=100, radius=5, dr=0.05)
-        #peaks_equ = alg_equ.peak_finder_v2(nda, thr=10, r0=5, dr=0.05)
+        #peaks_equ = alg_equ.peak_finder_v1(nda, thr_low=20, thr_high=150, radius=5, dr=0.05)
+        peaks_equ = alg_equ.peak_finder_v2(nda, thr=20, r0=5, dr=0.05)
 
         #maps_of_conpix_arc = alg_arc.maps_of_connected_pixels()
+        #maps_of_conpix_equ = alg_equ.maps_of_connected_pixels()
 
         ###===================
         if do_print(i) : print '%s\n%s\n%s\n%s' % (85*'_', pstore.header[0:66], pstore.rec_evtid(evt), addhdr)
@@ -191,15 +218,20 @@ for i, evt in enumerate(ds.events()) :
         ###===================
 
         if DO_PLOT and i%EVTPLOT==0 :
+        
+            #nda = nda_bkgd
+            #nda = nda_bkgd + regs_check      
+            #img = det.image(evt, nda)
+            #img = det.image(evt, nda)[xoffset:xoffset+xsize,yoffset:yoffset+ysize]
             img = det.image(evt, mask_img*nda)[xoffset:xoffset+xsize,yoffset:yoffset+ysize]
-            #img = det.image(evt, mask_img*maps_of_conpix)[xoffset:xoffset+xsize,yoffset:yoffset+ysize]
+            #img = det.image(evt, maps_of_conpix_equ)[xoffset:xoffset+xsize,yoffset:yoffset+ysize]
             ave, rms = img.mean(), img.std()
             amin, amax = ave-1*rms, ave+8*rms
             gg.plot_img(img, mode='do not hold', amin=amin, amax=amax)
             gg.plot_peaks_on_img(peaks_arc, axim, imRow, imCol, color='w') #, pbits=3)
             gg.plot_peaks_on_img(peaks_equ, axim, imRow, imCol, color='w') #, pbits=3)
 
-            #gg.plotHistogram(img, amp_range=(1,100), bins=99, title='Event %d' % i)
+            #gg.plotHistogram(nda, amp_range=(-100,100), bins=200, title='Event %d' % i)
 
             fig.canvas.set_window_title('Event: %d' % i)    
             fig.canvas.draw() # re-draw figure content
