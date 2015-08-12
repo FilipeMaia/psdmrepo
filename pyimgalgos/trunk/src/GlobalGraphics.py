@@ -1,5 +1,5 @@
 #------------------------------
-"""This module provides access to the calibration parameters
+"""Collection of global graphical methods.
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.

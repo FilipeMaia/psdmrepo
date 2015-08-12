@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-28
+2015-08-11 Mikhail S. Dubrovin
+- add GlobalUtils.py with method subtract_bkgd (PSAS-139)
+	
 Tag: V00-00-27
 2015-08-05 Mikhail S. Dubrovin
 - add PeakStore.py
