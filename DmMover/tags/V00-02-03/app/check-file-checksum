@@ -1,0 +1,69 @@
+#!/usr/bin/env python 
+
+import os
+import sys
+import argparse
+
+from DmMover.transmd5 import comp_bbcp_checksum
+
+
+usage = """
+Compare the checksums created by the data-mover for the files on FFB and ANA. 
+"""
+epilog=""" 
+
+Example:
+    %(prog)s --verbose /reg/d/ffb/xpp/xppa1213/xtc/e*xtc 
+
+
+Compare the two checksums of a file that were created by the dss->ffb mover and the 
+ffb->ana mover. The size a file on the FFB and its copied on ANA are also compared. 
+With the --disk option calculate the checksum reading the file on ANA and compare to
+the bbcp checksum.
+An error is reported if there is and checksum or file-size mismatch.
+"""
+
+#
+#  lfn = 
+#  cfn = /reg/d/psdm/<instr>/....  
+
+
+def main():
+
+    parser = argparse.ArgumentParser(description=usage, epilog=epilog)
+    
+    parser.add_argument("-v","--verbose", action="store_true", default=False, help="Verbose printouts")
+    parser.add_argument("--disk", action="store_true", 
+                        help="calculate checksum and compare to the one created by a data-mover")
+    parser.add_argument("--nosize", action="store_true", default=False, help="do not compare file sizes (Useful if file doesn't exist on ANA")
+    parser.add_argument("fnames", nargs='+', help="xtc file names either on FFB or ANA")
+    
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+    
+    prlen = len("/reg/d/psdm")
+    n_good, n_bad = 0,0
+    experiments = set()
+    for pfn in args.fnames:
+        ptoken = [x for x in pfn.split('/') if x]
+        exp = ptoken[4]
+        if not exp in experiments:
+            experiments.add(exp)
+        prefix = os.path.join("/", *ptoken[:3]) if args.disk else None
+        # lfn: /<instr>/<exp>/xtc/... 
+        lfn = os.path.join("/", *ptoken[3:])
+        stat = comp_bbcp_checksum(lfn, args.verbose, pfn_prefix=prefix, nosize=args.nosize)
+        if stat:
+            n_good += 1
+        else:
+            n_bad += 1
+            print "ERROR:", pfn
+
+    print "Result Good:", n_good, "Bad:", n_bad, experiments
+
+
+if __name__ == "__main__":
+
+    main()
