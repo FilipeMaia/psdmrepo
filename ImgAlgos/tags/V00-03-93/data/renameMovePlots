@@ -1,0 +1,48 @@
+#!/bin/sh
+
+echo "Number of input parameter(s) = $#"
+
+#sinkdir="figs-2012-06-15-cxi49012-filter"
+#sinkdir="figs-2012-06-27-cxi49012-filter"
+sinkdir="figs-2012-08-10-cxii0212-peakfinder-tuning"
+exp_run="cxii0212-r0091"
+evt="ev00001"
+beg_name="cspad"
+add_name=""
+#add_name="-selected"
+ext="png"
+
+if [ $# == 0 ] ; then
+echo "Use command: ./renameMovePlots <comment> [move]";
+exit 1;
+fi;
+
+par1=$1
+
+if [ $# == 1 ] ; then
+par2="none" ;
+else
+par2=$2 ;
+fi;
+
+echo $sinkdir_def
+echo $par1
+
+fnames="arr"
+fnames="$fnames spe"
+fnames="$fnames img"
+fnames="$fnames img-hr"
+
+for i in $fnames
+do
+  infile="$beg_name-$i.$ext"
+  outfile="$beg_name-$exp_run$add_name-$i-$par1.$ext"
+  echo "mv $infile  $sinkdir/$outfile"
+
+  if [ $par2 == "move" ]; then
+        mv $infile  $sinkdir/$outfile	
+  fi
+
+done
+
+echo "Add <move> at the end of the command line if everything is OK"
