@@ -1,0 +1,14 @@
+#exp-group {
+  padding:  10px;
+}
+#exp-group .info {
+    color:  maroon;
+}
+#exp-group button[name="update"] img {
+    width:  11px;
+}
+
+#exp-group #scope.ui-buttonset > label {
+    border-radius:      0 !important;
+    -moz-border-radius: 0 !important;
+}

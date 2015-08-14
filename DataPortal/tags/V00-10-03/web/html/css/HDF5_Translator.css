@@ -1,0 +1,159 @@
+#hdf5-translator {
+    padding:            0px;
+}
+
+#hdf5-translator > #tabs {
+    padding-top:        0px;
+    background:         0;
+    font-size:          11px;
+}
+#hdf5-translator > #tabs > ul {
+    background:         #f5f8f9 url(images/ui-bg_inset-hard_100_f5f8f9_1x100.png) 50% 50% repeat-x;
+}
+#hdf5-translator > #tabs > ul > li {
+    border-radius:      0 !important;
+}
+
+#hdf5-translator > #tabs > .panel {
+    border-left:        1px solid #c0c0c0;
+    padding:            10px 10px 10px 20px;
+    background-color:   #ffffff;
+    font-size:          12px;
+}
+
+#hdf5-translator .info {
+    color:  maroon;
+}
+#hdf5-translator .info#info {
+    font-size:          18px;
+}
+#hdf5-translator .panel#status > #ctrl {
+    margin-bottom:      20px;
+    font-size:          12px;
+}
+
+#hdf5-translator .panel#status > #ctrl span.label  {
+    display:            block;
+    margin-bottom:      5px;
+    margin-right:       10px;
+    font-weight:        bold;
+}
+#hdf5-translator .panel#status > #ctrl input[type="text"] ,
+#hdf5-translator .panel#status > #ctrl select  {
+    display:            block;
+    margin-bottom:      5px;
+    margin-right:       10px;
+}
+
+#hdf5-translator .panel#status > #ctrl input[name="runs"] {
+    width:              100%;
+}
+
+#hdf5-translator .panel#status > #ctrl .group {
+    float:              left;
+    margin-right:       20px;
+}
+#hdf5-translator .panel#status > #ctrl .buttons {
+    margin-left:        20px;
+    padding-top:        17px;
+}
+
+#hdf5-translator .panel#status > #body {
+    margin-left:        20px;
+}
+
+#hdf5-translator .panel#status > #body > #ctrl {
+    margin-top:         20px;
+}
+#hdf5-translator .panel#status > #body > #ctrl > div {
+    display:            inline-block;
+    margin-right:       30px;
+}
+#hdf5-translator .panel#status > #body > #ctrl span {
+    margin-left:        10px;
+}
+
+#hdf5-translator .panel#status > #body > #viewer {
+    margin-top:         15px;
+}
+
+#hdf5-translator .panel#status > #body > #viewer * {
+    font-family:        Verdana !important;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests {
+    border:             0;
+    border-spacing:     0px;
+    box-shadow:         0 5px 10px rgba(0,0,0,0.36);
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > thead td {
+    padding:        3px 5px;
+    background:     #d0d0d0;
+    border-right:   1px solid #0a0a0a;
+    border-bottom:  1px solid  #0a0a0a;
+    font-weight:    bold;
+    white-space:    nowrap;
+}
+#hdf5-translator .panel#status > #body > #viewer table.requests > thead > tr > td:first-child {
+    border-left:    1px solid #d0d0d0;
+}
+#hdf5-translator .panel#status > #body > #viewer table.requests > thead > tr > td:last-child {
+    border-right:   1px solid #d0d0d0;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody td {
+    padding:        3px 5px;
+    border-right:   1px solid #e0e0e0;
+    font-family:    Helvetica, sans-serif !important;
+    font-size:      12px;
+    white-space:    nowrap;
+}
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody td:last-child {
+    border-right:   0;
+}
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr.run-header > td {
+    border-top:     1px solid #e0e0e0;  //#0a0a0a; #0071BC;
+/*    background:     rgba(240, 248, 255, 0.39); //aliceblue;*/
+}
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr:first-child.run-header > td {
+    border-top:     0;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr.run-header > td:first-child {
+    background:     #ffffff;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr.first-in-class > td:not(:first-child) {
+    border-top:     1px solid #e0e0e0;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr.hdf5 {
+    background:     #fcfce4; //aliceblue;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody > tr.hdf5 > td:first-child {
+    background:     #ffffff;
+}
+
+#hdf5-translator .panel#status > #body > #viewer table.requests > tbody td button span {
+    font-size:      9px !important;
+}
+
+#hdf5-translator .panel#config > #ctrl {
+    margin-bottom:  20px;
+}
+#hdf5-translator .panel#config > #ctrl > .hdf5-notes {
+    max-width:      520px;
+    margin-right:   20px;
+    padding-top:    5px;
+    line-height:    16px;
+}
+
+#hdf5-translator .panel#config > #body {
+    padding-left:   10px;
+}
+
+#hdf5-translator .buttons button[name="update"] img {
+    width:          11px;
+}
