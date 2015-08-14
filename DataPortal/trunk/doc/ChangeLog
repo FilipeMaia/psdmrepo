@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+Tag: V00-10-03
+2015-08-14 Igor Gaponenko
+- fixed a bug in the Web service 'filemgr_files_search.php' (JIRA PSWA-54)
+
 Tag: V00-10-02
 2015-08-07 Igor Gaponenko
 - improved error reporting in the ServiceJSON

@@ -571,7 +571,7 @@ function handler ($SVC) {
                             'irods_dst_resource' => 'lustre-resc '
                        )
                     ) ;
-                    if (!is_null($request)) {
+                    if (!is_null($request) && (!($request['status'] === 'DONE') || ($request['status'] === 'FAILED'))) {
                         $entry['local'] = '<span style="color:black;">Restoring from tape...</span>' ;
                         $entry['restore_flag'] = 1 ;
                         $entry['restore_requested_time'] = $request['requested_time']->toStringShort() ;
