@@ -657,6 +657,7 @@ class Psana( unittest.TestCase ) :
         testStr = evt.get(str,'testkey')
         self.assertEqual(testStr,'testing string', msg="testStr does not have expected value")
         
+    @unittest.skip("sometimes fails on rel7 JIRA PSAS-177")
     def testLiveMode(self):
         '''Test that live mode works works. In particular, we are concerned about 
         merging with control streams. Tests:
