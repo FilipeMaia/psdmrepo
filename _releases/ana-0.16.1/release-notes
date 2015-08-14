@@ -1,0 +1,27 @@
+Psana:
+- ImgAlgos:  for Python-to-C++ project modules clean-up code, sort-out
+  print-out info, update documentation (PSAS-147); Multiple modifications
+  in AlgArrProc, AlgImgProc, PyAlgos, ex_peakfinder_cspad.py to get production
+  version; in PyAlgos.py add reshape_nda_to_2d, subtract_bkgd, update doc.
+- Detector:  minor extension of examples; add app/det_ndarr_average and
+  examples/ex_nda_average.py (PSAS-139)
+- pyimgalgos: add PeakStore.py; in GlobalGraphics.py add plot_peaks_on_img(),
+  extend show(mode) add DOCGEN in SConscript; add GlobalUtils.py with method
+  subtract_bkgd - with algorithm for normalized background subtraction in python (PSAS-139)
+- CalibManager: ConfigParametersForApp.py - add type pixel_bkgd and pixel_mask in
+  the list of types for all detectors; GUIFileManagerSingleControl.py - make persistent
+   path to source file.
+- PSCalib: fixed compiler complains in method rotation_cs() for RHEL7 migration
+
+Bugs fixed:
+- pdscalibdata: in NDArrIOV1 fix migration to RHEL7 problem reported in PSAS-171.
+- Translator: fix problem with translating ndarrays associated with src with
+  split event damage PSAS-172.
+- Translator: fix problem with translating vlen ndarrays that manifests
+  on RHEL7 PSAS-170.
+- Translator, psana_test: make unit tests write output to subdirectory based
+  on $SIT_ARCH - fix buildbot failure issues
+- psmon: fix issue with using newer version of matplotlib
+
+Other improvements:
+- suppressed compilation warnings triggered by Boost headers on RHEL7
