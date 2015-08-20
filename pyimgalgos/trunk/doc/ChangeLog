@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 =======
+Tag: V00-00-29
+2015-08-20 Mikhail S. Dubrovin
+- add NDArrSpectrum.py (PSAS-178)
+- adjust parameters in GlobalGraphics.hist1d
+	
 Tag: V00-00-28
 2015-08-11 Mikhail S. Dubrovin
 - add GlobalUtils.py with method subtract_bkgd (PSAS-139)

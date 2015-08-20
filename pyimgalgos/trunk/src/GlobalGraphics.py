@@ -166,16 +166,19 @@ def plotHistogram(arr, amp_range=None, figsize=(6,6), bins=None, title='', windo
 #--------------------------------
 
 def hist1d(arr, bins=None, amp_range=None, weights=None, color=None, show_stat=True, log=False, \
-           figsize=(6,5), axwin=(0.15, 0.10, 0.78, 0.82), \
+           figsize=(6,5), axwin=(0.15, 0.12, 0.78, 0.80), \
            title=None, xlabel=None, ylabel=None, titwin=None) :
     """Makes historgam from input array of values (arr), which are sorted in number of bins (bins) in the range (amp_range=(amin,amax))
     """
+    #print 'hist1d: title=%s, size=%d' % (title, arr.size)
+    if arr.size==0 : return None, None, None
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    if   titwin is not None : fig.canvas.set_window_title(titwin)
+    elif title  is not None : fig.canvas.set_window_title(title)
     axhi = fig.add_axes(axwin)
     hbins = bins if bins is not None else 100
     hi = axhi.hist(arr.flatten(), bins=hbins, range=amp_range, weights=weights, color=color, log=log) #, log=logYIsOn)
     if amp_range is not None : axhi.set_xlim(amp_range) # axhi.set_autoscale_on(False) # suppress autoscailing
-    if titwin is not None : fig.canvas.set_window_title(titwin)
     if title  is not None : axhi.set_title(title, color='k', fontsize=20)
     if xlabel is not None : axhi.set_xlabel(xlabel, fontsize=14)
     if ylabel is not None : axhi.set_ylabel(ylabel, fontsize=14)

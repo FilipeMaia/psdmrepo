@@ -26,10 +26,11 @@ import matplotlib.pyplot as plt
 #------------------------------
 
 def valueToIndexProtected(V, VRange) :
-    """Input: V - numpy array of values,
-              VRange - Vmin, Vmax, contains the binning parameters Vmin, Vmax, and Nbins
-       Output: Array of indexes from 0 to Nbins (Nbins+1 index) with shape of V.
-       The last index Nbins is used for overflow and underflow.
+    """Returns array of indexes from array of values
+    @param[in] V - numpy array of values,
+    @param[in] VRange - Vmin, Vmax, contains the binning parameters Vmin, Vmax, and Nbins
+    Output: Array of indexes from 0 to Nbins (Nbins+1 index) with shape of V.
+    The last index Nbins is used for overflow and underflow.
     """
     Vmin, Vmax, Nbins = VRange
     Nbins1 = int(Nbins)-1
