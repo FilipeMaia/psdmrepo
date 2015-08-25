@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2015-08-24 Mikhail S. Dubrovin
+Tag: V00-00-26
+- CalibPars.py - in findCalibFile use PSCalib.CalibFileFinder.findCalibFile(...) in stead of local algorithm 
+
+#---------------------
 2015-01-06 Mikhail S. Dubrovin
 Tag: V00-00-25
 - CSPAD2x2ImageUtils.py - add support for non-standard (2,185,388) shape of cspad2x2 ndarray

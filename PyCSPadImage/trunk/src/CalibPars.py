@@ -35,6 +35,8 @@ import numpy as np
 import PyCSPadImage.CalibParsDefault   as cpd
 import PyCSPadImage.CSPADCalibParsEvaluated as cpe
 
+from PSCalib.CalibFileFinder import CalibFileFinder
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -89,7 +91,7 @@ class CalibPars (object) :
 
     def __init__ (self, path=None, run=None, list_of_clib_types=None) :
         """Class constructor:
-           The path and run need to be defined to instantiate the object and load correct set of parameters.
+          The path and run need to be defined to instantiate the object and load correct set of parameters.
            If path or run is omitted, default parameters will be used. 
            Run number can be omitted here and passed later in getCalibPars(type, run)
            list_of_clib_types - optional parameter for optimization of time; only types from the list will be loaded.
@@ -313,6 +315,39 @@ class CalibPars (object) :
 #---------------------
 
 def findCalibFile (path_to_clib_types, type=None, run=None) :
+    """Use method PSCalib.CalibFileFinder.findCalibFile(...)
+    """
+
+    err_msg_prefix = 'findCalibFile(): ERROR in findCalibFile(path, type, run): '
+
+    if type==None :
+        print  err_msg_prefix + 'type IS NOT SPECIFIED'
+        return None
+
+    if run==None :
+        print  err_msg_prefix + 'run IS NOT SPECIFIED'
+        return None
+  
+    if not os.path.exists(path_to_clib_types) :
+        print  'WARNING in findCalibFile(): PATH %s DOES NOT EXIST.' % path_to_clib_types
+        return None
+
+    cdir, group, src = path_to_clib_types.rstrip('/').rsplit('/',2)
+    #cdir  = '/reg/d/psdm/xpp/xppi0815/calib'
+    #group = 'CsPad::CalibV1'
+    #src   = 'XppGon.0:Cspad.0'
+
+    cff = CalibFileFinder(cdir, group, pbits=0) # =0377
+    fname = cff.findCalibFile(src, type, run)
+
+    #print 'findCalibFile  cdir: %s\n  type: %s\n  runnum: %d' % (cdir, type, run)
+    #print '  calibration file name: %s' % fname
+
+    return fname
+
+#---------------------
+
+def findCalibFile_depricated (path_to_clib_types, type=None, run=None) :
     """Use the run number, self.path_to_calib_types, and type of the calibration constants.
        From the directory self.path_to_calib_types + '/' + type select the file
        which run range is valid for requested run.
