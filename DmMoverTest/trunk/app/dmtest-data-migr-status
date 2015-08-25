@@ -142,12 +142,12 @@ def main():
     # add file command
     add_parser = subparsers.add_parser('add', help='add run to file table')
     add_parser.add_argument("--with-fn", default=False, action="store_true",
-                            help="Use src_path as file path and don't construct the filename") 
+                            help="src_path contains file name") 
     add_parser.add_argument("runnr", type=int, help="run number")
     add_parser.add_argument("stream", type=int, help="stream")
     add_parser.add_argument("chunk", type=int, help="chunck")
     add_parser.add_argument("src_host", help="src host")
-    add_parser.add_argument("src_path", help="src_path includes filename (basename)")
+    add_parser.add_argument("src_path", help="src path of file (file name not included, it will be constructed)")
     add_parser.set_defaults(func=do_addfile_cmd)
 
     # A add run command
