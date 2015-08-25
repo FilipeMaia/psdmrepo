@@ -17,7 +17,7 @@ from DmMover.experiment import ExperimentInfo
 from DmMover.irodsreg import IrodsRegisterFile
 from DmMover.bbcp_mvr import BbcpCmd
 from DmMover.iocntrl import StdinCtrl
-from DmMover.mvrutils import network_name, trgpath_param
+from DmMover.mvrutils import network_name, trgpath_param, rm_remote_file
 
 
 # -----------------------------------------------------
@@ -31,6 +31,8 @@ irods = IrodsRegisterFile()
 mover = BbcpCmd()
 trg_path = None    # function that returns the trgpath for instrument
 
+__reldir = os.path.dirname(os.path.realpath(__file__))
+__rmcmd = os.path.join(__reldir, "mvr-rm-dss")
 
 # ============================================================================
 
@@ -91,7 +93,7 @@ def add4offline_migr(expid, trgfile, filetype):
 
 # ======================================================================
 
-def do_copy_xtc(transfer, exper, file_type=None):
+def do_copy_xtc(transfer, exper, file_type=None, do_rm=False):
     """ Transfer xtc file """
 
     srchost = network_name(transfer['host'])
@@ -139,6 +141,8 @@ def do_copy_xtc(transfer, exper, file_type=None):
             add4offline_migr(exper.id, trgfile, file_type)
         else:
             irods.register(linkfile, exper.instr, exper.name, file_type)
+        if do_rm:
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
     else:
         db.file_migration_stop(exper.id, basefilename, "b%d" % status)
         logging.error('Copy failed rc=%d', status)
@@ -147,7 +151,7 @@ def do_copy_xtc(transfer, exper, file_type=None):
 
 # ================================================================================
 
-def do_copy_index(transfer, exper, file_type=None, mark_failed=False):    
+def do_copy_index(transfer, exper, file_type=None, do_rm=False, mark_failed=False):    
     """ Transfer xtc and xtc.idx file from online to offline """
 
     basefilename = transfer['file']
@@ -181,6 +185,8 @@ def do_copy_index(transfer, exper, file_type=None, mark_failed=False):
         db.file_migration_stop(exper.id, basefilename)
         if exper.do_reg_ana:
             add4offline_migr(exper.id, trgfile, file_type)
+        if do_rm:
+            rm_remote_file(srchost, srcfile, trgfile, __rmcmd)
     else:
         # set error or mark file as FAIL
         db.file_migration_stop(exper.id, basefilename, "i%d" % status, mark_failed)
@@ -311,14 +317,14 @@ def transfer_loop(transfer_files, experiments, options, ctrl):
         check_if_exper_path_exists(exper, options.mode)
 
         if file_type in ('xtc', 'smd.xtc'):
-            rc = do_copy_xtc(transfer, exper, file_type=file_type)
+            rc = do_copy_xtc(transfer, exper, file_type=file_type, do_rm=options.rm)
             if rc != 0:
                 failed_transfer = True
             elif index_for_xtc:
                 ctrl.exit_if_requested()
                 do_copy_index(index_for_xtc, exper, file_type='xtc.idx')
         elif file_type == 'xtc.idx':
-            rc = do_copy_index(transfer, exper, file_type='xtc.idx', mark_failed=options.fail_idx)
+            rc = do_copy_index(transfer, exper, file_type='xtc.idx', do_rm=options.rm, mark_failed=options.fail_idx)
             if rc != 0:
                 failed_transfer = True
 
@@ -369,9 +375,10 @@ def main(argv=None):
     parser.add_option("--noidx",  action="store_true", default=False, help="Do not transfer index files")
     parser.add_option("--failidx", dest="fail_idx", action="store_true", default=False,
                       help="Mark idx files as lost if they could not be transferred")
-    parser.add_option("--mode", choices=('dss-ffb', 'ioc-ffb', 'ioclocal-ffb', 'ffb-offline', 'ffb-local', 'ioc-offline', 'local'), 
+    parser.add_option("--mode", choices=('dss-ffb', 'dsslocal-ffb', 'ioc-ffb', 'ioclocal-ffb', 'ffb-offline', 'ffb-local', 'ioc-offline', 'local'), 
                       help="transfer mode: ffb-offline or local")
     parser.add_option("--nopath", action="store_true", default=False, help="Do not check/create path")
+    parser.add_option("--rm", action="store_true", default=False,  help="remove file on the src host")
 
     parser.add_option("--querywait", type='int', default=20, help="wait between query for new transfers")
     parser.add_option("-v", "--verbose", action="count", default=0, help="debug level e.g: -v, -vv")
@@ -444,6 +451,11 @@ def main(argv=None):
     elif options.mode == 'dss-ffb':                    # dss->ffb_b 
         db.table_dm()
         mover.config(remote=True, realtime=True)
+        trg_path = trgpath_param(options.mode, "/brick1")
+    elif options.mode == 'dsslocal-ffb':              # dss_u2->ffb_b 
+        db.table_dm()
+        mover.bbcp="bbcp"
+        mover.config(remote=False, realtime=True)
         trg_path = trgpath_param(options.mode, "/brick1")
     elif options.mode == 'ioc-offline':                # ioc_u->ana 
         db.table_dm()

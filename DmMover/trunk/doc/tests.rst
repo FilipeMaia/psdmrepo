@@ -20,11 +20,11 @@ Create/modify entries in regdb
 
 Show files for an experiemnt (--expid <id>. defaiult 18, amadaq09).
 
-% dmtest_data_migr_status list --status all  | egrep '^18' | column  -t -s  '|'
+% dmtest-data-migr-status list --status all  | egrep '^18' | column  -t -s  '|'
 
 Set the status for a particular file:
 
-% dmtest_data_migr_status  set  e18-r0015-s00-c01.smd.xtc
+% dmtest-data-migr-status  set  e18-r0015-s00-c01.smd.xtc
 
  
 

@@ -14,7 +14,8 @@ class BbcpCmd(object):
     >>> mover.transfer(src, src_path, trg, trg_path, options="extra bbcp options")
     """
     def __init__(self):     
-        self.bbcp_remote = "ssh -x -a -oFallBackToRsh=no %I -l %U %H ionice -c2 -n7 /reg/g/pcds/pds/datamvr/bbcp-ssl" 
+        #self.bbcp_remote = "ssh -x -a -oFallBackToRsh=no %I -l %U %H ionice -c2 -n7 /reg/g/pcds/pds/datamvr/bbcp-ssl" 
+        self.bbcp_remote = "ssh -x -a -oFallBackToRsh=no %I -l %U %H ionice -c2 -n7 {}" 
         self.bbcp = "/reg/g/pcds/pds/datamvr/bbcp-ssl"
         self.user, self.ssh_key = None, None
         self.local_transfer = False
@@ -30,7 +31,7 @@ class BbcpCmd(object):
             
         print remote, realtime
         if remote:
-            self.bbcpcmd = "{} -S \"{}\" {}-z -P 15 -v -s 1".format(self.bbcp,self.bbcp_remote,ropt)
+            self.bbcpcmd = "{} -S \"{}\" {}-z -P 15 -v -s 1".format(self.bbcp,self.bbcp_remote.format(self.bbcp),ropt)
         else:
             self.bbcpcmd = "{} {}-P 15 -v -s 1".format(self.bbcp,ropt)
         
@@ -68,7 +69,6 @@ class BbcpCmd(object):
             trgurl = "%s:%s" % (trg, trg_path)
         else:
             trgurl = trg_path
-
 
         if self.ssh_key:
             extra_options = "%s -i %s" % (options, self.ssh_key)
