@@ -1,0 +1,143 @@
+#!/usr/bin/env python 
+
+from __future__ import print_function
+
+import os
+import sys
+import time
+import argparse
+
+import RegDB.experiment_info as expinfo 
+
+
+class CleanupFFB(object):
+    
+    def __init__(self):
+
+        self.do_rm = False
+
+
+    def run(self, exp):
+
+        file_count = self.clean_xtc_dir(exp.path, exp.md5root)
+        if file_count > 0:
+            print("Failed")
+
+
+    def check_xtc_dir(self, path):
+        """ Check if files still exist in experiment directory.
+        Return files found (not counting those in md5 dirs), directories found
+        and md5 folders found.
+        """
+
+        file_count = 0
+        to_rm, md5_dirs = set(), set()
+
+        for root, dirs, fl in os.walk(path):
+            to_rm.add(root)
+            if os.path.basename(root) == 'md5':
+                md5_dirs.add(root)
+            else:
+                if len(fl) > 0:
+                    print("Found files", root, len(fl))
+                    file_count += len(fl)
+
+        return file_count, to_rm, md5_dirs
+
+    def clean_xtc_dir(self, ffbpath, md5path):
+        """ Check if no files exist except md5 ones """
+
+        # First check if xtc file can be removed 
+
+        nfiles, to_rm_dir, md5_dir = self.check_xtc_dir(ffbpath)
+        print("Files:", nfiles)
+
+        if nfiles == 0:
+            
+            for f in md5_dir:
+                if f.startswith(ffbpath):
+                    md5_trg = os.path.join(md5path, f.replace(ffbpath, '').lstrip('/'), 'ffb') 
+                    if not os.path.exists(md5_trg):
+                        os.makedirs(md5_trg)
+                    cmd = "rsync --remove-source-files -av {}/ {}/.".format(f, md5_trg)
+                    print(cmd, "rm=", self.do_rm)
+                    if self.do_rm:
+                        os.system(cmd)
+                else:
+                    print("Could not determine md5 relative dir")
+
+            rm_list = list(to_rm_dir)
+            rm_list.sort(reverse=True)
+            # remove folders
+            try:
+                for f in rm_list:
+                    print("rm", f, self.do_rm)
+                    if self.do_rm:
+                        os.rmdir(f)
+            except OSError as e:
+                print(e)
+                
+
+        return nfiles
+
+
+
+class ExpInfo:
+    pass
+
+
+def find_exp(instr, rootpath="/reg/d/ffb"):
+
+    for exp in os.listdir(os.path.join(rootpath, instr)):
+        if exp.startswith(instr):
+            yield exp
+    
+        
+# ======================================================================================
+
+
+def main():
+
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("instr", help="instrument to cleanup")
+    parser.add_argument("--nexp", type=int, default=1, help="Max number of experiments to remove")
+    parser.add_argument("--days", type=int, default=365, help="min age of last run taken")
+    parser.add_argument("--dorm", action='store_true', default=False, help="remove directories")
+
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        return 0
+
+    print("Cleanup for instrument:", args.instr)
+    min_age = float(args.days) * 3600. * 24. 
+
+    cleaner = CleanupFFB()
+    cleaner.do_rm = args.dorm
+
+    nmax = args.nexp
+    print("Options", args.dorm, nmax, type(nmax), min_age)
+    for expname in find_exp(args.instr):
+        if nmax <= 0:
+            break        
+        exp = ExpInfo()
+        exp.name = expname
+        exp.path = "/reg/d/ffb/{}/{}".format(exp.name[:3], exp.name)
+        exp.id = expinfo.name2id(exp.name)
+
+        age = time.time() -  max((f['open'] for f in expinfo.get_open_files(exp.id)))
+        if age > min_age:        
+            print(nmax, exp.name, exp.id, exp.path, "Age ", age/3600./24.)
+
+            exp.md5root = "/reg/g/psdm/psdatmgr/datamvr/md5/{}/{}".format(exp.name[:3], exp.name)
+            cleaner.run(exp)
+            nmax -= 1
+
+
+
+
+
+if __name__ == "__main__":
+    
+    main()
