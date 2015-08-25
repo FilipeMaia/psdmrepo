@@ -1,0 +1,300 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package PyCSPadImage
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+#---------------------
+2015-08-24 Mikhail S. Dubrovin
+Tag: V00-00-26
+- CalibPars.py - in findCalibFile use PSCalib.CalibFileFinder.findCalibFile(...) in stead of local algorithm 
+
+#---------------------
+2015-01-06 Mikhail S. Dubrovin
+Tag: V00-00-25
+- CSPAD2x2ImageUtils.py - add support for non-standard (2,185,388) shape of cspad2x2 ndarray
+	
+#---------------------
+2014-07-18 Mikhail S. Dubrovin
+Tag: V00-00-24
+- CalibParsDefault.py - change default parameters for marg_gap_shift and offset
+- GlobalMethods.py - in getCSPadArrayFromFile add input from *.npy 	
+- Alignment.py - update
+
+#---------------------
+2014-07-02 Mikhail S. Dubrovin
+Tag: V00-00-23
+- CSPADPixCoords.py - use offset for pixel coordinates by default - add do_crop=True
+
+#---------------------
+2014-06-20 Mikhail S. Dubrovin
+Tag: V00-00-22
+-       src/PixCoords2x1.py - add get_xyz_maps_um(sp), add singleton cspad2x1_one
+-       src/Alignment.py - add allignment for new optical data
+	
+#---------------------
+2014-03-27 Mikhail S. Dubrovin
+Tag: V00-00-21
+- move GlobalGraphics and AngularIntegrator in pyimgalgos
+- in all imports use full path - import Package.Module as ...
+- removed loop dependence between HDF5Methods and CSPADCalibParsEvaluated
+	
+#---------------------
+2014-03-26 Mikhail S. Dubrovin
+Tag: V00-00-20
+- add new ring center searching algorithm in quad alignment Alignment.py old went to AlignmentV1.py
+	
+#---------------------
+2012-12-17 Mikhail S. Dubrovin
+Tag: V00-00-19
+A       src/CSPAD2x2ImageUtils.py
+A       src/CSPADImageUtils.py
+
+#---------------------
+2012-11-25 Mikhail S. Dubrovin
+Tag: V00-00-18
+- in GlobalGraphics.py add protected setting for matplotlib.use('Qt4Agg')
+
+#---------------------
+2012-10-22 Mikhail S. Dubrovin
+Tag: V00-00-17
+- in CSPadConfigPars.py comment test print statements
+
+#---------------------
+2012-09-24 Mikhail S. Dubrovin
+Tag: V00-00-16
+- in CSPadArrayImage.py fix skipped row of 2x1s in the array
+
+#---------------------
+2012-08-20 Mikhail S. Dubrovin
+Tag: V00-00-15
+- Improve test examples, add comments, change new method name in CSPadArrayImage.py
+	
+#---------------------
+2012-08-19 Mikhail S. Dubrovin
+Tag: V00-00-14
+- add module CSPadArrayImage.py
+	
+#---------------------
+2012-06-27 Mikhail S. Dubrovin
+Tag: V00-00-13
+- work on interface improvement 
+M       src/CalibParsEvaluated.py
+M       src/CalibPars.py
+M       src/PixCoords2x1.py
+M       src/CalibParsDefault.py
+A       src/CSPADCalibParsEvaluated.py
+M       src/CSPAD2x2CalibPars.py
+M       src/Alignment.py
+M       src/Examples.py
+M       src/CSPAD2x2PixCoords.py
+M       src/GlobalGraphics.py
+
+#---------------------
+2012-06-19 Mikhail S. Dubrovin
+- work on interface improvement 
+M       src/CalibParsDefault.py
+M       src/CSPadConfigPars.py
+M       src/CSPAD2x2CalibPars.py
+M       src/CSPAD2x2CalibParsDefault.py
+M       src/CSPAD2x2PixCoords.py
+M       src/CSPADPixCoords.py
+
+#---------------------
+2012-06-19 Mikhail S. Dubrovin
+- work on interface improvement 
+M       src/CSPadConfigPars.py
+M       src/HDF5Methods.py
+M       src/CSPAD2x2PixCoords.py
+M       src/CSPADPixCoords.py
+
+#---------------------
+2012-06-14 Mikhail S. Dubrovin
+- work on interface improvement 
+M       src/CalibPars.py
+D       src/CSPadPixCoordsWODB.py -> renamed to
+A  +    src/CSPADPixCoords.py
+M       src/PixCoords2x1.py
+M       src/CSPAD2x2CalibPars.py
+M       src/CSPAD2x2CalibParsDefault.py
+M       src/Alignment.py
+M       src/Examples.py
+M       src/CSPAD2x2PixCoords.py
+M       src/GlobalGraphics.py
+M       src/CSPAD2x2Examples.py
+
+#---------------------
+2012-06-07 Mikhail S. Dubrovin
+Tag: V00-00-12
+- improve interface
+M       src/PixCoords2x1.py
+M       src/CSPAD2x2CalibPars.py
+M       src/CSPAD2x2CalibParsDefault.py
+	
+#---------------------
+2012-03-14 Mikhail S. Dubrovin
+Tag: V00-00-11
+- add modules for CSPAD2x2:
+M       src/CalibParsEvaluated.py
+M       src/CalibPars.py
+M       src/CalibParsDefault.py
+M       src/PixCoords2x1.py
+A       src/CSPAD2x2CalibPars.py
+M       src/HDF5Methods.py
+A       src/CSPAD2x2CalibParsDefault.py
+M       src/Alignment.py
+M       src/GlobalGraphics.py
+D       src/CSPad2x2PixCoordsWODB.py -> src/CSPAD2x2PixCoords.py
+A       src/CSPAD2x2Examples.py
+
+2012-03-08 Mikhail S. Dubrovin
+Tag: V00-00-10
+- add CSPad2x2PixCoordsWODB.py for CSPad2x2
+- isolate PixCoords2x1.py from CSPadPixCoordsWODB.py and use it as a superclass
+
+#-----------------
+2013-02-28 Igor Gaponenko
+Tag: gapon-2013-02-28
+- migrated to explicit passing of CalParams object instead ofrelying on
+a sigleton
+
+#---------------------
+2012-02-01 Mikhail S. Dubrovin
+Tag: V00-00-09
+- Add module for cspad coordinates and image production without data base:
+A       src/CSPadPixCoordsWODB.py	
+	
+#---------------------
+2012-01-31 Mikhail S. Dubrovin
+Tag: V00-00-08
+M       src/GlobalGraphics.py
+
+#---------------------
+2012-06-29 Mikhail S. Dubrovin
+Tag: V00-00-07
+- Change names for CSpad Mini -> 2x2
+- Add Example for CSpad2x1
+M       src/Examples.py
+M       src/CSPadImageProducer.py
+M       src/GlobalMethods.py
+M       src/CSPadConfigPars.py
+
+#---------------------
+2012-06-25 Mikhail S. Dubrovin
+Tag: V00-00-06
+- Add mirror reflection of pixel coordinates in 
+	evaluateCSPadPixCoordinates (self, rotation=0, mirror=False) and
+        evaluateCSPadPixCoordinatesShapedAsData(self, fname, dsname, rotation=0, mirror=False)
+M       src/CalibParsEvaluated.py
+
+#---------------------
+2012-06-05 Mikhail S. Dubrovin
+Tag: V00-00-05
+- Add evaluation of the pixel coordinate arrays for 
+  entire cspad shape=(4,8,185,388), 
+  and for data-driven shape=(Nseg,185,388)
+- Add respective examples:
+M       src/CalibParsEvaluated.py
+M       src/Examples.py
+M       src/CalibPars.py
+
+#---------------------
+2012-05-08 Mikhail S. Dubrovin
+Tag: V00-00-04
+	
+- Add/modify modules in order to work with CSPad clobal 
+  2x1 coordimates
+A       PyCSPadImage/src/CalibParsEvaluated.py
+M       PyCSPadImage/src/Examples.py
+M       PyCSPadImage/src/Alignment.py
+M       PyCSPadImage/src/CalibPars.py
+M       PyCSPadImage/src/CSPadImageProducer.py
+M       PyCSPadImage/src/GlobalMethods.py
+M       PyCSPadImage/src/CSPadConfigPars.py
+	
+#---------------------
+2012-03-09 Mikhail S. Dubrovin
+Tag: V00-00-03
+	
+- Add Alignment.py, in order to isolate alignment stuff from Examples.py
+- Remove the alignment stuff from Examples.py
+- In Alignment.py add loading pedestals from calib file and subtraction.
+- In HDF5Methods.py add method: getAverageCSPadEvent(...)
+
+#---------------------
+2012-01-23 Mikhail S. Dubrovin
+
+- HDF5Methods.py: add methods 
+  get_cspad_name_and_data_type_from_dataset_name( dsname )
+  get_root_calib_dir_from_hdf5_path( path )
+  def get_cspad_calib_dir( path, cspad_name='CxiDs1.0:Cspad.0' )	
+  get_run_number_from_hdf5_file_name( fname )
+
+- GlobalMethods.py add methods
+  get_item_last_three_names(dsname)
+  getListOfFilesInDir(dirname)
+  printListOfFilesInDir(dirname)	
+	
+2012-01-20 Mikhail S. Dubrovin
+Tag: V00-00-02
+
+- PyCSPadImage/src/CalibPars.py
+  order the file list: flist.sort() 
+  in order to have 0-end.data and 1150-end.data in a right order
+
+- Examples.py
+  is modified for calibration purpose.
+
+	
+2011-11-18 Mikhail S. Dubrovin
+        - add Examples.py
+        - Move examples from CSPadImageProducer.py to new module Examples.py
+	- Make examples more readable
+	- Commented print statements inside the modules CalibPars.py and HDF5Methods.py
+	- Add example for xpp47712
+	
+2011-10-19 Mikhail S. Dubrovin
+Tag: V00-00-01
+
+In CSPadConfigPars.py 
+	- add setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
+	- remove optimization: #if fname != self.fileNameWithAlreadySetCSPadConfiguration :
+          which does not work in case of swap between Ds1 and Dsd
+	- add 'try-except' protection in getQuadNumsInEvent(...)
+
+  In HDF5Methods.py change getOneCSPadEventForTest(...) :
+        - use setCSPadConfigurationFromOpenFile()
+        - add close() for hdf5 file
+	
+2011-10-18 Mikhail S. Dubrovin
+
+- Add in example access to cxi37411 constants
+- The HDF5Methods.getOneCSPadEventForTest() now retreave 
+  configuration for each event:
+	cspadconfig.setCSPadConfiguration( fname, dsname, event )
+  We need it if the set of sensors is not complete, 
+  like in Dsd now (3 2x1 are missing).
+	
+- Changed modules:
+	       src/CSPadConfigPars.py
+	       src/CSPadImageProducer.py
+	       src/CalibPars.py
+	       src/HDF5Methods.py
+
+2011-10-17 Mikhail S. Dubrovin
+	
+  CSPadImageProducer.py <- see the test example in main
+  CSPadConfigPars.py
+  CalibPars.py
+  CalibParsDefault.py
+  GlobalGraphics.py
+  GlobalMethods.py
+  HDF5Methods.py
+
