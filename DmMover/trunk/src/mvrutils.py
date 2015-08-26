@@ -84,5 +84,34 @@ def rm_remote_file(rhost, rfile, lfile, remote_cmd):
         return False
     return True
 
+# ========================================================================================
+ 
+def do_gluster_rename(srcfile, trgfile, ffbpath):
+    """ Try to rename a file using the gluster path. If it fails use local path.
 
+    Example:
+    >>> do_gluster_rename("/brick1/amotst13/xtc/e12.xtc.inprogress", "/brick1/amotst13/xtc/e12.xtc", "/reg/d/ffb/amo/amotst13/xtc")
+    """
+    
+    src = pjoin(ffbpath, os.path.basename(srcfile))
+    trg = pjoin(ffbpath, os.path.basename(trgfile))
 
+    logging.info("rename using gluster path")
+    starttime = time.time()
+
+    gluster_rename = False
+    try:
+        os.rename(src, trg)
+    except OSError:
+        logging.error("Gluster rename failed %s", src)
+    else:
+        if os.path.exists(trgfile):
+            gluster_rename = True
+
+    # rename local if gluster rename failed (exception or file still exists)
+
+    if not gluster_rename:
+        os.rename(srcfile, trgfile)
+    elap = time.time() - starttime
+
+    logging.info("Renamed file ffb elap %.1f used-gluster %s src %s", elap, gluster_rename, src)
