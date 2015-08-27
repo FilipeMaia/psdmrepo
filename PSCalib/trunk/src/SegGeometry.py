@@ -5,7 +5,7 @@
 Methods of this class should be re-implemented in derived classes with name pattern SegGeometry<SensorVers> 
 for pixel geometry description of all sensors.
 For example, CSPAD 2x1 sensor is implemented in class :py:class:`PSCalib.SegGeometryCspad2x1V1`.
-Access to all implemented sensors is available through the factory method in class :py:class:`PSCalib.SegGeometry`.
+Access to all implemented sensors is available through the factory method in class :py:class:`PSCalib.SegGeometryStore`.
 
 
 Usage of interface methods::
@@ -34,8 +34,8 @@ Usage of interface methods::
 
 @see :py:class:`PSCalib.SegGeometry`, :py:class:`PSCalib.SegGeometryCspad2x1V1`, :py:class:`PSCalib.SegGeometryStore`
 
-This software was developed for the SIT project.  If you use all or 
-part of it, please give an appropriate acknowledgment.
+This software was developed for the SIT project.
+If you use all or part of it, please give an appropriate acknowledgment.
 
 Revision: $Revision$
 

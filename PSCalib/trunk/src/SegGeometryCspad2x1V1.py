@@ -491,6 +491,8 @@ def test_2x1_mask(mbits=0377) :
     pc2x1 = SegGeometryCspad2x1V1(use_wide_pix_center=False)
     X, Y = pc2x1.get_seg_xy_maps_pix_with_offset()
     mask = pc2x1.pixel_mask_array(mbits)
+    print 'mask:\n%s' % mask
+    print 'mask.shape: ', mask.shape
     iX, iY = (X+0.25).astype(int), (Y+0.25).astype(int)
     img = gg.getImageFromIndexArrays(iX,iY,mask)
     gg.plotImageLarge(img, amp_range=(-1, 2), figsize=(8,10))

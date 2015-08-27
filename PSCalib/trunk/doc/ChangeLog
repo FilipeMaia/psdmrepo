@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-48
+2015-08-27 Mikhail S. Dubrovin
+- minor corrections of auto-doc.
+- add bunch of modules src/CalibPars*.py, src/GenericCalibPars.py, src/GlobalUtils.py
+	- to access calibration constants from python (PSAS-139)
+2015-08-24 Mikhail S. Dubrovin
+- SegGeometryCspad2x1V1::pixel_mask_array - fix filling 2x1 last row of zeros.
+
 Tag: V00-02-47
 2015-07-10 Mikhail S. Dubrovin	
 - fixed compiler complains in method rotation_cs() for RHEL7 migration (PSAS-171)

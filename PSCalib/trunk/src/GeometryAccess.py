@@ -50,9 +50,6 @@ Revision: $Revision$
 @version $Id$
 
 @author Mikhail S. Dubrovin
-
-Interface
-
 """
 #--------------------------------
 __version__ = "$Revision$"

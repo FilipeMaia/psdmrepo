@@ -13,7 +13,7 @@ segments/sensors to access their pixel geometry uling :py:class:`PSCalib.SegGeom
 
 Usage::
 
-    from PSCalib.SegGeometryStroe import sgs
+    from PSCalib.SegGeometryStore import sgs
 
     sg = sgs.Create('SENS2X1:V1', pbits=0377)
     sg2= sgs.Create('EPIX100:V1', pbits=0377)

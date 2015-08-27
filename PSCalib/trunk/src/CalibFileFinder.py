@@ -4,7 +4,7 @@
 
 Usage::
 
-    from PSCalib.CalibFileFinder improt CalibFileFinder
+    from PSCalib.CalibFileFinder import CalibFileFinder
 
     cdir  = '/reg/d/psdm/CXI/cxi83714/calib/'
     group = 'CsPad::CalibV1'

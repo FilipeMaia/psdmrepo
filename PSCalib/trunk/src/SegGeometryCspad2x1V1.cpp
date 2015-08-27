@@ -277,13 +277,13 @@ const SegGeometry::pixel_mask_t* SegGeometryCspad2x1V1::pixel_mask_array(const u
   if(mbits & 1) {
     // mask edges
     for (size_t r=0; r<ROWS; r++) {
-      m_pix_mask_arr[r][0]         = 0;
+      m_pix_mask_arr[r][0]      = 0;
       m_pix_mask_arr[r][COLS-1] = 0;
     }
 
     for (size_t c=0; c<COLS; c++) {
-      m_pix_mask_arr[0][c]         = 0;
-      m_pix_mask_arr[ROWS-1][0] = 0;
+      m_pix_mask_arr[0][c]      = 0;
+      m_pix_mask_arr[ROWS-1][c] = 0;
     }
   } 
 
