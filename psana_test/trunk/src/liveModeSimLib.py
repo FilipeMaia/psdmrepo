@@ -15,7 +15,8 @@ simLiveMode - launches a bunch of threads doing inProgressCopyWithThrottle
 '''
 
 def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_ext, 
-                               max_mbs, delay_between_writes, forceOverwrite, verbose, lock=None):
+                               max_mbs, delay_between_writes, forceOverwrite, verbose, 
+                               lock=None, timeout=0.0):
     '''copies a file to an inprogress file with throttling. Renames the file when done.
 
     Copies a src to a dest in a sequence of blocks and sleeps between blocks. The caller can control 
@@ -37,6 +38,7 @@ def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_
                        (if they exist)
       verbose - debugging output about each block write
       lock=None - valid lock from multiprocessing must be passed if verbose is True
+      timeout - if > 0, stop after this much time
     '''
     ## helper function
     def vprint(msg):
@@ -63,7 +65,6 @@ def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_
             if os.path.exists(destInProgress): 
                 os.unlink(destInProgress)
 
-    assert mb_per_write > 0.0
     bytesPerRead = max(1,int((1<<20)*mb_per_write))
     readAll=True
     maxBytesToRead = -1
@@ -87,6 +88,8 @@ def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_
                 toRead = maxBytesToRead - totalBytesWritten
                 block = block[0:toRead]
                 hitMaxToRead = True
+        if timeout > 0.0 and (time.time()-t0) > timeout:
+            hitMaxToRead = True
         numWritten = destInProgressFile.write(block)
         totalBytesWritten += numWritten
         assert len(block)==numWritten, "only wrote %d bytes, but read %d" % (numWritten, len(block))
@@ -102,11 +105,13 @@ def inProgressCopyWithThrottle(src, dest, start_delay, mb_per_write, inprogress_
 
 def parseStreamDictOption(streams, optionString, typeArg):
     '''parses a string that specifies values for a set of streams.
+
     ARGS:
       streams - list of streams that need values set
       optionString - string, see examples for format, comma separatered, and intervals
                      of streams can be specified
       typeArg  - such as int or float, what to cast string values to
+
     RETURN:
       a dict whose keys are equal to streams, and values come from parsing optionString.
       If optionString does not specify a value for all streams, an exception is thrown

@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-33
+2015-8-27 David Schneider
+- add data mover script to test live small data. JIRA-85
+
 Tag: V00-08-32
 2015-8-14 David Schneider
 - disable live mode sim unit test since it failed once on a nightly in  
