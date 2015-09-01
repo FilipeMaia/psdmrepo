@@ -173,6 +173,7 @@ def getStreamMoverParams(ftype, stream, moverParams):
 def sumFileSizes(filenames):
     total = 0
     for fname in filenames:
+        if not os.path.isfile(fname): return 0
         total += os.stat(fname).st_size
     return total
 
@@ -191,6 +192,7 @@ def getAllFiles(stream2xtcFiles):
 
 def constructMoverProcess(srcFile, destFile, moveParams, timeout, verbose, lock, 
                           max_mb_write=0.0, overwrite=True):
+    assert os.path.exists(srcFile), "constructMoverProcess received srcfile that doesn't exist: %s" % srcFile
     process = multiprocessing.Process(target=liveModeLib.inProgressCopyWithThrottle,
                                       args=(srcFile,
                                             destFile,
@@ -223,6 +225,9 @@ def moveAllChunks(streamFtype2chunkCurrentProcess, stream2xtcFiles, args, lock):
                     doneKeys.append(key)
                     continue
                 srcFile = stream2xtcFiles[stream][ftype].pop(0)
+                if not os.path.isfile(srcFile):
+                    doneKeys.append(key)
+                    continue
                 destFile = os.path.join(outdir[ftype], os.path.basename(srcFile))
                 moveParams = getStreamMoverParams(ftype, stream, moverParams)
                 if args.timeout > 0:
@@ -256,6 +261,8 @@ def dataMover(args):
         for ftype, outdir in zip(['xtc','smalldata'],[xtcOutDir, smalldataOutDir]):
             if len(stream2xtcFiles[stream][ftype])==0: continue
             srcFile = stream2xtcFiles[stream][ftype].pop(0)
+            if not os.path.isfile(srcFile):
+                continue
             destFile = os.path.join(outdir, os.path.basename(srcFile))
             moveParams = getStreamMoverParams(ftype, stream, moverParams)
             key = '%s_stream_%d' % (ftype, stream)
@@ -275,7 +282,6 @@ def dataMover(args):
             t0, process = timeProcess
             process.terminate()
         raise kb
-
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=programDescription, 
@@ -302,7 +308,6 @@ if __name__ == '__main__':
     assert args.run is not None, "You must supply a run with -r"
     assert os.path.exists(args.inputdir), "Did not find input directorty: %s" % args.inputdir
     assert os.path.exists(args.outputdir), "Did not find output directorty: %s" % args.outputdir
-    assert os.path.exists(os.path.join(args.outputdir,'smalldata')), "Did not find smalldata subdir in output directorty: %s" % os.path.join(args.outputdir,'smalldata')
 
     if args.config is not None:
         assert os.path.exists(args.config), "config file not found: %s" % args.config

@@ -10,12 +10,17 @@
 #--------------------------------
 import sys
 import os
+import time
+import stat
 import tempfile
 import unittest
 import subprocess as sb
 import psana
 import pickle
 import shutil
+import random
+import collections
+import glob
 import numpy as np
 from psana_test import epicsPvToStr
 import psana_test.psanaTestLib as ptl
@@ -793,9 +798,132 @@ class Psana( unittest.TestCase ) :
 
         # now that we've finished and tests have passed, remove the temp directory under data/psana_test/liveModeSim
         shutil.rmtree(destDir)
-        
+
+    @unittest.skip("complicated test - skip for now. JIRA PSAS-182")
+    def testLiveModeConsistantEventOrder(self):
+        '''make sure that live mode always reads through events in the same order.
+        print event id's on inprogress files, and complete files and compare.
+        '''        
+        ##### helper functions
+        def copyTestDataToNewStagingLocation(params):
+            destDirBase = ptl.getDataArchDir(pkg='psana_test', 
+                                             datasubdir='test_output', 
+                                             archsubdir='liveModeSim')
+            destDir = tempfile.mkdtemp(dir=destDirBase, prefix='tmpStaging_')
+            srcDir = os.path.join(ptl.getMultiFileDataDir(), 'test_009_%s' % params.expname)
+            for srcXtc in glob.glob(os.path.join(srcDir, '*.xtc')):
+                destXtc = os.path.join(destDir, os.path.basename(srcXtc))
+                os.system('cp %s %s' % (srcXtc, destXtc))
+            return destDir
+
+        def readDgramHeaders(xtc, dgramOffsets):
+            f = file(xtc,'rb')
+            headers = []
+            for dgramOffset in dgramOffsets:
+                f.seek(dgramOffset)
+                headers.append(f.read(16))
+            f.close()
+            return headers
+
+        def writeDgramHeaders(xtc, dgramOffsets, newHeaders):
+            oldSize = os.stat(xtc).st_size
+            os.chmod(xtc, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IWGRP)
+            f = file(xtc,'r+b')
+            for dgramOffset in dgramOffsets:
+                f.seek(dgramOffset)
+                f.write(newHeaders.pop(0))
+            f.close()
+            newSize = os.stat(xtc).st_size
+            assert oldSize == newSize
+
+        def randomizeEventIds(destDir):
+            for xtc in glob.glob(os.path.join(destDir,'*.xtc')):
+                cmd = 'xtclinedump dg %s' % xtc
+                stdout,stderr = ptl.cmdTimeOut(cmd)
+                assert stderr.strip()=='', "stderr is %s" % stderr
+                L1AcceptDgramOffsets = [int(ln.split(' offset=')[1].split(' tp=')[0],16) for \
+                                        ln in stdout.split('\n') if ln.find(' L1Accept ex')>0]
+                headers = readDgramHeaders(xtc, L1AcceptDgramOffsets)
+                random.shuffle(headers)
+                writeDgramHeaders(xtc, L1AcceptDgramOffsets, headers)
+
+        def startSlowishDataMover(params, stagingDir):
+            destDirBase = ptl.getDataArchDir(pkg='psana_test', 
+                                             datasubdir='test_output', 
+                                             archsubdir='liveModeSim')
+            inProgressDir = tempfile.mkdtemp(dir=destDirBase, prefix='tmpInProgress_')
+            os.mkdir(os.path.join(inProgressDir, 'smalldata'))
+            mvCmd = 'python psana_test/src/psanaTestDataMover.py'
+            mvCmd += ' -i %s' % stagingDir
+            mvCmd += ' -r %d' % params.run
+            mvCmd += ' -o %s' % inProgressDir
+            mvCmd += ' -p 3'
+            mvCmd += ' -m .1'
+            if params.verboseMover:
+                mvCmd += ' -v'
+                print mvCmd
+            os.system('%s&' % mvCmd)
+            return inProgressDir
+
+        def eventIdCmd(params, inProgressDir, outputfile, livemode):
+            liveStr = {True:':live', False:''}
+            cmd =  'psana -m PrintEventId exp=%s:run=%d:dir=%s%s' % \
+                   (params.expname, params.run, inProgressDir, liveStr[livemode])
+            cmd += ' 2>&1 | grep -v warning > %s' % outputfile
+            return cmd
+            
+        def readEventIdsFromLiveInProgress(params, inProgressDir):
+            time.sleep(3)
+            finishedFiles = glob.glob(os.path.join(inProgressDir, '*.xtc'))
+            inProgressFiles = glob.glob(os.path.join(inProgressDir, '*.xtc.inprogress'))
+            assert len(finishedFiles)==0
+            assert len(inProgressFiles)>0
+            if params.verboseMover:
+                print "Before starting psana on inprogress:\n%s" % ptl.cmdTimeOut("ls -lrth %s" % inProgressDir)[0]
+            
+            eventIdsOut = os.path.join(inProgressDir, "eventid.inprogress.output")
+            cmd = eventIdCmd(params, inProgressDir, eventIdsOut, livemode=True)
+            if params.verboseMover:
+                print cmd
+            os.system(cmd)
+            return eventIdsOut
+
+        def readEventIdsFromLiveFinished(params, inProgressDir):
+            finishedFiles = glob.glob(os.path.join(inProgressDir, '*.xtc'))
+            inProgressFiles = glob.glob(os.path.join(inProgressDir, '*.xtc.inprogress'))
+            assert len(inProgressFiles)==0
+            assert len(finishedFiles)>0
+
+            eventIdsOut = os.path.join(inProgressDir, "eventid.finished.output")
+            cmd = eventIdCmd(params, inProgressDir, eventIdsOut, livemode=False)
+            if params.verboseMover:
+                print cmd
+            os.system(cmd)
+            return eventIdsOut
+
+        def compareEventIds(params, inProgressEventIds, finishedEventIds):
+            cmd = 'diff -u %s %s' % (inProgressEventIds, finishedEventIds)
+            if params.verboseMover:
+                print cmd
+            stdout, stderr = ptl.cmdTimeOut(cmd)
+            self.assertEqual(stderr.strip(),'', "Error on cmd=%s\nstderr=\n%s" % (cmd, stderr))
+            self.assertEqual(stdout.strip(),'', "Error on cmd=%s\nstdout=\n%s" % (cmd, stdout))
+
+        ########### end helper functions
+        Params = collections.namedtuple('Params',['expname', 'run', 'verboseMover'])
+        params = Params(expname='amob5114', run=477, verboseMover=False)
+        random.seed(23521)
+        stagingDir = copyTestDataToNewStagingLocation(params)
+        randomizeEventIds(stagingDir)
+        inProgressDir = startSlowishDataMover(params, stagingDir)
+        inProgressEventIds = readEventIdsFromLiveInProgress(params, inProgressDir)
+        finishedEventIds = readEventIdsFromLiveFinished(params, inProgressDir)
+        compareEventIds(params, inProgressEventIds, finishedEventIds)
+        # now that we've finished and tests have passed, remove the temp directory under data/psana_test/liveModeSim
+        shutil.rmtree(stagingDir)
+        shutil.rmtree(inProgressDir)
+
+
 if __name__ == "__main__":
     unittest.main(argv=[sys.argv[0], '-v'])
 
-#live mode=/reg/neh/home/davidsch/rel/liveMode/data/psana_test/liveModeSim/tmpq_1lty/livemode-delay_s80_then_catchup-sub-inprogress.stdout
-# offline=/reg/neh/home/davidsch/rel/liveMode/data/psana_test/liveModeSim/tmpq_1lty/offline_DumpDgram.stdout

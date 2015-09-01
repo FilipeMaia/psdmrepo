@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-34
+2015-8-31 David Schneider
+- extend data mover script to handle no small data files.
+- add unit test for JIRA PSAS-182 - verify live/inprogress event order
+  consistant with linear mode. Disable test so as to not complicate nightly.
+
 Tag: V00-08-33
 2015-8-27 David Schneider
 - add data mover script to test live small data. JIRA-85
