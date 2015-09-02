@@ -11,6 +11,12 @@ Package author: Wilko Kroeger
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2015-09-03 Wilko Kroeger
+- added options to resubmit requests for which the HPSS to disk transfer failed
+- allow to select experiment when updating the request status
+- more commands for dmt-cntl and query options.	
+
 Tag: V00-01-00
 2015-05-26
 - renamed tools to use common prefix (dmt)
