@@ -47,7 +47,7 @@ def trgpath_param(mode, path=None):
         """ Return  (reg_ana, cr_instr, rpath)  """
         
         #  (register_to_ana_tb, create_xtc_only, instr_in_trg_path, rootpath)
-        if mode == "dss-ffb":
+        if mode == "dss-ffb" or mode == "dsslocal-ffb":
             return (True, True, False, path)
         elif mode in ("ioc-ffb", "ioclocal-ffb"):
             if instr.upper() in ('AMO', 'CXI', 'MEC', 'SXR', 'XCS', 'XPP'):
@@ -84,5 +84,34 @@ def rm_remote_file(rhost, rfile, lfile, remote_cmd):
         return False
     return True
 
+# ========================================================================================
+ 
+def do_gluster_rename(srcfile, trgfile, ffbpath):
+    """ Try to rename a file using the gluster path. If it fails use local path.
 
+    Example:
+    >>> do_gluster_rename("/brick1/amotst13/xtc/e12.xtc.inprogress", "/brick1/amotst13/xtc/e12.xtc", "/reg/d/ffb/amo/amotst13/xtc")
+    """
+    
+    src = pjoin(ffbpath, os.path.basename(srcfile))
+    trg = pjoin(ffbpath, os.path.basename(trgfile))
 
+    logging.info("rename using gluster path")
+    starttime = time.time()
+
+    gluster_rename = False
+    try:
+        os.rename(src, trg)
+    except OSError:
+        logging.error("Gluster rename failed %s", src)
+    else:
+        if os.path.exists(trgfile):
+            gluster_rename = True
+
+    # rename local if gluster rename failed (exception or file still exists)
+
+    if not gluster_rename:
+        os.rename(srcfile, trgfile)
+    elap = time.time() - starttime
+
+    logging.info("Renamed file ffb elap %.1f used-gluster %s src %s", elap, gluster_rename, src)

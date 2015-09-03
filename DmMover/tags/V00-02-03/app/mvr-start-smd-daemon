@@ -1,0 +1,114 @@
+#!/bin/bash 
+
+
+
+function node_requested() {
+    # check if a allowed node ($1) is requested. return 0 if true
+    for req in ${REQ_NODES} ; do
+        req=${req#daq-}
+        [[ ${req} = ${1} ]] && return 0
+    done
+    return 1
+}
+
+function debug() {
+    if [ ${DEBUG} -eq 1 ] ; then
+        echo "$*"
+    fi
+}
+
+set -e
+
+TEST=
+DEBUG=0
+while getopts :Td OPT; do
+    case $OPT in
+        T|+T) TEST=echo ;;
+        d|+d) DEBUG=1 ;;
+        *)
+            echo "usage: ${0##*/} [+-T} [--] ARGS..."
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+REQ_NODES=$*
+PROCSERV="/reg/g/pcds/package/procServ-2.5.1/procServ --noautorestart --holdoff 60 --ignore ^D^C"
+
+cmd=$(type -p mv2offline-ana)
+if [[ -z "${cmd}" ]] ; then
+    echo "No command found"
+    exit 1
+fi
+echo "Using ${cmd}"
+
+# . /reg/g/psdm/bin/sit_setup.sh /reg/neh/home1/wilko/release_dev/data_mover
+
+#nodes=(ioc-cxi-rec01 ioc-fee-rec01 ioc-fee-rec02 ioc-fee-rec03 ioc-fee-rec04 ioc-sxr-rec01
+#    ioc-xcs-rec01 ioc-xcs-rec02 ioc-xcs-rec03 ioc-xpp-rec01 ioc-xpp-rec02
+#    ioc-xrt-rec01 ioc-xrt-rec02 ioc-xrt-rec03 ioc-xrt-rec04 ioc-xrt-rec05 ioc-und-rec01
+#    psana103::30::ffb-local
+#)
+
+nodes=("psana103::30::ffb-local" "/reg/d/cameras/ioc*::35::ioc-ffb")
+
+# workdir is local
+if ! cd /u1/psdm/mvr/log ; then
+    echo "Could not cd to workdir /u1/psdm/mvr/log"
+    exit 1
+fi
+
+let port_auto=1
+let baseport=31900
+for info in ${nodes[@]} ; do
+    node="${info%%:*}"
+    mode="${info##*:}"
+    mode="${mode:-ioc-ffb}"
+    port=$(echo "${info}" | sed -n -e 's/.*::\([^:]*\)::.*/\1/p')
+    if [[ -n "${port}" ]] ; then 
+        port=$(( ${baseport} + ${port} ))
+    else
+        port=$(( ${baseport} + ${port_auto} ))
+        port_auto=$(( ${port_auto} + 1 ))
+    fi
+    
+    #echo "$node" "$mode" ${port:-none}
+
+    # 
+    if [[ "${node:0:7}" = "/reg/d/" ]] ; then
+        seltype="dirpath"
+        selopt="${node}"
+        nodeid="smdiocdir"
+    else
+        seltype="host"
+        selopt="${node}"
+        nodeid="smd${node}"
+    fi
+    
+    
+    # check if only selected nodes should be started 
+    if [ $# -gt 0 ] && ! node_requested "${nodeid}" ; then
+        continue
+    fi
+    
+    logfile=/u1/psdm/mvr/log/mv2offline.${nodeid}
+    if [[ -e ${logfile} ]] && [[ "${TEST}" = "" ]]; then
+        mv_name=${logfile}.$(date +%Y%m%dT%H%M%S)
+        echo ${logfile} ${mv_name}
+        mv ${logfile} ${mv_name}
+    fi
+        
+    case "${mode}" in
+        ioc-ffb)   cmd_opts="-vv --smd --ireg" ;;
+        ffb-local|local) cmd_opts="-vv --smd --ireg" ;;
+        *) 
+            echo "Unknown mode"
+            continue ;;
+    esac
+    debug "sel: ${seltype}${selopt} port: ${port} mode: ${mode}  cmd-opts: ${cmd_opts}"
+    debug "$(pwd)"
+    
+    extra_opts="--logfile ${logfile} --name $(basename ${logfile}) ${port}"
+    ${TEST} ${PROCSERV} ${extra_opts} ${cmd} "--${seltype}" "${selopt}" --mode ${mode} ${cmd_opts} 
+done

@@ -1,0 +1,25 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package webfwk
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+A framework for building server-side and client-side applications
+
+Detailed description:
+=====================
+
+The framework provides a foundaton for a rapid construction of Web applications.
+
+The client (Web browser) side is based on JQuery, JQuery UI and a custom library
+of classes and widgets.
+
+The (Web) server side is represented by a library of PHP classes for implementing
+Web services, database accessors and other helpful services.

@@ -1,0 +1,26 @@
+#admin-notifications {
+    padding: 20px;
+}
+#admin-notifications .notes {
+    max-width:      680px;
+    font-size:      12px;
+}
+#admin-notifications > #tabs {
+    font-size:      12px;
+}
+#admin-notifications > #tabs .tab-body {
+    padding:        10px;
+    padding-left:   20px;
+    padding-bottom: 20px;
+    border:         solid 1px #b0b0b0;
+    font-size:      11px ;
+}
+#admin-notifications .hint {
+    padding-top:    4px;
+    color:          maroon;
+}
+
+#admin-notifications .info {
+    color:          maroon;
+}
+

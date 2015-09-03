@@ -4,15 +4,91 @@
 import os 
 import sys 
 import argparse
+from time import localtime
 from datetime import datetime
 
 import DmTapeRestore.trgdir as trgdir
 import DmTapeRestore.dbrestore as db
+from DmTapeRestore.restore import ns_to_date, exper_id_name
+
 
 import RegDB.experiment_info as regdb
 
 
-def rec_info():
+status = {'sub' : db.SUBMITTED, 'rec' : db.RECEIVED, 'new' : db.RECEIVED,
+          'done' : db.DONE, 'fail' : db.FAILED}
+
+#
+# Todo:
+#     Print row in row_order and convert time to readable format
+#
+
+row_order = ['status', 'exper_id', 'runnum', 'irods_filepath', 'file_type', 
+             'requested_time', 'requested_uid', 'irods_dst_resource', 'irods_src_resource']
+
+
+def runnum_or_fn(spec):
+    if spec.isdigit():
+        return {'runnum' : int(spec)}
+    else:
+        return {'fn' : spec}
+        
+        
+def parse_sel(args):
+    """ Interpret the arguments from a parser and create a dict with key:values that
+    will be used in an SQL query to select restore requests. 
+    """
+
+    vals = args.sel_spec
+    sel = {}
+
+    # query:  exp status runnum|filename
+    if args.parser_name == 'query':
+        fns = ( lambda x : exper_id_name(x), 
+                lambda x : {'status' : status.get(x, None)},
+                lambda x : runnum_or_fn(x))
+        for x, fn in zip(vals, fns):
+            sel.update(fn(x))
+
+    # update: status irods_file_name
+    if args.parser_name == "update":
+        sel['status'] = status.get(vals[0], None)
+        sel['fn'] = vals[1]
+
+    # add: exp 'xtc' runnum stream chunk |  exp 'hdf5' runnum
+    return sel
+
+def do_query(args):
+    """ Query for restore requests """
+
+    opts = parse_sel(args)    
+    for row in db.query(opts):
+        request_time = ns_to_date(row['requested_time'])
+        print row['exper_id'], row['runnum'], row['status'], request_time, \
+            row['irods_filepath'], row['requested_uid']
+
+def do_update_status(args):
+    """ Update the status of an request using the file name"""
+    
+    opts = parse_sel(args)
+    db.set_status(opts['status'], opts['fn'])
+
+def do_add_file(args):
+    pass
+
+def do_status(args):
+    """ Show files with a certain status """
+
+    for req in db.files_with_status(status[args.stat]):
+        iname = req['irods_filepath']
+        if args.long:
+            print " ".join(["{}".format(v) for v in req.itervalues()])
+            print req.keys()
+        else:
+            print req['status'], iname,  "EID=%d" % req['exper_id']
+
+
+def do_rec_info(args):
     """ Get all files in the recieve state and sort by exper """
 
     trg = trgdir.CheckTrgDir()
@@ -35,7 +111,6 @@ def rec_info():
         #else:
         #    received_exp[eid] = 1
 
-
     for eid, values in received_exp.iteritems():
         (nfiles, tmin_ns, tmax_ns) = values
         tmin = datetime.fromtimestamp(tmin_ns/1000000000)
@@ -47,40 +122,48 @@ def rec_info():
         if not stat:
             print "Missing", folder, stat
 
-
-
-#iname = '/psdm-zone/psdm/XCS/xcsc0113/xtc/e230-r0004-s03-c00.xtc'
-#db.set_status(db.DONE, iname)
-
-# ['status', 'irods_filepath', 'file_type', 'runnum', 'requested_uid', 'irods_dst_resource', 'requested_time', 'exper_id', 'irods_src_resource']
-
-
+# =========================================================================================
 
 def main():
 
-    status = {'sub' : db.SUBMITTED, 'rec' : db.RECEIVED, 'done' : db.DONE, 'fail' : db.FAILED}
-
     parser = argparse.ArgumentParser()
-
-    parser.add_argument("--listrec", action='store_true', help="status to query")
-    parser.add_argument("stat", choices = status.keys(), default='sub', nargs='?',
-                        help="status to query")
+    parser.add_argument("--long", "-l", action='store_true', 
+                        help="print long format (if applicable)")
     
+    subparsers = parser.add_subparsers(help='commands', dest="parser_name")
+
+    # status parser
+    stat_parser = subparsers.add_parser('stat', help='show request with certain status')
+    stat_parser.add_argument("stat", choices = status.keys(), default='sub', nargs='?',
+                             help="query for a particular status")
+    stat_parser.set_defaults(func=do_status)
+
+    # query 
+    query_parser = subparsers.add_parser('query', help="Select requests for experiment ")
+    query_parser.add_argument("sel_spec", nargs='*', help="ARGS: exp-id|name status fn|run-num")
+    query_parser.set_defaults(func=do_query)
+
+    # new: files in recieved state sorted by experiment
+    rec_parser = subparsers.add_parser('new', help='Show files that need to be restored (sorted by exp')
+    rec_parser.set_defaults(func=do_rec_info)
+    
+    # update status 
+    update_parser = subparsers.add_parser('update', help='update status for a file')
+    update_parser.add_argument("sel_spec", nargs=2, help="ARGS: status filename")
+    update_parser.set_defaults(func=do_update_status)
+
+    # add request
+    add_parser = subparsers.add_parser('add', help='update status for a file')
+    add_parser.add_argument("sel_spec", nargs='+', help="ARGS: ")
+    add_parser.set_defaults(func=do_add_file)
+
     try:
         args = parser.parse_args()
     except SystemExit:
         return 0
 
-    # print for each experiment how many files are in RECEIVED state
-    if args.listrec:
-        rec_info()
-        return 
-
-
-    for req in db.files_with_status(status[args.stat]):
-        iname = req['irods_filepath']
-        print req['status'], iname,  "EID=%d" % req['exper_id']
     
+    args.func(args)
 
 
 if __name__ == "__main__":

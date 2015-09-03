@@ -88,14 +88,18 @@ class CreateTrgDir:
         #    self.logger.info("Created dir for %s", exp.name)
         
 
+description = """
+Submit restore request to irods.
+"""
+        
 
 class SubmitRestore:
 
     def __init__(self):
-        parser = argparse.ArgumentParser()
-        parser.add_argument('-n', '--nfiles', type=int, default=1, help="files to submit")
-        parser.add_argument('--run', action='store_true')        
-        parser.add_argument('sel', nargs='?', help="select name")
+        parser = argparse.ArgumentParser(epilog=description)
+        parser.add_argument('-n', '--nfiles', type=int, default=1, help="max number of files to submit")
+        parser.add_argument('--run', action='store_true', help="do submit the restore request")        
+        parser.add_argument('sel', nargs='?', help="select only files that contain sel substring")
         self.args = parser.parse_args()
 
         self.trgdir = CreateTrgDir()

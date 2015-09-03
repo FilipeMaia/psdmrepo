@@ -1,0 +1,40 @@
+@CHARSET "ISO-8859-1";
+
+.runtables-ctrl {
+  width: inherit;
+  padding: 10px 10px 10px 10px;
+}
+.runtables-wa {
+  width: inherit;
+  padding: 10px 20px 10px 20px;
+  border-top: solid 1px #c0c0c0;
+}
+.runtables-info {
+  margin-bottom:10px;
+  color:maroon;
+}
+
+.runtables-body-tab-cont {
+  border: 1 solid #c0c0c0;
+  padding: 20px;
+  /*font-size: 11px;*/
+}
+
+#runtables-epics .runtables-body {
+  font-size: 11px;
+}
+
+div.runtables-calib-comment-cont {
+  max-height: 52px;
+  min-width: 480px;
+  overflow: auto;
+}
+div.runtables-calib-comment {
+}
+div.runtables-calib-comment pre {
+  margin: 0;
+  padding: 0;
+}
+textarea.runtables-calib-comment {
+  padding: 0;
+}

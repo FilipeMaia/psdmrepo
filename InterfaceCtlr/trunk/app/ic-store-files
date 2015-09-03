@@ -123,6 +123,10 @@ class ICStoreFiles ( AppBase ) :
         self._parser.add_option ( "--listonly",
                                   action="store_true", default=False,
                                   help="listonly missing files, do not register files" )
+
+        self._parser.add_option ( "--daq_exp",
+                                  action="store_true", default=False,
+                                  help="Check daq experiment. By default experiments with name XXXdaqXXXXX will be ignored")
     #
     #  Run the whole thing after parsing the command argunments and 
     #  installing logger. See BbrPyApp class for details.
@@ -173,9 +177,14 @@ class ICStoreFiles ( AppBase ) :
         try:
             # check all experiments
             for instr, exp in experiments :
-                
+
+                if not self._options.daq_exp and exp[3:6] == "daq":
+                    self.debug("Ignore Experiment %s", exp)
+                    continue
+
                 self.info( "Processing experiment %s:%s scan usr-dir %s", instr, exp, self._options.findusr )
                 parm = dict ( instrument=instr, instrument_lower=instr.lower(), experiment=exp )
+                continue
                 
                 # usr/ files. Do not process xtc or hdf5
                 if self._options.findusr:

@@ -1,0 +1,24 @@
+#dictionary-equipment {
+    padding:        20px;
+}
+#dictionary-equipment > #updated-info {
+    margin-top:     20px;
+}
+#dictionary-equipment > #tables {
+    margin-top:     10px;
+}
+#dictionary-equipment > #tables > .table-cont {
+    margin-right:   20px;
+}
+#dictionary-equipment > #tables > .table-cont > .table {
+    margin-top:     10px;
+}
+#dictionary-equipment .info {
+    color:          maroon;
+}
+#dictionary-equipment div.visible {
+  display: block;
+}
+#dictionary-equipment div.hidden {
+  display: none;
+}

@@ -1,0 +1,304 @@
+/* 
+    Document   : Fwk
+    Created on : Apr 23, 2013, 12:09:54 PM
+    Author     : gapon
+    Description:
+        The stylesheet for the custom Fwk class.
+*/
+body {
+  margin: 0;
+  padding: 0;
+}
+#fwk-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 130px;
+  background-color: #e0e0e0;
+}
+#fwk-top-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 92px;
+  background-color: #ffffff;
+}
+
+#fwk-top-home {
+   padding-left:    10px;
+   padding-top:     10px;
+}
+#fwk-top-home > a > img {
+    height: 36px;
+}
+
+#fwk-top-title {
+  width: 100%;
+  height: 61px;
+}
+#fwk-title,
+#fwk-subtitle {
+  /*
+  font-family: "Times", serif;
+  font-family: 'lucida grande',tahoma,verdana,arial,sans-serif;
+  */
+  font-family:  'Source Sans Pro',Arial,sans-serif;
+  font-size:    28px;
+  font-weight:  bold;
+  text-align:   left;
+}
+#fwk-subtitle {
+  margin-left: 10px;
+  color: #0071bc;
+}
+#fwk-session-logout {
+  margin-left: 5px;
+  margin-right: 5px;
+  font-weight: bold;
+  color: red;
+}
+#fwk-context-header {
+  width: 100%;
+  height: 36px;
+  background-color: #E0E0E0;
+/*  border-bottom: 2px solid #e0e0e0;*/
+}
+#fwk-context {
+  margin-left: 0px;
+  padding-top: 10px;
+  padding-left: 10px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 12px;
+}
+#fwk-tools {
+  margin-right: 10px;
+  border-right: solid 1px #c0c0c0;
+}
+.fwk-tool {
+  float: left;
+  padding: 5px;
+  padding-right: 10px;
+  cursor: pointer;
+}
+.fwk-tool:hover {
+  background-color: #c0c0c0;
+}
+.fwk-tool-end {
+  clear: both;
+  width: 1px;
+}
+#fwk-search {
+  padding-top: 2px;
+  padding-right: 10px;
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 11px;
+}
+#fwk-search > div > img {
+  height:   20px;
+}
+
+#fwk-search-text {
+  border-radius: 3px;
+  font-size: 12px;
+  padding: 1px;
+  margin-top: 6px;
+}
+#fwk-left {
+  position: absolute;
+  left: 0;
+  top: 130px;
+  width: 200px;
+/*  border-top: 2px solid #a0a0a0;*/
+  border-top: 1px solid #a0a0a0;
+  overflow: auto;
+}
+#fwk-splitter {
+  position: absolute;
+  left: 200px;
+  top: 130px;
+  width: 1px;
+  overflow: hidden;
+  cursor: e-resize;
+  border-left: 1px solid #a0a0a0;
+  border-right: 1px solid #a0a0a0;
+}
+#fwk-center {
+  position: relative;
+  top:130px;
+  margin: 0px 0px 20px 201px;
+  margin-bottom: 0px;
+  overflow: auto;
+  background-color: #ffffff;
+  border-left: 1px solid #a0a0a0;
+/*  border-top: 2px solid #a0a0a0;*/
+  border-top: 1px solid #a0a0a0;
+}
+#fwk-login {
+/*  margin-top: 10px;*/
+  margin-top: 5px;
+/*  padding: 8px;*/
+  font-size: 70%;
+  font-family: Arial, Helvetica, Verdana, Sans-Serif;
+}
+#fwk-tabs {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  height: 32px;
+  width: 100%;
+  border: 0;
+  padding: 0;
+}
+div.fwk-tab {
+
+  margin-left: 3px;
+  margin-top: 5px;
+
+  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+
+  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
+
+/*  color: #0071BC;*/
+/*  border-right: 2px solid #a0a0a0;*/
+  border-right: 1px solid #a0a0a0;
+
+/*  border-radius: 5px;*/
+/*  border-bottom-left-radius: 0;*/
+/*  border-bottom-right-radius: 0;*/
+
+/*  -moz-border-radius: 5px;*/
+/*  -moz-border-radius-bottomleft: 0;*/
+/*  -moz-border-radius-bottomright: 0;*/
+
+  cursor: pointer;
+}
+
+div.fwk-tab:hover {
+  background: #d0e5f5 url(/jquery/css/custom-theme/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
+}
+div.fwk-tab-first {
+  margin-left: 0px;
+  float: left;
+
+  border-top-left-radius: 0;
+
+  -moz-border-radius-topleft: 0;
+}
+.fwk-tab-next {
+  float: left;
+}
+.fwk-tab-last {
+  float: left;
+}
+.fwk-tab-end {
+  clear: both;
+}
+div.fwk-tab-select {
+  font-weight: bold;
+  background: #e0e0e0;
+}
+
+#fwk-menu {
+  width: 100%;
+  height: 100%;
+  background: url('../../portal/img/menu-bg-gradient-4.png') repeat;
+  /*background-color: #E0E0E0;*/
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 75%;
+}
+#fwk-menu-title {
+  height: 15px;
+}
+div.fwk-menu-item {
+  padding: 4px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+/*  color: #0071BC;*/
+  font-size: 13px;
+}
+div.fwk-menu-item:hover {
+  background:#f0f0f0;
+}
+.fwk-menu-select {
+  font-weight: bold;
+}
+.fwk-menu-group {
+  padding: 4px;
+  padding-left: 10px;
+  padding-bottom: 10px;
+  cursor: pointer;
+  color: #0071BC;
+  font-size: 13px;
+}
+.fwk-menu-group-members {
+  padding: 4px;
+  padding-left: 20px;
+}
+.fwk-menu-group-members-hidden {
+  display: none;
+}
+.fwk-menu-group-members-visible {
+  display: block;
+}
+.fwk-appl-wa {
+  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+  font-size: 75%;
+}
+.fwk-appl-wa-cont {
+}
+.fwk-hidden {
+  display: none;
+}
+.fwk-visible {
+  display: block;
+}
+
+/*
+    FEXME: Move these general styles elsewhere.
+ */
+a.link {
+    text-decoration:    none    !important;
+    font-weight:        bold    !important;
+    color:              #0071bc !important;
+}
+a:hover, a.link:hover {
+  color: red;
+}
+
+a.link[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-family: 'Segoe UI',Tahoma,Helvetica,Arial,Verdana,sans-serif;
+  font-weight: normal;
+  font-size: 12px;
+  text-align: left;
+}
+
+/*
+    Override JQuery UI styles
+*/
+li > a.ui-tabs-anchor {
+    font-size:      115%;
+    font-weight:    nomal;
+    color:          #000000 !important;
+}
+li.ui-tabs-active > a.ui-tabs-anchor {
+    font-weight:    bold !important;
+}
+.ui-corner-all {
+    -webkit-border-radius:  0 !important;
+    border-radius:          0 !important;
+}

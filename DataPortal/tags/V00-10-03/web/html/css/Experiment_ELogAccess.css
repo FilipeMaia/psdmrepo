@@ -1,0 +1,35 @@
+#exp-elog {
+    padding:    10px;
+}
+
+#exp-elog .info#updated {
+    margin-bottom:  5px;
+    color:          maroon;
+}
+#exp-elog > #body {
+    padding-left:   10px;
+    margin-right:   25px;
+}
+#exp-elog #operator > h2 {
+    margin-top:     5px;
+}
+#exp-elog #operator > div {
+    padding-left:   10px;
+    max-width:      520px;
+}
+#exp-elog #operator span.large {
+    font-size:      16px;
+    font-weight:    bold;
+}
+#exp-elog #operator #access {
+    margin-top:     10px;
+    margin-left:    15px;
+    margin-bottom:  15px;
+}
+#exp-elog #operator #access button {
+    font-size:  11px;
+    color:      black;
+}
+#exp-elog > #buttons > button[name="update"] img {
+    width:      11px;
+}

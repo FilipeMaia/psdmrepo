@@ -1,16 +1,25 @@
 #!/usr/bin/env python 
 
+from __future__ import print_function
 
 import os 
-import sys 
+import sys
 import argparse
+import datetime
 import subprocess
+from time import time
 
+import DmTapeRestore.restore as dmt
 import DmTapeRestore.dbrestore as db
+
+osp = os.path
 
 
 psdm_prefix = len("/psdm-zone/psdm/")
 
+def file_mtime(fn):
+    mtime = os.path.getmtime(fn)
+    return datetime.datetime.fromtimestamp(mtime).strftime("%Y-%m-%dT%H")
 
 def files_in_queue():
     
@@ -21,16 +30,31 @@ def files_in_queue():
     return in_queue
 
 def file_on_disk(iname):
-    
+    """ Check file status on disk """
     regpath = os.path.join("/reg/d/psdm/", iname[psdm_prefix:])
     if os.path.exists(regpath):
-        print "F ondisk", regpath
+        return "file-ondisk {}".format(file_mtime(regpath))
     elif os.path.exists("%s.fromtape" % regpath):
-        print "F stagefile ", regpath
+        return "stagefile-ondisk {}".format(file_mtime(regpath + ".fromtape"))
     else:
-        print "F notrace", regpath, iname 
+        return "file-missing"
         
 
+def resubmit_request(iname):
+    regpath = os.path.join("/reg/d/psdm/", iname[psdm_prefix:])
+    tmppath = regpath + ".fromtape"
+    
+    if osp.exists(regpath):
+        print("Can not fix", regpath, "exists")
+    elif not osp.exists(tmppath):
+        print("Can not fix", tmppath, "missing")
+    elif (time() - osp.getmtime(tmppath)) < 3600.0:
+        print("Can not fix", iname, "too recent (<1h)")
+    else:
+        print("Remove", tmppath, "and resubmit")
+        os.remove(tmppath)
+        db.set_status(db.RECEIVED, iname)
+        
 
 def main():
 
@@ -38,45 +62,50 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--run', action='store_true')
-
+    parser.add_argument('--listonly', '-l', action='store_true')
+    parser.add_argument('--max', type=int, default=-1,help="max number of files to update the status")
+    parser.add_argument('--fix', action='store_true', help="Resubmit requests with failed transfer")
+    parser.add_argument('--exp', help="select requests for experiment name or id")
+    
     try:
         args = parser.parse_args()
     except SystemExit:
         return 0
 
+    selection = {'status' : db.SUBMITTED}
+    if args.exp:
+        selection.update(dmt.exper_id_name(args.exp))
+    print(selection)
     
     irods_queue = files_in_queue()
-    #print "--- Check files in queue"
-    #for i in irods_queue:
-    #    file_on_disk(i)
 
-    # find all submitted files 
-    
-    
-    print "--- check submitted files "
     done, active = 0,0 
-    for req in db.files_with_status(db.SUBMITTED):
+    for req in db.query(selection):
         iname = req['irods_filepath']
-        #if iname.find('cxi') == -1 and iname.find('xcs') == -1:
-        #    continue
-
+        
         check_cmd = "ils -l %s | grep lustre-resc > /dev/null" % iname
-        #print check_cmd
         rc = os.system(check_cmd)
         
         if rc == 0:
+            if args.max >= 0 and done >= args.max:
+                print("max update requests reached")
+                break
             done += 1
-            print "DONE set", iname
-            db.set_status(db.DONE, iname)
+            print("DONE set", iname)
+            if not args.listonly:
+                db.set_status(db.DONE, iname)
         else:
             active += 1
             if iname in irods_queue:
-                print "File in queue", iname 
+                print("File in queue", iname)
             else:
-                print "request lost", iname 
-                file_on_disk(iname)
+                disk_status = file_on_disk(iname)
+                if args.fix:
+                    resubmit_request(iname)
+                print("request lost", disk_status, iname)
 
-    print done, active
+                    
+    print("Done set:", done, "active requests:", active)
 
 if __name__ == "__main__":
     main()

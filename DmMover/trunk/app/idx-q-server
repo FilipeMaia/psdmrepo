@@ -41,8 +41,6 @@ class CreateIdxFilesApp(AppBase):
         config = self.idx_config()
         print("CONFIG  " + "  ".join(( "{}:{}".format(x,y) for x,y in config.iteritems() )))
 
-
-
         wait_file = config.waitfile
         jqueue = JobQueue(config.dbpath)
 

@@ -1,0 +1,238 @@
+
+			====================================
+			The development ideas for Neo-CAPTAR
+			====================================
+
+
+__________________________________
+February 14, 2012 (short term plan)
+
++ move Excel generator to into neocaptar_cable_search.php?...[&format={excel|wiki|text}]
+  This will return URL and a name of the file instead of the actual list of cables
+
++ get rid of neocaptar_projuect_export.php
+
++ in neocaptar_search.js remember 'var params={}' which was used last time to make the search.
+  This will allow to reuse it for a purpose of exporting the last search into a desired format.
+
++ for visual consistency reason in 'Admin -> Cable Numbers' add the green bar before the table.
+
++ clear the fields in the 'Create Project' form after successful creation of a new project
+
++ replace number of cables 'in use' with Search in all Admin pages.
+
++ implement 'last active' in PHP scripts. This will be shown in the Admin -> Access Control
+
++ finalize editing Project Attributes by allowing the project owner to modify all but
+  the project owner field, and by allowing administrators to reassign projects to other managers.
+  Also add a web service for saving attributes in the database and updating the title.
+
++ load the dictionary as early as possible
+
++ add pinlist descriptions in the dictionary to allow adding an external URL to some
+  document. Allow to modify the dictionary entries to modify those URLs.
+
++ enable partial editing of cables after they're 'Registered' (got official JOB and CABLE numbers).
+  Edit only those fields which are not source and destination location names.
+
++ implement cable labels in PDF
+
++ implement project URL which can be used to communicate between various personnel
+  involved into cable management. Within each open project add an input field with
+  the project URL which can be cut and past.
+
++ prevent non-privileged project managers from changing cable status. Only managers
+  can do so. Ordinary project managers can only create projects and edit cables.
+
++ send e-mail notifications to all administrators when a new project is created
+
++ reinforce width of input fields in dictionary and cable editor
+
+
+- test printing cable labels
+
+- (Amedeo wanted this to be deferred) make Excel spreadsheet document compatible with their
+  existing standard (see examples on Confluence page:
+  https://confluence.slac.stanford.edu/display/PCDS/XCS+CAPTAR%2C+%28sheets+ordered+by+cable+number%29
+
+- expand the history table to record changes made when editing cables
+
+- Call for workflow review meeting (Amedeo and cable people). This is meant to refine
+  the workflow process: who can do what and in which sequence. We may need to define
+   more specific roles for people who're involved into implementing the cable requests.
+
+___________________________________________________
+December 16, 2011 (notes after a meeting with Jing)
+
+Input from Jing:
+
+
+/* BASED ON Jan 4, 2012 discussion with Jing, POSTPONE THIS UNTIL WE WILL
+ * GAIN MORE EXPERIENCE WITH THE SOFTWARE. BESIDES, RACKS CAN BE SHARED BY
+ * INSTRUMENTS. HENCE THE ONLY UNIQUE THING HERE
+ *
+ *   location -> rack -> ele(vation at a rack) -> device -> connection (port?)
+ *
+ *    - introduce a dictionary of instrument names
+ *    - add an instrument name as an optional property of a cable. 
+ *      [ NOTE: this information is for internal use only. It's not going to propagate
+ *              to the official CAPTAR database. ]
+ *    - introduce an association between racks and instrument names (in addition
+ *      to an existing association between a rack and its location. Use this association
+ *      to limit choices of racks if a particular instrument is selected.
+ */
+
+
+  - when 'registering' a cable allow using a non-standard generator of cable numbers
+    (the standard one is based on a location name. The non standard one will allow
+    choosing any existing registration from the Admin page).
+
+  - extend the 'Admin' page to allow adding arbitrary cable sequences. Perhaps we
+    should stop calling them 'locations', but rather call them 'job number sequence'?
+    Add a flag indicating that a particular sequence is associated with a location.
+
+  - allow associating a description with a pinlist. This can be a URL onto a remote document
+    at Confluence or elsewhere. Actually, give user multiple options here:
+
+      -- build in textual description
+      -- URL where to find the description (Confluence, etc.)
+      -- upload a file (PDF, or a image format or a text) with a thumbnail preview
+
+  - extend project definition and add the "Assigned To" property to indicate a person who will
+    be in charge of executing the project. This is the person with whom we will associate
+    job numbers.
+
+  - allow limited editing of cables at the 'Registered' stage. Do not allow editing
+    JOB number, CABLE #, and destination name.
+
+  - what about editing project owner/assignee?
+
+  + rename 'system' column of a cable into 'Formal Device Name'
+
+Other comments:
+
+  - cables are processed by three groups: Jing does the planning, Paco/Lupe fabricates
+    the cables, and someone installs and tests them.
+
+_________________________________________
+December 14, 2011 (tasks to be implemented)
+
+  + extend database schema to keep a track of cable status transitions (when and who)
+  + implement 'H' button to display a history in a table of a splash window (Jquery UI modal dialog)
+  + do not allow 'L' (Label) button until the cable is registered
+
+  - add project-level group operations for cable states ('Register all Planned projects', etc.).
+    Implement sanity checking (only allow registration if all fields are properly filled out).
+
+  - implement database backend for editing project attributed: trigger jobnumber allocation updates
+    if changing an owner. Then test registering more cables with the new owner.
+
+  - implement a registry for project owners ('Admin'->'Project Owners')
+
+  + implement other transitions for cable state (Registered->Labeled, etc.)
+
+  - implement e-mail notifications to the project owner when changing cable state.
+    Have e-mail notifications be configured in the 'Admin' page.
+
+  + extend the Web services to return the number of occurrences for each dictionary element.
+  - warn a user attempting to delete a dictionary element if there is at least 1 client (reference) of it (to it)
+  - turn the number of references into a URL landing at the search page on which all cables using this element will be reported
+
+  + implement project search
+  - add project 'Reload' button to refresh the list of cables. Make sure to post
+    a warning if there is an open editing session.
+
+  + proceed to Search and make it compatible with the list of cables in Projects
+  - consider restricting the number of cables returned or do not allow editing to speed up the GUI.
+    Alternatively do not show any tools in there. Instead of that use the link to the project to jump straight to that project
+    where all editing can be done.
+
+  - refined model for the group operations on project's cables: replace 'submit project'
+    with operations similar to what is defined for individual cables. The implementation
+    should simply loop over eligible cables and invoke operations one-by-one. Functions
+    for those operations are already implemented.
+
+  + implement column reduction according to check-boxes in the 'Display' group
+
+  - revisit font sizes. Specify the base size for <body> at some main index.php, and
+    use relative sizes (% of that base) elsewhere in the 'downstream' HTML (static or dynamic).
+
+__________________________________
+October 06, 2011 (planning meeting)
+
+  Here is a summary of a discussion (following my mock-up presentation)
+  with Amedeo's cable people. Some suggestion are about how to improve/change
+  the GUI of the mock-up.
+
+  _______________
+  1. Cable status
+
+    Each cable will be allowed to have a separate status:
+
+      Planned
+      Registered (AKA "submitted")
+      Labeled
+      Fabrication
+      Ready
+      Installed
+      Commissioned
+      Damaged
+      Retired
+
+    Group operations on the whole project (like 'Submit') will still be allowed.
+
+  ____________________________
+  2. On overall project status
+
+    Derive the project status based on a status of included cables as follows:
+
+    - if all cables are in the same state then use that state as the project status
+    - otherwise put 'in-progress'
+
+    Add multiple columns on the projects table to indicate statistics on cables
+    being in different state:
+
+      Pln Rgs Lbl Fbr Rdy Ins Cms Dmg Rtr
+      --- --- --- --- --- --- --- --- ---
+        0  12   3   0  12   4  23   0   0
+
+  _________________
+  3. Editing cables
+
+    Not allow to do so after printing the label.
+    Just put the cable into 'Retired' state and start a new cable
+
+  ______________________________________________________________________
+  4. Enforced (schema) restrictions for locations & system (device name)
+
+    Apparently there is LCLS naming convention guide which requires to limit
+    options when entering the following descriptions:
+
+      location / crate / slot / side => system (formal device) name
+
+    Regular users (customers) injecting projects & cables will be given limited
+    (and proven to exist) options/choices when entering/modifying cables.
+    Administrators will be able to extend the schema in two ways:
+
+    - when editing a cable there will be an option (in the select)
+      to allow adding a new location/crate/slot/side
+
+    - or doing this up-front using a separate page on the Cable's tab which
+      would be implemented similar to Cable type/connector/pin list.
+
+  _________________________
+  5. Job numbers generation
+
+    Generate a new number when submitting the project or the first individual cable of
+    the project. On top of that implement an administrative control:
+
+    - for mapping user accounts to TLAs
+    - and what's the last used or next available job number for each
+      registered person
+
+  __________________________
+  6. Reports on each project
+
+    There was a request to consider adding various reports on the database. 
+    Details will be discussed later when it will be known which reports are
+    needed.

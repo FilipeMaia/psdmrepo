@@ -1,0 +1,120 @@
+.elog-msg-viewer > #ctrl {
+  margin: 15px 0px 0px 0px;
+}
+.elog-msg-viewer > #body {
+  margin: 0px;
+  margin-top: 10px;
+  padding: 0px;
+}
+
+.elog-msg-viewer > #body .group-viewer {
+  margin: 10px;
+  margin-left: 16px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+}
+
+.elog-msg-viewer .m-id {
+  padding: 0px 4px 0px 2px;
+  margin: 2px;
+  border-radius: 2px;
+  background-color: #ffffff;
+}
+.elog-msg-viewer .m-run {
+  font-weight: bold;
+}
+.elog-msg-viewer .m-attach {
+  display: inline;
+  padding-bottom: 6px;
+  margin: 2px;
+}
+.elog-msg-viewer .m-subj-deleted {
+  text-decoration: line-through;
+}
+.elog-msg-viewer .m-subj-notes {
+  color: red;
+  font-style: italic;
+}
+
+.elog-msg-viewer .m-cont {
+  padding: 10px;
+  padding-right: 0;
+  padding-top: 0;
+}
+
+.elog-msg-viewer .m-cont .url-cont {
+  float: left;
+}
+.elog-msg-viewer .m-cont .button-cont {
+  float: right;
+/*  padding-left: 5px;*/
+}
+.elog-msg-viewer .m-cont .button-cont-last {
+  clear: both;
+}
+
+.elog-msg-viewer .m-cont .button-cont-left {
+  float: left;
+  padding-left: 5px;
+}
+.elog-msg-viewer .m-cont .button-cont-left-last {
+  clear: both;
+}
+
+.elog-msg-viewer .m-cont > .message {
+}
+.elog-msg-viewer .m-cont > .message > pre {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.elog-msg-viewer .m-cont > .attachments {
+  margin-top: 15px;
+  padding-left: 5px;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach {
+  float: left;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding:5px;
+  border: 1px solid #ffffff;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach:hover {
+/*  border: 1px dashed maroon;*/
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+}
+
+.elog-msg-viewer .m-cont > .attachments > .attach-last {
+  clear: both;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach > .preview {
+  margin-bottom:5px;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach > .attrname {
+  float: left;
+  width: 40px;
+  text-align: right;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach > .attrval {
+  float: left;
+  padding-left: 5px;
+  text-align: left;
+  color: maroon;
+}
+.elog-msg-viewer .m-cont > .attachments > .attach > .attrend {
+  clear: both;
+}
+
+.elog-msg-viewer .m-cont > .tags {
+  margin-top: 10px;
+  padding-top: 5px;
+  border-top: 1px solid #c0c0c0;
+}
+.elog-msg-viewer .m-cont > .tags > span {
+  color: maroon;
+}
+.elog-msg-viewer .m-cont > .children {
+  margin-top: 30px;
+}
+
+

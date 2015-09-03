@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>An example of the PropList widget</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+<style>
+body {
+    margin:         0px;
+    padding:        0px;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.test {
+    margin-left:    20px;
+}
+.test h3 {
+    margin:         0px;
+}
+.test > #proplist {
+    margin-left:    40px;
+}
+.test > .notes {
+    max-width:      640px;
+    font-family:    Lucida Grande,Lucida Sans,Arial,sans-serif;
+    font-size:      12px;
+}
+button {
+    background:     rgba(240, 248, 255, 0.39) !important;
+    border-radius:  2px !important;
+}
+button > span {
+    color:          black;
+    font-size:      10px;
+}
+</style>
+
+<script data-main="../webfwk/js/test_proplist_main.js" src="/require/require.js"></script>
+
+</head>
+<body>
+    <div class="test">
+        <h2>PropList</h2>
+        <div class="notes" >
+            <p>This is a test for the PropList widget. Property values can be edited if needed.
+               A simple demonstration of that is available via an additional RadioBox widget
+               placed before the list. By pressing the <b>EDIT FIRST</b> button the value cell
+               of the first property will be turned into the editing mode. The second button
+               <b>VIEW MODE</b> would extract the edited value and display the one within the cell.
+            </p>
+        </div>
+        <div id="radiobox" style="float:left;" ></div>
+        <div id="proplist" style="float:left;" ></div>
+        <div               style="clear:both;" ></div>
+    </div>
+</body>
+</html>

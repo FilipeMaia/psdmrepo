@@ -1,0 +1,76 @@
+#runtables-epics {
+  padding:          0;
+}
+
+#runtables-epics > #tabs {
+  padding:          0;
+  background:       0;
+  font-size:        11px;
+}
+
+#runtables-epics > #tabs > ul {
+  background:       #f5f8f9 url(images/ui-bg_inset-hard_100_f5f8f9_1x100.png) 50% 50% repeat-x;
+}
+#runtables-epics > #tabs > ul > li {
+  border-radius:    0 !important;
+}
+
+#runtables-epics > #tabs #ctrl {
+  padding:          10px 10px 0px 20px;
+  background-color: #ffffff;
+  font-size:        12px;
+}
+
+#runtables-epics > #tabs #ctrl > .buttons {
+  float:            left;
+  margin-left:      20px;
+  margin-right:     20px;
+}
+#runtables-epics > #tabs .control-button {
+  color:            #000000;
+  font-size:        11px;
+}
+#runtables-epics > #tabs .update-button img {
+    width:          11px;
+}
+
+#runtables-epics > #tabs #ctrl > .group {
+  float:            left;
+  margin-right:     10px;
+}
+#runtables-epics > #tabs #ctrl > .group > span.label {
+  display:          inline;
+  margin-bottom:    5px;
+  margin-right:     5px;
+  font-weight:      bold;
+}
+#runtables-epics > #tabs #ctrl > .group > input {
+  display:          inline;
+  margin-bottom:    5px;
+  margin-right:     5px;
+}
+#runtables-epics > #tabs #body {
+  margin-top:       20px;
+  padding:          0px 10px 10px 20px;
+  background-color: #ffffff;
+  font-size:        12px;
+}
+#runtables-epics > #tabs #body > #table_ctrl span {
+  display:          inline-block;
+  margin-right:     5px;
+  font-weight:      bold;
+}
+#runtables-epics > #tabs #body > #table {
+  margin-top:       5px;
+  overflow-x:       auto;
+  overflow-y:       hidden;
+}
+
+#runtables-epics .info {
+  color: maroon;
+}
+#runtables-epics a.link {
+    text-decoration:    none !important;
+    font-weight:        bold !important;
+    color:              #0071bc !important;
+}

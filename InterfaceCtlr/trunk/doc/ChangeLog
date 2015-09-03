@@ -10,6 +10,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag V01-03-16
+2015-09-02 Wilko Kroeger
+- By default do not scan the daq experiments (e.g.: CCCdaqNN). There is an option
+  to force scanning them.	
+	
 Tag V01-03-15
 2015-06-02
 - added CreateIDB_v2.sql to create controller database (used for iface_db_dqm)

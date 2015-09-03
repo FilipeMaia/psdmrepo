@@ -1,0 +1,87 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package irep
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-07
+2015-08-07  Igor Gaponenko
+- RHEL7, Apache 2.4, PHP 5.4 migration (JIRA PCI-37)
+
+Tag: V00-02-06
+2014-12-19 Igor Gaponenko
+- fixed a bug in the Dictionary application. It was requering the
+"Administrator" privilege to extend/modify the Dictionary where
+the "Dictionary" privilege is required only.
+
+Tag: V00-02-05
+2014-11-03 Igor Gaponenko
+- finished old code cleanup in a context of JIRA ticket PSWA-10
+
+Tag: V00-02-04
+2014-11-03 Igor Gaponenko
+- implemented equipment export into Excel spreadsheets (JIRA ticket PSWA-23)
+
+Tag: V00-02-03
+2014-10-31 Igor Gaponenko
+- minor CSS improvements in the Equipment search application
+- implemented full text search for model description and equipment notest
+as per JIRA note PSWA-22
+
+Tag: V00-02-02
+2014-10-29 Igor Gaponenko
+- finished major refactoring of the application as per JIRA ticket PSWA-10
+
+Tag: V00-02-01
+2014-10-24 Igor Gaponenko
+- continuted major refactoring of the application as per JIRA ticket PSWA-10
+
+Tag: V00-02-00
+2014-10-10 Igor Gaponenko
+- started major refactoring of the application based on webfwk and RequireJS
+the new version is available via new.php instead of index.php.
+
+Tag: V00-01-02
+2014-04-30 Igor Gaponenko
+- minor refactoring to depend on webfwk/
+
+Tag: V00-01-01
+2014-03-17 Igor Gaponenko
+- Add an option for displaying model descriptions for each piece of equipment
+
+Tag: V00-01-00
+2013-07-25 Igor Gaponenko
+- database schema for equipment extended to support composed objects
+- extended equipment Editor to support object composition
+- extended equipment search reports to display parent/child relationships between equipment items (composition)
+- search by equipment notes
+- search by model description
+- improved and extended equipment search form
+- implemented seach based on the SLACid
+
+Tag: V00-00-05
+2013-05-16 Igor Gaponenko
+- implemented search by the description field
+
+Tag: V00-00-04
+2013-01-28 Igor Gaponenko
+- added a documentation string for SLACid ranges (schema, ws, and UI)
+
+Tag: V00-00-03
+2012-12-20 Igor Gaponenko
+- this is the Beta version of the application deployed for trial use
+
+Tag: V00-00-02
+2012-12-10 Igor Gaponenko
+- saving results of the on-going development
+
+Tag: V00-00-01
+2012-10-12 Igor Gaponenko
+- created project template

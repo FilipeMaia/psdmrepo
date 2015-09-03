@@ -1,0 +1,518 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package Translator
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-02-37
+2015-08-07 David Schneider
+- run unit tests in subdirectory based on SIT_ARCH so that buildbot can run
+  tests in parallel on different platforms.
+
+Tag: V00-02-36
+2015-07-28 David Schneider
+- fix bug with in the Translation of vlen ndarrays (JIRA PSAS-170)
+  reenable unit tests.
+
+Tag: V00-02-35
+2015-07-28 David Schneider
+- temporarily disable unit tests for rhel7 (JIRA PSRT-63)
+
+Tag: V00-02-34
+2015-07-27 Igor Gaponenko
+- fixed a bug in using the static_cast (JIRA PSRT-63)
+
+Tag: V00-02-33
+2015-7-8 David Schneider
+- add option exclude_config_eventdata to address JIRA PSAS-167	
+
+Tag: V00-02-32
+2015-6-26 David Schneider
+- update to pdsdata 8.3.1 with Epix::Config100aV2, JIRA PSAS-166
+
+Tag: V00-02-31
+2015-6-2 David Schneider
+- add full event key filter, opent eventkey_filter. JIRA PSAS-155
+
+Tag: V00-02-30
+2015-5-1 David Schneider
+- update to pdsdata 8.2.7 with BldDataAnalogInputV1, JIRA PSAS-144
+
+Tag: V00-02-29
+- fix bug with controlling ndarray chunking: JIRA PSAS-137
+  save 'class' of type in writer map. use this to lookup which dataset
+  creation properties to use.
+
+Tag: V00-02-28
+- add parameter useControlData to get chunking control.
+- added unit test for chunking. Still have bug for controlling ndarray
+  chunking separately: JIRA PSAS-137
+
+Tag: V00-02-27
+- add std: to use of type_info in header, JIRA PSAS-127
+
+Tag: V00-02-26
+- extend reporting on unused parameters to cover chunk parameters
+	
+Tag: V00-02-25
+- add diagnostic about how long fastindex search for other stream calib
+  cycles takes.
+- attempt to make fastindex a little faster by decreasing block size while
+  increasing the number of blocks searched. Notes in JIRA issue PSAS-118
+	
+Tag: V00-02-24
+- attempt to address problems with runs from xppf7815 - JIRA issue PSAS-117
+  call H5Fflush on master file after external links added and file created.
+  call H5Fflush on generally translated files before being closed.
+- check for valid dataset id's and group id's before closing.
+- close runGroupDir at appropriate point
+	
+Tag: V00-02-23
+- fix bugs in automatic translation files, can't have a # comment character
+  on a line with an integer parameter.
+
+Tag: V00-02-22
+- make two psana config files for automatic translation, one for standard,
+  and one for monitoring (new file is monitoring_translation.cfg). Although 
+  one file would work for both, it makes it easier to change one without 
+  affecting the other.
+
+Tag: V00-02-21
+- updated data/automatic_translation.cfg file for both the online monitoring
+  split scan translator, and the normal translator
+- updated data/default_psana.cfg - document the unknown_src_ok option
+  remove old documentation about batch based split scan
+
+Tag: V00-02-20
+- add option to ignore unknown src in src_filter list. JIRA issue PSAS-114
+- restore cleanup of newwriter unit test
+	
+Tag: V00-02-19
+- setting option type_filter to exclude psana did not turn off epics. It seems
+  that it should. It now turns off epics. If for some reason someone only wants to
+  translate EPICS, it will be a hassle to configure, but I don't think anyone is 
+  doing that.
+	
+Tag: V00-02-18
+- update to pdsdata 8.2.4 with EvrDataV4 and present function
+	
+Tag: V00-02-17
+- improved fastindex. Remember where previous calib cycle was for each stream to 
+  get a better start for next calib cycle. Don't just use the new position for the
+  one stream the master is reading. Addresses JIRA PSAS-110
+- Refactor of fastindex - introduce class to save state.	
+	
+Tag: V00-02-16
+- change unit test for mpi split scan to suppress warnings in psana output before
+  checking for errrors. The last test had 3 ranks, and they were overwriting the
+  string 'warning' in the stderr.
+	
+Tag: V00-02-15
+- Schema change - 4 to 5 (for EndData, no more Filtered:xxxx, and external cc file format)
+- deprecated: remove filtered group (list of events user filters). The translator will still 
+  filter events based on the special key string "do_not_translate", but no longer save event ids
+  of filtered events.
+- check for keys that are not expected from the config file and warn the user.
+- increase fastindex default search - Jira PSAS-110
+- deprecated: remove non MPI split scan, did not work as well as MPI version.
+- switch external calib cycle schema to be the same as regular files.
+- split scan: don't translate config from master. translate in all external cc files.
+  add link from master to first such translated data. 
+- due to change in where split scan config is translated, we get translation of Configure 
+  EBeam which we had lost. Change unit test to include it in psana_test.dump compare for
+  split scan.
+
+Tag: V00-02-14
+205-02-09 David Schneider	
+- translate strings from the config store
+- add unit test test_mpiSplitScan_endData
+- remove mpilaunch from unit tests, path is now set up correctly, not needed
+- add variables to H5Output for Run/Job endData, but not used yet
+	
+Tag: V00-02-13
+1015-02-06 David Schneider
+- create new groups CalibCycle:xxxx/EndData only if new data shows up in ConfigStore during endcalibcycle. Track JIRA PSAS-101.
+- add parameter split_cc_in_subdir to put split scan calib cycles in a subdirectory, JIRA PSAS-104 and JIRA PSWA-32
+- bump schema version from 4 to 5 due to possible new EndData group.
+- add file TestEndDataPsanaMod.py for future use with testing the EndData feature.
+
+Tag: V00-02-12
+1015-2-5 David Schneider
+- incorporate fastindex_02 tag from fastindex branch into trunk. 
+- tracks JIRA PSAS-98 to get fast translation in live/online mode. fastindex is
+  a temporary, less robust solution until small data PSAS-85 makes more progress.
+  At that point we should remove fastindex.
+	
+Tag: V00-02-11
+2015-2-4 David Schneider
+- update psddlc wrapper, JIRA PSAS-103
+	
+Tag: V00-02-10
+2015-2-3 David Schneider
+- clean up issue with modifiying generated code to exclude small data.
+  Wrote new ddl_Translator driver script that excludes it.
+- support DEVEL as well. Track JIRA PSAS-103
+
+Tag: V00-02-09
+2015-2-2 David Schneider
+- regenerate for new pdsdata 8.2.2 with EBeamV7 fix. Also OceanOptics DataV3 and 
+  test bits on Quartz configV2 and smlData.
+- track JIRA PSAS-103. Note issue with smlData. Some generated code was modified in this package.
+
+Tag: V00-02-08
+2014-11-25 David Schneider
+- regenerate for new pdsdata 8.1.10/psddldata V01-00-22 with TimeTool::ConfigV2, 
+  TimeTool::DataV2, Quartz::ConfigV2
+- Track JIRA issue PSAS-72
+
+Tag: V00-02-07
+2014-10-23 David Schneider
+- regenerate for new pdsdata 8.1.8/psddldata V01-00-19 with Epix::Config100aV1 and Epix::ElementV2
+  Track JIRA issue PSAS-56
+
+Tag: V00-02-06
+2014-10-15 David Schneider
+- regenerate for new pdsdata 8.1.7/psddldata V01-00-18 with Bld::BldDataSpectrometerV1
+  Track JIRA issue PSAS-50
+
+Tag: V00-02-05
+2014-10-03 David Schneider
+	- regenerate for new pdsdata 8.1.4/psddldata with:
+	Evr::IOConfigV2. Track JIRA issue PSAS-41
+
+Tag: V00-02-04
+2014-09-29 David Schneider
+- minor adjustment to default.cfg
+	
+Tag: V00-02-03
+2014-09-24 David Schneider
+- add option Translator.H5Output.printenv for h5-mpi-translate to print environment
+- adjust trace/debug printout, adjust time reporting
+- have mpi unit tests clean up after themselves
+	
+Tag: V00-02-02
+2014-09-18 David Schneider
+- regenerate for new pdsdata 8.1.3/psddldata with:
+  TimeTool::ConfigV1, TimeTool::DataV1, L3T::DataV2, GenericPgp::ConfigV1
+
+Tag: V00-02-01
+2014-09-16 David Schneider
+- Fix some bugs with mpi based split scan. Not production ready.
+- instrument code with macros for printing debug/trace messages.
+	
+Tag: V00-02-00
+2014-09-03 David Schneider
+- Introduce mpi based split scan. Adds dependency on openmpi.
+- Some cleanup/refactoring. Make some H5Output functionality public
+  so it can be accessed from H5MpiTranslateApp	
+
+Tag: V00-01-30
+2014-08-06 David Schneider
+- adjust unit tests to use $SIT_ROOT environment variable to 
+  construct path to test data
+
+Tag: V00-01-29
+2014-07-18 David Schneider
+- add hack to address src alias from s80 and DAQ mapping to same group
+  trac ticket:318 (see also trac ticket:279)
+
+Tag: V00-01-28
+2014-07-18 David Schneider
+- fix issue with event data appearing in both beginCalib and event.
+  trac ticket:317
+
+Tag: V00-01-27
+2014-07-17 David Schneider
+- Move h5 file closing from destructor to endJob. Address trac ticket #316
+- Move initialization into beginJob
+- Clarify documentation for calibration filtering
+
+Tag: V00-01-26
+2014-07-16 David Schneider
+- Protect against distinct configStore keys that map to the same hdf5 path.
+  Such distinct keys should be for duplicate data, see
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/279#comment:16
+
+Tag: V00-01-25
+2014-07-10 David Schneider
+- Adjust unit test for new version of numpy
+  address warning on rhel6
+
+Tag: V00-01-24
+2014-07-09 David Schneider
+- Better implementation of master file. Only last
+  few calib cycles may be dangling.
+
+Tag: V00-01-23
+2014-07-08 David Schneider
+- Fix timing message
+
+Tag: V00-01-22
+2014-07-07 David Schneider
+- Fix spelling in default_psana.cfg
+
+Tag: V00-01-21
+2014-07-07 David Schneider
+- Add SplitScan mode.
+  Basic implementation of master file:
+  some external links are dangling during translation.
+- Re-enable calibration unit tests.
+  Use snapshot of calibration files. 
+  pedestal appears to have changed, adjust unit test
+ 
+Tag: V00-01-20
+2014-07-03 David Schneider
+- update to new pdsdata with BldEBeamV6
+
+Tag: V00-01-19
+2014-06-30 David Schneider
+- Translate pixel gain V1 calibration data if present
+- document quiet switch for no output
+
+Tag: V00-01-18
+2014-06-25 David Schneider
+- report Translator event processing time as percentage of total time.
+- add switches for splitting hdf5 into separate calib cycles.	
+
+Tag: V00-01-17
+2014-06-17 David Schneider
+- update documentation about storing epics.
+
+Tag: V00-01-16
+2014-06-16 David Schneider
+- switch from using stamp to event tag for deciding when to write
+  epics pvs. trac ticket #310
+- add unit test for translating timetool data
+
+Tag: V00-01-15
+2014-06-14 David Schneider
+- add option to translate epics on every shot (don't check for change)
+  short term solution for problem with translating timetool pv's that
+  don't set sec/nsec
+	
+Tag: V00-01-14
+2014-06-14 David Schneider
+- regenerate with psddl V00-13-12: move default_psana.cfg into data subdir
+- regenerate with psddldata V01-00-10: trac ticket #309
+	
+Tag: V00-01-13
+2014-06-12 David
+- move automatic translation config file into data subdir.
+
+Tag: V00-01-12
+2014-06-12 David
+- add psana config file to be used during automatic translation
+
+Tag: V00-01-11
+2014-06-10 David
+- refactor between this package and package psddl_hdf2psana
+  move NDArrayParameters into psddl_hdf2psana
+- extend two unit tests to read back fixed and vlen arrays into psana
+  tests psddl_hdf2psana V00-09-09
+
+Tag: V00-01-10
+2014-05-30 David
+- a unit test was not cleaning up after itself.
+
+Tag: V00-01-09
+2014-05-30 David
+- fix bug that caused epics aliases with a / in them to be discarded.
+
+Tag: V00-01-08
+2014-05-19 David
+- correct how multi value epics pv's are translated.
+- track ticket #301.
+
+Tag: V00-01-07
+2014-05-18 David
+- fix bug when translating calibrated cspad in the presence of damaged 
+  cspad that caused the same h5 group for the cspad src to be created 
+  twice, causing a crash. fix bug, trac ticket #302.
+
+Tag: V00-01-06
+2014-05-16 David
+- add unit test for epics
+- step for trac ticket #301
+
+Tag: V00-01-05
+2014-05-15 David
+- use file and memory h5 typeids
+- first step for trac ticket #301
+
+Tag: V00-01-04
+2014-05-08 David
+- update for psddldata V01-00-09, bld GMD v2
+- trac ticket #300
+
+Tag: V00-01-03
+2014-05-02 David
+- update for psddldata V01-00-08, epix 10k
+- trac ticket #295
+
+Tag: V00-01-02
+2014-04-21 David
+- Write both fixed sized ndarrays and vlen ndarrays.
+- Add _vlen to ndarray type group names. Necessary to distinguish 
+  'translate_vlen:key' from 'key' (See ticket:289). 
+
+Tag: V00-01-01
+2014-04-17 David
+- Replace NDArray group name with fully qualified type names like
+  ndarray_uint8_2 or ndarray_const_uint8_2. Necessary to keep hdf5 path names
+  unique when event keys differ only by ndarry template params.
+- Add attributes to type, src, and src__key group names to reconstruct
+  parameters like event key and template parameters without parsing path.
+	
+
+Tag: V00-01-00
+2014-04-15 David
+- First production tag for replacing o2o-translate. Changes:
+- Don't create src alias links. remove create_alias_links option
+- switch calibration handling to be backward compatible with o2o-translate
+- remove include_uncalibrated_data and excluce_calibrated_data switches
+- add skip_calibrated switch
+- remove short_bld_name option - always write Bld names as o2o did
+
+Tag: V00-00-29
+2014-04-07 David
+- fix unit test
+
+Tag: V00-00-28
+2014-04-07 David
+- modify srckey group names, write noSrc__key rather than just key when no src given
+
+Tag: V00-00-27
+2014-04-07 David
+- change src/key separator to __ to better distinguish two in name.
+
+Tag: V00-00-26
+2014-04-02 Wilko
+- disable unit test that references tutorial data not accessible on build machine
+
+Tag: V00-00-25
+2014-03-28 David
+- forgot to check in code for unittest
+
+Tag: V00-00-24
+2014-03-28 David
+- change filtering so src_filter does not apply if there is a key with the src.
+
+Tag: V00-00-23
+2014-03-26 David
+- report start,end and processing time
+- report on non default values from configuration
+
+Tag: V00-00-22
+2014-03-26 David
+- fix bug L3T::Data, treat all Event level Pds::Src as equal.
+	
+Tag: V00-00-21
+2014-03-25 David
+- fix bug with what calibstore data to associate with cspad2x2
+- update unittest
+	
+Tag: V00-00-20
+2014-03-25 David
+- support for const ndarrays
+- add translation of calibStore data
+- added option to skip calibrated data
+- add option to skip calibStore data
+- replaced ndarray and string key filtering with general key filtering
+	
+Tag: V00-00-19
+2014-03-10 David
+- update for psddldata V01-00-05
+
+Tag: V00-00-18
+2014-03-05 Andy
+- update for psddldata V01-00-04
+
+Tag: V00-00-17
+2014-02-26 Andy
+- write-ndarray-to-h5-example.cpp: Env constructor argument have changed,
+  need to update the code for new interface
+
+Tag: V00-00-16
+2014-02-12 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+- change a diagnostic message, change group name for Event level Source
+	
+Tag: V00-00-15
+2014-02-03 David Schneider
+- change default value for store_epics 
+- add type_filter option 
+- add ddl_Translator to generate ddl depedenent code
+
+Tag: V00-00-14
+2014-01-15 David Schneider
+- fix bug with when scr_filter is initialized
+- add unit test for writing Alias Config
+- move codegen template from psddl package here
+
+Tag: V00-00-13
+2014-01-14 David Schneider
+- use AliasMap to create h5 soft links for Pds::Src groups
+
+Tag: V00-00-12
+2014-01-14 David Schneider
+- removing test xtc files from the data subdirectory.
+
+Tag: V00-00-11
+2014-01-13 David Schneider
+- updating to work with PSEvt V00-08-00, new tag with Alias support.
+  User should be able to use aliases in src filter list.
+	
+Tag: V00-00-10
+2014-01-13 David Schneider
+- using PSEvt::Source instead of string for user src filter list
+
+Tag: V00-00-09
+2014-01-09 David Schneider
+- cleaning user key strings before making h5 group names.
+
+Tag: V00-00-08
+2014-01-08 David Schneider
+- changing two type names to be backward compatible with o2o-translate.
+
+Tag: V00-00-07
+2014-01-06 David Schneider
+- Regenerating backend from psddl V00-13-01.
+- Updates Translator for ana-0.10.10
+
+Tag: V00-00-06
+2014-01-06 David Schneider
+- Fixing bug with unit tests - one test depended on removed testing scripts.
+
+Tag: V00-00-05
+2013-12-20 David Schneider
+- Finished testing - this version seems production ready.
+- Removed testing scripts.
+
+Tag: V00-00-04
+2013-12-19 David Schneider
+- Users can register new hdf writers for simple classes. 
+- Changed filtered event handling - event key "do_not_translate" can be
+  added to any data - can create numerous datasets in Filtered groups.
+
+Tag: V00-00-03
+2013-12-10 David Schneider
+- Changed epics handling. Previous version printed the current state of all
+  epics at the start of each calib cycle. This version only creates an epics
+  pv group/dataset in a calib cycle if it changed.
+
+Tag: V00-00-02
+2013-12-09 David Schneider
+- Bug fixes and more detailed debugging statements.
+- Command line wrapper for psana module.
+
+Tag: V00-00-01
+2013-12-04 David Schneider
+- first production tag, however more testing needs to be done before 
+  using in place of o2o-translate.

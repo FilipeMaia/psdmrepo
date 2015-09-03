@@ -1,0 +1,107 @@
+#!/bin/bash 
+#
+# Simple command to access the service for creating missing index files.
+# Needs to run on the same server that runs the queue
+#
+# Usage:  idx_queue.sh [-v]  comand [options | arg]
+#
+#  commands:
+#      new | sub | done   
+#         count files with corresponding status. With -v option print the file names
+#         instead of the file count.
+#      wait [stat|set|rm]  (default stat)
+#         actions on wait semaphore file
+#      add [-l] xtcfile1 .. xtcfile2  
+#         add requests to queue to create idx files for xtc's.
+#         -l: do not add request if idx exists
+#
+
+readonly DB=${DM_IDX_DB:-/u1/psdm/srv_idx/db}
+readonly DB_TIMEOUT=3000
+readonly WAITFN={DM_IDX_WAIT:-/u1/psdm/srv_idx/WAIT}
+
+list_status() {
+    local stat=$1
+    if [[ ${VERBOSE} -eq 1 ]] ; then
+        sqlite3 ${DB} "select fpath || '/' || xtcfn from idx where status = '$stat';"
+    else
+        sqlite3 ${DB} "select count(*) from idx where status = '$stat';"
+    fi
+}
+
+wait_status() {
+    case ${1:-stat} in
+        stat) 
+            if [[ -e ${WAITFN} ]] ; then
+                echo "wait semaphore exists"
+            else
+                echo "no wait semaphore"
+            fi
+            ;;
+        set)
+            touch ${WAITFN}
+            wait_status stat
+            ;;
+        rm) 
+            [[ -e ${WAITFN} ]] && rm ${WAITFN}
+            wait_status stat
+            ;;
+    esac
+}
+
+add_to_queue() {
+    # add xtc file to queue 
+    
+    if [[ "$1" = "-l" ]] ; then
+        check=1
+        shift 1
+    else
+        check=0
+    fi
+
+    for xtc in "$@" ; do
+        bn=$(basename ${xtc})
+        dn=$(dirname ${xtc})
+        sec=$(date +%s)
+        
+        if [[ ${check} -eq 1 ]] ; then
+            idx=${dn}/index/${bn}.idx
+            [[ -e ${idx} ]] && echo "Idx exists ${xtc}" && continue
+        fi
+
+        sqlite3 ${DB} <<EOF
+.timeout ${DB_TIMEOUT}
+INSERT INTO idx (xtcfn,fpath,date_added) VALUES ('${bn}','${dn}',${sec});
+EOF
+    done
+}
+
+# --------------------------------------------------------------------
+
+VERBOSE=0
+while getopts :v OPT; do
+    case $OPT in
+        v|+v) VERBOSE=1 ;;
+        *) sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+
+[[ ! -e ${DB} ]] && echo "No DB ${DB}" && exit 1
+
+case $1 in
+    add) shift 1 ; add_to_queue "$@" ;;
+    new) list_status NEW ;;
+    sub*) list_status SUBMIT ;;
+    done*) list_status DONE ;;
+    fail*) list_status FAIL ;;
+    wait) 
+        wait_status ${2} 
+        shift 1 ;;
+    *) 
+        sed -n -e '2,/^[^#]\|^$/ s/^#//p' $0
+        exit
+esac

@@ -1,0 +1,19 @@
+#datafiles-summary {
+  padding:          10px;
+}
+
+#datafiles-summary > #ctrl {
+    margin-bottom:  10px;
+}
+#datafiles-summary > #ctrl .info {
+  color:            maroon;
+}
+
+#datafiles-summary > #table {
+    margin-right:   20px;
+}
+#datafiles-summary > #buttons img {
+    width:          11px;
+}
+
+    

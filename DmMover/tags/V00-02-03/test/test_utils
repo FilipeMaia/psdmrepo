@@ -1,0 +1,92 @@
+#!@PYTHON@
+ 
+import sys
+import unittest
+
+import DmMover.mvrutils as mvr 
+
+
+#import network_name, trgpath_fn
+ 
+class MyTest( unittest.TestCase ) :
+ 
+    def setUp(self) :
+        """
+        Method called to prepare the test fixture. This is called immediately
+        before calling the test method; any exception raised by this method
+        will be considered an error rather than a test failure. 
+        """
+        pass
+ 
+    def tearDown(self) :
+        """
+        Method called immediately after the test method has been called and
+        the result recorded. This is called even if the test method raised
+        an exception, so the implementation in subclasses may need to be
+        particularly careful about checking internal state. Any exception raised
+        by this method will be considered an error rather than a test failure.
+        This method will only be called if the setUp() succeeds, regardless
+        of the outcome of the test method.
+        """
+        pass
+ 
+    def test_trgpath_ioc(self):
+        """ trgpath_param returns three parameter that are needed to create the 
+        target path for a file transfer. The parameter depend on the transfer mode. """ 
+        
+        trgfn = mvr.trgpath_param("ioc-ffb", "/test/d1")
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('cxi')
+
+        self.assertEqual(path, "/test/d1")
+        self.assertTrue(reg_ana)
+        self.assertTrue(incl_instr)
+        self.assertTrue(cr_xtc_only)
+
+        trgfn = mvr.trgpath_param("ioc-ffb", "/test/d1")
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('dia')
+
+        self.assertIsNone(path)
+        self.assertFalse(reg_ana)
+        self.assertTrue(incl_instr)
+        self.assertFalse(cr_xtc_only)
+
+
+    def test_trgpath_dss(self):
+        """ see test_trgpath_ioc  """
+
+        trgfn = mvr.trgpath_param("dss-ffb", "/brick1")
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('cxi')
+
+        self.assertEqual(path, "/brick1")
+        self.assertTrue(reg_ana)
+        self.assertFalse(incl_instr)
+        self.assertTrue(cr_xtc_only)
+
+
+    def test_trgpath_offline(self):
+        """ see test_trgpath_ioc  """
+
+        trgfn = mvr.trgpath_param("ffb-offline")
+        reg_ana, cr_xtc_only, incl_instr, path = trgfn('xpp')
+
+        self.assertIsNone(path)
+        self.assertFalse(reg_ana)
+        self.assertTrue(incl_instr)
+        self.assertFalse(cr_xtc_only)
+
+
+    def test_networkname(self):
+        """ Test the host name that mvr.network_name returns 
+        The name is used by a transfer as the src host """
+
+        self.assertEqual(mvr.network_name("daq-cxi-dss12"), "10.1.1.1")
+        self.assertEqual(mvr.network_name("psanaxppffb03"), "psanaxppffb03")
+        self.assertEqual(mvr.network_name("psana103"), "psana103")
+        self.assertEqual(mvr.network_name("ioc-und-rec01"), "psana-und-rec01")
+        self.assertEqual(mvr.network_name("ioct-und-rec01"), "ioct-und-rec01")
+        self.assertEqual(mvr.network_name("ioc-fee-rec02"), "psana-fee-rec02")
+ 
+
+
+if __name__ == '__main__':
+  unittest.main(argv=[sys.argv[0], '-v'])

@@ -1,0 +1,45 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psana-tools
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Brief description:
+==================
+Testing and diagnostic tools. Scripts for maintaining and manage test data.
+
+Detailed description:
+=====================
+
+Package includes the psana module dump, run as
+
+psana -m psana_test.dump datasource
+
+This is a DDL generated Python Psana module that dumps everything from 
+the data source. See the confluence page 
+
+https://confluence.slac.stanford.edu/display/PSDM/psana+-+Module+Catalog
+
+where a detailed description lives.
+
+It also includes the command line tool
+
+xtclinedump
+
+to look at xtc files. Run the program for the help message.
+
+Finally it includes the script
+
+psana_test/src/psanaTestLib.py
+
+for running regression tests, and managing test data.
+The internal confluence page
+
+https://confluence.slac.stanford.edu/display/PCDS/Psana_test+package
+
+includes more information.
+

@@ -1,0 +1,97 @@
+#!/bin/bash 
+
+usage() {
+    
+    cat <<EOF
+List ffb disk usage.
+
+Usage: 
+   mvr_showspaceffb [-a] <instr>  [exp]
+
+Example Usage:
+   showsapceffb all         ;; show disk usage for all ffb nodes (all instr)
+   showspaceffb cxi         ;; shows disk usage for all cxi ffb hosts    
+   showspaceffb cxi exp     ;; show cxi ffb disk usage by experiments
+   showspaceffb -a cxi exp  ;; show cxi ffb disk usage by experiments and age offiles
+                               Needs to run on a host with access to /reg/d/ffb/
+EOF
+}
+
+
+ffbhosts=/reg/g/psdm/psdatmgr/etc/config/ffbhosts
+
+
+sel_ffb_hosts() {
+    # select ffb hosts from the master list
+    if [ ${1:?} = 'all' ] ; then
+        # return file for pdsh
+        hosts="^${ffbhosts}"
+    else
+        # return comma separate list
+        hosts_spaces=$(grep "psana${1}ffb" ${ffbhosts})  
+        hosts=$(echo ${hosts_spaces} | tr ' '  ',')
+    fi
+    if [[ -z ${hosts} ]] ; then
+        echo "ERROR no ffb hosts found" 1>&2
+        exit 1
+    fi
+    echo ${hosts}
+}
+
+
+space_by_exp()
+{
+    tmpfile=/tmp/$(uuidgen)
+    
+    hosts=$(sel_ffb_hosts ${1:?})
+    ${PDSH} -w ${hosts} "du -sk /brick1/${1}*" > $tmpfile
+    
+    echo "    path         [GB]  ffb-node (only if usage > 1GB)"
+    grep /brick1/$1  $tmpfile | sort -k 3 | tr -d ':' | awk ' $2 > 1048576  {printf "%s %5d %s\n", $3,int($2/1024/1024),$1}'
+    echo " ----------------------------------------------------- "
+        
+    echo "    path          [GB]  start stop entries-in-xtc-dir"
+    for d in $(awk '/brick/ {print $3}' $tmpfile | sort -u) ; do
+        szGB=$(grep $d $tmpfile | awk '{x+=$2} ; END {print int(x/1024/1024)}')
+        
+        [[ ${szGB} -le 0 ]] && continue
+
+        date_info=""
+        if [[ ${SHOW_AGE} -eq 1 ]] && [[ ${szGB} -gt 0 ]]; then
+            expname=$(echo $d | cut -d '/' -f3)
+            ffb_path=/reg/d/ffb/${expname:0:3}/${expname}/xtc 
+            date_info=$(ls --time-style=long-iso -ltr ${ffb_path} | egrep  '^-' |  awk ' NR == 2 {print $6} ; END {print $6, NR}')
+        fi
+
+        printf "%s %5d   %s %s  %s\n" ${d} ${szGB} ${date_info}
+    done | sort -n -k2
+    
+    [ -e $tmpfile ] && rm $tmpfile 
+}
+ 
+df_usage()
+{
+    hosts=$(sel_ffb_hosts ${1:?})
+    ${PDSH} -t 15 -u 10 -w ${hosts} df -hP /brick1 | grep -v Filesystem | column -t
+}
+
+
+readonly PDSH=pdsh
+SHOW_AGE=0
+while getopts :a OPT; do
+    case $OPT in
+        a|+a) SHOW_AGE=1 ;;
+        *) 
+            usage 
+            exit 2
+    esac
+done
+shift $(( OPTIND - 1 ))
+OPTIND=1
+
+instr=${1:-all}
+
+case ${2:-df} in
+    exp) space_by_exp ${instr} ;;
+    df) df_usage ${instr} ;;
+esac

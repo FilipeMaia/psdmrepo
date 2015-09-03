@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>An example of the CheckTable widget</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+<style>
+
+body {
+    margin: 0;
+    padding: 0;
+}
+h2 {
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+}
+.test {
+    padding: 10px 20px 20px 20px;
+}
+.test > #ctrl button {
+    width:100%;
+    border-radius: 2px;
+    font-size: 10px;
+    color: black;
+}
+.test > #checktable {
+    margin-top: 10px;
+}
+.test > #result {
+    margin-top: 20px;
+    margin-left: 40px;
+    color: maroon;
+}
+
+</style>
+
+<script data-main="../webfwk/js/test_checktable_main.js" src="/require/require.js"></script>
+
+</head>
+<body>
+    <div class="test">
+        <h2>CheckTable</h2>
+        <div id="ctrl" >
+            <table>
+                <tbody>
+                    <tr>
+                        <td><button name="insert_front"     title="Insert one row"                       >INSERT FRONT</button></td>
+                        <td><button name="append"           title="Append one row"                       >APPEND</button></td>
+                        <td><button name="remove_by_role"   title="Remove the PI of the experiment"      >REMOVE BY ROLE</button></td>
+                        <td><button name="remove_unchecked" title="Remove unchecked rows"                >REMOVE UNCHECKED</button></td>
+                        <td><button name="remove_all"       title="Remove all rows"                      >REMOVE ALL</button></td>
+                    </tr>
+                    <tr>
+                        <td><button name="find_checked"     title="Find the number of checked rows"      >FIND CHECKED</button></td>
+                        <td><button name="find_not_checked" title="Find the number of not checked rows"  >FIND NOT CHECKED</button></td>
+                        <td><button name="check"            title="Check all"                            >CHECK ALL</button></td>
+                        <td><button name="uncheck"          title="Un-check all"                         >UN-CHECK ALL</button></td>
+                    </tr>
+                    <tr>
+                        <td><button name="find_locked"      title="Find the number of locked rows"       >FIND LOCKED</button></td>
+                        <td><button name="find_not_locked"  title="Find the number of not locked rows"   >FIND NOT LOCKED</button></td>
+                        <td><button name="lock"             title="Lock all"                             >LOCK ALL</button></td>
+                        <td><button name="unlock"           title="Unlock all"                           >UNLOCK ALL</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div id="checktable" style="float:left;" ></div>
+        <div id="result"     style="float:left;" ></div>
+        <div style="clear:both;"></div>
+    </div>
+</body>
+</html>
